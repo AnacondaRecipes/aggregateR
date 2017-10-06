@@ -10,3 +10,10 @@ conda skeleton cran --output-suffix=-feedstock/recipe --recursive --update-polic
 # r-shinysky seems pretty dead these days. It was done as a fork of a fork of the real upstream and archived due to a lack of git tags.
 # r-rmr2 is also probably using archives due to a lack of git tags.
 # The other excluded packages are not R packages (rpy2, rstudio and metapackages).
+
+# .. to generate a (non-git) patch including new files and changes to submodules after updating the recipes but before having the guts to commit everything:
+
+# Signal 'intent to add' for all untracked files
+git add -N .
+git diff --submodule=diff --ignore-submodules=none > updates.patch
+git reset HEAD .
