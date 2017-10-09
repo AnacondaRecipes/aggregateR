@@ -1,4 +1,4 @@
-From 89ad2f62cd6cebe64c8ecde48f650b67ee0253fa Mon Sep 17 00:00:00 2001
+From 65533e437ef16f1eb0899785404eca211a3565ce Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Fri, 28 Oct 2016 14:46:13 +0100
 Subject: [PATCH 15/42] Win32 (MSVC): Do not use -lfoo to link to foo
@@ -15,15 +15,15 @@ unnecessary.
  src/CMakeLists.txt                               | 12 +++++++++
  src/cpp/core/CMakeLists.txt                      |  4 +--
  src/cpp/desktop/CMakeLists.txt                   |  2 +-
- src/cpp/desktop/synctex/rsinverse/CMakeLists.txt | 33 ++++++++++++------------
- src/cpp/desktop/urlopener/CMakeLists.txt         | 30 +++++++++++----------
- src/cpp/diagnostics/CMakeLists.txt               | 28 ++++++++++----------
- src/cpp/session/CMakeLists.txt                   | 30 +++++++++++----------
- src/cpp/session/consoleio/CMakeLists.txt         | 28 ++++++++++----------
- 8 files changed, 94 insertions(+), 73 deletions(-)
+ src/cpp/desktop/synctex/rsinverse/CMakeLists.txt | 32 +++++++++++++-----------
+ src/cpp/desktop/urlopener/CMakeLists.txt         | 30 +++++++++++-----------
+ src/cpp/diagnostics/CMakeLists.txt               | 28 +++++++++++----------
+ src/cpp/session/CMakeLists.txt                   | 30 +++++++++++-----------
+ src/cpp/session/consoleio/CMakeLists.txt         | 28 +++++++++++----------
+ 8 files changed, 94 insertions(+), 72 deletions(-)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 8edd57c..e9ce3bf 100644
+index 8edd57c16b..e9ce3bf141 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
 @@ -24,6 +24,18 @@ if ( (NOT RSTUDIO_SESSION_WIN64) AND
@@ -46,10 +46,10 @@ index 8edd57c..e9ce3bf 100644
  
  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/CMakeOverlay.txt")
 diff --git a/src/cpp/core/CMakeLists.txt b/src/cpp/core/CMakeLists.txt
-index 57d056c..e17ac7b 100644
+index 5803988968..bf5153e18a 100644
 --- a/src/cpp/core/CMakeLists.txt
 +++ b/src/cpp/core/CMakeLists.txt
-@@ -183,7 +183,7 @@ if (UNIX)
+@@ -187,7 +187,7 @@ if (UNIX)
     
           set(CORE_SYSTEM_LIBRARIES
              ${CORE_SYSTEM_LIBRARIES}
@@ -58,7 +58,7 @@ index 57d056c..e17ac7b 100644
     
           set(CORE_INCLUDE_DIRS
              ${CORE_INCLUDE_DIRS}
-@@ -260,7 +260,7 @@ else()
+@@ -266,7 +266,7 @@ else()
     add_subdirectory(zlib)
  
     # system libraries
@@ -68,10 +68,10 @@ index 57d056c..e17ac7b 100644
     # source files
     set(CORE_SOURCE_FILES ${CORE_SOURCE_FILES}
 diff --git a/src/cpp/desktop/CMakeLists.txt b/src/cpp/desktop/CMakeLists.txt
-index 60856c4..3880efd 100644
+index 9bebbcbcb8..5a91facfe0 100644
 --- a/src/cpp/desktop/CMakeLists.txt
 +++ b/src/cpp/desktop/CMakeLists.txt
-@@ -247,7 +247,7 @@ if(WIN32)
+@@ -251,7 +251,7 @@ if(WIN32)
                     ${CMAKE_CURRENT_BINARY_DIR}/rstudio.exe.manifest COPYONLY)
  
     if(MINGW)
@@ -79,19 +79,19 @@ index 60856c4..3880efd 100644
 +      set(LINK_FLAGS -Wl,-subsystem,windows ${_l}lversion)
        add_custom_command(
           OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/res.o"
-          COMMAND windres.exe
+          COMMAND "${WINDRES}"
 diff --git a/src/cpp/desktop/synctex/rsinverse/CMakeLists.txt b/src/cpp/desktop/synctex/rsinverse/CMakeLists.txt
-index 484a0ca..5180b36 100644
+index c5cca84999..6b0eec3a23 100644
 --- a/src/cpp/desktop/synctex/rsinverse/CMakeLists.txt
 +++ b/src/cpp/desktop/synctex/rsinverse/CMakeLists.txt
-@@ -36,22 +36,23 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rsinverse.rc.in
+@@ -36,22 +36,24 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rsinverse.rc.in
  configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rsinverse.exe.manifest
                  ${CMAKE_CURRENT_BINARY_DIR}/rsinverse.exe.manifest COPYONLY)
  
 -set(LINK_FLAGS -Wl,-subsystem,windows -lversion)
 -add_custom_command(
 -   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/res.o"
--   COMMAND windres.exe
+-   COMMAND "${WINDRES}"
 -      -I "."
 -      -i "rsinverse.rc"
 -      -o "${CMAKE_CURRENT_BINARY_DIR}/res.o"
@@ -102,13 +102,11 @@ index 484a0ca..5180b36 100644
 -set(RSINVERSE_SOURCE_FILES
 -   ${RSINVERSE_SOURCE_FILES}
 -   "${CMAKE_CURRENT_BINARY_DIR}/res.o")
--
--set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
 +if(MINGW)
 +   set(LINK_FLAGS -Wl,-subsystem,windows ${_l}version)
 +   add_custom_command(
 +      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/res.o"
-+      COMMAND windres.exe
++      COMMAND "${WINDRES}"
 +         -I "."
 +         -i "rsinverse.rc"
 +         -o "${CMAKE_CURRENT_BINARY_DIR}/res.o"
@@ -119,13 +117,15 @@ index 484a0ca..5180b36 100644
 +   set(RSINVERSE_SOURCE_FILES
 +      ${RSINVERSE_SOURCE_FILES}
 +      "${CMAKE_CURRENT_BINARY_DIR}/res.o")
+ 
+-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
 +   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
 +endif(MINGW)
  
  add_executable(rsinverse
    ${RSINVERSE_SOURCE_FILES}
 diff --git a/src/cpp/desktop/urlopener/CMakeLists.txt b/src/cpp/desktop/urlopener/CMakeLists.txt
-index 9b2ebcc..a91ea2e 100644
+index b9f40030e0..a194508091 100644
 --- a/src/cpp/desktop/urlopener/CMakeLists.txt
 +++ b/src/cpp/desktop/urlopener/CMakeLists.txt
 @@ -36,20 +36,22 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/urlopener.rc.in
@@ -135,7 +135,7 @@ index 9b2ebcc..a91ea2e 100644
 -set(LINK_FLAGS -Wl,-subsystem,windows -lversion)
 -add_custom_command(
 -   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/res.o"
--   COMMAND windres.exe
+-   COMMAND "${WINDRES}"
 -      -I "."
 -      -i "urlopener.rc"
 -      -o "${CMAKE_CURRENT_BINARY_DIR}/res.o"
@@ -150,7 +150,7 @@ index 9b2ebcc..a91ea2e 100644
 +   set(LINK_FLAGS -Wl,-subsystem,windows ${_l}version)
 +   add_custom_command(
 +      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/res.o"
-+      COMMAND windres.exe
++      COMMAND "${WINDRES}"
 +         -I "."
 +         -i "urlopener.rc"
 +         -o "${CMAKE_CURRENT_BINARY_DIR}/res.o"
@@ -166,7 +166,7 @@ index 9b2ebcc..a91ea2e 100644
  add_executable(urlopener
    ${URLOPENER_SOURCE_FILES}
 diff --git a/src/cpp/diagnostics/CMakeLists.txt b/src/cpp/diagnostics/CMakeLists.txt
-index c6b71d8..2c6756e 100644
+index 15925ef4f4..5ef68841e1 100644
 --- a/src/cpp/diagnostics/CMakeLists.txt
 +++ b/src/cpp/diagnostics/CMakeLists.txt
 @@ -41,19 +41,21 @@ if(WIN32)
@@ -175,7 +175,7 @@ index c6b71d8..2c6756e 100644
  
 -   add_custom_command(
 -      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/res.o"
--      COMMAND windres.exe
+-      COMMAND "${WINDRES}"
 -         -I "."
 -         -i "diagnostics.rc"
 -         -o "${CMAKE_CURRENT_BINARY_DIR}/res.o"
@@ -189,7 +189,7 @@ index c6b71d8..2c6756e 100644
 +   if(MINGW)
 +      add_custom_command(
 +         OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/res.o"
-+         COMMAND windres.exe
++         COMMAND "${WINDRES}"
 +            -I "."
 +            -i "diagnostics.rc"
 +            -o "${CMAKE_CURRENT_BINARY_DIR}/res.o"
@@ -205,16 +205,16 @@ index c6b71d8..2c6756e 100644
  
  add_executable(diagnostics
 diff --git a/src/cpp/session/CMakeLists.txt b/src/cpp/session/CMakeLists.txt
-index 011e4b3..b29af3e 100644
+index 4aa2327e10..5f200e9e91 100644
 --- a/src/cpp/session/CMakeLists.txt
 +++ b/src/cpp/session/CMakeLists.txt
-@@ -306,19 +306,21 @@ if(WIN32)
+@@ -339,19 +339,21 @@ if(WIN32)
     configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rsession.exe.manifest
                     ${CMAKE_CURRENT_BINARY_DIR}/rsession.exe.manifest COPYONLY)
  
 -   add_custom_command(
 -      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/res.o"
--      COMMAND windres.exe
+-      COMMAND "${WINDRES}"
 -         -I "."
 -         -i "rsession.rc"
 -         -o "${CMAKE_CURRENT_BINARY_DIR}/res.o"
@@ -228,7 +228,7 @@ index 011e4b3..b29af3e 100644
 +   if(MINGW)
 +      add_custom_command(
 +         OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/res.o"
-+         COMMAND windres.exe
++         COMMAND "${WINDRES}"
 +            -I "."
 +            -i "rsession.rc"
 +            -o "${CMAKE_CURRENT_BINARY_DIR}/res.o"
@@ -243,7 +243,7 @@ index 011e4b3..b29af3e 100644
     if(NOT RSTUDIO_SESSION_WIN64)
        add_subdirectory(consoleio)
     endif()
-@@ -342,7 +344,7 @@ endif()
+@@ -375,7 +377,7 @@ endif()
  # set link dependencies
  if(WIN32)
     set(RSTUDIO_CORE_ZLIB rstudio-core-zlib)
@@ -253,7 +253,7 @@ index 011e4b3..b29af3e 100644
  if(APPLE)
     find_library(MAC_APPKIT_LIBRARY NAMES AppKit)
 diff --git a/src/cpp/session/consoleio/CMakeLists.txt b/src/cpp/session/consoleio/CMakeLists.txt
-index 67aa6c6..0f51e89 100644
+index c013508a35..f8a17c535f 100644
 --- a/src/cpp/session/consoleio/CMakeLists.txt
 +++ b/src/cpp/session/consoleio/CMakeLists.txt
 @@ -36,19 +36,21 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/consoleio.rc.in
@@ -262,7 +262,7 @@ index 67aa6c6..0f51e89 100644
  
 -add_custom_command(
 -   OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/res.o"
--   COMMAND windres.exe
+-   COMMAND "${WINDRES}"
 -      -I "."
 -      -i "consoleio.rc"
 -      -o "${CMAKE_CURRENT_BINARY_DIR}/res.o"
@@ -276,7 +276,7 @@ index 67aa6c6..0f51e89 100644
 +if(MINGW)
 +   add_custom_command(
 +      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/res.o"
-+      COMMAND windres.exe
++      COMMAND "${WINDRES}"
 +         -I "."
 +         -i "consoleio.rc"
 +         -o "${CMAKE_CURRENT_BINARY_DIR}/res.o"
@@ -292,5 +292,5 @@ index 67aa6c6..0f51e89 100644
  add_executable(consoleio
    ${CONSOLEIO_SOURCE_FILES}
 -- 
-2.10.2
+2.15.0.rc0.37.gd35688db1.dirty
 

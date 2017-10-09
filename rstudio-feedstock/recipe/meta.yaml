@@ -1,4 +1,4 @@
-{% set version = '1.0.153' %}
+{% set version = '1.1.383' %}
 
 package:
   name: rstudio
@@ -8,7 +8,6 @@ source:
   git_url: https://github.com/rstudio/rstudio.git
   git_tag: v{{ version }}
   patches:
-    - 0000-remove-unused-C-method-registration.patch
     - 0001-macOS-Allow-disabling-R-framework.patch
     - 0002-Fix-program_options-for-Boost-1.59.patch
     - 0003-Boost-Define-MOVE_THREAD-t-as-t.move.patch
@@ -19,7 +18,7 @@ source:
     - 0008-Look-for-bin-R-in-CONDA_PREFIX.patch
     - 0009-Boost_USE_STATIC_LIBS-when-DEFINED-ENV-CONDA_BUILD.patch
     - 0010-Win32-Do-not-use-Rtools-when-DEFINED-ENV-CONDA_BUILD.patch
-    - 0011-Make-BOOST_VERSION-a-cache-var-do-not-use-1.50-when-.patch
+    - 0011-Make-BOOST_VERSION-a-cache-var-do-not-use-1.63.0-whe.patch
     - 0012-Add-missing-include-set.patch
     - 0013-Win32-IDispatch-is-a-struct-not-a-class.patch
     - 0014-Fix-SessionSource-macro-scoping-syntax-error-ifndef-.patch
@@ -38,44 +37,45 @@ source:
     - 0027-Win32-MSVC-Fix-SYNCTEX_DECLARE_CHARINDEX-not-sure-wh.patch
     - 0028-Conda-Define-CONDA_BUILD-when-ENV-CONDA_BUILD-for-rs.patch
     - 0029-Conda-Put-resources-in-share-rstudio.patch
-    - 0030-Conda-macOS-Do-not-call-runningApplicationsWithBundl.patch
-    - 0031-Conda-macOS-Use-bundleIdentifier-to-detect-running-f.patch
-    - 0032-Do-not-do-weird-fix-up-of-rpostbackPath.patch
-    - 0033-Conda-LD_LIBRARY_PATH-considered-harmful.patch
-    - 0034-Add-RSTUDIO_SUPPORTING_FILE_PATH-env-var-for-debuggi.patch
-    - 0035-Conda-Allow-symlinks-in-gwt-html-js.patch
-    - 0036-Win32-MSVC-Cannot-use-variadic-token-pasting-GNU-ext.patch
-    # - 0037-Get-rstudio-buildtools-from-local-storage.patch
-    - 0038-more-debugging.patch
-    - 0039-GWT-Debug-rpc-issues.patch
-    - 0040-GWT-Hacky-attempt-to-work-around-double-slash-issue.patch
-    - 0041-Remove-debug-output-and-forced-28080-port-number.patch
-    - 0042-Conda-Add-arch-suffix-to-the-QSettings-file.patch
-    - 0043-Use-conda-s-pandoc-when-CONDA_BUILD.patch
+    - 0030-Conda-macOS-Use-bundleIdentifier-to-detect-running-f.patch
+    - 0031-Do-not-do-weird-fix-up-of-rpostbackPath.patch
+    - 0032-Conda-LD_LIBRARY_PATH-considered-harmful.patch
+    - 0033-Add-RSTUDIO_SUPPORTING_FILE_PATH-env-var-for-debuggi.patch
+    - 0034-Conda-Allow-symlinks-in-gwt-html-js.patch
+    - 0035-Win32-MSVC-Cannot-use-variadic-token-pasting-GNU-ext.patch
+    - 0036-more-debugging.patch
+    - 0037-GWT-Debug-rpc-issues.patch
+    - 0038-Win32-Do-not-use-named-pipes-for-RStudio-rsession-co.patch
+    - 0039-GWT-Hacky-attempt-to-work-around-double-slash-issue.patch
+    - 0040-Remove-debug-output-and-forced-28080-port-number.patch
+    - 0041-Conda-Add-arch-suffix-to-the-QSettings-file.patch
+    - 0042-Use-conda-s-pandoc-when-CONDA_BUILD.patch
 
 build:
-  number: 1
+  number: 0
   skip: True           # [win and py<35]
   features:
     - vc14             # [win and py35]
 
 requirements:
   build:
+    - {{ compiler('cxx') }}  # [not win]
+    - m2-filesystem          # [win]
+    - m2-git                 # [win]
+    - git                    # [not win]
     # qtcreator is handy for debugging rsession (https://anaconda.org/qttesting/qtcreator)
-    # - qtcreator           # [win]
-    - gcc                   # [not win]
-    - libuuid               # [linux]
-    - jom                   # [win]
-    - m2w64-tools-git       # [win]
-    - ant                   # [osx]
-    - qt >=5.6              # [not osx]
-    - pandoc >=1.19.2       # [not linux]
-    - pandoc >=1.15.0       # [linux]
+    # - qtcreator            # [win]
+    - libuuid                # [linux]
+    - jom                    # [win]
+    - m2w64-tools-git        # [win]
+    - ant                    # [osx]
+    - qt >=5.6               # [not osx]
+    - pandoc >=1.19.2        # [not linux]
+    - pandoc >=1.15.0        # [linux]
     - cmake
     - boost >=1.61
     - r-base >=3.3.2
   run:
-    - libgcc                # [not win]
     - libuuid               # [linux]
     - qt >=5.6              # [not osx]
     - m2w64-grep            # [win]
@@ -84,8 +84,8 @@ requirements:
     - vs2015_runtime        # [win]
     - pandoc >=1.19.2       # [not linux]
     - pandoc >=1.15.0       # [linux]
-    - fonts-continuum
-    - r-essentials >=1.5.1
+    - fonts-anaconda
+    - r-essentials >=1.7.0
     # Using the notebook publish functionality requires the next 6 packages:
     - r-rstudioapi >=0.6
     - r-packrat >=0.4.8

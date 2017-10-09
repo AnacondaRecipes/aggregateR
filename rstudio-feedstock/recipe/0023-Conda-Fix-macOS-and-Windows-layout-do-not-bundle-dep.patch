@@ -1,4 +1,4 @@
-From 578431384783b0dd39f896e1ba29f5596e4ddc01 Mon Sep 17 00:00:00 2001
+From ea44eab85e9fadcf42026e667af37b543c188e82 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Sat, 29 Oct 2016 17:39:52 +0100
 Subject: [PATCH 23/42] Conda: Fix macOS and Windows layout, do not bundle deps
@@ -14,7 +14,7 @@ Subject: [PATCH 23/42] Conda: Fix macOS and Windows layout, do not bundle deps
  7 files changed, 92 insertions(+), 62 deletions(-)
 
 diff --git a/CMakeGlobals.txt b/CMakeGlobals.txt
-index 980d735..8cf4e00 100644
+index 980d735507..8cf4e002dd 100644
 --- a/CMakeGlobals.txt
 +++ b/CMakeGlobals.txt
 @@ -114,7 +114,7 @@ if(WIN32)
@@ -27,10 +27,10 @@ index 980d735..8cf4e00 100644
     set(RSTUDIO_INSTALL_SUPPORTING RStudio.app/Contents/Resources)
  else()
 diff --git a/dependencies/windows/install-dependencies.cmd b/dependencies/windows/install-dependencies.cmd
-index 27c274a..99580c3 100644
+index 3dffd9f117..5e864ee7ff 100644
 --- a/dependencies/windows/install-dependencies.cmd
 +++ b/dependencies/windows/install-dependencies.cmd
-@@ -54,28 +54,34 @@ if not "%CONDA_BUILD%" == "1" (
+@@ -57,28 +57,34 @@ if not "%CONDA_BUILD%" == "1" (
    )
  )
  
@@ -83,7 +83,7 @@ index 27c274a..99580c3 100644
  )
  
  if not exist sumatra\3.1.1 (
-@@ -174,8 +180,9 @@ if not exist libclang\%LIBCLANG_HEADERS% (
+@@ -204,8 +210,9 @@ if not exist libclang\%LIBCLANG_HEADERS% (
  )
  
  
@@ -96,7 +96,7 @@ index 27c274a..99580c3 100644
  popd
  
 diff --git a/package/win32/CMakeLists.txt b/package/win32/CMakeLists.txt
-index f8e047c..4c7acab 100644
+index f8e047c2bb..4c7acab588 100644
 --- a/package/win32/CMakeLists.txt
 +++ b/package/win32/CMakeLists.txt
 @@ -3,7 +3,8 @@
@@ -110,7 +110,7 @@ index f8e047c..4c7acab 100644
             DESTINATION "${RSTUDIO_INSTALL_BIN}/msys_ssh")
  endif()
 diff --git a/src/cpp/desktop-mac/CMakeLists.txt b/src/cpp/desktop-mac/CMakeLists.txt
-index 00b1f99..83cf1a1 100644
+index 00b1f99a4c..83cf1a145d 100644
 --- a/src/cpp/desktop-mac/CMakeLists.txt
 +++ b/src/cpp/desktop-mac/CMakeLists.txt
 @@ -70,26 +70,46 @@ file(GLOB PNG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/png/*.png)
@@ -181,10 +181,10 @@ index 00b1f99..83cf1a1 100644
  # install mac-terminal script
  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mac-terminal.in
 diff --git a/src/cpp/desktop/CMakeLists.txt b/src/cpp/desktop/CMakeLists.txt
-index ee57271..a1f51ed 100644
+index c2130e7e3d..bbcb894515 100644
 --- a/src/cpp/desktop/CMakeLists.txt
 +++ b/src/cpp/desktop/CMakeLists.txt
-@@ -284,14 +284,15 @@ endif(WIN32)
+@@ -288,14 +288,15 @@ endif(WIN32)
  # bundle it unless we are building on linux and NOT linking against the
  # qtsdk -- in that case we are linking against system versions of the
  # qt libraries which should therefore not be bundled
@@ -205,7 +205,7 @@ index ee57271..a1f51ed 100644
  
     add_executable(rstudio
        ${DESKTOP_SOURCE_FILES}
-@@ -336,8 +337,11 @@ if(NOT APPLE)
+@@ -341,8 +342,11 @@ if(NOT APPLE)
        ${LINK_FLAGS}
     )
  
@@ -218,7 +218,7 @@ index ee57271..a1f51ed 100644
  
     # configure Info.plist
     configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in
-@@ -370,17 +374,12 @@ else()
+@@ -375,17 +379,12 @@ else()
        ${COCOA_LIBRARY}
        ${SECURITY_LIBRARY})
  
@@ -242,7 +242,7 @@ index ee57271..a1f51ed 100644
  # bundle qt dependencies if this is a package build
  if(RSTUDIO_BUNDLE_QT)
 diff --git a/src/cpp/desktop/DesktopMain.cpp b/src/cpp/desktop/DesktopMain.cpp
-index a33e3ec..bff22d1 100644
+index a33e3ec648..bff22d1e26 100644
 --- a/src/cpp/desktop/DesktopMain.cpp
 +++ b/src/cpp/desktop/DesktopMain.cpp
 @@ -310,7 +310,7 @@ int main(int argc, char* argv[])
@@ -264,10 +264,10 @@ index a33e3ec..bff22d1 100644
              sessionPath = installPath.complete("bin/x64/rsession");
  #endif
 diff --git a/src/cpp/session/CMakeLists.txt b/src/cpp/session/CMakeLists.txt
-index c2cd8ba..819d50d 100644
+index c0e6f36a68..9d3c852bd2 100644
 --- a/src/cpp/session/CMakeLists.txt
 +++ b/src/cpp/session/CMakeLists.txt
-@@ -480,8 +480,9 @@ if (NOT RSTUDIO_SESSION_WIN64)
+@@ -547,8 +547,9 @@ if (NOT RSTUDIO_SESSION_WIN64)
        endif()
     endif()
  
@@ -279,7 +279,7 @@ index c2cd8ba..819d50d 100644
        install(DIRECTORY "${RSTUDIO_WINDOWS_DEPENDENCIES_DIR}/gnudiff"
                USE_SOURCE_PERMISSIONS
                DESTINATION  ${RSTUDIO_INSTALL_BIN})
-@@ -491,8 +492,10 @@ if (NOT RSTUDIO_SESSION_WIN64)
+@@ -558,8 +559,10 @@ if (NOT RSTUDIO_SESSION_WIN64)
        install(DIRECTORY "${RSTUDIO_WINDOWS_DEPENDENCIES_DIR}/msys-ssh-1000-18"
                USE_SOURCE_PERMISSIONS
                DESTINATION  ${RSTUDIO_INSTALL_BIN})
@@ -291,5 +291,5 @@ index c2cd8ba..819d50d 100644
                DESTINATION  "${RSTUDIO_INSTALL_BIN}/sumatra")
        install(FILES resources/sumatrapdfrestrict.ini
 -- 
-2.10.2
+2.15.0.rc0.37.gd35688db1.dirty
 
