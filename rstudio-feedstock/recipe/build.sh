@@ -2,6 +2,12 @@
 # Xcode.
 _XCODE_BUILD=0
 
+# Boost 1.65.1 cannot be used with -std=c++17 it seems. -std=c++14 works.
+re='(.*[[:space:]])\-std\=[^[:space:]]*(.*)'
+if [[ "${CXXFLAGS}" =~ $re ]]; then
+  export CXXFLAGS="${BASH_REMATCH[1]} -std=c++14 ${BASH_REMATCH[2]}"
+fi
+
 export RSTUDIO_VERSION_MAJOR=$(echo ${PKG_VERSION} | cut -d. -f1)
 export RSTUDIO_VERSION_MINOR=$(echo ${PKG_VERSION} | cut -d. -f2)
 export RSTUDIO_VERSION_PATCH=$(echo ${PKG_VERSION} | cut -d. -f3)
@@ -72,7 +78,7 @@ cmake                                   \
 if [[ ${_XCODE_BUILD} == 1 ]]; then
   cmake --build . --target install -- ${_VERBOSE}
 else
-  make install ${VERBOSE}
+  make install -j${CPU_COUNT} ${VERBOSE_CM}
 fi
 
 if [[ $(uname) == Darwin ]]; then
