@@ -12,9 +12,9 @@ source:
   url:
     - https://cran.r-project.org/src/contrib/bcp_{{ version }}.tar.gz
     - https://cran.r-project.org/src/contrib/Archive/bcp/bcp_{{ version }}.tar.gz
-
-
   sha256: f5b54d26fb09d087cf187dec0bc105a52476bf162b1c5a4a9a9e2929023a6dae
+
+
   # patches:
    # List any patch files here
    # - fix.patch
@@ -32,23 +32,24 @@ build:
 requirements:
   build:
     - r-base
+    - {{ compiler('cxx') }}      # [not win]
+    - {{ compiler('fortran') }}  # [not win]
+    - {{native}}toolchain        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
     - r-rcpp >=0.9.2
     - r-rcpparmadillo
-    - posix                # [win]
-    - {{native}}toolchain  # [win]
-    - gcc                  # [not win]
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
     - r-rcpp >=0.9.2
     - r-rcpparmadillo
-    - {{native}}gcc-libs   # [win]
-    - libgcc               # [not win]
 
 test:
   commands:
     # You can put additional test commands to be run here.
-    - $R -e "library('bcp')"  # [not win]
+    - $R -e "library('bcp')"           # [not win]
     - "\"%R%\" -e \"library('bcp')\""  # [win]
 
   # You can also put a file called run_test.py, run_test.sh, or run_test.bat
@@ -66,6 +67,10 @@ about:
     2015); this allows estimation of change point models with multivariate responses.
     Parallel MCMC, previously available in bcp v.3.0.0, is currently not implemented.
   license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - mingwandroid
 
 # The original CRAN metadata for this package was:
 
