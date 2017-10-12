@@ -7,7 +7,7 @@ git submodule foreach git clean -dxf .
 git clean -dxf .
 
 # 2. .. to update the recipes:
-conda skeleton cran --output-suffix=-feedstock/recipe --recursive --add-maintainer=mingwandroid --update-policy=merge-keep-build-num $(echo * | sed 's/rstudio-feedstock//' | sed 's/r-essentials-feedstock//' | sed 's/r-recommended-feedstock//' | sed 's/r-shinysky-feedstock//' | sed 's/r-rmr2-feedstock//' | sed 's/rpy2-feedstock//' | sed 's/r-base-feedstock//')
+conda skeleton cran --output-suffix=-feedstock/recipe --recursive --add-maintainer=mingwandroid --update-policy=merge-keep-build-num $(echo * | sed 's/rstudio-feedstock//' | sed 's/r-essentials-feedstock//' | sed 's/r-recommended-feedstock//' | sed 's/r-shinysky-feedstock//' | sed 's/r-rmr2-feedstock//' | sed 's/rpy2-feedstock//' | sed 's/rpy2-2.8-feedstock//' | sed 's/r-base-feedstock//')
 
 # Here, the exclusion of r-rmr2 and r-shinysky are because they are from GitHub but not from git repos which breaks conda skeleton cran's assumptions, namely:
 #   1. Any URL with 'github' in it is a git repository (it could be an archive)
