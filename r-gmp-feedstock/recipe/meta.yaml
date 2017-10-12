@@ -1,0 +1,97 @@
+{% set version = '0.5-13.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gmp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  fn: gmp_{{ version }}.tar.gz
+  url:
+    - https://cran.r-project.org/src/contrib/gmp_{{ version }}.tar.gz
+    - https://cran.r-project.org/src/contrib/Archive/gmp/gmp_{{ version }}.tar.gz
+  sha256: 2f805374a26742cd43f6b2054130d8670eda1940070aabb9971e9e48226d0976
+
+
+  # patches:
+   # List any patch files here
+   # - fix.patch
+
+build:
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Rmpfr
+requirements:
+  build:
+    - r-base
+    - {{ compiler('cxx') }}      # [not win]
+    - {{native}}toolchain        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{native}}gmp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - {{native}}gmp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gmp')"           # [not win]
+    - "\"%R%\" -e \"library('gmp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://mulcyber.toulouse.inra.fr/projects/gmp
+  license: GPL
+  summary: Multiple Precision Arithmetic (big integers and rationals, prime number tests, matrix
+    computation), "arithmetic without limitations" using the C library GMP (GNU Multiple
+    Precision Arithmetic).
+  license_family: GPL
+
+extra:
+  recipe-maintainers:
+    - mingwandroid
+
+# The original CRAN metadata for this package was:
+
+# Package: gmp
+# Version: 0.5-13.1
+# Date: 2017-01-02
+# Title: Multiple Precision Arithmetic
+# Author: Antoine Lucas, Immanuel Scholz, Rainer Boehme <rb-gmp@reflex-studio.de>, Sylvain Jasson <jasson@toulouse.inra.fr>, Martin Maechler <maechler@stat.math.ethz.ch>
+# Maintainer: Antoine Lucas <antoinelucas@gmail.com>
+# Description: Multiple Precision Arithmetic (big integers and rationals, prime number tests, matrix computation), "arithmetic without limitations" using the C library GMP (GNU Multiple Precision Arithmetic).
+# Depends: R (>= 3.0.0)
+# Imports: methods
+# Suggests: Rmpfr
+# SystemRequirements: gmp (>= 4.2.3)
+# License: GPL
+# BuildResaveData: no
+# LazyDataNote: not available, as we use data/*.R *and* our classes
+# URL: http://mulcyber.toulouse.inra.fr/projects/gmp
+# NeedsCompilation: yes
+# Packaged: 2017-03-10 06:58:47 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2017-03-10 08:05:38
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml

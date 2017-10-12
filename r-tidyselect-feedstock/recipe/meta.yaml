@@ -1,0 +1,99 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tidyselect
+  version: {{ version|replace("-", "_") }}
+
+source:
+  fn: tidyselect_{{ version }}.tar.gz
+  url:
+    - https://cran.r-project.org/src/contrib/tidyselect_{{ version }}.tar.gz
+    - https://cran.r-project.org/src/contrib/Archive/tidyselect/tidyselect_{{ version }}.tar.gz
+  sha256: 396117335269021d8709e2b1ddd613da81e2bfe56fdc58e107bbccbe0ac320c0
+
+
+  # patches:
+   # List any patch files here
+   # - fix.patch
+
+build:
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - r-base
+    - {{ compiler('cxx') }}      # [not win]
+    - {{native}}toolchain        # [win]
+    - r-rcpp >=0.12.0
+    - r-glue
+    - r-purrr
+    - r-rlang >=0.1
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.0
+    - r-glue
+    - r-purrr
+    - r-rlang >=0.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tidyselect')"           # [not win]
+    - "\"%R%\" -e \"library('tidyselect')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=tidyselect
+  license: GPL-3
+  summary: A backend for the selecting functions of the 'tidyverse'. It makes it easy to implement
+    select-like functions in your own packages in a way that is consistent with other
+    'tidyverse' interfaces for selection.
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - mingwandroid
+
+# The original CRAN metadata for this package was:
+
+# Package: tidyselect
+# Title: Select from a Set of Strings
+# Version: 0.2.0
+# Authors@R: c( person("Lionel", "Henry", ,"lionel@rstudio.com", c("aut", "cre")), person("Hadley", "Wickham", ,"hadley@rstudio.com", "aut"), person("RStudio", role = "cph") )
+# Description: A backend for the selecting functions of the 'tidyverse'. It makes it easy to implement select-like functions in your own packages in a way that is consistent with other 'tidyverse' interfaces for selection.
+# Depends: R (>= 3.1.0)
+# Imports: glue, purrr, rlang (>= 0.1), Rcpp (>= 0.12.0)
+# Suggests: testthat
+# LinkingTo: Rcpp (>= 0.12.0),
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# ByteCompile: true
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2017-08-30 12:08:48 UTC; lionel
+# Author: Lionel Henry [aut, cre], Hadley Wickham [aut], RStudio [cph]
+# Maintainer: Lionel Henry <lionel@rstudio.com>
+# Repository: CRAN
+# Date/Publication: 2017-08-30 13:54:39 UTC
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml
