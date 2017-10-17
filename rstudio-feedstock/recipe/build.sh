@@ -66,6 +66,7 @@ fi
 cmake                                   \
       -DCMAKE_INSTALL_PREFIX=${PREFIX}  \
       -DBOOST_ROOT=${PREFIX}            \
+      -DBOOST_VERSION=1.65.1            \
       -DRSTUDIO_TARGET=Desktop          \
       -DCMAKE_BUILD_TYPE=Release        \
       -DLIBR_HOME=${PREFIX}/lib/R       \
