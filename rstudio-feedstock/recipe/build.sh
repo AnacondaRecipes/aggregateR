@@ -49,12 +49,13 @@ export BOOST_ROOT=${PREFIX}
 _VERBOSE="VERBOSE=1"
 
 declare -a _CMAKE_EXTRA_CONFIG
-if [[ $(uname) == Darwin ]]; then
+if [[ ${HOST} =~ .*darwin.* ]]; then
   if [[ ${_XCODE_BUILD} == 1 ]]; then
     _CMAKE_EXTRA_CONFIG+=(-G'Xcode')
     _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_ARCHITECTURES=x86_64)
     _VERBOSE=""
   fi
+  _CMAKE_EXTRA_CONFIG+=(-DRSTUDIO_USE_LIBCXX=TRUE)
   unset MACOSX_DEPLOYMENT_TARGET
   export MACOSX_DEPLOYMENT_TARGET
 else
@@ -71,6 +72,8 @@ cmake                                   \
       -DCMAKE_BUILD_TYPE=Release        \
       -DLIBR_HOME=${PREFIX}/lib/R       \
       -DUSE_MACOS_R_FRAMEWORK=FALSE     \
+      -DCMAKE_C_COMPILER=${CC}          \
+      -DCMAKE_CXX_COMPILER=${CXX}       \
       "${_CMAKE_EXTRA_CONFIG[@]}"       \
       ..
 
