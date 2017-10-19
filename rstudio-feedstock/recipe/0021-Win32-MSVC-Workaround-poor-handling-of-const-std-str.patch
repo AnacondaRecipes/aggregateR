@@ -1,0 +1,54 @@
+From c557071ae484fe4598295a06539da194fdd5696c Mon Sep 17 00:00:00 2001
+From: Ray Donnelly <mingw.android@gmail.com>
+Date: Sat, 29 Oct 2016 17:23:05 +0100
+Subject: [PATCH 21/44] Win32 (MSVC): Workaround poor handling of const
+ std::string
+
+When str is const std::string, MSVC cannot handle this:
+wchar_t wide[str.length() + 1];
+..
+error C2131: expression did not evaluate to a constant
+src\cpp\core\StringUtils.cpp(244): note: failure was caused by non-constant arguments or reference to a non-constant symbol
+src\cpp\core\StringUtils.cpp(244): note: see usage of 'str'
+
+.. so use alloca instead.
+---
+ src/cpp/core/StringUtils.cpp | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/src/cpp/core/StringUtils.cpp b/src/cpp/core/StringUtils.cpp
+index b02022bc76..a888358433 100644
+--- a/src/cpp/core/StringUtils.cpp
++++ b/src/cpp/core/StringUtils.cpp
+@@ -245,8 +245,12 @@ std::string utf8ToSystem(const std::string& str,
+       return std::string();
+ 
+ #ifdef _WIN32
++#ifndef _MSC_VER
+    wchar_t wide[str.length() + 1];
+-   int chars = ::MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, wide, sizeof(wide));
++#else
++   wchar_t* wide = static_cast<wchar_t*>(alloca(sizeof(wchar_t) * (str.length() + 1)));
++#endif
++   int chars = ::MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, wide, sizeof(wchar_t) * (str.length() + 1));
+    if (chars < 0)
+    {
+       LOG_ERROR(systemError(::GetLastError(), ERROR_LOCATION));
+@@ -282,8 +286,12 @@ std::string systemToUtf8(const std::string& str, int codepage)
+       return std::string();
+ 
+ #ifdef _WIN32
+-   wchar_t wide[str.length() + 1];
+-   int chars = ::MultiByteToWideChar(codepage, 0, str.c_str(), str.length(), wide, sizeof(wide));
++#ifndef _MSC_VER
++    wchar_t wide[str.length() + 1];
++#else
++   wchar_t* wide = static_cast<wchar_t*>(alloca(sizeof(wchar_t) * (str.length() + 1)));
++#endif
++   int chars = ::MultiByteToWideChar(codepage, 0, str.c_str(), str.length(), wide, sizeof(wchar_t) * (str.length() + 1));
+    if (chars < 0)
+    {
+       LOG_ERROR(systemError(::GetLastError(), ERROR_LOCATION));
+-- 
+2.14.2
+
