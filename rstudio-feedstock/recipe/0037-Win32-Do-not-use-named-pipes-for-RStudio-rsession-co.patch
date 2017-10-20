@@ -1,7 +1,7 @@
-From d1baa9566120318081c9fc3564020a37ebeb9031 Mon Sep 17 00:00:00 2001
+From dbbcc4054763980df16bd2fbca2a8e1af2ebc7ff Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Sat, 5 Nov 2016 00:59:07 +0000
-Subject: [PATCH 37/45] Win32: Do not use named pipes for RStudio/rsession
+Subject: [PATCH 37/44] Win32: Do not use named pipes for RStudio/rsession
  comms
 
 Mostly because I can snoop on TCP/IP more easily than on named pipes
@@ -25,8 +25,8 @@ cpp\session\include\session/http/SessionRequest.hpp (no change)
 #endif
 
 We should only apply this change when debugging tricky problems
-as it could cause issues, but fixing it to work again would be
-handy.
+as it could cause issues, but I am keeping it around for future
+reference in-case I need to snoop the comms (using mingw-w64?).
 
 Note: There never was any support for allowing builds to define
 _WIN32_USING_NAMED_PIPES; really it should be implemented as a
@@ -35,14 +35,16 @@ on the cmake commandline: -D_WIN32_USING_NAMED_PIPES=FALSE when
 I need to debug the communications. Before I do that I would need
 to make it compile again, obviously.
 
-Also, enabling this requires boost::asio::local.
+Also, enabling this requires boost::asio::local which I suppose
+msys2/mingw-w64-boost *may* have implemented over a TCP socket?
+
 ---
  src/cpp/desktop/DesktopOptions.cpp                      | 2 +-
  src/cpp/session/include/session/http/SessionRequest.hpp | 4 ++--
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/src/cpp/desktop/DesktopOptions.cpp b/src/cpp/desktop/DesktopOptions.cpp
-index 3e1c7b5431..553bff4c59 100644
+index 3e1c7b5431..c8ba20295c 100644
 --- a/src/cpp/desktop/DesktopOptions.cpp
 +++ b/src/cpp/desktop/DesktopOptions.cpp
 @@ -90,7 +90,7 @@ QString Options::portNumber() const
@@ -55,7 +57,7 @@ index 3e1c7b5431..553bff4c59 100644
                            portNumber_ + QString::fromUtf8("-rsession");
  #else
 diff --git a/src/cpp/session/include/session/http/SessionRequest.hpp b/src/cpp/session/include/session/http/SessionRequest.hpp
-index 7e6313f322..3e14f345af 100644
+index 7e6313f322..3b866f7cda 100644
 --- a/src/cpp/session/include/session/http/SessionRequest.hpp
 +++ b/src/cpp/session/include/session/http/SessionRequest.hpp
 @@ -21,7 +21,7 @@
