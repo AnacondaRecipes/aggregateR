@@ -10,18 +10,19 @@ FOR /f "usebackqeol=; tokens=1 delims=." %%A IN ('%PKG_VERSION%') DO set RSTUDIO
 FOR /f "usebackqeol=; tokens=2 delims=." %%A IN ('%PKG_VERSION%') DO set RSTUDIO_VERSION_MINOR=%%A
 FOR /f "usebackqeol=; tokens=3 delims=." %%A IN ('%PKG_VERSION%') DO set RSTUDIO_VERSION_PATCH=%%A
 
-cd dependencies\windows
-call install-dependencies.cmd
-cd ..\..
+pushd dependencies\windows
+  call install-dependencies.cmd
+popd
 
-cd dependencies\common
-mkdir rmarkdown
-cd rmarkdown
-call conda install -c r --no-deps --yes --copy --prefix "%CD%" r-markdown
-cd ..\..\..
+pushd dependencies\common
+  mkdir rmarkdown
+  pushd rmarkdown
+    call conda install -c r --no-deps --yes --copy --prefix "%CD%" r-markdown
+  popd
+popd
 
 mkdir build
-cd build
+pushd build
 
 if "%ARCH%"=="32" (
    set R_ARCH=i386
@@ -57,8 +58,7 @@ set BOOST_ROOT=%PREFIX%
 :: conda's Boost and Qt packages do not provide debug libraries:
 :: '_ITERATOR_DEBUG_LEVEL': value '0' doesn't match value '2'
 :: 'RuntimeLibrary': value 'MD_DynamicRelease' doesn't match value 'MDd_DynamicDebug'
-
-if "%USE_JOM%" == "1" (
+if "%USE_JOM%" == "0" goto skip_jom
 ::  for /f "delims=" %%A in ('where cl.exe') do set "CL_EXE=%%A"
 ::  set "CL_EXE=!CL_EXE:\=/!"
   echo Using cmake -G"NMake Makefiles"
@@ -79,8 +79,11 @@ if "%USE_JOM%" == "1" (
 ::     popd
 ::  )
   jom VERBOSE=1
+  if %errorlevel% neq 0 exit /b %errorlevel%
   jom install VERBOSE=1
-) else (
+  if %errorlevel% neq 0 exit /b %errorlevel%
+  goto skip_msvs
+:skip_jom
 :: /MP == object level parallelism, but when added on its own
 :: WIN32, _WINDOWS and /EHsc are dropped, so add them back too.
 :: This needs to be fixed in the CMakeLists.txt files.
@@ -97,7 +100,8 @@ if "%USE_JOM%" == "1" (
         -DCMAKE_C_FLAGS="/MP /DWIN32 /D_WINDOWS /EHsc" ^
         ..
   cmake --build . --config %BUILD_TYPE% --target INSTALL
-)
+  if %errorlevel% neq 0 exit /b %errorlevel%
+:skip_msvs
 
 IF NOT EXIST %PREFIX%\Menu mkdir %PREFIX%\Menu
 copy %RECIPE_DIR%\menu-windows.json %PREFIX%\Menu\
@@ -107,3 +111,5 @@ del %PREFIX%\R\bin\!R_ARCH!\Rgraphapp.dll.exports.txt
 del %PREFIX%\R\bin\!R_ARCH!\Rgraphapp.lib
 del %PREFIX%\R\bin\!R_ARCH!\R.def
 del %PREFIX%\R\bin\!R_ARCH!\R.lib
+
+popd

@@ -80,9 +80,9 @@ cmake                                   \
 # "cmake --build" might be fine on all OSes/generators (though it does
 # seem to be building the Debug variant on Xcode), so for now check _XCODE_BUILD
 if [[ ${_XCODE_BUILD} == 1 ]]; then
-  cmake --build . --target install -- ${_VERBOSE}
+  cmake --build . --target install -- ${_VERBOSE} || exit 1
 else
-  make install -j${CPU_COUNT} ${VERBOSE_CM}
+  make install -j${CPU_COUNT} ${VERBOSE_CM} || exit 1
 fi
 
 if [[ $(uname) == Darwin ]]; then
