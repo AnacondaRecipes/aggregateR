@@ -1,0 +1,101 @@
+{% set version = '1.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-odbc
+  version: {{ version|replace("-", "_") }}
+
+source:
+
+
+  # You can add a hash for the file here, like md5, sha1 or sha256
+  git_url: https://github.com/rstats-db/odbc
+  git_tag: v1.1.2
+  # patches:
+   # List any patch files here
+   # - fix.patch
+
+build:
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tibble, DBItest, testthat, covr, magrittr
+requirements:
+  build:
+    - r-base
+    - {{posix}}filesystem        # [win]
+    - {{posix}}git
+    - {{ compiler('cxx') }}      # [not win]
+    - {{native}}toolchain        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}automake          # [not win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - r-bh
+    - r-dbi >=0.3.0
+    - r-rcpp >=0.12.11
+    - r-bit64
+    - r-blob >=1.1.0
+    - r-hms
+
+  run:
+    - r-base
+    - r-bh
+    - r-dbi >=0.3.0
+    - r-rcpp >=0.12.11
+    - r-bit64
+    - r-blob >=1.1.0
+    - r-hms
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('odbc')"           # [not win]
+    - "\"%R%\" -e \"library('odbc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/rstats-db/odbc
+  license: MIT + file LICENSE
+  summary: A DBI-compatible interface to ODBC databases.
+  license_family: MIT
+
+
+
+# The original CRAN metadata for this package was:
+
+# Package: odbc
+# Title: Connect to ODBC Compatible Databases (using the DBI Interface)
+# Version: 1.1.2
+# Authors@R: c( person("Jim", "Hester", , "james.hester@rstudio.com", role = c("aut", "cre")), person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut")), person("lexicalunit", role = c("cph"), comment = "nanodbc library"), person("Google Inc.", role = c("cph"), comment = "cctz library"), person("RStudio", role = c("cph", "fnd")) )
+# Description: A DBI-compatible interface to ODBC databases.
+# License: MIT + file LICENSE
+# URL: https://github.com/rstats-db/odbc
+# BugReports: https://github.com/rstats-db/odbc/issues
+# SystemRequirements: C++11, GNU make, An ODBC3 driver manager and drivers.
+# Roxygen: list(markdown = TRUE)
+# RoxygenNote: 6.0.1
+# LazyData: true
+# ByteCompile: true
+# Imports: DBI (>= 0.3.0), methods, Rcpp (>= 0.12.11), blob (>= 1.1.0), bit64, hms
+# Suggests: tibble, DBItest, testthat, covr, magrittr
+# LinkingTo: Rcpp, BH
+# Collate: 'odbc.R' 'Driver.R' 'Connection.R' 'DataTypes.R' 'RcppExports.R' 'Result.R' 'Table.R' 'Viewer.R' 'db_oracle.R' 'hidden.R' 'utils.R' 'zzz.R'
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml
