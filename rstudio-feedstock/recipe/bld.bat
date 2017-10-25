@@ -6,7 +6,7 @@ set USE_JOM=1
 :: set BUILD_TYPE=RelWithDebInfo
 set BUILD_TYPE=Release
 
-set _JAVA_OPTIONS=-Xmx1G
+set _JAVA_OPTIONS=-Xmx768M
 
 FOR /f "usebackqeol=; tokens=1 delims=." %%A IN ('%PKG_VERSION%') DO set RSTUDIO_VERSION_MAJOR=%%A
 FOR /f "usebackqeol=; tokens=2 delims=." %%A IN ('%PKG_VERSION%') DO set RSTUDIO_VERSION_MINOR=%%A
