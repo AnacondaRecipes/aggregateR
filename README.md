@@ -158,3 +158,5 @@ r-whisker        2500
 r-xlsx           2000
 r-xlsxjars       1500
 r-xts            3000
+
+r-base64enc,r-bitops,r-brew,r-catools,r-class,r-dichromat,r-domc,r-foreach,r-fracdiff,r-functional,r-gridbase,r-gtools,r-hexbin,r-iterators,r-kernsmooth,r-labeling,r-magrittr,r-manipulate,r-matrixmodels,r-minqa,r-mlmrev,r-modeltools,r-nloptr,r-nmf,r-pkgmaker,r-praise,r-profilemodel,r-quadprog,r-randomforest,r-registry,r-rjson,r-rjsonio,r-rngtools,r-rocr,r-rserve,r-spatial,r-timedate,r-uuid,r-whisker,r-xlsx,r-xlsxjars,r-xts
