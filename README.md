@@ -24,3 +24,137 @@ git submodule foreach git add .
 /usr/local/bin/git diff -a --submodule=diff --ignore-submodules=none > updates.patch
 git reset HEAD .
 git submodule foreach git reset HEAD .
+
+Already fixed:
+r-bitops
+r-brew
+r-catools
+r-dichromat
+r-fracdiff
+r-labeling
+r-magrittr
+r-minqa
+r-mlmrev
+r-nloptr
+r-profilemodel
+r-quadprog
+r-rjsonio
+r-timedate
+r-whisker
+r-xts
+
+Still broken:
+r-base64enc
+r-class
+r-domc
+r-foreach
+r-functional
+r-gridbase
+r-gtools
+r-hexbin
+r-iterators
+r-kernsmooth
+r-manipulate
+r-matrixmodels
+r-modeltools
+r-nmf
+r-pkgmaker
+r-praise
+r-randomforest
+r-registry
+r-rjson
+r-rngtools
+r-rocr
+r-rserve
+r-spatial
+r-uuid
+r-xlsx
+r-xlsxjars
+
+The complete list of the 42 legacy packages that must maintain their build number at between 1 and 4 (bump all to 4?) is:
+r-base64enc     2
+r-bitops        3
+r-brew          3
+r-catools       3
+r-class         3
+r-dichromat     4
+r-domc          1
+r-foreach       3
+r-fracdiff      2
+r-functional    1
+r-gridbase      1
+r-gtools        1
+r-hexbin        3
+r-iterators     3
+r-kernsmooth    3
+r-labeling      3
+r-magrittr      3
+r-manipulate    1
+r-matrixmodels  1
+r-minqa         2
+r-mlmrev        3
+r-modeltools    3
+r-nloptr        3
+r-nmf           1
+r-pkgmaker      1
+r-praise        1
+r-profilemodel  3
+r-quadprog      2
+r-randomforest  2
+r-registry      1
+r-rjson         1
+r-rjsonio       2
+r-rngtools      1
+r-rocr          1
+r-rserve        1
+r-spatial       3
+r-timedate      3
+r-uuid          2
+r-whisker       3
+r-xlsx          1
+r-xlsxjars      1
+r-xts           2
+
+Very rough popularity figures taken from: https://dgrtwo.shinyapps.io/cranview/
+r-base64enc      6000
+r-bitops         6000
+r-brew           1000
+r-catools        6000
+r-class          400
+r-dichromat      7000
+r-domc           10
+r-foreach        2000
+r-fracdiff       900
+r-functional     200
+r-gridbase       200
+r-gtools         2000
+r-hexbin         2000
+r-iterators      2000
+r-kernsmooth     8000
+r-labeling       7000
+r-magrittr       12000
+r-manipulate     1000
+r-matrixmodels   4000
+r-minqa          4000
+r-mlmrev         10
+r-modeltools     1900
+r-nloptr         3000
+r-nmf            200
+r-pkgmaker       1000
+r-praise         1500
+r-profilemodel   100
+r-quadprog       1800
+r-randomforest   1800
+r-registry       800
+r-rjson          1500
+r-rjsonio        1500
+r-rngtools       500
+r-rocr           600
+r-rserve         600
+r-spatial        150
+r-timedate       1500
+r-uuid           250
+r-whisker        2500
+r-xlsx           2000
+r-xlsxjars       1500
+r-xts            3000
