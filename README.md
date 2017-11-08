@@ -160,3 +160,23 @@ r-xlsxjars       1500
 r-xts            3000
 
 r-base64enc-feedstock-feedstock,r-bitops-feedstock-feedstock,r-brew-feedstock-feedstock,r-catools-feedstock-feedstock,r-class-feedstock-feedstock,r-dichromat-feedstock-feedstock,r-domc-feedstock-feedstock,r-foreach-feedstock-feedstock,r-fracdiff-feedstock-feedstock,r-functional-feedstock-feedstock,r-gridbase-feedstock-feedstock,r-gtools-feedstock-feedstock,r-hexbin-feedstock-feedstock,r-iterators-feedstock-feedstock,r-kernsmooth-feedstock-feedstock,r-labeling-feedstock-feedstock,r-magrittr-feedstock-feedstock,r-manipulate-feedstock-feedstock,r-matrixmodels-feedstock-feedstock,r-minqa-feedstock-feedstock,r-mlmrev-feedstock-feedstock,r-modeltools-feedstock-feedstock,r-nloptr-feedstock-feedstock,r-nmf-feedstock-feedstock,r-pkgmaker-feedstock-feedstock,r-praise-feedstock-feedstock,r-profilemodel-feedstock-feedstock,r-quadprog-feedstock-feedstock,r-randomforest-feedstock-feedstock,r-registry-feedstock-feedstock,r-rjson-feedstock-feedstock,r-rjsonio-feedstock-feedstock,r-rngtools-feedstock-feedstock,r-rocr-feedstock-feedstock,r-rserve-feedstock-feedstock,r-spatial-feedstock-feedstock,r-timedate-feedstock-feedstock,r-uuid-feedstock-feedstock,r-whisker-feedstock-feedstock,r-xlsx-feedstock-feedstock,r-xlsxjars-feedstock,r-xts-feedstock
+
+Additions:
+
+We probably want to get biocLite added as per https://github.com/ContinuumIO/anaconda-issues/issues/7068
+source("https://bioconductor.org/biocLite.R")
+biocLite()
+
+Seems we miss, or have too old versions of:
+
+BiocInstaller
+blob
+memoise
+BiocGenerics
+bit
+S4Vectors
+Biobase
+bit64
+IRanges
+RSQLite
+AnnotationDbi
