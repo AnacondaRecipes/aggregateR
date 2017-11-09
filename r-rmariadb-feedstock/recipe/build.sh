@@ -4,7 +4,8 @@
 mv DESCRIPTION DESCRIPTION.old
 grep -v '^Priority: ' DESCRIPTION.old > DESCRIPTION
 
-$R CMD INSTALL --build .
+DISABLE_AUTOBREW=1 \
+  $R CMD INSTALL --build .
 
 # Add more build steps here, if they are necessary.
 
