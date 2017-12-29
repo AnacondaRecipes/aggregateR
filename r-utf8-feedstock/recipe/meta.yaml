@@ -1,0 +1,91 @@
+{% set version = '1.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-utf8
+  version: {{ version|replace("-", "_") }}
+
+source:
+  fn: utf8_{{ version }}.tar.gz
+  url:
+    - https://cran.r-project.org/src/contrib/utf8_{{ version }}.tar.gz
+    - https://cran.r-project.org/src/contrib/Archive/utf8/utf8_{{ version }}.tar.gz
+  sha256: 148517aadb75d82aba61f63afe2a30d254abebbdc7e32dd0830e12ff443915b9
+
+
+  # patches:
+   # List any patch files here
+   # - fix.patch
+
+build:
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: corpus, knitr, testthat
+requirements:
+  build:
+    - r-base
+    - {{ compiler('c') }}        # [not win]
+    - {{native}}toolchain        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('utf8')"           # [not win]
+    - "\"%R%\" -e \"library('utf8')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/patperry/r-utf8
+  license: Apache License (== 2.0) | file LICENSE
+  summary: Processing and printing 'UTF-8' encoded international text (Unicode). Functions to
+    input, validate, normalize, encode, format, and display.
+  license_family: APACHE
+
+extra:
+  recipe-maintainers:
+    - mingwandroid
+
+# The original CRAN metadata for this package was:
+
+# Package: utf8
+# Version: 1.1.2
+# Title: Unicode Text Processing
+# Authors@R: c( person(c("Patrick", "O."), "Perry", role = c("aut", "cph", "cre"), email = "pperry@stern.nyu.edu"), person("Unicode, Inc.", role = c("cph", "dtc"), comment = "Unicode Character Database"))
+# Depends: R (>= 2.10)
+# Suggests: corpus, knitr, testthat
+# Description: Processing and printing 'UTF-8' encoded international text (Unicode). Functions to input, validate, normalize, encode, format, and display.
+# License: Apache License (== 2.0) | file LICENSE
+# URL: https://github.com/patperry/r-utf8
+# BugReports: https://github.com/patperry/r-utf8/issues
+# LazyData: Yes
+# Encoding: UTF-8
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2017-12-13 22:37:54 UTC; ptrck
+# Author: Patrick O. Perry [aut, cph, cre], Unicode, Inc. [cph, dtc] (Unicode Character Database)
+# Maintainer: Patrick O. Perry <pperry@stern.nyu.edu>
+# Repository: CRAN
+# Date/Publication: 2017-12-14 16:27:32 UTC
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml

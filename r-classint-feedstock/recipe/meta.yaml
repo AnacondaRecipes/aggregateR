@@ -1,0 +1,92 @@
+{% set version = '0.1-24' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-classint
+  version: {{ version|replace("-", "_") }}
+
+source:
+  fn: classInt_{{ version }}.tar.gz
+  url:
+    - https://cran.r-project.org/src/contrib/classInt_{{ version }}.tar.gz
+    - https://cran.r-project.org/src/contrib/Archive/classInt/classInt_{{ version }}.tar.gz
+  sha256: f3dc9084450ea3da07e1ea5eeb097fd2fedc7e29e5d7794b418bcb438c4fcfa2
+
+
+  # patches:
+   # List any patch files here
+   # - fix.patch
+
+build:
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+
+requirements:
+  build:
+    - r-base
+    - {{ compiler('c') }}        # [not win]
+    - {{ compiler('fortran') }}  # [not win]
+    - {{native}}toolchain        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - r-class
+    - r-e1071
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-class
+    - r-e1071
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('classInt')"           # [not win]
+    - "\"%R%\" -e \"library('classInt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=classInt
+  license: GPL (>= 2)
+  summary: Selected commonly used methods for choosing univariate class intervals for mapping
+    or other graphics purposes.
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - mingwandroid
+
+# The original CRAN metadata for this package was:
+
+# Package: classInt
+# Version: 0.1-24
+# Date: 2017-04-14
+# Title: Choose Univariate Class Intervals
+# Authors@R: c(person("Roger", "Bivand", role=c("aut", "cre"), email="Roger.Bivand@nhh.no"), person("Hisaji", "Ono", role="ctb"), person("Richard", "Dunlap", role="ctb"), person("Matthieu", "Stigler", role="ctb"))
+# Depends: R (>= 2.2)
+# Imports: grDevices, stats, graphics, e1071, class
+# Description: Selected commonly used methods for choosing univariate class intervals for mapping or other graphics purposes.
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2017-04-14 11:32:48 UTC; rsb
+# Author: Roger Bivand [aut, cre], Hisaji Ono [ctb], Richard Dunlap [ctb], Matthieu Stigler [ctb]
+# Maintainer: Roger Bivand <Roger.Bivand@nhh.no>
+# Repository: CRAN
+# Date/Publication: 2017-04-16 19:24:25 UTC
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml

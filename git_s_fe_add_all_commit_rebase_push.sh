@@ -1,4 +1,4 @@
-#!/usr/bin/env bash -x
+#!/usr/bin/env bash
 
 # Run this as:
 # git submodule foreach '$toplevel/git_s_fe_add_all_commit_rebase_push.sh $name $path $sha1 $toplevel ["Commit message"] [-F "commit_msg.txt"]'
@@ -11,9 +11,9 @@ toplevel=$1; shift
 git diff-files --quiet --ignore-submodules -- || changes_in_files=1
 git diff-index --cached --quiet HEAD --ignore-submodules -- || changes_in_index=1
 
-# if [[ ${changes_in_files} != 1 ]] && [[ ${changes_in_index} != 1 ]]; then
-#   exit 0
-# fi
+if [[ ${changes_in_files} != 1 ]] && [[ ${changes_in_index} != 1 ]]; then
+  exit 0
+fi
 
 echo "Changes in $name"
 
@@ -25,7 +25,7 @@ fi
 
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 if [[ ${current_branch} != ${wanted_branch} ]]; then
-  git checkout -B ${wanted_branch}
+  git checkout ${wanted_branch}
 fi
 
 from_file=$1; shift
