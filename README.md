@@ -7,7 +7,15 @@ git submodule foreach git clean -dxf .
 git clean -dxf .
 
 # 2. .. to update the recipes:
-conda skeleton cran --output-suffix=-feedstock/recipe --recursive --add-maintainer=mingwandroid --update-policy=merge-keep-build-num $(echo *feedstock | sed 's/\brstudio-feedstock\b//' | sed 's/\br-essentials-feedstock\b//' | sed 's/\br-recommended-feedstock\b//' | sed 's/\br-shinysky-feedstock\b//' | sed 's/\br-rmr2-feedstock\b//' | sed 's/\brpy2-feedstock\b//' | sed 's/\brpy2-2.8-feedstock\b//' | sed 's/\br-base-feedstock\b//' | sed 's/\br-feedstock\b//')
+conda skeleton cran --output-suffix=-feedstock/recipe --recursive --add-maintainer=mingwandroid --update-policy=merge-keep-build-num $(find . -name "*feedstock" | sed -e 's|^./rstudio-feedstock$||' -e 's|^./r-essentials-feedstock$||' -e 's|^./r-recommended-feedstock$||' -e 's|^./r-shinysky-feedstock$||' -e 's|^./r-rmr2-feedstock$||' -e 's|^./rpy2-feedstock$||' -e 's|^./rpy2-2.8-feedstock$||' -e 's|^./r-base-feedstock$||' -e 's|^./$||' -e 's|^./r-feedstock$||' -e 's|^./\.git.*$||')
+conda skeleton cran --output-suffix=-feedstock/recipe --add-maintainer=mingwandroid --update-policy=merge-keep-build-num \
+    https://github.com/bokeh/rbokeh \
+    https://github.com/IRkernel/IRkernel \
+    https://github.com/rstats-db/odbc \
+    https://github.com/nexr/RHive
+# .. take care that RHive's git tag gets reset back to nexr-rhive-2.0.10 (which was released in Dec 2014, not that there has been any real work since then):
+sed -i.bak 's|nexr-rhive-2\.0\.10-ranger.*$|nexr-rhive-2\.0\.10|' r-rhive-feedstock/recipe/meta.yaml
+rm r-rhive-feedstock/recipe/meta.yaml.bak
 
 # Here, the exclusion of r-rmr2 and r-shinysky are because they are from GitHub but not from git repos which breaks conda skeleton cran's assumptions, namely:
 #   1. Any URL with 'github' in it is a git repository (it could be an archive)
@@ -130,21 +138,19 @@ Hack any that require Rcpp or Rcpparmadillo to need a compiler('cxx') too.
 r-data.table
 build:
 -    - llvm-openmp >=4.0.1        # [osx]
+host:
+-    - llvm-openmp >=4.0.1        # [osx]
 run:
 -    - llvm-openmp >=4.0.1        # [osx]
 
 r-gmp
-build:
+host:
 -    - {{native}}gmp
 run:
 -    - {{native}}gmp
 
-r-hunspell
-build:
--    - {{ compiler('c') }}        # [not win]
-
 r-igraph:
-build:
+host:
 -    - {{native}}gmp
 -    - {{native}}libxml2
 run:
@@ -152,7 +158,7 @@ run:
 -    - {{native}}libxml2
 
 r-mongolite
-build:
+host:
 -    - {{native}}openssl
 -    - {{native}}cyrus-sasl       # [not win]
 run:
@@ -160,27 +166,19 @@ run:
 -    - {{native}}cyrus-sasl       # [not win]
 
 r-nloptr
-build:
+host:
 -    - {{native}}nlopt            # [win]
 run:
 -    - {{native}}nlopt            # [win]
 
 r-odbc
-build:
--    - {{ compiler('cxx') }}      # [not win]
--    - {{native}}toolchain        # [win]
--    - {{posix}}filesystem        # [win]
--    - {{posix}}autoconf
--    - {{posix}}automake-wrapper  # [win]
--    - {{posix}}automake          # [not win]
--    - {{posix}}pkg-config
--    - {{posix}}make
+host:
 -    - {{native}}unixodbc         # [not win]
 run:
 -    - {{native}}unixodbc         # [not win]
 
 r-rcurl
-build:
+host:
 -    - {{native}}curl
 run:
 -    - {{native}}curl
@@ -192,41 +190,46 @@ build:
 -    - {{ cdt('java-1.7.0-openjdk-devel') }}  # [linux]
 
 r-rmariadb
-build:
+host:
+-    - {{native}}mysql
+run:
 -    - {{native}}mysql
 
 r-rmysql
-build:
+host:
 -    - {{native}}mysql
 run:
 -    - {{native}}mysql  (why is this not a run dep for r-rmariadb?)
 
 r-rodbc
-build:
+host:
 -    - {{native}}unixodbc         # [not win]
 run:
 -    - {{native}}unixodbc         # [not win]
 
 r-rzmq
-build:
+host:
 -    - {{native}}zeromq >=3.0.0
 run:
 -    - {{native}}zeromq >=3.0.0
 
 r-sf
-build:
+host:
 -    - {{native}}libgdal
 run
 -    - {{native}}libgdal
 
 r-udunits2
-build:
+host:
 -    - {{native}}udunits2
 run:
 -    - {{native}}udunits2
 
 r-xml
-build:
+host:
 -    - {{native}}libxml2 >=2.6.3
 run:
 -    - {{native}}libxml2 >=2.6.3
+
+# Build ..
+~/conda/private_conda_recipes/rays-scratch-scripts/build-in-order --product=r --upload-channel=rdonnellyr --pkg-build-channel-priority=D --installer-build-channel-priority=D --skip-existing=yes --build-toolchain=no 2>&1 | tee ~/conda/R-3.4.3.log
