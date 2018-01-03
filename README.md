@@ -232,4 +232,7 @@ run:
 -    - {{native}}libxml2 >=2.6.3
 
 # Build ..
-~/conda/private_conda_recipes/rays-scratch-scripts/build-in-order --product=r --upload-channel=rdonnellyr --pkg-build-channel-priority=D --installer-build-channel-priority=D --skip-existing=yes --build-toolchain=no 2>&1 | tee ~/conda/R-3.4.3.log
+# linux-64 (does not look for existing packages on rdonnellyr (or to be exact, on the --upload-channel))
+~/conda/private_conda_recipes/rays-scratch-scripts/build-in-order --product=r --upload-channel=rdonnellyr --pkg-build-channel-priority=M --installer-build-channel-priority=D --skip-existing=yes --build-toolchain=no 2>&1 | tee ~/conda/R-3.4.3.log
+# the rest (does look on rdonnellyr)
+~/conda/private_conda_recipes/rays-scratch-scripts/build-in-order --product=r --upload-channel=rdonnellyr --pkg-build-channel-priority=M,U --installer-build-channel-priority=D --skip-existing=yes --build-toolchain=no 2>&1 | tee ~/conda/R-3.4.3.log
