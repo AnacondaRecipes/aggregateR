@@ -7,6 +7,7 @@ git submodule foreach git clean -dxf .
 git clean -dxf .
 
 # 2. .. to update the recipes:
+export CONDA_R=3.4.3
 conda skeleton cran --output-suffix=-feedstock/recipe --recursive --add-maintainer=mingwandroid --update-policy=merge-keep-build-num $(find . -name "*feedstock" | sed -e 's|^./rstudio-feedstock$||' -e 's|^./r-essentials-feedstock$||' -e 's|^./r-recommended-feedstock$||' -e 's|^./r-shinysky-feedstock$||' -e 's|^./r-rmr2-feedstock$||' -e 's|^./rpy2-feedstock$||' -e 's|^./rpy2-2.8-feedstock$||' -e 's|^./r-base-feedstock$||' -e 's|^./$||' -e 's|^./r-feedstock$||' -e 's|^./\.git.*$||')
 conda skeleton cran --output-suffix=-feedstock/recipe --add-maintainer=mingwandroid --update-policy=merge-keep-build-num \
     https://github.com/bokeh/rbokeh \
@@ -16,6 +17,8 @@ conda skeleton cran --output-suffix=-feedstock/recipe --add-maintainer=mingwandr
 # .. take care that RHive's git tag gets reset back to nexr-rhive-2.0.10 (which was released in Dec 2014, not that there has been any real work since then):
 sed -i.bak 's|nexr-rhive-2\.0\.10-ranger.*$|nexr-rhive-2\.0\.10|' r-rhive-feedstock/recipe/meta.yaml
 rm r-rhive-feedstock/recipe/meta.yaml.bak
+sed -i.bak "s|version = \".*\"|version = \"${CONDA_R}\"|" r-recommended-feedstock/recipe/meta.yaml
+# .. now update all of the versions in r-essentials and bump the version of that too (now unified with r-base version)
 
 # Here, the exclusion of r-rmr2 and r-shinysky are because they are from GitHub but not from git repos which breaks conda skeleton cran's assumptions, namely:
 #   1. Any URL with 'github' in it is a git repository (it could be an archive)
@@ -182,6 +185,35 @@ host:
 -    - {{native}}curl
 run:
 -    - {{native}}curl
+
+r-rgl:
+build:
+-    - {{ cdt('xorg-x11-proto-devel') }}  # [linux]
+-    - {{ cdt('mesa-libgl-devel') }}      # [linux]
+-    - {{ cdt('libx11-devel') }}          # [linux]
+-    - {{ cdt('libxext-devel') }}         # [linux]
+-    - {{ cdt('libxrender-devel') }}      # [linux]
+-    - {{ cdt('mesa-libgl-devel') }}      # [linux]
+-    - {{ cdt('mesa-libegl-devel') }}     # [linux]
+-    - {{ cdt('mesa-dri-drivers') }}      # [linux]
+-    - {{ cdt('libxau-devel') }}          # [linux]
+-    - {{ cdt('libdrm-devel') }}          # [linux]
+-    - {{ cdt('libxcomposite-devel') }}   # [linux]
+-    - {{ cdt('libxcursor-devel') }}      # [linux]
+-    - {{ cdt('libxi-devel') }}           # [linux]
+-    - {{ cdt('libxrandr-devel') }}       # [linux]
+-    - {{ cdt('libxscrnsaver-devel') }}   # [linux]
+-    - {{ cdt('libxtst-devel') }}         # [linux]
+-    - {{ cdt('libselinux-devel') }}      # [linux]
+-    - {{ cdt('libxdamage') }}            # [linux]
+-    - {{ cdt('libxfixes') }}             # [linux]
+-    - {{ cdt('libxxf86vm') }}            # [linux]
+host:
+-    - expat                              # [linux]
+-    - libglu                             # [linux]
+run:
+-    - expat                              # [linux]
+-    - libglu                             # [linux]
 
 r-rjava
 build:
