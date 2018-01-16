@@ -19,6 +19,9 @@ sed -i.bak 's|nexr-rhive-2\.0\.10-ranger.*$|nexr-rhive-2\.0\.10|' r-rhive-feedst
 rm r-rhive-feedstock/recipe/meta.yaml.bak
 sed -i.bak "s|version = \".*\"|version = \"${CONDA_R}\"|" r-recommended-feedstock/recipe/meta.yaml
 # .. now update all of the versions in r-essentials and bump the version of that too (now unified with r-base version)
+# If you need to regenerate the build order:
+for linux-64 (edit ~/conda/private_conda_recipes/rays-scratch-scripts/c3i-build-orderer-config/build_platforms.d/example.yml)
+c3i examine --matrix-base-dir ~/conda/private_conda_recipes/rays-scratch-scripts/c3i-build-orderer-config ~/conda/aggregateR --output /tmp/build-order --folders $(find . -maxdepth 1 -type d | grep -v -e '\.git' -e '\.$')
 
 # Here, the exclusion of r-rmr2 and r-shinysky are because they are from GitHub but not from git repos which breaks conda skeleton cran's assumptions, namely:
 #   1. Any URL with 'github' in it is a git repository (it could be an archive)
@@ -35,6 +38,8 @@ git submodule foreach git add .
 /usr/local/bin/git diff -a --submodule=diff --ignore-submodules=none > updates.patch
 git reset HEAD .
 git submodule foreach git reset HEAD .
+
+# 4 .. if updating RStudio then check if the R package dependencies need to be updated
 
 The complete list of the 36 legacy packages that must maintain their build number at 4 at R 3.4.3 buildout time (29th Dec 2017) is:
 
