@@ -77,6 +77,18 @@ cmake                                   \
       "${_CMAKE_EXTRA_CONFIG[@]}"       \
       ..
 
+# In spite of following: https://unix.stackexchange.com/a/221988
+# and those limits seeming to have taken:
+# launchctl limit | grep maxfiles
+# maxfiles    262144         524288
+# .. we still get failures:
+# Error writing out generated unit at '$SRC_DIR/src/gwt/gen/org/rstudio/studio/client/rsconnect/ui/RSAccountConnector_Binder__Impl.java':
+#  java.io.FileNotFoundException: gen/org/rstudio/studio/client/rsconnect/ui/RSAccountConnector_Binder__Impl.java (Too many open files)
+# .. so instead build in series (it may be that running make install twice works just as well here).
+if [[ $(uname) == Darwin ]]; then
+  CPU_COUNT=1
+fi
+
 # "cmake --build" might be fine on all OSes/generators (though it does
 # seem to be building the Debug variant on Xcode), so for now check _XCODE_BUILD
 if [[ ${_XCODE_BUILD} == 1 ]]; then
