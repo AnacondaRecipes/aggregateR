@@ -2,9 +2,9 @@ setlocal EnableDelayedExpansion
 :: Jom is much faster, but if you need to debug something, making Visual Studio
 :: projects can be useful. Packages are always built with Jom though. That side
 :: of the process has never been tested using Visual Studio but it might work.
-set USE_JOM=1
+set USE_JOM=0
 :: set BUILD_TYPE=RelWithDebInfo
-set BUILD_TYPE=Release
+set BUILD_TYPE=RelWithDebInfo
 
 set _JAVA_OPTIONS=-Xmx768M
 
@@ -34,6 +34,8 @@ if "%ARCH%"=="32" (
    set MS_MACH=X64
 )
 
+set R_ROOT=%PREFIX%\lib\R
+
 :: Create an import library for the mingw-w64 compiled R.dll. We must not use
 :: MS's dumpbin for this as that doesn't add 'DATA' annotations to variables.
 :: mingw-w64's gendef must be used instead.
@@ -41,18 +43,18 @@ if "%ARCH%"=="32" (
 :: echo LIBRARY R > %PREFIX%\R\bin\!R_ARCH!\R.def
 :: echo EXPORTS >> %PREFIX%\R\bin\!R_ARCH!\R.def
 :: for /f "skip=19 tokens=4" %%A in (%PREFIX%\R\bin\!R_ARCH!\R.dll.exports.txt) do echo %%A >> %PREFIX%\R\bin\!R_ARCH!\R.def
-gendef %PREFIX%\R\bin\!R_ARCH!\R.dll - > %PREFIX%\R\bin\!R_ARCH!\R.def
-lib /def:%PREFIX%\R\bin\!R_ARCH!\R.def /out:%PREFIX%\R\bin\!R_ARCH!\R.lib /machine:!MS_MACH!
+gendef %R_ROOT%\bin\!R_ARCH!\R.dll - > %R_ROOT%\bin\!R_ARCH!\R.def
+lib /def:%R_ROOT%\bin\!R_ARCH!\R.def /out:%R_ROOT%\bin\!R_ARCH!\R.lib /machine:!MS_MACH!
 
 :: .. and one for Rgraphapp.dll. Unfortunately, the first export from this is bad:
 :: ".refptr.GAI_active_windows.refptr.GAI_app_control_proc..." so this horrible loop
 :: is used to create a new header then copy everything after line 8 from the defs file.
 :: Yes, I know this is awful.
-gendef %PREFIX%\R\bin\!R_ARCH!\Rgraphapp.dll - > %PREFIX%\R\bin\!R_ARCH!\Rgraphapp.dll.exports.txt
-echo LIBRARY Rgraphapp > %PREFIX%\R\bin\!R_ARCH!\Rgraphapp.def
-echo EXPORTS >> %PREFIX%\R\bin\!R_ARCH!\Rgraphapp.def
-for /f "delims= skip=8" %%A in (%PREFIX%\R\bin\!R_ARCH!\Rgraphapp.dll.exports.txt) do echo %%A >> %PREFIX%\R\bin\!R_ARCH!\Rgraphapp.def
-lib /def:%PREFIX%\R\bin\!R_ARCH!\Rgraphapp.def /out:%PREFIX%\R\bin\!R_ARCH!\Rgraphapp.lib /machine:!MS_MACH!
+gendef %R_ROOT%\bin\!R_ARCH!\Rgraphapp.dll - > %R_ROOT%\bin\!R_ARCH!\Rgraphapp.dll.exports.txt
+echo LIBRARY Rgraphapp > %R_ROOT%\bin\!R_ARCH!\Rgraphapp.def
+echo EXPORTS >> %R_ROOT%\bin\!R_ARCH!\Rgraphapp.def
+for /f "delims= skip=8" %%A in (%R_ROOT%\bin\!R_ARCH!\Rgraphapp.dll.exports.txt) do echo %%A >> %R_ROOT%\bin\!R_ARCH!\Rgraphapp.def
+lib /def:%R_ROOT%\bin\!R_ARCH!\Rgraphapp.def /out:%R_ROOT%\bin\!R_ARCH!\Rgraphapp.lib /machine:!MS_MACH!
 
 set BOOST_ROOT=%PREFIX%
 
@@ -68,9 +70,9 @@ if "%USE_JOM%" == "0" goto skip_jom
         -DCMAKE_INSTALL_PREFIX=%PREFIX%\Library ^
         -DRSTUDIO_TARGET=Desktop ^
         -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ^
-        -DLIBR_HOME=%PREFIX%\R ^
-        -DLIBR_CORE_LIBRARY=%PREFIX%\R\bin\!R_ARCH!\R.lib ^
-        -DLIBR_GRAPHAPP_LIBRARY=%PREFIX%\R\bin\!R_ARCH!\Rgraphapp.lib ^
+        -DLIBR_HOME=%R_ROOT% ^
+        -DLIBR_CORE_LIBRARY=%R_ROOT%\bin\!R_ARCH!\R.lib ^
+        -DLIBR_GRAPHAPP_LIBRARY=%R_ROOT%\bin\!R_ARCH!\Rgraphapp.lib ^
         -DQT_QMAKE_EXECUTABLE=%PREFIX%\Library\bin\qmake.exe ^
         -DCMAKE_MAKE_PROGRAM=jom ^
         ..
@@ -94,9 +96,9 @@ if "%USE_JOM%" == "0" goto skip_jom
         -DCMAKE_INSTALL_PREFIX=%PREFIX%\Library ^
         -DRSTUDIO_TARGET=Desktop ^
         -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ^
-        -DLIBR_HOME=%PREFIX%\R ^
-        -DLIBR_CORE_LIBRARY=%PREFIX%\R\bin\!R_ARCH!\R.lib ^
-        -DLIBR_GRAPHAPP_LIBRARY=%PREFIX%\R\bin\!R_ARCH!\Rgraphapp.lib ^
+        -DLIBR_HOME=%R_ROOT% ^
+        -DLIBR_CORE_LIBRARY=%R_ROOT%\bin\!R_ARCH!\R.lib ^
+        -DLIBR_GRAPHAPP_LIBRARY=%R_ROOT%\bin\!R_ARCH!\Rgraphapp.lib ^
         -DQT_QMAKE_EXECUTABLE=%PREFIX%\Library\bin\qmake.exe ^
         -DCMAKE_CXX_FLAGS="/MP /DWIN32 /D_WINDOWS /EHsc" ^
         -DCMAKE_C_FLAGS="/MP /DWIN32 /D_WINDOWS /EHsc" ^
@@ -109,9 +111,9 @@ IF NOT EXIST %PREFIX%\Menu mkdir %PREFIX%\Menu
 copy %RECIPE_DIR%\menu-windows.json %PREFIX%\Menu\
 copy %RECIPE_DIR%\rstudio.ico %PREFIX%\Menu\
 
-del %PREFIX%\R\bin\!R_ARCH!\Rgraphapp.dll.exports.txt
-del %PREFIX%\R\bin\!R_ARCH!\Rgraphapp.lib
-del %PREFIX%\R\bin\!R_ARCH!\R.def
-del %PREFIX%\R\bin\!R_ARCH!\R.lib
+del %R_ROOT%\bin\!R_ARCH!\Rgraphapp.dll.exports.txt
+del %R_ROOT%\bin\!R_ARCH!\Rgraphapp.lib
+del %R_ROOT%\bin\!R_ARCH!\R.def
+del %R_ROOT%\bin\!R_ARCH!\R.lib
 
 popd
