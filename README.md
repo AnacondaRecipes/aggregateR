@@ -273,3 +273,10 @@ run:
 ~/conda/private_conda_recipes/rays-scratch-scripts/build-in-order --product=r --upload-channel=rdonnellyr --pkg-build-channel-priority=M --installer-build-channel-priority=D --skip-existing=yes --build-toolchain=no 2>&1 | tee ~/conda/R-3.4.3.log
 # the rest (does look on rdonnellyr) - ACTUALLY WE CANNOT USE NOARCH YET UNFORTUNATELY, SO USE THE ABOVE FOR ALL PLATFORMS.
 ~/conda/private_conda_recipes/rays-scratch-scripts/build-in-order --product=r --upload-channel=rdonnellyr --pkg-build-channel-priority=M,U --installer-build-channel-priority=D --skip-existing=yes --build-toolchain=no 2>&1 | tee ~/conda/R-3.4.3.log
+
+# To check that anaconda upload didn't drop some packages:
+python ~/conda/private_conda_recipes/rays-scratch-scripts/binstar_copy.py --owner rdonnellyr --platform "osx-64" --operation list > /tmp/uploaded.txt
+.. then compare against e.g:
+pushd /opt/conda/conda-bld/osx-64
+ls -1 | LC_ALL=C sort > /tmp/build.txt
+diff -urN /tmp/build.txt /tmp/uploaded.txt
