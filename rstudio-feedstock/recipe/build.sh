@@ -1,8 +1,8 @@
 # Changing to not using an .app bundle is a bit tricky. I need to use
 # Xcode.
 _XCODE_BUILD=0
-# BUILD_TYPE=Release
-BUILD_TYPE=RelWithDebInfo
+BUILD_TYPE=Release
+# BUILD_TYPE=RelWithDebInfo
 
 # Boost 1.65.1 cannot be used with -std=c++17 it seems. -std=c++14 works.
 re='(.*[[:space:]])\-std\=[^[:space:]]*(.*)'
@@ -108,5 +108,4 @@ elif [[ $(uname) == Linux ]]; then
   echo "be even nicer if menuinst handled both that and App bundles."
 fi
 
-exit 1
-
+# exit 1

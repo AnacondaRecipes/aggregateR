@@ -2,9 +2,9 @@ setlocal EnableDelayedExpansion
 :: Jom is much faster, but if you need to debug something, making Visual Studio
 :: projects can be useful. Packages are always built with Jom though. That side
 :: of the process has never been tested using Visual Studio but it might work.
-set USE_JOM=0
+set USE_JOM=1
 :: set BUILD_TYPE=RelWithDebInfo
-set BUILD_TYPE=RelWithDebInfo
+set BUILD_TYPE=Release
 
 set _JAVA_OPTIONS=-Xmx768M
 
@@ -111,12 +111,12 @@ IF NOT EXIST %PREFIX%\Menu mkdir %PREFIX%\Menu
 copy %RECIPE_DIR%\menu-windows.json %PREFIX%\Menu\
 copy %RECIPE_DIR%\rstudio.ico %PREFIX%\Menu\
 
+:: If you need to debug in an IDE:
+:: exit /b 1
+
 del %R_ROOT%\bin\!R_ARCH!\Rgraphapp.dll.exports.txt
 del %R_ROOT%\bin\!R_ARCH!\Rgraphapp.lib
 del %R_ROOT%\bin\!R_ARCH!\R.def
 del %R_ROOT%\bin\!R_ARCH!\R.lib
 
 popd
-
-exit /b 1
-
