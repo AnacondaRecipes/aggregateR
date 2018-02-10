@@ -1,15 +1,15 @@
-From d77d2c10974b72889e1daabec7dcb7987d68e2f3 Mon Sep 17 00:00:00 2001
+From e964d7f763e438e36b548437d126b148dbfaaa90 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Wed, 19 Oct 2016 14:59:07 +0100
 Subject: [PATCH 07/45] Look for `bin/R` in `$CONDA_PREFIX`
 
 And also relative to the executable folder.
 
-.. on Windows, this is `R/bin/R`.
+.. on all OSes this is `lib/R/bin/R`.
 ---
  src/cpp/core/r_util/REnvironmentPosix.cpp | 12 ++++++++++++
- src/cpp/desktop/DesktopRVersion.cpp       | 24 ++++++++++++++++++++++++
- 2 files changed, 36 insertions(+)
+ src/cpp/desktop/DesktopRVersion.cpp       | 30 ++++++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+)
 
 diff --git a/src/cpp/core/r_util/REnvironmentPosix.cpp b/src/cpp/core/r_util/REnvironmentPosix.cpp
 index 1c2754d77e..bd1c4070cc 100644
@@ -35,10 +35,10 @@ index 1c2754d77e..bd1c4070cc 100644
     rScriptPaths.push_back("/usr/local/bin/R");
     rScriptPaths.push_back("/opt/local/bin/R");
 diff --git a/src/cpp/desktop/DesktopRVersion.cpp b/src/cpp/desktop/DesktopRVersion.cpp
-index fb108a3efe..5d7f0710a1 100644
+index fb108a3efe..451cdee2fa 100644
 --- a/src/cpp/desktop/DesktopRVersion.cpp
 +++ b/src/cpp/desktop/DesktopRVersion.cpp
-@@ -270,6 +270,21 @@ void enumRegistry(QList<RVersion>* pResults)
+@@ -270,6 +270,27 @@ void enumRegistry(QList<RVersion>* pResults)
     }
  }
  
@@ -49,18 +49,24 @@ index fb108a3efe..5d7f0710a1 100644
 +   // by a relative path from the executable. This is similar to what we do
 +   // in REnviornmentPosix.cpp
 +   char* conda_prefix = getenv("CONDA_PREFIX");
-+   if (conda_prefix != NULL)
-+      versionsFromRHome(QString::fromStdString(std::string(conda_prefix) + "/R"), pResults);
-+   QDir executable_path = QDir(QCoreApplication::applicationFilePath() + QString::fromLatin1("/../../R")).absolutePath();
-+   if (executable_path.exists())
-+      versionsFromRHome(executable_path, pResults);
++   // New Unix-a-like layout followed by the old Windows layout.
++   const char* pfxs[2] = {"/lib/R", "/R"};
++   const char* pfxs2[2] = {"/../../../lib/R", "/../../../R"};
++   for (int i = 0; i < 2; ++i) {
++      if (conda_prefix != NULL)
++         versionsFromRHome(QString::fromStdString(std::string(conda_prefix) + pfxs[i]), pResults);
++      QDir executable_path = QDir(QCoreApplication::applicationFilePath() + QString::fromLatin1(pfxs2[i])).absolutePath();
++      QString wtf = executable_path.absolutePath();
++      if (executable_path.exists())
++         versionsFromRHome(executable_path, pResults);
++   }
 +}
 +#endif
 +
  // Return all valid versions of R we can find, nicely sorted and de-duped.
  // You can explicitly pass in versions that you know about (that may or
  // may not be valid) using the versions param.
-@@ -277,6 +292,9 @@ QList<RVersion> allRVersions(QList<RVersion> versions)
+@@ -277,6 +298,9 @@ QList<RVersion> allRVersions(QList<RVersion> versions)
  {
     versionsFromRHome(QString::fromStdString(system::getenv("R_HOME")),
                       &versions);
@@ -70,7 +76,7 @@ index fb108a3efe..5d7f0710a1 100644
     enumRegistry(&versions);
     enumProgramFiles(&versions);
  
-@@ -344,11 +362,17 @@ RVersion detectPreferredFromRegistry(HKEY key, Architecture architecture)
+@@ -344,11 +368,17 @@ RVersion detectPreferredFromRegistry(HKEY key, Architecture architecture)
  
  RVersion autoDetect(Architecture architecture, bool preferredOnly)
  {
@@ -89,5 +95,5 @@ index fb108a3efe..5d7f0710a1 100644
        return RVersion();
  
 -- 
-2.14.2
+2.15.0
 
