@@ -117,3 +117,6 @@ del %R_ROOT%\bin\!R_ARCH!\R.def
 del %R_ROOT%\bin\!R_ARCH!\R.lib
 
 popd
+
+exit /b 1
+

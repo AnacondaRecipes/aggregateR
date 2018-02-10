@@ -1,6 +1,8 @@
 # Changing to not using an .app bundle is a bit tricky. I need to use
 # Xcode.
 _XCODE_BUILD=0
+# BUILD_TYPE=Release
+BUILD_TYPE=RelWithDebInfo
 
 # Boost 1.65.1 cannot be used with -std=c++17 it seems. -std=c++14 works.
 re='(.*[[:space:]])\-std\=[^[:space:]]*(.*)'
@@ -69,7 +71,7 @@ cmake                                   \
       -DBOOST_ROOT=${PREFIX}            \
       -DBOOST_VERSION=1.65.1            \
       -DRSTUDIO_TARGET=Desktop          \
-      -DCMAKE_BUILD_TYPE=Release        \
+      -DCMAKE_BUILD_TYPE=${BUILD_TYPE}  \
       -DLIBR_HOME=${PREFIX}/lib/R       \
       -DUSE_MACOS_R_FRAMEWORK=FALSE     \
       -DCMAKE_C_COMPILER=${CC}          \
@@ -105,3 +107,6 @@ elif [[ $(uname) == Linux ]]; then
   echo "It would be nice to add a .desktop file here, but it would"
   echo "be even nicer if menuinst handled both that and App bundles."
 fi
+
+exit 1
+
