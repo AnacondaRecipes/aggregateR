@@ -29,8 +29,11 @@ if [[ ${target_platform} == osx-64 ]]; then
     $INSTALL_NAME_TOOL -change /usr/lib/libc++.1.dylib "$PREFIX"/lib/libc++.1.dylib ${SHARED_LIB}
     # We may want to whitelist some of these instead?
     $INSTALL_NAME_TOOL -change /usr/lib/libz.1.dylib "$PREFIX"/lib/libz.1.dylib ${SHARED_LIB}
+    # libncurses cannot be modified as there is not enough space:
+    # changing install names or rpaths can't be redone for: ./dependencies/common/libclang/3.5/libclang.dylib (for architecture x86_64)
+    # because larger updated load commands do not fit (the program must be relinked, and you may need to use -headerpad or -headerpad_max_install_names
+    # $INSTALL_NAME_TOOL -change /usr/lib/libncurses.5.4.dylib "$PREFIX"/lib/libncursesw.6.dylib ${SHARED_LIB}
     $INSTALL_NAME_TOOL -change /usr/lib/libedit.3.dylib "$PREFIX"/lib/libedit.0.dylib ${SHARED_LIB}
-    $INSTALL_NAME_TOOL -change /usr/lib/libncurses.5.4.dylib "$PREFIX"/lib/libncursesw.6.dylib ${SHARED_LIB}
   done
 fi
 
@@ -89,7 +92,7 @@ cmake                                   \
       "${_CMAKE_EXTRA_CONFIG[@]}"       \
       ..
 
-# In spite of following: https://unix.stackexchange.com/a/221988
+# on macOS 10.9, in spite of following: https://unix.stackexchange.com/a/221988
 # and those limits seeming to have taken:
 # launchctl limit | grep maxfiles
 # maxfiles    262144         524288
@@ -97,9 +100,11 @@ cmake                                   \
 # Error writing out generated unit at '$SRC_DIR/src/gwt/gen/org/rstudio/studio/client/rsconnect/ui/RSAccountConnector_Binder__Impl.java':
 #  java.io.FileNotFoundException: gen/org/rstudio/studio/client/rsconnect/ui/RSAccountConnector_Binder__Impl.java (Too many open files)
 # .. so instead build in series (it may be that running make install twice works just as well here).
-if [[ $(uname) == Darwin ]]; then
-  CPU_COUNT=1
-fi
+# Update: It turns out that the number of files needed is constant and the number of threads has no bearing on this:
+# https://groups.google.com/d/msg/google-web-toolkit/EGiOO0g85rI/tGrxa9_Ou9wJ
+# When building a ClientBundle with images, the compiler holds all the source image files open at the same time, even if you never refer to the image in your code
+# Also for macOS 10.9, the way to increase this limit is to add the following to ~/.bash_profile:
+# ulimit -n 2048
 
 # "cmake --build" might be fine on all OSes/generators (though it does
 # seem to be building the Debug variant on Xcode), so for now check _XCODE_BUILD
