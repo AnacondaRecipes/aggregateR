@@ -24,6 +24,16 @@ pushd dependencies/common
   ./install-packages
 popd
 
+if [[ ${target_platform} == osx-64 ]]; then
+  for SHARED_LIB in $(find . -type f -iname "libclang.dylib"); do
+    $INSTALL_NAME_TOOL -change /usr/lib/libc++.1.dylib "$PREFIX"/lib/libc++.1.dylib
+    # We may want to whitelist some of these instead?
+    $INSTALL_NAME_TOOL -change /usr/lib/libz.1.dylib "$PREFIX"/lib/libz.1.dylib
+    $INSTALL_NAME_TOOL -change /usr/lib/libedit.3.dylib "$PREFIX"/lib/libedit.0.dylib
+    $INSTALL_NAME_TOOL -change /usr/lib/libncurses.5.4.dylib "$PREFIX"/lib/libncursesw.6.dylib
+  fi
+fi
+
 mkdir build
 cd build
 
