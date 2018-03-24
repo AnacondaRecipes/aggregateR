@@ -1,0 +1,67 @@
+From 6f663c44c6514ac50be51833c58d97873c0b1112 Mon Sep 17 00:00:00 2001
+From: Ray Donnelly <mingw.android@gmail.com>
+Date: Sat, 24 Mar 2018 10:39:05 +0000
+Subject: [PATCH 07/33] Make BOOST_VERSION a cache var, do not use 1.63.0 when
+ DEFINED ENV{CONDA_BUILD}
+
+---
+ dependencies/common/install-common                         | 4 +++-
+ src/cpp/CMakeLists.txt                                     | 5 +++++
+ src/cpp/session/http/SessionHttpConnectionListenerImpl.hpp | 2 +-
+ 3 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/dependencies/common/install-common b/dependencies/common/install-common
+index df834fa65e..ef4cc24ffc 100755
+--- a/dependencies/common/install-common
++++ b/dependencies/common/install-common
+@@ -20,7 +20,9 @@ set -e
+ ./install-gwt
+ ./install-dictionaries
+ ./install-mathjax
+-./install-boost
++if [[ -z ${CONDA_BUILD} ]]; then
++  ./install-boost
++fi
+ ./install-pandoc
+ ./install-libclang
+ ./install-packages
+diff --git a/src/cpp/CMakeLists.txt b/src/cpp/CMakeLists.txt
+index 7917ca9aec..27e7b79813 100644
+--- a/src/cpp/CMakeLists.txt
++++ b/src/cpp/CMakeLists.txt
+@@ -149,6 +149,9 @@ else()
+ 
+ endif()
+ 
++# Boost.Signals is no longer being maintained and is now deprecated. Please switch to Boost.Signals2
++add_definitions(-DBOOST_SIGNALS_NO_DEPRECATION_WARNING)
++
+ # determine whether we should statically link boost. we always do this
+ # unless we are building a non-packaged build on linux (in which case
+ # boost dynamic libraries are presumed to be installed on the system ldpath)
+@@ -168,6 +171,8 @@ if (RSTUDIO_BOOST_VERSION)
+    set(BOOST_VERSION "${RSTUDIO_BOOST_VERSION}")
+ endif()
+ 
++set(BOOST_VERSION 1.63.0 CACHE STRING "Boost version to use")
++
+ # disable Boost Signals deprecation warning
+ add_definitions(-DBOOST_SIGNALS_NO_DEPRECATION_WARNING)
+ 
+diff --git a/src/cpp/session/http/SessionHttpConnectionListenerImpl.hpp b/src/cpp/session/http/SessionHttpConnectionListenerImpl.hpp
+index 248081b1c0..75c3b1d38f 100644
+--- a/src/cpp/session/http/SessionHttpConnectionListenerImpl.hpp
++++ b/src/cpp/session/http/SessionHttpConnectionListenerImpl.hpp
+@@ -24,8 +24,8 @@
+ #include <boost/asio/placeholders.hpp>
+ #include <boost/algorithm/string/predicate.hpp>
+ 
+-#include <core/Macros.hpp>
+ #include <core/BoostThread.hpp>
++#include <core/Macros.hpp>
+ #include <core/FilePath.hpp>
+ #include <core/FileLock.hpp>
+ #include <core/Error.hpp>
+-- 
+2.14.3 (Apple Git-98)
+
