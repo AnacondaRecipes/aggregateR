@@ -37,7 +37,8 @@ if [[ ${target_platform} == osx-64 ]]; then
   done
 fi
 
-mkdir build
+rm -rf build || true
+mkdir build || true
 cd build
 
 if ! which javac; then
@@ -73,23 +74,39 @@ if [[ ${HOST} =~ .*darwin.* ]]; then
   _CMAKE_EXTRA_CONFIG+=(-DRSTUDIO_USE_LIBCXX=TRUE)
   unset MACOSX_DEPLOYMENT_TARGET
   export MACOSX_DEPLOYMENT_TARGET
-else
-  _CMAKE_EXTRA_CONFIG+=(-DQT_QMAKE_EXECUTABLE=${PREFIX}/bin/qmake)
+  _CMAKE_EXTRA_CONFIG+=(-DCMAKE_AR=${AR})
+  _CMAKE_EXTRA_CONFIG+=(-DCMAKE_RANLIB=${RANLIB})
+  _CMAKE_EXTRA_CONFIG+=(-DCMAKE_LINKER=${LD})
 fi
+_CMAKE_EXTRA_CONFIG+=(-DQT_QMAKE_EXECUTABLE=${PREFIX}/bin/qmake)
 
 #      -Wdev --debug-output --trace                \
 
-cmake                                   \
-      -DCMAKE_INSTALL_PREFIX=${PREFIX}  \
-      -DBOOST_ROOT=${PREFIX}            \
-      -DBOOST_VERSION=1.65.1            \
-      -DRSTUDIO_TARGET=Desktop          \
-      -DCMAKE_BUILD_TYPE=${BUILD_TYPE}  \
-      -DLIBR_HOME=${PREFIX}/lib/R       \
-      -DUSE_MACOS_R_FRAMEWORK=FALSE     \
-      -DCMAKE_C_COMPILER=${CC}          \
-      -DCMAKE_CXX_COMPILER=${CXX}       \
-      "${_CMAKE_EXTRA_CONFIG[@]}"       \
+echo cmake                                    \
+      -DCMAKE_INSTALL_PREFIX=${PREFIX}        \
+      -DBOOST_ROOT=${PREFIX}                  \
+      -DBOOST_VERSION=1.65.1                  \
+      -DRSTUDIO_TARGET=Desktop                \
+      -DCMAKE_BUILD_TYPE=${BUILD_TYPE}        \
+      -DLIBR_HOME=${PREFIX}/lib/R             \
+      -DUSE_MACOS_R_FRAMEWORK=FALSE           \
+      -DCMAKE_C_COMPILER=$(type -p ${CC})     \
+      -DCMAKE_CXX_COMPILER=$(type -p ${CXX})  \
+      "${_CMAKE_EXTRA_CONFIG[@]}"             \
+      -Wdev --debug-output --trace            \
+      ..
+
+cmake                                         \
+      -DCMAKE_INSTALL_PREFIX=${PREFIX}        \
+      -DBOOST_ROOT=${PREFIX}                  \
+      -DBOOST_VERSION=1.65.1                  \
+      -DRSTUDIO_TARGET=Desktop                \
+      -DCMAKE_BUILD_TYPE=${BUILD_TYPE}        \
+      -DLIBR_HOME=${PREFIX}/lib/R             \
+      -DUSE_MACOS_R_FRAMEWORK=FALSE           \
+      -DCMAKE_C_COMPILER=$(type -p ${CC})     \
+      -DCMAKE_CXX_COMPILER=$(type -p ${CXX})  \
+      "${_CMAKE_EXTRA_CONFIG[@]}"             \
       ..
 
 # on macOS 10.9, in spite of following: https://unix.stackexchange.com/a/221988
