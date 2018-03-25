@@ -78,6 +78,10 @@ if [[ ${HOST} =~ .*darwin.* ]]; then
   _CMAKE_EXTRA_CONFIG+=(-DCMAKE_RANLIB=${RANLIB})
   _CMAKE_EXTRA_CONFIG+=(-DCMAKE_LINKER=${LD})
 fi
+if [[ ${HOST} =~ .*linux.* ]]; then
+  LIBRT=$(find ${PREFIX} -name "librt.so")
+  _CMAKE_EXTRA_CONFIG+=(-DRT_LIBRARIES=${LIBRT})
+fi
 _CMAKE_EXTRA_CONFIG+=(-DQT_QMAKE_EXECUTABLE=${PREFIX}/bin/qmake)
 
 #      -Wdev --debug-output --trace                \
