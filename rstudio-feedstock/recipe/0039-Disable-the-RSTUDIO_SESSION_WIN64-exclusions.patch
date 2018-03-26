@@ -1,0 +1,57 @@
+From c90e2e382730a3976b737323a3f3ee321eecd25f Mon Sep 17 00:00:00 2001
+From: Ray Donnelly <mingw.android@gmail.com>
+Date: Mon, 26 Mar 2018 10:24:28 -0700
+Subject: [PATCH 39/39] Disable the RSTUDIO_SESSION_WIN64 exclusions
+
+---
+ CMakeGlobals.txt               | 2 +-
+ src/cpp/session/CMakeLists.txt | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeGlobals.txt b/CMakeGlobals.txt
+index a70d9062e0..ac05c54925 100644
+--- a/CMakeGlobals.txt
++++ b/CMakeGlobals.txt
+@@ -149,7 +149,7 @@ if (APPLE AND RSTUDIO_DESKTOP AND NOT DEFINED ENV{CONDA_BUILD})
+    set(RSTUDIO_INSTALL_BIN RStudio.app/Contents/MacOS)
+    set(RSTUDIO_INSTALL_SUPPORTING RStudio.app/Contents/Resources)
+ else()
+-   if (RSTUDIO_SESSION_WIN64)
++   if (RSTUDIO_SESSION_WIN64 AND NOT DEFINED ENV{CONDA_BUILD})
+      set(RSTUDIO_INSTALL_BIN x64)
+    else()
+      set(RSTUDIO_INSTALL_BIN bin)
+diff --git a/src/cpp/session/CMakeLists.txt b/src/cpp/session/CMakeLists.txt
+index d770e46475..55044324db 100644
+--- a/src/cpp/session/CMakeLists.txt
++++ b/src/cpp/session/CMakeLists.txt
+@@ -344,7 +344,7 @@ if(WIN32)
+    configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rsession.exe.manifest
+                    ${CMAKE_CURRENT_BINARY_DIR}/rsession.exe.manifest COPYONLY)
+ 
+-   if(NOT RSTUDIO_SESSION_WIN64)
++   if(NOT RSTUDIO_SESSION_WIN64 OR DEFINED ENV{CONDA_BUILD})
+       add_subdirectory(consoleio)
+    endif()
+ endif()
+@@ -428,7 +428,7 @@ endif()
+ install(TARGETS rsession DESTINATION ${RSTUDIO_INSTALL_BIN})
+ 
+ # include resources, R scripts and 64bit binaries if this isn't a session 64bit build
+-if (NOT RSTUDIO_SESSION_WIN64)
++if (NOT RSTUDIO_SESSION_WIN64 OR DEFINED ENV{CONDA_BUILD})
+ 
+    # postback
+    add_subdirectory(postback)
+@@ -585,7 +585,7 @@ if (NOT RSTUDIO_SESSION_WIN64)
+ endif()
+ 
+ # install 64-bit MSVC runtime for session win64
+-if(RSTUDIO_SESSION_WIN64)
++if(RSTUDIO_SESSION_WIN64 AND NOT DEFINED ENV{CONDA_BUILD})
+    include(InstallRequiredSystemLibraries)
+    install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION ${RSTUDIO_INSTALL_BIN})
+ endif()
+-- 
+2.16.2
+

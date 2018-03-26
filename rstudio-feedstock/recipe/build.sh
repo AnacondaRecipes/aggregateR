@@ -84,7 +84,7 @@ if [[ ${HOST} =~ .*linux.* ]]; then
 fi
 _CMAKE_EXTRA_CONFIG+=(-DQT_QMAKE_EXECUTABLE=${PREFIX}/bin/qmake)
 
-#      -Wdev --debug-output --trace                \
+#      -Wdev --debug-output --trace           \
 
 echo cmake                                    \
       -DCMAKE_INSTALL_PREFIX=${PREFIX}        \
@@ -111,6 +111,7 @@ cmake                                         \
       -DCMAKE_C_COMPILER=$(type -p ${CC})     \
       -DCMAKE_CXX_COMPILER=$(type -p ${CXX})  \
       "${_CMAKE_EXTRA_CONFIG[@]}"             \
+      -Wdev --debug-output --trace            \
       ..
 
 # on macOS 10.9, in spite of following: https://unix.stackexchange.com/a/221988

@@ -75,6 +75,7 @@ if "%USE_JOM%" == "0" goto skip_jom
         -DLIBR_GRAPHAPP_LIBRARY=%R_ROOT%\bin\!R_ARCH!\Rgraphapp.lib ^
         -DQT_QMAKE_EXECUTABLE=%PREFIX%\Library\bin\qmake.exe ^
         -DCMAKE_MAKE_PROGRAM=jom ^
+        -Wdev --debug-output --trace ^
         ..
 ::  if "%PROCESSOR_ARCHITECTURE%"=="x86" (
 ::     echo Early test for OpenJDK heap allocation problem
