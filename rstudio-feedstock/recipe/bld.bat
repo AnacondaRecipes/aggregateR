@@ -113,7 +113,7 @@ copy %RECIPE_DIR%\menu-windows.json %PREFIX%\Menu\
 copy %RECIPE_DIR%\rstudio.ico %PREFIX%\Menu\
 
 :: If you need to debug in an IDE:
-exit /b 1
+:: exit /b 1
 
 del %R_ROOT%\bin\!R_ARCH!\Rgraphapp.dll.exports.txt
 del %R_ROOT%\bin\!R_ARCH!\Rgraphapp.lib
