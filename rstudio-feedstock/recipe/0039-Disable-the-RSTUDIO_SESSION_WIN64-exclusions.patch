@@ -1,12 +1,14 @@
-From c90e2e382730a3976b737323a3f3ee321eecd25f Mon Sep 17 00:00:00 2001
+From edbd42142df0877146a506ff8b8816c51553d8b4 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Mon, 26 Mar 2018 10:24:28 -0700
 Subject: [PATCH 39/39] Disable the RSTUDIO_SESSION_WIN64 exclusions
 
+.. and also the x64 vs bin install layout changes.
 ---
- CMakeGlobals.txt               | 2 +-
- src/cpp/session/CMakeLists.txt | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ CMakeGlobals.txt                | 2 +-
+ src/cpp/desktop/DesktopMain.cpp | 4 ++--
+ src/cpp/session/CMakeLists.txt  | 6 +++---
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/CMakeGlobals.txt b/CMakeGlobals.txt
 index a70d9062e0..ac05c54925 100644
@@ -21,6 +23,28 @@ index a70d9062e0..ac05c54925 100644
       set(RSTUDIO_INSTALL_BIN x64)
     else()
       set(RSTUDIO_INSTALL_BIN bin)
+diff --git a/src/cpp/desktop/DesktopMain.cpp b/src/cpp/desktop/DesktopMain.cpp
+index 1727c65d23..ddae69aa61 100644
+--- a/src/cpp/desktop/DesktopMain.cpp
++++ b/src/cpp/desktop/DesktopMain.cpp
+@@ -463,7 +463,7 @@ int main(int argc, char* argv[])
+          sessionPath = currentPath.complete("session/rsession");
+          scriptsPath = currentPath.complete("desktop");
+          devMode = true;
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(CONDA_BUILD)
+          if (version.architecture() == ArchX64 &&
+              installPath.complete("session/x64").exists())
+          {
+@@ -480,7 +480,7 @@ int main(int argc, char* argv[])
+          scriptsPath = installPath.complete("bin");
+ 
+          // check for win64 binary on windows
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(CONDA_BUILD)
+          if (version.architecture() == ArchX64 &&
+              installPath.complete("bin/x64").exists())
+          {
 diff --git a/src/cpp/session/CMakeLists.txt b/src/cpp/session/CMakeLists.txt
 index d770e46475..55044324db 100644
 --- a/src/cpp/session/CMakeLists.txt
