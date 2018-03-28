@@ -1,14 +1,18 @@
-From edbd42142df0877146a506ff8b8816c51553d8b4 Mon Sep 17 00:00:00 2001
+From f4aa156fe262bd329f686ce5fe03954e1d23fe5a Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Mon, 26 Mar 2018 10:24:28 -0700
-Subject: [PATCH 39/39] Disable the RSTUDIO_SESSION_WIN64 exclusions
+Subject: [PATCH 39/42] Disable the RSTUDIO_SESSION_WIN64 exclusions
 
 .. and also the x64 vs bin install layout changes.
 ---
- CMakeGlobals.txt                | 2 +-
- src/cpp/desktop/DesktopMain.cpp | 4 ++--
- src/cpp/session/CMakeLists.txt  | 6 +++---
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ CMakeGlobals.txt                        | 2 +-
+ src/cpp/desktop/CMakeLists.txt          | 2 +-
+ src/cpp/desktop/DesktopMain.cpp         | 4 ++--
+ src/cpp/diagnostics/CMakeLists.txt      | 2 +-
+ src/cpp/r/CMakeLists.txt                | 2 +-
+ src/cpp/session/CMakeLists.txt          | 6 +++---
+ src/cpp/session/postback/CMakeLists.txt | 2 +-
+ 7 files changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/CMakeGlobals.txt b/CMakeGlobals.txt
 index a70d9062e0..ac05c54925 100644
@@ -23,6 +27,19 @@ index a70d9062e0..ac05c54925 100644
       set(RSTUDIO_INSTALL_BIN x64)
     else()
       set(RSTUDIO_INSTALL_BIN bin)
+diff --git a/src/cpp/desktop/CMakeLists.txt b/src/cpp/desktop/CMakeLists.txt
+index 50e7aa913f..a8d0c37a6a 100644
+--- a/src/cpp/desktop/CMakeLists.txt
++++ b/src/cpp/desktop/CMakeLists.txt
+@@ -296,7 +296,7 @@ if(WIN32)
+    configure_file (${CMAKE_CURRENT_SOURCE_DIR}/rstudio.exe.manifest
+                    ${CMAKE_CURRENT_BINARY_DIR}/rstudio.exe.manifest COPYONLY)
+ 
+-   if(NOT RSTUDIO_SESSION_WIN64)
++   if(NOT RSTUDIO_SESSION_WIN64 OR DEFINED ENV{CONDA_BUILD}))
+       add_subdirectory(urlopener)
+       add_subdirectory(synctex/rsinverse)
+    endif()
 diff --git a/src/cpp/desktop/DesktopMain.cpp b/src/cpp/desktop/DesktopMain.cpp
 index 1727c65d23..ddae69aa61 100644
 --- a/src/cpp/desktop/DesktopMain.cpp
@@ -45,8 +62,34 @@ index 1727c65d23..ddae69aa61 100644
           if (version.architecture() == ArchX64 &&
               installPath.complete("bin/x64").exists())
           {
+diff --git a/src/cpp/diagnostics/CMakeLists.txt b/src/cpp/diagnostics/CMakeLists.txt
+index 9b45573de4..9f11340fb4 100644
+--- a/src/cpp/diagnostics/CMakeLists.txt
++++ b/src/cpp/diagnostics/CMakeLists.txt
+@@ -63,7 +63,7 @@ endif()
+ target_link_libraries(diagnostics
+    rstudio-core
+ )
+-if(NOT RSTUDIO_SESSION_WIN64)
++if(NOT RSTUDIO_SESSION_WIN64 OR DEFINED ENV{CONDA_BUILD}))
+    install(TARGETS diagnostics DESTINATION ${RSTUDIO_INSTALL_BIN})
+ endif()
+ 
+diff --git a/src/cpp/r/CMakeLists.txt b/src/cpp/r/CMakeLists.txt
+index f6a66c453b..9fac52a82c 100644
+--- a/src/cpp/r/CMakeLists.txt
++++ b/src/cpp/r/CMakeLists.txt
+@@ -96,7 +96,7 @@ target_link_libraries(rstudio-r
+ )
+ 
+ # install rules
+-if (NOT RSTUDIO_SESSION_WIN64)
++if (NOT RSTUDIO_SESSION_WIN64 OR DEFINED ENV{CONDA_BUILD})
+    file(GLOB R_SRC_FILES "R/*.R")
+    install(FILES ${R_SRC_FILES} DESTINATION ${RSTUDIO_INSTALL_SUPPORTING}/R)
+ endif()
 diff --git a/src/cpp/session/CMakeLists.txt b/src/cpp/session/CMakeLists.txt
-index d770e46475..55044324db 100644
+index 0b89447bbe..5d81089ec8 100644
 --- a/src/cpp/session/CMakeLists.txt
 +++ b/src/cpp/session/CMakeLists.txt
 @@ -344,7 +344,7 @@ if(WIN32)
@@ -76,6 +119,19 @@ index d770e46475..55044324db 100644
     include(InstallRequiredSystemLibraries)
     install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION ${RSTUDIO_INSTALL_BIN})
  endif()
+diff --git a/src/cpp/session/postback/CMakeLists.txt b/src/cpp/session/postback/CMakeLists.txt
+index 1ee77b75ee..b4cd926b46 100644
+--- a/src/cpp/session/postback/CMakeLists.txt
++++ b/src/cpp/session/postback/CMakeLists.txt
+@@ -55,7 +55,7 @@ configure_file(rpostback-askpass ${POSTBACK_SCRIPT_DIR}/rpostback-askpass)
+ configure_file(askpass-passthrough ${POSTBACK_SCRIPT_DIR}/askpass-passthrough)
+ 
+ # installation rules
+-if(NOT RSTUDIO_SESSION_WIN64)
++if(NOT RSTUDIO_SESSION_WIN64 OR DEFINED ENV{CONDA_BUILD})
+    install(TARGETS rpostback DESTINATION ${RSTUDIO_INSTALL_BIN})
+    file(GLOB POSTBACK_SCRIPTS "rpostback-*")
+    set(POSTBACK_SCRIPTS ${POSTBACK_SCRIPTS} "askpass-passthrough")
 -- 
 2.16.2
 
