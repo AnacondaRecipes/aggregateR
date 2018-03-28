@@ -112,7 +112,10 @@ IF NOT EXIST %PREFIX%\Menu mkdir %PREFIX%\Menu
 copy %RECIPE_DIR%\menu-windows.json %PREFIX%\Menu\
 copy %RECIPE_DIR%\rstudio.ico %PREFIX%\Menu\
 
-:: If you need to debug in an IDE:
+:: If you need to debug in an IDE, first:
+:: cp /c/Users/builder/m64/conda-bld/rstudio_1522223226967/work/src/cpp/r/R/*.R _h_env/Library/share/rstudio/R/
+:: Then set the debugging env to add:
+:: RSTUDIO_SUPPORTING_FILE_PATH=C:/Users/builder/m64/conda-bld/rstudio_1522223226967/_h_env/Library/share/rstudio
 :: exit /b 1
 
 del %R_ROOT%\bin\!R_ARCH!\Rgraphapp.dll.exports.txt
