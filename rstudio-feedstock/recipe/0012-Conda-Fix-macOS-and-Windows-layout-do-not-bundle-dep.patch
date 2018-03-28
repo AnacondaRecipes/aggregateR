@@ -1,16 +1,16 @@
-From d25a9034bcda45e8ef19a5d3f9b86dcf88ad4e67 Mon Sep 17 00:00:00 2001
+From 3dddcae6f7abd40487c5e9807080ffd85372dfec Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Sat, 29 Oct 2016 17:39:52 +0100
-Subject: [PATCH 12/35] Conda: Fix macOS and Windows layout, do not bundle deps
+Subject: [PATCH 12/42] Conda: Fix macOS and Windows layout, do not bundle deps
 
 ---
  CMakeGlobals.txt                              |  2 +-
- dependencies/windows/install-dependencies.cmd | 47 ++++++++++++---------
+ dependencies/windows/install-dependencies.cmd | 47 +++++++++--------
  package/win32/CMakeLists.txt                  |  3 +-
- src/cpp/desktop-mac/CMakeLists.txt            | 60 ++++++++++++++++++---------
- src/cpp/desktop/CMakeLists.txt                | 16 ++++---
- src/cpp/session/CMakeLists.txt                |  7 +++-
- 6 files changed, 85 insertions(+), 50 deletions(-)
+ src/cpp/desktop-mac/CMakeLists.txt            | 60 ++++++++++++++--------
+ src/cpp/desktop/CMakeLists.txt                | 74 ++++++++++++++++++---------
+ src/cpp/session/CMakeLists.txt                |  7 ++-
+ 6 files changed, 124 insertions(+), 69 deletions(-)
 
 diff --git a/CMakeGlobals.txt b/CMakeGlobals.txt
 index ce82c40c4e..5af28df1e4 100644
@@ -26,7 +26,7 @@ index ce82c40c4e..5af28df1e4 100644
     set(RSTUDIO_INSTALL_SUPPORTING RStudio.app/Contents/Resources)
  else()
 diff --git a/dependencies/windows/install-dependencies.cmd b/dependencies/windows/install-dependencies.cmd
-index 5759dc4bf7..dbca59f99d 100644
+index af7ddda2b8..fa8494947d 100644
 --- a/dependencies/windows/install-dependencies.cmd
 +++ b/dependencies/windows/install-dependencies.cmd
 @@ -35,28 +35,34 @@ set LIBCLANG_HEADERS_FILE=libclang-%LIBCLANG_HEADERS%.zip
@@ -180,7 +180,7 @@ index c9bff323fb..58fbfb49bc 100644
  # install mac-terminal script
  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mac-terminal.in
 diff --git a/src/cpp/desktop/CMakeLists.txt b/src/cpp/desktop/CMakeLists.txt
-index f00c7a5f3d..8fda3efe5c 100644
+index f00c7a5f3d..c5b9facc75 100644
 --- a/src/cpp/desktop/CMakeLists.txt
 +++ b/src/cpp/desktop/CMakeLists.txt
 @@ -311,10 +311,11 @@ endif(WIN32)
@@ -199,21 +199,80 @@ index f00c7a5f3d..8fda3efe5c 100644
  endif()
  
  set(RSTUDIO_QTMODULES
-@@ -335,7 +336,7 @@ set(RSTUDIO_QTMODULES
+@@ -334,10 +335,16 @@ set(RSTUDIO_QTMODULES
+     Qml
  )
  
++if(APPLE AND NOT DEFINED ENV{CONDA_BUILD})
++   set(RSTUDIO_EXE_NAME "RStudio")
++else()
++   set(RSTUDIO_EXE_NAME "rstudio")
++endif(APPLE)
++
  # define executable (Windows & Linux)
 -if(NOT APPLE)
 +if(NOT APPLE OR DEFINED ENV{CONDA_BUILD})
  
-    add_executable(rstudio
+-   add_executable(rstudio
++   add_executable(${RSTUDIO_EXE_NAME}
        ${DESKTOP_SOURCE_FILES}
-@@ -377,8 +378,11 @@ if(NOT APPLE)
-       target_link_libraries(rstudio Version)
+       ${MOC_DESKTOP_SOURCE_FILES}
+       ${DESKTOP_RESOURCES_SOURCES}
+@@ -352,33 +359,50 @@ if(NOT APPLE)
+    )
+ 
+    if(WIN32)
+-      qt5_use_modules(rstudio ${RSTUDIO_QTMODULES} ${RSTUDIO_EXTRA_QTMODULES})
++      qt5_use_modules(${RSTUDIO_EXE_NAME} ${RSTUDIO_QTMODULES} ${RSTUDIO_EXTRA_QTMODULES})
+    else()
+-      qt5_use_modules(rstudio ${RSTUDIO_QTMODULES} ${RSTUDIO_EXTRA_QTMODULES} DBus)
++      qt5_use_modules(${RSTUDIO_EXE_NAME} ${RSTUDIO_QTMODULES} ${RSTUDIO_EXTRA_QTMODULES} DBus)
+    endif()
+ 
+    # add rpath for linux so we can find qt libraries in our bin dir
+    if(UNIX AND RSTUDIO_BUNDLE_QT)
+       set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+-      set_target_properties(rstudio PROPERTIES
++      set_target_properties(${RSTUDIO_EXE_NAME} PROPERTIES
+                             INSTALL_RPATH \$ORIGIN)
+    endif()
+ 
+    # set link dependencies
+-   target_link_libraries(rstudio
+-      ${QT_LIBRARIES}
+-      ${Boost_LIBRARIES}
+-      rstudio-core
+-      ${LINK_FLAGS}
+-   )
++   if(APPLE)
++      target_link_libraries(${RSTUDIO_EXE_NAME}
++         ${QT_LIBRARIES}
++         ${Boost_LIBRARIES}
++         rstudio-core
++         ${APPLICATION_SERVICES_LIBRARY}
++         ${COCOA_LIBRARY}
++         ${SECURITY_LIBRARY})
++   else()
++      target_link_libraries(${RSTUDIO_EXE_NAME}
++         ${QT_LIBRARIES}
++         ${Boost_LIBRARIES}
++         rstudio-core
++         ${LINK_FLAGS}
++      )
++   endif()
+ 
+    # extra dependencies for Windows
+    if(WIN32)
+-      target_link_libraries(rstudio Version)
++      target_link_libraries(${RSTUDIO_EXE_NAME} Version)
++   endif()
++
++   if(DEFINED ENV{CONDA_BUILD})
++      target_compile_definitions(${RSTUDIO_EXE_NAME} PRIVATE "-DCONDA_BUILD")
     endif()
  
 +   # install target
-+   install(TARGETS rstudio DESTINATION ${RSTUDIO_INSTALL_BIN})
++   install(TARGETS ${RSTUDIO_EXE_NAME} DESTINATION ${RSTUDIO_INSTALL_BIN})
 +
  # for OSX we create a bundle
 -else()
@@ -221,8 +280,55 @@ index f00c7a5f3d..8fda3efe5c 100644
  
     # configure Info.plist
     configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in
+@@ -398,7 +422,7 @@ else()
+    # define bundle name and executable
+    set(MACOSX_BUNDLE_BUNDLE_NAME "RStudio")
+ 
+-   add_executable(RStudio MACOSX_BUNDLE
++   add_executable(${RSTUDIO_EXE_NAME} MACOSX_BUNDLE
+       ${DESKTOP_SOURCE_FILES}
+       ${MOC_DESKTOP_SOURCE_FILES}
+       ${DESKTOP_RESOURCES_SOURCES}
+@@ -406,9 +430,9 @@ else()
+       ${ICNS_FILES}
+       ${PNG_FILES})
+ 
+-   qt5_use_modules(RStudio ${RSTUDIO_QTMODULES})
++   qt5_use_modules(${RSTUDIO_EXE_NAME} ${RSTUDIO_QTMODULES})
+ 
+-   target_link_libraries(RStudio
++   target_link_libraries(${RSTUDIO_EXE_NAME}
+       ${QT_LIBRARIES}
+       rstudio-core
+       ${APPLICATION_SERVICES_LIBRARY}
+@@ -418,12 +442,12 @@ else()
+ endif()
+ 
+ # install target (OSX install goes into the bundle)
+-if(APPLE)
+-  set_target_properties(RStudio PROPERTIES
++if(APPLE AND NOT DEFINED ENV{CONDA_BUILD})
++  set_target_properties(${RSTUDIO_EXE_NAME} PROPERTIES
+      MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+-  install(TARGETS RStudio BUNDLE DESTINATION .)
++  install(TARGETS ${RSTUDIO_EXE_NAME} BUNDLE DESTINATION .)
+ else()
+-  install(TARGETS rstudio DESTINATION ${RSTUDIO_INSTALL_BIN})
++  install(TARGETS ${RSTUDIO_EXE_NAME} DESTINATION ${RSTUDIO_INSTALL_BIN})
+ endif()
+ 
+ # bundle qt dependencies if this is a package build
+@@ -515,7 +539,7 @@ if(RSTUDIO_BUNDLE_QT)
+          add_library(${ICU_LIBRARY} SHARED IMPORTED)
+          set_property(TARGET ${ICU_LIBRARY} PROPERTY IMPORTED_LOCATION "${QT_LIBRARY_DIR}/${ICU_LIBRARY}.so")
+       endforeach()
+-      target_link_libraries(rstudio ${ICU_LIBRARIES})
++      target_link_libraries(${RSTUDIO_EXE_NAME} ${ICU_LIBRARIES})
+ 
+       # configure and install qt
+       configure_file(
 diff --git a/src/cpp/session/CMakeLists.txt b/src/cpp/session/CMakeLists.txt
-index 313cde89b7..4c979dcbc7 100644
+index 89c2d2d0fd..1db47cb1a3 100644
 --- a/src/cpp/session/CMakeLists.txt
 +++ b/src/cpp/session/CMakeLists.txt
 @@ -535,8 +535,9 @@ if (NOT RSTUDIO_SESSION_WIN64)

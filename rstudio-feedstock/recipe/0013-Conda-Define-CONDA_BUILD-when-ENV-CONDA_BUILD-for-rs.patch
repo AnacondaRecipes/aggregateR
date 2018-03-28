@@ -1,0 +1,58 @@
+From 71bc1238b7d999e06c36f0950e4d1e18d3fe2faf Mon Sep 17 00:00:00 2001
+From: Ray Donnelly <mingw.android@gmail.com>
+Date: Wed, 28 Mar 2018 21:29:26 +0100
+Subject: [PATCH 13/42] Conda: Define CONDA_BUILD when ENV{CONDA_BUILD} for
+ rstudio and rsession
+
+---
+ src/cpp/core/CMakeLists.txt        | 4 ++++
+ src/cpp/desktop-mac/CMakeLists.txt | 2 ++
+ src/cpp/session/CMakeLists.txt     | 4 ++++
+ 3 files changed, 10 insertions(+)
+
+diff --git a/src/cpp/core/CMakeLists.txt b/src/cpp/core/CMakeLists.txt
+index 98301db99d..2a65480539 100644
+--- a/src/cpp/core/CMakeLists.txt
++++ b/src/cpp/core/CMakeLists.txt
+@@ -344,6 +344,10 @@ target_link_libraries(
+    ${CORE_SYSTEM_LIBRARIES}
+ )
+ 
++if(DEFINED ENV{CONDA_BUILD})
++   target_compile_definitions(rstudio-core PRIVATE "-DCONDA_BUILD")
++endif()
++
+ # define executable (for running unit tests)
+ if (RSTUDIO_UNIT_TESTS_ENABLED)
+ 
+diff --git a/src/cpp/desktop-mac/CMakeLists.txt b/src/cpp/desktop-mac/CMakeLists.txt
+index 58fbfb49bc..d59ddfa779 100644
+--- a/src/cpp/desktop-mac/CMakeLists.txt
++++ b/src/cpp/desktop-mac/CMakeLists.txt
+@@ -106,6 +106,8 @@ else()
+       ${OPENGL_LIBRARY}
+       ${WEBKIT_LIBRARY})
+ 
++   target_compile_definitions(rstudio PRIVATE "-DCONDA_BUILD")
++
+    # install target
+    install(TARGETS rstudio DESTINATION ${RSTUDIO_INSTALL_BIN})
+ 
+diff --git a/src/cpp/session/CMakeLists.txt b/src/cpp/session/CMakeLists.txt
+index 1db47cb1a3..6b40b2db8b 100644
+--- a/src/cpp/session/CMakeLists.txt
++++ b/src/cpp/session/CMakeLists.txt
+@@ -357,6 +357,10 @@ if(RSTUDIO_DEVELOPMENT OR RSTUDIO_RUN_IN_PLACE)
+    set_target_properties(rsession PROPERTIES SKIP_BUILD_RPATH TRUE)
+ endif()
+ 
++if(DEFINED ENV{CONDA_BUILD})
++   target_compile_definitions(rsession PRIVATE "-DCONDA_BUILD")
++endif()
++
+ # add origin rpath for suse/sles
+ if(RSTUDIO_PACKAGE_VARIANT STREQUAL "SLES")
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+-- 
+2.14.3 (Apple Git-98)
+
