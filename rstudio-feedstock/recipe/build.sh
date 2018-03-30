@@ -10,6 +10,10 @@ if [[ "${CXXFLAGS}" =~ $re ]]; then
   export CXXFLAGS="${BASH_REMATCH[1]} -std=c++14 ${BASH_REMATCH[2]}"
 fi
 
+if [[ ${_XCODE_BUILD} == 1 ]]; then
+  export LD=$CXX
+fi
+
 export RSTUDIO_VERSION_MAJOR=$(echo ${PKG_VERSION} | cut -d. -f1)
 export RSTUDIO_VERSION_MINOR=$(echo ${PKG_VERSION} | cut -d. -f2)
 export RSTUDIO_VERSION_PATCH=$(echo ${PKG_VERSION} | cut -d. -f3)
