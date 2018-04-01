@@ -1,0 +1,40 @@
+From 9cedd0ebdb588acc061b96c0076516a2dac2b7f4 Mon Sep 17 00:00:00 2001
+From: Ray Donnelly <mingw.android@gmail.com>
+Date: Sat, 31 Mar 2018 12:59:53 +0100
+Subject: [PATCH 44/44] Use find_program to locate ant
+
+This is necessary for Xcode builds since Xcode scrubs PATH
+---
+ src/gwt/CMakeLists.txt | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/src/gwt/CMakeLists.txt b/src/gwt/CMakeLists.txt
+index a15f9e8e00..5f6c44c9c1 100644
+--- a/src/gwt/CMakeLists.txt
++++ b/src/gwt/CMakeLists.txt
+@@ -35,14 +35,18 @@ if("${GWT_EXTRAS_DIR}" STREQUAL "")
+ endif()
+ 
+ # invoke ant to build
++find_program(ANT ant)
++if(NOT ANT)
++   message(FATAL_ERROR "ant not found!")
++endif()
+ add_custom_target(gwt_build ALL)
+ add_custom_command(
+    TARGET gwt_build
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+-   COMMAND ant -Dbuild.dir="${GWT_BIN_DIR}"
+-               -Dwww.dir="${GWT_WWW_DIR}"
+-               -Dextras.dir="${GWT_EXTRAS_DIR}"
+-               -Dlib.dir="${GWT_LIB_DIR}")
++   COMMAND ${ANT} -Dbuild.dir="${GWT_BIN_DIR}"
++                  -Dwww.dir="${GWT_WWW_DIR}"
++                  -Dextras.dir="${GWT_EXTRAS_DIR}"
++                  -Dlib.dir="${GWT_LIB_DIR}")
+ 
+ # create test script and copy to binary directory with executable permissions
+ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gwt-unit-tests.sh.in
+-- 
+2.16.1
+

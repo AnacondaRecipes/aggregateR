@@ -1,8 +1,8 @@
 # Changing to not using an .app bundle is a bit tricky. I need to use
 # Xcode.
-_XCODE_BUILD=0
-BUILD_TYPE=Release
-# BUILD_TYPE=RelWithDebInfo
+_XCODE_BUILD=1
+# BUILD_TYPE=Release
+BUILD_TYPE=RelWithDebInfo
 
 # Boost 1.65.1 cannot be used with -std=c++17 it seems. -std=c++14 works.
 re='(.*[[:space:]])\-std\=[^[:space:]]*(.*)'
@@ -12,6 +12,9 @@ fi
 
 if [[ ${_XCODE_BUILD} == 1 ]]; then
   export LD=$CXX
+  # https://stackoverflow.com/q/15761583
+  # https://forums.developer.apple.com/thread/17757
+  export LDFLAGS="${LDFLAGS} -Xlinker -U -Xlinker _objc_readClassPair"
 fi
 
 export RSTUDIO_VERSION_MAJOR=$(echo ${PKG_VERSION} | cut -d. -f1)
@@ -41,9 +44,11 @@ if [[ ${target_platform} == osx-64 ]]; then
   done
 fi
 
-rm -rf build || true
-mkdir build || true
-cd build
+# Out-of-source-tree builds make debugging really difficult:
+# https://github.com/rstudio/rstudio/wiki/RStudio-Development
+# rm -rf build || true
+# mkdir build || true
+# cd build
 
 if ! which javac; then
   echo "Fatal: Please install javac with your system package manager"
@@ -55,17 +60,8 @@ if ! which ant; then
   exit 1
 fi
 
-# Note, you can select a different default R interpreter launching
-# RStudio by:
-# export RSTUDIO_WHICH_R=${CONDA_PREFIX}/bin/R
-
-# You can use this so that -Wl,-rpath-link gets used during linking
-# executables. Without it, -Wl,-rpath is used anyway (and also) and
-# either works fine from the perspective of ld finding transitively
-# linked shared libraries:
-# -DCMAKE_PLATFORM_RUNTIME_PATH=${PREFIX}/lib
-
 export BOOST_ROOT=${PREFIX}
+
 _VERBOSE="VERBOSE=1"
 
 declare -a _CMAKE_EXTRA_CONFIG
@@ -73,6 +69,7 @@ if [[ ${HOST} =~ .*darwin.* ]]; then
   if [[ ${_XCODE_BUILD} == 1 ]]; then
     _CMAKE_EXTRA_CONFIG+=(-G'Xcode')
     _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_ARCHITECTURES=x86_64)
+    _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_SYSROOT=${CONDA_BUILD_SYSROOT})
     _VERBOSE=""
   fi
   _CMAKE_EXTRA_CONFIG+=(-DRSTUDIO_USE_LIBCXX=TRUE)
@@ -87,8 +84,6 @@ if [[ ${HOST} =~ .*linux.* ]]; then
   _CMAKE_EXTRA_CONFIG+=(-DRT_LIBRARIES=${LIBRT})
 fi
 _CMAKE_EXTRA_CONFIG+=(-DQT_QMAKE_EXECUTABLE=${PREFIX}/bin/qmake)
-
-#      -Wdev --debug-output --trace           \
 
 echo cmake                                    \
       -DCMAKE_INSTALL_PREFIX=${PREFIX}        \
@@ -115,8 +110,9 @@ cmake                                         \
       -DCMAKE_C_COMPILER=$(type -p ${CC})     \
       -DCMAKE_CXX_COMPILER=$(type -p ${CXX})  \
       "${_CMAKE_EXTRA_CONFIG[@]}"             \
-      -Wdev --debug-output --trace            \
       ..
+
+exit 1
 
 # on macOS 10.9, in spite of following: https://unix.stackexchange.com/a/221988
 # and those limits seeming to have taken:
@@ -149,4 +145,4 @@ elif [[ $(uname) == Linux ]]; then
   echo "be even nicer if menuinst handled both that and App bundles."
 fi
 
-# exit 1
+exit 1
