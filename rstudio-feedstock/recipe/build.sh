@@ -26,8 +26,8 @@ if [[ ${_DEBUG} == yes ]]; then
   # 8  thread_proxy                                                                                                                                                                                                                             0x55f50557b72e
   # 9  start_thread                                                                                                                                                                                          pthread_create.c              465  0x7fb0f3d6c7fc
   # 10 clone                                                                                                                                                                                                 clone.S                       95   0x7fb0f2590b5f
-  export CFLAGS=${DEBUG_CFLAGS} -O0
-  export CXXFLAGS=${DEBUG_CXXFLAGS} -O0
+  export CFLAGS="${DEBUG_CFLAGS} -O0"
+  export CXXFLAGS="${DEBUG_CXXFLAGS} -O0"
 else
   BUILD_TYPE=Release
   RSTUDIO_TARGET=Desktop
@@ -218,7 +218,7 @@ if [[ ${_DEBUG} == yes ]]; then
   echo "    PKG_NAME=${PKG_NAME} \\"
   echo " PKG_VERSION=${PKG_VERSION} \\"
   echo " CONDA_BUILD=1 \\"
-  echo "${SYS_PREFIX}/envs/devenv/bin/qtcreator -debug \$(ps -fu $USER | grep rsession | grep -v grep | awk '{print \$2}')"
+  echo "${SYS_PREFIX}/envs/devenv/bin/qtcreator -debug \$(ps aux | grep rsession | grep -v grep | awk '{print \$2}')"
   # If you want to try using QtCreator to hack on the software this might work (if you are very lucky, more likely you
   # will spend hours battling the poor implementation that is QtCreator's CMake integration: imporing existing builds
   # results in dropped configuration parameters; the configuration dialog does not show any parameters while CMake is
