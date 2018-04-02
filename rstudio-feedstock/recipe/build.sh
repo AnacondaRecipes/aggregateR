@@ -1,7 +1,6 @@
-# Changing to not using an .app bundle is a bit tricky. I need to use
-# Xcode.
-_DEBUG=yes
+#!/bin/sh
 
+_DEBUG=no
 if [[ ${_DEBUG} == yes ]]; then
   # BUILD_TYPE=RelWithDebInfo
   BUILD_TYPE=Debug
@@ -9,29 +8,14 @@ if [[ ${_DEBUG} == yes ]]; then
   # BUILD_TYPE=RelWithDebInfo
   BUILD_TYPE=Debug
   RSTUDIO_TARGET=Server
-  #
-  # -Og is removing too much debug info. The callstack that leads to the correct termination on Linux is:
-  #
-  # (where we land at SessionClientEvent.cpp:
-  #              case client_events::kConsoleWriteError:
-  #                 return "console_error";
-  #
-  # 1  rstudio::session::ClientEvent::typeName[abi:cxx11]() const                                                                                                                                            SessionClientEvent.cpp        518  0x55f504d2fef3
-  # 2  rstudio::session::ClientEvent::asJsonObject                                                                                                                                                           SessionClientEvent.cpp        201  0x55f504d31933
-  # 3  rstudio::session::ClientEventService::run                                                                                                                                                             SessionClientEventService.cpp 332  0x55f504d40d82
-  # 4  boost::_mfi::mf0<void, rstudio::session::ClientEventService>::operator()                                                                                                                              mem_fn_template.hpp           49   0x55f504d41935
-  # 5  boost::_bi::list1<boost::_bi::value<rstudio::session::ClientEventService *>>::operator()<boost::_mfi::mf0<void, rstudio::session::ClientEventService>, boost::_bi::list0>                             bind.hpp                      259  0x55f504d41935
-  # 6  boost::_bi::bind_t<void, boost::_mfi::mf0<void, rstudio::session::ClientEventService>, boost::_bi::list1<boost::_bi::value<rstudio::session::ClientEventService *>>>::operator()                      bind.hpp                      1294 0x55f504d41935
-  # 7  boost::detail::thread_data<boost::_bi::bind_t<void, boost::_mfi::mf0<void, rstudio::session::ClientEventService>, boost::_bi::list1<boost::_bi::value<rstudio::session::ClientEventService *>>>>::run thread.hpp                    116  0x55f504d41935
-  # 8  thread_proxy                                                                                                                                                                                                                             0x55f50557b72e
-  # 9  start_thread                                                                                                                                                                                          pthread_create.c              465  0x7fb0f3d6c7fc
-  # 10 clone                                                                                                                                                                                                 clone.S                       95   0x7fb0f2590b5f
   export CFLAGS="${DEBUG_CFLAGS} -O0"
   export CXXFLAGS="${DEBUG_CXXFLAGS} -O0"
 else
   BUILD_TYPE=Release
   RSTUDIO_TARGET=Desktop
 fi
+# This can be useful sometimes, but in general QtCreator works better since
+# it's what upstream uses.
 _XCODE_BUILD=no
 
 # Boost 1.65.1 cannot be used with -std=c++17 it seems. -std=c++14 works.
@@ -74,25 +58,9 @@ if [[ ${target_platform} == osx-64 ]]; then
   done
 fi
 
-# Out-of-source-tree builds make debugging really difficult:
-# https://github.com/rstudio/rstudio/wiki/RStudio-Development
-# rm -rf build || true
-# mkdir build || true
-# cd build
-
-if ! which javac; then
-  echo "Fatal: Please install javac with your system package manager"
-  exit 1
-fi
-
-if ! which ant; then
-  echo "Fatal: Please install ant with your system package manager"
-  exit 1
-fi
-
 export BOOST_ROOT=${PREFIX}
 
-_VERBOSE="VERBOSE=1"
+_VERBOSE=${VERBOSE_CM}
 
 declare -a _CMAKE_EXTRA_CONFIG
 if [[ ${HOST} =~ .*darwin.* ]]; then
@@ -186,6 +154,7 @@ elif [[ $(uname) == Linux ]]; then
   echo "be even nicer if menuinst handled both that and App bundles."
 fi
 
+# Please do not remove this block. If you ever need it you will thank me.
 if [[ ${_DEBUG} == yes ]]; then
   echo ""
   echo "# Build finished, since _DEBUG is yes (in build.sh), you should open 2 or 3 new shells:"
@@ -204,7 +173,11 @@ if [[ ${_DEBUG} == yes ]]; then
   echo "# Then open Chrome, browse to:"
   echo "# .. the code server at: http://127.0.0.1:9876"
   echo "# .. the RStudo app at:  http://127.0.0.1:8787"
-  echo "google-chrome-stable http://127.0.0.1:9876 http://127.0.0.1:8787 &"
+  if [[ $(uname) == Darwin ]]; then
+    echo "/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome http://127.0.0.1:9876 http://127.0.0.1:8787 &"
+  else
+    echo "google-chrome-stable http://127.0.0.1:9876 http://127.0.0.1:8787 &"
+  fi
   echo "# and follow the instructions given at:"
   echo "# https://github.com/rstudio/rstudio/wiki/RStudio-Development"
   echo "# If you need to debug rsession (likely you do) then QtCreator from anaconda.org/rdonnelly can help"
@@ -213,7 +186,7 @@ if [[ ${_DEBUG} == yes ]]; then
   echo "ln -s ${SRC_DIR} /usr/local/src/conda/${PKG_NAME}-${PKG_VERSION}"
   echo "[[ -L /usr/local/src/conda-prefix ]] && rm -rf /usr/local/src/conda-prefix"
   echo "ln -s ${PREFIX} /usr/local/src/conda-prefix"
-  echo "
+  echo ""
   echo "# Launch QtCreator with some necessary environment variables set:"
   echo "rm ${SRC_DIR}/CMakeLists.txt.user || true"
   echo "     SRC_DIR=${SRC_DIR} \\"
