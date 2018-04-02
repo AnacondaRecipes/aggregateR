@@ -56,6 +56,7 @@ source:
     - 0044-Use-find_program-to-locate-ant.patch
     - 0045-change-RStudio.launch-from-org.rstudio.studio.RStudi.patch
     - 0046-Use-style-PRETTY-for-another-bit-of-GWT.patch
+    - 0047-Set-auth-none-1-in-conf-rserver-dev.conf-in-case-we-.patch
 
 build:
   number: 0
@@ -76,6 +77,9 @@ build:
 requirements:
   build:
     - {{ compiler('cxx') }}
+    # Not actually needed but R pulls in gfortran but somehow not the impl?!
+    # .. when using the dbg compilers this leads to a failure to find gfortran executable?!
+    - {{ compiler('fortran') }}
     - {{ cdt('xorg-x11-proto-devel') }}  # [linux]
     - {{ cdt('libx11-devel') }}          # [linux]
     - {{ cdt('libxext-devel') }}         # [linux]
@@ -100,6 +104,10 @@ requirements:
     - {{ cdt('libxfixes') }}             # [linux]
     - {{ cdt('libxxf86vm') }}            # [linux]
     - {{ cdt('mesa-libgbm') }}           # [linux]
+    # pam-devel and audit-libs are only needed in server mode which
+    # is only enabled (in build.sh) when debugging problems.
+    - {{ cdt('pam-devel') }}             # [linux]
+    - {{ cdt('audit-libs') }}            # [linux]
     - openjdk
     - m2-filesystem                      # [win]
     - m2-git                             # [win]
@@ -120,6 +128,8 @@ requirements:
     - icu >=58
     - zlib >=1.2
     - r >=3.4.3
+    # Mainly in-case you need to debug something with Shiny applications.
+    - r-shiny
     # With MRO, when CMake calls calls "R.exe --vanilla --slave -e cat(as.character(getRversion()))" it fails with:
     # "The system cannot find the path specified." (even though it works fine from cmd.exe)
     # - _r-mutex 1.0.0-anacondar_1

@@ -1,7 +1,7 @@
-From 61ec80ad1ba525c07efdfad11d28f1ccd78d0550 Mon Sep 17 00:00:00 2001
+From 389b70c3f660bc6349566951ee085c129053427a Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Mon, 31 Oct 2016 12:01:00 +0000
-Subject: [PATCH 16/42] Conda: Put resources in share/rstudio
+Subject: [PATCH 16/44] Conda: Put resources in share/rstudio
 
 ..on all platforms.
 
@@ -21,9 +21,9 @@ Add resolveIDEPath for Xcode and/or QtCreator debugging
  src/cpp/desktop/DesktopOptions.cpp                 |   6 +
  src/cpp/r/R/Diagnostics.R                          |  13 +-
  src/cpp/session/SessionMain.cpp                    |   6 +
- src/cpp/session/SessionOptions.cpp                 | 151 +++++++++++++++------
+ src/cpp/session/SessionOptions.cpp                 | 160 +++++++++++++++------
  src/cpp/session/include/session/SessionOptions.hpp |  16 +++
- 13 files changed, 220 insertions(+), 58 deletions(-)
+ 13 files changed, 228 insertions(+), 59 deletions(-)
 
 diff --git a/CMakeGlobals.txt b/CMakeGlobals.txt
 index 5af28df1e4..b94d6bf5cd 100644
@@ -86,7 +86,7 @@ diff --git a/src/cpp/desktop-mac/AppDelegate.mm b/src/cpp/desktop-mac/AppDelegat
 index 9aee06a07b..1f38a961af 100644
 --- a/src/cpp/desktop-mac/AppDelegate.mm
 +++ b/src/cpp/desktop-mac/AppDelegate.mm
-@@ -360,6 +360,22 @@ - (void) applicationDidFinishLaunching: (NSNotification *) aNotification
+@@ -360,6 +360,22 @@ bool prepareEnvironment(Options& options)
           sessionPath_ = installPath.complete("MacOS/rsession");
           scriptsPath = installPath.complete("MacOS");
        }
@@ -132,7 +132,7 @@ diff --git a/src/cpp/desktop-mac/Options.mm b/src/cpp/desktop-mac/Options.mm
 index 0d96d834a8..7636bb1fe8 100644
 --- a/src/cpp/desktop-mac/Options.mm
 +++ b/src/cpp/desktop-mac/Options.mm
-@@ -157,12 +157,16 @@
+@@ -157,12 +157,16 @@ FilePath Options::supportingFilePath() const
  {
     if (supportingFilePath_.empty())
     {
@@ -278,10 +278,22 @@ index b34be0c325..46586d4679 100644
        std::string firstProjectPath = "";
        bool newUser = false;
 diff --git a/src/cpp/session/SessionOptions.cpp b/src/cpp/session/SessionOptions.cpp
-index 1319e7a5d7..c487f21fa8 100644
+index 1319e7a5d7..4f93f60e07 100644
 --- a/src/cpp/session/SessionOptions.cpp
 +++ b/src/cpp/session/SessionOptions.cpp
-@@ -49,9 +49,38 @@ namespace rstudio {
+@@ -13,6 +13,11 @@
+  *
+  */
+ 
++// Work around both R_ext/boolean.h and /opt/MacOSX10.9.sdk/usr/include/mach-o/dyld.h
++// wanting to make an enum containing FALSE and TRUE
++#define ENUM_DYLD_BOOL
++#include <boost/dll/runtime_symbol_info.hpp>
++
+ #include <session/SessionOptions.hpp>
+ 
+ #include <boost/foreach.hpp>
+@@ -49,9 +54,38 @@ namespace rstudio {
  namespace session {  
  
  namespace {
@@ -321,19 +333,22 @@ index 1319e7a5d7..c487f21fa8 100644
  
  void ensureDefaultDirectory(std::string* pDirectory,
                              const std::string& userHomePath)
-@@ -86,7 +115,11 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
+@@ -86,7 +120,13 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
     core::system::unsetenv(kMonitorSharedSecretEnvVar);
  
     // compute the resource path
-+#ifndef CONDA_BUILD
-    Error error = core::system::installPath("..", argv[0], &resourcePath_);
-+#else
-+   Error error = core::system::installPath("../share/rstudio", argv[0], &resourcePath_);
+-   Error error = core::system::installPath("..", argv[0], &resourcePath_);
++   Error error = Success();
++#ifdef CONDA_BUILD
++   error = core::system::installPath("../share/rstudio", boost::dll::program_location().string().c_str(), &resourcePath_);
++   if (error || !resourcePath_.exists())
 +#endif
++      error = core::system::installPath("..", boost::dll::program_location().string().c_str(), &resourcePath_);
++
     if (error)
     {
        LOG_ERROR_MESSAGE("Unable to determine install path: "+error.summary());
-@@ -94,13 +127,13 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
+@@ -94,13 +134,13 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
     }
  
     // detect running in OSX bundle and tweak resource path
@@ -349,7 +364,7 @@ index 1319e7a5d7..c487f21fa8 100644
     bool is64 = false;
     if (resourcePath_.complete("x64").exists())
     {
-@@ -342,17 +375,20 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
+@@ -342,17 +382,20 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
        ("external-rpostback-path", 
         value<std::string>(&rpostbackPath_)->default_value(kDefaultPostbackPath),
         "Path to rpostback executable")
@@ -374,7 +389,7 @@ index 1319e7a5d7..c487f21fa8 100644
         "Path to msys_ssh utilities (windows-only)")
        ("external-sumatra-path",
         value<std::string>(&sumatraPath_)->default_value("bin/sumatra"),
-@@ -546,6 +582,7 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
+@@ -546,6 +589,7 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
     resolvePath(resourcePath_, &sessionLibraryPath_);
     resolvePath(resourcePath_, &sessionPackageArchivesPath_);
     resolvePostbackPath(resourcePath_, &rpostbackPath_);
@@ -382,7 +397,7 @@ index 1319e7a5d7..c487f21fa8 100644
  #ifdef _WIN32
     resolvePath(resourcePath_, &consoleIoPath_);
     resolvePath(resourcePath_, &gnudiffPath_);
-@@ -561,6 +598,9 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
+@@ -561,6 +605,9 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
     std::string completion;
     if (pty.isWithin(resourcePath_))
     {
@@ -392,7 +407,7 @@ index 1319e7a5d7..c487f21fa8 100644
        if (is64)
           completion = "x64/winpty.dll";
        else
-@@ -572,6 +612,7 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
+@@ -572,6 +619,7 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
           completion = "64/bin/winpty.dll";
        else
           completion = "32/bin/winpty.dll";
@@ -400,7 +415,7 @@ index 1319e7a5d7..c487f21fa8 100644
     }
     winptyPath_ = pty.complete(completion).absolutePath();
  #endif
-@@ -692,21 +733,23 @@ void Options::resolvePath(const FilePath& resourcePath,
+@@ -692,21 +740,23 @@ void Options::resolvePath(const FilePath& resourcePath,
                            std::string* pPath)
  {
     if (!pPath->empty())
@@ -434,7 +449,7 @@ index 1319e7a5d7..c487f21fa8 100644
     }
     else
     {
-@@ -714,54 +757,74 @@ void Options::resolvePostbackPath(const FilePath& resourcePath,
+@@ -714,54 +764,74 @@ void Options::resolvePostbackPath(const FilePath& resourcePath,
     }
  }
  
@@ -580,5 +595,5 @@ index 89095fa66c..aac822d1ed 100644
     std::string gnudiffPath_;
     std::string gnugrepPath_;
 -- 
-2.14.3 (Apple Git-98)
+2.16.1
 

@@ -1,7 +1,7 @@
-From a0cb1157b3dfada6bdb75c884411263b6fbe0423 Mon Sep 17 00:00:00 2001
+From 788c25f5a0999781aac7f687845d80bdf57daa1b Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Sat, 29 Oct 2016 17:39:52 +0100
-Subject: [PATCH 11/42] Conda: Fix macOS and Windows layout, do not bundle deps
+Subject: [PATCH 11/44] Conda: Fix macOS and Windows layout, do not bundle deps
 
 ---
  CMakeGlobals.txt                              |  2 +-
@@ -180,10 +180,10 @@ index c9bff323fb..58fbfb49bc 100644
  # install mac-terminal script
  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mac-terminal.in
 diff --git a/src/cpp/desktop/CMakeLists.txt b/src/cpp/desktop/CMakeLists.txt
-index f00c7a5f3d..c5b9facc75 100644
+index 33435c5ac5..c39f785671 100644
 --- a/src/cpp/desktop/CMakeLists.txt
 +++ b/src/cpp/desktop/CMakeLists.txt
-@@ -311,10 +311,11 @@ endif(WIN32)
+@@ -310,10 +310,11 @@ endif(WIN32)
  # bundle it unless we are building on linux and NOT linking against the
  # qtsdk -- in that case we are linking against system versions of the
  # qt libraries which should therefore not be bundled
@@ -199,7 +199,7 @@ index f00c7a5f3d..c5b9facc75 100644
  endif()
  
  set(RSTUDIO_QTMODULES
-@@ -334,10 +335,16 @@ set(RSTUDIO_QTMODULES
+@@ -333,10 +334,16 @@ set(RSTUDIO_QTMODULES
      Qml
  )
  
@@ -207,7 +207,7 @@ index f00c7a5f3d..c5b9facc75 100644
 +   set(RSTUDIO_EXE_NAME "RStudio")
 +else()
 +   set(RSTUDIO_EXE_NAME "rstudio")
-+endif(APPLE)
++endif(APPLE AND NOT DEFINED ENV{CONDA_BUILD})
 +
  # define executable (Windows & Linux)
 -if(NOT APPLE)
@@ -218,7 +218,7 @@ index f00c7a5f3d..c5b9facc75 100644
        ${DESKTOP_SOURCE_FILES}
        ${MOC_DESKTOP_SOURCE_FILES}
        ${DESKTOP_RESOURCES_SOURCES}
-@@ -352,33 +359,50 @@ if(NOT APPLE)
+@@ -351,33 +358,50 @@ if(NOT APPLE)
     )
  
     if(WIN32)
@@ -280,7 +280,7 @@ index f00c7a5f3d..c5b9facc75 100644
  
     # configure Info.plist
     configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in
-@@ -398,7 +422,7 @@ else()
+@@ -397,7 +421,7 @@ else()
     # define bundle name and executable
     set(MACOSX_BUNDLE_BUNDLE_NAME "RStudio")
  
@@ -289,7 +289,7 @@ index f00c7a5f3d..c5b9facc75 100644
        ${DESKTOP_SOURCE_FILES}
        ${MOC_DESKTOP_SOURCE_FILES}
        ${DESKTOP_RESOURCES_SOURCES}
-@@ -406,9 +430,9 @@ else()
+@@ -405,9 +429,9 @@ else()
        ${ICNS_FILES}
        ${PNG_FILES})
  
@@ -301,7 +301,7 @@ index f00c7a5f3d..c5b9facc75 100644
        ${QT_LIBRARIES}
        rstudio-core
        ${APPLICATION_SERVICES_LIBRARY}
-@@ -418,12 +442,12 @@ else()
+@@ -417,12 +441,12 @@ else()
  endif()
  
  # install target (OSX install goes into the bundle)
@@ -318,7 +318,7 @@ index f00c7a5f3d..c5b9facc75 100644
  endif()
  
  # bundle qt dependencies if this is a package build
-@@ -515,7 +539,7 @@ if(RSTUDIO_BUNDLE_QT)
+@@ -514,7 +538,7 @@ if(RSTUDIO_BUNDLE_QT)
           add_library(${ICU_LIBRARY} SHARED IMPORTED)
           set_property(TARGET ${ICU_LIBRARY} PROPERTY IMPORTED_LOCATION "${QT_LIBRARY_DIR}/${ICU_LIBRARY}.so")
        endforeach()
@@ -355,5 +355,5 @@ index 89c2d2d0fd..1db47cb1a3 100644
                DESTINATION  "${RSTUDIO_INSTALL_BIN}/sumatra")
        install(FILES resources/sumatrapdfrestrict.ini
 -- 
-2.14.3 (Apple Git-98)
+2.16.1
 
