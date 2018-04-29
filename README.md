@@ -7,8 +7,12 @@ git submodule foreach git clean -dxf .
 git clean -dxf .
 
 # 2. .. to update the recipes:
-export CONDA_R=3.4.3
-conda skeleton cran --cran-url https://mran.microsoft.com/snapshot/2018-01-01 --output-suffix=-feedstock/recipe --recursive --add-maintainer=mingwandroid --update-policy=merge-keep-build-num $(find . -name "*feedstock" | sed -e 's|^./rstudio-feedstock$||' -e 's|^./r-essentials-feedstock$||' -e 's|^./r-recommended-feedstock$||' -e 's|^./r-shinysky-feedstock$||' -e 's|^./r-rmr2-feedstock$||' -e 's|^./rpy2-feedstock$||' -e 's|^./rpy2-2.8-feedstock$||' -e 's|^./r-base-feedstock$||' -e 's|^./r-irkernel-feedstock$||' -e 's|^./r-rhive-feedstock$||' -e 's|^./r-feedstock$||' -e 's|^./$||' -e 's|^./\.git.*$||')
+export CONDA_R=3.5.0
+conda skeleton cran --cran-url https://mran.microsoft.com/snapshot/2018-04-23 --output-suffix=-feedstock/recipe --recursive --add-maintainer=mingwandroid \
+                    --update-policy=merge-keep-build-num $(find . -name "*feedstock" | sed -e 's|^./rstudio-feedstock$||' -e 's|^./r-essentials-feedstock$||' \
+                    -e 's|^./r-recommended-feedstock$||' -e 's|^./r-shinysky-feedstock$||' -e 's|^./r-rmr2-feedstock$||' -e 's|^./rpy2-feedstock$||' \
+                    -e 's|^./rpy2-2.8-feedstock$||' -e 's|^./r-base-feedstock$||' -e 's|^./r-irkernel-feedstock$||' -e 's|^./r-rhive-feedstock$||' \
+                    -e 's|^./r-feedstock$||' -e 's|^./$||' -e 's|^./\.git.*$||')
 conda skeleton cran --output-suffix=-feedstock/recipe --add-maintainer=mingwandroid --update-policy=merge-keep-build-num \
     https://github.com/bokeh/rbokeh \
     https://github.com/IRkernel/IRkernel \
