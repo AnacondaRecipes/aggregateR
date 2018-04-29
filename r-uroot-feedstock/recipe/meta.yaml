@@ -1,0 +1,97 @@
+{% set version = '2.0-9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-uroot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  fn: uroot_2.0-9.tar.gz
+  url:
+    - {{ cran_mirror }}/src/contrib/uroot_2.0-9.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/uroot/uroot_2.0-9.tar.gz
+  sha256: 9b7616d64ed87b29ee45368bf7f08d15c0ec058e450c69171fbfecb44943ac5b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}          # [not win]
+    - {{ compiler('cxx') }}        # [not win]
+    - {{native}}toolchain          # [win]
+    - {{posix}}filesystem          # [win]
+    - {{posix}}sed                 # [win]
+    - {{posix}}grep                # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake-wrapper    # [win]
+    - {{posix}}automake            # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs           # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('uroot')"           # [not win]
+    - "\"%R%\" -e \"library('uroot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://jalobe.com
+  license: GPL-2
+  summary: Seasonal unit roots and seasonal stability tests. P-values based on response surface
+    regressions are available for both tests. P-values based on bootstrap are available
+    for seasonal unit root tests. A parallel implementation of the bootstrap method
+    requires a CUDA capable GPU  with compute capability >= 3.0, otherwise a debugging
+    version fully coded in R is used.
+  license_family: GPL2
+
+extra:
+  recipe-maintainers:
+    - mingwandroid
+
+# The original CRAN metadata for this package was:
+
+# Package: uroot
+# Version: 2.0-9
+# Date: 2017-01-27
+# Title: Unit Root Tests for Seasonal Time Series
+# Author: Javier Lopez-de-Lacalle <javlacalle@yahoo.es>
+# Maintainer: Javier Lopez-de-Lacalle <javlacalle@yahoo.es>
+# Depends: R (>= 3.0.0), stats
+# SystemRequirements: nvcc (release >= 7.1) (NVIDIA Cuda Compiler driver)
+# Encoding: UTF-8
+# Description: Seasonal unit roots and seasonal stability tests. P-values based on response surface regressions are available for both tests. P-values based on bootstrap are available for seasonal unit root tests. A parallel implementation of the bootstrap method requires a CUDA capable GPU  with compute capability >= 3.0, otherwise a debugging version fully coded in R is used.
+# NeedsCompilation: yes
+# LazyData: yes
+# LazyDataCompression: xz
+# License: GPL-2
+# URL: https://jalobe.com
+# Packaged: 2017-01-27 19:58:17 UTC; javlacalle
+# Repository: CRAN
+# Date/Publication: 2017-01-29 16:25:31
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml
