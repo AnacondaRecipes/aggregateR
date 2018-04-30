@@ -45,7 +45,7 @@ git submodule foreach git reset HEAD .
 
 # 4 .. if updating RStudio then check if the R package dependencies need to be updated
 
-The complete list of the 36 legacy packages that must maintain their build number at 4 at R 3.4.3 buildout time (29th Dec 2017) is:
+The complete list of the 33 legacy packages that must maintain their build number at 4 at R 3.5.0 buildout time (Mon 30 Apr 2018) is:
 
 r-base64enc
 r-bitops
@@ -57,7 +57,6 @@ r-fracdiff
 r-functional
 r-gridbase
 r-gtools
-r-hexbin
 r-kernsmooth
 r-labeling
 r-magrittr
@@ -67,12 +66,10 @@ r-minqa
 r-mlmrev
 r-modeltools
 r-nloptr
-r-nmf
 r-pkgmaker
 r-praise
 r-profilemodel
 r-quadprog
-r-randomforest
 r-rjson
 r-rjsonio
 r-rngtools
