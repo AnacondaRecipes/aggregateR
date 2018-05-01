@@ -1,4 +1,4 @@
-{% set version = '1.0.0' %}
+{% set version = '2.0.3' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -12,33 +12,43 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/callr_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/callr/callr_{{ version }}.tar.gz
-  sha256: 2c56808c723aba2ea8a8b6bbdc9b8332c96f59b119079861dd52f5988c27f715
-
-
-  # patches:
-   # List any patch files here
-   # - fix.patch
+  sha256: f1f7d511b215eb88d8680edef09d31eb93b3ef8beb124f8edf0c82601f7575cc
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
-  
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: covr, testthat
+# Suggests: covr, parallel, testthat, withr
 requirements:
   build:
+    - {{ compiler('c') }}        # [not win]
+    - {{ compiler('cxx') }}      # [not win]
+    - {{native}}toolchain        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
 
   host:
     - r-base
+    - r-r6
+    - r-assertthat
+    - r-crayon
+    - r-debugme
+    - r-testthat
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-r6
+    - r-assertthat
+    - r-crayon
+    - r-debugme
+    - r-testthat
 
 test:
   commands:
@@ -53,7 +63,7 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://github.com/MangoTheCat/callr
+  home: https://github.com/r-lib/callr#readme
   license: MIT + file LICENSE
   summary: It is sometimes useful to perform a computation in a separate R process, without affecting
     the current R process at all. This packages does exactly that.
@@ -67,21 +77,23 @@ extra:
 
 # Package: callr
 # Title: Call R from R
-# Version: 1.0.0
-# Author: Gabor Csardi
-# Maintainer: Gabor Csardi <gcsardi@mango-solutions.com>
+# Version: 2.0.3
+# Author: Gabor Csardi, Winston Chang
+# Maintainer: Gabor Csardi <csardi.gabor@gmail.com>
 # Description: It is sometimes useful to perform a computation in a separate R process, without affecting the current R process at all. This packages does exactly that.
 # License: MIT + file LICENSE
 # LazyData: true
-# URL: https://github.com/MangoTheCat/callr
-# BugReports: https://github.com/MangoTheCat/callr/issues
-# RoxygenNote: 5.0.1.9000
-# Suggests: covr, testthat
+# URL: https://github.com/r-lib/callr#readme
+# BugReports: https://github.com/r-lib/callr/issues
+# RoxygenNote: 6.0.1.9000
+# Imports: assertthat, crayon, debugme, R6, utils
+# Suggests: covr, parallel, testthat, withr
+# LinkingTo: testthat
 # Encoding: UTF-8
-# NeedsCompilation: no
-# Packaged: 2016-06-17 21:09:31 UTC; gaborcsardi
+# NeedsCompilation: yes
+# Packaged: 2018-04-10 22:03:50 UTC; gaborcsardi
 # Repository: CRAN
-# Date/Publication: 2016-06-18 15:24:15
+# Date/Publication: 2018-04-11 03:50:18 UTC
 
 # See
 # http://docs.continuum.io/conda/build.html for
