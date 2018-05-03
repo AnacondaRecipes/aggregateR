@@ -1,6 +1,6 @@
 # Instructions for updating and building the Anaconda R package ecosystem (non-MRO)
 
-## 1. Figure out or decide upon the latest R version and the appropriate MRAN snapshot date to use.
+## 1. Figure out or decide upon the latest R version and the appropriate MRAN snapshot date to use
 ```
 # For example:
 export CRAN_URL=https://mran.microsoft.com/snapshot/2018-04-23
@@ -18,10 +18,11 @@ git submodule foreach git clean -dxf .
 git clean -dxf .
 ```
 
-## 3. Update all of the recipes that are sourced from MRAN.
+## 3. Update all of the recipes that are sourced from MRAN
 ```
-conda skeleton cran
-  --cran-url https://mran.microsoft.com/snapshot/2018-04-23 \ --output-suffix=-feedstock/recipe --recursive \
+conda skeleton cran \
+  --cran-url https://mran.microsoft.com/snapshot/2018-04-23 \
+  --output-suffix=-feedstock/recipe --recursive \
   --add-maintainer=mingwandroid \
   --update-policy=merge-keep-build-num \
   $(find . -name "*feedstock" | \
@@ -52,12 +53,11 @@ Here, the exclusion of `r-rmr2` and `r-shinysky` are because they are from `GitH
 `r-weatherdata` has been removed from CRAN around R 3.5.0 time.
 The other excluded packages are not R packages at all (`rpy2`, `rstudio` and metapackages).
 
-At this point prune [this list](#list-of-packages-with-build-number-problems) (i.e. edit this very file to remove) packages that have had a new version released
-which allows us to reset the build number back to 0. The ultimate goal is for this list to disappear completely.
-
-## 4. Update all of the recipes that are sourced from `GitHub`.
+## 4. Update all of the recipes that are sourced from `GitHub`
 ```
-conda skeleton cran --output-suffix=-feedstock/recipe --add-maintainer=mingwandroid --update-policy=merge-keep-build-num \
+conda skeleton cran --output-suffix=-feedstock/recipe \
+    --add-maintainer=mingwandroid \
+    --update-policy=merge-keep-build-num \
     https://github.com/bokeh/rbokeh \
     https://github.com/IRkernel/IRkernel \
     https://github.com/rstats-db/odbc \
@@ -69,6 +69,9 @@ conda skeleton cran --output-suffix=-feedstock/recipe --add-maintainer=mingwandr
 sed -i.bak 's|nexr-rhive-2\.0\.10-ranger.*$|nexr-rhive-2\.0\.10|' r-rhive-feedstock/recipe/meta.yaml
 rm r-rhive-feedstock/recipe/meta.yaml.bak
 ```
+
+At this point prune [this list](#list-of-packages-with-build-number-problems) (i.e. edit this very file to remove) packages that have had a new version released
+which allows us to reset the build number back to 0. The ultimate goal is for this list to disappear completely.
 
 ## 5. Update some metapackage versions
 ```
@@ -82,7 +85,7 @@ rm r-essentials-feedstock/recipe/meta.yaml.bak
 # Now go through r-essentials-feedstock and update all of the versions *very* carefully, using _'s not -'s
 ```
 
-## 6. Add new dependencies, either as forks of `conda-forge` recipes when available or directly.
+## 6. Add new dependencies, either as forks of `conda-forge` recipes when available or directly
 ```
 # If conda-forge has r-foo-feedstock then move our new one out of the way:
 mv r-foo-feedstock r-foo-feedstock.mran.latest
@@ -94,14 +97,17 @@ git add -N .
 git commit -m "Added new dependencies as of R ${CONDA_R}"
 ```
 
-## 7. Go through the super-module (due to the inline recipes) and every submodule and very carefully undo any damage done by the update procedure (usually CDT and/or 'system' packages getting dropped).
+## 7. For the super-module (due to the inline recipes) and every submodule carefully undo damage done by the update procedure
+
+The damage most often seen is that CDT and/or 'system' packages get dropped since `conda skeleton cran` does not parse `SystemRequirements:`
+TODO :: Consider adding this feature to `conda skeleton cran`?
 ```
 git checkout -p .
 # This is boring and it is easy to lose concentration and make a costly mistake so pay close attention:
 git submodule foreach "git checkout -p ."
 ```
 
-## 8. Go through the super-module (due to the inline recipes) and every submodule add the new changes.
+## 8. For the super-module (due to the inline recipes) and every submodule add the new changes
 ```
 git add -p .
 git commit -m "Updates as of R ${CONDA_R}"
@@ -110,18 +116,28 @@ git submodule foreach "git add -p . && git commit -m 'Updates as of R ${CONDA_R}
 ```
 
 ## 9. Regenerate the build order
-for linux-64 (edit ~/conda/private_conda_recipes/rays-scratch-scripts/c3i-build-orderer-config/build_platforms.d/example.yml)
+For linux-64 (edit ~/conda/pcr/rays-scratch-scripts/c3i-build-orderer-config/build_platforms.d/example.yml)
 ```
-c3i examine --matrix-base-dir ~/conda/private_conda_recipes/rays-scratch-scripts/c3i-build-orderer-config \
-    ~/conda/aggregateR --output /tmp/build-order --folders $(find . -maxdepth 1 -type d | grep -v -e '\.git' -e '\.$')
-# TODO :: The source filename is not correct here.
+c3i examine --matrix-base-dir ~/conda/pcr/rays-scratch-scripts/c3i-build-orderer-config \
+    ~/conda/aggregateR \
+    --output /tmp/build-order \
+    --folders $(find . -maxdepth 1 -type d | grep -v -e '\.git' -e '\.$')
+# TODO :: The source filename is not correct here, find the correct file and update this document.
 cp /tmp/build-order-recipes ~/conda/pcr/rays-scratch-scripts/build-order/r/all
 # Now use git to put back some of the useful comments in this file iff you are using `build-in-order` to do the build-out.
 ```
 
-## 10. If updating RStudio then check if the R package dependencies need to be updated. Look for the dependencies [here](https://github.com/rstudio/rstudio/blob/master/src/gwt/src/org/rstudio/studio/client/common/dependencies/DependencyManager.java)
+## 10. If updating RStudio then check if the R package dependencies need to be updated
+
+Look for these dependencies [here](https://github.com/rstudio/rstudio/blob/master/src/gwt/src/org/rstudio/studio/client/common/dependencies/DependencyManager.java)
+TODO :: I seem to remember some dependencies were located in some other files too. Check into this and update this document.
 
 ## 11. Run the build using either my `build-in-order` or plain old `conda-build`:
+
+You can use either now because, for the parts that we need from `build-in-order` we are close to
+`conda` and `conda-build` and the `Anaconda Distribution` being fully capable of doing the right
+thing. In particular, the first part (compiling the toolchain) and the final parts (dealing with
+`constructor` and creating baked metapackages) are not used.
 ```
 # `build-in-order` method (starting at `r-foo-feedstock`):
 build-in-order --product=r \
@@ -223,7 +239,7 @@ r-xlsx           2000
 r-xlsxjars       1500
 ```
 
-## Possible additions:
+## Possible additions?:
 
 We probably want to get biocLite added as per https://github.com/ContinuumIO/anaconda-issues/issues/7068
 ```
