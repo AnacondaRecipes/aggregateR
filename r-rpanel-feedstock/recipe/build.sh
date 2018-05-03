@@ -12,8 +12,9 @@ export DISABLE_AUTOBREW=1
 # R refuses to build packages that mark themselves as Priority: Recommended
 mv DESCRIPTION DESCRIPTION.old
 grep -v '^Priority: ' DESCRIPTION.old > DESCRIPTION
-if [[ $target_paltform =~ linux.* ]]; then
-  xvfb-run $R CMD INSTALL --build .
+if [[ $target_platform =~ linux.* ]]; then
+  DISPLAY=${DISPLAY:-:0} \
+    xvfb-run $R CMD INSTALL --build .
 else
   $R CMD INSTALL --build .
 fi
