@@ -52,7 +52,8 @@ Here, the exclusion of `r-rmr2` and `r-shinysky` are because they are from `GitH
 `r-weatherdata` has been removed from CRAN around R 3.5.0 time.
 The other excluded packages are not R packages at all (`rpy2`, `rstudio` and metapackages).
 
-At this point take care to prune from [this list](#list-of-packages-with-build-number-problems)
+At this point prune [this list](#list-of-packages-with-build-number-problems) (i.e. edit this very file to remove) packages that have had a new version released
+which allows us to reset the build number back to 0. The ultimate goal is for this list to disappear completely.
 
 ## 4. Update all of the recipes that are sourced from `GitHub`.
 ```
