@@ -1,40 +1,99 @@
-# aggregateR
+# Instructions for updating and building the Anaconda R package ecosystem (non-MRO)
 
-# 1. .. to clean everything up:
+## 1. Clean everything up (please exercise caution)
+```
 git reset --hard
 git submodule foreach git reset --hard
 git submodule foreach git clean -dxf .
 git clean -dxf .
+```
 
-# 2. .. to update the recipes:
+## 2. Update all of the recipes that are sourced from MRAN.
+```
 export CONDA_R=3.5.0
-conda skeleton cran --cran-url https://mran.microsoft.com/snapshot/2018-04-23 --output-suffix=-feedstock/recipe --recursive --add-maintainer=mingwandroid \
-                    --update-policy=merge-keep-build-num $(find . -name "*feedstock" | sed -e 's|^./rstudio-feedstock$||' -e 's|^./rstudio-1.1.442-feedstock$||' -e 's|^./r-essentials-feedstock$||' \
-                    -e 's|^./r-recommended-feedstock$||' -e 's|^./r-shinysky-feedstock$||' -e 's|^./r-rmr2-feedstock$||' -e 's|^./rpy2-feedstock$||' \
-                    -e 's|^./rpy2-2.8-feedstock$||' -e 's|^./r-base-feedstock$||' -e 's|^./r-irkernel-feedstock$||' -e 's|^./r-rhive-feedstock$||' \
-                    -e 's|^./r-feedstock$||' -e 's|^./r-weatherdata-feedstock$||' -e 's|^./_r-mutex-feedstock$||' -e 's|^./$||' -e 's|^./\.git.*$||')
+conda skeleton cran
+  --cran-url https://mran.microsoft.com/snapshot/2018-04-23 \ --output-suffix=-feedstock/recipe --recursive \
+  --add-maintainer=mingwandroid \
+  --update-policy=merge-keep-build-num \
+  $(find . -name "*feedstock" | \
+    sed -e 's|^./rstudio-feedstock$||' \
+        -e 's|^./rstudio-1.1.442-feedstock$||' \
+        -e 's|^./r-essentials-feedstock$||' \
+        -e 's|^./r-recommended-feedstock$||' \
+        -e 's|^./r-shinysky-feedstock$||' \
+        -e 's|^./r-rmr2-feedstock$||' \
+        -e 's|^./rpy2-feedstock$||' \
+        -e 's|^./rpy2-2.8-feedstock$||' \
+        -e 's|^./r-base-feedstock$||' \
+        -e 's|^./r-irkernel-feedstock$||' \
+        -e 's|^./r-rhive-feedstock$||' \
+        -e 's|^./r-feedstock$||' \
+        -e 's|^./r-weatherdata-feedstock$||' \
+        -e 's|^./_r-mutex-feedstock$||' \
+        -e 's|^./$||' \
+        -e 's|^./\.git.*$||')
+```
+
+Here, the exclusion of `r-rmr2` and `r-shinysky` are because they are from GitHub but not from git repos which breaks conda skeleton cran's assumptions, namely:
+1. Any URL with 'github' in it is a git repository (it could be an archive)
+2. Any git repository will have tags and the right default is the 'latest' one
+
+`r-shinysky` seems pretty dead these days. It was done as a fork of a fork of the real upstream and archived due to a lack of git tags.
+`r-rmr2` is also probably using archives due to a lack of git tags.
+`r-weatherdata` has been removed from CRAN around R 3.5.0 time.
+The other excluded packages are not R packages (`rpy2`, `rstudio` and metapackages).
+
+At this point take care to prune from [this list]
+
+## 3. Update all of the recipes that are sourced from GitHub.
+```
 conda skeleton cran --output-suffix=-feedstock/recipe --add-maintainer=mingwandroid --update-policy=merge-keep-build-num \
     https://github.com/bokeh/rbokeh \
     https://github.com/IRkernel/IRkernel \
     https://github.com/rstats-db/odbc \
     https://github.com/nexr/RHive
-# .. take care that RHive's git tag gets reset back to nexr-rhive-2.0.10 (which was released in Dec 2014, not that there has been any real work since then):
+```
+### .. take care that RHive's git tag gets reset back to `nexr-rhive-2.0.10` (released Dec 2014, it has not changed much since though):
+```
 sed -i.bak 's|nexr-rhive-2\.0\.10-ranger.*$|nexr-rhive-2\.0\.10|' r-rhive-feedstock/recipe/meta.yaml
 rm r-rhive-feedstock/recipe/meta.yaml.bak
+```
+
+## 4. Update some metapackage versions
+```
 sed -i.bak "s|version = \".*\"|version = \"${CONDA_R}\"|" r-recommended-feedstock/recipe/meta.yaml
-# .. now update all of the versions in r-essentials and bump the version of that too (now unified with r-base version)
-# If you need to regenerate the build order:
+rm r-recommended-feedstock/recipe/meta.yaml.bak
+sed -i.bak "s|version = \".*\"|version = \"${CONDA_R}\"|" r-feedstock/recipe/meta.yaml
+rm r-recommended-feedstock/recipe/meta.yaml.bak
+```
+
+## 5. Add new dependencies, either as forks of `conda-forge` recipes when available or directly.
+```
+# If conda-forge has r-foo-feedstock then move our new one out of the way:
+mv r-foo-feedstock r-foo-feedstock.mran.latest
+# .. fork theirs then:
+git submodule add -b ../r-foo-feedstock r-foo-feedstock
+# .. and compare and merge across the differences and delete r-foo-feedstock.mran.latest
+# Git add the remaining ones (the cleanup in 1. is important for this to work right):
+git add -N .
+git commit -m "Added new dependencies as of R ${CONDA_R}"
+```
+
+## 6. Go through the super-module (we have some inline recipes) and every submodule very carefully and undo any damage done by the update procedure (CDT and/or 'system' packages getting dropped).
+```
+git 
+git submodule foreach "git checkout -p ."
+```
+
+## 7. Regenerate the build order
 for linux-64 (edit ~/conda/private_conda_recipes/rays-scratch-scripts/c3i-build-orderer-config/build_platforms.d/example.yml)
-c3i examine --matrix-base-dir ~/conda/private_conda_recipes/rays-scratch-scripts/c3i-build-orderer-config ~/conda/aggregateR --output /tmp/build-order --folders $(find . -maxdepth 1 -type d | grep -v -e '\.git' -e '\.$')
+```
+c3i examine --matrix-base-dir ~/conda/private_conda_recipes/rays-scratch-scripts/c3i-build-orderer-config \
+    ~/conda/aggregateR --output /tmp/build-order --folders $(find . -maxdepth 1 -type d | grep -v -e '\.git' -e '\.$')
+cp /tmp/build-order-recipes <somewhere>
+```
 
-# Here, the exclusion of r-rmr2 and r-shinysky are because they are from GitHub but not from git repos which breaks conda skeleton cran's assumptions, namely:
-#   1. Any URL with 'github' in it is a git repository (it could be an archive)
-#   2. Any git repository will have tags and the right default is the 'latest' one
-# r-shinysky seems pretty dead these days. It was done as a fork of a fork of the real upstream and archived due to a lack of git tags.
-# r-rmr2 is also probably using archives due to a lack of git tags.
-# The other excluded packages are not R packages (rpy2, rstudio and metapackages).
-
-# 3 .. to generate a (non-git) patch including new files and changes to submodules after updating the recipes but before having the guts to commit everything:
+## 8. Generate a (non-git) patch including new files and changes to submodules after updating the recipes but before having the guts to commit everything:
 # Signal 'intent to add' for all untracked files
 git add -N .
 git submodule foreach git add -N .
@@ -43,7 +102,9 @@ git submodule foreach git add .
 git reset HEAD .
 git submodule foreach git reset HEAD .
 
-# 4 .. if updating RStudio then check if the R package dependencies need to be updated
+## 9 .. if updating RStudio then check if the R package dependencies need to be updated
+
+[this list]
 
 The complete list of the 33 legacy packages that must maintain their build number at 4 at R 3.5.0 buildout time (Mon 30 Apr 2018) is:
 
