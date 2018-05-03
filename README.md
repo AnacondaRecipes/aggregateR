@@ -268,7 +268,7 @@ AnnotationDbi
 python ~/conda/pcr/rays-scratch-scripts/binstar_copy.py \
   --owner rdonnellyr --platform "osx-64" \
   --operation list > /tmp/uploaded.txt
-.. then compare against e.g:
+# .. then compare against e.g:
 pushd /opt/conda/conda-bld/osx-64
 ls -1 | LC_ALL=C sort > /tmp/build.txt
 diff -urN /tmp/build.txt /tmp/uploaded.txt
