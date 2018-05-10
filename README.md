@@ -139,23 +139,25 @@ You can use either now because, for the parts that we need from `build-in-order`
 thing. In particular, the first part (compiling the toolchain) and the final parts (dealing with
 `constructor` and creating baked metapackages) are not used.
 ```
-# `build-in-order` method (starting at `r-foo-feedstock`):
-build-in-order --product=r \
+# `build-in-order` method
+# Advantages: You can add `--start-at=r-foo-feedstock` to err, start at `r-foo-feedstock`
+#             You can add `--packages=r-foo-feedstock,r-bar-feedstock` to build only some.
+~/conda/pcr/rays-scratch-scripts/build-in-order --product=r \
   --upload-channel=none --pkg-build-channel-priority=M \
   --installer-build-channel-priority=D --skip-existing=yes \
-  --start-at=r-foo-feedstock --build-toolchain=no 2>&1 | tee -a ~/conda/R-${CONDA_R}-${uname}-${uname -m}.log
+  --build-toolchain=no 2>&1 | tee -a ~/conda/R-${CONDA_R}-$(uname)-$(uname -m).log
 
 # `conda-build` (doing all packages):
 CONDA_ADD_PIP_AS_PYTHON_DEPENDENCY=0 \
-  conda-build $(cat ~/conda/pcr/rays-scratch-scripts/build-order/r/all) | tr '\n' ' ') \
+  conda-build $(cat ~/conda/pcr/rays-scratch-scripts/build-order/r/all | tr '\n' ' ') \
   -c https://repo.continuum.io/pkgs/main \
-  --skip-existing --error-overlinking 2>&1 | tee -a ~/conda/R-${CONDA_R}-${uname}-${uname -m}.log
+  --skip-existing --error-overlinking 2>&1 | tee -a ~/conda/R-${CONDA_R}-$(uname)-$(uname -m).log
 
 # `conda-build` (starting at `r-foo-feedstock`):
 CONDA_ADD_PIP_AS_PYTHON_DEPENDENCY=0 \
   conda-build $(cat ~/conda/pcr/rays-scratch-scripts/build-order/r/all | sed '/r-foo-feedstock/,$d' | tr '\n' ' ') \
   -c https://repo.continuum.io/pkgs/main \
-  --skip-existing --error-overlinking 2>&1 | tee -a ~/conda/R-${CONDA_R}-${uname}-${uname -m}.log
+  --skip-existing --error-overlinking 2>&1 | tee -a ~/conda/R-${CONDA_R}-$(uname)-$(uname -m).log
 ```
 
 # Addendum and miscellaneous notes:
