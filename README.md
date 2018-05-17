@@ -21,10 +21,11 @@ git clean -dxf .
 ## 3. Update all of the recipes that are sourced from MRAN
 ```
 conda skeleton cran \
-  --cran-url https://mran.microsoft.com/snapshot/2018-04-23 \
+  --cran-url ${CRAN_URL} \
   --output-suffix=-feedstock/recipe --recursive \
   --add-maintainer=mingwandroid \
   --update-policy=merge-keep-build-num \
+  --r-interp=r-base \
   $(find . -name "*feedstock" | \
     sed -e 's|^./rstudio-feedstock$||' \
         -e 's|^./rstudio-1.1.442-feedstock$||' \
