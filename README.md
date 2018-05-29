@@ -276,3 +276,8 @@ pushd /opt/conda/conda-bld/osx-64
 ls -1 | LC_ALL=C sort > /tmp/build.txt
 diff -urN /tmp/build.txt /tmp/uploaded.txt
 ```
+
+## To get a very poor list (contains lots of things other than packages) of the non-R packages that R packages depend upon:
+```
+grep -R '\- ' */recipe/*.yaml | awk '{print $3}' | grep -v '{{posix}}' | grep -v 'r-' | sed 's|{{native}}||' | sort | uniq > Rdeps
+```
