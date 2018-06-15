@@ -1,0 +1,34 @@
+From 841ce5189f1647cf8b1c1b0a4f1787ae4e0d4a9b Mon Sep 17 00:00:00 2001
+From: Ray Donnelly <mingw.android@gmail.com>
+Date: Sat, 31 Mar 2018 12:59:53 +0100
+Subject: [PATCH 37/40] Use find_program to locate ant
+
+This is necessary for Xcode builds since Xcode scrubs PATH
+---
+ src/gwt/CMakeLists.txt |    6 +++++-
+ 1 files changed, 5 insertions(+), 1 deletions(-)
+
+diff --git a/src/gwt/CMakeLists.txt b/src/gwt/CMakeLists.txt
+index fcbc4d9..d2939b6 100644
+--- a/src/gwt/CMakeLists.txt
++++ b/src/gwt/CMakeLists.txt
+@@ -41,11 +41,15 @@ if(DEFINED ENV{GWT_BUILD})
+ endif()
+ 
+ if(GWT_BUILD)
++   find_program(ANT ant)
++   if(NOT ANT)
++      message(FATAL_ERROR "ant not found!")
++   endif()
+    add_custom_target(gwt_build ALL)
+    add_custom_command(
+       TARGET gwt_build
+       WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+-      COMMAND ant -Dbuild.dir="${GWT_BIN_DIR}"
++      COMMAND ${ANT} -Dbuild.dir="${GWT_BIN_DIR}"
+                   -Dwww.dir="${GWT_WWW_DIR}"
+                   -Dextras.dir="${GWT_EXTRAS_DIR}"
+                   -Dlib.dir="${GWT_LIB_DIR}")
+-- 
+1.7.1
+

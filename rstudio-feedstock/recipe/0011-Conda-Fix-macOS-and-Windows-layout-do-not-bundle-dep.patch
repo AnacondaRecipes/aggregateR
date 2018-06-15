@@ -1,22 +1,22 @@
-From 6e8d70815f9e73df7a18536dcbfa609c0a87f57c Mon Sep 17 00:00:00 2001
+From b3c8de24350490a5321f9c40834e1fdb27d8eb6f Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Sat, 29 Oct 2016 17:39:52 +0100
-Subject: [PATCH 11/42] Conda: Fix macOS and Windows layout, do not bundle deps
+Subject: [PATCH 11/40] Conda: Fix macOS and Windows layout, do not bundle deps
 
 ---
- CMakeGlobals.txt                              |  2 +-
- dependencies/windows/install-dependencies.cmd | 47 +++++++++--------
- package/win32/CMakeLists.txt                  |  3 +-
- src/cpp/desktop-mac/CMakeLists.txt            | 60 ++++++++++++++--------
- src/cpp/desktop/CMakeLists.txt                | 74 ++++++++++++++++++---------
- src/cpp/session/CMakeLists.txt                |  7 ++-
- 6 files changed, 124 insertions(+), 69 deletions(-)
+ CMakeGlobals.txt                              |    2 +-
+ dependencies/windows/install-dependencies.cmd |   47 +++++++++-------
+ package/win32/CMakeLists.txt                  |    8 ++-
+ src/cpp/desktop-mac/CMakeLists.txt            |   60 +++++++++++++-------
+ src/cpp/desktop/CMakeLists.txt                |   74 ++++++++++++++++--------
+ src/cpp/session/CMakeLists.txt                |    3 +-
+ 6 files changed, 125 insertions(+), 69 deletions(-)
 
 diff --git a/CMakeGlobals.txt b/CMakeGlobals.txt
-index ce82c40c4e..5af28df1e4 100644
+index 2d23e06..23136cb 100644
 --- a/CMakeGlobals.txt
 +++ b/CMakeGlobals.txt
-@@ -142,7 +142,7 @@ if(NOT EXISTS "${RSTUDIO_DEPENDENCIES_DIR}")
+@@ -156,7 +156,7 @@ if(NOT EXISTS "${RSTUDIO_DEPENDENCIES_DIR}")
  endif()
  
  # special install directories for apple desktop
@@ -26,10 +26,10 @@ index ce82c40c4e..5af28df1e4 100644
     set(RSTUDIO_INSTALL_SUPPORTING RStudio.app/Contents/Resources)
  else()
 diff --git a/dependencies/windows/install-dependencies.cmd b/dependencies/windows/install-dependencies.cmd
-index af7ddda2b8..fa8494947d 100644
+index ebf2c01..7d116d0 100644
 --- a/dependencies/windows/install-dependencies.cmd
 +++ b/dependencies/windows/install-dependencies.cmd
-@@ -35,28 +35,34 @@ set LIBCLANG_HEADERS_FILE=libclang-%LIBCLANG_HEADERS%.zip
+@@ -31,28 +31,34 @@ set LIBCLANG_FILE=%LIBCLANG_NAME%.zip
  set QT_VERSION=5.10.1
  set QT_FILE=QtSDK-%QT_VERSION%-msvc2015.7z
  
@@ -82,9 +82,9 @@ index af7ddda2b8..fa8494947d 100644
  )
  
  if not exist sumatra\3.1.1 (
-@@ -208,8 +214,9 @@ if not exist libclang\%LIBCLANG_HEADERS% (
+@@ -173,8 +179,9 @@ if not exist libclang\%LIBCLANG_VERSION% (
+   del %LIBCLANG_FILE%
  )
- 
  
 -
 -install-packages.cmd
@@ -95,21 +95,27 @@ index af7ddda2b8..fa8494947d 100644
  popd
  
 diff --git a/package/win32/CMakeLists.txt b/package/win32/CMakeLists.txt
-index cfcc87dbd4..8b2e688654 100644
+index 411b6dc..2c467d0 100644
 --- a/package/win32/CMakeLists.txt
 +++ b/package/win32/CMakeLists.txt
-@@ -10,7 +10,8 @@ endif()
+@@ -9,9 +9,13 @@ endif()
+ # append our module directory to path
  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
  
++
  # install ssh-console batch file into msys_ssh directory (called by shortcut)
--if(NOT RSTUDIO_SESSION_WIN64)
+-install(PROGRAMS src/ssh-console.bat
+-        DESTINATION "${RSTUDIO_INSTALL_BIN}/msys_ssh")
 +# (I have seen no evidence that this is used anywhere by RStudio nowadays)
 +if(NOT RSTUDIO_SESSION_WIN64 AND NOT ENV{CONDA_BUILD})
-    install(PROGRAMS src/ssh-console.bat
-            DESTINATION "${RSTUDIO_INSTALL_BIN}/msys_ssh")
- endif()
++   install(PROGRAMS src/ssh-console.bat
++           DESTINATION "${RSTUDIO_INSTALL_BIN}/msys_ssh")
++endif()
+ 
+ set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}${RSTUDIO_PACKAGE_SUFFIX}${CPACK_PACKAGE_VERSION}")
+ if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
 diff --git a/src/cpp/desktop-mac/CMakeLists.txt b/src/cpp/desktop-mac/CMakeLists.txt
-index c9bff323fb..58fbfb49bc 100644
+index c9bff32..58fbfb4 100644
 --- a/src/cpp/desktop-mac/CMakeLists.txt
 +++ b/src/cpp/desktop-mac/CMakeLists.txt
 @@ -71,26 +71,46 @@ file(GLOB PNG_FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/png/*.png)
@@ -180,10 +186,10 @@ index c9bff323fb..58fbfb49bc 100644
  # install mac-terminal script
  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mac-terminal.in
 diff --git a/src/cpp/desktop/CMakeLists.txt b/src/cpp/desktop/CMakeLists.txt
-index 33435c5ac5..d6a21e29b9 100644
+index 76f85ab..be33b1d 100644
 --- a/src/cpp/desktop/CMakeLists.txt
 +++ b/src/cpp/desktop/CMakeLists.txt
-@@ -310,10 +310,11 @@ endif(WIN32)
+@@ -311,10 +311,11 @@ endif(WIN32)
  # bundle it unless we are building on linux and NOT linking against the
  # qtsdk -- in that case we are linking against system versions of the
  # qt libraries which should therefore not be bundled
@@ -199,7 +205,7 @@ index 33435c5ac5..d6a21e29b9 100644
  endif()
  
  set(RSTUDIO_QTMODULES
-@@ -333,10 +334,16 @@ set(RSTUDIO_QTMODULES
+@@ -334,10 +335,16 @@ set(RSTUDIO_QTMODULES
      Qml
  )
  
@@ -218,7 +224,7 @@ index 33435c5ac5..d6a21e29b9 100644
        ${DESKTOP_SOURCE_FILES}
        ${MOC_DESKTOP_SOURCE_FILES}
        ${DESKTOP_RESOURCES_SOURCES}
-@@ -351,33 +358,50 @@ if(NOT APPLE)
+@@ -352,33 +359,50 @@ if(NOT APPLE)
     )
  
     if(WIN32)
@@ -280,7 +286,7 @@ index 33435c5ac5..d6a21e29b9 100644
  
     # configure Info.plist
     configure_file (${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in
-@@ -397,7 +421,7 @@ else()
+@@ -398,7 +422,7 @@ else()
     # define bundle name and executable
     set(MACOSX_BUNDLE_BUNDLE_NAME "RStudio")
  
@@ -289,7 +295,7 @@ index 33435c5ac5..d6a21e29b9 100644
        ${DESKTOP_SOURCE_FILES}
        ${MOC_DESKTOP_SOURCE_FILES}
        ${DESKTOP_RESOURCES_SOURCES}
-@@ -405,9 +429,9 @@ else()
+@@ -406,9 +430,9 @@ else()
        ${ICNS_FILES}
        ${PNG_FILES})
  
@@ -301,7 +307,7 @@ index 33435c5ac5..d6a21e29b9 100644
        ${QT_LIBRARIES}
        rstudio-core
        ${APPLICATION_SERVICES_LIBRARY}
-@@ -417,12 +441,12 @@ else()
+@@ -418,12 +442,12 @@ else()
  endif()
  
  # install target (OSX install goes into the bundle)
@@ -318,7 +324,7 @@ index 33435c5ac5..d6a21e29b9 100644
  endif()
  
  # bundle qt dependencies if this is a package build
-@@ -514,7 +538,7 @@ if(RSTUDIO_BUNDLE_QT)
+@@ -515,7 +539,7 @@ if(RSTUDIO_BUNDLE_QT)
           add_library(${ICU_LIBRARY} SHARED IMPORTED)
           set_property(TARGET ${ICU_LIBRARY} PROPERTY IMPORTED_LOCATION "${QT_LIBRARY_DIR}/${ICU_LIBRARY}.so")
        endforeach()
@@ -328,32 +334,19 @@ index 33435c5ac5..d6a21e29b9 100644
        # configure and install qt
        configure_file(
 diff --git a/src/cpp/session/CMakeLists.txt b/src/cpp/session/CMakeLists.txt
-index 89c2d2d0fd..1db47cb1a3 100644
+index e9cbfb8..a40fb59 100644
 --- a/src/cpp/session/CMakeLists.txt
 +++ b/src/cpp/session/CMakeLists.txt
-@@ -535,8 +535,9 @@ if (NOT RSTUDIO_SESSION_WIN64)
-       endif()
-    endif()
+@@ -533,7 +533,8 @@ if(WIN32)
+ endif()
  
--   # install gnudiff, mysys_ssh, and sumatra-pdf on windows
--   if(WIN32)
-+   # install gnudiff, mysys_ssh, and sumatra-pdf on windows. Conda builds provide their
-+   # own m2w64-diffutils, m2w64-grep and m2-openssh pacakges.
-+   if(WIN32 AND NOT DEFINED ENV{CONDA_BUILD})
-       install(DIRECTORY "${RSTUDIO_WINDOWS_DEPENDENCIES_DIR}/gnudiff"
-               USE_SOURCE_PERMISSIONS
-               DESTINATION  ${RSTUDIO_INSTALL_BIN})
-@@ -546,8 +547,10 @@ if (NOT RSTUDIO_SESSION_WIN64)
-       install(DIRECTORY "${RSTUDIO_WINDOWS_DEPENDENCIES_DIR}/msys-ssh-1000-18"
-               USE_SOURCE_PERMISSIONS
-               DESTINATION  ${RSTUDIO_INSTALL_BIN})
-+   endif(WIN32 AND NOT DEFINED ENV{CONDA_BUILD})
- 
- 
-+   if(WIN32)
-       install(PROGRAMS "${RSTUDIO_WINDOWS_DEPENDENCIES_DIR}/sumatra/3.1.1/SumatraPDF.exe"
-               DESTINATION  "${RSTUDIO_INSTALL_BIN}/sumatra")
-       install(FILES resources/sumatrapdfrestrict.ini
+ # install gnudiff, mysys_ssh, and sumatra-pdf on windows
+-if(WIN32)
++# Conda builds provide their own m2w64-diffutils, m2w64-grep and m2-openssh pacakges.
++if(WIN32 AND NOT DEFINED ENV{CONDA_BUILD})
+    install(DIRECTORY "${RSTUDIO_WINDOWS_DEPENDENCIES_DIR}/gnudiff"
+            USE_SOURCE_PERMISSIONS
+            DESTINATION  ${RSTUDIO_INSTALL_BIN})
 -- 
-2.15.1 (Apple Git-101)
+1.7.1
 
