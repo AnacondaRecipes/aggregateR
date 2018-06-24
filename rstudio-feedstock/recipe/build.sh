@@ -41,7 +41,7 @@ pushd dependencies/common
   ./install-mathjax
 # ./install-boost
 # ./install-pandoc
-  ./install-libclang
+# ./install-libclang
   ./install-packages
 popd
 
