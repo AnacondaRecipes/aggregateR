@@ -124,7 +124,7 @@ c3i examine --matrix-base-dir ~/conda/pcr/rays-scratch-scripts/c3i-build-orderer
     --output /tmp/build-order \
     --folders $(find . -maxdepth 1 -type d | grep -v -e '\.git' -e '\.$')
 # TODO :: The source filename is not correct here, find the correct file and update this document.
-cp /tmp/build-order-recipes ~/conda/pcr/rays-scratch-scripts/build-order/r/all
+cp /tmp/build-order/output_order_recipes_linux-64 ~/conda/pcr/rays-scratch-scripts/build-order/r/all
 # Now use git to put back some of the useful comments in this file iff you are using `build-in-order` to do the build-out.
 ```
 
