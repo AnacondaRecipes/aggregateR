@@ -1,0 +1,83 @@
+{% set version = '1.1.39-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-x13binary
+  version: {{ version|replace("-", "_") }}
+
+source:
+  fn: x13binary_{{ version }}.tar.gz
+  url:
+    - {{ cran_mirror }}/src/contrib/x13binary_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/x13binary/x13binary_{{ version }}.tar.gz
+  sha256: cc7ba5deffb9fef0fd251b97224587d34423df292aa5b90e1d5b99110aa4daec
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - libgfortran  # [osx]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('x13binary')"           # [not win]
+    - "\"%R%\" -e \"library('x13binary')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=x13binary
+  license: file LICENSE
+  summary: The US Census Bureau provides a seasonal adjustment program now called 'X-13ARIMA-SEATS'
+    building on both earlier programs called X-11 and X-12 as well as the SEATS program
+    by the Bank of Spain. The US Census Bureau offers both source and binary versions
+    -- which this package integrates for use by other R packages.
+  license_family: OTHER
+
+extra:
+  recipe-maintainers:
+    - mingwandroid
+
+# The original CRAN metadata for this package was:
+
+# Package: x13binary
+# Type: Package
+# Title: Provide the 'x13ashtml' Seasonal Adjustment Binary
+# Version: 1.1.39-1
+# Date: 2017-05-04
+# Author: Dirk Eddelbuettel and Christoph Sax
+# Maintainer: Dirk Eddelbuettel <edd@debian.org>
+# Description: The US Census Bureau provides a seasonal adjustment program now called 'X-13ARIMA-SEATS' building on both earlier programs called X-11 and X-12 as well as the SEATS program by the Bank of Spain. The US Census Bureau offers both source and binary versions -- which this package integrates for use by other R packages.
+# License: file LICENSE
+# Copyright: file inst/COPYRIGHT
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2017-05-04 15:05:36.286623 UTC; edd
+# License_restricts_use: no
+# Repository: CRAN
+# Date/Publication: 2017-05-04 18:26:45 UTC
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml

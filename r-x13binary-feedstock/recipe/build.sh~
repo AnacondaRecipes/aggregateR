@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Use our own shared libgcc_s.1.dylib
+if [[ $target_platform == osx-64 ]]; then
+  for SHARED_LIB in inst/lib/libquadmath.0.dylib inst/lib/libquadmath.0.d; do
+    ${INSTALL_NAME_TOOL} -change install_name_tool -change "@executable_path/../lib/libgcc_s.1.dylib" "${PREFIX}/lib/libgcc_s.1.dylib" ./inst/lib/libgfortran.3.dylib ${SHARED_LIB}
+  done
+fi
+
+if [[ $target_platform =~ linux.* ]] || [[ $target_platform == win-32 ]] || [[ $target_platform == win-64 ]] || [[ $target_platform == osx-64 ]]; then
+  export DISABLE_AUTOBREW=1
+  mv DESCRIPTION DESCRIPTION.old
+  grep -v '^Priority: ' DESCRIPTION.old > DESCRIPTION
+  $R CMD INSTALL --build .
+else
+  mkdir -p $PREFIX/lib/R/library/x13binary
+  mv * $PREFIX/lib/R/library/x13binary
+fi
+
+exit 1
+
