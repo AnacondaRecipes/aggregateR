@@ -1,0 +1,118 @@
+From 1b31ac8b278413650e80b66a3cb7001de3bed2ec Mon Sep 17 00:00:00 2001
+From: Ray Donnelly <mingw.android@gmail.com>
+Date: Tue, 17 Jul 2018 09:08:10 -0700
+Subject: [PATCH 41/41] Revert "disable macOS-specific Cmd+Shift+/ handling
+ (closes #2443)"
+
+This reverts commit d026ae8b360f993726a27c33ccf9c05be8cf70d2.
+---
+ src/cpp/desktop/DesktopGwtCallback.cpp   | 13 -------------
+ src/cpp/desktop/DesktopGwtCallback.hpp   |  4 ++--
+ src/cpp/desktop/DesktopGwtCallbackMac.mm | 23 -----------------------
+ src/cpp/desktop/DesktopMainWindow.cpp    |  2 +-
+ 4 files changed, 3 insertions(+), 39 deletions(-)
+
+diff --git a/src/cpp/desktop/DesktopGwtCallback.cpp b/src/cpp/desktop/DesktopGwtCallback.cpp
+index 7e1dff5..3b9a9fd 100644
+--- a/src/cpp/desktop/DesktopGwtCallback.cpp
++++ b/src/cpp/desktop/DesktopGwtCallback.cpp
+@@ -74,8 +74,6 @@ GwtCallback::GwtCallback(MainWindow* pMainWindow, GwtWindow* pOwner)
+      pSynctex_(nullptr),
+      pendingQuit_(PendingQuitNone)
+ {
+-   initialize();
+-   
+ #ifdef Q_OS_LINUX
+    // listen for clipboard selection change events (X11 only); allow override in options or 
+    // via environment variable. clipboard monitoring enables us to support middle-click paste on
+@@ -100,17 +98,6 @@ GwtCallback::GwtCallback(MainWindow* pMainWindow, GwtWindow* pOwner)
+ #endif
+ }
+ 
+-#ifndef Q_OS_MAC
+-void GwtCallback::initialize()
+-{
+-}
+-#endif
+-
+-void GwtCallback::invokeReflowComment()
+-{
+-   pMainWindow_->invokeCommand(QStringLiteral("reflowComment"));
+-}
+-
+ Synctex& GwtCallback::synctex()
+ {
+    if (pSynctex_ == nullptr)
+diff --git a/src/cpp/desktop/DesktopGwtCallback.hpp b/src/cpp/desktop/DesktopGwtCallback.hpp
+index 83a8fe6..4782f5e 100644
+--- a/src/cpp/desktop/DesktopGwtCallback.hpp
++++ b/src/cpp/desktop/DesktopGwtCallback.hpp
+@@ -57,7 +57,7 @@ class GwtCallback : public QObject
+ 
+ public:
+    GwtCallback(MainWindow* pMainWindow, GwtWindow* pOwner);
+-   void initialize();
++
+    int collectPendingQuitRequest();
+ 
+ Q_SIGNALS:
+@@ -239,8 +239,8 @@ public Q_SLOTS:
+    QString getDisplayDpi();
+ 
+ private:
+-   void invokeReflowComment();
+    Synctex& synctex();
++
+    void activateAndFocusOwner();
+ 
+ private:
+diff --git a/src/cpp/desktop/DesktopGwtCallbackMac.mm b/src/cpp/desktop/DesktopGwtCallbackMac.mm
+index 3588191..6073612 100644
+--- a/src/cpp/desktop/DesktopGwtCallbackMac.mm
++++ b/src/cpp/desktop/DesktopGwtCallbackMac.mm
+@@ -178,29 +178,6 @@ bool showOfficeDoc(NSString* path, NSString* appName, NSString* formatString)
+ 
+ RS_END_NAMESPACE()
+ 
+-void GwtCallback::initialize()
+-{
+-   [NSEvent addLocalMonitorForEventsMatchingMask: NSKeyDownMask
+-                                         handler: ^(NSEvent* event)
+-    {
+-       // detect attempts to run Command + Shift + /, and let our own
+-       // reflow comment code run instead
+-       if (event.keyCode == 44 &&
+-           (event.modifierFlags & NSEventModifierFlagShift) != 0 &&
+-           (event.modifierFlags & NSEventModifierFlagCommand) != 0 &&
+-           (event.modifierFlags & NSEventModifierFlagControl) == 0 &&
+-           (event.modifierFlags & NSEventModifierFlagOption) == 0 &&
+-           (event.modifierFlags & NSEventModifierFlagFunction) == 0)
+-       {
+-          invokeReflowComment();
+-          return (NSEvent*) nil;
+-       }
+-       
+-       return event;
+-    }];
+-
+-}
+-
+ int GwtCallback::showMessageBox(int type,
+                                 QString qCaption,
+                                 QString qMessage,
+diff --git a/src/cpp/desktop/DesktopMainWindow.cpp b/src/cpp/desktop/DesktopMainWindow.cpp
+index 9430679..b6a11fa 100644
+--- a/src/cpp/desktop/DesktopMainWindow.cpp
++++ b/src/cpp/desktop/DesktopMainWindow.cpp
+@@ -85,7 +85,7 @@ MainWindow::MainWindow(QUrl url) :
+    pMainMenuStub->addMenu(QString::fromUtf8("Help"));
+    setMenuBar(pMainMenuStub);
+ #endif
+-   
++
+    connect(&menuCallback_, SIGNAL(menuBarCompleted(QMenuBar*)),
+            this, SLOT(setMenuBar(QMenuBar*)));
+    connect(&menuCallback_, SIGNAL(commandInvoked(QString)),
+-- 
+1.9.5 (Apple Git-50.3)
+
