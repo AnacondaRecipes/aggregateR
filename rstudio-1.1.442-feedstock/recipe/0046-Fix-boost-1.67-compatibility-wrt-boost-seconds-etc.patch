@@ -1,0 +1,56 @@
+From 856710aa4ff13791cb778cec1363165ac1e4505b Mon Sep 17 00:00:00 2001
+From: Ray Donnelly <mingw.android@gmail.com>
+Date: Fri, 20 Jul 2018 18:03:55 -0700
+Subject: [PATCH 46/46] Fix boost 1.67 compatibility wrt boost seconds etc
+
+See: https://github.com/monero-project/kovri/issues/855
+---
+ src/cpp/core/DateTime.cpp           | 2 +-
+ src/cpp/core/file_lock/FileLock.cpp | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/cpp/core/DateTime.cpp b/src/cpp/core/DateTime.cpp
+index adac90f..6480be1 100644
+--- a/src/cpp/core/DateTime.cpp
++++ b/src/cpp/core/DateTime.cpp
+@@ -65,7 +65,7 @@ boost::posix_time::ptime timeFromSecondsSinceEpoch(double sec)
+    using namespace boost::posix_time;
+ 
+    ptime time_t_epoch(date(1970,1,1));
+-   return time_t_epoch + seconds(sec);
++   return time_t_epoch + seconds((boost::int64_t)sec);
+ }
+ 
+ boost::posix_time::ptime timeFromMillisecondsSinceEpoch(int64_t ms)
+diff --git a/src/cpp/core/file_lock/FileLock.cpp b/src/cpp/core/file_lock/FileLock.cpp
+index 145fa64..cfc57d3 100644
+--- a/src/cpp/core/file_lock/FileLock.cpp
++++ b/src/cpp/core/file_lock/FileLock.cpp
+@@ -133,11 +133,11 @@ void FileLock::initialize(const Settings& settings)
+ 
+    // timeout interval
+    double timeoutInterval = getFieldPositive(settings, "timeout-interval", kDefaultTimeoutInterval);
+-   FileLock::s_timeoutInterval = boost::posix_time::seconds(timeoutInterval);
++   FileLock::s_timeoutInterval = boost::posix_time::seconds((boost::int64_t)timeoutInterval);
+    
+    // refresh rate
+    double refreshRate = getFieldPositive(settings, "refresh-rate", kDefaultRefreshRate);
+-   FileLock::s_refreshRate = boost::posix_time::seconds(refreshRate);
++   FileLock::s_refreshRate = boost::posix_time::seconds((boost::int64_t)refreshRate);
+    
+    // logging
+    bool loggingEnabled = settings.getBool("enable-logging", false);
+@@ -212,8 +212,8 @@ void FileLock::log(const std::string& message)
+ 
+ // default values for static members
+ FileLock::LockType FileLock::s_defaultType(FileLock::LOCKTYPE_LINKBASED);
+-boost::posix_time::seconds FileLock::s_timeoutInterval(kDefaultTimeoutInterval);
+-boost::posix_time::seconds FileLock::s_refreshRate(kDefaultRefreshRate);
++boost::posix_time::seconds FileLock::s_timeoutInterval((boost::int64_t)kDefaultTimeoutInterval);
++boost::posix_time::seconds FileLock::s_refreshRate((boost::int64_t)kDefaultRefreshRate);
+ bool FileLock::s_loggingEnabled(false);
+ bool FileLock::s_isLoadBalanced(false);
+ FilePath FileLock::s_logFile;
+-- 
+1.9.5 (Apple Git-50.3)
+
