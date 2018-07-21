@@ -1,7 +1,7 @@
-From 5c6274217559b1aaacb5c7980d7489eb26fc59b4 Mon Sep 17 00:00:00 2001
+From 0209f4915ad59b0687af0965050f3bc0b5c89a92 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Mon, 31 Oct 2016 12:01:00 +0000
-Subject: [PATCH 28/45] Conda: Put resources in share/rstudio
+Subject: [PATCH 28/28] Conda: Put resources in share/rstudio
 
 ..on all platforms.
 
@@ -21,12 +21,12 @@ Add resolveIDEPath for Xcode and/or QtCreator debugging
  src/cpp/desktop/DesktopOptions.cpp                 |   6 +
  src/cpp/r/R/Diagnostics.R                          |  13 +-
  src/cpp/session/SessionMain.cpp                    |   6 +
- src/cpp/session/SessionOptions.cpp                 | 151 +++++++++++++++------
+ src/cpp/session/SessionOptions.cpp                 | 152 +++++++++++++++------
  src/cpp/session/include/session/SessionOptions.hpp |  16 +++
- 13 files changed, 220 insertions(+), 58 deletions(-)
+ 13 files changed, 221 insertions(+), 58 deletions(-)
 
 diff --git a/CMakeGlobals.txt b/CMakeGlobals.txt
-index 8cf4e002dd..2af7da566b 100644
+index 8cf4e00..2af7da5 100644
 --- a/CMakeGlobals.txt
 +++ b/CMakeGlobals.txt
 @@ -123,7 +123,7 @@ else()
@@ -39,7 +39,7 @@ index 8cf4e002dd..2af7da566b 100644
  
  # if the install prefix is /usr/local then tweak as appropriate
 diff --git a/src/cpp/core/FilePath.cpp b/src/cpp/core/FilePath.cpp
-index cfde191d50..b0cae8029f 100644
+index f915ce4..c07e25b 100644
 --- a/src/cpp/core/FilePath.cpp
 +++ b/src/cpp/core/FilePath.cpp
 @@ -406,6 +406,12 @@ bool FilePath::hasExtensionLowerCase(const std::string& ext) const
@@ -56,7 +56,7 @@ index cfde191d50..b0cae8029f 100644
  
  struct MimeType
 diff --git a/src/cpp/core/include/core/FilePath.hpp b/src/cpp/core/include/core/FilePath.hpp
-index 35642bd66b..97f68d8856 100644
+index 35642bd..97f68d8 100644
 --- a/src/cpp/core/include/core/FilePath.hpp
 +++ b/src/cpp/core/include/core/FilePath.hpp
 @@ -185,6 +185,9 @@ public:
@@ -70,10 +70,10 @@ index 35642bd66b..97f68d8856 100644
     FilePath childPath(const std::string& path) const ;
     
 diff --git a/src/cpp/core/system/Win32System.cpp b/src/cpp/core/system/Win32System.cpp
-index 89a5d9bb97..92cdbd7cd2 100644
+index 5d7337b..b56a6a7 100644
 --- a/src/cpp/core/system/Win32System.cpp
 +++ b/src/cpp/core/system/Win32System.cpp
-@@ -618,7 +618,7 @@ Error installPath(const std::string& relativeToExecutable,
+@@ -625,7 +625,7 @@ Error installPath(const std::string& relativeToExecutable,
     if (relativeToExecutable == "..") // common case
       *pInstallationPath = exePath.parent().parent();
     else
@@ -83,7 +83,7 @@ index 89a5d9bb97..92cdbd7cd2 100644
     return Success();
  }
 diff --git a/src/cpp/desktop-mac/AppDelegate.mm b/src/cpp/desktop-mac/AppDelegate.mm
-index d8a408d919..078ca31032 100644
+index d8a408d..078ca31 100644
 --- a/src/cpp/desktop-mac/AppDelegate.mm
 +++ b/src/cpp/desktop-mac/AppDelegate.mm
 @@ -345,6 +345,22 @@ bool prepareEnvironment(Options& options)
@@ -110,7 +110,7 @@ index d8a408d919..078ca31032 100644
     
     // set the scripts path in options
 diff --git a/src/cpp/desktop-mac/Main.mm b/src/cpp/desktop-mac/Main.mm
-index 2f069a9777..31d550edf6 100644
+index 2f069a9..31d550e 100644
 --- a/src/cpp/desktop-mac/Main.mm
 +++ b/src/cpp/desktop-mac/Main.mm
 @@ -40,6 +40,14 @@ int main(int argc, char* argv[])
@@ -129,7 +129,7 @@ index 2f069a9777..31d550edf6 100644
     // create our app delegate
     AppDelegate* appDelegate = [[[AppDelegate alloc] init] autorelease];
 diff --git a/src/cpp/desktop-mac/Options.mm b/src/cpp/desktop-mac/Options.mm
-index 0d96d834a8..7636bb1fe8 100644
+index 0d96d83..7636bb1 100644
 --- a/src/cpp/desktop-mac/Options.mm
 +++ b/src/cpp/desktop-mac/Options.mm
 @@ -157,12 +157,16 @@ FilePath Options::supportingFilePath() const
@@ -150,7 +150,7 @@ index 0d96d834a8..7636bb1fe8 100644
     return supportingFilePath_;
  }
 diff --git a/src/cpp/desktop/DesktopMain.cpp b/src/cpp/desktop/DesktopMain.cpp
-index 1008e3a267..77fcc122a2 100644
+index 1008e3a..77fcc12 100644
 --- a/src/cpp/desktop/DesktopMain.cpp
 +++ b/src/cpp/desktop/DesktopMain.cpp
 @@ -47,6 +47,12 @@
@@ -213,7 +213,7 @@ index 1008e3a267..77fcc122a2 100644
        desktop::options().setScriptsPath(scriptsPath);
  
 diff --git a/src/cpp/desktop/DesktopOptions.cpp b/src/cpp/desktop/DesktopOptions.cpp
-index 72ac53253f..a4ed145ba7 100644
+index 72ac532..a4ed145 100644
 --- a/src/cpp/desktop/DesktopOptions.cpp
 +++ b/src/cpp/desktop/DesktopOptions.cpp
 @@ -290,6 +290,7 @@ FilePath Options::supportingFilePath() const
@@ -224,20 +224,20 @@ index 72ac53253f..a4ed145ba7 100644
        // default to install path
        core::system::installPath("..",
                                  QApplication::arguments().at(0).toUtf8(),
-@@ -299,6 +300,11 @@ FilePath Options::supportingFilePath() const
- #ifdef __APPLE__
+@@ -300,6 +301,11 @@ FilePath Options::supportingFilePath() const
           if (supportingFilePath_.complete("Info.plist").exists())
              supportingFilePath_ = supportingFilePath_.complete("Resources");
-+#endif
+ #endif
 +#else
 +      core::system::installPath("../share/rstudio",
 +                                QApplication::arguments().at(0).toUtf8(),
 +                                &supportingFilePath_);
- #endif
++#endif
     }
     return supportingFilePath_;
+ }
 diff --git a/src/cpp/r/R/Diagnostics.R b/src/cpp/r/R/Diagnostics.R
-index e578148880..92e6c75f27 100644
+index e578148..92e6c75 100644
 --- a/src/cpp/r/R/Diagnostics.R
 +++ b/src/cpp/r/R/Diagnostics.R
 @@ -44,18 +44,7 @@ capture.output({
@@ -261,7 +261,7 @@ index e578148880..92e6c75f27 100644
    if (file.exists(cppDiag)) {
      diag <- system(cppDiag, intern=TRUE)
 diff --git a/src/cpp/session/SessionMain.cpp b/src/cpp/session/SessionMain.cpp
-index 76e6818ffc..6d6b58fcd3 100644
+index 76e6818..6d6b58f 100644
 --- a/src/cpp/session/SessionMain.cpp
 +++ b/src/cpp/session/SessionMain.cpp
 @@ -1668,6 +1668,12 @@ int main (int argc, char * const argv[])
@@ -278,7 +278,7 @@ index 76e6818ffc..6d6b58fcd3 100644
        std::string firstProjectPath = "";
        bool newUser = false;
 diff --git a/src/cpp/session/SessionOptions.cpp b/src/cpp/session/SessionOptions.cpp
-index 4859166366..6a629359ac 100644
+index 630db34..f40ea81 100644
 --- a/src/cpp/session/SessionOptions.cpp
 +++ b/src/cpp/session/SessionOptions.cpp
 @@ -49,9 +49,38 @@ namespace rstudio {
@@ -333,12 +333,13 @@ index 4859166366..6a629359ac 100644
     if (error)
     {
        LOG_ERROR_MESSAGE("Unable to determine install path: "+error.summary());
-@@ -94,13 +127,13 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
+@@ -94,13 +127,14 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
     }
  
     // detect running in OSX bundle and tweak resource path
 -#ifdef __APPLE__
 +#if defined(__APPLE__) && !defined(CONDA_BUILD)
++resourcePath_.complete("Info.plist").exists
     if (resourcePath_.complete("Info.plist").exists())
        resourcePath_ = resourcePath_.complete("Resources");
  #endif
@@ -346,10 +347,10 @@ index 4859166366..6a629359ac 100644
     // detect running in x64 directory and tweak resource path
 -#ifdef _WIN32
 +#if defined(_WIN32) && !defined(CONDA_BUILD)
-    bool is64 = false;
     if (resourcePath_.complete("x64").exists())
     {
-@@ -329,17 +362,20 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
+       resourcePath_ = resourcePath_.parent();
+@@ -327,17 +361,20 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
        ("external-rpostback-path", 
         value<std::string>(&rpostbackPath_)->default_value(kDefaultPostbackPath),
         "Path to rpostback executable")
@@ -374,7 +375,7 @@ index 4859166366..6a629359ac 100644
         "Path to msys_ssh utilities (windows-only)")
        ("external-sumatra-path",
         value<std::string>(&sumatraPath_)->default_value("bin/sumatra"),
-@@ -532,6 +568,7 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
+@@ -530,6 +567,7 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
     resolvePath(resourcePath_, &sessionLibraryPath_);
     resolvePath(resourcePath_, &sessionPackageArchivesPath_);
     resolvePostbackPath(resourcePath_, &rpostbackPath_);
@@ -382,25 +383,25 @@ index 4859166366..6a629359ac 100644
  #ifdef _WIN32
     resolvePath(resourcePath_, &consoleIoPath_);
     resolvePath(resourcePath_, &gnudiffPath_);
-@@ -547,6 +584,9 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
+@@ -543,6 +581,9 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
+    // it lives in a directory named 32 or 64
+    core::FilePath pty(winptyPath_);
     std::string completion;
++#if defined(CONDA_BUILD)
++       completion = "winpty.dll";
++#else
     if (pty.isWithin(resourcePath_))
     {
-+#if defined(CONDA_BUILD)
-+      completion = "winpty.dll";
-+#else
-       if (is64)
-          completion = "x64/winpty.dll";
-       else
-@@ -558,6 +598,7 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
-          completion = "64/bin/winpty.dll";
-       else
-          completion = "32/bin/winpty.dll";
+ #ifdef _WIN64
+@@ -558,6 +599,7 @@ core::ProgramStatus Options::read(int argc, char * const argv[], std::ostream& o
+ #else
+       completion = "32/bin/winpty.dll";
+ #endif
 +#endif
     }
     winptyPath_ = pty.complete(completion).absolutePath();
  #endif
-@@ -674,21 +715,23 @@ void Options::resolvePath(const FilePath& resourcePath,
+@@ -674,21 +716,23 @@ void Options::resolvePath(const FilePath& resourcePath,
                            std::string* pPath)
  {
     if (!pPath->empty())
@@ -434,7 +435,7 @@ index 4859166366..6a629359ac 100644
     }
     else
     {
-@@ -696,54 +739,74 @@ void Options::resolvePostbackPath(const FilePath& resourcePath,
+@@ -696,54 +740,74 @@ void Options::resolvePostbackPath(const FilePath& resourcePath,
     }
  }
  
@@ -537,7 +538,7 @@ index 4859166366..6a629359ac 100644
  } // namespace session
  } // namespace rstudio
 diff --git a/src/cpp/session/include/session/SessionOptions.hpp b/src/cpp/session/include/session/SessionOptions.hpp
-index 99afc040c6..373b0e60e6 100644
+index 99afc040..373b0e6 100644
 --- a/src/cpp/session/include/session/SessionOptions.hpp
 +++ b/src/cpp/session/include/session/SessionOptions.hpp
 @@ -244,6 +244,11 @@ public:
@@ -580,5 +581,5 @@ index 99afc040c6..373b0e60e6 100644
     std::string gnudiffPath_;
     std::string gnugrepPath_;
 -- 
-2.14.2
+1.9.5 (Apple Git-50.3)
 
