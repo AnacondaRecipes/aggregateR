@@ -154,9 +154,9 @@ CONDA_ADD_PIP_AS_PYTHON_DEPENDENCY=0 \
   -c https://repo.continuum.io/pkgs/main \
   --skip-existing --error-overlinking 2>&1 | tee -a ~/conda/R-${CONDA_R}-$(uname)-$(uname -m).log
 
-# `conda-build` (starting at `r-foo-feedstock`):
+# `conda-build` (starting at `_r-mutex-feedstock`):
 CONDA_ADD_PIP_AS_PYTHON_DEPENDENCY=0 \
-  conda-build $(cat ~/conda/pcr/rays-scratch-scripts/build-order/r/all | sed '/_r-mutex-feedstock/,$!d' | tr '\n' ' ') \
+  conda-build $(cat ~/conda/pcr/rays-scratch-scripts/build-order/r/all | sed '/^_r-mutex-feedstock/,$!d' | tr '\n' ' ') \
   -c https://repo.continuum.io/pkgs/main \
   --skip-existing --error-overlinking 2>&1 | tee -a ~/conda/R-${CONDA_R}-$(uname)-$(uname -m).log
 ```
