@@ -1,23 +1,23 @@
-From 79b52769290e62076bb2535761c1f92b25cd63ac Mon Sep 17 00:00:00 2001
+From 1447c5f01a8bbe9a509ea96a3ebad24f6044606f Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Tue, 8 Nov 2016 12:40:15 +0000
-Subject: [PATCH 38/45] GWT: Hacky attempt to work around double-slash issue
+Subject: [PATCH 38/47] GWT: Hacky attempt to work around double-slash issue
 
 GWT.getHostPageBaseURL() is returning URLs that end with // on Windows
 and I have no idea why. I think Qt is to blame here, and I need to build
 it with debug symbols to find out.
 ---
- src/gwt/src/org/rstudio/core/client/StringUtil.java     | 17 ++++++++++++++++-
- .../org/rstudio/core/client/command/ShortcutViewer.java |  3 ++-
- .../rstudio/studio/client/application/Application.java  | 10 +++++-----
- .../studio/client/application/ApplicationQuit.java      |  2 +-
- .../studio/client/application/ApplicationUtils.java     |  5 +++--
- .../studio/client/common/impl/DesktopWindowOpener.java  |  3 ++-
- .../studio/client/common/impl/WebWindowOpener.java      |  5 +++--
- .../org/rstudio/studio/client/projects/Projects.java    |  3 ++-
- .../studio/client/server/remote/RemoteServer.java       |  4 ++--
- .../studio/client/shiny/ui/ShinyApplicationPanel.java   |  2 +-
- .../studio/client/workbench/model/SessionInfo.java      |  2 +-
+ .../src/org/rstudio/core/client/StringUtil.java | 17 ++++++++++++++++-
+ .../core/client/command/ShortcutViewer.java     |  3 ++-
+ .../studio/client/application/Application.java  | 10 +++++-----
+ .../client/application/ApplicationQuit.java     |  2 +-
+ .../client/application/ApplicationUtils.java    |  5 +++--
+ .../client/common/impl/DesktopWindowOpener.java |  3 ++-
+ .../client/common/impl/WebWindowOpener.java     |  5 +++--
+ .../studio/client/projects/Projects.java        |  3 ++-
+ .../client/server/remote/RemoteServer.java      |  4 ++--
+ .../client/shiny/ui/ShinyApplicationPanel.java  |  2 +-
+ .../client/workbench/model/SessionInfo.java     |  2 +-
  11 files changed, 38 insertions(+), 18 deletions(-)
 
 diff --git a/src/gwt/src/org/rstudio/core/client/StringUtil.java b/src/gwt/src/org/rstudio/core/client/StringUtil.java
@@ -70,10 +70,10 @@ index a96f4d509b..a88e370d3d 100644
     }
     
 diff --git a/src/gwt/src/org/rstudio/studio/client/application/Application.java b/src/gwt/src/org/rstudio/studio/client/application/Application.java
-index e37df8bf33..3c09c21adc 100644
+index f9419def81..331dc1770e 100644
 --- a/src/gwt/src/org/rstudio/studio/client/application/Application.java
 +++ b/src/gwt/src/org/rstudio/studio/client/application/Application.java
-@@ -552,7 +552,7 @@ public class Application implements ApplicationEventHandlers
+@@ -558,7 +558,7 @@ public class Application implements ApplicationEventHandlers
           public void run()
           { 
              if (baseUrlOnly)
@@ -82,7 +82,7 @@ index e37df8bf33..3c09c21adc 100644
              else
                 Window.Location.reload();
           }
-@@ -593,7 +593,7 @@ public class Application implements ApplicationEventHandlers
+@@ -599,7 +599,7 @@ public class Application implements ApplicationEventHandlers
     {
        // calculate the url without the scope
        InvalidSessionInfo info = event.getInfo();
@@ -91,7 +91,7 @@ index e37df8bf33..3c09c21adc 100644
        String scopePath = info.getScopePath();
        int loc = baseURL.indexOf(scopePath);
        if (loc != -1)
-@@ -659,7 +659,7 @@ public class Application implements ApplicationEventHandlers
+@@ -665,7 +665,7 @@ public class Application implements ApplicationEventHandlers
                       server_.quitSession(false,
                                           null,
                                           null,
@@ -100,7 +100,7 @@ index e37df8bf33..3c09c21adc 100644
                                           new SimpleRequestCallback<Boolean>());
                    }
                    else
-@@ -707,8 +707,8 @@ public class Application implements ApplicationEventHandlers
+@@ -713,8 +713,8 @@ public class Application implements ApplicationEventHandlers
     {
        // ensure there is no session context if requested
        String url = includeContext ? 
@@ -268,5 +268,5 @@ index dcee59ab4c..ecc790a3a2 100644
     }
     
 -- 
-2.14.2
+2.17.0.windows.1
 
