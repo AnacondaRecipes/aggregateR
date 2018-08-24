@@ -1,10 +1,11 @@
 # Instructions for updating and building the Anaconda R package ecosystem (non-MRO)
 
-## 1. Figure out or decide upon the latest R version and the appropriate MRAN snapshot date to use
+## 1. Figure out or decide upon the latest R version and the appropriate MRAN snapshot date to use, you should check:
+https://mran.microsoft.com/documents/rro/reproducibility#reproducibility
 ```
 # For example:
-export CRAN_URL=https://mran.microsoft.com/snapshot/2018-04-23
-export CONDA_R=3.5.0
+export CRAN_URL=https://mran.microsoft.com/snapshot/2018-08-01
+export CONDA_R=3.5.1
 # Edit ~/conda/aggregateR/conda_build_config.yaml and change:
     cran_mirror:
       - <CRAN_URL>
