@@ -166,18 +166,16 @@ CONDA_ADD_PIP_AS_PYTHON_DEPENDENCY=0 \
 
 ## list of packages with build number problems
 
-The 33 (mostly legacy or perhaps 'finished'?) packages that must maintain their build number at `4` at R 3.5.0 buildout time (Mon 30 Apr 2018). It may be the case that we do not need to do this any more; it could've been down to their lack of exact pinning on the `r` or `r-base` version that has since been fixed, however I'm playing it safe here.
+The 26 (mostly legacy or perhaps 'finished'?) packages that must maintain their build number at `4` at R 3.5.1 snapshot time (2018-08-01). It may be the case that we do not need to do this any more; it could've been down to their lack of exact pinning on the `r` or `r-base` version that has since been fixed, however I'm playing it safe here.
 ```
 r-base64enc
 r-bitops
 r-brew
-r-catools
 r-class
 r-dichromat
 r-fracdiff
 r-functional
 r-gridbase
-r-gtools
 r-kernsmooth
 r-labeling
 r-magrittr
@@ -185,21 +183,16 @@ r-manipulate
 r-matrixmodels
 r-minqa
 r-mlmrev
-r-modeltools
 r-nloptr
-r-pkgmaker
 r-praise
 r-profilemodel
 r-quadprog
-r-rjson
 r-rjsonio
-r-rngtools
 r-rocr
 r-rserve
 r-spatial
 r-uuid
 r-whisker
-r-xlsx
 r-xlsxjars
 ```
 
