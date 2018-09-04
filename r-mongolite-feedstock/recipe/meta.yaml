@@ -1,4 +1,4 @@
-{% set version = '1.5' %}
+{% set version = '1.6' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -8,30 +8,24 @@ package:
   version: {{ version|replace("-", "_") }}
 
 source:
-  fn: mongolite_{{ version }}.tar.gz
   url:
     - {{ cran_mirror }}/src/contrib/mongolite_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/mongolite/mongolite_{{ version }}.tar.gz
-  sha256: 5ef2e4f006ca57db030257f66782c79aa4f52aacf079d576a7e4b5194cf1191b
+  sha256: 06757ef06a5b98eadcba097a3c98e0998a091f431fb8ba672ceddce2961e5571
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
+  missing_dso_whitelist:
+    - /usr/lib/libresolv.9.dylib
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
-  # From: http://mongoc.org/libmongoc/current/mongoc_uri_t.html#srv-example
-  # On Unix, the MongoDB C Driver relies on libresolv to look up SRV and TXT records.
-  # If libresolv is unavailable, then using a “mongodb+srv” URI will cause an error.
-  # If your libresolv lacks res_nsearch then the driver will fall back to res_search,
-  # which is not thread-safe.
-  missing_dso_whitelist:  # [osx]
-    - /usr/lib/libresolv.9.dylib  # [osx]
 
-# Suggests: spelling
+# Suggests: spelling, nycflights13, ggplot2
 requirements:
   build:
     - {{ compiler('c') }}        # [not win]
@@ -40,14 +34,17 @@ requirements:
     - {{posix}}sed               # [win]
     - {{posix}}grep              # [win]
     - {{posix}}autoconf
-    - {{posix}}automake-wrapper  # [win]
     - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
     - {{posix}}pkg-config
     - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
 
   host:
     - r-base
     - r-jsonlite >=1.4
+    - r-mime
     - r-openssl >=0.9.4
     - {{native}}openssl
     - {{native}}cyrus-sasl       # [not win]
@@ -58,6 +55,7 @@ requirements:
     - r-base
     - {{native}}gcc-libs         # [win]
     - r-jsonlite >=1.4
+    - r-mime
     - r-openssl >=0.9.4
     - {{native}}openssl
     - {{native}}cyrus-sasl       # [not win]
@@ -96,22 +94,23 @@ extra:
 # Type: Package
 # Title: Fast and Simple 'MongoDB' Client for R
 # Description: High-performance 'MongoDB' client based on 'libmongoc' and 'jsonlite'. Includes support for aggregation, indexing, map-reduce, streaming, encryption, enterprise authentication. The online user manual provides an overview of the  available methods in the package: <https://jeroen.github.io/mongolite/>.
-# Version: 1.5
+# Version: 1.6
 # Authors@R: c( person("Jeroen", "Ooms", ,"jeroen@berkeley.edu", role = c("aut", "cre")), person("MongoDB, Inc", role = "cph", comment = "Bundled mongo-c-driver, see AUTHORS file") )
-# Imports: jsonlite (>= 1.4), openssl (>= 0.9.4)
+# Imports: jsonlite (>= 1.4), openssl (>= 0.9.4), mime
 # License: Apache License 2.0
 # URL: https://github.com/jeroen/mongolite/ (devel) https://jeroen.github.io/mongolite/ (user manual) http://mongoc.org/ (upstream)
 # BugReports: https://github.com/jeroen/mongolite/issues
 # SystemRequirements: OpenSSL, Cyrus SASL (aka libsasl2)
 # RoxygenNote: 6.0.1.9000
-# Suggests: spelling
+# Suggests: spelling, nycflights13, ggplot2
 # Language: en-GB
+# Encoding: UTF-8
 # NeedsCompilation: yes
-# Packaged: 2018-01-02 10:51:01 UTC; jeroen
+# Packaged: 2018-07-02 12:14:51 UTC; jeroen
 # Author: Jeroen Ooms [aut, cre], MongoDB, Inc [cph] (Bundled mongo-c-driver, see AUTHORS file)
 # Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
 # Repository: CRAN
-# Date/Publication: 2018-01-03 10:34:59 UTC
+# Date/Publication: 2018-07-02 21:20:06 UTC
 
 # See
 # http://docs.continuum.io/conda/build.html for
