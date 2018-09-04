@@ -70,6 +70,7 @@ if [[ ${HOST} =~ .*darwin.* ]]; then
     _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_ARCHITECTURES=x86_64)
     _VERBOSE=""
   fi
+  _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_SYSROOT=${CONDA_BUILD_SYSROOT})
   _CMAKE_EXTRA_CONFIG+=(-DRSTUDIO_USE_LIBCXX=TRUE)
   unset MACOSX_DEPLOYMENT_TARGET
   export MACOSX_DEPLOYMENT_TARGET
@@ -105,6 +106,9 @@ cmake                                   \
 # When building a ClientBundle with images, the compiler holds all the source image files open at the same time, even if you never refer to the image in your code
 # Also for macOS 10.9, the way to increase this limit is to add the following to ~/.bash_profile:
 # ulimit -n 2048
+
+make rstudio/fast ${VERBOSE_CM}
+exit 1
 
 # "cmake --build" might be fine on all OSes/generators (though it does
 # seem to be building the Debug variant on Xcode), so for now check _XCODE_BUILD

@@ -15,7 +15,7 @@ diff --git a/src/cpp/r/RExec.cpp b/src/cpp/r/RExec.cpp
 index ff8f584715..01ab72baf1 100644
 --- a/src/cpp/r/RExec.cpp
 +++ b/src/cpp/r/RExec.cpp
-@@ -27,11 +27,11 @@
+@@ -27,11 +27,16 @@
  
  #include <R_ext/Parse.h>
  
@@ -23,8 +23,13 @@ index ff8f584715..01ab72baf1 100644
 -LibExtern Rboolean R_interrupts_suspended;
 -LibExtern int R_interrupts_pending;
 +#include <R_ext/libextern.h>
++#ifdef MSVC
 +extern "C" __declspec(dllimport) Rboolean R_interrupts_suspended;
 +extern "C" __declspec(dllimport) int R_interrupts_pending;
++#else
++LibExtern Rboolean R_interrupts_suspended;
++LibExtern int R_interrupts_pending;
++#endif
  #ifdef _WIN32
 -LibExtern int UserBreak;
 +extern "C" __declspec(dllimport) int UserBreak;
@@ -66,12 +71,16 @@ diff --git a/src/cpp/r/session/RSession.cpp b/src/cpp/r/session/RSession.cpp
 index dcbd554cb8..8fecd20c8a 100644
 --- a/src/cpp/r/session/RSession.cpp
 +++ b/src/cpp/r/session/RSession.cpp
-@@ -62,7 +62,7 @@
+@@ -62,7 +62,11 @@
  #include <R_ext/Utils.h>
  #include <R_ext/Rdynload.h>
  #include <R_ext/RStartup.h>
 -extern "C" SA_TYPE SaveAction;
++#ifdef MSVC
 +extern "C" __declspec(dllimport) SA_TYPE SaveAction;
++#else
++extern "C" SA_TYPE SaveAction;
++#endif
  
  #define CTXT_BROWSER 16
  
@@ -79,12 +88,16 @@ diff --git a/src/cpp/session/modules/SessionWorkbench.cpp b/src/cpp/session/modu
 index f2ef2a8bad..a44371122a 100644
 --- a/src/cpp/session/modules/SessionWorkbench.cpp
 +++ b/src/cpp/session/modules/SessionWorkbench.cpp
-@@ -50,7 +50,7 @@
+@@ -50,7 +50,11 @@
  #include "SessionSpelling.hpp"
  
  #include <R_ext/RStartup.h>
 -extern "C" SA_TYPE SaveAction;
++#ifdef MSVC
 +extern "C" __declspec(dllimport) SA_TYPE SaveAction;
++#else
++extern "C" SA_TYPE SaveAction;
++#endif
  
  #include "session-config.h"
  #ifdef RSTUDIO_SERVER
