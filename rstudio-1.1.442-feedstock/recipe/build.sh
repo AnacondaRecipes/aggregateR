@@ -1,13 +1,39 @@
 # Changing to not using an .app bundle is a bit tricky. I need to use
 # Xcode.
-_XCODE_BUILD=0
-BUILD_TYPE=Release
-# BUILD_TYPE=RelWithDebInfo
+_DEBUG=no
+if [[ ${_DEBUG} == yes ]]; then
+  # BUILD_TYPE=RelWithDebInfo
+  BUILD_TYPE=Debug
+  # BUILD_TYPE=RelWithDebInfo
+  BUILD_TYPE=Debug
+  RSTUDIO_TARGET=Server
+  export CFLAGS="${DEBUG_CFLAGS} -O0"
+  export CXXFLAGS="${DEBUG_CXXFLAGS} -O0"
+else
+  BUILD_TYPE=Release
+fi
+
+if [[ ${rstudio_variant} == server ]]; then
+  RSTUDIO_TARGET=Server
+else
+  RSTUDIO_TARGET=Desktop
+fi
+
+# This can be useful sometimes, but in general QtCreator works better since
+# it's what upstream uses.
+_XCODE_BUILD=no
 
 # Boost 1.65.1 cannot be used with -std=c++17 it seems. -std=c++14 works.
 re='(.*[[:space:]])\-std\=[^[:space:]]*(.*)'
 if [[ "${CXXFLAGS}" =~ $re ]]; then
   export CXXFLAGS="${BASH_REMATCH[1]} -std=c++14 ${BASH_REMATCH[2]}"
+fi
+
+if [[ ${_XCODE_BUILD} == yes ]]; then
+  export LD=$CXX
+  # https://stackoverflow.com/q/15761583
+  # https://forums.developer.apple.com/thread/17757
+  export LDFLAGS="${LDFLAGS} -Xlinker -U -Xlinker _objc_readClassPair"
 fi
 
 export RSTUDIO_VERSION_MAJOR=$(echo ${PKG_VERSION} | cut -d. -f1)
@@ -61,37 +87,56 @@ fi
 # -DCMAKE_PLATFORM_RUNTIME_PATH=${PREFIX}/lib
 
 export BOOST_ROOT=${PREFIX}
-_VERBOSE="VERBOSE=1"
+
+_VERBOSE=${VERBOSE_CM}
 
 declare -a _CMAKE_EXTRA_CONFIG
 if [[ ${HOST} =~ .*darwin.* ]]; then
-  if [[ ${_XCODE_BUILD} == 1 ]]; then
+  if [[ ${_XCODE_BUILD} == yes ]]; then
     _CMAKE_EXTRA_CONFIG+=(-G'Xcode')
     _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_ARCHITECTURES=x86_64)
+    _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_SYSROOT=${CONDA_BUILD_SYSROOT})
     _VERBOSE=""
   fi
-  _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_SYSROOT=${CONDA_BUILD_SYSROOT})
-  _CMAKE_EXTRA_CONFIG+=(-DRSTUDIO_USE_LIBCXX=TRUE)
   unset MACOSX_DEPLOYMENT_TARGET
   export MACOSX_DEPLOYMENT_TARGET
-else
-  _CMAKE_EXTRA_CONFIG+=(-DQT_QMAKE_EXECUTABLE=${PREFIX}/bin/qmake)
+  _CMAKE_EXTRA_CONFIG+=(-DCMAKE_AR=${AR})
+  _CMAKE_EXTRA_CONFIG+=(-DCMAKE_RANLIB=${RANLIB})
+  _CMAKE_EXTRA_CONFIG+=(-DCMAKE_LINKER=${LD})
 fi
+if [[ ${HOST} =~ .*linux.* ]]; then
+  # I hate you so much CMake.
+  LIBRT=$(find ${PREFIX} -name "librt.so")
+  LIBPTHREAD=$(find ${PREFIX} -name "libpthread.so")
+  LIBUTIL=$(find ${PREFIX} -name "libutil.so")
+  _CMAKE_EXTRA_CONFIG+=(-DPTHREAD_LIBRARIES=${LIBPTHREAD})
+  _CMAKE_EXTRA_CONFIG+=(-DUTIL_LIBRARIES=${LIBUTIL})
+  _CMAKE_EXTRA_CONFIG+=(-DRT_LIBRARIES=${LIBRT})
+  if [[ ${RSTUDIO_TARGET} == Server ]]; then
+    LIBPAM=$(find ${PREFIX} -name "libpam.so")
+    LIBAUDIT=$(find ${PREFIX} -name "libaudit.so")
+    LIBDL=$(find ${PREFIX} -name "libdl.so")
+    _CMAKE_EXTRA_CONFIG+=(-DPAM_INCLUDE_DIR=${PREFIX}/${HOST}/sysroot/usr/include)
+    _CMAKE_EXTRA_CONFIG+=(-DPAM_LIBRARY="${LIBPAM} ${LIBAUDIT}")
+    _CMAKE_EXTRA_CONFIG+=(-DDL_LIBRARIES=${LIBDL})
+  fi
+fi
+_CMAKE_EXTRA_CONFIG+=(-DQT_QMAKE_EXECUTABLE=${PREFIX}/bin/qmake)
 
 #      -Wdev --debug-output --trace                \
 
-cmake                                   \
-      -DCMAKE_INSTALL_PREFIX=${PREFIX}  \
-      -DBOOST_ROOT=${PREFIX}            \
-      -DBOOST_VERSION=1.65.1            \
-      -DRSTUDIO_TARGET=Desktop          \
-      -DCMAKE_BUILD_TYPE=${BUILD_TYPE}  \
-      -DLIBR_HOME=${PREFIX}/lib/R       \
-      -DUSE_MACOS_R_FRAMEWORK=FALSE     \
-      -DCMAKE_C_COMPILER=${CC}          \
-      -DCMAKE_CXX_COMPILER=${CXX}       \
-      "${_CMAKE_EXTRA_CONFIG[@]}"       \
-      ..
+cmake                                         \
+      -DCMAKE_INSTALL_PREFIX=${PREFIX}        \
+      -DBOOST_ROOT=${PREFIX}                  \
+      -DBOOST_VERSION=1.65.1                  \
+      -DRSTUDIO_TARGET=${RSTUDIO_TARGET}      \
+      -DCMAKE_BUILD_TYPE=${BUILD_TYPE}        \
+      -DLIBR_HOME=${PREFIX}/lib/R             \
+      -DUSE_MACOS_R_FRAMEWORK=FALSE           \
+      -DCMAKE_C_COMPILER=$(type -p ${CC})     \
+      -DCMAKE_CXX_COMPILER=$(type -p ${CXX})  \
+      "${_CMAKE_EXTRA_CONFIG[@]}"             \
+	  .
 
 # on macOS 10.9, in spite of following: https://unix.stackexchange.com/a/221988
 # and those limits seeming to have taken:
@@ -107,13 +152,13 @@ cmake                                   \
 # Also for macOS 10.9, the way to increase this limit is to add the following to ~/.bash_profile:
 # ulimit -n 2048
 
-make rstudio/fast ${VERBOSE_CM}
-exit 1
+# make rstudio/fast ${VERBOSE_CM}
+# exit 1
 
 # "cmake --build" might be fine on all OSes/generators (though it does
 # seem to be building the Debug variant on Xcode), so for now check _XCODE_BUILD
-if [[ ${_XCODE_BUILD} == 1 ]]; then
-  cmake --build . --target install -- ${_VERBOSE} || exit 1
+if [[ ${_XCODE_BUILD} == yes ]]; then
+  cmake --build . --target install -- ${_VERBOSE} -jobs ${CPU_COUNT} || exit 1
 else
   make install -j${CPU_COUNT} ${VERBOSE_CM} || exit 1
 fi
@@ -127,4 +172,52 @@ elif [[ $(uname) == Linux ]]; then
   echo "be even nicer if menuinst handled both that and App bundles."
 fi
 
-# exit 1
+# Please do not remove this block. If you ever need it you will thank me.
+if [[ ${_DEBUG} == yes ]]; then
+  echo ""
+  echo "# Build finished, since _DEBUG is yes (in build.sh), you should open 2 or 3 new shells:"
+  echo ""
+  echo "# Shell 1:"
+  echo "cd ${SRC_DIR}/src/gwt"
+  echo ". ${SYS_PREFIX}/bin/activate ${PREFIX}"
+  echo "ant superdevmode"
+  echo ""
+  echo "# Shell 2:"
+  echo "cd ${SRC_DIR}/src/cpp"
+  echo "./rserver-dev"
+  echo ""
+  echo "# Shell 3:"
+  echo ". ${SYS_PREFIX}/bin/activate ${PREFIX}"
+  echo "# Then open Chrome, browse to:"
+  echo "# .. the code server at: http://127.0.0.1:9876"
+  echo "# .. the RStudo app at:  http://127.0.0.1:8787"
+  if [[ $(uname) == Darwin ]]; then
+    echo "/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome http://127.0.0.1:9876 http://127.0.0.1:8787 &"
+  else
+    echo "google-chrome-stable http://127.0.0.1:9876 http://127.0.0.1:8787 &"
+  fi
+  echo "# and follow the instructions given at:"
+  echo "# https://github.com/rstudio/rstudio/wiki/RStudio-Development"
+  echo "# If you need to debug rsession (likely you do) then QtCreator from anaconda.org/rdonnelly can help"
+  echo "# Make a fixed symlink to the transient source code (-fdebug-prefix-map was used here):"
+  echo "[[ -L /usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} ]] && rm -rf /usr/local/src/conda/${PKG_NAME}-${PKG_VERSION}"
+  echo "ln -s ${SRC_DIR} /usr/local/src/conda/${PKG_NAME}-${PKG_VERSION}"
+  echo "[[ -L /usr/local/src/conda-prefix ]] && rm -rf /usr/local/src/conda-prefix"
+  echo "ln -s ${PREFIX} /usr/local/src/conda-prefix"
+  echo ""
+  echo "# Launch QtCreator with some necessary environment variables set:"
+  echo "rm ${SRC_DIR}/CMakeLists.txt.user || true"
+  echo "     SRC_DIR=${SRC_DIR} \\"
+  echo "      PREFIX=${PREFIX} \\"
+  echo "    PKG_NAME=${PKG_NAME} \\"
+  echo " PKG_VERSION=${PKG_VERSION} \\"
+  echo " CONDA_BUILD=1 \\"
+  echo "${SYS_PREFIX}/envs/devenv/bin/qtcreator -debug \$(ps aux | grep rsession | grep -v grep | awk '{print \$2}')"
+  # If you want to try using QtCreator to hack on the software this might work (if you are very lucky, more likely you
+  # will spend hours battling the poor implementation that is QtCreator's CMake integration: imporing existing builds
+  # results in dropped configuration parameters; the configuration dialog does not show any parameters while CMake is
+  # in a state of not being able to run to successful completion - you are best off hacking CMakeLists.txt.user to add
+  # the dropped parameters but overall, as of QtCreator 4.6.0 it is best avoided)
+  # echo "${SYS_PREFIX}/envs/devenv/bin/qtcreator ${SRC_DIR}/CMakeLists.txt &"
+  exit 1
+fi
