@@ -13,7 +13,7 @@ else
   BUILD_TYPE=Release
 fi
 
-if [[ ${rstudio_variant} == server ]]; then
+if [[ ${rstudio_variant} == -server ]]; then
   RSTUDIO_TARGET=Server
 else
   RSTUDIO_TARGET=Desktop
@@ -112,6 +112,10 @@ if [[ ${HOST} =~ .*linux.* ]]; then
   _CMAKE_EXTRA_CONFIG+=(-DPTHREAD_LIBRARIES=${LIBPTHREAD})
   _CMAKE_EXTRA_CONFIG+=(-DUTIL_LIBRARIES=${LIBUTIL})
   _CMAKE_EXTRA_CONFIG+=(-DRT_LIBRARIES=${LIBRT})
+  # May only be necessary for server?
+  export CPPFLAGS="${CPPFLAGS} -Wl,-rpath-link,${PREFIX}/lib"
+  export CXXFLAGS="${CXXFLAGS} -Wl,-rpath-link,${PREFIX}/lib"
+  export CFLAGS="${CFLAGS} -Wl,-rpath-link,${PREFIX}/lib"
   if [[ ${RSTUDIO_TARGET} == Server ]]; then
     LIBPAM=$(find ${PREFIX} -name "libpam.so")
     LIBAUDIT=$(find ${PREFIX} -name "libaudit.so")
@@ -123,7 +127,8 @@ if [[ ${HOST} =~ .*linux.* ]]; then
 fi
 _CMAKE_EXTRA_CONFIG+=(-DQT_QMAKE_EXECUTABLE=${PREFIX}/bin/qmake)
 
-#      -Wdev --debug-output --trace                \
+
+#      -Wdev --debug-output --trace            \
 
 cmake                                         \
       -DCMAKE_INSTALL_PREFIX=${PREFIX}        \
@@ -136,7 +141,7 @@ cmake                                         \
       -DCMAKE_C_COMPILER=$(type -p ${CC})     \
       -DCMAKE_CXX_COMPILER=$(type -p ${CXX})  \
       "${_CMAKE_EXTRA_CONFIG[@]}"             \
-	  .
+      ..
 
 # on macOS 10.9, in spite of following: https://unix.stackexchange.com/a/221988
 # and those limits seeming to have taken:
