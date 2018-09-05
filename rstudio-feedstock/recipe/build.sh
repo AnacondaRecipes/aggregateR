@@ -4,7 +4,6 @@ _DEBUG=no
 if [[ ${_DEBUG} == yes ]]; then
   # BUILD_TYPE=RelWithDebInfo
   BUILD_TYPE=Debug
-  RSTUDIO_TARGET=Server
   # BUILD_TYPE=RelWithDebInfo
   BUILD_TYPE=Debug
   RSTUDIO_TARGET=Server
@@ -12,8 +11,14 @@ if [[ ${_DEBUG} == yes ]]; then
   export CXXFLAGS="${DEBUG_CXXFLAGS} -O0"
 else
   BUILD_TYPE=Release
+fi
+
+if [[ ${rstudio_variant} == -server ]]; then
+  RSTUDIO_TARGET=Server
+else
   RSTUDIO_TARGET=Desktop
 fi
+
 # This can be useful sometimes, but in general QtCreator works better since
 # it's what upstream uses.
 _XCODE_BUILD=no
@@ -58,6 +63,29 @@ if [[ ${target_platform} == osx-64 ]]; then
   done
 fi
 
+mkdir build
+pushd build
+
+if ! which javac; then
+  echo "Fatal: Please install javac with your system package manager"
+  exit 1
+fi
+
+if ! which ant; then
+  echo "Fatal: Please install ant with your system package manager"
+  exit 1
+fi
+
+# Note, you can select a different default R interpreter launching
+# RStudio by:
+# export RSTUDIO_WHICH_R=${CONDA_PREFIX}/bin/R
+
+# You can use this so that -Wl,-rpath-link gets used during linking
+# executables. Without it, -Wl,-rpath is used anyway (and also) and
+# either works fine from the perspective of ld finding transitively
+# linked shared libraries:
+# -DCMAKE_PLATFORM_RUNTIME_PATH=${PREFIX}/lib
+
 export BOOST_ROOT=${PREFIX}
 
 _VERBOSE=${VERBOSE_CM}
@@ -84,6 +112,10 @@ if [[ ${HOST} =~ .*linux.* ]]; then
   _CMAKE_EXTRA_CONFIG+=(-DPTHREAD_LIBRARIES=${LIBPTHREAD})
   _CMAKE_EXTRA_CONFIG+=(-DUTIL_LIBRARIES=${LIBUTIL})
   _CMAKE_EXTRA_CONFIG+=(-DRT_LIBRARIES=${LIBRT})
+  # May only be necessary for server?
+  export CPPFLAGS="${CPPFLAGS} -Wl,-rpath-link,${PREFIX}/lib"
+  export CXXFLAGS="${CXXFLAGS} -Wl,-rpath-link,${PREFIX}/lib"
+  export CFLAGS="${CFLAGS} -Wl,-rpath-link,${PREFIX}/lib"
   if [[ ${RSTUDIO_TARGET} == Server ]]; then
     LIBPAM=$(find ${PREFIX} -name "libpam.so")
     LIBAUDIT=$(find ${PREFIX} -name "libaudit.so")
@@ -95,19 +127,8 @@ if [[ ${HOST} =~ .*linux.* ]]; then
 fi
 _CMAKE_EXTRA_CONFIG+=(-DQT_QMAKE_EXECUTABLE=${PREFIX}/bin/qmake)
 
-echo cmake                                    \
-      -DCMAKE_INSTALL_PREFIX=${PREFIX}        \
-      -DBOOST_ROOT=${PREFIX}                  \
-      -DBOOST_VERSION=1.65.1                  \
-      -DRSTUDIO_TARGET=${RSTUDIO_TARGET}      \
-      -DCMAKE_BUILD_TYPE=${BUILD_TYPE}        \
-      -DLIBR_HOME=${PREFIX}/lib/R             \
-      -DUSE_MACOS_R_FRAMEWORK=FALSE           \
-      -DCMAKE_C_COMPILER=$(type -p ${CC})     \
-      -DCMAKE_CXX_COMPILER=$(type -p ${CXX})  \
-      "${_CMAKE_EXTRA_CONFIG[@]}"             \
-      -Wdev --debug-output --trace            \
-      .
+
+#      -Wdev --debug-output --trace            \
 
 cmake                                         \
       -DCMAKE_INSTALL_PREFIX=${PREFIX}        \
@@ -120,8 +141,7 @@ cmake                                         \
       -DCMAKE_C_COMPILER=$(type -p ${CC})     \
       -DCMAKE_CXX_COMPILER=$(type -p ${CXX})  \
       "${_CMAKE_EXTRA_CONFIG[@]}"             \
-      -Wdev --debug-output --trace            \
-      .
+      ..
 
 # on macOS 10.9, in spite of following: https://unix.stackexchange.com/a/221988
 # and those limits seeming to have taken:
@@ -136,6 +156,9 @@ cmake                                         \
 # When building a ClientBundle with images, the compiler holds all the source image files open at the same time, even if you never refer to the image in your code
 # Also for macOS 10.9, the way to increase this limit is to add the following to ~/.bash_profile:
 # ulimit -n 2048
+
+# make rstudio/fast ${VERBOSE_CM}
+# exit 1
 
 # "cmake --build" might be fine on all OSes/generators (though it does
 # seem to be building the Debug variant on Xcode), so for now check _XCODE_BUILD
