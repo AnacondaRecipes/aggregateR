@@ -1,3 +1,4 @@
+#!/bin/sh
 # Changing to not using an .app bundle is a bit tricky. I need to use
 # Xcode.
 _DEBUG=no
@@ -64,7 +65,7 @@ if [[ ${target_platform} == osx-64 ]]; then
 fi
 
 mkdir build
-cd build
+pushd build
 
 if ! which javac; then
   echo "Fatal: Please install javac with your system package manager"
