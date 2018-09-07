@@ -178,6 +178,14 @@ elif [[ $(uname) == Linux ]]; then
   echo "be even nicer if menuinst handled both that and App bundles."
 fi
 
+if [[ ${rstudio_variant} == -server ]]; then
+  if [[ ! -d "${PREFIX}"/www ]]; then
+    mv "${PREFIX}"/share/rstudio/www "${PREFIX}"/
+  elif [[ -d  "${PREFIX}"/share/rstudio/www ]]; then
+    rm -rf "${PREFIX}"/share/rstudio/www
+  fi
+fi
+
 # Please do not remove this block. If you ever need it you will thank me.
 if [[ ${_DEBUG} == yes ]]; then
   echo ""
