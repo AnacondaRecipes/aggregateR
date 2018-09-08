@@ -1,15 +1,9 @@
 #!/bin/sh
 # Changing to not using an .app bundle is a bit tricky. I need to use
 # Xcode.
-_DEBUG=no
-if [[ ${_DEBUG} == yes ]]; then
+if [[ ${DEBUG_C} == yes ]]; then
   # BUILD_TYPE=RelWithDebInfo
   BUILD_TYPE=Debug
-  # BUILD_TYPE=RelWithDebInfo
-  BUILD_TYPE=Debug
-  RSTUDIO_TARGET=Server
-  export CFLAGS="${DEBUG_CFLAGS} -O0"
-  export CXXFLAGS="${DEBUG_CXXFLAGS} -O0"
 else
   BUILD_TYPE=Release
 fi
@@ -27,7 +21,7 @@ _XCODE_BUILD=no
 # Boost 1.65.1 cannot be used with -std=c++17 it seems. -std=c++14 works.
 re='(.*[[:space:]])\-std\=[^[:space:]]*(.*)'
 if [[ "${CXXFLAGS}" =~ $re ]]; then
-  export CXXFLAGS="${BASH_REMATCH[1]} -std=c++14 ${BASH_REMATCH[2]}"
+  export CXXFLAGS="${BASH_REMATCH[1]} -std=c++11 ${BASH_REMATCH[2]}"
 fi
 
 if [[ ${_XCODE_BUILD} == yes ]]; then
@@ -92,7 +86,7 @@ export BOOST_ROOT=${PREFIX}
 _VERBOSE=${VERBOSE_CM}
 
 declare -a _CMAKE_EXTRA_CONFIG
-if [[ ${HOST} =~ .*darwin.* ]]; then
+if [[ ${target_platform} == osx-64 ]]; then
   if [[ ${_XCODE_BUILD} == yes ]]; then
     _CMAKE_EXTRA_CONFIG+=(-G'Xcode')
     _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_ARCHITECTURES=x86_64)
@@ -104,6 +98,8 @@ if [[ ${HOST} =~ .*darwin.* ]]; then
   _CMAKE_EXTRA_CONFIG+=(-DCMAKE_AR=${AR})
   _CMAKE_EXTRA_CONFIG+=(-DCMAKE_RANLIB=${RANLIB})
   _CMAKE_EXTRA_CONFIG+=(-DCMAKE_LINKER=${LD})
+  _CMAKE_EXTRA_CONFIG+=(-DRSTUDIO_USE_LIBCXX=TRUE)
+  _CMAKE_EXTRA_CONFIG+=(-DRSTUDIO_USE_LIBSTDCXX=FALSE)
 fi
 if [[ ${HOST} =~ .*linux.* ]]; then
   # I hate you so much CMake.
@@ -134,7 +130,7 @@ _CMAKE_EXTRA_CONFIG+=(-DQT_QMAKE_EXECUTABLE=${PREFIX}/bin/qmake)
 cmake                                         \
       -DCMAKE_INSTALL_PREFIX=${PREFIX}        \
       -DBOOST_ROOT=${PREFIX}                  \
-      -DBOOST_VERSION=1.65.1                  \
+      -DBOOST_VERSION=1.67.0                  \
       -DRSTUDIO_TARGET=${RSTUDIO_TARGET}      \
       -DCMAKE_BUILD_TYPE=${BUILD_TYPE}        \
       -DLIBR_HOME=${PREFIX}/lib/R             \
@@ -187,7 +183,7 @@ if [[ ${rstudio_variant} == -server ]]; then
 fi
 
 # Please do not remove this block. If you ever need it you will thank me.
-if [[ ${_DEBUG} == yes ]]; then
+if [[ ${DEBUG_C} == yes ]]; then
   echo ""
   echo "# Build finished, since _DEBUG is yes (in build.sh), you should open 2 or 3 new shells:"
   echo ""
@@ -233,5 +229,5 @@ if [[ ${_DEBUG} == yes ]]; then
   # in a state of not being able to run to successful completion - you are best off hacking CMakeLists.txt.user to add
   # the dropped parameters but overall, as of QtCreator 4.6.0 it is best avoided)
   # echo "${SYS_PREFIX}/envs/devenv/bin/qtcreator ${SRC_DIR}/CMakeLists.txt &"
-  exit 1
+  exit 0
 fi
