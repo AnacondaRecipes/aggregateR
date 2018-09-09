@@ -194,7 +194,7 @@ if [[ ${DEBUG_C} == yes ]]; then
   echo ""
   echo "# Shell 2:"
   echo "cd ${SRC_DIR}/src/cpp"
-  echo "./rserver-dev"
+  echo "R_HOME=${CONDA_PREFIX}/lib/R R_DOC_DIR=${CONDA_PREFIX}/lib/R/doc ./rserver-dev"
   echo ""
   echo "# Shell 3:"
   echo ". ${SYS_PREFIX}/bin/activate ${PREFIX}"
@@ -221,6 +221,8 @@ if [[ ${DEBUG_C} == yes ]]; then
   echo "      PREFIX=${PREFIX} \\"
   echo "    PKG_NAME=${PKG_NAME} \\"
   echo " PKG_VERSION=${PKG_VERSION} \\"
+  echo "      R_HOME=${CONDA_PREFIX}/lib/R \\"
+  echo "   R_DOC_DIR=${CONDA_PREFIX}/lib/R/doc \\"
   echo " CONDA_BUILD=1 \\"
   echo "${SYS_PREFIX}/envs/devenv/bin/qtcreator -debug \$(ps aux | grep rsession | grep -v grep | awk '{print \$2}')"
   # If you want to try using QtCreator to hack on the software this might work (if you are very lucky, more likely you
