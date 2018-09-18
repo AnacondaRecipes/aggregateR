@@ -175,11 +175,8 @@ elif [[ $(uname) == Linux ]]; then
 fi
 
 if [[ ${rstudio_variant} == -server ]]; then
-  if [[ ! -d "${PREFIX}"/www ]]; then
-    mv "${PREFIX}"/share/rstudio/www "${PREFIX}"/
-  elif [[ -d  "${PREFIX}"/share/rstudio/www ]]; then
-    rm -rf "${PREFIX}"/share/rstudio/www
-  fi
+  [[ ! -d "{PREFIX}"/www ]] && mkdir "${PREFIX}"/www
+  mv "${PREFIX}"/share/rstudio/www/* "${PREFIX}"/www/
 fi
 
 # Please do not remove this block. If you ever need it you will thank me.
