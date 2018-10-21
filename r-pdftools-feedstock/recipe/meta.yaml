@@ -1,0 +1,103 @@
+{% set version = '1.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pdftools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pdftools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pdftools/pdftools_{{ version }}.tar.gz
+  sha256: 5f790c3678eacdc15147a671571c86b5f8d6eb692fa680324bc5d27542e6d0fb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: jpeg, png, webp, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}        # [not win]
+    - {{ compiler('cxx') }}      # [not win]
+    - {{native}}toolchain        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.12
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.12
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pdftools')"           # [not win]
+    - "\"%R%\" -e \"library('pdftools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://ropensci.org/blog/2016/03/01/pdftools-and-jeroen (blog) https://github.com/ropensci/pdftools#readme
+    (devel) https://poppler.freedesktop.org (upstream)
+  license: MIT + file LICENSE
+  summary: Utilities based on 'libpoppler' for extracting text, fonts, attachments and  metadata
+    from a PDF file. Also supports high quality rendering of PDF documents info PNG,
+    JPEG, TIFF format, or into raw bitmap vectors for further processing in R.
+  license_family: MIT
+
+extra:
+  recipe-maintainers:
+    - mingwandroid
+
+# The original CRAN metadata for this package was:
+
+# Package: pdftools
+# Type: Package
+# Title: Text Extraction, Rendering and Converting of PDF Documents
+# Version: 1.8
+# Authors@R: person("Jeroen", "Ooms", role = c("aut", "cre"), email = "jeroen@berkeley.edu", comment = c(ORCID = "0000-0002-4035-0289"))
+# Description: Utilities based on 'libpoppler' for extracting text, fonts, attachments and  metadata from a PDF file. Also supports high quality rendering of PDF documents info PNG, JPEG, TIFF format, or into raw bitmap vectors for further processing in R.
+# License: MIT + file LICENSE
+# URL: https://ropensci.org/blog/2016/03/01/pdftools-and-jeroen (blog) https://github.com/ropensci/pdftools#readme (devel) https://poppler.freedesktop.org (upstream)
+# BugReports: https://github.com/ropensci/pdftools/issues
+# SystemRequirements: Poppler C++ API: libpoppler-cpp-dev (deb) or poppler-cpp-devel (rpm). The unit tests also require the 'poppler-data' package (rpm/deb)
+# Encoding: UTF-8
+# Imports: Rcpp (>= 0.12.12)
+# LinkingTo: Rcpp
+# Suggests: jpeg, png, webp, testthat
+# RoxygenNote: 6.0.1.9000
+# NeedsCompilation: yes
+# Packaged: 2018-05-27 11:19:03 UTC; jeroen
+# Author: Jeroen Ooms [aut, cre] (<https://orcid.org/0000-0002-4035-0289>)
+# Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
+# Repository: CRAN
+# Date/Publication: 2018-05-27 13:56:09 UTC
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml
