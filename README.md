@@ -7,6 +7,11 @@ https://mran.microsoft.com/documents/rro/reproducibility#reproducibility
 export CRAN_URL=https://mran.microsoft.com/snapshot/2018-08-01
 export CRAN_URL=https://cran.r-project.org
 export CONDA_R=3.5.1
+# Or, if using cmd.exe (bash scripts below will not work!)
+set CRAN_URL=https://mran.microsoft.com/snapshot/2018-08-01
+set CRAN_URL=https://cran.r-project.org
+set CONDA_R=3.5.1
+
 # Edit ~/conda/aggregateR/conda_build_config.yaml and change:
     cran_mirror:
       - <CRAN_URL>
