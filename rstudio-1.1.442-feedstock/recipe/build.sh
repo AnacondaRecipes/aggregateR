@@ -1,4 +1,5 @@
 #!/bin/sh
+exit 1
 # Changing to not using an .app bundle is a bit tricky. I need to use
 # Xcode.
 if [[ ${DEBUG_C} == yes ]]; then
@@ -90,18 +91,19 @@ if [[ ${target_platform} == osx-64 ]]; then
   if [[ ${_XCODE_BUILD} == yes ]]; then
     _CMAKE_EXTRA_CONFIG+=(-G'Xcode')
     _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_ARCHITECTURES=x86_64)
-    _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_SYSROOT=${CONDA_BUILD_SYSROOT})
     _VERBOSE=""
   fi
-  unset MACOSX_DEPLOYMENT_TARGET
-  export MACOSX_DEPLOYMENT_TARGET
+  export MACOSX_DEPLOYMENT_TARGET=10.9
+  export CMAKE_OSX_SYSROOT=${CONDA_BUILD_SYSROOT}
+  _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_DEPLOYMENT_TARGET=10.9)
+  _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_SYSROOT=${CONDA_BUILD_SYSROOT})
   _CMAKE_EXTRA_CONFIG+=(-DCMAKE_AR=${AR})
   _CMAKE_EXTRA_CONFIG+=(-DCMAKE_RANLIB=${RANLIB})
   _CMAKE_EXTRA_CONFIG+=(-DCMAKE_LINKER=${LD})
   _CMAKE_EXTRA_CONFIG+=(-DRSTUDIO_USE_LIBCXX=TRUE)
   _CMAKE_EXTRA_CONFIG+=(-DRSTUDIO_USE_LIBSTDCXX=FALSE)
 fi
-if [[ ${HOST} =~ .*linux.* ]]; then
+if [[ ${target_platform} =~ .*linux.* ]]; then
   # I hate you so much CMake.
   LIBRT=$(find ${PREFIX} -name "librt.so")
   LIBPTHREAD=$(find ${PREFIX} -name "libpthread.so")
@@ -138,6 +140,7 @@ cmake                                         \
       -DCMAKE_C_COMPILER=$(type -p ${CC})     \
       -DCMAKE_CXX_COMPILER=$(type -p ${CXX})  \
       "${_CMAKE_EXTRA_CONFIG[@]}"             \
+      -Wdev --debug-output --trace            \
       ..
 
 # on macOS 10.9, in spite of following: https://unix.stackexchange.com/a/221988
