@@ -1,5 +1,5 @@
 #!/bin/sh
-exit 1
+
 # Changing to not using an .app bundle is a bit tricky. I need to use
 # Xcode.
 if [[ ${DEBUG_C} == yes ]]; then
