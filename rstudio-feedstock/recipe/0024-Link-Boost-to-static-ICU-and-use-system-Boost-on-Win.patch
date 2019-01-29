@@ -1,20 +1,20 @@
-From f5cb90e78894f58afd7825968ae8acc06ca0e02b Mon Sep 17 00:00:00 2001
+From bf4794989b1d9cf3791602e3ddcd32f7213e73cd Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Wed, 18 Oct 2017 13:08:43 +0000
-Subject: [PATCH 24/40] Link Boost to static ICU and use system Boost on
+Subject: [PATCH 24/24] Link Boost to static ICU and use system Boost on
  Windows
 
 FindICU.cmake has no support for static linking and FindBoost.cmake does not
 help either so do some awful things around hacking CMAKE_FIND_LIBRARY_SUFFIXES
 ---
- src/cpp/CMakeLists.txt | 37 +++++++++++++++++++++++++++++++++++--
- 1 file changed, 35 insertions(+), 2 deletions(-)
+ src/cpp/CMakeLists.txt | 38 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 36 insertions(+), 2 deletions(-)
 
 diff --git a/src/cpp/CMakeLists.txt b/src/cpp/CMakeLists.txt
-index 92aed41..3e16f85 100644
+index 56804a7a2f..3dc311db10 100644
 --- a/src/cpp/CMakeLists.txt
 +++ b/src/cpp/CMakeLists.txt
-@@ -186,8 +186,8 @@ list(APPEND BOOST_LIBS
+@@ -199,8 +199,8 @@ list(APPEND BOOST_LIBS
     thread
  )
  
@@ -25,10 +25,10 @@ index 92aed41..3e16f85 100644
     # prefer static link to our custom built version
     set(RSTUDIO_TOOLS_BOOST /opt/rstudio-tools/boost/boost_1_63_0)
     if(NOT RSTUDIO_USE_SYSTEM_BOOST AND EXISTS ${RSTUDIO_TOOLS_BOOST})
-@@ -207,7 +207,40 @@ if(UNIX)
-    else()
-       add_definitions(-DRSTUDIO_BOOST_NAMESPACE=boost)
-       find_package(Boost ${BOOST_VERSION} REQUIRED COMPONENTS ${BOOST_LIBS})
+@@ -227,6 +227,40 @@ if(UNIX)
+          list(REMOVE_ITEM BOOST_LIBS signals)
+       endif()
+       find_package(Boost ${RSTUDIO_BOOST_REQUESTED_VERSION} REQUIRED COMPONENTS ${BOOST_LIBS})
 +      set(ICU_DEBUG TRUE)
 +      set(ICU_USE_STATIC_LIBS TRUE)
 +      # This has no place here and it does not work anyway. It should be in FindICU.cmake
@@ -43,7 +43,7 @@ index 92aed41..3e16f85 100644
 +          set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
 +        endif()
 +      endif()
-+      find_package(ICU COMPONENTS i18n uc data) # Must be linked in this order
++       find_package(ICU COMPONENTS i18n uc data) # Must be linked in this order
 +      # We should have found static libraries here, -ldl is needed due to libicuuc.a::uprv_dl_open_58
 +      if(UNIX)
 +         list(APPEND Boost_LIBRARIES ${ICU_LIBRARIES} -ldl)
@@ -61,11 +61,11 @@ index 92aed41..3e16f85 100644
 +      # message(STATUS "Manually determined ICUUC_LIBRARY as ${ICUUC_LIBRARY}")
 +      # message(STATUS "Manually determined ICUDATA_LIBRARY as ${ICUDATA_LIBRARY}")
 +      # list(APPEND Boost_LIBRARIES ${ICUI18N_LIBRARY} ${ICUUC_LIBRARY} ${ICUDATA_LIBRARY} -ldl)
-       message(STATUS "Using system Boost ${BOOST_VERSION}")
++      message(STATUS "Using system Boost ${BOOST_VERSION}")
 +      message(STATUS "Boost_LIBRARIES ${Boost_LIBRARIES}")
     endif()
  
-    # WIN32 BOOST
+ # WIN32 BOOST
 -- 
-1.9.5 (Apple Git-50.3)
+2.17.2 (Apple Git-113)
 
