@@ -1,4 +1,4 @@
-From 75d81eb551d60e4b61084e9c9233ecef6056f955 Mon Sep 17 00:00:00 2001
+From 4a8487b15d137ba96caa79f0ecbe5f044d434676 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Sat, 29 Oct 2016 17:39:52 +0100
 Subject: [PATCH 11/41] Conda: Fix macOS and Windows layout, do not bundle deps
@@ -8,9 +8,9 @@ Subject: [PATCH 11/41] Conda: Fix macOS and Windows layout, do not bundle deps
  dependencies/windows/install-dependencies.cmd | 46 ++++++++------
  package/win32/CMakeLists.txt                  |  8 ++-
  src/cpp/desktop-mac/CMakeLists.txt            | 60 ++++++++++++-------
- src/cpp/desktop/CMakeLists.txt                | 44 +++++++++-----
+ src/cpp/desktop/CMakeLists.txt                | 53 +++++++++++-----
  src/cpp/session/CMakeLists.txt                |  3 +-
- 6 files changed, 104 insertions(+), 59 deletions(-)
+ 6 files changed, 113 insertions(+), 59 deletions(-)
 
 diff --git a/CMakeGlobals.txt b/CMakeGlobals.txt
 index 2d23e06917..23136cb6dd 100644
@@ -185,7 +185,7 @@ index c9bff323fb..58fbfb49bc 100644
  # install mac-terminal script
  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/mac-terminal.in
 diff --git a/src/cpp/desktop/CMakeLists.txt b/src/cpp/desktop/CMakeLists.txt
-index f8d720d5bd..ea82987409 100644
+index f8d720d5bd..8c0732810e 100644
 --- a/src/cpp/desktop/CMakeLists.txt
 +++ b/src/cpp/desktop/CMakeLists.txt
 @@ -324,10 +324,11 @@ endif(WIN32)
@@ -238,16 +238,25 @@ index f8d720d5bd..ea82987409 100644
        ${RSTUDIO_QTMODULES}
        ${QT_LIBRARIES}
        ${Boost_LIBRARIES}
-@@ -388,7 +395,7 @@ if(NOT APPLE)
+@@ -388,7 +395,16 @@ if(NOT APPLE)
  
     # extra dependencies for Windows
     if(WIN32)
 -      target_link_libraries(rstudio Version)
 +      target_link_libraries(${RSTUDIO_EXE_NAME} Version)
++   endif()
++
++   # extra dependencies for Apple
++   if(APPLE)
++      target_link_libraries(${RSTUDIO_EXE_NAME}
++         ${APPLICATION_SERVICES_LIBRARY}
++         ${COCOA_LIBRARY}
++         ${SECURITY_LIBRARY}
++      )
     endif()
  
  # for OSX we create a bundle
-@@ -412,7 +419,7 @@ else()
+@@ -412,7 +428,7 @@ else()
     # define bundle name and executable
     set(MACOSX_BUNDLE_BUNDLE_NAME "RStudio")
  
@@ -256,7 +265,7 @@ index f8d720d5bd..ea82987409 100644
        ${DESKTOP_SOURCE_FILES}
        ${MOC_DESKTOP_SOURCE_FILES}
        ${DESKTOP_RESOURCES_SOURCES}
-@@ -420,7 +427,7 @@ else()
+@@ -420,7 +436,7 @@ else()
        ${ICNS_FILES}
        ${PNG_FILES})
  
@@ -265,7 +274,7 @@ index f8d720d5bd..ea82987409 100644
        ${RSTUDIO_QTMODULES}
        ${QT_LIBRARIES}
        rstudio-core
-@@ -431,14 +438,19 @@ else()
+@@ -431,14 +447,19 @@ else()
  endif()
  
  # install target (OSX install goes into the bundle)
@@ -289,7 +298,7 @@ index f8d720d5bd..ea82987409 100644
    install(TARGETS rstudio DESTINATION ${RSTUDIO_INSTALL_BIN})
  endif()
  
-@@ -531,7 +543,7 @@ if(RSTUDIO_BUNDLE_QT)
+@@ -531,7 +552,7 @@ if(RSTUDIO_BUNDLE_QT)
           add_library(${ICU_LIBRARY} SHARED IMPORTED)
           set_property(TARGET ${ICU_LIBRARY} PROPERTY IMPORTED_LOCATION "${QT_LIBRARY_DIR}/${ICU_LIBRARY}.so")
        endforeach()
@@ -313,5 +322,5 @@ index 66b0dd0521..d1690539c9 100644
             USE_SOURCE_PERMISSIONS
             DESTINATION  ${RSTUDIO_INSTALL_BIN})
 -- 
-2.17.2 (Apple Git-113)
+2.20.1
 

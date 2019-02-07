@@ -61,6 +61,9 @@ if [[ ${target_platform} == osx-64 ]]; then
     # $INSTALL_NAME_TOOL -change /usr/lib/libncurses.5.4.dylib "$PREFIX"/lib/libncursesw.6.dylib ${SHARED_LIB}
     $INSTALL_NAME_TOOL -change /usr/lib/libedit.3.dylib "$PREFIX"/lib/libedit.0.dylib ${SHARED_LIB}
   done
+  if [[ $(uname) == Darwin ]]; then
+    export PATH="${PREFIX}/bin/xc-avoidance:${PATH}"
+  fi
 fi
 
 mkdir build
@@ -95,11 +98,15 @@ if [[ ${HOST} =~ .*darwin.* ]]; then
   if [[ ${_XCODE_BUILD} == yes ]]; then
     _CMAKE_EXTRA_CONFIG+=(-G'Xcode')
     _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_ARCHITECTURES=x86_64)
-    _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_SYSROOT=${CONDA_BUILD_SYSROOT})
     _VERBOSE=""
   fi
   unset MACOSX_DEPLOYMENT_TARGET
   export MACOSX_DEPLOYMENT_TARGET
+  _CMAKE_EXTRA_CONFIG+=(-DCMAKE_OSX_SYSROOT=${CONDA_BUILD_SYSROOT})
+  # .. this does nothing either (likely due to RStudio redefining it)
+  # export CMAKE_OSX_SYSROOT=${CONDA_BUILD_SYSROOT}
+  # Maybe this works?! (see share/cmake-3.12/Modules/Platform/Darwin-Initialize.cmake)
+  # export SDKROOT=${CONDA_BUILD_SYSROOT}
   _CMAKE_EXTRA_CONFIG+=(-DCMAKE_AR=${AR})
   _CMAKE_EXTRA_CONFIG+=(-DCMAKE_RANLIB=${RANLIB})
   _CMAKE_EXTRA_CONFIG+=(-DCMAKE_LINKER=${LD})
@@ -128,20 +135,20 @@ fi
 _CMAKE_EXTRA_CONFIG+=(-DQT_QMAKE_EXECUTABLE=${PREFIX}/bin/qmake)
 
 
-#      -Wdev --debug-output --trace            \
 
-cmake                                         \
-      -DCMAKE_INSTALL_PREFIX=${PREFIX}        \
-      -DBOOST_ROOT=${PREFIX}                  \
-      -DBOOST_VERSION=1.65.1                  \
-      -DRSTUDIO_TARGET=${RSTUDIO_TARGET}      \
-      -DCMAKE_BUILD_TYPE=${BUILD_TYPE}        \
-      -DLIBR_HOME=${PREFIX}/lib/R             \
-      -DUSE_MACOS_R_FRAMEWORK=FALSE           \
-      -DCMAKE_C_COMPILER=$(type -p ${CC})     \
-      -DCMAKE_CXX_COMPILER=$(type -p ${CXX})  \
-      "${_CMAKE_EXTRA_CONFIG[@]}"             \
-      ..
+cmake                                     \
+  -DCMAKE_INSTALL_PREFIX=${PREFIX}        \
+  -DBOOST_ROOT=${PREFIX}                  \
+  -DBOOST_VERSION=1.65.1                  \
+  -DRSTUDIO_TARGET=${RSTUDIO_TARGET}      \
+  -DCMAKE_BUILD_TYPE=${BUILD_TYPE}        \
+  -DLIBR_HOME=${PREFIX}/lib/R             \
+  -DUSE_MACOS_R_FRAMEWORK=FALSE           \
+  -DCMAKE_C_COMPILER=$(type -p ${CC})     \
+  -DCMAKE_CXX_COMPILER=$(type -p ${CXX})  \
+  "${_CMAKE_EXTRA_CONFIG[@]}"             \
+  -Wdev --debug-output --trace            \
+  .. 2>&1 | tee cmake.log
 
 # on macOS 10.9, in spite of following: https://unix.stackexchange.com/a/221988
 # and those limits seeming to have taken:
