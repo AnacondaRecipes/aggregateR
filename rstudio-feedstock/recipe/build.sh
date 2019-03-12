@@ -59,7 +59,8 @@ if [[ ${target_platform} == osx-64 ]]; then
     # changing install names or rpaths can't be redone for: ./dependencies/common/libclang/3.5/libclang.dylib (for architecture x86_64)
     # because larger updated load commands do not fit (the program must be relinked, and you may need to use -headerpad or -headerpad_max_install_names
     # $INSTALL_NAME_TOOL -change /usr/lib/libncurses.5.4.dylib "$PREFIX"/lib/libncursesw.6.dylib ${SHARED_LIB}
-    $INSTALL_NAME_TOOL -change /usr/lib/libedit.3.dylib "$PREFIX"/lib/libedit.0.dylib ${SHARED_LIB}
+    # Not needed since 1.2 branch?
+    # $INSTALL_NAME_TOOL -change /usr/lib/libedit.3.dylib "$PREFIX"/lib/libedit.0.dylib ${SHARED_LIB}
   done
   if [[ $(uname) == Darwin ]]; then
     export PATH="${PREFIX}/bin/xc-avoidance:${PATH}"
@@ -135,20 +136,42 @@ fi
 _CMAKE_EXTRA_CONFIG+=(-DQT_QMAKE_EXECUTABLE=${PREFIX}/bin/qmake)
 
 
+#  -Wdev --debug-output --trace            \
 
-cmake                                     \
-  -DCMAKE_INSTALL_PREFIX=${PREFIX}        \
-  -DBOOST_ROOT=${PREFIX}                  \
-  -DBOOST_VERSION=1.65.1                  \
-  -DRSTUDIO_TARGET=${RSTUDIO_TARGET}      \
+mkdir old
+pushd old
+time cmake                                \
+  -DCMAKE_INSTALL_PREFIX="${PREFIX}"      \
   -DCMAKE_BUILD_TYPE=${BUILD_TYPE}        \
-  -DLIBR_HOME=${PREFIX}/lib/R             \
-  -DUSE_MACOS_R_FRAMEWORK=FALSE           \
   -DCMAKE_C_COMPILER=$(type -p ${CC})     \
   -DCMAKE_CXX_COMPILER=$(type -p ${CXX})  \
+  -DBOOST_ROOT="${PREFIX}"                \
+  -DBOOST_VERSION=1.65.1                  \
+  -DRSTUDIO_TARGET=${RSTUDIO_TARGET}      \
+  -DLIBR_HOME="${PREFIX}"/lib/R           \
+  -DUSE_MACOS_R_FRAMEWORK=FALSE           \
   "${_CMAKE_EXTRA_CONFIG[@]}"             \
-  -Wdev --debug-output --trace            \
-  .. 2>&1 | tee cmake.log
+  ../.. 2>&1 | tee cmake.log
+popd
+
+mkdir new
+pushd new
+source ${BUILD_PREFIX}/share/cmake.conda/conda-env-vars.sh
+echo doing the new stuff:
+echo "  cmake general flags: ${CONDA_CMAKE_DEFAULTS[@]}"
+echo "cmake toolchain flags: ${CONDA_CMAKE_TOOLCHAIN[@]}"
+time cmake                            \
+  "${CONDA_CMAKE_DEFAULTS[@]}"        \
+  "${CONDA_CMAKE_TOOLCHAIN[@]}"       \
+  -DBOOST_ROOT="${PREFIX}"            \
+  -DBOOST_VERSION=1.65.1              \
+  -DRSTUDIO_TARGET=${RSTUDIO_TARGET}  \
+  -DLIBR_HOME="${PREFIX}"/lib/R       \
+  -DUSE_MACOS_R_FRAMEWORK=FALSE       \
+  "${_CMAKE_EXTRA_CONFIG[@]}"         \
+  ../.. 2>&1 | tee cmake.log
+popd
+exit 1
 
 # on macOS 10.9, in spite of following: https://unix.stackexchange.com/a/221988
 # and those limits seeming to have taken:
