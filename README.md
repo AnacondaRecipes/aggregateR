@@ -33,6 +33,7 @@ conda skeleton cran \
   --add-maintainer=mingwandroid \
   --update-policy=merge-keep-build-num \
   --r-interp=r-base \
+  --use-noarch-generic \
   $(find . -name "*feedstock" | \
     sed -e 's|^./rstudio-feedstock$||' \
         -e 's|^./rstudio-1.1.442-feedstock$||' \
