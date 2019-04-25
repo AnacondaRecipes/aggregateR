@@ -1,4 +1,4 @@
-{% set version = '0.3-6' %}
+{% set version = '0.4.1' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,7 +11,7 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/geometry_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/geometry/geometry_{{ version }}.tar.gz
-  sha256: 2be231ac99171367635cd957f27da77705329df97520ab86f655839c41dc0968
+  sha256: b5fe067e37d7a8df0628295258a49ddee139261ea7b486c0eb5eae8db8da716c
 
 build:
   merge_build_host: True  # [win]
@@ -23,10 +23,11 @@ build:
     - lib/R/lib/
     - lib/
 
-# Suggests: testthat, rgl, R.matlab, tripack
+# Suggests: spelling, testthat, rgl, R.matlab, tripack
 requirements:
   build:
     - {{ compiler('c') }}        # [not win]
+    - {{ compiler('cxx') }}      # [not win]
     - {{native}}toolchain        # [win]
     - {{posix}}filesystem        # [win]
     - {{posix}}make
@@ -36,11 +37,17 @@ requirements:
 
   host:
     - r-base
+    - r-rcpp
+    - r-rcppprogress
+    - r-lpsolve
     - r-magic
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcppprogress
+    - r-lpsolve
     - r-magic
 
 test:
@@ -56,17 +63,17 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: http://geometry.r-forge.r-project.org/
-  license: GPL (>= 3) + file LICENSE
-  summary: Makes the qhull library (www.qhull.org) available in R, in a similar manner as in
-    Octave and MATLAB. Qhull computes convex hulls, Delaunay triangulations, halfspace
+  home: https://davidcsterratt.github.io/geometry
+  license: GPL (>= 3)
+  summary: Makes the 'Qhull' library <http://www.qhull.org> available in R, in a similar manner
+    as in Octave and MATLAB. Qhull computes convex hulls, Delaunay triangulations, halfspace
     intersections about a point, Voronoi diagrams, furthest-site Delaunay triangulations,
-    and furthest-site Voronoi diagrams. It runs in 2-d, 3-d, 4-d, and higher dimensions.
+    and furthest-site Voronoi diagrams. It runs in 2D, 3D, 4D, and higher dimensions.
     It implements the Quickhull algorithm for computing the convex hull. Qhull does
     not support constrained Delaunay triangulations, or mesh generation of non-convex
-    objects, but the package does include some R functions that allow for this. Currently
-    the package only gives access to Delaunay triangulation and convex hull computation.
+    objects, but the package does include some R functions that allow for this.
   license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
 
 extra:
   recipe-maintainers:
@@ -75,22 +82,27 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: geometry
-# License: GPL (>= 3) + file LICENSE
-# Title: Mesh Generation and Surface Tesselation
-# Authors@R: c(person("C. B.", "Barber" , role="cph"), person("Kai", "Habel", role=c("cph","aut")), person("Raoul", "Grasman", role=c("cph","aut")), person("Robert B.", "Gramacy", role=c("cph","aut")), person("Andreas", "Stahel", role=c("cph","aut")), person("David C.", "Sterratt", role=c("cph","aut","cre"), email="david.c.sterratt@ed.ac.uk"))
-# Description: Makes the qhull library (www.qhull.org) available in R, in a similar manner as in Octave and MATLAB. Qhull computes convex hulls, Delaunay triangulations, halfspace intersections about a point, Voronoi diagrams, furthest-site Delaunay triangulations, and furthest-site Voronoi diagrams. It runs in 2-d, 3-d, 4-d, and higher dimensions. It implements the Quickhull algorithm for computing the convex hull. Qhull does not support constrained Delaunay triangulations, or mesh generation of non-convex objects, but the package does include some R functions that allow for this. Currently the package only gives access to Delaunay triangulation and convex hull computation.
-# Version: 0.3-6
-# URL: http://geometry.r-forge.r-project.org/
-# Date: 2015-09-04
-# BugReports: https://r-forge.r-project.org/tracker/?group_id=1149
-# Depends: R (>= 2.5.0), magic
-# Suggests: testthat, rgl, R.matlab, tripack
+# License: GPL (>= 3)
+# Title: Mesh Generation and Surface Tessellation
+# Authors@R: c( person("Jean-Romain", "Roussel" , role=c("cph", "ctb"), comment = "wrote tsearch function with QuadTrees"), person("C. B.", "Barber" , role="cph"),  person("Kai", "Habel", role=c("cph","aut")),  person("Raoul", "Grasman", role=c("cph","aut")), person("Robert B.", "Gramacy", role=c("cph","aut")), person("Pavlo", "Mozharovskyi", role=c("cph","aut")), person("David C.", "Sterratt", role=c("cph","aut","cre"), email="david.c.sterratt@ed.ac.uk", comment=c(ORCID="0000-0001-9092-9099")))
+# Description: Makes the 'Qhull' library <http://www.qhull.org> available in R, in a similar manner as in Octave and MATLAB. Qhull computes convex hulls, Delaunay triangulations, halfspace intersections about a point, Voronoi diagrams, furthest-site Delaunay triangulations, and furthest-site Voronoi diagrams. It runs in 2D, 3D, 4D, and higher dimensions. It implements the Quickhull algorithm for computing the convex hull. Qhull does not support constrained Delaunay triangulations, or mesh generation of non-convex objects, but the package does include some R functions that allow for this.
+# Version: 0.4.1
+# URL: https://davidcsterratt.github.io/geometry
+# Date: 2019-03-27
+# BugReports: https://github.com/davidcsterratt/geometry/issues
+# Depends: R (>= 3.0.0)
+# Imports: magic, Rcpp, lpSolve
+# Suggests: spelling, testthat, rgl, R.matlab, tripack
+# RoxygenNote: 6.1.1
+# LinkingTo: Rcpp, RcppProgress
+# Encoding: UTF-8
+# Language: en-GB
 # NeedsCompilation: yes
-# Packaged: 2015-09-09 10:46:51 UTC; sterratt
-# Author: C. B. Barber [cph], Kai Habel [cph, aut], Raoul Grasman [cph, aut], Robert B. Gramacy [cph, aut], Andreas Stahel [cph, aut], David C. Sterratt [cph, aut, cre]
+# Packaged: 2019-03-27 16:34:48 UTC; sterratt
+# Author: Jean-Romain Roussel [cph, ctb] (wrote tsearch function with QuadTrees), C. B. Barber [cph], Kai Habel [cph, aut], Raoul Grasman [cph, aut], Robert B. Gramacy [cph, aut], Pavlo Mozharovskyi [cph, aut], David C. Sterratt [cph, aut, cre] (<https://orcid.org/0000-0001-9092-9099>)
 # Maintainer: David C. Sterratt <david.c.sterratt@ed.ac.uk>
 # Repository: CRAN
-# Date/Publication: 2015-09-09 13:47:14
+# Date/Publication: 2019-03-27 17:10:03 UTC
 
 # See
 # http://docs.continuum.io/conda/build.html for
