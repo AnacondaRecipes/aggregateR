@@ -1,0 +1,106 @@
+{% set version = '1.2.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fs/fs_{{ version }}.tar.gz
+  sha256: 2a4cb4cd98700973b5746965dd21ae42cf11c4cf160d42946e8a0e406914580d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr, pillar (>= 1.0.0), crayon, rmarkdown, knitr, withr,
+requirements:
+  build:
+    - {{ compiler('c') }}        # [not win]
+    - {{ compiler('cxx') }}      # [not win]
+    - {{native}}toolchain        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fs')"           # [not win]
+    - "\"%R%\" -e \"library('fs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://fs.r-lib.org, https://github.com/r-lib/fs
+  license: GPL-3
+  summary: A cross-platform interface to file system operations, built on top of the 'libuv'
+    C library.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - mingwandroid
+
+# The original CRAN metadata for this package was:
+
+# Package: fs
+# Title: Cross-Platform File System Operations Based on 'libuv'
+# Version: 1.2.7
+# Authors@R: c( person("Jim", "Hester", email = "james.f.hester@gmail.com", role = c("aut", "cre")), person("Hadley", "Wickham", , "hadley@rstudio.com", "aut"), person("libuv project contributors", role = "cph", comment = "libuv library"), person("Joyent, Inc. and other Node contributors", role = "cph", comment = "libuv library"), person("RStudio", role = c("cph", "fnd")) )
+# Description: A cross-platform interface to file system operations, built on top of the 'libuv' C library.
+# Depends: R (>= 3.1)
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# ByteCompile: true
+# LinkingTo: Rcpp
+# Imports: methods, Rcpp
+# SystemRequirements: GNU make
+# RoxygenNote: 6.1.1
+# URL: http://fs.r-lib.org, https://github.com/r-lib/fs
+# BugReports: https://github.com/r-lib/fs/issues
+# Copyright: file COPYRIGHTS
+# Suggests: testthat, covr, pillar (>= 1.0.0), crayon, rmarkdown, knitr, withr,
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2019-03-19 18:52:57 UTC; jhester
+# Author: Jim Hester [aut, cre], Hadley Wickham [aut], libuv project contributors [cph] (libuv library), Joyent, Inc. and other Node contributors [cph] (libuv library), RStudio [cph, fnd]
+# Maintainer: Jim Hester <james.f.hester@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-03-19 23:20:03 UTC
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml

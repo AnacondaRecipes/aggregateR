@@ -1,0 +1,89 @@
+{% set version = '2.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-remotes
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/remotes_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/remotes/remotes_{{ version }}.tar.gz
+  sha256: 379866c034b95ffb0ce3c77569ec36491d4484c21d5b5af61728b31ae52476c9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: brew, callr, curl, covr, git2r (>= 0.23.0), knitr, mockery, pkgbuild (>= 1.0.1), pingr, rmarkdown, rprojroot, testthat, withr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('remotes')"           # [not win]
+    - "\"%R%\" -e \"library('remotes')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/r-lib/remotes#readme
+  license: GPL (>= 2)
+  summary: Download and install R packages stored in 'GitHub', 'BitBucket', or plain 'subversion'
+    or 'git' repositories. This package provides the 'install_*' functions in 'devtools'.
+    Indeed most of the code was copied over from 'devtools'.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - mingwandroid
+
+# The original CRAN metadata for this package was:
+
+# Package: remotes
+# Title: R Package Installation from Remote Repositories, Including 'GitHub'
+# Version: 2.0.4
+# Authors@R: c( person("Jim", "Hester", , "james.hester@rstudio.com", role = c("aut", "cre")), person("Gabor", "Csardi", , "csardi.gabor@gmail.com", role = c("aut")), person("Hadley", "Wickham", role = c("aut")), person("Winston", "Chang", role = "aut"), person("RStudio", role = "cph"), person("Martin", "Morgan", role = "aut"), person("Dan", "Tenenbaum", role = "aut"), person("Mango Solutions", role = "cph") )
+# Description: Download and install R packages stored in 'GitHub', 'BitBucket', or plain 'subversion' or 'git' repositories. This package provides the 'install_*' functions in 'devtools'. Indeed most of the code was copied over from 'devtools'.
+# License: GPL (>= 2)
+# URL: https://github.com/r-lib/remotes#readme
+# BugReports: https://github.com/r-lib/remotes/issues
+# Imports: methods, stats, tools, utils
+# Suggests: brew, callr, curl, covr, git2r (>= 0.23.0), knitr, mockery, pkgbuild (>= 1.0.1), pingr, rmarkdown, rprojroot, testthat, withr
+# Depends: R (>= 3.0.0)
+# VignetteBuilder: knitr
+# RoxygenNote: 6.1.1
+# SystemRequirements: Subversion for install_svn, git for install_git
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2019-04-10 14:53:06 UTC; jhester
+# Author: Jim Hester [aut, cre], Gabor Csardi [aut], Hadley Wickham [aut], Winston Chang [aut], RStudio [cph], Martin Morgan [aut], Dan Tenenbaum [aut], Mango Solutions [cph]
+# Maintainer: Jim Hester <james.hester@rstudio.com>
+# Repository: CRAN
+# Date/Publication: 2019-04-10 16:32:54 UTC
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml

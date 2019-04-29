@@ -1,0 +1,89 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-forge
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/forge_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/forge/forge_{{ version }}.tar.gz
+  sha256: 8a57396adc21970f57a13916ed2335d6eb35a5e29f09ee3e80f3a93298fe4e5e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-magrittr
+    - r-rlang >=0.3.1
+
+  run:
+    - r-base
+    - r-magrittr
+    - r-rlang >=0.3.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('forge')"           # [not win]
+    - "\"%R%\" -e \"library('forge')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=forge
+  license: Apache License (>= 2.0)
+  summary: Helper functions with a consistent interface to coerce and verify the types and shapes
+    of values for input checking.
+  license_family: APACHE
+
+extra:
+  recipe-maintainers:
+    - mingwandroid
+
+# The original CRAN metadata for this package was:
+
+# Package: forge
+# Type: Package
+# Title: Casting Values into Shape
+# Version: 0.2.0
+# Authors@R: c( person("Kevin", "Kuo", role = c("aut", "cre"), email = "kevin.kuo@rstudio.com", comment = c(ORCID = "0000-0001-7803-7901")) )
+# Description: Helper functions with a consistent interface to coerce and verify the types and shapes of values for input checking.
+# License: Apache License (>= 2.0)
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 3.1.2)
+# Imports: rlang (>= 0.3.1), magrittr
+# RoxygenNote: 6.1.0
+# Suggests: testthat, covr
+# NeedsCompilation: no
+# Packaged: 2019-02-26 15:41:55 UTC; kevinykuo
+# Author: Kevin Kuo [aut, cre] (<https://orcid.org/0000-0001-7803-7901>)
+# Maintainer: Kevin Kuo <kevin.kuo@rstudio.com>
+# Repository: CRAN
+# Date/Publication: 2019-02-26 16:00:03 UTC
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml

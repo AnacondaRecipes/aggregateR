@@ -1,0 +1,94 @@
+{% set version = '3.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sys
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sys_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sys/sys_{{ version }}.tar.gz
+  sha256: 2819498461fe2ce83d319d1a47844e86bcea6d01d10861818dba289e7099bbcc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: unix (>= 1.4), spelling, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}        # [not win]
+    - {{native}}toolchain        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sys')"           # [not win]
+    - "\"%R%\" -e \"library('sys')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jeroen/sys#readme
+  license: MIT + file LICENSE
+  summary: Drop-in replacements for the base system2() function with fine control and consistent
+    behavior across platforms. Supports clean interruption, timeout,  background tasks,
+    and streaming STDIN / STDOUT / STDERR over binary or text  connections. Arguments
+    on Windows automatically get encoded and quoted to work  on different locales.
+  license_family: MIT
+
+extra:
+  recipe-maintainers:
+    - mingwandroid
+
+# The original CRAN metadata for this package was:
+
+# Package: sys
+# Type: Package
+# Title: Powerful and Reliable Tools for Running System Commands in R
+# Version: 3.2
+# Authors@R: c(person("Jeroen", "Ooms", role = c("aut", "cre"),  email = "jeroen@berkeley.edu", comment = c(ORCID = "0000-0002-4035-0289")), person("Gabor", "Csardi", , "csardi.gabor@gmail.com", role = "ctb"))
+# Description: Drop-in replacements for the base system2() function with fine control and consistent behavior across platforms. Supports clean interruption, timeout,  background tasks, and streaming STDIN / STDOUT / STDERR over binary or text  connections. Arguments on Windows automatically get encoded and quoted to work  on different locales.
+# License: MIT + file LICENSE
+# URL: https://github.com/jeroen/sys#readme
+# BugReports: https://github.com/jeroen/sys/issues
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Suggests: unix (>= 1.4), spelling, testthat
+# Language: en-US
+# NeedsCompilation: yes
+# Packaged: 2019-04-23 21:04:34 UTC; jeroen
+# Author: Jeroen Ooms [aut, cre] (<https://orcid.org/0000-0002-4035-0289>), Gabor Csardi [ctb]
+# Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
+# Repository: CRAN
+# Date/Publication: 2019-04-23 22:40:08 UTC
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml

@@ -1,0 +1,83 @@
+{% set version = '1.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-clisymbols
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/clisymbols_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/clisymbols/clisymbols_{{ version }}.tar.gz
+  sha256: 0649f2ce39541820daee3ed408d765eddf83db5db639b493561f4e5fbf88efe0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('clisymbols')"           # [not win]
+    - "\"%R%\" -e \"library('clisymbols')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/gaborcsardi/clisymbols
+  license: MIT + file LICENSE
+  summary: A small subset of Unicode symbols, that are useful when building command line applications.
+    They fall back to alternatives on terminals that do not support Unicode. Many symbols
+    were taken from the 'figures' 'npm' package (see <https://github.com/sindresorhus/figures>).
+  license_family: MIT
+
+extra:
+  recipe-maintainers:
+    - mingwandroid
+
+# The original CRAN metadata for this package was:
+
+# Package: clisymbols
+# Title: Unicode Symbols at the R Prompt
+# Version: 1.2.0
+# Authors@R: c( person("Gabor", "Csardi", , "csardi.gabor@gmail.com", role = c("aut", "cre")), person("Sindre", "Sorhus", role = "aut") )
+# Description: A small subset of Unicode symbols, that are useful when building command line applications. They fall back to alternatives on terminals that do not support Unicode. Many symbols were taken from the 'figures' 'npm' package (see <https://github.com/sindresorhus/figures>).
+# License: MIT + file LICENSE
+# URL: https://github.com/gaborcsardi/clisymbols
+# BugReports: https://github.com/gaborcsardi/clisymbols/issues
+# Suggests: testthat
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2017-05-21 10:41:16 UTC; gaborcsardi
+# Author: Gabor Csardi [aut, cre], Sindre Sorhus [aut]
+# Maintainer: Gabor Csardi <csardi.gabor@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-05-21 17:19:19 UTC
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml
