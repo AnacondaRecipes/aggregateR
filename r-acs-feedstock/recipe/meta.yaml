@@ -1,0 +1,101 @@
+{% set version = '2.1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-acs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/acs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/acs/acs_{{ version }}.tar.gz
+  sha256: 05aa69eaf07381253ed7ddf7200a395d72c37cdeb2af8ddf6653218a5c4e5c2a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests:
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-xml
+    - r-httr
+    - r-plyr
+    - r-stringr
+
+  run:
+    - r-base
+    - r-xml
+    - r-httr
+    - r-plyr
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('acs')"           # [not win]
+    - "\"%R%\" -e \"library('acs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://dusp.mit.edu/faculty/ezra-glenn, http://eglenn.scripts.mit.edu/citystate/,
+    http://mailman.mit.edu/mailman/listinfo/acs-r
+  license: GPL-3
+  summary: Provides a general toolkit for downloading, managing, analyzing, and presenting data
+    from the U.S. Census (<https://www.census.gov/data/developers/data-sets.html>),
+    including SF1 (Decennial short-form), SF3 (Decennial long-form), and the American
+    Community Survey (ACS).  Confidence intervals provided with ACS data are converted
+    to standard errors to be bundled with estimates in complex acs objects.  Package
+    provides new methods to conduct standard operations on acs objects and present/plot
+    data in statistically appropriate ways.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: acs
+# Type: Package
+# Title: Download, Manipulate, and Present American Community Survey and Decennial Data from the US Census
+# Version: 2.1.4
+# Date: 2019-02-14
+# Authors@R: c(person("Ezra Haber", "Glenn", role = c("aut", "cre"), email = "eglenn@mit.edu"))
+# Author: Ezra Haber Glenn [aut, cre]
+# Maintainer: Ezra Haber Glenn <eglenn@mit.edu>
+# URL: http://dusp.mit.edu/faculty/ezra-glenn, http://eglenn.scripts.mit.edu/citystate/, http://mailman.mit.edu/mailman/listinfo/acs-r
+# Description: Provides a general toolkit for downloading, managing, analyzing, and presenting data from the U.S. Census (<https://www.census.gov/data/developers/data-sets.html>), including SF1 (Decennial short-form), SF3 (Decennial long-form), and the American Community Survey (ACS).  Confidence intervals provided with ACS data are converted to standard errors to be bundled with estimates in complex acs objects.  Package provides new methods to conduct standard operations on acs objects and present/plot data in statistically appropriate ways.
+# Suggests:
+# Imports: graphics, stats, plyr, utils, httr
+# Depends: R (>= 2.10), stringr, methods, XML
+# License: GPL-3
+# LazyData: yes
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2019-02-19 20:08:11 UTC; eglenn
+# Repository: CRAN
+# Date/Publication: 2019-02-19 21:40:14 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,83 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-algebraichaplopackage
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/AlgebraicHaploPackage_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/AlgebraicHaploPackage/AlgebraicHaploPackage_{{ version }}.tar.gz
+  sha256: 0730d213f3f5f42db93f9c9e70b60191268da392a5f6f1c0155b27603a2b35cf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: compiler
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('AlgebraicHaploPackage')"           # [not win]
+    - "\"%R%\" -e \"library('AlgebraicHaploPackage')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=AlgebraicHaploPackage
+  license: GPL-2
+  summary: Two unordered pairs of data of two different snips positions is haplotyped by resolving
+    a small number ob closed equations.
+  license_family: GPL2
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: AlgebraicHaploPackage
+# Type: Package
+# Title: Haplotype Two Snips Out of a Paired Group of Patients
+# Version: 1.2
+# Date: 2015-10-26
+# Author: Jan Wolfertz
+# Maintainer: Jan Wolfertz <Jan.wolfertz@uni-duesseldorf.de>
+# Depends: R (>= 3.1.3)
+# Suggests: compiler
+# Description: Two unordered pairs of data of two different snips positions is haplotyped by resolving a small number ob closed equations.
+# LazyLoad: yes
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2015-10-27 14:54:33 UTC; jan
+# Repository: CRAN
+# Date/Publication: 2015-10-31 08:46:53
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

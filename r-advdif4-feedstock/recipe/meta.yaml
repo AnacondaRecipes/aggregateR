@@ -1,0 +1,85 @@
+{% set version = '0.7.18' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-advdif4
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/AdvDif4_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/AdvDif4/AdvDif4_{{ version }}.tar.gz
+  sha256: c75797b51edc0ab7ad12e3eeed67293ad3676f9bd9535c017462b152f899abf5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('AdvDif4')"           # [not win]
+    - "\"%R%\" -e \"library('AdvDif4')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=AdvDif4
+  license: GPL-3
+  summary: This software solves an Advection Bi-Flux Diffusive Problem using the Finite Difference
+    Method FDM. Vasconcellos, J.F.V., Marinho, G.M., Zanni, J.H., 2016, Numerical analysis
+    of an anomalous diffusion with a bimodal flux distribution. <doi:10.1016/j.rimni.2016.05.001>.
+    Silva, L.G., Knupp, D.C., Bevilacqua, L., Galeao, A.C.N.R., Silva Neto, A.J., 2014,
+    Formulation and solution of an Inverse Anomalous Diffusion Problem with Stochastic
+    Techniques. <doi:10.5902/2179460X13184>. In this version, it is possible to include
+    a source as a function depending on space and time, that is, s(x,t).
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: AdvDif4
+# Type: Package
+# Title: Solving 1D Advection Bi-Flux Diffusion Equation
+# Version: 0.7.18
+# Author: Jader Lugon Junior, Pedro Paulo Gomes Watts Rodrigues, Luiz Bevilacqua, Gisele Moraes Marinho, Diego Campos Knupp, Joao Flavio Vieira Vasconcellos and Antonio Jose da Silva Neto.
+# Maintainer: Jader Lugon Junior <jlugonjr@gmail.com>
+# Description: This software solves an Advection Bi-Flux Diffusive Problem using the Finite Difference Method FDM. Vasconcellos, J.F.V., Marinho, G.M., Zanni, J.H., 2016, Numerical analysis of an anomalous diffusion with a bimodal flux distribution. <doi:10.1016/j.rimni.2016.05.001>. Silva, L.G., Knupp, D.C., Bevilacqua, L., Galeao, A.C.N.R., Silva Neto, A.J., 2014, Formulation and solution of an Inverse Anomalous Diffusion Problem with Stochastic Techniques. <doi:10.5902/2179460X13184>. In this version, it is possible to include a source as a function depending on space and time, that is, s(x,t).
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Repository: CRAN
+# NeedsCompilation: no
+# Packaged: 2019-07-21 18:07:09 UTC; Usuario
+# Date/Publication: 2019-07-21 18:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

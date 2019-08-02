@@ -1,0 +1,92 @@
+{% set version = '2.2-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-adaptivetau
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/adaptivetau_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/adaptivetau/adaptivetau_{{ version }}.tar.gz
+  sha256: 9df34357496fe7db0854845f48de1d988f8036bb43638f70193db6e80965d1c9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('adaptivetau')"           # [not win]
+    - "\"%R%\" -e \"library('adaptivetau')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=adaptivetau
+  license: GPL (>= 3)
+  summary: Implements adaptive tau leaping to approximate the trajectory of a continuous-time
+    stochastic process as described by Cao et al. (2007) The Journal of Chemical Physics
+    <doi:10.1063/1.2745299> (aka. the Gillespie stochastic simulation algorithm).  This
+    package is based upon work supported by NSF DBI-0906041 and NIH K99-GM104158 to
+    Philip Johnson and NIH R01-AI049334 to Rustom Antia.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: adaptivetau
+# Type: Package
+# Title: Tau-Leaping Stochastic Simulation
+# Version: 2.2-3
+# Date: 2019-3-19
+# Author: Philip Johnson
+# Maintainer: Philip Johnson <plfj@umd.edu>
+# Depends: R (>= 2.10.1)
+# Enhances: compiler
+# Description: Implements adaptive tau leaping to approximate the trajectory of a continuous-time stochastic process as described by Cao et al. (2007) The Journal of Chemical Physics <doi:10.1063/1.2745299> (aka. the Gillespie stochastic simulation algorithm).  This package is based upon work supported by NSF DBI-0906041 and NIH K99-GM104158 to Philip Johnson and NIH R01-AI049334 to Rustom Antia.
+# License: GPL (>= 3)
+# NeedsCompilation: yes
+# Packaged: 2019-03-19 19:49:54 UTC; pjohnson
+# Repository: CRAN
+# Date/Publication: 2019-03-19 22:53:31 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,89 @@
+{% set version = '1.40.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-agrmt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/agrmt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/agrmt/agrmt_{{ version }}.tar.gz
+  sha256: bd359e03632c4c3e4d89c8e2980c3bbe0cd23246799cf7bc9d7d7eb20cb64ff8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('agrmt')"           # [not win]
+    - "\"%R%\" -e \"library('agrmt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://agrmt.r-forge.r-project.org
+  license: GPL-3
+  summary: 'Calculate agreement or consensus in ordered rating scales. The package implements
+    van der Eijk''s (2001) <DOI: 10.1023/A:1010374114305> measure of agreement A, which
+    can be used to describe agreement, consensus, or polarization among respondents.
+    It also implements measures of consensus (dispersion) by Leik, Tatsle and Wierman,
+    Blair and Lacy, Kvalseth, Berry and Mielke, and Garcia-Montalvo and Reynal-Querol.
+    Furthermore, an implementation of Galtungs AJUS-system is provided to classify distributions,
+    as well as a function to identify the position of multiple modes.'
+
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: agrmt
+# Type: Package
+# Title: Calculate Agreement or Consensus in Ordered Rating Scales
+# Version: 1.40.4
+# Date: 2016-04-02
+# Author: Didier Ruedin
+# Maintainer: Didier Ruedin <didier.ruedin@wolfson.oxon.org>
+# Description: Calculate agreement or consensus in ordered rating scales. The package implements van der Eijk's (2001) <DOI: 10.1023/A:1010374114305> measure of agreement A, which can be used to describe agreement, consensus, or polarization among respondents. It also implements measures of consensus (dispersion) by Leik, Tatsle and Wierman, Blair and Lacy, Kvalseth, Berry and Mielke, and Garcia-Montalvo and Reynal-Querol. Furthermore, an implementation of Galtungs AJUS-system is provided to classify distributions, as well as a function to identify the position of multiple modes.
+# URL: http://agrmt.r-forge.r-project.org
+# License: GPL-3
+# Repository: CRAN
+# Repository/R-Forge/Project: agrmt
+# Repository/R-Forge/Revision: 84
+# Repository/R-Forge/DateTimeStamp: 2016-04-02 08:21:07
+# Date/Publication: 2016-04-02 23:38:12
+# NeedsCompilation: no
+# Packaged: 2016-04-02 08:25:21 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

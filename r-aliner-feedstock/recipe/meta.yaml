@@ -1,0 +1,95 @@
+{% set version = '1.1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-aliner
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/alineR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/alineR/alineR_{{ version }}.tar.gz
+  sha256: 598dc7dbc60ce817736fd83368874d52e546f72cea45e90bfa1718190fbd24be
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('alineR')"           # [not win]
+    - "\"%R%\" -e \"library('alineR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=alineR
+  license: GPL-3
+  summary: Functions are provided to calculate the 'ALINE' Distance between words as per  (Kondrak
+    2000) and (Downey, Hallmark, Cox, Norquest, & Lansing, 2008,  <doi:10.1080/09296170802326681>).
+    The score is based on phonetic features represented  using the Unicode-compliant
+    International Phonetic Alphabet (IPA). Parameterized  features weights are used
+    to determine the optimal alignment and functions are provided to estimate optimum
+    values using a genetic algorithm and supervised  learning. See (Downey, Sun, and
+    Norquest 2017,  <https://journal.r-project.org/archive/2017/RJ-2017-005/index.html>.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: alineR
+# Type: Package
+# Title: Alignment of Phonetic Sequences Using the 'ALINE' Algorithm
+# Version: 1.1.4
+# Date: 2017-09-12
+# Authors@R: c(person('Sean', 'Downey', role = c("aut","cre"),email="sean@codexdata.com"), person('Guowei', 'Sun', role = "aut",email="gwsun@umd.edu"), person('Greg', 'Kondrak', role = "cph", comment="Copyright holder of original ALINE algorithm C++ source code included in package."))
+# Maintainer: Sean Downey <sean@codexdata.com>
+# LazyData: true
+# LazyLoad: true
+# Description: Functions are provided to calculate the 'ALINE' Distance between words as per  (Kondrak 2000) and (Downey, Hallmark, Cox, Norquest, & Lansing, 2008,  <doi:10.1080/09296170802326681>). The score is based on phonetic features represented  using the Unicode-compliant International Phonetic Alphabet (IPA). Parameterized  features weights are used to determine the optimal alignment and functions are provided to estimate optimum values using a genetic algorithm and supervised  learning. See (Downey, Sun, and Norquest 2017,  <https://journal.r-project.org/archive/2017/RJ-2017-005/index.html>.
+# License: GPL-3
+# NeedsCompilation: yes
+# Packaged: 2017-09-13 20:26:48 UTC; seandowney
+# Repository: CRAN
+# Date/Publication: 2017-09-14 17:18:26 UTC
+# Author: Sean Downey [aut, cre], Guowei Sun [aut], Greg Kondrak [cph] (Copyright holder of original ALINE algorithm C++ source code included in package.)
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

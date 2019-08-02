@@ -1,0 +1,83 @@
+{% set version = '1.0.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-aidar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/aidar_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/aidar/aidar_{{ version }}.tar.gz
+  sha256: 728f7e1b7c79cb93770a64cf513d5d56f4b509ee6714a6c106d40bf8b1f851e0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-xml
+
+  run:
+    - r-base
+    - r-xml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('aidar')"           # [not win]
+    - "\"%R%\" -e \"library('aidar')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=aidar
+  license: LGPL (>= 2)
+  summary: Read objects from the AIDA (<http://aida.freehep.org/>) file and make them available
+    as dataframes in R.
+  license_family: LGPL
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: aidar
+# Title: Tools for Reading AIDA Files
+# Description: Read objects from the AIDA (<http://aida.freehep.org/>) file and make them available as dataframes in R.
+# Version: 1.0.5
+# Author: Andreas Pfeiffer <apfeiffer1@gmail.com>
+# Maintainer: Andreas Pfeiffer <apfeiffer1@gmail.com>
+# License: LGPL (>= 2)
+# Suggests: testthat
+# Imports: XML
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-01-26 22:11:38 UTC; ap
+# Repository: CRAN
+# Date/Publication: 2018-01-26 22:20:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

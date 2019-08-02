@@ -1,0 +1,97 @@
+{% set version = '0.5.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-alterryx
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/alterryx_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/alterryx/alterryx_{{ version }}.tar.gz
+  sha256: 707cdb10ecfca66775b5ffd096d92baa07c25b0c2561e4ab71f0d445882038dd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-base64enc
+    - r-digest
+    - r-httr
+    - r-jsonlite >=1.4
+
+  run:
+    - r-base
+    - r-base64enc
+    - r-digest
+    - r-httr
+    - r-jsonlite >=1.4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('alterryx')"           # [not win]
+    - "\"%R%\" -e \"library('alterryx')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mtreadwell/alterryx, https://gallery.alteryx.com/api-docs/
+  license: GPL-2
+  summary: A tool to access each of the 'Alteryx' Gallery 'API' endpoints. Users can queue jobs,
+    poll job status, and retrieve application output as a data frame. You will need
+    an 'Alteryx' Server license and have 'Alteryx' Gallery running to utilize this package.
+    The 'API' is accessed through the 'URL' that you setup for the server running 'Alteryx'
+    Gallery and more information on the endpoints can be found at <https://gallery.alteryx.com/api-docs/>.
+  license_family: GPL2
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: alterryx
+# Type: Package
+# Title: An 'API' Client for the 'Alteryx' Gallery
+# Version: 0.5.0
+# Author: Michael Treadwell
+# Maintainer: Michael Treadwell <michael.treadwell@interworks.com>
+# Description: A tool to access each of the 'Alteryx' Gallery 'API' endpoints. Users can queue jobs, poll job status, and retrieve application output as a data frame. You will need an 'Alteryx' Server license and have 'Alteryx' Gallery running to utilize this package. The 'API' is accessed through the 'URL' that you setup for the server running 'Alteryx' Gallery and more information on the endpoints can be found at <https://gallery.alteryx.com/api-docs/>.
+# URL: https://github.com/mtreadwell/alterryx, https://gallery.alteryx.com/api-docs/
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# Imports: httr, utils, digest, base64enc, jsonlite (>= 1.4)
+# RoxygenNote: 6.1.1
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-06-06 19:40:25 UTC; mtreadwell
+# Repository: CRAN
+# Date/Publication: 2019-06-06 20:22:22 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

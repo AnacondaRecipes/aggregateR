@@ -1,0 +1,102 @@
+{% set version = '1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-adaptivesparsity
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/AdaptiveSparsity_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/AdaptiveSparsity/AdaptiveSparsity_{{ version }}.tar.gz
+  sha256: 217d267067d55a90ec79f96f9eaee676cd4273fa666b16893532515a512db946
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-rcpp
+    - r-rcpparmadillo >=0.2.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-matrix
+    - r-rcpp
+    - r-rcpparmadillo >=0.2.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('AdaptiveSparsity')"           # [not win]
+    - "\"%R%\" -e \"library('AdaptiveSparsity')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=AdaptiveSparsity
+  license: LGPL (>= 3.0)
+  summary: Implements Figueiredo EM algorithm for adaptive sparsity (Jeffreys prior) (see Figueiredo,
+    M.A.T.; , "Adaptive sparseness for supervised learning," Pattern Analysis and Machine
+    Intelligence, IEEE Transactions on , vol.25, no.9, pp. 1150- 1159, Sept. 2003) and
+    Wong algorithm for adaptively sparse gaussian geometric models (see Wong, Eleanor,
+    Suyash Awate, and P. Thomas Fletcher. "Adaptive Sparsity in Gaussian Graphical Models."
+    In Proceedings of the 30th International Conference on Machine Learning (ICML-13),
+    pp. 311-319. 2013.)
+  license_family: LGPL
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: AdaptiveSparsity
+# Type: Package
+# Title: Adaptive Sparsity Models
+# Version: 1.6
+# Date: 2018-08-20
+# Author: Kristen Zygmunt, Eleanor Wong, Tom Fletcher
+# Maintainer: Kris Campbell <kris@sci.utah.edu>
+# Description: Implements Figueiredo EM algorithm for adaptive sparsity (Jeffreys prior) (see Figueiredo, M.A.T.; , "Adaptive sparseness for supervised learning," Pattern Analysis and Machine Intelligence, IEEE Transactions on , vol.25, no.9, pp. 1150- 1159, Sept. 2003) and Wong algorithm for adaptively sparse gaussian geometric models (see Wong, Eleanor, Suyash Awate, and P. Thomas Fletcher. "Adaptive Sparsity in Gaussian Graphical Models." In Proceedings of the 30th International Conference on Machine Learning (ICML-13), pp. 311-319. 2013.)
+# License: LGPL (>= 3.0)
+# Depends: R (>= 3.0.2)
+# Imports: MASS, Matrix, Rcpp
+# LinkingTo: Rcpp (>= 0.12.13), RcppArmadillo (>= 0.2.0)
+# NeedsCompilation: yes
+# Packaged: 2018-08-20 21:38:23 UTC; kris
+# Repository: CRAN
+# Date/Publication: 2018-08-20 22:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

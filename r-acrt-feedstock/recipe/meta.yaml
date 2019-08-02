@@ -1,0 +1,96 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-acrt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/acrt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/acrt/acrt_{{ version }}.tar.gz
+  sha256: daacf679ee63107167c23a62b58cd45722633fa933e6c4cfceee3a87306b3679
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcppeigen
+    - r-sandwich
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcppeigen
+    - r-sandwich
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('acrt')"           # [not win]
+    - "\"%R%\" -e \"library('acrt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=acrt
+  license: GPL-2
+  summary: 'Functions for testing affine hypotheses on the regression coefficient vector in regression
+    models with autocorrelated errors. '
+
+  license_family: GPL2
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: acrt
+# Type: Package
+# Title: Autocorrelation Robust Testing
+# Version: 1.0.1
+# Date: 2016-12-23
+# Author: David Preinerstorfer
+# Maintainer: David Preinerstorfer <david.preinerstorfer@econ.au.dk>
+# Description: Functions for testing affine hypotheses on the regression coefficient vector in regression models with autocorrelated errors.
+# License: GPL-2
+# Imports: methods, stats, sandwich, Rcpp
+# LinkingTo: Rcpp, RcppEigen
+# NeedsCompilation: yes
+# Packaged: 2016-12-27 12:37:57 UTC; au563869
+# Repository: CRAN
+# Date/Publication: 2016-12-27 14:15:43
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

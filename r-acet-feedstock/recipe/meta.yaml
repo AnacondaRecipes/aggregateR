@@ -1,0 +1,102 @@
+{% set version = '1.8.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-acet
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ACEt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ACEt/ACEt_{{ version }}.tar.gz
+  sha256: 9836c006a8d31d6ddbe58bfb91e29643885f727e8a13139497bd20f2a6694618
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh
+    - r-mass
+    - r-rcpp >=0.11.1
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-mass
+    - r-rcpp >=0.11.1
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ACEt')"           # [not win]
+    - "\"%R%\" -e \"library('ACEt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ACEt
+  license: GPL (>= 2)
+  summary: Twin models that are able to estimate the dynamic behaviour of the variance components
+    in the classical twin models with respect to age using B-splines and P-splines.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ACEt
+# Type: Package
+# Title: Estimating Dynamic Heritability and Twin Model Comparison
+# Version: 1.8.0
+# Date: 2017-04-29
+# Author: Liang He
+# Maintainer: Liang He <lianghe@mit.edu>
+# Description: Twin models that are able to estimate the dynamic behaviour of the variance components in the classical twin models with respect to age using B-splines and P-splines.
+# License: GPL (>= 2)
+# Depends: R (>= 3.1.1)
+# Imports: Rcpp (>= 0.11.1), splines, MASS
+# Encoding: UTF-8
+# LinkingTo: BH, RcppArmadillo, Rcpp
+# Repository: CRAN
+# Repository/R-Forge/Project: acet
+# Repository/R-Forge/Revision: 41
+# Repository/R-Forge/DateTimeStamp: 2017-05-07 03:20:51
+# Date/Publication: 2017-05-07 20:51:57 UTC
+# NeedsCompilation: yes
+# Packaged: 2017-05-07 03:45:24 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
