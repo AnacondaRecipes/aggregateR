@@ -1,0 +1,89 @@
+{% set version = '1.2.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-automl
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/automl_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/automl/automl_{{ version }}.tar.gz
+  sha256: 499301969268e5b50e937a20af6d4561373d8132f8a92db7e99bf10c096681d1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: datasets
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('automl')"           # [not win]
+    - "\"%R%\" -e \"library('automl')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://aboulaboul.github.io/automl https://github.com/aboulaboul/automl
+  license: GNU General Public License
+  summary: Fits from simple regression to highly customizable deep neural networks  either with
+    gradient descent or metaheuristic, using automatic hyper parameters  tuning and
+    custom cost function. A mix inspired by the common tricks on Deep Learning and Particle
+    Swarm Optimization.
+  license_family: GPL
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: automl
+# Type: Package
+# Title: Deep Learning with Metaheuristic
+# Version: 1.2.8
+# Authors@R: person("Alex", "Boulange", role = c("aut", "cre"), email = "aboul@free.fr")
+# BugReports: https://github.com/aboulaboul/automl/issues
+# Description: Fits from simple regression to highly customizable deep neural networks  either with gradient descent or metaheuristic, using automatic hyper parameters  tuning and custom cost function. A mix inspired by the common tricks on Deep Learning and Particle Swarm Optimization.
+# URL: https://aboulaboul.github.io/automl https://github.com/aboulaboul/automl
+# License: GNU General Public License
+# Encoding: UTF-8
+# LazyData: TRUE
+# Imports: stats, utils, parallel
+# Suggests: datasets
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2019-03-14 11:05:38 UTC; aboul
+# Author: Alex Boulange [aut, cre]
+# Maintainer: Alex Boulange <aboul@free.fr>
+# Repository: CRAN
+# Date/Publication: 2019-03-16 15:03:30 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

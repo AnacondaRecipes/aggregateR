@@ -1,0 +1,99 @@
+{% set version = '1.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-barycenter
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Barycenter_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Barycenter/Barycenter_{{ version }}.tar.gz
+  sha256: 5e6e1c546044dd43649cd69f41bca7882ff660a2e2a36a5f3245572c39070c7a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.1
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.1
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Barycenter')"           # [not win]
+    - "\"%R%\" -e \"library('Barycenter')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Barycenter
+  license: GPL-2
+  summary: 'Computations of entropy regularized Wasserstein Distances, a.k.a. dual-Sinkhorn divergences,
+    and entropy regularized Wasserstein Barycenters. Relevant papers are Marco Cuturi
+    (2013) <arXiv:1306.0895>, Marco Cuturi (2014) <arXiv:1310.4375> and Jason Altschuler
+    et al. <arXiv:1705.09634>. '
+
+  license_family: GPL2
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Barycenter
+# Encoding: latin1
+# Type: Package
+# Title: Regularized Wasserstein Distances and Barycenters
+# Version: 1.3.1
+# Date: 2018-04-05
+# Author: Marcel Klatt
+# Maintainer: Marcel Klatt <marcel.klatt@stud.uni-goettingen.de>
+# Description: Computations of entropy regularized Wasserstein Distances, a.k.a. dual-Sinkhorn divergences, and entropy regularized Wasserstein Barycenters. Relevant papers are Marco Cuturi (2013) <arXiv:1306.0895>, Marco Cuturi (2014) <arXiv:1310.4375> and Jason Altschuler et al. <arXiv:1705.09634>.
+# License: GPL-2
+# LazyData: TRUE
+# LinkingTo: Rcpp, RcppArmadillo
+# Depends: R (>= 2.10.0), Rcpp (>= 0.11.1)
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2018-05-04 08:48:15 UTC; mklatt
+# Repository: CRAN
+# Date/Publication: 2018-05-04 09:05:27 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

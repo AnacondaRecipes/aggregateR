@@ -1,0 +1,86 @@
+{% set version = '0.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-basicmcmcplots
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/basicMCMCplots_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/basicMCMCplots/basicMCMCplots_{{ version }}.tar.gz
+  sha256: 88469f37e91c29886a3215d430c0b981b5a5f16b26c997b5e7e7efbf03850dfa
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('basicMCMCplots')"           # [not win]
+    - "\"%R%\" -e \"library('basicMCMCplots')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=basicMCMCplots
+  license: GPL-3
+  summary: Provides a function for examining posterior MCMC samples from a single chain using
+    trace plots and density plots, and from multiple chains by comparing posterior medians
+    and credible intervals from each chain.  These plotting functions have a variety
+    of options, such as figure sizes, legends, parameters to plot, and saving plots
+    to file. Functions interface with the NIMBLE software package, see de Valpine, Turek,
+    Paciorek, Anderson-Bergman, Temple Lang and Bodik (2017) <doi:10.1080/10618600.2016.1172487>.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: basicMCMCplots
+# Title: Trace Plots, Density Plots and Chain Comparisons for MCMC Samples
+# Version: 0.2.2
+# Authors@R: person("Daniel", "Turek", email = "danielturek@gmail.com", role = c("aut", "cre"))
+# Description: Provides a function for examining posterior MCMC samples from a single chain using trace plots and density plots, and from multiple chains by comparing posterior medians and credible intervals from each chain.  These plotting functions have a variety of options, such as figure sizes, legends, parameters to plot, and saving plots to file. Functions interface with the NIMBLE software package, see de Valpine, Turek, Paciorek, Anderson-Bergman, Temple Lang and Bodik (2017) <doi:10.1080/10618600.2016.1172487>.
+# Depends: R (>= 3.4.0)
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-07-18 16:58:13 UTC; dturek
+# Author: Daniel Turek [aut, cre]
+# Maintainer: Daniel Turek <danielturek@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-07-18 17:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

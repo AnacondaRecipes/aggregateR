@@ -1,0 +1,91 @@
+{% set version = '0.2.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-backpipe
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/backpipe_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/backpipe/backpipe_{{ version }}.tar.gz
+  sha256: f536df12e23836a0e239e3638916b9901d55e4260fb15405000b40d4d366628a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: magrittr (>= 1.5), pipeR (>= 0.6.0.6), R6 (>= 2.1.1), testthat (>= 1.0.0), shiny (>= 0.12.1), knitr (>= 1.11), rstudioapi (>= 0.7), rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('backpipe')"           # [not win]
+    - "\"%R%\" -e \"library('backpipe')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/decisionpatterns/backpipe
+  license: GPL-2 | file LICENSE
+  summary: 'Provides a backward-pipe operator for ''magrittr'' (%<%) or  ''pipeR'' (%<<%) that
+    allows for a performing operations from right-to-left.  This allows writing more
+    legible code where right-to-left ordering is  natural. This is common with hierarchies
+    and nested structures such as  trees, directories or markup languages (e.g. HTML
+    and XML).  The package also includes a R-Studio add-in that can be bound to a keyboard  shortcut. '
+
+  license_family: GPL2
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: backpipe
+# Type: Package
+# Title: Backward Pipe (Right-to-Left) Operator
+# Version: 0.2.3
+# Date: 2018-06-25
+# Authors@R: c( person("Christopher", "Brown", , "chris.brown@decisionpatterns.com", c("aut", "cre") ), person("Decision Patterns", role = "cph") )
+# Description: Provides a backward-pipe operator for 'magrittr' (%<%) or  'pipeR' (%<<%) that allows for a performing operations from right-to-left.  This allows writing more legible code where right-to-left ordering is  natural. This is common with hierarchies and nested structures such as  trees, directories or markup languages (e.g. HTML and XML).  The package also includes a R-Studio add-in that can be bound to a keyboard  shortcut.
+# Depends: R (>= 3.1.0)
+# Suggests: magrittr (>= 1.5), pipeR (>= 0.6.0.6), R6 (>= 2.1.1), testthat (>= 1.0.0), shiny (>= 0.12.1), knitr (>= 1.11), rstudioapi (>= 0.7), rmarkdown
+# License: GPL-2 | file LICENSE
+# URL: https://github.com/decisionpatterns/backpipe
+# BugReports: https://github.com/decisionpatterns/backpipe/issues
+# RoxygenNote: 6.0.1.9000
+# Encoding: UTF-8
+# VignetteBuilder: knitr
+# Repository: CRAN
+# NeedsCompilation: no
+# Packaged: 2018-06-25 23:34:55 UTC; cbrown
+# Author: Christopher Brown [aut, cre], Decision Patterns [cph]
+# Maintainer: Christopher Brown <chris.brown@decisionpatterns.com>
+# Date/Publication: 2018-06-26 04:38:34 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

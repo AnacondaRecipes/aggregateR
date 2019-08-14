@@ -1,0 +1,84 @@
+{% set version = '1.11.189' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-awr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/AWR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/AWR/AWR_{{ version }}.tar.gz
+  sha256: edc9519e6661f1faa4ac81e8f5b78755813d97d06417177f417ba3ee99d13a61
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rjava
+
+  run:
+    - r-base
+    - r-rjava
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('AWR')"           # [not win]
+    - "\"%R%\" -e \"library('AWR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://gitlab.com/daroczig/AWR
+  license: AGPL-3
+  summary: Installs the compiled Java modules of the Amazon Web Services ('AWS') 'SDK' to be
+    used in downstream R packages interacting with 'AWS'. See <https://aws.amazon.com/sdk-for-java>
+    for more information on the 'AWS' 'SDK' for Java.
+  license_family: AGPL
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: AWR
+# Maintainer: Gergely Daroczi <daroczig@rapporter.net>
+# Author: Gergely Daroczi <daroczig@rapporter.net>
+# Title: 'AWS' Java 'SDK' for R
+# Description: Installs the compiled Java modules of the Amazon Web Services ('AWS') 'SDK' to be used in downstream R packages interacting with 'AWS'. See <https://aws.amazon.com/sdk-for-java> for more information on the 'AWS' 'SDK' for Java.
+# Version: 1.11.189
+# Date: 2017-09-05
+# URL: https://gitlab.com/daroczig/AWR
+# License: AGPL-3
+# Imports: rJava, utils
+# NeedsCompilation: no
+# Packaged: 2017-09-06 23:49:11 UTC; daroczig
+# Repository: CRAN
+# Date/Publication: 2017-09-07 18:33:38 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

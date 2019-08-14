@@ -1,0 +1,87 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-aws.ec2metadata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/aws.ec2metadata_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/aws.ec2metadata/aws.ec2metadata_{{ version }}.tar.gz
+  sha256: 08895e2a47a63ef5de0eef6ee6c19600f17c039bf9d645390cd08febc49374d1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-curl
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-curl
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('aws.ec2metadata')"           # [not win]
+    - "\"%R%\" -e \"library('aws.ec2metadata')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/cloudyr/aws.ec2metadata
+  license: GPL (>= 2)
+  summary: Retrieve Amazon EC2 instance metadata from within the running instance.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: aws.ec2metadata
+# Type: Package
+# Title: Get EC2 Instance Metadata
+# Version: 0.2.0
+# Date: 2019-07-15
+# Authors@R: c(person("Thomas J.", "Leeper", role = c("aut"), email = "thosjleeper@gmail.com", comment = c(ORCID = "0000-0003-4097-6326")), person("Jonathan", "Stott", role = c("cre", "aut"), email =  "jonathan.stott@magairports.com") )
+# Description: Retrieve Amazon EC2 instance metadata from within the running instance.
+# License: GPL (>= 2)
+# URL: https://github.com/cloudyr/aws.ec2metadata
+# BugReports: https://github.com/cloudyr/aws.ec2metadata/issues
+# Imports: curl, jsonlite
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-07-15 14:29:56 UTC; jon_m
+# Author: Thomas J. Leeper [aut] (<https://orcid.org/0000-0003-4097-6326>), Jonathan Stott [cre, aut]
+# Maintainer: Jonathan Stott <jonathan.stott@magairports.com>
+# Repository: CRAN
+# Date/Publication: 2019-07-15 14:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

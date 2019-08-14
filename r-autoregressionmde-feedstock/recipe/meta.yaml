@@ -1,0 +1,83 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-autoregressionmde
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/AutoregressionMDE_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/AutoregressionMDE/AutoregressionMDE_{{ version }}.tar.gz
+  sha256: 79432b4fc91ef1b90a1640e4e326e85afa0b6547be0a0ebf55a289ab0906afb6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('AutoregressionMDE')"           # [not win]
+    - "\"%R%\" -e \"library('AutoregressionMDE')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=AutoregressionMDE
+  license: GPL-2
+  summary: Consider autoregressive model of order p where the distribution function of innovation
+    is unknown, but innovations are independent and symmetrically distributed. The package
+    contains a function named ARMDE which takes X (vector of n observations) and p (order
+    of the model) as input argument and returns minimum distance estimator of the parameters
+    in the model.
+  license_family: GPL2
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: AutoregressionMDE
+# Title: Minimum Distance Estimation in Autoregressive Model
+# Version: 1.0
+# Authors@R: person("Jiwoong", "Kim", email = "kimjiwo2@stt.msu.edu", role = c("aut", "cre"))
+# Description: Consider autoregressive model of order p where the distribution function of innovation is unknown, but innovations are independent and symmetrically distributed. The package contains a function named ARMDE which takes X (vector of n observations) and p (order of the model) as input argument and returns minimum distance estimator of the parameters in the model.
+# Depends: R (>= 3.2.2)
+# License: GPL-2
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2015-09-14 05:48:40 UTC; Jason
+# Author: Jiwoong Kim [aut, cre]
+# Maintainer: Jiwoong Kim <kimjiwo2@stt.msu.edu>
+# Repository: CRAN
+# Date/Publication: 2015-09-14 09:12:45
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

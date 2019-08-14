@@ -1,0 +1,98 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-batman
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/batman_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/batman/batman_{{ version }}.tar.gz
+  sha256: 6e1098ca6813f928ca5e051d633802b71100ab446b4631878839926b40e98f31
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('batman')"           # [not win]
+    - "\"%R%\" -e \"library('batman')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ironholds/batman
+  license: MIT + file LICENSE
+  summary: Survey systems and other third-party data sources commonly use non-standard representations
+    of logical values when it comes to qualitative data - "Yes", "No" and "N/A", say.
+    batman is a package designed to seamlessly convert these into logicals. It is highly
+    localised, and contains equivalents to boolean values in languages including German,
+    French, Spanish, Italian, Turkish, Chinese and Polish.
+  license_family: MIT
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: batman
+# Title: Convert Categorical Representations of Logicals to Actual Logicals
+# Version: 0.1.0
+# Date: 2015-10-13
+# Author: Oliver Keyes [aut, cre], Ruben C. Arslan [ctb], Christopher Akiki [ctb], Mine Cetinkaya-Rundel [ctb], Peter Meissner [ctb], Ilaria Prosdocimi [ctb], Thomas Leeper [ctb], Amy Lee [ctb], Adolfo Alvarez [ctb]
+# Maintainer: Oliver Keyes <ironholds@gmail.com>
+# Description: Survey systems and other third-party data sources commonly use non-standard representations of logical values when it comes to qualitative data - "Yes", "No" and "N/A", say. batman is a package designed to seamlessly convert these into logicals. It is highly localised, and contains equivalents to boolean values in languages including German, French, Spanish, Italian, Turkish, Chinese and Polish.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# URL: https://github.com/ironholds/batman
+# BugReports: https://github.com/ironholds/batman/issues
+# Suggests: testthat
+# LinkingTo: Rcpp
+# Imports: Rcpp
+# NeedsCompilation: yes
+# Packaged: 2015-10-26 14:56:10 UTC; ironholds
+# Repository: CRAN
+# Date/Publication: 2015-10-26 17:07:24
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

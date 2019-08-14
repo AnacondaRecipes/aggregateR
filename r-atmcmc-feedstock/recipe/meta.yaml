@@ -1,0 +1,79 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-atmcmc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/atmcmc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/atmcmc/atmcmc_{{ version }}.tar.gz
+  sha256: f60621933e9f3330b45cc6eef9c9f8de82bc1fd41b470fe01c5f7bcacb4a6616
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('atmcmc')"           # [not win]
+    - "\"%R%\" -e \"library('atmcmc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=atmcmc
+  license: GPL (>= 2)
+  summary: Uses adaptive diagnostics to tune and run a random walk Metropolis MCMC algorithm,
+    to converge to a specified target distribution and estimate means of functionals.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: atmcmc
+# Type: Package
+# Title: Automatically Tuned Markov Chain Monte Carlo
+# Version: 1.0
+# Date: 2014-09-16
+# Author: Jinyoung Yang
+# Maintainer: Jinyoung Yang <jinyoung.yang@mail.utoronto.ca>
+# Description: Uses adaptive diagnostics to tune and run a random walk Metropolis MCMC algorithm, to converge to a specified target distribution and estimate means of functionals.
+# License: GPL (>= 2)
+# Packaged: 2014-09-29 20:01:29 UTC; 1
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-09-29 23:00:15
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

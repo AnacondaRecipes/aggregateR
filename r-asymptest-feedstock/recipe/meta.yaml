@@ -1,0 +1,84 @@
+{% set version = '0.1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-asymptest
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/asympTest_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/asympTest/asympTest_{{ version }}.tar.gz
+  sha256: f96b8062ca482e2bda4d03ae5f1b3fe4db4f0b0d594883fa4708051ff53d800a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('asympTest')"           # [not win]
+    - "\"%R%\" -e \"library('asympTest')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.r-project.org
+  license: GPL (>= 2)
+  summary: One and two sample mean and variance tests (differences and ratios) are considered.
+    The test statistics are all expressed in the same form as the Student t-test, which
+    facilitates their presentation in the classroom. This contribution also fills the
+    gap of a robust (to non-normality) alternative to the chi-square single variance
+    test for large samples, since no such procedure is implemented in standard statistical
+    software.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: asympTest
+# Version: 0.1.4
+# Date: 2018-05-10
+# Title: A Simple R Package for Classical Parametric Statistical Tests and Confidence Intervals in Large Samples
+# Author: Cqls Team
+# Maintainer: Pierre Lafaye de Micheaux <lafaye@unsw.edu.au>
+# Depends: R (>= 1.8.0)
+# Description: One and two sample mean and variance tests (differences and ratios) are considered. The test statistics are all expressed in the same form as the Student t-test, which facilitates their presentation in the classroom. This contribution also fills the gap of a robust (to non-normality) alternative to the chi-square single variance test for large samples, since no such procedure is implemented in standard statistical software.
+# License: GPL (>= 2)
+# URL: https://www.r-project.org
+# Packaged: 2018-05-10 09:59:30 UTC; lafaye
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2018-05-10 12:15:54 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

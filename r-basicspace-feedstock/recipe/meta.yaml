@@ -1,0 +1,87 @@
+{% set version = '0.20' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-basicspace
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/basicspace_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/basicspace/basicspace_{{ version }}.tar.gz
+  sha256: 8c9f22eea92da00fdcabb8f03c66aa488330a1a7b7cb78f6cb51abe6d194d45b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('basicspace')"           # [not win]
+    - "\"%R%\" -e \"library('basicspace')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=basicspace
+  license: GPL-2
+  summary: Conducts Aldrich-McKelvey and Blackbox Scaling (Poole et al 2016) <doi:10.18637/jss.v069.i07>
+    to recover latent dimensions of judgment.
+  license_family: GPL2
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: basicspace
+# Version: 0.20
+# Date: 2018-02-12
+# Title: Recovering a Basic Space from Issue Scales
+# Author: Keith Poole <ktpoole@uga.edu>, Howard Rosenthal <hr31@nyu.edu>, Jeffrey Lewis <jblewis@ucla.edu>, James Lo <lojames@usc.edu> and Royce Carroll <rcarroll@rice.edu>
+# Maintainer: James Lo <lojames@usc.edu>
+# Depends: R (>= 3.0.0), tools (>= 2.0.0)
+# Description: Conducts Aldrich-McKelvey and Blackbox Scaling (Poole et al 2016) <doi:10.18637/jss.v069.i07> to recover latent dimensions of judgment.
+# License: GPL-2
+# Repository: CRAN
+# NeedsCompilation: yes
+# Packaged: 2018-02-12 22:32:58 UTC; jameslo
+# Date/Publication: 2018-02-12 23:30:33 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

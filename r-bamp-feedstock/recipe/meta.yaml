@@ -1,0 +1,105 @@
+{% set version = '2.0.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bamp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bamp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bamp/bamp_{{ version }}.tar.gz
+  sha256: 15a658d4ff9564b43a74428fd43ef63c3e71e1872a55e74b4309732319f1387b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, R.rsp
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-abind
+    - r-coda
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-abind
+    - r-coda
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bamp')"           # [not win]
+    - "\"%R%\" -e \"library('bamp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://volkerschmid.github.io/bamp/
+  license: GPL-3
+  summary: Bayesian Age-Period-Cohort Modeling and Prediction using efficient Markov Chain Monte
+    Carlo Methods. This is the R version of the previous BAMP software as described
+    in Volker Schmid and Leonhard Held (2007) <DOI:10.18637/jss.v021.i08> Bayesian Age-Period-Cohort
+    Modeling and Prediction - BAMP, Journal of Statistical Software 21:8. This package
+    includes checks of convergence using Gelman's R.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bamp
+# Type: Package
+# Title: Bayesian Age-Period-Cohort Modeling and Prediction
+# Version: 2.0.7
+# Date: 2019-05-16
+# Author: Volker Schmid [aut, cre], Florian Geressen [ctb], Leonhard Held [ctb], Evi Rainer [ctb]
+# Authors@R: c(person("Volker","Schmid",email="volker.schmid@lmu.de", role=c("aut","cre")),person("Florian","Geressen",role="ctb"), person("Leonhard","Held",role="ctb"),person("Evi","Rainer",role="ctb"))
+# Maintainer: Volker Schmid <volker.schmid@lmu.de>
+# Description: Bayesian Age-Period-Cohort Modeling and Prediction using efficient Markov Chain Monte Carlo Methods. This is the R version of the previous BAMP software as described in Volker Schmid and Leonhard Held (2007) <DOI:10.18637/jss.v021.i08> Bayesian Age-Period-Cohort Modeling and Prediction - BAMP, Journal of Statistical Software 21:8. This package includes checks of convergence using Gelman's R.
+# License: GPL-3
+# Encoding: UTF-8
+# Depends: R (>= 3.5.0)
+# Imports: coda, graphics, parallel, stats, abind
+# LazyData: true
+# RoxygenNote: 6.1.1
+# VignetteBuilder: knitr, R.rsp
+# Suggests: knitr, rmarkdown, R.rsp
+# URL: https://volkerschmid.github.io/bamp/
+# BugReports: https://github.com/volkerschmid/bamp/issues
+# NeedsCompilation: yes
+# Packaged: 2019-05-16 15:17:08 UTC; schmid
+# Repository: CRAN
+# Date/Publication: 2019-05-16 15:40:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

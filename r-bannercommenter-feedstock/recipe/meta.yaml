@@ -1,0 +1,88 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bannercommenter
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bannerCommenter_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bannerCommenter/bannerCommenter_{{ version }}.tar.gz
+  sha256: 524ba9504ab5d85b0383c521fbe1490255a80a43a0eb0075a72eb5f9cc27b559
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, dplyr, datasets
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bannerCommenter')"           # [not win]
+    - "\"%R%\" -e \"library('bannerCommenter')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bannerCommenter
+  license: GPL (>= 2)
+  summary: A convenience package for use while drafting code. It facilitates making stand-out
+    comment lines decorated with bands of characters.  The input text strings are converted
+    into R comment lines, suitably formatted. These are then displayed in a console
+    window and, if possible, automatically transferred to a clipboard ready for pasting
+    into an R script.  Designed to save time when drafting R scripts that will need
+    to be navigated and maintained by other programmers.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bannerCommenter
+# Type: Package
+# Title: Make Banner Comments with a Consistent Format
+# Version: 0.1.1
+# Author: Bill Venables <Bill.Venables@gmail.com>
+# Maintainer: Bill Venables <Bill.Venables@gmail.com>
+# Description: A convenience package for use while drafting code. It facilitates making stand-out comment lines decorated with bands of characters.  The input text strings are converted into R comment lines, suitably formatted. These are then displayed in a console window and, if possible, automatically transferred to a clipboard ready for pasting into an R script.  Designed to save time when drafting R scripts that will need to be navigated and maintained by other programmers.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Suggests: knitr, rmarkdown, dplyr, datasets
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-07-27 05:27:44 UTC; bill
+# Repository: CRAN
+# Date/Publication: 2019-07-27 05:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

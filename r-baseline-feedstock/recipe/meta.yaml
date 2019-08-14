@@ -1,0 +1,94 @@
+{% set version = '1.2-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-baseline
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/baseline_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/baseline/baseline_{{ version }}.tar.gz
+  sha256: feeda85700464cdc544beb533c440079327cb5e3d225b0a18d0a207091db60ee
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: gWidgets, IDPmisc, lattice, pls, MASS
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-sparsem
+
+  run:
+    - r-base
+    - r-sparsem
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('baseline')"           # [not win]
+    - "\"%R%\" -e \"library('baseline')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=baseline
+  license: GPL-2
+  summary: Collection of baseline correction algorithms, along with a framework and a GUI for
+    optimising baseline algorithm parameters. Typical use of the package is for removing
+    background effects from spectra originating from various types of spectroscopy and
+    spectrometry, possibly optimizing this with regard to regression or classification
+    results. Correction methods include polynomial fitting, weighted local smoothers
+    and many more.
+  license_family: GPL2
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Encoding: latin1
+# Package: baseline
+# Type: Package
+# Title: Baseline Correction of Spectra
+# Version: 1.2-1
+# Date: 2015-07-05
+# Authors@R: c(person("Kristian Hovde", "Liland", role = c("aut","cre"), email="kristian.liland@nmbu.no"), person("Bjrn-Helge", "Mevik", role=c("aut")), person("Roberto", "Canteri", role=c("ctb")))
+# Maintainer: Kristian Hovde Liland <kristian.liland@nmbu.no>
+# Description: Collection of baseline correction algorithms, along with a framework and a GUI for optimising baseline algorithm parameters. Typical use of the package is for removing background effects from spectra originating from various types of spectroscopy and spectrometry, possibly optimizing this with regard to regression or classification results. Correction methods include polynomial fitting, weighted local smoothers and many more.
+# License: GPL-2
+# Depends: R (>= 2.15)
+# Imports: graphics, SparseM, grDevices, stats, methods
+# Suggests: gWidgets, IDPmisc, lattice, pls, MASS
+# LazyLoad: true
+# LazyData: true
+# ZipData: true
+# NeedsCompilation: no
+# Packaged: 2015-07-05 15:35:37 UTC; kristian.liland
+# Author: Kristian Hovde Liland [aut, cre], Bjrn-Helge Mevik [aut], Roberto Canteri [ctb]
+# Repository: CRAN
+# Date/Publication: 2015-07-05 23:57:57
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

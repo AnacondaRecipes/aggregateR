@@ -1,0 +1,91 @@
+{% set version = '0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-auto.pca
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/auto.pca_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/auto.pca/auto.pca_{{ version }}.tar.gz
+  sha256: de6b98842878b1aa07e236cf55e881bee137142497a75c1f7447fece6ea3a206
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-plyr
+    - r-psych
+
+  run:
+    - r-base
+    - r-plyr
+    - r-psych
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('auto.pca')"           # [not win]
+    - "\"%R%\" -e \"library('auto.pca')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=auto.pca
+  license: GPL-2
+  summary: PCA done by eigenvalue decomposition of a data correlation matrix, here it automatically
+    determines the number of factors by eigenvalue greater than 1 and it gives the uncorrelated
+    variables based on the rotated component scores, Such that in each principal component
+    variable which has the high variance are selected. It will be useful for non-statisticians
+    in selection of variables. For more information, see the <http://www.ijcem.org/papers032013/ijcem_032013_06.pdf>
+    web page.
+  license_family: GPL2
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: auto.pca
+# Type: Package
+# Version: 0.3
+# Title: Automatic Variable Reduction Using Principal Component Analysis
+# Date: 2017-09-03
+# Author: Navinkumar Nedunchezhian
+# Maintainer: Navinkumar Nedunchezhian <navinkumar.nedunchezhian@gmail.com>
+# Description: PCA done by eigenvalue decomposition of a data correlation matrix, here it automatically determines the number of factors by eigenvalue greater than 1 and it gives the uncorrelated variables based on the rotated component scores, Such that in each principal component variable which has the high variance are selected. It will be useful for non-statisticians in selection of variables. For more information, see the <http://www.ijcem.org/papers032013/ijcem_032013_06.pdf> web page.
+# License: GPL-2
+# LazyData: TRUE
+# Imports: psych,plyr
+# Suggests: knitr
+# NeedsCompilation: no
+# Packaged: 2017-09-12 02:08:08 UTC; NSD
+# Repository: CRAN
+# Date/Publication: 2017-09-12 09:24:21 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

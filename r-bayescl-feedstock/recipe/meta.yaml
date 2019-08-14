@@ -1,0 +1,94 @@
+{% set version = '0.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bayescl
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bayesCL_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bayesCL/bayesCL_{{ version }}.tar.gz
+  sha256: 75c90d0f3382458680a482f6224d5edf632695e424782b54b526d8163b4547d0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bayesCL')"           # [not win]
+    - "\"%R%\" -e \"library('bayesCL')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bayesCL
+  license: GPL (>= 3)
+  summary: Bayesian Inference on a GPU. The package currently supports sampling from PolyaGamma,
+    Multinomial logit and Bayesian lasso.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bayesCL
+# Version: 0.0.1
+# Date: 2017-04-10
+# Title: Bayesian Inference on a GPU using OpenCL
+# Author: Rok Cesnovar, Erik Strumbelj
+# Maintainer: Rok Cesnovar <rok.cesnovar@fri.uni-lj.si>
+# Description: Bayesian Inference on a GPU. The package currently supports sampling from PolyaGamma, Multinomial logit and Bayesian lasso.
+# License: GPL (>= 3)
+# Depends: R (>= 2.14.0)
+# Packaged: 2017-04-10 12:23:01 UTC; rok
+# NeedsCompilation: yes
+# SystemRequirements: OpenCL library; single-precision AMD or Nvidia GPU;
+# Repository: CRAN
+# Date/Publication: 2017-04-14 21:38:23 UTC
+# RoxygenNote: 6.0.1
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
