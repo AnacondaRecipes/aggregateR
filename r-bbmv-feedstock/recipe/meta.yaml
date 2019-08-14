@@ -1,0 +1,89 @@
+{% set version = '2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bbmv
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BBMV_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BBMV/BBMV_{{ version }}.tar.gz
+  sha256: 89b520e1c65130ad27ab865639df2e3f2304e694e3f0a738cc30a5fe43e3a485
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: coda, geiger
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-ape
+
+  run:
+    - r-base
+    - r-ape
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BBMV')"           # [not win]
+    - "\"%R%\" -e \"library('BBMV')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=BBMV
+  license: GPL-2
+  summary: 'Provides a set of functions to fit general macroevolutionary models for continuous
+    traits evolving in adaptive landscapes of any shape. This package implements the
+    Fokker-Planck-Kolmogorov model (FPK), in which the trait evolves under random diffusion
+    but is also subject to a force that pulls it towards specific values - this force
+    can be of any shape. FPK has a version in which hard reflective bounds exist at
+    the extremes of the trait interval: this second model is called BBMV. '
+
+  license_family: GPL2
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: BBMV
+# Type: Package
+# Title: Models for Continuous Traits Evolving in Macroevolutionary Landscapes of any Shape
+# Version: 2.1
+# Date: 2018-04-23
+# Author: Florian C. Boucher
+# Maintainer: Florian C. Boucher <flofloboucher@gmail.com>
+# Depends: R (>= 3.1.0), ape
+# Suggests: coda, geiger
+# Description: Provides a set of functions to fit general macroevolutionary models for continuous traits evolving in adaptive landscapes of any shape. This package implements the Fokker-Planck-Kolmogorov model (FPK), in which the trait evolves under random diffusion but is also subject to a force that pulls it towards specific values - this force can be of any shape. FPK has a version in which hard reflective bounds exist at the extremes of the trait interval: this second model is called BBMV.
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2018-04-23 12:02:15 UTC; boucherf
+# Repository: CRAN
+# Date/Publication: 2018-04-30 07:34:16 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

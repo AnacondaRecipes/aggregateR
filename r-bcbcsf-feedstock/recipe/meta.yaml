@@ -1,0 +1,95 @@
+{% set version = '1.0-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bcbcsf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BCBCSF_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BCBCSF/BCBCSF_{{ version }}.tar.gz
+  sha256: f6e484e787c9192e130287f0f42c7582720c7eed8bda532c3a1d446454b67043
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-abind
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-abind
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BCBCSF')"           # [not win]
+    - "\"%R%\" -e \"library('BCBCSF')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.r-project.org, http://math.usask.ca/~longhai
+  license: GPL (>= 2)
+  summary: 'Fully Bayesian Classification with a subset of high-dimensional features, such as
+    expression levels of genes. The data are modeled with a hierarchical Bayesian models
+    using heavy-tailed t distributions as priors. When a large number of features are
+    available, one may like to select only a subset of features to use, typically those
+    features strongly correlated with the response in training cases. Such a feature
+    selection procedure is however invalid since the relationship between the response
+    and the features has be exaggerated by feature selection. This package provides
+    a way to avoid this bias and yield better-calibrated predictions for future cases
+    when one uses F-statistic to select features. '
+
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: BCBCSF
+# Version: 1.0-1
+# Title: Bias-Corrected Bayesian Classification with Selected Features
+# Author: Longhai Li <longhai@math.usask.ca>
+# Maintainer: Longhai Li <longhai@math.usask.ca>
+# Depends: R (>= 2.13.1), abind
+# Description: Fully Bayesian Classification with a subset of high-dimensional features, such as expression levels of genes. The data are modeled with a hierarchical Bayesian models using heavy-tailed t distributions as priors. When a large number of features are available, one may like to select only a subset of features to use, typically those features strongly correlated with the response in training cases. Such a feature selection procedure is however invalid since the relationship between the response and the features has be exaggerated by feature selection. This package provides a way to avoid this bias and yield better-calibrated predictions for future cases when one uses F-statistic to select features.
+# License: GPL (>= 2)
+# URL: http://www.r-project.org, http://math.usask.ca/~longhai
+# Packaged: 2015-09-25 21:59:35 UTC; longhai
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2015-09-26 01:05:27
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

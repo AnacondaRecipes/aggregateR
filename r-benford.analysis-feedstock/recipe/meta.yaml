@@ -1,0 +1,86 @@
+{% set version = '0.1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-benford.analysis
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/benford.analysis_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/benford.analysis/benford.analysis_{{ version }}.tar.gz
+  sha256: 8f214381da7e40847eddc1367f99508616a523c7ac59c2577af4e894053d0c78
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+
+  run:
+    - r-base
+    - r-data.table
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('benford.analysis')"           # [not win]
+    - "\"%R%\" -e \"library('benford.analysis')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/carloscinelli/benford.analysis
+  license: GPL-3
+  summary: Provides tools that make it easier to validate data using Benford's Law.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: benford.analysis
+# Type: Package
+# Title: Benford Analysis for Data Validation and Forensic Analytics
+# Version: 0.1.5
+# Author: Carlos Cinelli
+# Maintainer: Carlos Cinelli <carloscinelli@hotmail.com>
+# Description: Provides tools that make it easier to validate data using Benford's Law.
+# Depends: R (>= 3.0.0)
+# Imports: data.table
+# License: GPL-3
+# Suggests: testthat
+# URL: http://github.com/carloscinelli/benford.analysis
+# BugReports: http://github.com/carloscinelli/benford.analysis/issues
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2018-12-21 05:55:14 UTC; carloscinelli
+# Repository: CRAN
+# Date/Publication: 2018-12-21 09:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

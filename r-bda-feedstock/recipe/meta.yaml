@@ -1,0 +1,87 @@
+{% set version = '10.1.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bda
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bda_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bda/bda_{{ version }}.tar.gz
+  sha256: 9d88660cf86894d2d44ba686a0f85dbf2ddde167c17539e554dc6b7b25eecc1b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bda')"           # [not win]
+    - "\"%R%\" -e \"library('bda')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bda
+  license: Unlimited
+  summary: 'Functions for density estimation based on  grouped data, and next-generation gene
+    expression  data. '
+
+  license_family: MIT
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bda
+# Version: 10.1.9
+# Date: 2018-01-04
+# Title: Density Estimation for Grouped Data
+# Author: Bin Wang <bwang@southalabama.edu>.
+# Maintainer: Bin Wang <bwang@southalabama.edu>
+# Depends: R (>= 2.10.0)
+# Description: Functions for density estimation based on  grouped data, and next-generation gene expression  data.
+# License: Unlimited
+# NeedsCompilation: yes
+# Packaged: 2018-01-05 03:08:03 UTC; bwang
+# Repository: CRAN
+# Date/Publication: 2018-01-05 04:56:38 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

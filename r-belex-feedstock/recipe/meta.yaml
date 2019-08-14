@@ -1,0 +1,84 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-belex
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/belex_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/belex/belex_{{ version }}.tar.gz
+  sha256: ba8a310bce42f7abceca091ad862df704c9383d46f1a387a6576d3c09ef5c394
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-xml
+
+  run:
+    - r-base
+    - r-xml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('belex')"           # [not win]
+    - "\"%R%\" -e \"library('belex')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=belex
+  license: GPL-3
+  summary: Tools for downloading historical financial data from the www.belex.rs.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: belex
+# Title: Download Historical Data from the Belgrade Stock Exchange
+# Version: 0.1.0
+# Authors@R: c(person("Milos", "Vilotic", email = "milos.vilotic@gmail.com", role = c("aut", "cre")), person("Zlatko", "Kovacic", role = c("aut")))
+# Description: Tools for downloading historical financial data from the www.belex.rs.
+# Depends: R (>= 3.2.5)
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Imports: XML
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-08-04 18:28:22 UTC; AAA
+# Author: Milos Vilotic [aut, cre], Zlatko Kovacic [aut]
+# Maintainer: Milos Vilotic <milos.vilotic@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-08-04 21:59:17
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

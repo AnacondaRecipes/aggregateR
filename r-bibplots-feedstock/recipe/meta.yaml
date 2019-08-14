@@ -1,0 +1,84 @@
+{% set version = '0.0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bibplots
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BibPlots_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BibPlots/BibPlots_{{ version }}.tar.gz
+  sha256: 5e39c13ec41c494eb2b999f1806a7206083f3d4a74d20e7f3542700cfbe27e3d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BibPlots')"           # [not win]
+    - "\"%R%\" -e \"library('BibPlots')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=BibPlots
+  license: EUPL
+  summary: Currently, the package provides four functions for plotting and analyzing bibliometric
+    data (JIF, Journal Impact Factor, and paper percentile values), beamplots with citations,
+    and two plot function to visualize the result of a reference publication year spectroscopy
+    (RPYS) analysis performed in the free software 'CRExplorer' (see <http://crexplorer.net>).
+    Further extension to more plot variants is planned.
+  license_family: OTHER
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: BibPlots
+# Title: Plot Functions for Use in Bibliometrics
+# Version: 0.0.6
+# Authors@R: person("Robin", "Haunschild", email = "R.Haunschild@fkf.mpg.de", role = c("aut", "cre"))
+# Description: Currently, the package provides four functions for plotting and analyzing bibliometric data (JIF, Journal Impact Factor, and paper percentile values), beamplots with citations, and two plot function to visualize the result of a reference publication year spectroscopy (RPYS) analysis performed in the free software 'CRExplorer' (see <http://crexplorer.net>). Further extension to more plot variants is planned.
+# Depends: R (>= 3.1.2)
+# License: EUPL
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-06-05 14:30:31 UTC; rhaun
+# Author: Robin Haunschild [aut, cre]
+# Maintainer: Robin Haunschild <R.Haunschild@fkf.mpg.de>
+# Repository: CRAN
+# Date/Publication: 2019-06-05 14:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

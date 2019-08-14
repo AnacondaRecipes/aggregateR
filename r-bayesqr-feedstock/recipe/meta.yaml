@@ -1,0 +1,86 @@
+{% set version = '2.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bayesqr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bayesQR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bayesQR/bayesQR_{{ version }}.tar.gz
+  sha256: e4236f81fa78140fabfd4e82db4ce3ae240a5e98855e642e7c469804533edeb0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bayesQR')"           # [not win]
+    - "\"%R%\" -e \"library('bayesQR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bayesQR
+  license: GPL (>= 2)
+  summary: Bayesian quantile regression using the asymmetric Laplace distribution, both continuous
+    as well as binary dependent variables are supported. The package consists of implementations
+    of the methods of Yu & Moyeed (2001) <doi:10.1016/S0167-7152(01)00124-9>, Benoit
+    & Van den Poel (2012) <doi:10.1002/jae.1216> and Al-Hamzawi, Yu & Benoit (2012)
+    <doi:10.1177/1471082X1101200304>. To speed up the calculations, the Markov Chain
+    Monte Carlo core of all algorithms is programmed in Fortran and called from R.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bayesQR
+# Version: 2.3
+# Date: 2017-01-13
+# Title: Bayesian Quantile Regression
+# Author: Dries F. Benoit, Rahim Al-Hamzawi, Keming Yu, Dirk Van den Poel
+# Maintainer: Dries F. Benoit <Dries.Benoit@UGent.be>
+# Depends: R (>= 3.0), graphics (>= 3.0), methods (>= 3.0), stats (>= 3.0), utils (>= 2.0)
+# Description: Bayesian quantile regression using the asymmetric Laplace distribution, both continuous as well as binary dependent variables are supported. The package consists of implementations of the methods of Yu & Moyeed (2001) <doi:10.1016/S0167-7152(01)00124-9>, Benoit & Van den Poel (2012) <doi:10.1002/jae.1216> and Al-Hamzawi, Yu & Benoit (2012) <doi:10.1177/1471082X1101200304>. To speed up the calculations, the Markov Chain Monte Carlo core of all algorithms is programmed in Fortran and called from R.
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2017-01-26 20:05:00 UTC; dfbenoit
+# Repository: CRAN
+# Date/Publication: 2017-01-27 10:38:21
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

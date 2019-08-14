@@ -1,0 +1,79 @@
+{% set version = '1.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bezier
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bezier_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bezier/bezier_{{ version }}.tar.gz
+  sha256: 262ff2d4f81a8f4b5ba3a5347b906c346f29384bb5b9a0781f2741b4910885ef
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bezier')"           # [not win]
+    - "\"%R%\" -e \"library('bezier')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bezier
+  license: GPL (>= 2)
+  summary: The bezier package is a toolkit for working with Bezier curves and splines. The package
+    provides functions for point generation, arc length estimation, degree elevation
+    and curve fitting.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bezier
+# Date: 2018-12-08
+# Title: Toolkit for Bezier Curves and Splines
+# Description: The bezier package is a toolkit for working with Bezier curves and splines. The package provides functions for point generation, arc length estimation, degree elevation and curve fitting.
+# Version: 1.1.2
+# Author: Aaron Olsen
+# Maintainer: Aaron Olsen <aarolsen@gmail.com>
+# Repository: CRAN
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2018-12-08 14:58:40 UTC; aaron
+# Date/Publication: 2018-12-14 21:30:20 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

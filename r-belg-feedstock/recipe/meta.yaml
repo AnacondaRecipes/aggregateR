@@ -1,0 +1,103 @@
+{% set version = '0.2.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-belg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/belg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/belg/belg_{{ version }}.tar.gz
+  sha256: 6eef6f27a38a7dec2dd982ee4769b584e1d6b59d83cd75b1238dfeeaba0344eb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, sp, raster, covr, knitr, rmarkdown, ggplot2, rasterVis
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('belg')"           # [not win]
+    - "\"%R%\" -e \"library('belg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/Nowosad/belg
+  license: MIT + file LICENSE
+  summary: Calculates the Boltzmann entropy of a landscape gradient. This package uses the analytical
+    method created by Gao, P., Zhang, H. and Li, Z., 2018 (<doi:10.1111/tgis.12315>).
+    It also extend the original  idea by allowing calculations on data with missing
+    values.
+  license_family: MIT
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: belg
+# Title: Boltzmann Entropy of a Landscape Gradient
+# Version: 0.2.3
+# Description: Calculates the Boltzmann entropy of a landscape gradient. This package uses the analytical method created by Gao, P., Zhang, H. and Li, Z., 2018 (<doi:10.1111/tgis.12315>). It also extend the original  idea by allowing calculations on data with missing values.
+# Authors@R: c(person("Jakub", "Nowosad",  email = "nowosad.jakub@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1057-3721")), person("Space Informatics Lab", role = c("cph")) )
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# ByteCompile: true
+# RoxygenNote: 6.0.1
+# Depends: R (>= 3.3.0)
+# LinkingTo: Rcpp, RcppArmadillo
+# Imports: Rcpp
+# Suggests: testthat, sp, raster, covr, knitr, rmarkdown, ggplot2, rasterVis
+# URL: https://github.com/Nowosad/belg
+# BugReports: https://github.com/Nowosad/belg/issues
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2018-06-16 17:28:19 UTC; jn
+# Author: Jakub Nowosad [aut, cre] (<https://orcid.org/0000-0002-1057-3721>), Space Informatics Lab [cph]
+# Maintainer: Jakub Nowosad <nowosad.jakub@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-06-17 16:35:46 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

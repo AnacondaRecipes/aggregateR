@@ -1,0 +1,88 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bcv
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bcv_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bcv/bcv_{{ version }}.tar.gz
+  sha256: f20952c5ecca41c6e2102e2e1e3267c0e5e2f6c94cd2cbd0025c271eb3720c7b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bcv')"           # [not win]
+    - "\"%R%\" -e \"library('bcv')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bcv
+  license: BSD_3_clause + file LICENSE
+  summary: ' Methods for choosing the rank of an SVD approximation via cross validation.  The
+    package provides both Gabriel-style "block" holdouts and Wold-style "speckled" holdouts.  It
+    also includes an  implementation of the SVDImpute algorithm.  For more information
+    about Bi-cross-validation, see Owen & Perry''s 2009 AoAS article (at http://arxiv.org/abs/0908.2062)
+    and Perry''s 2009 PhD thesis (at http://arxiv.org/abs/0909.3052).'
+
+  license_family: BSD
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bcv
+# Version: 1.0.1
+# Date: 2015-05-20
+# Title: Cross-Validation for the SVD (Bi-Cross-Validation)
+# Author: Patrick O. Perry
+# Maintainer: Patrick O. Perry <pperry@stern.nyu.edu>
+# Description:  Methods for choosing the rank of an SVD approximation via cross validation.  The package provides both Gabriel-style "block" holdouts and Wold-style "speckled" holdouts.  It also includes an  implementation of the SVDImpute algorithm.  For more information about Bi-cross-validation, see Owen & Perry's 2009 AoAS article (at http://arxiv.org/abs/0908.2062) and Perry's 2009 PhD thesis (at http://arxiv.org/abs/0909.3052).
+# License: BSD_3_clause + file LICENSE
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2015-05-21 19:23:21 UTC; ptrck
+# Repository: CRAN
+# Date/Publication: 2015-05-22 07:28:17
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

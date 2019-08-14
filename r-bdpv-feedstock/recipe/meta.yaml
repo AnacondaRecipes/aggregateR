@@ -1,0 +1,83 @@
+{% set version = '1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bdpv
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bdpv_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bdpv/bdpv_{{ version }}.tar.gz
+  sha256: d5401981622e0341354cbe08c486b1e9843505ee167ab1dfd41caf8cabaa9671
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bdpv')"           # [not win]
+    - "\"%R%\" -e \"library('bdpv')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bdpv
+  license: GPL (>= 2)
+  summary: Computation of asymptotic confidence intervals for negative and positive predictive
+    values in binary diagnostic tests in case-control studies. Experimental design for
+    hypothesis tests on predictive values.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bdpv
+# Type: Package
+# Title: Inference and Design for Predictive Values in Diagnostic Tests
+# Version: 1.3
+# Date: 2019-03-11
+# Authors@R: c(person("Frank", "Schaarschmidt", role = c("aut", "cre"), email = "schaarschmidt@biostat.uni-hannover.de"))
+# Author: Frank Schaarschmidt [aut, cre]
+# Maintainer: Frank Schaarschmidt <schaarschmidt@biostat.uni-hannover.de>
+# Imports: graphics, stats
+# Description: Computation of asymptotic confidence intervals for negative and positive predictive values in binary diagnostic tests in case-control studies. Experimental design for hypothesis tests on predictive values.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2019-03-11 14:54:20 UTC; Schaarschmidt
+# Repository: CRAN
+# Date/Publication: 2019-03-11 15:12:40 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

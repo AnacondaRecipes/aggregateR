@@ -1,0 +1,78 @@
+{% set version = '0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bethel
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bethel_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bethel/bethel_{{ version }}.tar.gz
+  sha256: 201253eb0b459fda0d04e2bbb8e1dc0624c1c7dc42dd7548bf8585298ee193fe
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bethel')"           # [not win]
+    - "\"%R%\" -e \"library('bethel')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bethel
+  license: GPL (>= 2)
+  summary: The sample size according to the Bethel's procedure.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bethel
+# Version: 0.2
+# Date: 2009-05-19
+# Author: Michele De Meo
+# Maintainer: Michele De Meo <micheledemeo@gmail.com>
+# Title: Bethel's algorithm.
+# Description: The sample size according to the Bethel's procedure.
+# Depends: R (>= 2.5.0)
+# License: GPL (>= 2)
+# Packaged: 2012-10-29 08:58:17 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2012-10-29 08:58:17
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

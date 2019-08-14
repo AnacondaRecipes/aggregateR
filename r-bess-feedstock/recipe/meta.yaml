@@ -1,0 +1,103 @@
+{% set version = '1.0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bess
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BeSS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BeSS/BeSS_{{ version }}.tar.gz
+  sha256: bc28d953f754cddd32aee3b9229e33f467def76579263420a62bd70b3be30f05
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix >=1.2_6
+    - r-rcpp >=0.12.8
+    - r-rcppeigen
+    - r-glmnet
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix >=1.2_6
+    - r-rcpp >=0.12.8
+    - r-rcppeigen
+    - r-glmnet
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BeSS')"           # [not win]
+    - "\"%R%\" -e \"library('BeSS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=BeSS
+  license: GPL-3
+  summary: An implementation of best subset selection in generalized linear model and Cox proportional
+    hazard model via the primal dual active set algorithm proposed by Wen, C., Zhang,
+    A., Quan, S. and Wang, X. (2017) <arXiv:1709.06254>. The algorithm formulates coefficient
+    parameters and residuals as primal and dual variables and utilizes efficient active
+    set selection strategies based on the complementarity of the primal and dual variables.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: BeSS
+# Type: Package
+# Title: Best Subset Selection in Linear, Logistic and CoxPH Models
+# Version: 1.0.6
+# Date: 2019-02-19
+# Author: Canhong Wen, Aijun Zhang, Shijie Quan, Xueqin Wang
+# Maintainer: Canhong Wen <wencanhong@gmail.com>
+# Description: An implementation of best subset selection in generalized linear model and Cox proportional hazard model via the primal dual active set algorithm proposed by Wen, C., Zhang, A., Quan, S. and Wang, X. (2017) <arXiv:1709.06254>. The algorithm formulates coefficient parameters and residuals as primal and dual variables and utilizes efficient active set selection strategies based on the complementarity of the primal and dual variables.
+# License: GPL-3
+# Depends: R (>= 3.2.0)
+# Imports: Rcpp(>= 0.12.8), Matrix(>= 1.2-6), glmnet, survival
+# LinkingTo: Rcpp, RcppEigen
+# NeedsCompilation: yes
+# Packaged: 2019-02-19 15:49:51 UTC; quanshijief
+# Repository: CRAN
+# Date/Publication: 2019-02-21 07:20:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

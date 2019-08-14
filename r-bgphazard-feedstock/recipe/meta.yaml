@@ -1,0 +1,82 @@
+{% set version = '1.2.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bgphazard
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BGPhazard_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BGPhazard/BGPhazard_{{ version }}.tar.gz
+  sha256: 81cbfe9d9a324489a4382555088230983ca46a96e6d998c38200f6e18b17e9fa
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival
+
+  run:
+    - r-base
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BGPhazard')"           # [not win]
+    - "\"%R%\" -e \"library('BGPhazard')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=BGPhazard
+  license: GPL (>= 2)
+  summary: Computes the hazard rate estimate as described by Nieto-Barajas and Walker (2002)
+    and Nieto-Barajas (2003).
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: BGPhazard
+# Version: 1.2.3
+# Date: 2016-02-11
+# Title: Markov Beta and Gamma Processes for Modeling Hazard Rates
+# Author: L. E. Nieto-Barajas and J. A. Garcia Bueno
+# Maintainer: Jose Antonio Garcia Bueno <joseagbueno@gmail.com>
+# Depends: R(>= 3.1.2)
+# Imports: survival
+# Description: Computes the hazard rate estimate as described by Nieto-Barajas and Walker (2002) and Nieto-Barajas (2003).
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2016-02-11 14:09:14 UTC; Jos<c3><a9>
+# Repository: CRAN
+# Date/Publication: 2016-02-11 16:43:02
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,90 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bayesloglin
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bayesloglin_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bayesloglin/bayesloglin_{{ version }}.tar.gz
+  sha256: 9a09a50f49f8f58b8cc20cff921fbef4eb4a7fdb5f85b59ff89a57e3a08a5f48
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-igraph
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-igraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bayesloglin')"           # [not win]
+    - "\"%R%\" -e \"library('bayesloglin')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bayesloglin
+  license: GPL (>= 2)
+  summary: The function MC3() searches for log-linear models with the highest posterior probability.
+    The function gibbsSampler() is a blocked Gibbs sampler for sampling from the posterior
+    distribution of the log-linear parameters. The functions findPostMean() and findPostCov()
+    compute the posterior mean and covariance matrix for decomposable models which,
+    for these models, is available in closed form.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bayesloglin
+# Title: Bayesian Analysis of Contingency Table Data
+# Version: 1.0.1
+# Date: 2016-12-18
+# Author: Matthew Friedlander
+# Maintainer: Matthew Friedlander <friedla@yorku.ca>
+# Depends: igraph
+# Description: The function MC3() searches for log-linear models with the highest posterior probability. The function gibbsSampler() is a blocked Gibbs sampler for sampling from the posterior distribution of the log-linear parameters. The functions findPostMean() and findPostCov() compute the posterior mean and covariance matrix for decomposable models which, for these models, is available in closed form.
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2016-12-27 13:56:30 UTC; hornik
+# Repository: CRAN
+# Date/Publication: 2016-12-27 15:28:19
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

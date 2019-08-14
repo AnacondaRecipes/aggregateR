@@ -1,0 +1,93 @@
+{% set version = '1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bclust
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bclust_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bclust/bclust_{{ version }}.tar.gz
+  sha256: 42fad3138a795fc034f5dff6499f34cc78ab87837f144fb936cb08f995007d06
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bclust')"           # [not win]
+    - "\"%R%\" -e \"library('bclust')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://bclust.r-forge.r-project.org/
+  license: GPL (>= 2)
+  summary: Builds a dendrogram using log posterior as a natural distance defined by the model
+    and meanwhile waits the clustering variables. It is also capable to computing equivalent
+    Bayesian discrimination probabilities. The adopted method suites small sample large
+    dimension setting. The model parameter estimation maybe difficult, depending on
+    data structure and the chosen distribution family.
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bclust
+# Type: Package
+# Title: Bayesian Hierarchical Clustering Using Spike and Slab Models
+# Version: 1.5
+# Date: 2015-08-12
+# Author: Vahid PARTOVI NIA and Anthony C. DAVISON
+# Maintainer: Vahid PARTOVI NIA <vpartovinia@gmail.com>
+# Depends: R (>= 3.2.1), stats, grDevices, graphics
+# Description: Builds a dendrogram using log posterior as a natural distance defined by the model and meanwhile waits the clustering variables. It is also capable to computing equivalent Bayesian discrimination probabilities. The adopted method suites small sample large dimension setting. The model parameter estimation maybe difficult, depending on data structure and the chosen distribution family.
+# License: GPL (>= 2)
+# URL: http://bclust.r-forge.r-project.org/
+# Repository: CRAN
+# Repository/R-Forge/Project: bclust
+# Repository/R-Forge/Revision: 41
+# Repository/R-Forge/DateTimeStamp: 2015-08-27 17:06:01
+# Date/Publication: 2015-09-15 00:33:08
+# NeedsCompilation: yes
+# Packaged: 2015-08-27 17:25:11 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

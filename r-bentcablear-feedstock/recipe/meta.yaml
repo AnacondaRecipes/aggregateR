@@ -1,0 +1,87 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bentcablear
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bentcableAR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bentcableAR/bentcableAR_{{ version }}.tar.gz
+  sha256: e77977ded2418bbbf8f1c9f6ad80af2f67332a8e8a45886529296d45d2a659be
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bentcableAR')"           # [not win]
+    - "\"%R%\" -e \"library('bentcableAR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bentcableAR
+  license: GPL (>= 3)
+  summary: ' Included are two main interfaces for fitting and diagnosing bent-cable regressions
+    for autoregressive time-series data or independent data (time series or otherwise):
+    ''bentcable.ar()'' and ''bentcable.dev.plot()''. Some components in the package
+    can also be used as stand-alone functions. The bent cable (linear-quadratic-linear)
+    generalizes the broken stick (linear-linear), which is also handled by this package.
+    Version 0.2 corrects a glitch in the computation of confidence intervals for the
+    CTP. References that were updated from Versions 0.2.1 and 0.2.2 appear in Version
+    0.2.3 and up. Version 0.3.0 improves robustness of the error-message producing mechanism.
+    It is the author''s intention to distribute any future updates via GitHub.'
+
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bentcableAR
+# Type: Package
+# Title: Bent-Cable Regression for Independent Data or Autoregressive Time Series
+# Version: 0.3.0
+# Date: 2015-04-10
+# Author:  Grace Chiu <bentcable@gmail.com>, CSIRO, CSIT Bldg, ANU Campus, Acton, ACT 2601, Australia
+# Maintainer: Grace Chiu <bentcable@gmail.com>
+# Description:  Included are two main interfaces for fitting and diagnosing bent-cable regressions for autoregressive time-series data or independent data (time series or otherwise): 'bentcable.ar()' and 'bentcable.dev.plot()'. Some components in the package can also be used as stand-alone functions. The bent cable (linear-quadratic-linear) generalizes the broken stick (linear-linear), which is also handled by this package. Version 0.2 corrects a glitch in the computation of confidence intervals for the CTP. References that were updated from Versions 0.2.1 and 0.2.2 appear in Version 0.2.3 and up. Version 0.3.0 improves robustness of the error-message producing mechanism. It is the author's intention to distribute any future updates via GitHub.
+# License: GPL (>= 3)
+# Packaged: 2015-04-10 07:32:33 UTC; gchiu
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-04-10 12:16:48
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

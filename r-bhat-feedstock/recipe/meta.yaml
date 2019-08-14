@@ -1,0 +1,76 @@
+{% set version = '0.9-10' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bhat
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Bhat_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Bhat/Bhat_{{ version }}.tar.gz
+  sha256: 9b9424d753b2d21b5535c22e03b59fb5aaf497ee1520b766980df831f3bfe4ed
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Bhat')"           # [not win]
+    - "\"%R%\" -e \"library('Bhat')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Bhat
+  license: GPL (>= 2)
+  summary: Functions for MLE, MCMC, CIs (originally in Fortran)
+  license_family: GPL3
+  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Bhat
+# Title: General likelihood exploration
+# Version: 0.9-10
+# Author: Georg Luebeck <gluebeck@fhcrc.org> and Rafael Meza <rmeza@umich.edu>
+# Description: Functions for MLE, MCMC, CIs (originally in Fortran)
+# Maintainer: Rafael Meza <rmeza@umich.edu>
+# License: GPL (>= 2)
+# Packaged: 2013-01-12 20:50:16 UTC; rafaelmeza
+# Repository: CRAN
+# Date/Publication: 2013-01-16 08:13:31
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
