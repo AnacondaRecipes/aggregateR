@@ -1,0 +1,88 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-blockmatrix
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/blockmatrix_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/blockmatrix/blockmatrix_{{ version }}.tar.gz
+  sha256: d94c6d74f82f581fafc126cd1ae60cc1ec9b8b53b30090ca47eba2483c4d6692
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('blockmatrix')"           # [not win]
+    - "\"%R%\" -e \"library('blockmatrix')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://cri.gmpf.eu/Research/Sustainable-Agro-Ecosystems-and-Bioresources/Dynamics-in-the-agro-ecosystems/people/Emanuele-Cordano
+  license: GPL-2
+  summary: Some elementary matrix algebra tools are implemented to manage block matrices or partitioned
+    matrix, i.e. "matrix of matrices" (http://en.wikipedia.org/wiki/Block_matrix). The
+    block matrix is here defined as a new S3 object. In this package, some methods for
+    "matrix" object are rewritten for "blockmatrix" object. New methods are implemented.
+    This package was created to solve equation systems with block matrices for the analysis
+    of environmental vector time series . Bugs/comments/questions/collaboration of any
+    kind are warmly welcomed.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: blockmatrix
+# Maintainer: Emanuele Cordano <emanuele.cordano@gmail.com>
+# License: GPL (>= 2)
+# Title: blockmatrix: Tools to solve algebraic systems with partitioned matrices
+# Type: Package
+# Author: Emanuele Cordano
+# Description: Some elementary matrix algebra tools are implemented to manage block matrices or partitioned matrix, i.e. "matrix of matrices" (http://en.wikipedia.org/wiki/Block_matrix). The block matrix is here defined as a new S3 object. In this package, some methods for "matrix" object are rewritten for "blockmatrix" object. New methods are implemented. This package was created to solve equation systems with block matrices for the analysis of environmental vector time series . Bugs/comments/questions/collaboration of any kind are warmly welcomed.
+# Version: 1.0
+# Repository: CRAN
+# Date: 2014-01-20
+# Depends: R (>= 2.13)
+# URL: http://cri.gmpf.eu/Research/Sustainable-Agro-Ecosystems-and-Bioresources/Dynamics-in-the-agro-ecosystems/people/Emanuele-Cordano
+# Collate: 'as.blockmatrix.matrix.R' 'as.matrix.blockmatrix.R' 'blockmatrix.R' 'dim.blockmatrix.R' 'is.zero.blockmatrix.R' 'length.blockmatrix.R' 'matmult.blockmatrix.R' 'methods.blockmatrix.R' 'names.blockmatrix.R' 'ncol.blockmatrix.R' 'ncol_elements.blockmatrix.R' 'nrow.blockmatrix.R' 'nrow_elements.blockmatrix.R' 'solve.blockmatrix.R' 't.blockmatrix.R' 'value.blockmatrix.R' 'value.replacement.blockmatrix.R' 'zbracket[.blockmatrix.R' 'zbracket[.replacement.blockmatrix.R'
+# Packaged: 2014-01-19 15:56:09 UTC; ecor
+# NeedsCompilation: no
+# Date/Publication: 2014-01-19 18:10:34
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

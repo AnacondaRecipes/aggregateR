@@ -1,0 +1,87 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-binford
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/binford_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/binford/binford_{{ version }}.tar.gz
+  sha256: 6111ae8aa6e6dc228a32b9ab0db087893d4308980468bf7c6b8f546afd6eb712
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dplyr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('binford')"           # [not win]
+    - "\"%R%\" -e \"library('binford')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/benmarwick/binford
+  license: GPL-3
+  summary: Binford's hunter-gatherer data includes more than 200 variables coding aspects of
+    hunter-gatherer subsistence, mobility, and social organization for 339 ethnographically
+    documented groups of hunter-gatherers.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: binford
+# Type: Package
+# Title: Binford's Hunter-Gatherer Data
+# Version: 0.1.0
+# Authors@R: c( person("Ben", "Marwick", email = "benmarwick@gmail.com", role = c("aut", "cre")), person("Amber", "Johnson", email = "ajohnson@truman.edu", role = "aut"), person("Doug", "White", email = "drwhite@uci.edu", role = "aut"), person("E. Anthon", "Eff", email = "Anthon.Eff@mtsu.edu", role = "aut") )
+# Description: Binford's hunter-gatherer data includes more than 200 variables coding aspects of hunter-gatherer subsistence, mobility, and social organization for 339 ethnographically documented groups of hunter-gatherers.
+# License: GPL-3
+# Depends: R (>= 3.1.0)
+# Suggests: dplyr
+# URL: http://github.com/benmarwick/binford
+# LazyData: TRUE
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-08-01 09:08:45 UTC; bmarwick
+# Author: Ben Marwick [aut, cre], Amber Johnson [aut], Doug White [aut], E. Anthon Eff [aut]
+# Maintainer: Ben Marwick <benmarwick@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-08-01 13:29:14
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

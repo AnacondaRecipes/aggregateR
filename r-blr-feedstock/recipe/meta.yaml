@@ -1,0 +1,88 @@
+{% set version = '1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-blr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BLR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BLR/BLR_{{ version }}.tar.gz
+  sha256: 862b10a8b63d8b6c8b5522d2c8547e7ad15498d140113fba8b4231f981c644aa
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-suppdists
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-suppdists
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BLR')"           # [not win]
+    - "\"%R%\" -e \"library('BLR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=BLR
+  license: GPL-2
+  summary: Bayesian Linear Regression.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: BLR
+# Version: 1.5
+# Date: 2018-08-23
+# Title: Bayesian Linear Regression
+# Author: Gustavo de los Campos, Paulino Perez Rodriguez,
+# Maintainer: Paulino Perez Rodriguez <perpdgo@colpos.mx>
+# Depends: R (>= 3.1.2), SuppDists
+# Description: Bayesian Linear Regression.
+# LazyLoad: true
+# License: GPL-2
+# Packaged: 2018-08-23 19:13:23 UTC; pperez
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2018-08-23 14:36:37 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,83 @@
+{% set version = '1.1.8-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-boa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/boa_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/boa/boa_{{ version }}.tar.gz
+  sha256: 17fe407ca2a98cf92d15cf54c4816fece05da217993e90a60c5f6d87cbc49012
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('boa')"           # [not win]
+    - "\"%R%\" -e \"library('boa')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.jstatsoft.org/v21/i11
+  license: GPL-2
+  summary: A menu-driven program and library of functions for carrying out convergence diagnostics
+    and statistical and graphical analysis of Markov chain Monte Carlo sampling output.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: boa
+# Version: 1.1.8-2
+# Date: 2016-06-22
+# Title: Bayesian Output Analysis Program (BOA) for MCMC
+# Authors@R: person("Brian J.", "Smith", role = c("aut", "cre"), email = "brian-j-smith@uiowa.edu")
+# Maintainer: Brian J. Smith <brian-j-smith@uiowa.edu>
+# Depends: R (>= 2.7)
+# Imports: graphics, grDevices, stats, utils
+# Description: A menu-driven program and library of functions for carrying out convergence diagnostics and statistical and graphical analysis of Markov chain Monte Carlo sampling output.
+# License: GPL-2
+# URL: http://www.jstatsoft.org/v21/i11
+# NeedsCompilation: no
+# Packaged: 2016-06-22 14:13:21 UTC; bjsmith
+# Author: Brian J. Smith [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2016-06-23 01:29:05
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,94 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bigtcr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bigtcr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bigtcr/bigtcr_{{ version }}.tar.gz
+  sha256: 05f3d2ce7bc86baaa183e163906879f849eef5075e11bee83bb5398504f303d0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bigtcr')"           # [not win]
+    - "\"%R%\" -e \"library('bigtcr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bigtcr
+  license: GPL-3
+  summary: For studying recurrent disease and death with competing risks, comparisons based on
+    the well-known cumulative incidence function can be confounded by different prevalence
+    rates of the competing events. Alternatively, comparisons of the conditional distribution
+    of the survival time given the failure event type are more relevant for investigating
+    the prognosis of different patterns of recurrence disease. This package implements
+    a nonparametric estimator for the conditional cumulative incidence function and
+    a nonparametric conditional bivariate cumulative incidence function for the bivariate
+    gap times proposed in Huang et al. (2016) <doi:10.1111/biom.12494>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bigtcr
+# Title: Nonparametric Analysis of Bivariate Gap Time with Competing Risks
+# Version: 1.1
+# Author: Chenguang Wang [aut, cre], Chiung-Yu Huang [aut], Mei-Cheng Wang [aut]
+# Maintainer: Chenguang Wang <cwang68@jhmi.edu>
+# Description: For studying recurrent disease and death with competing risks, comparisons based on the well-known cumulative incidence function can be confounded by different prevalence rates of the competing events. Alternatively, comparisons of the conditional distribution of the survival time given the failure event type are more relevant for investigating the prognosis of different patterns of recurrence disease. This package implements a nonparametric estimator for the conditional cumulative incidence function and a nonparametric conditional bivariate cumulative incidence function for the bivariate gap times proposed in Huang et al. (2016) <doi:10.1111/biom.12494>.
+# Depends: R (>= 3.4)
+# License: GPL (>= 3)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 5.0.1
+# NeedsCompilation: yes
+# Packaged: 2018-01-27 16:33:27 UTC; cwang68
+# Repository: CRAN
+# Date/Publication: 2018-01-27 16:54:52 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

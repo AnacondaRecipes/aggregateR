@@ -1,0 +1,96 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bnn
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BNN_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BNN/BNN_{{ version }}.tar.gz
+  sha256: 6dc6c90b8251463ee2f1287dc999e577664bd6aeb4879e176a8959dc1cee098e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BNN')"           # [not win]
+    - "\"%R%\" -e \"library('BNN')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=BNN
+  license: GPL-2
+  summary: 'Perform Bayesian variable selection for high-dimensional nonlinear systems and also
+    can be used to test nonlinearity for a general regression problem. The computation
+    can be accelerated using multiple CPUs. You can refer to <doi:10.1080/01621459.2017.1409122>
+    for more detail. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: BNN
+# Type: Package
+# Title: Bayesian Neural Network for High-Dimensional Nonlinear Variable Selection
+# Version: 1.0.2
+# Date: 2018-02-02
+# Authors@R: c(person("Bochao", "Jia", role = c("ctb", "aut", "cre", "cph"), email = "jbc409@ufl.edu"), person("Faming", "Liang", role = c("ctb"), email = "fmliang@purdue.edu"), person("Robert", "Gentleman", role = c("cph")), person("Ross", "Ihaka", role = c("cph")), person("The R Core Team", role = c("cph")))
+# Depends: R (>= 3.0.2)
+# Imports: mvtnorm
+# Description: Perform Bayesian variable selection for high-dimensional nonlinear systems and also can be used to test nonlinearity for a general regression problem. The computation can be accelerated using multiple CPUs. You can refer to <doi:10.1080/01621459.2017.1409122> for more detail.
+# License: GPL-2
+# LazyLoad: true
+# Packaged: 2018-02-02 21:29:02 UTC; jia97
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2018-02-02 21:51:53 UTC
+# RoxygenNote: 6.0.1
+# Author: Bochao Jia [ctb, aut, cre, cph], Faming Liang [ctb], Robert Gentleman [cph], Ross Ihaka [cph], The R Core Team [cph]
+# Maintainer: Bochao Jia <jbc409@ufl.edu>
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

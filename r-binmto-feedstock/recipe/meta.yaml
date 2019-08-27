@@ -1,0 +1,87 @@
+{% set version = '0.0-7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-binmto
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/binMto_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/binMto/binMto_{{ version }}.tar.gz
+  sha256: fe59c29b9fa06bd1a1f51c44a56bc45d03b8c3677902b3e53f5d92e09bcee965
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('binMto')"           # [not win]
+    - "\"%R%\" -e \"library('binMto')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=binMto
+  license: GPL-2
+  summary: Asymptotic simultaneous confidence intervals for comparison of many treatments with
+    one control, for the difference of binomial proportions, allows for Dunnett-like-adjustment,
+    Bonferroni or unadjusted intervals. Simulation of power of the above interval methods,
+    approximate calculation of any-pair-power, and sample size iteration based on approximate
+    any-pair power. Exact conditional maximum test for many-to-one comparisons to a
+    control.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: binMto
+# Type: Package
+# Title: Many-to-One Comparisons of Proportions
+# Version: 0.0-7
+# Date: 2018-04-18
+# Author: Frank Schaarschmidt
+# Maintainer: Frank Schaarschmidt <schaarschmidt@biostat.uni-hannover.de>
+# Imports: mvtnorm
+# Description: Asymptotic simultaneous confidence intervals for comparison of many treatments with one control, for the difference of binomial proportions, allows for Dunnett-like-adjustment, Bonferroni or unadjusted intervals. Simulation of power of the above interval methods, approximate calculation of any-pair-power, and sample size iteration based on approximate any-pair power. Exact conditional maximum test for many-to-one comparisons to a control.
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2018-04-19 11:09:37 UTC; Schaarschmidt
+# Repository: CRAN
+# Date/Publication: 2018-04-20 07:44:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

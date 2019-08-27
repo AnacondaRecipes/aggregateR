@@ -1,0 +1,87 @@
+{% set version = '1.1-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-binom
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/binom_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/binom/binom_{{ version }}.tar.gz
+  sha256: 8c88a1047a18ffb138a9b4dad5fcacc3d31ad68f4479fcbb4c0617879b485256
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lattice, polynom, tcltk, ggplot2
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('binom')"           # [not win]
+    - "\"%R%\" -e \"library('binom')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=binom
+  license: GPL-3
+  summary: Constructs confidence intervals on the probability of success in a binomial experiment
+    via several parameterizations
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: binom
+# Title: Binomial Confidence Intervals For Several Parameterizations
+# Version: 1.1-1
+# Date: 2014-01-01
+# Author: Sundar Dorai-Raj <sundar.dorai-raj@pdf.com>
+# Description: Constructs confidence intervals on the probability of success in a binomial experiment via several parameterizations
+# Maintainer: Sundar Dorai-Raj <sdorairaj@gmail.com>
+# Suggests: lattice, polynom, tcltk, ggplot2
+# License: GPL
+# Packaged: 2014-01-02 13:43:44 UTC; sdorairaj
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2014-01-02 23:11:45
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

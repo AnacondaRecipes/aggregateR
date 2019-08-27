@@ -1,0 +1,88 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-blendedlink
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/blendedLink_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/blendedLink/blendedLink_{{ version }}.tar.gz
+  sha256: 77a32c4af647f8254dab254d593623174b1c46e9dca842e79632a1a7a4bda1a5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('blendedLink')"           # [not win]
+    - "\"%R%\" -e \"library('blendedLink')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=blendedLink
+  license: GPL-2 | GPL-3
+  summary: A new link function that equals one specified link function up to a cutover then a
+    linear rescaling of another specified link function. For use in glm() or glm2().
+    The intended use is in binary regression, in which case the first link should be
+    set to "log" and the second to "logit". This ensures that fitted probabilities are
+    between 0 and 1 and that exponentiated coefficients can be interpreted as relative
+    risks for probabilities up to the cutoff.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: blendedLink
+# Type: Package
+# Title: A New Link Function that Blends Two Specified Link Functions
+# Version: 1.0
+# Date: 2017-01-31
+# Author: Robert Clark
+# Maintainer: "Robert Clark" <rclark@uow.edu.au>
+# Imports: stats
+# Description: A new link function that equals one specified link function up to a cutover then a linear rescaling of another specified link function. For use in glm() or glm2(). The intended use is in binary regression, in which case the first link should be set to "log" and the second to "logit". This ensures that fitted probabilities are between 0 and 1 and that exponentiated coefficients can be interpreted as relative risks for probabilities up to the cutoff.
+# License: GPL-2 | GPL-3
+# LazyData: TRUE
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2017-01-30 22:58:14 UTC; rclark
+# Repository: CRAN
+# Date/Publication: 2017-01-31 06:51:05
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

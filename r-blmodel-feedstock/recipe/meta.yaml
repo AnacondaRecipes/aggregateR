@@ -1,0 +1,84 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-blmodel
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BLModel_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BLModel/BLModel_{{ version }}.tar.gz
+  sha256: 256011e3c7c2833277d9b960ab408cd2c42447ed15423c22cbb5a9f7ca16ae50
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: mvtnorm, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BLModel')"           # [not win]
+    - "\"%R%\" -e \"library('BLModel')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=BLModel
+  license: GNU General Public License version 3
+  summary: Posterior distribution in the Black-Litterman model is computed from a prior distribution
+    given in the form of a time series of asset returns and a continuous distribution
+    of views provided by the user as an external function.
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: BLModel
+# Title: Black-Litterman Posterior Distribution
+# Version: 1.0.2
+# Authors@R: c( person("Andrzej", "Palczewski", email = "A.Palczewski@mimuw.edu.pl", role = c("aut", "cre")), person("Jan", "Palczewski", email = "J.Palczewski@leeds.ac.uk", role = c("aut")), person("Alicja","Gosiewska", email = "alicjagosiewska@gmail.com", role = c("ctb")))
+# Description: Posterior distribution in the Black-Litterman model is computed from a prior distribution given in the form of a time series of asset returns and a continuous distribution of views provided by the user as an external function.
+# Depends: R (>= 3.3.0)
+# License: GNU General Public License version 3
+# Encoding: UTF-8
+# LazyData: true
+# Author: Andrzej Palczewski [aut, cre], Jan Palczewski [aut], Alicja Gosiewska [ctb]
+# Maintainer: Andrzej Palczewski <A.Palczewski@mimuw.edu.pl>
+# RoxygenNote: 6.0.1
+# Suggests: mvtnorm, testthat
+# NeedsCompilation: no
+# Packaged: 2017-03-28 16:52:03 UTC; apalczew
+# Repository: CRAN
+# Date/Publication: 2017-03-29 06:38:36 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

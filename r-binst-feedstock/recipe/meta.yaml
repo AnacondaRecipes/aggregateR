@@ -1,0 +1,89 @@
+{% set version = '0.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-binst
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/binst_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/binst/binst_{{ version }}.tar.gz
+  sha256: 24b2178697d1e114c38605b4f98f61d05cf3c7983f472ea37fdf2619ec997f26
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: discretization, Formula, testthat, BAMMtools, earth
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rpart
+
+  run:
+    - r-base
+    - r-rpart
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('binst')"           # [not win]
+    - "\"%R%\" -e \"library('binst')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jules-and-dave/binst
+  license: MIT
+  summary: Various supervised and unsupervised binning tools including using entropy, recursive
+    partition methods and clustering.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: binst
+# Type: Package
+# Title: Data Preprocessing, Binning for Classification and Regression
+# Version: 0.2.1
+# Date: 2018-01-05
+# Author: Chapman Siu
+# Maintainer: Chapman Siu <chpmn.siu@gmail.com>
+# Description: Various supervised and unsupervised binning tools including using entropy, recursive partition methods and clustering.
+# LazyData: TRUE
+# Imports: stats, rpart
+# Suggests: discretization, Formula, testthat, BAMMtools, earth
+# RoxygenNote: 5.0.1
+# License: MIT + file LICENSE
+# URL: https://github.com/jules-and-dave/binst
+# NeedsCompilation: no
+# Packaged: 2018-01-04 23:48:21 UTC; chapm
+# Repository: CRAN
+# Date/Publication: 2018-01-05 04:08:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

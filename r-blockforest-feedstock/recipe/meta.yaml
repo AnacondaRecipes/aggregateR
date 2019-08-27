@@ -1,0 +1,119 @@
+{% set version = '0.2.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-blockforest
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/blockForest_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/blockForest/blockForest_{{ version }}.tar.gz
+  sha256: 72577e292318dc07e0176f7a979b883eed9229d612004713d0f62744f0d841a7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-rcpp >=0.11.2
+    - r-rcppeigen
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-rcpp >=0.11.2
+    - r-rcppeigen
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('blockForest')"           # [not win]
+    - "\"%R%\" -e \"library('blockForest')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/bips-hb/blockForest
+  license: GPL-3
+  summary: 'A random forest variant ''block forest'' (''BlockForest'') tailored to the  prediction
+    of binary, survival and continuous outcomes using block-structured  covariate data,
+    for example, clinical covariates plus measurements of a certain  omics data type
+    or multi-omics data, that is, data for which measurements of  different types of
+    omics data and/or clinical data for each patient exist. Examples  of different omics
+    data types include gene expression measurements, mutation data and copy number variation
+    measurements. Block forest are presented in Hornung & Wright (2019). The package
+    includes four other random forest variants for multi-omics data: ''RandomBlock'',
+    ''BlockVarSel'',  ''VarProb'', and ''SplitWeights''. These were also considered
+    in Hornung & Wright (2019),  but performed worse than block forest in their comparison
+    study based on 20 real  multi-omics data sets. Therefore, we recommend to use block
+    forest (''BlockForest'')  in applications. The other random forest variants can,
+    however, be consulted for  academic purposes, for example, in the context of further
+    methodological  developments.  Reference: Hornung, R. & Wright, M. N. (2019) Block
+    Forests: random forests for blocks of clinical and omics covariate data. BMC Bioinformatics
+    20:358. <doi:10.1186/s12859-019-2942-y>.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: blockForest
+# Type: Package
+# Title: Block Forests: Random Forests for Blocks of Clinical and Omics Covariate Data
+# Version: 0.2.3
+# Date: 2019-07-03
+# Author: Roman Hornung, Marvin N. Wright
+# Maintainer: Marvin N. Wright <cran@wrig.de>
+# Description: A random forest variant 'block forest' ('BlockForest') tailored to the  prediction of binary, survival and continuous outcomes using block-structured  covariate data, for example, clinical covariates plus measurements of a certain  omics data type or multi-omics data, that is, data for which measurements of  different types of omics data and/or clinical data for each patient exist. Examples  of different omics data types include gene expression measurements, mutation data and copy number variation measurements. Block forest are presented in Hornung & Wright (2019). The package includes four other random forest variants for multi-omics data: 'RandomBlock', 'BlockVarSel',  'VarProb', and 'SplitWeights'. These were also considered in Hornung & Wright (2019),  but performed worse than block forest in their comparison study based on 20 real  multi-omics data sets. Therefore, we recommend to use block forest ('BlockForest')  in applications. The other random forest variants can, however, be consulted for  academic purposes, for example, in the context of further methodological  developments.  Reference: Hornung, R. & Wright, M. N. (2019) Block Forests: random forests for blocks of clinical and omics covariate data. BMC Bioinformatics 20:358. <doi:10.1186/s12859-019-2942-y>.
+# License: GPL-3
+# Imports: Rcpp (>= 0.11.2), Matrix, methods, survival
+# LinkingTo: Rcpp, RcppEigen
+# Depends: R (>= 3.1)
+# Suggests: testthat
+# RoxygenNote: 6.1.0
+# NeedsCompilation: yes
+# URL: https://github.com/bips-hb/blockForest
+# BugReports: https://github.com/bips-hb/blockForest/issues
+# Packaged: 2019-07-03 15:43:10 UTC; wright
+# Repository: CRAN
+# Date/Publication: 2019-07-03 16:10:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

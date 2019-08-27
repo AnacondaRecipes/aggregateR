@@ -1,0 +1,93 @@
+{% set version = '1.2-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bioftf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BioFTF_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BioFTF/BioFTF_{{ version }}.tar.gz
+  sha256: 30e2f73a107b1f33aea073dd46dda32b1f1ab69a498e4397651937c22e74260f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BioFTF')"           # [not win]
+    - "\"%R%\" -e \"library('BioFTF')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.r-project.org
+  license: GPL-2
+  summary: The main drawback of the most common biodiversity indices is that different measures
+    may lead to different rankings among communities. This instrument overcomes this
+    limit using some functional tools with the diversity profiles. In particular, the
+    derivatives, the curvature, the radius of curvature, the arc length, and the surface
+    area are proposed. The goal of this method is to interpret in detail the diversity
+    profiles and obtain an ordering between different ecological communities on the
+    basis of diversity. In contrast to the typical indices of diversity, the proposed
+    method is able to capture the multidimensional aspect of biodiversity, because it
+    takes into account both the evenness and the richness of the species present in
+    an ecological community.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: BioFTF
+# Version: 1.2-0
+# Date: 2016-09-26
+# Title: Biodiversity Assessment Using Functional Tools
+# Authors@R: c(person("Fabrizio Maturo", role = c("aut", "cre"), email = "f.maturo@unich.it"), person("Francesca Fortuna", role = "aut", email = "francesca.fortuna@unich.it"), person("Tonio Di Battista", role = "aut", email = "dibattis@unich.it"))
+# Author: Fabrizio Maturo [aut, cre], Francesca Fortuna [aut], Tonio Di Battista [aut]
+# Maintainer: Fabrizio Maturo <f.maturo@unich.it>
+# Depends: R (>= 3.1.0)
+# Suggests: MASS
+# Description: The main drawback of the most common biodiversity indices is that different measures may lead to different rankings among communities. This instrument overcomes this limit using some functional tools with the diversity profiles. In particular, the derivatives, the curvature, the radius of curvature, the arc length, and the surface area are proposed. The goal of this method is to interpret in detail the diversity profiles and obtain an ordering between different ecological communities on the basis of diversity. In contrast to the typical indices of diversity, the proposed method is able to capture the multidimensional aspect of biodiversity, because it takes into account both the evenness and the richness of the species present in an ecological community.
+# License: GPL (>= 2)
+# URL: https://www.r-project.org
+# BugReports: f.maturo@unich.it
+# NeedsCompilation: no
+# Packaged: 2016-09-26 21:30:42 UTC; fabrizio
+# Repository: CRAN
+# Date/Publication: 2016-09-26 23:45:40
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

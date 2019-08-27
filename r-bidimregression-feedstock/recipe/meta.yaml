@@ -1,0 +1,90 @@
+{% set version = '2.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bidimregression
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BiDimRegression_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BiDimRegression/BiDimRegression_{{ version }}.tar.gz
+  sha256: 450649ca3f78cdf235126d67820b85264a9e8829616ac2a6fc04d86e3e02074c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, dplyr, ggplot2
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+
+  run:
+    - r-base
+    - r-formula
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BiDimRegression')"           # [not win]
+    - "\"%R%\" -e \"library('BiDimRegression')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=BiDimRegression
+  license: GPL-3
+  summary: Calculates the bidimensional regression between two 2D configurations following the
+    approach by Tobler (1965).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: BiDimRegression
+# Version: 2.0.0
+# Date: 2018-05-09
+# Title: Calculates the Bidimensional Regression Between Two 2D Configurations
+# Authors@R: c( person("Claus-Christian", "Carbon", role = c("aut"), email ="ccc@experimental-psychology.com"), person("Alexander (Sasha)", "Pastukhov", role = c("cre", "ctb"), email ="pastukhov.alexander@gmail.com"))
+# Imports: Formula, methods
+# Depends: R (>= 1.8.0)
+# Description: Calculates the bidimensional regression between two 2D configurations following the approach by Tobler (1965).
+# License: GPL-3
+# URL: https://CRAN.R-project.org/package=BiDimRegression
+# NeedsCompilation: no
+# Repository: CRAN
+# RoxygenNote: 6.0.1
+# LazyData: true
+# Suggests: testthat, knitr, rmarkdown, dplyr, ggplot2
+# VignetteBuilder: knitr
+# Packaged: 2018-05-09 10:31:52 UTC; sasha
+# Author: Claus-Christian Carbon [aut], Alexander (Sasha) Pastukhov [cre, ctb]
+# Maintainer: Alexander (Sasha) Pastukhov <pastukhov.alexander@gmail.com>
+# Date/Publication: 2018-05-16 11:32:59 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

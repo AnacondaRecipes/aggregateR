@@ -1,0 +1,84 @@
+{% set version = '0.9-19' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bindata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bindata_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bindata/bindata_{{ version }}.tar.gz
+  sha256: 8d8a7f00fb47ddaaaa678fb5af37c108ab8de3f5c9ce7b352678cff05d10ca97
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-e1071
+    - r-mvtnorm >=0.7_0
+
+  run:
+    - r-base
+    - r-e1071
+    - r-mvtnorm >=0.7_0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bindata')"           # [not win]
+    - "\"%R%\" -e \"library('bindata')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bindata
+  license: GPL-2
+  summary: Generation of correlated artificial binary data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bindata
+# Version: 0.9-19
+# Date: 2011-11-11
+# Title: Generation of Artificial Binary Data
+# Author: Friedrich Leisch and Andreas Weingessel and Kurt Hornik
+# Maintainer: Friedrich Leisch <Friedrich.Leisch@R-project.org>
+# Description: Generation of correlated artificial binary data.
+# License: GPL-2
+# Imports: e1071, mvtnorm (>= 0.7-0)
+# Packaged: 2012-11-13 11:25:52 UTC; hornik
+# Depends: R (>= 2.10)
+# Repository: CRAN
+# Date/Publication: 2012-11-14 08:47:27
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

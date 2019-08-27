@@ -1,0 +1,92 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bigml
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bigml_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bigml/bigml_{{ version }}.tar.gz
+  sha256: e93b7b99fdddf5dfe16477a963d7076841398c8562194179b773b2b7649e856e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcurl
+    - r-rjsonio
+    - r-plyr
+
+  run:
+    - r-base
+    - r-rcurl
+    - r-rjsonio
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bigml')"           # [not win]
+    - "\"%R%\" -e \"library('bigml')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/bigmlcom/bigml-r
+  license: LGPL-3
+  summary: The 'bigml' package contains bindings for the BigML API. The package includes methods
+    that provide straightforward access to basic API functionality, as well as methods
+    that accommodate idiomatic R data types and concepts.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bigml
+# Type: Package
+# Title: Bindings for the BigML API
+# Version: 0.1.2
+# Date: 2015-05-08
+# Authors@R: c(person("Leon", "Hwang", role=c("cre", "aut"), email="hwang@bigml.com"))
+# Description: The 'bigml' package contains bindings for the BigML API. The package includes methods that provide straightforward access to basic API functionality, as well as methods that accommodate idiomatic R data types and concepts.
+# License: LGPL-3
+# URL: https://github.com/bigmlcom/bigml-r
+# BugReports: https://github.com/bigmlcom/bigml-r/issues
+# Imports: RJSONIO, RCurl, plyr
+# Collate: 'bigml-internal.R' 'formEncodeURL.R' 'bigml-package.R' 'createDataset.R' 'createModel.R' 'createPrediction.R' 'createSource.R' 'getDataset.R' 'getModel.R' 'getPrediction.R' 'getSource.R' 'listDatasets.R' 'listModels.R' 'listSources.R' 'quickDataset.R' 'quickModel.R' 'quickPrediction.R' 'quickSource.R' 'setCredentials.R' 'deleteResource.R'
+# NeedsCompilation: no
+# Packaged: 2015-05-19 07:44:35 UTC; leon
+# Author: Leon Hwang [cre, aut]
+# Maintainer: Leon Hwang <hwang@bigml.com>
+# Repository: CRAN
+# Date/Publication: 2015-05-20 01:18:53
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
