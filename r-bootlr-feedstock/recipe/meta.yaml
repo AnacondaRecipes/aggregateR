@@ -1,0 +1,92 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bootlr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bootLR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bootLR/bootLR_{{ version }}.tar.gz
+  sha256: 24a869db64fd7633c9ec8150a816aac849dfdbf4299b477fffecf8d204a145aa
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-binom
+    - r-boot
+
+  run:
+    - r-base
+    - r-binom
+    - r-boot
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bootLR')"           # [not win]
+    - "\"%R%\" -e \"library('bootLR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bootLR
+  license: LGPL-2.1
+  summary: Computes appropriate confidence intervals for the likelihood ratio tests commonly
+    used in medicine/epidemiology, using the method of Marill et al. (2015) <doi:10.1177/0962280215592907>.  It
+    is particularly useful when the sensitivity or specificity in the sample is 100%.  Note
+    that this does not perform the test on nested models--for that, see 'epicalc::lrtest'.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-2.1'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bootLR
+# Type: Package
+# Title: Bootstrapped Confidence Intervals for (Negative) Likelihood Ratio Tests
+# Version: 1.0.2
+# Date: 2019-01-27
+# Author: Keith A. Marill and Ari B. Friedman
+# Maintainer: Ari B. Friedman <abfriedman@gmail.com>
+# Description: Computes appropriate confidence intervals for the likelihood ratio tests commonly used in medicine/epidemiology, using the method of Marill et al. (2015) <doi:10.1177/0962280215592907>.  It is particularly useful when the sensitivity or specificity in the sample is 100%.  Note that this does not perform the test on nested models--for that, see 'epicalc::lrtest'.
+# License: LGPL-2.1
+# LazyData: TRUE
+# Imports: boot, stats, binom
+# Suggests: testthat
+# Collate: 'bootLR.R'
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-02-01 02:45:58 UTC; arib
+# Repository: CRAN
+# Date/Publication: 2019-02-01 15:13:30 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

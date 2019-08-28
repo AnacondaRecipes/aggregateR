@@ -1,0 +1,83 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bootes
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bootES_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bootES/bootES_{{ version }}.tar.gz
+  sha256: e07ff200521ce393076bc21a27e201680cfc2a2586644ebc6e577f8076e08a41
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-boot
+
+  run:
+    - r-base
+    - r-boot
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bootES')"           # [not win]
+    - "\"%R%\" -e \"library('bootES')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.enplusadvisors.com
+  license: GPL-2
+  summary: Calculate robust measures of effect sizes using the bootstrap.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bootES
+# Version: 1.2
+# Date: 2015-08-14
+# Depends: R (>= 2.10.1), boot
+# Imports: stats, graphics
+# Title: Bootstrap Effect Sizes
+# Author: Daniel Gerlanc <dgerlanc@enplusadvisors.com> and Kris Kirby <kkirby@williams.edu>
+# Maintainer: Daniel Gerlanc <dgerlanc@enplusadvisors.com>
+# Description: Calculate robust measures of effect sizes using the bootstrap.
+# License: GPL (>= 2)
+# URL: http://www.enplusadvisors.com
+# NeedsCompilation: no
+# Packaged: 2015-08-14 18:31:01 UTC; daniel
+# Repository: CRAN
+# Date/Publication: 2015-08-14 20:42:50
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

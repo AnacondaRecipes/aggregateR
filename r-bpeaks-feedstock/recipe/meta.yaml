@@ -1,0 +1,87 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bpeaks
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bPeaks_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bPeaks/bPeaks_{{ version }}.tar.gz
+  sha256: ad6a91ca38e3090388ea932fa806e64ad5f87fb9ed1d5d4fd89c025e197cd2fc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bPeaks')"           # [not win]
+    - "\"%R%\" -e \"library('bPeaks')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bPeaks
+  license: GPL-3
+  summary: 'bPeaks is a simple approach to identify transcription factor binding sites from ChIP-seq
+    data. Our general philosophy is to provide an easy-to-use tool, well-adapted for
+    small eukaryotic genomes (< 20 Mb). bPeaks uses a combination of 4 cutoffs (T1,
+    T2, T3 and T4) to mimic "good peak" properties as described by biologists who visually
+    inspect the ChIP-seq data on a genome browser. For yeast genomes, bPeaks calculates
+    the proportion of peaks that fall in promoter sequences. These peaks are good candidates
+    as transcription factor binding sites. '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bPeaks
+# Type: Package
+# Title: bPeaks: an intuitive peak-calling strategy to detect transcription factor binding sites from ChIP-seq data in small eukaryotic genomes
+# Version: 1.2
+# Date: 2014-02-28
+# Author: Jawad MERHEJ and Gaelle LELANDAIS
+# Maintainer: Gaelle LELANDAIS <gaelle.lelandais@univ-paris-diderot.fr>
+# Description: bPeaks is a simple approach to identify transcription factor binding sites from ChIP-seq data. Our general philosophy is to provide an easy-to-use tool, well-adapted for small eukaryotic genomes (< 20 Mb). bPeaks uses a combination of 4 cutoffs (T1, T2, T3 and T4) to mimic "good peak" properties as described by biologists who visually inspect the ChIP-seq data on a genome browser. For yeast genomes, bPeaks calculates the proportion of peaks that fall in promoter sequences. These peaks are good candidates as transcription factor binding sites.
+# License: GPL
+# Packaged: 2014-02-28 15:55:50 UTC; lelandais
+# Depends: R (>= 2.10)
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-02-28 17:55:13
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

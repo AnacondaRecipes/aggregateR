@@ -1,0 +1,95 @@
+{% set version = '0.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bs4dash
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bs4Dash_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bs4Dash/bs4Dash_{{ version }}.tar.gz
+  sha256: 03fe481605635d2aaf52779d09ea33a8f354eb6fb8a75d353142e58589bf4ea4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: plotly, shinyWidgets, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-htmltools
+    - r-shiny
+
+  run:
+    - r-base
+    - r-htmltools
+    - r-shiny
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bs4Dash')"           # [not win]
+    - "\"%R%\" -e \"library('bs4Dash')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://rinterface.github.io/bs4Dash/index.html, https://github.com/RinteRface/bs4Dash
+  license: GPL-2
+  summary: Make 'Bootstrap 4' dashboards. Use the full power of 'AdminLTE3', a dashboard template
+    built on top of 'Bootstrap 4'  <https://github.com/almasaeed2010/AdminLTE/tree/v3-dev>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bs4Dash
+# Type: Package
+# Title: A 'Bootstrap 4' Version of 'shinydashboard'
+# Version: 0.4.0
+# Authors@R: c( person("David", "Granjon", email = "dgranjon@ymail.com", role = c("aut", "cre")), person(family = "RinteRface", role = "cph"), person(family = "Almasaeed Studio", role = c("ctb", "cph"), comment = "AdminLTE3 theme for Bootstrap 4"), person("Winston", "Chang", role = c("ctb", "cph"), comment = "Utils functions from shinydashboard"), person("Thomas", "Park", role = c("ctb", "cph"), comment = "Bootswatch Sketchy theme CSS"))
+# Maintainer: David Granjon <dgranjon@ymail.com>
+# Description: Make 'Bootstrap 4' dashboards. Use the full power of 'AdminLTE3', a dashboard template built on top of 'Bootstrap 4'  <https://github.com/almasaeed2010/AdminLTE/tree/v3-dev>.
+# URL: https://rinterface.github.io/bs4Dash/index.html, https://github.com/RinteRface/bs4Dash
+# BugReports: https://github.com/RinteRface/bs4Dash/issues
+# License: GPL (>= 2) | file LICENSE
+# Imports: shiny, htmltools
+# Suggests: plotly, shinyWidgets, knitr, rmarkdown
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# VignetteBuilder: knitr
+# Collate: 'update-functions.R' 'render-functions.R' 'cards.R' 'dashboardSidebar.R' 'dashboardBody.R' 'dashboardFooter.R' 'dashboardControlbar.R' 'dashboardNavbar.R' 'dashboardPage.R' 'aliases.R' 'bs4DashGallery.R' 'deps.R' 'useful-items.R' 'utils.R'
+# NeedsCompilation: no
+# Packaged: 2019-07-25 12:20:54 UTC; granjda1
+# Author: David Granjon [aut, cre], RinteRface [cph], Almasaeed Studio [ctb, cph] (AdminLTE3 theme for Bootstrap 4), Winston Chang [ctb, cph] (Utils functions from shinydashboard), Thomas Park [ctb, cph] (Bootswatch Sketchy theme CSS)
+# Repository: CRAN
+# Date/Publication: 2019-07-25 12:40:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

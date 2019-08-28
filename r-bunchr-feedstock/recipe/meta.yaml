@@ -1,0 +1,93 @@
+{% set version = '1.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bunchr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bunchr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bunchr/bunchr_{{ version }}.tar.gz
+  sha256: 6d3931d722cdbfb5073689909c463205786846feb7f5473a54601ad1c56b10ad
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, roxygen2
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-shiny >=0.10.2
+
+  run:
+    - r-base
+    - r-shiny >=0.10.2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bunchr')"           # [not win]
+    - "\"%R%\" -e \"library('bunchr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/trilnick/bunchr
+  license: MIT
+  summary: View and analyze data where bunching is expected. Estimate counter- factual distributions.
+    For earnings data, estimate the compensated elasticity of earnings w.r.t. the net-of-tax
+    rate.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bunchr
+# Type: Package
+# Title: Analyze Bunching in a Kink or Notch Setting
+# Version: 1.2.0
+# Authors@R: person("Itai", "Trilnick", email = "itai.trilnick@berkeley.edu", role = c("aut", "cre"))
+# Maintainer: Itai Trilnick <itai.trilnick@berkeley.edu>
+# Description: View and analyze data where bunching is expected. Estimate counter- factual distributions. For earnings data, estimate the compensated elasticity of earnings w.r.t. the net-of-tax rate.
+# URL: http://github.com/trilnick/bunchr
+# BugReports: http://github.com/trilnick/bunchr/issues
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# RoxygenNote: 5.0.1
+# Depends: R (>= 3.3.1)
+# Imports: stats, graphics, utils, shiny (>= 0.10.2)
+# Suggests: knitr, rmarkdown, testthat, roxygen2
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2017-01-30 03:40:11 UTC; User
+# Author: Itai Trilnick [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2017-01-30 12:30:00
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,84 @@
+{% set version = '1.0-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bursts
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bursts_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bursts/bursts_{{ version }}.tar.gz
+  sha256: 464ed0f5f28133775ac9ed5fbaf655a3574c977b243fa3fb4094d71d5a024f9c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bursts')"           # [not win]
+    - "\"%R%\" -e \"library('bursts')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bursts
+  license: MIT
+  summary: An implementation of Jon Kleinberg's burst detection algorithm.  Uses an infinite
+    Markov model to detect periods of increased activity in a series of discrete events
+    with known times, and provides a simple visualization of the results.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bursts
+# Type: Package
+# Title: Markov model for bursty behavior in streams
+# Version: 1.0-1
+# Date: 2014-02-21
+# Authors@R: person("Jeff", "Binder", role = c("aut", "cre"), email = "extruded@gmail.com")
+# Maintainer: Jeff Binder <extruded@gmail.com>
+# Description: An implementation of Jon Kleinberg's burst detection algorithm.  Uses an infinite Markov model to detect periods of increased activity in a series of discrete events with known times, and provides a simple visualization of the results.
+# License: MIT + file LICENSE
+# Copyright: (c) 2012 NYU School of Medicine; (c) 2012-14 Jeff Binder
+# Packaged: 2014-02-22 04:59:36 UTC; jechk
+# Author: Jeff Binder [aut, cre]
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-02-22 06:11:51
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

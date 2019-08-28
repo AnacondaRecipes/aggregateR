@@ -1,0 +1,86 @@
+{% set version = '1.3.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bpcp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bpcp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bpcp/bpcp_{{ version }}.tar.gz
+  sha256: e59045cf0de049bac80c94c2d2c23c3d481df33368782d60b63672468f1d9d50
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: survival
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bpcp')"           # [not win]
+    - "\"%R%\" -e \"library('bpcp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bpcp
+  license: GPL-2
+  summary: Calculates nonparametric pointwise confidence intervals for the survival distribution
+    for right censored data. Has two-sample tests for dissimilarity (e.g., difference,
+    ratio or odds ratio) in survival at a fixed time. Especially important for small
+    sample sizes or heavily censored data. Includes mid-p options.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bpcp
+# Type: Package
+# Title: Beta Product Confidence Procedure for Right Censored Data
+# Version: 1.3.4
+# Date: 2016-06-14
+# Author: Michael P. Fay
+# Maintainer: Michael P. Fay <mfay@niaid.nih.gov>
+# Depends: stats
+# Suggests: survival
+# Description: Calculates nonparametric pointwise confidence intervals for the survival distribution for right censored data. Has two-sample tests for dissimilarity (e.g., difference, ratio or odds ratio) in survival at a fixed time. Especially important for small sample sizes or heavily censored data. Includes mid-p options.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2016-06-14 12:47:08 UTC; faym
+# Repository: CRAN
+# Date/Publication: 2016-06-14 15:22:51
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,94 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bpa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bpa_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bpa/bpa_{{ version }}.tar.gz
+  sha256: c03d564beaf1b580b333e9d274453036459d9f5cfb46a5f5910467ad6cc0e75a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-magrittr
+    - r-plyr
+
+  run:
+    - r-base
+    - r-magrittr
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bpa')"           # [not win]
+    - "\"%R%\" -e \"library('bpa')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/bgreenwell/bpa
+  license: GPL-2
+  summary: Run basic pattern analyses on character sets, digits, or combined input containing
+    both characters and numeric digits. Useful for data cleaning and for identifying
+    columns containing multiple or nonstandard formats.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bpa
+# Type: Package
+# Title: Basic Pattern Analysis
+# Version: 0.1.1
+# Date: 2016-04-03
+# Authors@R: person("Brandon", "Greenwell", email = "greenwell.brandon@gmail.com", role = c("aut", "cre"))
+# Description: Run basic pattern analyses on character sets, digits, or combined input containing both characters and numeric digits. Useful for data cleaning and for identifying columns containing multiple or nonstandard formats.
+# Depends: base
+# Imports: magrittr, plyr
+# Suggests: testthat, knitr, rmarkdown
+# License: GPL (>= 2)
+# URL: https://github.com/bgreenwell/bpa
+# BugReports: https://github.com/bgreenwell/bpa/issues
+# RoxygenNote: 5.0.1
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2016-04-03 23:53:13 UTC; w108bmg
+# Author: Brandon Greenwell [aut, cre]
+# Maintainer: Brandon Greenwell <greenwell.brandon@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-04-04 08:37:03
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

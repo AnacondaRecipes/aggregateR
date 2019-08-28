@@ -1,0 +1,97 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bvarsv
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bvarsv_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bvarsv/bvarsv_{{ version }}.tar.gz
+  sha256: 3d4b2fd2995e10c601496997cd4bc8b2f97765e1c8517931d6c72e14d77264af
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bvarsv')"           # [not win]
+    - "\"%R%\" -e \"library('bvarsv')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://sites.google.com/site/fk83research/code
+  license: GPL-2
+  summary: R/C++ implementation of the model proposed by Primiceri ("Time Varying Structural
+    Vector Autoregressions and Monetary Policy", Review of Economic Studies, 2005),
+    with functionality for computing posterior predictive distributions and impulse
+    responses.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bvarsv
+# Type: Package
+# Title: Bayesian Analysis of a Vector Autoregressive Model with Stochastic Volatility and Time-Varying Parameters
+# Version: 1.1
+# Date: 2015-10-29
+# Author: Fabian Krueger
+# Maintainer: Fabian Krueger <Fabian.Krueger83@gmail.com>
+# Description: R/C++ implementation of the model proposed by Primiceri ("Time Varying Structural Vector Autoregressions and Monetary Policy", Review of Economic Studies, 2005), with functionality for computing posterior predictive distributions and impulse responses.
+# License: GPL (>= 2)
+# Imports: Rcpp (>= 0.11.0)
+# LinkingTo: Rcpp, RcppArmadillo
+# URL: https://sites.google.com/site/fk83research/code
+# NeedsCompilation: yes
+# Packaged: 2015-11-25 13:14:28 UTC; kruegefn
+# Repository: CRAN
+# Date/Publication: 2015-11-25 14:40:22
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,83 @@
+{% set version = '1.01' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-allan
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/allan_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/allan/allan_{{ version }}.tar.gz
+  sha256: f508476d67814a11f3dd78f49491ea4ac578e2582e4a07993a062fee4b4b7b09
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-biglm
+
+  run:
+    - r-base
+    - r-biglm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('allan')"           # [not win]
+    - "\"%R%\" -e \"library('allan')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=allan
+  license: GPL-3
+  summary: Automated fitting of linear regression models and a stepwise routine
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: allan
+# Type: Package
+# Title: Automated Large Linear Analysis Node
+# Version: 1.01
+# Date: 2010-07-23
+# Author: Alan Lee
+# Maintainer: Alan Lee <alanlee@stanfordalumni.org>
+# Description: Automated fitting of linear regression models and a stepwise routine
+# License: GPL
+# LazyLoad: yes
+# Depends: biglm
+# Packaged: 2012-10-29 08:58:12 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2012-10-29 08:58:12
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

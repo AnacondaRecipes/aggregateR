@@ -1,0 +1,83 @@
+{% set version = '1.2-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bootstepaic
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bootStepAIC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bootStepAIC/bootStepAIC_{{ version }}.tar.gz
+  sha256: bd6d85128b0a49aa60689fc19dc1be1410d8be722000740c333748a5e527db5c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bootStepAIC')"           # [not win]
+    - "\"%R%\" -e \"library('bootStepAIC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bootStepAIC
+  license: GPL-2
+  summary: Model selection by bootstrapping the stepAIC() procedure.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bootStepAIC
+# Title: Bootstrap stepAIC
+# Version: 1.2-0
+# Date: 2009-06-04
+# Author: Dimitris Rizopoulos <d.rizopoulos@erasmusmc.nl>
+# Maintainer: Dimitris Rizopoulos <d.rizopoulos@erasmusmc.nl>
+# Description: Model selection by bootstrapping the stepAIC() procedure.
+# Depends: R(>= 2.3.0), MASS
+# LazyLoad: yes
+# LazyData: yes
+# License: GPL (>= 2)
+# Packaged: 2009-06-04 07:15:31 UTC; Dimitris
+# Repository: CRAN
+# Date/Publication: 2009-06-04 16:11:54
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,89 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bpp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bpp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bpp/bpp_{{ version }}.tar.gz
+  sha256: 75da4a83408a17b6bbc693791c02862b0b671f723ab60e369df3d0bd45b2cf85
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bpp')"           # [not win]
+    - "\"%R%\" -e \"library('bpp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bpp
+  license: GPL-2
+  summary: Implements functions to update Bayesian Predictive Power Computations after not stopping
+    a clinical trial at an interim analysis. Such an interim analysis can either be
+    blinded or unblinded. Code is provided for Normally distributed endpoints with known
+    variance, with a prominent example being the hazard ratio.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bpp
+# Type: Package
+# Title: Computations Around Bayesian Predictive Power
+# Version: 1.0.0
+# Date: 2016-12-13
+# Author: Kaspar Rufibach, Paul Jordan, Markus Abt
+# Maintainer: Kaspar Rufibach <kaspar.rufibach@roche.com>
+# Depends: mvtnorm, R (>= 2.10)
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# Description: Implements functions to update Bayesian Predictive Power Computations after not stopping a clinical trial at an interim analysis. Such an interim analysis can either be blinded or unblinded. Code is provided for Normally distributed endpoints with known variance, with a prominent example being the hazard ratio.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2016-12-13 07:39:28 UTC; rufiback
+# Repository: CRAN
+# Date/Publication: 2016-12-13 15:33:39
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

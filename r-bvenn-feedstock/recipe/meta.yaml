@@ -1,0 +1,83 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bvenn
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bvenn_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bvenn/bvenn_{{ version }}.tar.gz
+  sha256: 1e50b53454797f6c316155665067460289058ca2f87647ef59a2adc213513ef7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bvenn')"           # [not win]
+    - "\"%R%\" -e \"library('bvenn')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bvenn
+  license: GPL-2
+  summary: This package implements a simple alternative to the traditional Venn diagram. It depicts
+    each overlap as a separate bubble with area proportional to the overlap size. Relation
+    of the bubbles to input sets is shown by their their arrangement.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bvenn
+# Type: Package
+# Title: A Simple alternative to proportional Venn diagrams
+# Version: 0.1
+# Date: 2012-08-08
+# Author: Raivo Kolde <rkolde@gmail.com>
+# Maintainer: Raivo Kolde <rkolde@gmail.com>
+# Description: This package implements a simple alternative to the traditional Venn diagram. It depicts each overlap as a separate bubble with area proportional to the overlap size. Relation of the bubbles to input sets is shown by their their arrangement.
+# License: GPL (>= 2)
+# Depends: grid
+# Collate: 'bvenn-package.r' 'bvenn.r'
+# Packaged: 2012-08-09 11:47:32 UTC; Kolde
+# Repository: CRAN
+# Date/Publication: 2012-08-09 12:57:55
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

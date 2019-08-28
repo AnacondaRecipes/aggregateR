@@ -1,0 +1,84 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-brm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/brm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/brm/brm_{{ version }}.tar.gz
+  sha256: ad899e4e7f3e84a8914676f53c82e9cd14912c60f6375555d87842245e7c9340
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('brm')"           # [not win]
+    - "\"%R%\" -e \"library('brm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=brm
+  license: MIT
+  summary: Fits novel models for the conditional relative risk, risk difference and odds ratio.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: brm
+# Type: Package
+# Title: Binary Regression Model
+# Version: 1.0
+# Date: 2016-09-15
+# Author: Linbo Wang, Thomas Richardson
+# Maintainer: Linbo Wang <linbowang@g.harvard.edu>
+# Description: Fits novel models for the conditional relative risk, risk difference and odds ratio.
+# License: MIT + file LICENSE
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Suggests: knitr, rmarkdown
+# Imports: stats
+# Packaged: 2016-09-17 04:16:41 UTC; i
+# Repository: CRAN
+# Date/Publication: 2016-09-17 07:10:51
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,94 @@
+{% set version = '0.95' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-c212
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/c212_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/c212/c212_{{ version }}.tar.gz
+  sha256: 4af698564de7757f9e1d45f37a871c836fb1f2af15c0eec848e36b2f7ca3f5b1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-coda
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-coda
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('c212')"           # [not win]
+    - "\"%R%\" -e \"library('c212')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=c212
+  license: GPL-2
+  summary: Methods for detecting safety signals in clinical trials using groupings of adverse
+    events by body-system or system organ class.The package title c212 is in reference
+    to the original Engineering and Physical Sciences Research Council (UK) funded project
+    which was named CASE 2/12.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: c212
+# Type: Package
+# Title: Methods for Detecting Safety Signals in Clinical Trials Using Body-Systems (System Organ Classes)
+# Version: 0.95
+# Date: 2019-05-10
+# Author: Raymond Carragher <rcarragh@gmail.com>
+# Maintainer: Raymond Carragher <rcarragh@gmail.com>
+# Depends: coda
+# Encoding: UTF-8
+# Description: Methods for detecting safety signals in clinical trials using groupings of adverse events by body-system or system organ class.The package title c212 is in reference to the original Engineering and Physical Sciences Research Council (UK) funded project which was named CASE 2/12.
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2019-05-14 11:08:04 UTC; clb13102
+# Repository: CRAN
+# Date/Publication: 2019-05-14 12:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

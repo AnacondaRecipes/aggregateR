@@ -1,0 +1,88 @@
+{% set version = '0.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-brnn
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/brnn_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/brnn/brnn_{{ version }}.tar.gz
+  sha256: e69df7965ed6ef4c5098935d957f189d0c776482f1532e7f0cf6d2af83c8d8ad
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-formula
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('brnn')"           # [not win]
+    - "\"%R%\" -e \"library('brnn')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=brnn
+  license: GPL-2
+  summary: Bayesian regularization for feed-forward neural networks.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: brnn
+# Version: 0.7
+# Date: 2018-08-23
+# Title: Bayesian Regularization for Feed-Forward Neural Networks
+# Author: Paulino Perez Rodriguez, Daniel Gianola
+# Maintainer: Paulino Perez Rodriguez <perpdgo@colpos.mx>
+# Depends: R (>= 3.1.2), Formula
+# Description: Bayesian regularization for feed-forward neural networks.
+# LazyLoad: true
+# License: GPL-2
+# NeedsCompilation: yes
+# Repository: CRAN
+# Packaged: 2018-08-23 18:13:09 UTC; pperez
+# Date/Publication: 2018-08-23 13:54:29 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
