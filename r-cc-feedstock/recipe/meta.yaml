@@ -1,0 +1,85 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CC/CC_{{ version }}.tar.gz
+  sha256: 7eb33bea4e38607b712caa22effce9514616f837c854e47fc590c5f7ce883aa1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CC')"           # [not win]
+    - "\"%R%\" -e \"library('CC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CC
+  license: GPL-2
+  summary: 'Tools for creating and visualizing statistical process control charts. Control charts
+    are used for monitoring measurement processes, such as those occurring in manufacturing.  The
+    objective is to monitor the history of such processes and flag outlying measurements:
+    out-of-control signals.  Montgomery, D. (2009, ISBN:978-0-470-16992-6) contains
+    an extensive discussion of the methodology.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CC
+# Title: Control Charts
+# Version: 1.0
+# Author: W.J. Braun
+# Description: Tools for creating and visualizing statistical process control charts. Control charts are used for monitoring measurement processes, such as those occurring in manufacturing.  The objective is to monitor the history of such processes and flag outlying measurements: out-of-control signals.  Montgomery, D. (2009, ISBN:978-0-470-16992-6) contains an extensive discussion of the methodology.
+# LazyLoad: true
+# LazyData: true
+# ZipData: no
+# Maintainer: W.John Braun <john.braun@ubc.ca>
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2019-08-26 16:42:09 UTC; braun
+# Repository: CRAN
+# Date/Publication: 2019-08-27 08:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

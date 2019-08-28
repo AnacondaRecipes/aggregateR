@@ -1,0 +1,102 @@
+{% set version = '0.6.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-casmap
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CASMAP_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CASMAP/CASMAP_{{ version }}.tar.gz
+  sha256: dc245eef9af134e82832f225516550d96b932a6a49bfb72a7fafa846060d62fc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CASMAP')"           # [not win]
+    - "\"%R%\" -e \"library('CASMAP')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CASMAP
+  license: GPL-2
+  summary: "A significant pattern mining-based toolbox for region-based genome-wide association
+    studies and higher-order epistasis analyses, implementing the methods described
+    in Llinares-L\xF3pez et al. (2017) <doi:10.1093/bioinformatics/btx071>."
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CASMAP
+# Type: Package
+# Title: Detection of Statistically Significant Combinations of SNPs in Association Mapping
+# Version: 0.6.0
+# Authors@R: c( person("Felipe", "Llinares-Lopez", role=c("aut", "cph")), person("Laetitia", "Papaxanthos", role=c("aut", "cph")), person("Damian", "Roqueiro", role=c("aut", "cph")), person("Matthew", "Baker", role = c("ctr")), person("Mikoaj", "Rybinski", role = c("ctr")), person("Uwe", "Schmitt", role = c("ctr")), person("Dean", "Bodenham", role=c("aut", "cre", "cph"), email="deanbodenhambsse@gmail.com"), person("Karsten", "Borgwardt", role=c("aut", "fnd", "cph")) )
+# Description: A significant pattern mining-based toolbox for region-based genome-wide association studies and higher-order epistasis analyses, implementing the methods described in Llinares-Lopez et al. (2017) <doi:10.1093/bioinformatics/btx071>.
+# Depends: R (>= 3.0.2)
+# Imports: methods, Rcpp
+# LinkingTo: Rcpp
+# Encoding: UTF-8
+# LazyData: true
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# RoxygenNote: 6.0.1
+# SystemRequirements: C++11
+# Suggests: testthat, knitr, rmarkdown
+# Author: Felipe Llinares-Lopez [aut, cph], Laetitia Papaxanthos [aut, cph], Damian Roqueiro [aut, cph], Matthew Baker [ctr], Mikoaj Rybinski [ctr], Uwe Schmitt [ctr], Dean Bodenham [aut, cre, cph], Karsten Borgwardt [aut, fnd, cph]
+# Maintainer: Dean Bodenham <deanbodenhambsse@gmail.com>
+# VignetteBuilder: knitr
+# Packaged: 2018-07-05 13:51:28 UTC; dean
+# Repository: CRAN
+# Date/Publication: 2018-07-18 13:40:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

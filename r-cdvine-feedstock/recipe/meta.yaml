@@ -1,0 +1,98 @@
+{% set version = '1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cdvine
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CDVine_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CDVine/CDVine_{{ version }}.tar.gz
+  sha256: e77b5ccccbb5cd8fb885773d718a1905a14271eb66262970b1c45b6fd645e732
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-igraph
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-igraph
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CDVine')"           # [not win]
+    - "\"%R%\" -e \"library('CDVine')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CDVine
+  license: GPL-2
+  summary: Functions for statistical inference of canonical vine (C-vine) and D-vine copulas.
+    Tools for bivariate exploratory data analysis and for bivariate as well as vine
+    copula selection are provided. Models can be estimated either sequentially or by
+    joint maximum likelihood estimation. Sampling algorithms and plotting methods are
+    also included. Data is assumed to lie in the unit hypercube (so-called copula data).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CDVine
+# Type: Package
+# Title: Statistical Inference of C- And D-Vine Copulas
+# Version: 1.4
+# Date: 2015-10-29
+# Author: Ulf Schepsmeier, Eike Christian Brechmann
+# Maintainer: Tobias Erhardt <tobias.erhardt@tum.de>
+# Depends: R (>= 2.11.0)
+# Imports: MASS, mvtnorm, graphics, igraph, stats
+# Description: Functions for statistical inference of canonical vine (C-vine) and D-vine copulas. Tools for bivariate exploratory data analysis and for bivariate as well as vine copula selection are provided. Models can be estimated either sequentially or by joint maximum likelihood estimation. Sampling algorithms and plotting methods are also included. Data is assumed to lie in the unit hypercube (so-called copula data).
+# License: GPL (>= 2)
+# LazyLoad: yes
+# NeedsCompilation: yes
+# Packaged: 2015-10-29 09:21:57 UTC; Tobias
+# Repository: CRAN
+# Date/Publication: 2015-10-29 13:03:16
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

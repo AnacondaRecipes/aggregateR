@@ -1,0 +1,84 @@
+{% set version = '1.0.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ccagfa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CCAGFA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CCAGFA/CCAGFA_{{ version }}.tar.gz
+  sha256: 0b499234e2456e123b8c2590156d38c7623dafd62ee842b2e527dd024333abcb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CCAGFA')"           # [not win]
+    - "\"%R%\" -e \"library('CCAGFA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://research.ics.aalto.fi/mi/
+  license: GPL-2
+  summary: Variational Bayesian algorithms for learning canonical correlation analysis (CCA),
+    inter-battery factor analysis (IBFA), and group factor analysis (GFA). Inference
+    with several random initializations can be run with the functions CCAexperiment()
+    and GFAexperiment().
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CCAGFA
+# Type: Package
+# Title: Bayesian Canonical Correlation Analysis and Group Factor Analysis
+# Version: 1.0.8
+# Date: 2015-10-20
+# Authors@R: c(person("Seppo", "Virtanen", role = c("aut", "cre"), email = "s.virtanen@warwick.ac.uk"), person("Eemeli", "Leppaaho", role = "aut", email = "eemeli.leppaaho@aalto.fi"), person("Arto", "Klami", role = "aut", email = "arto.klami@cs.helsinki.fi"))
+# Author: Seppo Virtanen [aut, cre], Eemeli Leppaaho [aut], Arto Klami [aut]
+# Maintainer: Seppo Virtanen <s.virtanen@warwick.ac.uk>
+# Description: Variational Bayesian algorithms for learning canonical correlation analysis (CCA), inter-battery factor analysis (IBFA), and group factor analysis (GFA). Inference with several random initializations can be run with the functions CCAexperiment() and GFAexperiment().
+# License: GPL (>= 2)
+# URL: http://research.ics.aalto.fi/mi/
+# Packaged: 2015-12-17 11:32:38 UTC; eleppaah
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-12-17 16:08:55
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

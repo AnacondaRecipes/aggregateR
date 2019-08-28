@@ -1,0 +1,83 @@
+{% set version = '0.97' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-catspec
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/catspec_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/catspec/catspec_{{ version }}.tar.gz
+  sha256: 41af961e3861ed74c9f075215445b7db7449edc473e99af0844a46f136f039b3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: mlogit,survival
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('catspec')"           # [not win]
+    - "\"%R%\" -e \"library('catspec')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=catspec
+  license: GPL-2
+  summary: '`ctab'' creates (multiway) percentage tables. `sqtab'' contains a set of functions
+    for estimating models for square tables such as quasi-independence, symmetry, uniform
+    association. Examples show how to use these models in a loglinear model using glm
+    or in a multinomial logistic model using mlogit or clogit'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: catspec
+# Version: 0.97
+# Title: Special models for categorical variables
+# Author: John Hendrickx <John_Hendrickx@yahoo.com>
+# Maintainer: John Hendrickx <John_Hendrickx@yahoo.com>
+# Description: `ctab' creates (multiway) percentage tables. `sqtab' contains a set of functions for estimating models for square tables such as quasi-independence, symmetry, uniform association. Examples show how to use these models in a loglinear model using glm or in a multinomial logistic model using mlogit or clogit
+# Suggests: mlogit,survival
+# License: GPL (>= 2)
+# Packaged: 2013-04-16 21:54:52 UTC; john
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-04-17 07:33:44
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

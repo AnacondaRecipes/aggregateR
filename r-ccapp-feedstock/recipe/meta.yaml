@@ -1,0 +1,105 @@
+{% set version = '0.3.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ccapp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ccaPP_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ccaPP/ccaPP_{{ version }}.tar.gz
+  sha256: f27e556f523aa09af4c8a8460b37b2975ddd69f3f431157215e42eac31bfda98
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, mvtnorm
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo >=0.4.100.0
+    - r-pcapp >=1.8_1
+    - r-robustbase
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo >=0.4.100.0
+    - r-pcapp >=1.8_1
+    - r-robustbase
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ccaPP')"           # [not win]
+    - "\"%R%\" -e \"library('ccaPP')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ccaPP
+  license: GPL-2
+  summary: Canonical correlation analysis and maximum correlation via projection pursuit, as
+    well as fast implementations of correlation estimators, with a focus on robust and
+    non-parametric methods.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ccaPP
+# Type: Package
+# Title: (Robust) Canonical Correlation Analysis via Projection Pursuit
+# Version: 0.3.2
+# Date: 2016-03-07
+# Depends: R (>= 3.2.0), parallel, pcaPP (>= 1.8-1), robustbase
+# Imports: Rcpp (>= 0.11.0)
+# LinkingTo: Rcpp (>= 0.11.0), RcppArmadillo (>= 0.4.100.0)
+# Suggests: knitr, mvtnorm
+# VignetteBuilder: knitr
+# Description: Canonical correlation analysis and maximum correlation via projection pursuit, as well as fast implementations of correlation estimators, with a focus on robust and non-parametric methods.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# Authors@R: c(person("Andreas", "Alfons", email = "alfons@ese.eur.nl", role = c("aut", "cre")), person("David", "Simcha", role = "ctb"))
+# Author: Andreas Alfons [aut, cre], David Simcha [ctb]
+# Maintainer: Andreas Alfons <alfons@ese.eur.nl>
+# NeedsCompilation: yes
+# Packaged: 2016-03-07 09:51:46 UTC; andreas
+# Repository: CRAN
+# Date/Publication: 2016-03-07 22:51:48
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

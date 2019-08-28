@@ -1,0 +1,98 @@
+{% set version = '0.2.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-catseyes
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/catseyes_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/catseyes/catseyes_{{ version }}.tar.gz
+  sha256: 9c03a83acc1ff5226aced4eca3f5722d820173d7ce1b8c26c65806eaa4b412dc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: emmeans
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('catseyes')"           # [not win]
+    - "\"%R%\" -e \"library('catseyes')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=catseyes
+  license: GPL-3
+  summary: 'Provides the tools to produce catseye plots, principally by catseyesplot() function
+    which calls R''s standard plot() function internally, or alternatively by the catseyes()
+    function to overlay the catseye plot onto an existing R plot window. Catseye plots
+    illustrate the normal distribution of the mean (picture a  normal bell curve reflected
+    over its base and rotated 90 degrees), with a shaded confidence interval; they are
+    an intuitive way of illustrating and comparing normally distributed estimates, and
+    are arguably a superior alternative to standard confidence intervals, since they
+    show the full distribution rather than fixed quantile bounds. The catseyesplot and
+    catseyes functions require pre-calculated means and standard errors (or standard
+    deviations), provided as numeric vectors; this allows the flexibility of obtaining
+    this information from a variety of sources, such as direct calculation or prediction
+    from a model.  Catseye plots, as illustrations of the normal distribution of the
+    means, are described in Cumming (2013 & 2014). Cumming, G. (2013). The new statistics:
+    Why and how. Psychological Science, 27, 7-29. <doi:10.1177/0956797613504966> pmid:24220629.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: catseyes
+# Type: Package
+# Title: Create Catseye Plots Illustrating the Normal Distribution of the Means
+# Version: 0.2.3
+# Authors@R: person("Clark", "Andersen", email = "clanders@utmb.edu", role=c("cre","aut"))
+# Description: Provides the tools to produce catseye plots, principally by catseyesplot() function which calls R's standard plot() function internally, or alternatively by the catseyes() function to overlay the catseye plot onto an existing R plot window. Catseye plots illustrate the normal distribution of the mean (picture a  normal bell curve reflected over its base and rotated 90 degrees), with a shaded confidence interval; they are an intuitive way of illustrating and comparing normally distributed estimates, and are arguably a superior alternative to standard confidence intervals, since they show the full distribution rather than fixed quantile bounds. The catseyesplot and catseyes functions require pre-calculated means and standard errors (or standard deviations), provided as numeric vectors; this allows the flexibility of obtaining this information from a variety of sources, such as direct calculation or prediction from a model.  Catseye plots, as illustrations of the normal distribution of the means, are described in Cumming (2013 & 2014). Cumming, G. (2013). The new statistics: Why and how. Psychological Science, 27, 7-29. <doi:10.1177/0956797613504966> pmid:24220629.
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.0
+# Suggests: emmeans
+# NeedsCompilation: no
+# Packaged: 2019-01-17 18:52:35 UTC; clanders
+# Author: Clark Andersen [cre, aut]
+# Maintainer: Clark Andersen <clanders@utmb.edu>
+# Repository: CRAN
+# Date/Publication: 2019-01-25 16:50:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

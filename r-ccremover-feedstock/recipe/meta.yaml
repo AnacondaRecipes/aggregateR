@@ -1,0 +1,93 @@
+{% set version = '1.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ccremover
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ccRemover_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ccRemover/ccRemover_{{ version }}.tar.gz
+  sha256: 26158d005a807567782e92c2104deeacec44e2410914d3f8c2e77928fa06edda
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ccRemover')"           # [not win]
+    - "\"%R%\" -e \"library('ccRemover')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ccRemover
+  license: GPL-3
+  summary: Implements a method for identifying and removing the cell-cycle effect from scRNA-Seq
+    data. The description of the  method is in Barron M. and Li J. (2016) <doi:10.1038/srep33892>.
+    Identifying and removing  the cell-cycle effect from single-cell RNA-Sequencing
+    data. Submitted.  Different from previous methods, ccRemover implements a mechanism
+    that formally tests whether a component is cell-cycle related or not, and thus while
+    it often thoroughly removes the cell-cycle effect, it preserves other features/signals
+    of interest in the data.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ccRemover
+# Type: Package
+# Title: Removes the Cell-Cycle Effect from Single-Cell RNA-Sequencing Data
+# Version: 1.0.4
+# Authors@R: c( person("Jun", "Li", email = "jun.li@nd.edu",role = c("aut","cre")), person("Martin", "Barron", email = "mbarron2@nd.edu",role = c("aut")))
+# Description: Implements a method for identifying and removing the cell-cycle effect from scRNA-Seq data. The description of the  method is in Barron M. and Li J. (2016) <doi:10.1038/srep33892>. Identifying and removing  the cell-cycle effect from single-cell RNA-Sequencing data. Submitted.  Different from previous methods, ccRemover implements a mechanism that formally tests whether a component is cell-cycle related or not, and thus while it often thoroughly removes the cell-cycle effect, it preserves other features/signals of interest in the data.
+# Depends: R (>= 2.10.0)
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# Imports: stats, utils
+# NeedsCompilation: no
+# Packaged: 2017-08-17 15:33:13 UTC; Administrator
+# Author: Jun Li [aut, cre], Martin Barron [aut]
+# Maintainer: Jun Li <jun.li@nd.edu>
+# Repository: CRAN
+# Date/Publication: 2017-08-19 12:23:32 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

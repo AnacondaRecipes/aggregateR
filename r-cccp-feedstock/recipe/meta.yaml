@@ -1,0 +1,105 @@
+{% set version = '0.2-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cccp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cccp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cccp/cccp_{{ version }}.tar.gz
+  sha256: ec5b322108c20aa388f438d5c58fe33ead30251844ed52fd843633dfdcef80c3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: RUnit, numDeriv
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.2
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.2
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cccp')"           # [not win]
+    - "\"%R%\" -e \"library('cccp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cccp
+  license: GPL-3
+  summary: 'Routines for solving convex optimization problems with cone constraints by means
+    of interior-point methods. The implemented algorithms are partially ported from
+    CVXOPT, a Python module for convex optimization (see <http://cvxopt.org> for more
+    information). '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cccp
+# Version: 0.2-4
+# Date: 2015-02-09
+# Title: Cone Constrained Convex Problems
+# Authors@R: c(person("Bernhard", "Pfaff", role = c("aut", "cre"), email = "bernhard@pfaffikus.de"), person("Lieven", "Vandenberghe", role = "cph", comment = "copyright holder of cvxopt"), person("Martin", "Andersen", role = "cph", comment = "copyright holder of cvxopt"), person("Joachim", "Dahl", role = "cph", comment = "copyright holder of cvxopt"))
+# Maintainer: Bernhard Pfaff <bernhard@pfaffikus.de>
+# Depends: R (>= 3.0.1), methods
+# Suggests: RUnit, numDeriv
+# LazyLoad: yes
+# Description: Routines for solving convex optimization problems with cone constraints by means of interior-point methods. The implemented algorithms are partially ported from CVXOPT, a Python module for convex optimization (see <http://cvxopt.org> for more information).
+# Imports: Rcpp (>= 0.11.2)
+# LinkingTo: Rcpp, RcppArmadillo
+# License: GPL (>= 3)
+# RcppModules: CPG
+# Author: Bernhard Pfaff [aut, cre], Lieven Vandenberghe [cph] (copyright holder of cvxopt), Martin Andersen [cph] (copyright holder of cvxopt), Joachim Dahl [cph] (copyright holder of cvxopt)
+# Repository: CRAN
+# Repository/R-Forge/Project: cccp
+# Repository/R-Forge/Revision: 187
+# Repository/R-Forge/DateTimeStamp: 2015-02-09 22:15:59
+# Date/Publication: 2015-02-10 10:39:33
+# Packaged: 2015-02-09 22:25:14 UTC; rforge
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

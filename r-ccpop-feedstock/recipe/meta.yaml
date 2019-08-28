@@ -1,0 +1,83 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ccpop
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CCpop_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CCpop/CCpop_{{ version }}.tar.gz
+  sha256: 8a7df915358ed15c2c04cb1b1a1b1d0bcd37b5c1f627c4c9b1136494d6e06f82
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-nloptr
+
+  run:
+    - r-base
+    - r-nloptr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CCpop')"           # [not win]
+    - "\"%R%\" -e \"library('CCpop')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CCpop
+  license: GPL-2
+  summary: Tests of association between SNPs or pairs of SNPs and binary phenotypes, in case-control
+    / case-population / case-control-population studies.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CCpop
+# Type: Package
+# Title: One and two locus GWAS of binary phenotype with case-control-population design
+# Version: 1.0
+# Date: 2014-03-18
+# Author: Shachar Kaufman
+# Maintainer: Shachar Kaufman <shachark@post.tau.ac.il>
+# Description: Tests of association between SNPs or pairs of SNPs and binary phenotypes, in case-control / case-population / case-control-population studies.
+# Depends: nloptr
+# License: GPL-2
+# Packaged: 2014-03-24 10:32:47 UTC; Shachar
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-03-24 12:03:06
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

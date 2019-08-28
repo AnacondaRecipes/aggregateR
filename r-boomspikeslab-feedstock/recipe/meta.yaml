@@ -1,0 +1,99 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-boomspikeslab
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BoomSpikeSlab_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BoomSpikeSlab/BoomSpikeSlab_{{ version }}.tar.gz
+  sha256: a2b81ce14c1891a5e87a457e92ffe8e0ed9d325a235e7d4c7a255d71d5e07466
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, testthat, mlbench
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh >=1.65.0
+    - r-boom >=0.9.1
+    - r-igraph
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.65.0
+    - r-boom >=0.9.1
+    - r-igraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BoomSpikeSlab')"           # [not win]
+    - "\"%R%\" -e \"library('BoomSpikeSlab')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=BoomSpikeSlab
+  license: LGPL-2.1
+  summary: Spike and slab regression a la McCulloch and George (1997).
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-2.1'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: BoomSpikeSlab
+# Date: 2019-06-03
+# Title: MCMC for Spike and Slab Regression
+# Author: Steven L. Scott <steve.the.bayesian@gmail.com>
+# Maintainer: Steven L. Scott <steve.the.bayesian@gmail.com>
+# Description: Spike and slab regression a la McCulloch and George (1997).
+# Depends: Boom (>= 0.9.1) , R (>= 3.1.0)
+# LinkingTo: BH (>= 1.65.0), Boom(>= 0.9.1)
+# Suggests: MASS, testthat, mlbench
+# Imports: igraph
+# Version: 1.1.1
+# License: LGPL-2.1 | file LICENSE
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2019-06-06 18:43:27 UTC; stevescott
+# Repository: CRAN
+# Date/Publication: 2019-06-07 15:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

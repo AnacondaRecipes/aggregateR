@@ -1,0 +1,87 @@
+{% set version = '1.0-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-censcov
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/censCov_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/censCov/censCov_{{ version }}.tar.gz
+  sha256: 6f6c689d1f06def0ae5d8f38affbaffe6c9cfe989d119a6d2f353811a2af3b45
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival
+
+  run:
+    - r-base
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('censCov')"           # [not win]
+    - "\"%R%\" -e \"library('censCov')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=censCov
+  license: GPL-3
+  summary: Implementations of threshold regression approaches for linear regression models with
+    a covariate subject to random censoring, including deletion threshold regression
+    and completion threshold regression. Reverse survival regression, which flip the
+    role of response variable and the covariate, is also considered.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: censCov
+# Type: Package
+# Title: Linear Regression with a Randomly Censored Covariate
+# Version: 1.0-0
+# Date: 2017-04-25
+# Author: Jing Qian, Sy Han (Steven) Chiou
+# Maintainer: Sy Han (Steven) Chiou <schiou@hsph.harvard.edu>
+# Description: Implementations of threshold regression approaches for linear regression models with a covariate subject to random censoring, including deletion threshold regression and completion threshold regression. Reverse survival regression, which flip the role of response variable and the covariate, is also considered.
+# License: GPL (>= 3)
+# Imports: survival
+# Encoding: UTF-8
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2017-04-25 22:25:34 UTC; steven
+# Repository: CRAN
+# Date/Publication: 2017-04-25 23:35:57 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

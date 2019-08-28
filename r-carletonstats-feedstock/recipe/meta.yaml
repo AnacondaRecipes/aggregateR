@@ -1,0 +1,86 @@
+{% set version = '2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-carletonstats
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CarletonStats_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CarletonStats/CarletonStats_{{ version }}.tar.gz
+  sha256: 83a9b30b58ee14eebc2e1fa957ced205bef6282797e7db2cda7222f70cdfff5d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, ggplot2, grDevices, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CarletonStats')"           # [not win]
+    - "\"%R%\" -e \"library('CarletonStats')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CarletonStats
+  license: GPL-2
+  summary: Includes commands for bootstrapping and permutation tests, a command for created grouped
+    bar plots, and a demo of the quantile-normal plot for data drawn from different
+    distributions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CarletonStats
+# Type: Package
+# Version: 2.0
+# Title: Functions for Statistics Classes at Carleton College
+# Description: Includes commands for bootstrapping and permutation tests, a command for created grouped bar plots, and a demo of the quantile-normal plot for data drawn from different distributions.
+# Date: 2018-08-08
+# Author: Laura Chihara
+# Maintainer: Laura Chihara <lchihara@carleton.edu>
+# License: GPL-2
+# LazyData: TRUE
+# Suggests: MASS, ggplot2, grDevices, testthat
+# NeedsCompilation: no
+# Encoding: UTF-8
+# RoxygenNote: 6.1.0
+# Packaged: 2018-08-08 16:22:07 UTC; lchihara
+# Repository: CRAN
+# Date/Publication: 2018-08-08 17:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

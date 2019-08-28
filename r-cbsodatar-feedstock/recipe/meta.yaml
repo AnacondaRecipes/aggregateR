@@ -1,0 +1,92 @@
+{% set version = '0.3.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cbsodatar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cbsodataR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cbsodataR/cbsodataR_{{ version }}.tar.gz
+  sha256: 1a5dcbf649cddb1750bb08ad7a062dfdadb8d6cb20b6fbd351b933b24304fda4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, dplyr, shiny
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-jsonlite
+    - r-whisker
+
+  run:
+    - r-base
+    - r-jsonlite
+    - r-whisker
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cbsodataR')"           # [not win]
+    - "\"%R%\" -e \"library('cbsodataR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/edwindj/cbsodataR
+  license: GPL-2
+  summary: The data and meta data from Statistics Netherlands (<https://www.cbs.nl>) can be browsed
+    and downloaded. The client uses the open data API of Statistics Netherlands.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cbsodataR
+# Type: Package
+# Title: Statistics Netherlands (CBS) Open Data API Client
+# Version: 0.3.4
+# Authors@R: c(person("Edwin", "de Jonge", email="edwindjonge@gmail.com", role = c("aut","cre")), person("Sara", "Houweling", role=c("ctb")))
+# Description: The data and meta data from Statistics Netherlands (<https://www.cbs.nl>) can be browsed and downloaded. The client uses the open data API of Statistics Netherlands.
+# License: GPL-2
+# URL: https://github.com/edwindj/cbsodataR
+# BugReports: https://github.com/edwindj/cbsodataR/issues
+# Encoding: UTF-8
+# Imports: whisker, jsonlite, utils
+# Suggests: knitr, rmarkdown, dplyr, shiny
+# VignetteBuilder: knitr
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-08-20 11:49:00 UTC; edwin
+# Author: Edwin de Jonge [aut, cre], Sara Houweling [ctb]
+# Maintainer: Edwin de Jonge <edwindjonge@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-08-20 12:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-capn
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/capn_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/capn/capn_{{ version }}.tar.gz
+  sha256: 994d21e2b88ef1114961f8f080fa038e1674c26657f60af9f80a74df01986e93
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('capn')"           # [not win]
+    - "\"%R%\" -e \"library('capn')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=capn
+  license: GPL-2
+  summary: 'Implements approximation methods for natural capital asset prices suggested by Fenichel
+    and Abbott (2014) <doi:10.1086/676034> in Journal of the Associations of Environmental
+    and Resource Economists (JAERE), Fenichel et al. (2016) <doi:10.1073/pnas.1513779113>
+    in Proceedings of the National Academy of Sciences (PNAS), and Yun et al. (2017)
+    in PNAS (accepted), and their extensions: creating Chebyshev polynomial nodes and
+    grids, calculating basis of Chebyshev polynomials, approximation and their simulations
+    for: V-approximation (single and multiple stocks, PNAS), P-approximation (single
+    stock, PNAS), and Pdot-approximation (single stock, JAERE). Development of this
+    package was generously supported by the Knobloch Family Foundation.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: capn
+# Type: Package
+# Title: Capital Asset Pricing for Nature
+# Version: 1.0.0
+# Date: 2017-06-04
+# Authors@R: c( person("Seong Do","Yun",role=c("aut","cre"),email="seongdo.yun@yale.edu"), person("Eli P.","Fenichel",role=c("aut","ctb")), person("Joshua K.","Abbott",role=c("aut","ctb")))
+# Author: Seong Do Yun [aut, cre], Eli P. Fenichel [aut, ctb], Joshua K. Abbott [aut, ctb]
+# Maintainer: Seong Do Yun <seongdo.yun@yale.edu>
+# Description: Implements approximation methods for natural capital asset prices suggested by Fenichel and Abbott (2014) <doi:10.1086/676034> in Journal of the Associations of Environmental and Resource Economists (JAERE), Fenichel et al. (2016) <doi:10.1073/pnas.1513779113> in Proceedings of the National Academy of Sciences (PNAS), and Yun et al. (2017) in PNAS (accepted), and their extensions: creating Chebyshev polynomial nodes and grids, calculating basis of Chebyshev polynomials, approximation and their simulations for: V-approximation (single and multiple stocks, PNAS), P-approximation (single stock, PNAS), and Pdot-approximation (single stock, JAERE). Development of this package was generously supported by the Knobloch Family Foundation.
+# Depends: R (>= 3.0.1)
+# License: GPL (>= 2)
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2017-06-04 15:45:59 UTC; sy382
+# Repository: CRAN
+# Date/Publication: 2017-06-05 17:48:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,95 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cbsem
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cbsem_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cbsem/cbsem_{{ version }}.tar.gz
+  sha256: c4aea9b60968beaf0622758efbcf67ff5ad5c1f4077fec05f7c614ef6026813d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: R.rsp
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cbsem')"           # [not win]
+    - "\"%R%\" -e \"library('cbsem')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cbsem
+  license: GPL-3
+  summary: 'The composites are linear combinations of their indicators in composite based structural
+    equation models. Structural models are considered consisting of two blocks. The
+    indicators of the exogenous composites are named by X, the indicators of the endogenous
+    by Y. Reflective relations are given by arrows pointing  from the composite to their
+    indicators. Their values are called loadings.  In a reflective-reflective scenario
+    all indicators have loadings. Arrows are pointing to their indicators only from
+    the endogenous composites in  the formative-reflective scenario. There are no loadings
+    at all in the formative-formative scenario. The covariance matrices are computed
+    for these three scenarios. They can be used to simulate these models. These models
+    can also be estimated and a segmentation procedure is included as well.   '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cbsem
+# Type: Package
+# Title: Simulation, Estimation and Segmentation of Composite Based Structural Equation Models
+# Version: 1.0.0
+# Author: Rainer Schlittgen
+# Maintainer: Rainer Schlittgen <R.Schlittgen@t-online.de>
+# Description: The composites are linear combinations of their indicators in composite based structural equation models. Structural models are considered consisting of two blocks. The indicators of the exogenous composites are named by X, the indicators of the endogenous by Y. Reflective relations are given by arrows pointing  from the composite to their indicators. Their values are called loadings.  In a reflective-reflective scenario all indicators have loadings. Arrows are pointing to their indicators only from the endogenous composites in  the formative-reflective scenario. There are no loadings at all in the formative-formative scenario. The covariance matrices are computed for these three scenarios. They can be used to simulate these models. These models can also be estimated and a segmentation procedure is included as well.
+# Depends: R (>= 2.10)
+# License: GPL
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: R.rsp
+# VignetteBuilder: R.rsp
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2019-01-30 10:55:47 UTC; Gigabyte
+# Repository: CRAN
+# Date/Publication: 2019-02-03 17:05:33 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

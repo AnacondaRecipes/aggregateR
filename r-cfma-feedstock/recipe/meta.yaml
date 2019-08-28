@@ -1,0 +1,85 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cfma
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cfma_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cfma/cfma_{{ version }}.tar.gz
+  sha256: 6953c24befe34c8ca2f30a62961a2bb5eb4372f73b1ad7b024e45d9cc72bdf00
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cfma')"           # [not win]
+    - "\"%R%\" -e \"library('cfma')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cfma
+  license: GPL-2
+  summary: 'Performs causal functional mediation analysis (CFMA) for functional treatment, functional
+    mediator, and functional outcome. This package includes two functional mediation
+    model types: (1) a concurrent mediation model and (2) a historical influence mediation
+    model. See Zhao et al. (2018), Functional Mediation Analysis with an Application
+    to Functional Magnetic Resonance Imaging Data, <arXiv:1805.06923> for details.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cfma
+# Type: Package
+# Title: Causal Functional Mediation Analysis
+# Version: 1.0
+# Date: 2018-05-16
+# Author: Yi Zhao <zhaoyi1026@gmail.com>, Xi Luo <xi.rossi.luo@gmail.com>, Martin Lindquist <mal2053@gmail.com>, Brian Caffo <bcaffo@gmail.com>
+# Maintainer: Yi Zhao <zhaoyi1026@gmail.com>
+# Description: Performs causal functional mediation analysis (CFMA) for functional treatment, functional mediator, and functional outcome. This package includes two functional mediation model types: (1) a concurrent mediation model and (2) a historical influence mediation model. See Zhao et al. (2018), Functional Mediation Analysis with an Application to Functional Magnetic Resonance Imaging Data, <arXiv:1805.06923> for details.
+# License: GPL (>= 2)
+# Depends: R (>= 2.10)
+# NeedsCompilation: no
+# Packaged: 2018-05-22 14:15:59 UTC; yizhao
+# Repository: CRAN
+# Date/Publication: 2018-05-24 12:45:18 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

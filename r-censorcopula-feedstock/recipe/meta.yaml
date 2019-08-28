@@ -1,0 +1,83 @@
+{% set version = '2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-censorcopula
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/censorcopula_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/censorcopula/censorcopula_{{ version }}.tar.gz
+  sha256: 483dcf9af15d6a3b50651d3f6fe724d3e45c31a21b66fbb1002e467a6927f39a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-copula
+
+  run:
+    - r-base
+    - r-copula
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('censorcopula')"           # [not win]
+    - "\"%R%\" -e \"library('censorcopula')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=censorcopula
+  license: GPL-2
+  summary: Implement an interval censor method  to break ties when using data with ties to fitting
+    a  bivariate copula.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: censorcopula
+# Type: Package
+# Title: Estimate Parameter of Bivariate Copula
+# Version: 2.0
+# Date: 2016-03-07
+# Author: Yan Li, Yang Li, Yichen Qin, and Jun yan
+# Maintainer: Yan Li <YanLi_stats@hotmail.com>
+# Description: Implement an interval censor method  to break ties when using data with ties to fitting a  bivariate copula.
+# License: GPL (>= 2)
+# Depends: copula
+# NeedsCompilation: no
+# Packaged: 2016-03-21 13:23:35 UTC; Leonhard
+# Repository: CRAN
+# Date/Publication: 2016-03-25 14:48:05
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
