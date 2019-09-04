@@ -1,0 +1,104 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ciee
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CIEE_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CIEE/CIEE_{{ version }}.tar.gz
+  sha256: 89e2865fd2a4914278d610c24fb7ee8246a533abb1c84445063e900d2e4b780e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lavaan, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival
+
+  run:
+    - r-base
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CIEE')"           # [not win]
+    - "\"%R%\" -e \"library('CIEE')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CIEE
+  license: GPL-2
+  summary: 'In many studies across different disciplines, detailed measures of the variables
+    of interest are available. If assumptions can be made regarding the direction of
+    effects between the assessed variables, this has to be considered in the analysis.
+    The functions in this package implement the novel approach CIEE (causal inference
+    using estimating equations; Konigorski et al., 2018, <DOI:10.1002/gepi.22107>) for
+    estimating and testing the direct effect of an exposure variable on a primary outcome,
+    while adjusting for indirect effects of the exposure on the primary outcome through
+    a secondary intermediate outcome and potential factors influencing the secondary
+    outcome. The underlying directed acyclic graph (DAG) of this considered model is
+    described in the vignette. CIEE can be applied to studies in many different fields,
+    and it is implemented here for the analysis of a continuous primary outcome and
+    a time-to-event primary outcome subject to censoring. CIEE uses estimating equations
+    to obtain estimates of the direct effect and robust sandwich standard error estimates.
+    Then, a large-sample Wald-type test statistic is computed for testing the absence
+    of the direct effect. Additionally, standard multiple regression, regression of
+    residuals, and the structural equation modeling approach are implemented for comparison. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CIEE
+# Type: Package
+# Title: Estimating and Testing Direct Effects in Directed Acyclic Graphs using Estimating Equations
+# Version: 0.1.1
+# Authors@R: c( person("Stefan", "Konigorski", email = "stefan.konigorski@gmail.com", role = c("aut", "cre")),  person("Yildiz E.", "Yilmaz", email = "yyilmaz@mun.ca", role = "ctb"))
+# Description: In many studies across different disciplines, detailed measures of the variables of interest are available. If assumptions can be made regarding the direction of effects between the assessed variables, this has to be considered in the analysis. The functions in this package implement the novel approach CIEE (causal inference using estimating equations; Konigorski et al., 2018, <DOI:10.1002/gepi.22107>) for estimating and testing the direct effect of an exposure variable on a primary outcome, while adjusting for indirect effects of the exposure on the primary outcome through a secondary intermediate outcome and potential factors influencing the secondary outcome. The underlying directed acyclic graph (DAG) of this considered model is described in the vignette. CIEE can be applied to studies in many different fields, and it is implemented here for the analysis of a continuous primary outcome and a time-to-event primary outcome subject to censoring. CIEE uses estimating equations to obtain estimates of the direct effect and robust sandwich standard error estimates. Then, a large-sample Wald-type test statistic is computed for testing the absence of the direct effect. Additionally, standard multiple regression, regression of residuals, and the structural equation modeling approach are implemented for comparison.
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: TRUE
+# Imports: stats, survival
+# Suggests: lavaan, knitr, rmarkdown
+# VignetteBuilder: knitr
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-03-19 15:49:15 UTC; skonigor
+# Author: Stefan Konigorski [aut, cre], Yildiz E. Yilmaz [ctb]
+# Maintainer: Stefan Konigorski <stefan.konigorski@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-03-19 16:00:23 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,90 @@
+{% set version = '1.0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cifsmry
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CIFsmry_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CIFsmry/CIFsmry_{{ version }}.tar.gz
+  sha256: 4012356a3847a09998685df5c2262a7c8bdac99587522dea1a1ebef4f61755d4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CIFsmry')"           # [not win]
+    - "\"%R%\" -e \"library('CIFsmry')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CIFsmry
+  license: GPL-2
+  summary: 'Estimate of cumulative incidence function in two samples. Provide weighted summary
+    statistics based on various methods and weights. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CIFsmry
+# Type: Package
+# Title: Weighted summary of cumulative incidence functions
+# Version: 1.0.1.1
+# Date: 2013-10-10
+# Author: Jianing Li
+# Maintainer: Jianing Li <jili@mcw.edu>
+# Depends: R(>= 3.0.1)
+# Description: Estimate of cumulative incidence function in two samples. Provide weighted summary statistics based on various methods and weights.
+# License: GPL (>= 2)
+# Packaged: 2016-07-10 11:33:20 UTC; ripley
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2016-07-10 15:39:40
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,94 @@
+{% set version = '0.4.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-clarifai
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/clarifai_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/clarifai/clarifai_{{ version }}.tar.gz
+  sha256: da3c9a9217b092735f577a5ceeab15bfd82798fb42f30b0bcae0db236827f145
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-curl
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-curl
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('clarifai')"           # [not win]
+    - "\"%R%\" -e \"library('clarifai')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/soodoku/clarifai
+  license: MIT
+  summary: Get description of images from Clarifai API. For more information, see <http://clarifai.com>.
+    Clarifai uses a large deep learning cloud to come up with descriptive labels of
+    the things in an image. It also provides how confident it is about each of the labels.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: clarifai
+# Title: Access to Clarifai API
+# Version: 0.4.2
+# Authors@R: person("Gaurav", "Sood", email = "gsood07@gmail.com", role = c("aut", "cre"))
+# Maintainer: Gaurav Sood <gsood07@gmail.com>
+# Description: Get description of images from Clarifai API. For more information, see <http://clarifai.com>. Clarifai uses a large deep learning cloud to come up with descriptive labels of the things in an image. It also provides how confident it is about each of the labels.
+# URL: http://github.com/soodoku/clarifai
+# BugReports: http://github.com/soodoku/clarifai/issues
+# Depends: R (>= 3.2.0)
+# License: MIT + file LICENSE
+# LazyData: true
+# VignetteBuilder: knitr
+# Imports: curl, jsonlite
+# Suggests: knitr, rmarkdown, testthat
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-04-12 00:53:25 UTC; gsood
+# Author: Gaurav Sood [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2017-04-12 13:41:15 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

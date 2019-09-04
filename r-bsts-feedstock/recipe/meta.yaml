@@ -1,0 +1,103 @@
+{% set version = '0.9.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bsts
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bsts_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bsts/bsts_{{ version }}.tar.gz
+  sha256: f8d3a33cc425e24232c3a357f7c603ac302c0553d095beb31ac65ca0efa5db7f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh >=1.65.0
+    - r-boom >=0.9.1
+    - r-boomspikeslab >=1.1.1
+    - r-xts
+    - r-zoo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.65.0
+    - r-boom >=0.9.1
+    - r-boomspikeslab >=1.1.1
+    - r-xts
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bsts')"           # [not win]
+    - "\"%R%\" -e \"library('bsts')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bsts
+  license: LGPL-2.1
+  summary: Time series regression using dynamic linear models fit using MCMC. See Scott and Varian
+    (2014) <DOI:10.1504/IJMMNO.2014.059942>, among many other sources.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-2.1'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bsts
+# Date: 2019-06-03
+# Title: Bayesian Structural Time Series
+# Author: Steven L. Scott <steve.the.bayesian@gmail.com>
+# Maintainer: Steven L. Scott <steve.the.bayesian@gmail.com>
+# Description: Time series regression using dynamic linear models fit using MCMC. See Scott and Varian (2014) <DOI:10.1504/IJMMNO.2014.059942>, among many other sources.
+# Depends: BoomSpikeSlab (>= 1.1.1), zoo, xts, Boom (>= 0.9.1), R(>= 3.4.0)
+# Suggests: testthat
+# LinkingTo: Boom (>= 0.9.1), BH (>= 1.65.0)
+# Version: 0.9.1
+# License: LGPL-2.1 | file LICENSE
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2019-06-04 01:04:56 UTC; stevescott
+# Repository: CRAN
+# Date/Publication: 2019-06-07 17:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

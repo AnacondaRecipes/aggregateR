@@ -1,0 +1,97 @@
+{% set version = '2.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-changepoint
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/changepoint_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/changepoint/changepoint_{{ version }}.tar.gz
+  sha256: 727edd88f1e39885654d319688bf088942984e240b28db2fbc204c764b8a73c9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-zoo >=0.9_1
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-zoo >=0.9_1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('changepoint')"           # [not win]
+    - "\"%R%\" -e \"library('changepoint')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/rkillick/changepoint/
+  license: GPL-3
+  summary: Implements various mainstream and specialised changepoint methods for finding single
+    and multiple changepoints within data.  Many popular non-parametric and frequentist
+    methods are included.  The cpt.mean(), cpt.var(), cpt.meanvar() functions should
+    be your first point of call.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: changepoint
+# Type: Package
+# Title: Methods for Changepoint Detection
+# Version: 2.2.2
+# Date: 2016-10-04
+# Authors@R: c(person("Rebecca", "Killick", role=c("aut","cre"),email="r.killick@lancs.ac.uk"), person("Kaylea", "Haynes", role="aut"),         person("Idris", "Eckley", role=c("ths","aut")), person("Paul","Fearnhead",role=c("ctb","ths")), person("Jamie","Lee",role="ctr"))
+# Maintainer: Rebecca Killick <r.killick@lancs.ac.uk>
+# BugReports: <changepoints@lancs.ac.uk>
+# URL: https://github.com/rkillick/changepoint/
+# Description: Implements various mainstream and specialised changepoint methods for finding single and multiple changepoints within data.  Many popular non-parametric and frequentist methods are included.  The cpt.mean(), cpt.var(), cpt.meanvar() functions should be your first point of call.
+# Depends: R(>= 3.1), methods, stats, zoo(>= 0.9-1)
+# Suggests: testthat
+# License: GPL
+# LazyLoad: yes
+# Packaged: 2016-10-04 14:31:26 UTC; killick
+# NeedsCompilation: yes
+# Author: Rebecca Killick [aut, cre], Kaylea Haynes [aut], Idris Eckley [ths, aut], Paul Fearnhead [ctb, ths], Jamie Lee [ctr]
+# Repository: CRAN
+# Date/Publication: 2016-10-04 17:08:03
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

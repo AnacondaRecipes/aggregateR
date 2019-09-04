@@ -1,0 +1,96 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-circularddm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CircularDDM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CircularDDM/CircularDDM_{{ version }}.tar.gz
+  sha256: ff0c994971b08a3b4d590da8f13455f0b8c42bcf6c7a0600dd7037db8e94adf3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.3
+    - r-rcpparmadillo >=0.6.700.6.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.3
+    - r-rcpparmadillo >=0.6.700.6.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CircularDDM')"           # [not win]
+    - "\"%R%\" -e \"library('CircularDDM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CircularDDM
+  license: GPL-2
+  summary: Circular drift-diffusion model for continuous reports.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CircularDDM
+# Version: 0.1.0
+# Date: 2018-06-18
+# Title: Circular Drift-Diffusion Model
+# Authors@R: c(person("Yi-Shin", "Lin", role = c("aut", "cre"), email = "yishin.lin@utas.edu.au"), person("Andrew", "Heathcote", role = "aut"), person("Peter", "Kvam", role = "aut"))
+# Author: Yi-Shin Lin [aut, cre], Andrew Heathcote [aut], Peter Kvam [aut]
+# Maintainer: Yi-Shin Lin <yishin.lin@utas.edu.au>
+# Depends: R (>= 3.0.2)
+# Description: Circular drift-diffusion model for continuous reports.
+# License: GPL-2
+# LazyData: TRUE
+# Imports: Rcpp (>= 0.12.3)
+# LinkingTo: Rcpp (>= 0.12.3), RcppArmadillo (>= 0.6.700.6.0)
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Repository: CRAN
+# Packaged: 2018-06-18 00:27:08 UTC; yslin
+# Date/Publication: 2018-06-18 04:30:26 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

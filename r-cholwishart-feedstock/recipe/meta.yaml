@@ -1,0 +1,100 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cholwishart
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CholWishart_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CholWishart/CholWishart_{{ version }}.tar.gz
+  sha256: e0ef0849e9a1245caab8e692a40ac56240fac745b08031ac70a3e3596d6afbcf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CholWishart')"           # [not win]
+    - "\"%R%\" -e \"library('CholWishart')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://gzt.github.io/CholWishart
+  license: GPL-3
+  summary: Sampling from the Cholesky factorization of a Wishart random  variable, sampling from
+    the inverse Wishart distribution, sampling from  the Cholesky factorization of an
+    inverse Wishart random variable, sampling from the pseudo Wishart distribution,
+    sampling from the generalized inverse Wishart distribution, computing densities
+    for the Wishart  and inverse Wishart distributions, and computing the multivariate
+    gamma  and digamma functions.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CholWishart
+# Type: Package
+# Title: Cholesky Decomposition of the Wishart Distribution
+# Version: 1.0.1
+# Authors@R: c(person(c("Geoffrey", "Thompson"),email="gzthompson@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-2436-8822")), person("R Core Team", role = "ctb"))
+# Description: Sampling from the Cholesky factorization of a Wishart random  variable, sampling from the inverse Wishart distribution, sampling from  the Cholesky factorization of an inverse Wishart random variable, sampling from the pseudo Wishart distribution, sampling from the generalized inverse Wishart distribution, computing densities for the Wishart  and inverse Wishart distributions, and computing the multivariate gamma  and digamma functions.
+# License: GPL (>= 3)
+# Encoding: UTF-8
+# Language: en-us
+# LazyData: true
+# RoxygenNote: 6.1.1
+# URL: https://gzt.github.io/CholWishart
+# BugReports: https://github.com/gzt/CholWishart/issues
+# Depends: R (>= 3.3.0)
+# Suggests: testthat, knitr, rmarkdown, covr
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2019-06-18 21:50:20 UTC; gzt
+# Author: Geoffrey Thompson [aut, cre] (<https://orcid.org/0000-0003-2436-8822>), R Core Team [ctb]
+# Maintainer: Geoffrey Thompson <gzthompson@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-06-18 22:20:54 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

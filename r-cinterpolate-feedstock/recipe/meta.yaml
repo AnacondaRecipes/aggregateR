@@ -1,0 +1,97 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cinterpolate
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cinterpolate_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cinterpolate/cinterpolate_{{ version }}.tar.gz
+  sha256: 02b9010b647ddd57d8854cd1324e3756930d4229f992581f84c2c61e888686ab
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cinterpolate')"           # [not win]
+    - "\"%R%\" -e \"library('cinterpolate')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mrc-ide/cinterpolate
+  license: MIT
+  summary: 'Simple interpolation methods designed to be used from C code. Supports constant,
+    linear and spline interpolation. An R wrapper is included but this package is primarily
+    designed to be used from C code using ''LinkingTo''.  The spline calculations are
+    classical cubic interpolation, e.g., Forsythe, Malcolm and Moler (1977) <ISBN: 9780131653320>.'
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cinterpolate
+# Title: Interpolation From C
+# Version: 1.0.0
+# Description: Simple interpolation methods designed to be used from C code. Supports constant, linear and spline interpolation. An R wrapper is included but this package is primarily designed to be used from C code using 'LinkingTo'.  The spline calculations are classical cubic interpolation, e.g., Forsythe, Malcolm and Moler (1977) <ISBN: 9780131653320>.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Authors@R: person("Rich", "FitzJohn", role = c("aut", "cre"), email = "rich.fitzjohn@gmail.com")
+# URL: https://github.com/mrc-ide/cinterpolate
+# BugReports: https://github.com/mrc-ide/cinterpolate/issues
+# RoxygenNote: 6.1.1
+# Suggests: knitr, rmarkdown, testthat
+# VignetteBuilder: knitr
+# Language: en-GB
+# NeedsCompilation: yes
+# Packaged: 2019-04-09 18:08:48 UTC; rfitzjoh
+# Author: Rich FitzJohn [aut, cre]
+# Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-04-10 17:05:44 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

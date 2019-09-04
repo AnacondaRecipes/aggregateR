@@ -1,0 +1,86 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-checkarg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/checkarg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/checkarg/checkarg_{{ version }}.tar.gz
+  sha256: 86f5302ba361c019d68824e7660d6c8fc3ced729bf7bf5b0a2a97bc284966d66
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('checkarg')"           # [not win]
+    - "\"%R%\" -e \"library('checkarg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=checkarg
+  license: GPL-2
+  summary: 'Utility functions that allow checking the basic validity of a function argument or
+    any other value,  including generating an error and assigning a default in a single
+    line of code. The main purpose of the package is to provide simple and easily readable
+    argument checking to improve code robustness. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: checkarg
+# Title: Check the Basic Validity of a (Function) Argument
+# Version: 0.1.0
+# Authors@R: c(person("Ivo Van Walle", "Developer", role = c("aut", "cre"), email = "ivo.van.walle@gmail.com"))
+# Description: Utility functions that allow checking the basic validity of a function argument or any other value,  including generating an error and assigning a default in a single line of code. The main purpose of the package is to provide simple and easily readable argument checking to improve code robustness.
+# Depends: R (>= 3.1.0)
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-05-18 17:34:46 UTC; Ivo
+# Author: Ivo Van Walle Developer [aut, cre]
+# Maintainer: Ivo Van Walle Developer <ivo.van.walle@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-05-19 05:57:22 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

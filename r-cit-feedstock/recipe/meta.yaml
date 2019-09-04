@@ -1,0 +1,99 @@
+{% set version = '2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cit
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cit_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cit/cit_{{ version }}.tar.gz
+  sha256: 4c131b4f35069505e245a50cf4f6599614b7b3e1d02f4237027af34ff2c8c8d1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cit')"           # [not win]
+    - "\"%R%\" -e \"library('cit')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cit
+  license: Artistic-2.0
+  summary: A likelihood-based hypothesis testing approach is implemented for assessing causal
+    mediation. For example, it could be used to test for mediation of a known causal
+    association between a DNA variant, the 'instrumental variable', and a clinical outcome
+    or phenotype by gene expression or DNA methylation, the potential mediator. Another
+    example would be testing mediation of the effect of a drug on a clinical outcome
+    by the molecular target. The hypothesis test generates a p-value or permutation-based
+    FDR value with confidence intervals to quantify uncertainty in the causal inference.
+    The outcome can be represented by either a continuous or binary variable, the potential
+    mediator is continuous, and the instrumental variable can be continuous or binary
+    and is not limited to a single variable but may be a design matrix representing
+    multiple variables.
+  license_family: OTHER
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/Artistic-2.0'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cit
+# Type: Package
+# Title: Causal Inference Test
+# Version: 2.2
+# Date: 2017-12-11
+# Author: Joshua Millstein
+# Maintainer: Joshua Millstein <joshua.millstein@usc.edu>
+# Description: A likelihood-based hypothesis testing approach is implemented for assessing causal mediation. For example, it could be used to test for mediation of a known causal association between a DNA variant, the 'instrumental variable', and a clinical outcome or phenotype by gene expression or DNA methylation, the potential mediator. Another example would be testing mediation of the effect of a drug on a clinical outcome by the molecular target. The hypothesis test generates a p-value or permutation-based FDR value with confidence intervals to quantify uncertainty in the causal inference. The outcome can be represented by either a continuous or binary variable, the potential mediator is continuous, and the instrumental variable can be continuous or binary and is not limited to a single variable but may be a design matrix representing multiple variables.
+# SystemRequirements: gsl (with development libraries)
+# License: Artistic-2.0
+# LazyLoad: yes
+# NeedsCompilation: yes
+# Packaged: 2017-12-15 20:30:07 UTC; joshuamillstein
+# Repository: CRAN
+# Date/Publication: 2017-12-15 20:46:00 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
