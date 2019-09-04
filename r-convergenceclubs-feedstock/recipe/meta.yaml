@@ -1,0 +1,91 @@
+{% set version = '1.4.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-convergenceclubs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ConvergenceClubs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ConvergenceClubs/ConvergenceClubs_{{ version }}.tar.gz
+  sha256: d72626e69b4f82ce64ab09159102327ec89d752a08f8024323bb1bed2ab78e3e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lmtest >=0.9_35
+    - r-sandwich >=2.3_4
+
+  run:
+    - r-base
+    - r-lmtest >=0.9_35
+    - r-sandwich >=2.3_4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ConvergenceClubs')"           # [not win]
+    - "\"%R%\" -e \"library('ConvergenceClubs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ConvergenceClubs
+  license: GPL-3
+  summary: Functions for clustering regions that form convergence clubs, according to the definition
+    of Phillips and Sul (2009) <doi:10.1002/jae.1080>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ConvergenceClubs
+# Title: Finding Convergence Clubs
+# Description: Functions for clustering regions that form convergence clubs, according to the definition of Phillips and Sul (2009) <doi:10.1002/jae.1080>.
+# Version: 1.4.3
+# Date: 2018-12-05
+# Authors@R: c( person("Roberto", "Sichera",, "roberto.sichera@unipa.it", c("aut", "cre", "cph")),  person("Pietro", "Pizzuto",, "pietro.pizzuto02@unipa.it", "aut") )
+# URL: https://CRAN.R-project.org/package=ConvergenceClubs
+# BugReports: https://github.com/rhobis/ConvergenceClubs/issues
+# Depends: R (>= 3.0.1)
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Imports: lmtest (>= 0.9-35), sandwich (>= 2.3-4)
+# NeedsCompilation: no
+# Packaged: 2018-12-14 14:19:01 UTC; roberto
+# Author: Roberto Sichera [aut, cre, cph], Pietro Pizzuto [aut]
+# Maintainer: Roberto Sichera <roberto.sichera@unipa.it>
+# Repository: CRAN
+# Date/Publication: 2018-12-14 14:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

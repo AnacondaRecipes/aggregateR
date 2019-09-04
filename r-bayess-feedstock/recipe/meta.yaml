@@ -1,0 +1,90 @@
+{% set version = '1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bayess
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bayess_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bayess/bayess_{{ version }}.tar.gz
+  sha256: b51b25e36dfe7812a83d27af8b278a15f706541ffe40d7c81b1c0a0bcbbcb12b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-combinat
+    - r-gplots
+    - r-mnormt
+
+  run:
+    - r-base
+    - r-mass
+    - r-combinat
+    - r-gplots
+    - r-mnormt
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bayess')"           # [not win]
+    - "\"%R%\" -e \"library('bayess')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bayess
+  license: GPL-2
+  summary: bayess contains a collection of functions that allows the reenactment of the R programs
+    used in the book "Bayesian Essentials with R" (revision of "Bayesian Core") without
+    further programming. R code being available as well, they can be modified by the
+    user to conduct one's own simulations.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: bayess
+# Title: Bayesian Essentials with R
+# Version: 1.4
+# Date: 2013-02-02
+# Depends: stats, MASS, mnormt, gplots, combinat
+# Author: Christian P. Robert, Universite Paris Dauphine, and Jean-Michel Marin, Universite Montpellier 2
+# Maintainer: Christian P. Robert <xian@ceremade.dauphine.fr>
+# Description: bayess contains a collection of functions that allows the reenactment of the R programs used in the book "Bayesian Essentials with R" (revision of "Bayesian Core") without further programming. R code being available as well, they can be modified by the user to conduct one's own simulations.
+# License: GPL-2
+# Packaged: 2013-02-09 21:07:30 UTC; xian
+# Repository: CRAN
+# Date/Publication: 2013-02-09 22:07:40
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

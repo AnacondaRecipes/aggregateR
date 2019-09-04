@@ -1,0 +1,93 @@
+{% set version = '1.1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-conover.test
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/conover.test_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/conover.test/conover.test_{{ version }}.tar.gz
+  sha256: 1399ad060f9d3e1a04f0a44b77cd1fcb0928739288341e58ec61b64827083738
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('conover.test')"           # [not win]
+    - "\"%R%\" -e \"library('conover.test')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=conover.test
+  license: GPL-2
+  summary: Computes the Conover-Iman test (1979) for stochastic dominance and reports the results
+    among multiple pairwise comparisons after a Kruskal-Wallis test for stochastic dominance
+    among k groups (Kruskal and Wallis, 1952). The interpretation of stochastic dominance
+    requires an assumption that the CDF of one group does not cross the CDF of the other.
+    conover.test makes k(k-1)/2 multiple pairwise comparisons based on Conover-Iman
+    t-test-statistic of the rank differences. The null hypothesis for each pairwise
+    comparison is that the probability of observing a randomly selected value from the
+    first group that is larger than a randomly selected value from the second group
+    equals one half; this null hypothesis corresponds to that of the Wilcoxon-Mann-Whitney
+    rank-sum test. Like the rank-sum test, if the data can be assumed to be continuous,
+    and the distributions are assumed identical except for a difference in location,
+    Conover-Iman test may be understood as a test for median difference. conover.test
+    accounts for tied ranks. The Conover-Iman test is strictly valid if and only if
+    the corresponding Kruskal-Wallis null hypothesis is rejected.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: conover.test
+# Version: 1.1.5
+# Date: 2017-10-28
+# Title: Conover-Iman Test of Multiple Comparisons Using Rank Sums
+# Author: Alexis Dinno <alexis.dinno@pdx.edu>
+# Maintainer: Alexis Dinno <alexis.dinno@pdx.edu>
+# Description: Computes the Conover-Iman test (1979) for stochastic dominance and reports the results among multiple pairwise comparisons after a Kruskal-Wallis test for stochastic dominance among k groups (Kruskal and Wallis, 1952). The interpretation of stochastic dominance requires an assumption that the CDF of one group does not cross the CDF of the other. conover.test makes k(k-1)/2 multiple pairwise comparisons based on Conover-Iman t-test-statistic of the rank differences. The null hypothesis for each pairwise comparison is that the probability of observing a randomly selected value from the first group that is larger than a randomly selected value from the second group equals one half; this null hypothesis corresponds to that of the Wilcoxon-Mann-Whitney rank-sum test. Like the rank-sum test, if the data can be assumed to be continuous, and the distributions are assumed identical except for a difference in location, Conover-Iman test may be understood as a test for median difference. conover.test accounts for tied ranks. The Conover-Iman test is strictly valid if and only if the corresponding Kruskal-Wallis null hypothesis is rejected.
+# License: GPL-2
+# LazyData: no
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2017-10-30 19:13:36 UTC; Alexis
+# Repository: CRAN
+# Date/Publication: 2017-10-30 19:59:17 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

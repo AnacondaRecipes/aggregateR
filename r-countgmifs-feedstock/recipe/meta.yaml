@@ -1,0 +1,86 @@
+{% set version = '0.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-countgmifs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/countgmifs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/countgmifs/countgmifs_{{ version }}.tar.gz
+  sha256: aeaace56408ff0570dff48b74bec917733274b78b90e660837e1e21b4feea8a5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('countgmifs')"           # [not win]
+    - "\"%R%\" -e \"library('countgmifs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=countgmifs
+  license: GPL-2
+  summary: Provides a function for fitting Poisson and negative binomial regression models when
+    the number of parameters exceeds the sample size, using the the generalized monotone
+    incremental forward stagewise method.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: countgmifs
+# Title: Discrete Response Regression for High-Dimensional Data
+# Version: 0.0.1
+# Authors@R: person("Kellie", "Archer", email = "archer.43@osu.edu", role = c("aut", "cre"))
+# Description: Provides a function for fitting Poisson and negative binomial regression models when the number of parameters exceeds the sample size, using the the generalized monotone incremental forward stagewise method.
+# Depends: R (>= 3.5.0), MASS
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1.9000
+# NeedsCompilation: no
+# Packaged: 2018-07-09 12:50:49 UTC; karcher
+# Author: Kellie Archer [aut, cre]
+# Maintainer: Kellie Archer <archer.43@osu.edu>
+# Repository: CRAN
+# Date/Publication: 2018-07-10 16:40:28 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,93 @@
+{% set version = '6.8.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-aptools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/APtools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/APtools/APtools_{{ version }}.tar.gz
+  sha256: 39679c7262f4494942741c5fee7871ad73938ad79e50d90ea518e9d37cf32a9c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-cmprsk
+    - r-survival
+
+  run:
+    - r-base
+    - r-cmprsk
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('APtools')"           # [not win]
+    - "\"%R%\" -e \"library('APtools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=APtools
+  license: LGPL-3
+  summary: We provide tools to estimate two prediction accuracy metrics, the average positive
+    predictive values (AP) as well as the well-known AUC (the area under the receiver
+    operator characteristic curve) for risk scores.  The outcome of interest is either
+    binary or censored event time. Note that for censored event time, our functions'
+    estimates, the AP and the AUC, are time-dependent for pre-specified time interval(s).
+    A function that compares the APs of two risk scores/markers is also included. Optional
+    outputs include positive predictive values and true positive fractions at the specified
+    marker cut-off values, and a plot of the time-dependent AP versus time (available
+    for event time data).
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: APtools
+# Type: Package
+# Title: Average Positive Predictive Values (AP) for Binary Outcomes and Censored Event Times
+# Version: 6.8.8
+# Depends: graphics, stats, utils, survival, cmprsk
+# Author: Hengrui Cai <hengruicai@gmail.com>, Yan Yuan <yyuan@ualberta.ca>, Qian Michelle Zhou <qz70@msstate.edu>, Bingying Li<dorisli1120@gmail.com>
+# Maintainer: Hengrui Cai <hengruicai@gmail.com>
+# Description: We provide tools to estimate two prediction accuracy metrics, the average positive predictive values (AP) as well as the well-known AUC (the area under the receiver operator characteristic curve) for risk scores.  The outcome of interest is either binary or censored event time. Note that for censored event time, our functions' estimates, the AP and the AUC, are time-dependent for pre-specified time interval(s). A function that compares the APs of two risk scores/markers is also included. Optional outputs include positive predictive values and true positive fractions at the specified marker cut-off values, and a plot of the time-dependent AP versus time (available for event time data).
+# License: LGPL-3
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2018-09-21 04:13:20 UTC; apple
+# Repository: CRAN
+# Date/Publication: 2018-09-21 04:40:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

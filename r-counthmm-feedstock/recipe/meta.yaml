@@ -1,0 +1,86 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-counthmm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/countHMM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/countHMM/countHMM_{{ version }}.tar.gz
+  sha256: fa997b6fa45a4fb9afa2bc9f6a00d717c19842efd2fba27859ba0a1bcfb7e08b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('countHMM')"           # [not win]
+    - "\"%R%\" -e \"library('countHMM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=countHMM
+  license: GPL-3
+  summary: "Provides tools for penalized estimation of flexible hidden Markov models for time
+    series of counts w/o the need to specify a (parametric) family of distributions.
+    These include functions for model fitting, model checking, and state decoding. For
+    details, see Adam, T., Langrock, R., and Wei\xC3\u0178, C.H. (2019): Penalized Estimation
+    of Flexible Hidden Markov Models for Time Series of Counts. <arXiv:1901.03275>."
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: countHMM
+# Type: Package
+# Title: Penalized Estimation of Flexible Hidden Markov Models for Time Series of Counts
+# Version: 0.1.0
+# Author: Timo Adam
+# Maintainer: Timo Adam <timo.adam@uni-bielefeld.de>
+# Description: Provides tools for penalized estimation of flexible hidden Markov models for time series of counts w/o the need to specify a (parametric) family of distributions. These include functions for model fitting, model checking, and state decoding. For details, see Adam, T., Langrock, R., and WeiAY, C.H. (2019): Penalized Estimation of Flexible Hidden Markov Models for Time Series of Counts. <arXiv:1901.03275>.
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-04-17 10:11:13 UTC; timoadam
+# Repository: CRAN
+# Date/Publication: 2019-04-24 13:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

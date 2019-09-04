@@ -1,0 +1,94 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-container
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/container_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/container/container_{{ version }}.tar.gz
+  sha256: 6334476214bdf3edd6c57f60469aae3a2a0bf9b0b0ba94c45553945e4f920e89
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, testthat, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+
+  run:
+    - r-base
+    - r-r6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('container')"           # [not win]
+    - "\"%R%\" -e \"library('container')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/rpahl/container
+  license: GPL-3
+  summary: Common container data structures deque, set and dict (resembling 'Python's dict type)
+    with typical member functions to insert, delete and access container elements. Provides
+    iterators and reference semantics.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: container
+# Type: Package
+# Title: Deque, Set, and Dict - R6 Based Container Classes with Iterators
+# Version: 0.3.0
+# Date: 2018-12-01
+# Authors@R:  person("Roman", "Pahl", email = "roman.pahl@gmail.com", role = c("aut", "cre"))
+# Description: Common container data structures deque, set and dict (resembling 'Python's dict type) with typical member functions to insert, delete and access container elements. Provides iterators and reference semantics.
+# Depends: R (>= 3.0)
+# License: GPL-3
+# LazyData: TRUE
+# Encoding: UTF-8
+# Imports: R6
+# VignetteBuilder: knitr
+# Suggests: knitr, testthat, rmarkdown
+# URL: https://github.com/rpahl/container
+# BugReports: https://github.com/rpahl/container/issues
+# NeedsCompilation: no
+# Author: Roman Pahl [aut, cre]
+# Maintainer: Roman Pahl <roman.pahl@gmail.com>
+# Repository: CRAN
+# RoxygenNote: 6.0.1
+# Packaged: 2018-12-01 22:32:39 UTC; roman
+# Date/Publication: 2018-12-01 22:50:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

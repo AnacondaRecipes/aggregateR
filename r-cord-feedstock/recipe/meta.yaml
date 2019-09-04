@@ -1,0 +1,99 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cord
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cord_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cord/cord_{{ version }}.tar.gz
+  sha256: 4555838e7d3720204bd8e86c760db3e568e4307a35968ef7b847855e3933b2a3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: pcaPP
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cord')"           # [not win]
+    - "\"%R%\" -e \"library('cord')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cord
+  license: GPL-3
+  summary: Partition data points (variables) into communities/clusters, similar to clustering
+    algorithms, such as k-means and hierarchical clustering.  This package implements
+    a clustering algorithm based on a new metric CORD, defined for high dimensional
+    parametric or semi-parametric distributions.  Read http://arxiv.org/abs/1508.01939
+    for more details.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cord
+# Type: Package
+# Title: Community Estimation in G-Models via CORD
+# Version: 0.1.1
+# Date: 2015-09-18
+# Author: Xi (Rossi) LUO, Florentina Bunea, Christophe Giraud
+# Maintainer: Xi (Rossi) LUO <xi.rossi.luo@gmail.com>
+# Description: Partition data points (variables) into communities/clusters, similar to clustering algorithms, such as k-means and hierarchical clustering.  This package implements a clustering algorithm based on a new metric CORD, defined for high dimensional parametric or semi-parametric distributions.  Read http://arxiv.org/abs/1508.01939 for more details.
+# License: GPL-3
+# Suggests: pcaPP
+# Imports: Rcpp
+# LinkingTo: Rcpp, RcppArmadillo
+# Packaged: 2015-09-20 02:30:10 UTC; xluo
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2015-09-20 08:01:07
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

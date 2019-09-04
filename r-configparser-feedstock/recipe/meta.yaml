@@ -1,0 +1,93 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-configparser
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ConfigParser_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ConfigParser/ConfigParser_{{ version }}.tar.gz
+  sha256: a3263e763c73cadbf6da55f4123c957558e42c25eabc3a7f8e10335cfe33504a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-ini
+
+  run:
+    - r-base
+    - r-r6
+    - r-ini
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ConfigParser')"           # [not win]
+    - "\"%R%\" -e \"library('ConfigParser')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/hhoeflin/ConfigParser
+  license: GPL-3
+  summary: Enhances the 'ini' package by adding the ability to interpolate variables. The INI
+    configuration file is read into an R6 ConfigParser object (loosely inspired by Pythons
+    ConfigParser module) and the keys can be read, where '%(....)s' instances are interpolated
+    by other included options or outside variables.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ConfigParser
+# Title: Package to Parse an INI File, Including Variable Interpolation
+# Version: 1.0.0
+# Authors@R: person("Holger", "Hoefling", email = "hhoeflin@gmail.com", role = c("aut", "cre"))
+# Description: Enhances the 'ini' package by adding the ability to interpolate variables. The INI configuration file is read into an R6 ConfigParser object (loosely inspired by Pythons ConfigParser module) and the keys can be read, where '%(....)s' instances are interpolated by other included options or outside variables.
+# Depends: R (>= 3.0.0), ini, R6
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: testthat
+# RoxygenNote: 6.0.1.9000
+# URL: https://github.com/hhoeflin/ConfigParser
+# BugReports: https://github.com/hhoeflin/ConfigParser/issues
+# NeedsCompilation: no
+# Packaged: 2017-08-16 19:00:42 UTC; hhoeflin
+# Author: Holger Hoefling [aut, cre]
+# Maintainer: Holger Hoefling <hhoeflin@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-08-22 14:02:31 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

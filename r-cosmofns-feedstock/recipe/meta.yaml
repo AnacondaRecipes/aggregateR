@@ -1,0 +1,82 @@
+{% set version = '1.0-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cosmofns
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cosmoFns_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cosmoFns/cosmoFns_{{ version }}.tar.gz
+  sha256: e6e976d2890daadae709bee25d17eb4c53e1ed833ea5c7e2a6d5dbdedf82dd28
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cosmoFns')"           # [not win]
+    - "\"%R%\" -e \"library('cosmoFns')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cosmoFns
+  license: GPL-2
+  summary: Package encapsulates standard expressions for distances, times, luminosities, and
+    other quantities useful in observational cosmology, including molecular line observations.
+    Currently coded for a flat universe only.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cosmoFns
+# Type: Package
+# Title: Functions for cosmological distances, times, luminosities, etc.
+# Version: 1.0-1
+# Date: 2012-09-16
+# Author: Andrew Harris
+# Maintainer: Andrew Harris <harris@astro.umd.edu>
+# Description: Package encapsulates standard expressions for distances, times, luminosities, and other quantities useful in observational cosmology, including molecular line observations. Currently coded for a flat universe only.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# Packaged: 2012-12-15 13:11:54 UTC; Andrew Harris
+# Repository: CRAN
+# Date/Publication: 2012-12-15 15:47:34
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

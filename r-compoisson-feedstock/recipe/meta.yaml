@@ -1,0 +1,82 @@
+{% set version = '0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-compoisson
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/compoisson_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/compoisson/compoisson_{{ version }}.tar.gz
+  sha256: 17f8843094c52cc436a0fbf9807a85ef097ca187c4de684fba24e2e6fba1ad6c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('compoisson')"           # [not win]
+    - "\"%R%\" -e \"library('compoisson')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=compoisson
+  license: BSD
+  summary: Provides routines for density and moments of the Conway-Maxwell-Poisson distribution
+    as well as functions for fitting the COM-Poisson model for over/under-dispersed
+    count data.
+  license_family: BSD
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: compoisson
+# Type: Package
+# Title: Conway-Maxwell-Poisson Distribution
+# Version: 0.3
+# Date: 2008-05-07
+# Author: Jeffrey Dunn
+# Maintainer: Jeffrey Dunn <jsd115@gmail.com>
+# Description: Provides routines for density and moments of the Conway-Maxwell-Poisson distribution as well as functions for fitting the COM-Poisson model for over/under-dispersed count data.
+# License: BSD
+# Depends: stats, MASS
+# Packaged: 2012-10-29 08:58:27 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2012-10-29 08:58:27
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

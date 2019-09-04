@@ -1,0 +1,83 @@
+{% set version = '2015.2-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-condmvnorm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/condMVNorm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/condMVNorm/condMVNorm_{{ version }}.tar.gz
+  sha256: 0466d818f055832d48e283423a6e2f606f277b2bf68d81a38a0b4a2ba91ca610
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('condMVNorm')"           # [not win]
+    - "\"%R%\" -e \"library('condMVNorm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=condMVNorm
+  license: GPL-2
+  summary: Computes conditional multivariate normal probabilities, random deviates and densities.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: condMVNorm
+# Title: Conditional Multivariate Normal Distribution
+# Version: 2015.2-1
+# Date: 2015-02-10
+# Authors@R: c(person("Ravi", "Varadhan", role = c("aut", "cre"), email = "ravi.varadhan@jhu.edu"))
+# Description: Computes conditional multivariate normal probabilities, random deviates and densities.
+# Imports: stats
+# Depends: R(>= 1.9.0), mvtnorm
+# License: GPL-2
+# Author: Ravi Varadhan [aut, cre]
+# Maintainer: Ravi Varadhan <ravi.varadhan@jhu.edu>
+# NeedsCompilation: no
+# Repository: CRAN
+# Packaged: 2015-02-11 17:55:04 UTC; rvaradh1
+# Date/Publication: 2015-02-11 19:55:24
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
