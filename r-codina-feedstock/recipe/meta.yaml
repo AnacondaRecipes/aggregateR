@@ -1,0 +1,99 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-codina
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CoDiNA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CoDiNA/CoDiNA_{{ version }}.tar.gz
+  sha256: b0714a23cba71893e8df10b8b6f649f148796d7adc6fa07b82affd981f516d02
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, wTO
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-igraph
+    - r-magrittr
+    - r-plyr
+    - r-visnetwork
+
+  run:
+    - r-base
+    - r-data.table
+    - r-igraph
+    - r-magrittr
+    - r-plyr
+    - r-visnetwork
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CoDiNA')"           # [not win]
+    - "\"%R%\" -e \"library('CoDiNA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CoDiNA
+  license: GPL-2
+  summary: 'Categorize links and nodes from multiple networks in 3 categories: Common links (alpha)
+    specific links (gamma), and different links (beta). Also categorizes the links into
+    sub-categories and groups. The package includes a visualization tool for the networks.
+    More information about the methodology can be found at: Gysi et. al., 2018 <arXiv:1802.00828>.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CoDiNA
+# Type: Package
+# Title: Co-Expression Differential Network Analysis
+# Version: 1.1.1
+# Author: Deisy Morselli Gysi, Tiago de Miranda Fragoso, Eivind Almaas and Katja Nowick.
+# Maintainer: Deisy Morselli Gysi <deisy@bioinf.uni-leipzig.de>
+# Description: Categorize links and nodes from multiple networks in 3 categories: Common links (alpha) specific links (gamma), and different links (beta). Also categorizes the links into sub-categories and groups. The package includes a visualization tool for the networks. More information about the methodology can be found at: Gysi et. al., 2018 <arXiv:1802.00828>.
+# License: GPL-2
+# LazyData: TRUE
+# Depends: R (>= 3.1)
+# Imports: data.table, igraph, magrittr, plyr, visNetwork
+# RoxygenNote: 6.1.1
+# Suggests: knitr, rmarkdown, wTO
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-03-06 15:04:57 UTC; deisy
+# Repository: CRAN
+# Date/Publication: 2019-03-06 15:32:53 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

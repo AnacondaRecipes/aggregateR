@@ -1,0 +1,85 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-compactr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/compactr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/compactr/compactr_{{ version }}.tar.gz
+  sha256: bd9ae63d9b070bdad0ba6fb2f016133498289ac72b22207ba4a0571b8d6e5e38
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('compactr')"           # [not win]
+    - "\"%R%\" -e \"library('compactr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=compactr
+  license: GPL-2
+  summary: Creates empty plots with compact axis notation to which users can add whatever they
+    like (points, lines, text, etc.) The notation is more compact in the sense that
+    the axis-labels and tick-labels are closer to the axis and the tick-marks are shorter.
+    Also, if the plot appears as part of a matrix, the x-axis notation is suppressed
+    unless the plot appears along the bottom row and the y-axis notation is suppress
+    unless the plot appears along the left column.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: compactr
+# Type: Package
+# Title: Creates empty plots with compact axis notation
+# Version: 0.1
+# Date: 2013-07-18
+# Author: Carlisle Rainey
+# Maintainer: Carlisle Rainey <carlislerainey@gmail.com>
+# Description: Creates empty plots with compact axis notation to which users can add whatever they like (points, lines, text, etc.) The notation is more compact in the sense that the axis-labels and tick-labels are closer to the axis and the tick-marks are shorter. Also, if the plot appears as part of a matrix, the x-axis notation is suppressed unless the plot appears along the bottom row and the y-axis notation is suppress unless the plot appears along the left column.
+# License: GPL-2
+# Collate: 'eplot.R' 'addxaxis.R' 'compactr-package.R' 'mm.R' 'aplot.R'
+# Packaged: 2013-07-31 20:27:27 UTC; root
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-08-01 08:15:50
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

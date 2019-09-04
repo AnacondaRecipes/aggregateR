@@ -1,0 +1,83 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-clustergenomics
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/clusterGenomics_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/clusterGenomics/clusterGenomics_{{ version }}.tar.gz
+  sha256: 2c30cd079e1ddbf72ed06de232643b73e5e9dae9a5856710e9444703deddf088
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('clusterGenomics')"           # [not win]
+    - "\"%R%\" -e \"library('clusterGenomics')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=clusterGenomics
+  license: Artistic-2.0
+  summary: The Partitioning Algorithm based on Recursive Thresholding (PART) is used to recursively
+    uncover clusters and subclusters in the data. Functionality is also available for
+    visualization of the clustering.
+  license_family: OTHER
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/Artistic-2.0'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: clusterGenomics
+# Type: Package
+# Title: Identifying clusters in genomics data by recursive partitioning
+# Version: 1.0
+# Date: 2013-07-01
+# Author: Gro Nilsen and Ole Christian Lingjaerde
+# Maintainer: Gro Nilsen <gronilse@ifi.uio.no>
+# Description: The Partitioning Algorithm based on Recursive Thresholding (PART) is used to recursively uncover clusters and subclusters in the data. Functionality is also available for visualization of the clustering.
+# Depends:
+# License: Artistic-2.0
+# LazyLoad: yes
+# Packaged: 2013-07-02 15:15:56 UTC; Gro
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-07-02 19:51:19
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

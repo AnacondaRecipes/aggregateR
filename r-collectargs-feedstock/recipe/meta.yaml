@@ -1,0 +1,92 @@
+{% set version = '0.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-collectargs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/collectArgs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/collectArgs/collectArgs_{{ version }}.tar.gz
+  sha256: 3dee7934b32a3fd3a392a5184c2f69d0bf48fa05e565a878feadc5ae7be0e53b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-magrittr
+
+  run:
+    - r-base
+    - r-magrittr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('collectArgs')"           # [not win]
+    - "\"%R%\" -e \"library('collectArgs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=collectArgs
+  license: MIT
+  summary: We often want to take all (or most) of the objects in one environment (such as the
+    parameter values of a function) and pass them to another. This might be calling
+    a second function, or iterating over a list, calling the same function. These functions
+    wrap often repeated code. Current stable version (committed on October 14, 2017).
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: collectArgs
+# Title: Quickly and Neatly Collect Arguments from One Environment to Pass to Another
+# Version: 0.4.0
+# Authors@R: c(Rick = person(given="Rick", family="Saporta", email="RickSaporta@gmail.com", role=c("aut","cre"), comment=NULL))
+# Description: We often want to take all (or most) of the objects in one environment (such as the parameter values of a function) and pass them to another. This might be calling a second function, or iterating over a list, calling the same function. These functions wrap often repeated code. Current stable version (committed on October 14, 2017).
+# Depends: R (>= 3.0.2)
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: TRUE
+# Imports: magrittr, stats
+# RoxygenNote: 6.0.1.9000
+# Suggests: knitr, rmarkdown, testthat
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2017-10-14 04:12:25 UTC; rsaporta
+# Author: Rick Saporta [aut, cre]
+# Maintainer: Rick Saporta <RickSaporta@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-10-14 15:06:49 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

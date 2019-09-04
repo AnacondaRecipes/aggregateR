@@ -1,0 +1,90 @@
+{% set version = '0.1.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-comf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/comf_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/comf/comf_{{ version }}.tar.gz
+  sha256: 10a13ca42a40f71207b097eeb0addf4bf73117ccd8fbc4ca4b2ea348ed482859
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: R.rsp
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-plyr
+    - r-reshape
+
+  run:
+    - r-base
+    - r-plyr
+    - r-reshape
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('comf')"           # [not win]
+    - "\"%R%\" -e \"library('comf')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=comf
+  license: GPL-2
+  summary: Functions to calculate various common and less common thermal comfort indices, convert
+    physical variables, and evaluate the performance of thermal comfort indices.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: comf
+# Type: Package
+# Title: Functions for Thermal Comfort Research
+# Version: 0.1.9
+# Date: 2019-04-11
+# Imports: plyr, graphics, reshape
+# Author: Marcel Schweiker [aut, cre] and Sophia Mueller [aut] and Michael Kleber [ctr] and Boris Kingma [ctr] and Masanori Shukuya [ctr]
+# Maintainer: Marcel Schweiker <marcel.schweiker@kit.edu>
+# Description: Functions to calculate various common and less common thermal comfort indices, convert physical variables, and evaluate the performance of thermal comfort indices.
+# License: GPL-2
+# LazyLoad: yes
+# LazyData: true
+# Suggests: R.rsp
+# VignetteBuilder: R.rsp
+# NeedsCompilation: no
+# Packaged: 2019-04-08 20:16:37 UTC; cd7163
+# Repository: CRAN
+# Date/Publication: 2019-04-08 20:32:52 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

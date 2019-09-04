@@ -1,0 +1,92 @@
+{% set version = '0.9.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cmprskqr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cmprskQR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cmprskQR/cmprskQR_{{ version }}.tar.gz
+  sha256: f6b4c871632f1b679f9dbf19fb022ec72c430c5d2f6dfc7afe4d836334355a00
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-quantreg
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-quantreg
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cmprskQR')"           # [not win]
+    - "\"%R%\" -e \"library('cmprskQR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://bitbucket.org/sdlugosz/cmprskqr
+  license: GPL-2
+  summary: Estimation, testing and regression modeling of subdistribution functions in competing
+    risks using quantile regressions, as described in Peng and Fine (2009) <DOI:10.1198/jasa.2009.tm08228>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cmprskQR
+# Version: 0.9.1
+# Date: 2016-01-29
+# Title: Analysis of Competing Risks Using Quantile Regressions
+# Author: Stephan Dlugosz, based on code from Limin Peng and Ruosha Li
+# Maintainer: Stephan Dlugosz <stephan.dlugosz@googlemail.com>
+# Depends: R (>= 2.13.0)
+# Imports: graphics, quantreg, stats, survival
+# Description: Estimation, testing and regression modeling of subdistribution functions in competing risks using quantile regressions, as described in Peng and Fine (2009) <DOI:10.1198/jasa.2009.tm08228>.
+# License: GPL (>= 2)
+# URL: https://bitbucket.org/sdlugosz/cmprskqr
+# NeedsCompilation: yes
+# Packaged: 2016-02-01 16:15:23 UTC; ligges
+# Repository: CRAN
+# Date/Publication: 2016-02-01 17:15:23
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

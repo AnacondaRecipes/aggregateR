@@ -1,0 +1,90 @@
+{% set version = '0.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-circmle
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CircMLE_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CircMLE/CircMLE_{{ version }}.tar.gz
+  sha256: 894633fd704f633c81f98423d69e041eeef45a989a0578aa32c1458ebdab370c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-circular >=0.4_7
+
+  run:
+    - r-base
+    - r-circular >=0.4_7
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CircMLE')"           # [not win]
+    - "\"%R%\" -e \"library('CircMLE')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.r-project.org
+  license: GPL-2
+  summary: A series of wrapper functions to implement the 10 maximum likelihood models of animal
+    orientation described by Schnute and Groot (1992) <DOI:10.1016/S0003-3472(05)80068-5>.
+    The functions also include the ability to use different optimizer methods and calculate
+    various model selection metrics (i.e., AIC, AICc, BIC).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CircMLE
+# Title: Maximum Likelihood Analysis of Circular Data
+# Version: 0.2.1
+# Authors@R: c( person("Robert", "Fitak", role = c("aut", "cre"), email = "rfitak9@gmail.com"), person("Sonke", "Johnsen", role = "aut", email = "sjohnsen@duke.edu"))
+# Description: A series of wrapper functions to implement the 10 maximum likelihood models of animal orientation described by Schnute and Groot (1992) <DOI:10.1016/S0003-3472(05)80068-5>. The functions also include the ability to use different optimizer methods and calculate various model selection metrics (i.e., AIC, AICc, BIC).
+# Maintainer: Robert Fitak <rfitak9@gmail.com>
+# Author: Robert Fitak [aut, cre], Sonke Johnsen [aut]
+# Depends: R (>= 3.2.2)
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# URL: https://www.r-project.org
+# NeedsCompilation: no
+# Date: 2018-02-08
+# Repository: CRAN
+# Imports: circular (>= 0.4-7), stats,
+# RoxygenNote: 6.0.1.9000
+# Packaged: 2018-02-20 14:56:58 UTC; rfitak
+# Date/Publication: 2018-02-20 15:09:48 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

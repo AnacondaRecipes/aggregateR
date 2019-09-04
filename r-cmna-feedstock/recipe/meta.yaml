@@ -1,0 +1,91 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cmna
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cmna_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cmna/cmna_{{ version }}.tar.gz
+  sha256: e638b6060bbc2b0179f8efea640fa071098bf2da2262e8f62d0f545484c26ba3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cmna')"           # [not win]
+    - "\"%R%\" -e \"library('cmna')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://howardjp.github.io/cmna/
+  license: BSD_2_clause
+  summary: Provides the source and examples for James P. Howard, II,  "Computational Methods
+    for Numerical Analysis with R,"  <http://howardjp.github.io/cmna/>, a book on numerical
+    methods in R.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_2_clause'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cmna
+# Type: Package
+# Title: Computational Methods for Numerical Analysis
+# Version: 1.0.2
+# Date: 2019-07-23
+# Encoding: UTF-8
+# Authors@R: person(given = "James", family = "Howard", email = "jh@jameshoward.us", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-4530-1547"))
+# URL: https://howardjp.github.io/cmna/
+# BugReports: https://github.com/howardjp/cmna/issues
+# Description: Provides the source and examples for James P. Howard, II,  "Computational Methods for Numerical Analysis with R,"  <http://howardjp.github.io/cmna/>, a book on numerical methods in R.
+# License: BSD_2_clause + file LICENSE
+# LazyLoad: no
+# Suggests: testthat
+# RoxygenNote: 6.1.1
+# Depends: R (>= 2.10)
+# NeedsCompilation: no
+# Packaged: 2019-07-23 16:42:13 UTC; howarjp1
+# Author: James Howard [aut, cre] (<https://orcid.org/0000-0003-4530-1547>)
+# Maintainer: James Howard <jh@jameshoward.us>
+# Repository: CRAN
+# Date/Publication: 2019-07-23 22:52:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

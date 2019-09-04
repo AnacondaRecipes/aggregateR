@@ -1,0 +1,110 @@
+{% set version = '2.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-clustvarlv
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ClustVarLV_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ClustVarLV/ClustVarLV_{{ version }}.tar.gz
+  sha256: a090d4e600308d8dda326ed0aa9452101b1f1a91e1d24ada7855d7587f1ddb0d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcppeigen
+    - r-doparallel
+    - r-foreach
+    - r-iterators
+    - r-plyr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcppeigen
+    - r-doparallel
+    - r-foreach
+    - r-iterators
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ClustVarLV')"           # [not win]
+    - "\"%R%\" -e \"library('ClustVarLV')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ClustVarLV
+  license: GPL-3
+  summary: Functions for the clustering of variables around Latent Variables, for 2-way or 3-way
+    data. Each cluster of variables, which may be defined as a local or directional
+    cluster, is associated with a latent variable. External variables measured on the
+    same observations or/and additional information on the variables can be taken into
+    account. A "noise" cluster or sparse latent variables can also be defined.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ClustVarLV
+# Title: Clustering of Variables Around Latent Variables
+# Version: 2.0.0
+# Author: Evelyne Vigneau [aut, cre],  Mingkun Chen [ctb], Veronique Cariou [aut]
+# Maintainer: Evelyne Vigneau <evelyne.vigneau@oniris-nantes.fr>
+# Description: Functions for the clustering of variables around Latent Variables, for 2-way or 3-way data. Each cluster of variables, which may be defined as a local or directional cluster, is associated with a latent variable. External variables measured on the same observations or/and additional information on the variables can be taken into account. A "noise" cluster or sparse latent variables can also be defined.
+# Depends: R (>= 3.0.0)
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: TRUE
+# Imports: Rcpp, doParallel, foreach, parallel, iterators, plyr
+# LinkingTo: Rcpp, RcppEigen
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# RoxygenNote: 6.1.1
+# NeedsCompilation: yes
+# Packaged: 2019-06-26 11:46:13 UTC; evelyne.vigneau
+# Repository: CRAN
+# Date/Publication: 2019-06-28 13:30:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

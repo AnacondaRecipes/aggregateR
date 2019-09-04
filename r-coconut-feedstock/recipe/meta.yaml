@@ -1,0 +1,87 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-coconut
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/COCONUT_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/COCONUT/COCONUT_{{ version }}.tar.gz
+  sha256: df06003e28e5dbcc6a009bcc1be675ccc2c1a3a2da0ec55a8dbecf666c8759e2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: limma, parallel
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('COCONUT')"           # [not win]
+    - "\"%R%\" -e \"library('COCONUT')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=COCONUT
+  license: GPL-3
+  summary: Allows for pooled analysis of microarray data by batch-correcting control samples,
+    and then applying the derived correction parameters to non-control samples to obtain
+    bias-free, inter-dataset corrected data.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: COCONUT
+# Type: Package
+# Title: COmbat CO-Normalization Using conTrols (COCONUT)
+# Version: 1.0.2
+# Date: 2017-09-18
+# Author: Timothy E Sweeney, MD, PhD [aut,cre]
+# Maintainer: Timothy E Sweeney <tes17@alumni.stanford.edu>
+# Depends: stats
+# Suggests: limma, parallel
+# Enhances:
+# Description: Allows for pooled analysis of microarray data by batch-correcting control samples, and then applying the derived correction parameters to non-control samples to obtain bias-free, inter-dataset corrected data.
+# License: GPL-3
+# LazyData: TRUE
+# NeedsCompilation: no
+# RoxygenNote: 6.0.1
+# Packaged: 2017-09-19 02:35:09 UTC; timsweeney
+# Repository: CRAN
+# Date/Publication: 2017-09-19 07:55:13 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

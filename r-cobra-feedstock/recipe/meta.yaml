@@ -1,0 +1,94 @@
+{% set version = '0.99.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cobra
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/COBRA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/COBRA/COBRA_{{ version }}.tar.gz
+  sha256: c4e3faf8f1f634b28cd6de5f37cd383ae090b55b083cf6d84524b0d344e02ce4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: snowfall, lars, ridge, tree, randomForest
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('COBRA')"           # [not win]
+    - "\"%R%\" -e \"library('COBRA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.lsta.upmc.fr/doct/guedj/index.html
+  license: GPL-2
+  summary: 'This package performs prediction for regression-oriented problems, aggregating in
+    a nonlinear scheme any basic regression machines suggested by the context and provided
+    by the user. If the user has no valuable knowledge on the data, four defaults machines
+    wrappers are implemented so as to cover a minimal spectrum of prediction methods.
+    If necessary, the computations may be parallelized. The method is described in Biau,
+    Fischer, Guedj and Malley (2013), "COBRA: A Nonlinear Aggregation Strategy".'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: COBRA
+# Type: Package
+# Title: Nonlinear Aggregation of Predictors
+# Version: 0.99.4
+# Date: 2013-07-30
+# Author: Benjamin Guedj <benjamin.guedj@upmc.fr>
+# Maintainer: Benjamin Guedj <benjamin.guedj@upmc.fr>
+# Description: This package performs prediction for regression-oriented problems, aggregating in a nonlinear scheme any basic regression machines suggested by the context and provided by the user. If the user has no valuable knowledge on the data, four defaults machines wrappers are implemented so as to cover a minimal spectrum of prediction methods. If necessary, the computations may be parallelized. The method is described in Biau, Fischer, Guedj and Malley (2013), "COBRA: A Nonlinear Aggregation Strategy".
+# License: GPL (>= 2)
+# URL: http://www.lsta.upmc.fr/doct/guedj/index.html
+# Suggests: snowfall, lars, ridge, tree, randomForest
+# Packaged: 2013-07-30 10:18:10 UTC; benjamin
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2013-07-30 15:14:34
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

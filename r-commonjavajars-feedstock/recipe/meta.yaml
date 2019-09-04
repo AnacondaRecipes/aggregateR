@@ -1,0 +1,85 @@
+{% set version = '1.0-6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-commonjavajars
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CommonJavaJars_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CommonJavaJars/CommonJavaJars_{{ version }}.tar.gz
+  sha256: 5953e4d145354a2c5872fc6d8c8a380ffbca479459ca6b721f3a6c3a9fc73f50
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rJava, knitr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CommonJavaJars')"           # [not win]
+    - "\"%R%\" -e \"library('CommonJavaJars')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://gsrmtp.r-forge.r-project.org/
+  license: GPL-2
+  summary: Useful libraries for building a Java based GUI under R are provided.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CommonJavaJars
+# Type: Package
+# Title: Useful Libraries for Building a Java Based GUI under R
+# Version: 1.0-6
+# Author: Kornelius Rohmeyer (R package), see COPYRIGHTS file for the authors of the java libraries
+# Maintainer: Kornelius Rohmeyer <rohmeyer@small-projects.de>
+# Description: Useful libraries for building a Java based GUI under R are provided.
+# Depends: R (>= 2.8.0)
+# Suggests: rJava, knitr
+# VignetteBuilder: knitr
+# SystemRequirements: Java (>= 5.0)
+# License: GPL-2
+# Copyright: See COPYRIGHTS file
+# URL: http://gsrmtp.r-forge.r-project.org/
+# NeedsCompilation: no
+# Packaged: 2018-07-09 13:08:31 UTC; kornl
+# Repository: CRAN
+# Date/Publication: 2018-07-09 13:30:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

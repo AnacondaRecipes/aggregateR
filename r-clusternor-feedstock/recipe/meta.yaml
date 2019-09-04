@@ -1,0 +1,105 @@
+{% set version = '0.0-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-clusternor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/clusternor_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/clusternor/clusternor_{{ version }}.tar.gz
+  sha256: 2008ab76dccd77714ebf163cd7ad538fa0c73f3b98bef3719b1a98987c99c161
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.8
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.8
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('clusternor')"           # [not win]
+    - "\"%R%\" -e \"library('clusternor')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/neurodata/knorR
+  license: Apache License 2.0
+  summary: The clustering 'NUMA' Optimized Routines package or 'clusternor' is a highly optimized
+    package for performing clustering in parallel with accelerations specifically targeting
+    multi-core Non-Uniform Memory Access ('NUMA') hardware architectures. Disa Mhembere,
+    Da Zheng, Carey E. Priebe, Joshua T. Vogelstein, Randal Burns (2019) <arXiv:1902.09527>.
+  license_family: APACHE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: clusternor
+# Version: 0.0-3
+# Date: 2019-03-28
+# Title: A Parallel Clustering Non-Uniform Memory Access ('NUMA') Optimized Package
+# Authors@R: c(person("Disa", "Mhembere", role = c("aut", "cre"), email = "disa@cs.jhu.edu"), person("Neurodata (https://neurodata.io)", role="cph"))
+# Description: The clustering 'NUMA' Optimized Routines package or 'clusternor' is a highly optimized package for performing clustering in parallel with accelerations specifically targeting multi-core Non-Uniform Memory Access ('NUMA') hardware architectures. Disa Mhembere, Da Zheng, Carey E. Priebe, Joshua T. Vogelstein, Randal Burns (2019) <arXiv:1902.09527>.
+# LinkingTo: Rcpp
+# Depends: R (>= 3.0), Rcpp (>= 0.12.8)
+# License: Apache License 2.0
+# URL: https://github.com/neurodata/knorR
+# SystemRequirements: GNU make C++11, pthreads
+# BugReports: https://github.com/flashxio/knor/issues
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: yes
+# Suggests: testthat
+# Packaged: 2019-03-29 05:47:47 UTC; disa
+# Author: Disa Mhembere [aut, cre], Neurodata (https://neurodata.io) [cph]
+# Maintainer: Disa Mhembere <disa@cs.jhu.edu>
+# Repository: CRAN
+# Date/Publication: 2019-03-29 15:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

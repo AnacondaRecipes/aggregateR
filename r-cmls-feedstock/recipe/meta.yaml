@@ -1,0 +1,89 @@
+{% set version = '1.0-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cmls
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CMLS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CMLS/CMLS_{{ version }}.tar.gz
+  sha256: 765f5d122fb37b93ac121bb41989af6b4260442bc55ac82fcb7a6a4335c68294
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-quadprog
+
+  run:
+    - r-base
+    - r-quadprog
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CMLS')"           # [not win]
+    - "\"%R%\" -e \"library('CMLS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CMLS
+  license: GPL-2
+  summary: Solves multivariate least squares (MLS) problems subject to constraints on the coefficients,
+    e.g., non-negativity, orthogonality, equality, inequality, monotonicity, unimodality,
+    smoothness, etc. Includes flexible functions for solving MLS problems subject to
+    user-specified equality and/or inequality constraints, as well as a wrapper function
+    that implements 24 common constraint options. Also does k-fold or generalized cross-validation
+    to tune constraint options for MLS problems. See ten Berge (1993, ISBN:9789066950832)
+    for an overview of MLS problems, and see Goldfarb and Idnani (1983) <doi:10.1007/BF02591962>
+    for a discussion of the underlying quadratic programming algorithm.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CMLS
+# Type: Package
+# Title: Constrained Multivariate Least Squares
+# Version: 1.0-0
+# Date: 2018-06-06
+# Author: Nathaniel E. Helwig <helwig@umn.edu>
+# Maintainer: Nathaniel E. Helwig <helwig@umn.edu>
+# Depends: quadprog, parallel
+# Description: Solves multivariate least squares (MLS) problems subject to constraints on the coefficients, e.g., non-negativity, orthogonality, equality, inequality, monotonicity, unimodality, smoothness, etc. Includes flexible functions for solving MLS problems subject to user-specified equality and/or inequality constraints, as well as a wrapper function that implements 24 common constraint options. Also does k-fold or generalized cross-validation to tune constraint options for MLS problems. See ten Berge (1993, ISBN:9789066950832) for an overview of MLS problems, and see Goldfarb and Idnani (1983) <doi:10.1007/BF02591962> for a discussion of the underlying quadratic programming algorithm.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2018-06-06 17:19:23 UTC; Nate
+# Repository: CRAN
+# Date/Publication: 2018-06-10 15:17:57 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

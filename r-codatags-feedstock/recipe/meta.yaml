@@ -1,0 +1,85 @@
+{% set version = '1.43' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-codatags
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CodataGS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CodataGS/CodataGS_{{ version }}.tar.gz
+  sha256: e6423ef1b765e5336692cdacb815c419afe9f89ee5cb9df923c6cae2823656ae
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+
+  run:
+    - r-base
+    - r-matrix
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CodataGS')"           # [not win]
+    - "\"%R%\" -e \"library('CodataGS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CodataGS
+  license: GPL-3
+  summary: Computes genomic breeding values using external information on the markers. The package
+    fits a linear mixed model with heteroscedastic random effects, where the random
+    effect variance is fitted using a linear predictor and a log link. The method is
+    described in Mouresan, Selle and Ronnegard (2019) <doi:10.1101/636746>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CodataGS
+# Type: Package
+# Title: Genomic Prediction Using SNP Codata
+# Version: 1.43
+# Date: 2019-05-17
+# Author: Lars Ronnegard
+# Maintainer: Lars Ronnegard <lrn@du.se>
+# Description: Computes genomic breeding values using external information on the markers. The package fits a linear mixed model with heteroscedastic random effects, where the random effect variance is fitted using a linear predictor and a log link. The method is described in Mouresan, Selle and Ronnegard (2019) <doi:10.1101/636746>.
+# License: GPL
+# Depends: Matrix
+# NeedsCompilation: no
+# Packaged: 2019-05-17 12:09:05 UTC; lrn
+# Repository: CRAN
+# Date/Publication: 2019-05-17 15:40:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

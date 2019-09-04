@@ -1,0 +1,83 @@
+{% set version = '0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-combineportfolio
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CombinePortfolio_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CombinePortfolio/CombinePortfolio_{{ version }}.tar.gz
+  sha256: 91b396012a1e2d601fc98ce46f79dc3ec6b616624a1ad36de8ea60a84434494e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CombinePortfolio')"           # [not win]
+    - "\"%R%\" -e \"library('CombinePortfolio')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CombinePortfolio
+  license: GPL-2
+  summary: Estimation of optimal portfolio weights as combination of simple portfolio strategies,
+    like the tangency, global minimum variance (GMV) or naive (1/N) portfolio. It is
+    based on a utility maximizing 8-fund rule. Popular special cases like the Kan-Zhou(2007)
+    2-fund and 3-fund rule or the Tu-Zhou(2011) estimator are nested.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CombinePortfolio
+# Type: Package
+# Title: Estimation of Optimal Portfolio Weights by Combining Simple Portfolio Strategies
+# Version: 0.4
+# Date: 2019-02-10
+# Author: Florian Ziel
+# Maintainer: Florian Ziel <florian.ziel@uni-due.de>
+# Description: Estimation of optimal portfolio weights as combination of simple portfolio strategies, like the tangency, global minimum variance (GMV) or naive (1/N) portfolio. It is based on a utility maximizing 8-fund rule. Popular special cases like the Kan-Zhou(2007) 2-fund and 3-fund rule or the Tu-Zhou(2011) estimator are nested.
+# Depends: R (>= 3.0.2)
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2019-02-10 21:43:28 UTC
+# Packaged: 2019-02-10 15:32:04 UTC; florian
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

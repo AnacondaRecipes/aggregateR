@@ -1,0 +1,94 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-colt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/colt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/colt/colt_{{ version }}.tar.gz
+  sha256: 9edb35744c946c87d321611b88dfbddf46558fcb544074bb442f9290dfc61209
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, rstudioapi
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-crayon >=1.3.4
+
+  run:
+    - r-base
+    - r-crayon >=1.3.4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('colt')"           # [not win]
+    - "\"%R%\" -e \"library('colt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/s-fleck/colt
+  license: MIT
+  summary: ' A collection of command-line color styles based on the ''crayon'' package. ''Colt''
+    styles are defined in themes that can easily be switched, to ensure command line
+    output looks nice on dark as well as light consoles.'
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: colt
+# Type: Package
+# Title: Command-Line Color Themes
+# Version: 0.1.1
+# Authors@R: person("Stefan", "Fleck", email = "stefan.b.fleck@gmail.com", role = c("aut", "cre"))
+# Maintainer: Stefan Fleck <stefan.b.fleck@gmail.com>
+# Description:  A collection of command-line color styles based on the 'crayon' package. 'Colt' styles are defined in themes that can easily be switched, to ensure command line output looks nice on dark as well as light consoles.
+# License: MIT + file LICENSE
+# Imports: crayon (>= 1.3.4)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# Suggests: knitr, rmarkdown, rstudioapi
+# Depends: R (>= 2.10)
+# URL: https://github.com/s-fleck/colt
+# BugReports: https://github.com/s-fleck/colt/issues
+# NeedsCompilation: no
+# Packaged: 2017-10-10 04:14:06 UTC; hoelk
+# Author: Stefan Fleck [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2017-10-10 04:20:30 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
