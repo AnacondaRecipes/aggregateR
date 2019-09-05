@@ -1,0 +1,103 @@
+{% set version = '0.4-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-crf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CRF_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CRF/CRF_{{ version }}.tar.gz
+  sha256: b48c4432c586dd2ef11da0228c43cc493eee282eaf5c23401022735c6e4ff85d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, Rglpk
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CRF')"           # [not win]
+    - "\"%R%\" -e \"library('CRF')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/wulingyun/CRF
+  license: GPL-2
+  summary: Implements modeling and computational tools for conditional random fields (CRF) model
+    as well as other probabilistic undirected graphical models of discrete data with
+    pairwise and unary potentials.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CRF
+# Version: 0.4-2
+# Title: Conditional Random Fields
+# Description: Implements modeling and computational tools for conditional random fields (CRF) model as well as other probabilistic undirected graphical models of discrete data with pairwise and unary potentials.
+# Authors@R: c(person("Ling-Yun", "Wu", role = c("aut", "cre"), email = "wulingyun@gmail.com"))
+# ByteCompile: TRUE
+# Depends: R (>= 3.0.0)
+# Imports: Matrix
+# Suggests: knitr, rmarkdown, Rglpk
+# VignetteBuilder: knitr
+# License: GPL (>= 2)
+# BugReports: https://github.com/wulingyun/CRF/issues
+# URL: https://github.com/wulingyun/CRF
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# Author: Ling-Yun Wu [aut, cre]
+# Maintainer: Ling-Yun Wu <wulingyun@gmail.com>
+# Repository: CRAN
+# Repository/R-Forge/Project: crf
+# Repository/R-Forge/Revision: 50
+# Repository/R-Forge/DateTimeStamp: 2019-03-04 05:00:34
+# Date/Publication: 2019-03-04 10:20:02 UTC
+# NeedsCompilation: yes
+# Packaged: 2019-03-04 05:50:37 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

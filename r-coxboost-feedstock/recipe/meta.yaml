@@ -1,0 +1,93 @@
+{% set version = '1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-coxboost
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CoxBoost_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CoxBoost/CoxBoost_{{ version }}.tar.gz
+  sha256: 0f6a5f77629b50a0937688184feaa6ae98bd22e6453762971a8fe48f9855b3af
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: parallel, snowfall
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-prodlim
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-prodlim
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CoxBoost')"           # [not win]
+    - "\"%R%\" -e \"library('CoxBoost')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CoxBoost
+  license: GPL-2
+  summary: This package provides routines for fitting Cox models by likelihood based boosting
+    for a single endpoint or in presence of competing risks
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CoxBoost
+# Version: 1.4
+# Title: Cox models by likelihood based boosting for a single survival endpoint or competing risks
+# Author: Harald Binder <binderh@uni-mainz.de>
+# Maintainer: Harald Binder <binderh@uni-mainz.de>
+# Depends: R (>= 2.14.0), survival, Matrix, prodlim
+# Suggests: parallel, snowfall
+# Description: This package provides routines for fitting Cox models by likelihood based boosting for a single endpoint or in presence of competing risks
+# License: GPL (>= 2)
+# Packaged: 2013-05-09 21:07:32 UTC; harald
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2013-05-10 10:18:16
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

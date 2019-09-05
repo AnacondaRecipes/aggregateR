@@ -1,0 +1,105 @@
+{% set version = '0.1-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cubfits
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cubfits_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cubfits/cubfits_{{ version }}.tar.gz
+  sha256: eae592120c4c6372bcf42186bfcc68ad2a1b74f5c6a8f9a1b2d8df9deaf25144
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: seqinr, VGAM, EMCluster
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-coda
+    - r-foreach
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-coda
+    - r-foreach
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cubfits')"           # [not win]
+    - "\"%R%\" -e \"library('cubfits')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/snoweye/cubfits
+  license: Mozilla Public License 2.0
+  summary: Estimating mutation and selection coefficients on synonymous codon bias usage based
+    on models of ribosome overhead cost (ROC). Multinomial logistic regression and Markov
+    Chain Monte Carlo are used to estimate and predict protein production rates with/without
+    the presence of expressions and measurement errors. Work flows with examples for
+    simulation, estimation and prediction processes are also provided with parallelization
+    speedup. The whole framework is tested with yeast genome and gene expression data
+    of Yassour, et al. (2009) <doi:10.1073/pnas.0812841106>.
+  license_family: MOZILLA
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cubfits
+# Version: 0.1-3
+# Date: 2017-04-23
+# Title: Codon Usage Bias Fits
+# Authors@R: c(person("Wei-Chen", "Chen", role = c("aut", "cre"), email = "wccsnow@gmail.com"), person("Russell", "Zaretzki", role = "aut"), person("William", "Howell", role = "aut"), person("Cedric", "Landerer", role = "aut"), person("Drew", "Schmidt", role = "aut"), person("Michael A.", "Gilchrist", role = "aut"), person("Preston", "Hewgley", role = "ctb"), person("Students", "REU13", role = "ctb"))
+# Depends: R(>= 3.0.0), methods, coda, foreach, parallel, stats, graphics, utils
+# Suggests: seqinr, VGAM, EMCluster
+# Enhances: pbdMPI (>= 0.3-1)
+# LazyLoad: yes
+# LazyData: yes
+# Description: Estimating mutation and selection coefficients on synonymous codon bias usage based on models of ribosome overhead cost (ROC). Multinomial logistic regression and Markov Chain Monte Carlo are used to estimate and predict protein production rates with/without the presence of expressions and measurement errors. Work flows with examples for simulation, estimation and prediction processes are also provided with parallelization speedup. The whole framework is tested with yeast genome and gene expression data of Yassour, et al. (2009) <doi:10.1073/pnas.0812841106>.
+# License: Mozilla Public License 2.0
+# URL: https://github.com/snoweye/cubfits
+# NeedsCompilation: yes
+# Maintainer: Wei-Chen Chen <wccsnow@gmail.com>
+# Packaged: 2017-04-29 21:16:27 UTC; snoweye
+# Author: Wei-Chen Chen [aut, cre], Russell Zaretzki [aut], William Howell [aut], Cedric Landerer [aut], Drew Schmidt [aut], Michael A. Gilchrist [aut], Preston Hewgley [ctb], Students REU13 [ctb]
+# Repository: CRAN
+# Date/Publication: 2017-04-30 21:43:54 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

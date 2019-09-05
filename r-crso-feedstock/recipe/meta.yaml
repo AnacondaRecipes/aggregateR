@@ -1,0 +1,105 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-crso
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/crso_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/crso/crso_{{ version }}.tar.gz
+  sha256: 6309376c23a7b36540025dbb6ecc3b376d8ea11382c35b7651a2f8f2d1df20e4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-foreach
+
+  run:
+    - r-base
+    - r-foreach
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('crso')"           # [not win]
+    - "\"%R%\" -e \"library('crso')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=crso
+  license: GPL-2
+  summary: 'An algorithm for identifying candidate driver combinations in cancer. CRSO  is based
+    on a theoretical model of cancer in which a cancer rule  is defined to be a collection
+    of two or more events (i.e., alterations) that are minimally  sufficient to cause
+    cancer. A cancer rule set is a set of cancer rules that collectively  are assumed
+    to account for all of ways to cause cancer in the population. In CRSO every  event
+    is designated explicitly as a passenger or driver within each patient.  Each event
+    is associated with a patient-specific, event-specific passenger penalty,  reflecting
+    how unlikely the event would have happened by chance, i.e., as a passenger. CRSO
+    evaluates each rule set by assigning all samples to a rule in the rule set, or to
+    the null rule, and then calculating the total statistical penalty from all unassigned
+    event. CRSO uses a three phase procedure find the best rule set of  fixed size K
+    for a range of Ks. A core rule set is then identified from among the best rule sets
+    of size K as the rule set that best balances rule set size and  statistical penalty.  Users
+    should consult the ''crso'' vignette for an example walk through of a full CRSO
+    run. The full description, of the CRSO algorithm is presented in:  Klein MI, Cannataro
+    V, Townsend J, Stern DF and Zhao H. "Identifying combinations of cancer driver in
+    individual patients."  BioRxiv 674234 [Preprint]. June 19, 2019. <doi:10.1101/674234>.
+    Please cite this article if you use ''crso''.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: crso
+# Title: Cancer Rule Set Optimization ('crso')
+# Version: 0.1.1
+# Author: Michael Klein <michael.klein@yale.edu>
+# Maintainer: Michael Klein <michael.klein@yale.edu>
+# Description: An algorithm for identifying candidate driver combinations in cancer. CRSO  is based on a theoretical model of cancer in which a cancer rule  is defined to be a collection of two or more events (i.e., alterations) that are minimally  sufficient to cause cancer. A cancer rule set is a set of cancer rules that collectively  are assumed to account for all of ways to cause cancer in the population. In CRSO every  event is designated explicitly as a passenger or driver within each patient.  Each event is associated with a patient-specific, event-specific passenger penalty,  reflecting how unlikely the event would have happened by chance, i.e., as a passenger. CRSO evaluates each rule set by assigning all samples to a rule in the rule set, or to the null rule, and then calculating the total statistical penalty from all unassigned event. CRSO uses a three phase procedure find the best rule set of  fixed size K for a range of Ks. A core rule set is then identified from among the best rule sets of size K as the rule set that best balances rule set size and  statistical penalty.  Users should consult the 'crso' vignette for an example walk through of a full CRSO run. The full description, of the CRSO algorithm is presented in:  Klein MI, Cannataro V, Townsend J, Stern DF and Zhao H. "Identifying combinations of cancer driver in individual patients."  BioRxiv 674234 [Preprint]. June 19, 2019. <doi:10.1101/674234>. Please cite this article if you use 'crso'.
+# Depends: R (>= 3.5.0), foreach
+# Imports: stats, utils
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-07-04 20:36:20 UTC; michaelklein
+# Repository: CRAN
+# Date/Publication: 2019-07-07 17:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

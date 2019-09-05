@@ -1,0 +1,91 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-crn
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/crn_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/crn/crn_{{ version }}.tar.gz
+  sha256: 4df4ed08713415b4198aa1d16f4678454a42c89f5ec7163b347aa1433a6780bb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcurl
+    - r-chron
+
+  run:
+    - r-base
+    - r-rcurl
+    - r-chron
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('crn')"           # [not win]
+    - "\"%R%\" -e \"library('crn')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://stevemosher.wordpress.com/
+  license: GPL-2
+  summary: The crn package provides the core functions required to download and format data from
+    the Climate Reference Network. Both daily and hourly data are downloaded from the
+    ftp, a consolidated file of all stations is created, station metadata is extracted.
+    In addition functions for selecting individual variables and creating R friendly
+    datasets for them is provided.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: crn
+# Type: Package
+# Title: Downloads and Builds datasets for Climate Reference Network
+# Version: 1.1
+# Date: 2011-09-20
+# Author: Steven Mosher
+# Maintainer: Steven Mosher <moshersteven@gmail.com>
+# Depends: R (>= 2.11.0), chron, RCurl
+# Description: The crn package provides the core functions required to download and format data from the Climate Reference Network. Both daily and hourly data are downloaded from the ftp, a consolidated file of all stations is created, station metadata is extracted. In addition functions for selecting individual variables and creating R friendly datasets for them is provided.
+# License: GPL (>= 2)
+# URL: http://stevemosher.wordpress.com/
+# LazyLoad: yes
+# LazyData: FALSE
+# Packaged: 2012-08-01 22:56:52 UTC; steve
+# Repository: CRAN
+# Date/Publication: 2012-08-02 04:40:52
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

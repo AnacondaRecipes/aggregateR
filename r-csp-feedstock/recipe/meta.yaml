@@ -1,0 +1,85 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-csp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/csp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/csp/csp_{{ version }}.tar.gz
+  sha256: 30e49fd1748c4757f15d27af29fb546ede05f1450a2c5719b9d7c5962cab85dd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, ggplot2
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('csp')"           # [not win]
+    - "\"%R%\" -e \"library('csp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://ippsr.msu.edu/public-policy/correlates-state-policy https://github.com/expersso/csp
+  license: CC0
+  summary: Provides the Correlates of State Policy data set for easy use in R.
+  license_family: CC
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: csp
+# Type: Package
+# Title: Correlates of State Policy Data Set in R
+# Version: 0.1.0
+# Date: 2016-06-23
+# Authors@R: person("Eric", "Persson", email = "expersso5@gmail.com", role = c("aut", "cre"))
+# Description: Provides the Correlates of State Policy data set for easy use in R.
+# License: CC0
+# LazyData: TRUE
+# URL: http://ippsr.msu.edu/public-policy/correlates-state-policy https://github.com/expersso/csp
+# Suggests: knitr, rmarkdown, ggplot2
+# VignetteBuilder: knitr
+# Depends: R (>= 2.10)
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-07-04 13:07:45 UTC; persson
+# Author: Eric Persson [aut, cre]
+# Maintainer: Eric Persson <expersso5@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-07-04 20:29:15
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

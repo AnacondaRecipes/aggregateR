@@ -1,0 +1,85 @@
+{% set version = '0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-crsnls
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/crsnls_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/crsnls/crsnls_{{ version }}.tar.gz
+  sha256: 0a1016b2c4b29b87f49a2d48e40ee14324f791aa8f94e2145ca6c7445bee6067
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('crsnls')"           # [not win]
+    - "\"%R%\" -e \"library('crsnls')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=crsnls
+  license: GPL-2
+  summary: Functions for nonlinear regression parameters estimation by algorithms based on Controlled
+    Random Search algorithm. Both functions (crs4hc(), crs4hce()) adapt current search
+    strategy by four heuristics competition. In addition, crs4hce() improves adaptability
+    by adaptive stopping condition.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: crsnls
+# Type: Package
+# Title: Nonlinear Regression Parameters Estimation by 'CRS4HC' and 'CRS4HCe'
+# Version: 0.2
+# Date: 2016-04-26
+# Authors@R: c(person("Josef", "Tvrdik", email="josef.tvrdik@osu.cz", role="aut"), person("Tomas", "Goryl", email="tomas.goryl@gmail.com", role=c("trl","cre")))
+# Maintainer: Tomas Goryl <tomas.goryl@gmail.com>
+# Description: Functions for nonlinear regression parameters estimation by algorithms based on Controlled Random Search algorithm. Both functions (crs4hc(), crs4hce()) adapt current search strategy by four heuristics competition. In addition, crs4hce() improves adaptability by adaptive stopping condition.
+# License: GPL-2
+# Encoding: UTF-8
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-04-26 00:11:40 UTC; user
+# Author: Josef Tvrdik [aut], Tomas Goryl [trl, cre]
+# Repository: CRAN
+# Date/Publication: 2016-04-26 08:44:13
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

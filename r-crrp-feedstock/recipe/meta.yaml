@@ -1,0 +1,95 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-crrp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/crrp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/crrp/crrp_{{ version }}.tar.gz
+  sha256: 19f53262725669c67c2f596e1fb8876f925763b9307ca2428a346f65b22405bb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-cmprsk
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-cmprsk
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('crrp')"           # [not win]
+    - "\"%R%\" -e \"library('crrp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=crrp
+  license: GPL-2
+  summary: In competing risks regression, the proportional subdistribution hazards(PSH) model
+    is popular for its direct assessment of covariate effects on the cumulative incidence
+    function. This package allows for penalized variable selection for the PSH model.
+    Penalties include LASSO, SCAD, MCP, and their group versions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: crrp
+# Type: Package
+# Title: Penalized Variable Selection in Competing Risks Regression
+# Version: 1.0
+# Date: 2015-06-19
+# Author: Zhixuan Fu
+# Maintainer: Zhixuan Fu <zhixuan.fu@yale.edu>
+# Depends: survival, Matrix, cmprsk
+# Description: In competing risks regression, the proportional subdistribution hazards(PSH) model is popular for its direct assessment of covariate effects on the cumulative incidence function. This package allows for penalized variable selection for the PSH model. Penalties include LASSO, SCAD, MCP, and their group versions.
+# License: GPL (>= 2)
+# Packaged: 2015-06-19 22:39:06 UTC; Evie
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2015-06-20 00:56:59
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

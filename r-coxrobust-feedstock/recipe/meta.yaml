@@ -1,0 +1,88 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-coxrobust
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/coxrobust_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/coxrobust/coxrobust_{{ version }}.tar.gz
+  sha256: f8a4d6f36e082ff5eb02c5bc9f67ff73986db2c346d277e3d0afbb57be031722
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('coxrobust')"           # [not win]
+    - "\"%R%\" -e \"library('coxrobust')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=coxrobust
+  license: GPL-2
+  summary: Fit robustly proportional hazards regression model
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: coxrobust
+# Version: 1.0
+# Depends: R (>= 2.0.0), survival
+# Date: 2006-03-05
+# Title: Robust Estimation in Cox Model
+# LazyLoad: Yes
+# Description: Fit robustly proportional hazards regression model
+# Author: Tadeusz Bednarski <t.bednarski@prawo.uni.wroc.pl>, Filip Borowicz <f.borowicz@prawo.uni.wroc.pl>
+# Maintainer: Filip Borowicz <f.borowicz@prawo.uni.wroc.pl>
+# License: GPL (>= 2)
+# Packaged: Mon Mar 6 23:03:22 2006; filu
+# Repository: CRAN
+# Date/Publication: 2006-03-15 09:12:51
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

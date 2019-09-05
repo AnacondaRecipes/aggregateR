@@ -1,0 +1,103 @@
+{% set version = '0.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cubist
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Cubist_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Cubist/Cubist_{{ version }}.tar.gz
+  sha256: cd3e152cc72ab33f720a8fb6b8b6787171e1c037cfda48f1735ab692ed6d85d4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: mlbench, caret, knitr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lattice
+    - r-reshape2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-lattice
+    - r-reshape2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Cubist')"           # [not win]
+    - "\"%R%\" -e \"library('Cubist')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://topepo.github.io/Cubist
+  license: GPL-3
+  summary: Regression modeling using rules with added instance-based corrections.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Cubist
+# Type: Package
+# Title: Rule- And Instance-Based Regression Modeling
+# Version: 0.2.2
+# Authors@R: c( person("Max", "Kuhn", , "mxkuhn@gmail.com", c("aut", "cre")), person("Steve", "Weston", role = "ctb"), person("Chris", "Keefer", role = "ctb"), person("Nathan", "Coulter", role = "ctb"), person("Ross", "Quinlan", role = "aut", comment = "Author of imported C code"), person("Rulequest Research Pty Ltd.", role = "cph", comment = "Copyright holder of imported C code"))
+# Maintainer: Max Kuhn <mxkuhn@gmail.com>
+# Description: Regression modeling using rules with added instance-based corrections.
+# Depends: lattice
+# Imports: reshape2
+# Suggests: mlbench, caret, knitr
+# URL: https://topepo.github.io/Cubist
+# BugReports: https://github.com/topepo/Cubist/issues
+# License: GPL-3
+# LazyLoad: yes
+# RoxygenNote: 6.0.1
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2018-05-21 16:51:57 UTC; max
+# Author: Max Kuhn [aut, cre], Steve Weston [ctb], Chris Keefer [ctb], Nathan Coulter [ctb], Ross Quinlan [aut] (Author of imported C code), Rulequest Research Pty Ltd. [cph] (Copyright holder of imported C code)
+# Repository: CRAN
+# Date/Publication: 2018-05-21 17:58:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

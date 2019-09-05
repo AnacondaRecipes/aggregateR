@@ -1,0 +1,81 @@
+{% set version = '1.0-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-crblocks
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/crblocks_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/crblocks/crblocks_{{ version }}.tar.gz
+  sha256: 456bfb8157b2c1618faba4ad0af59b476272a9cae04aef50d8d2e713df0c2078
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('crblocks')"           # [not win]
+    - "\"%R%\" -e \"library('crblocks')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://carma.newcastle.edu.au/davida/
+  license: GPL-3
+  summary: Implements a statistical test for comparing bar plots or histograms of categorical
+    data derived from a randomized block repeated measures layout.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: crblocks
+# Version: 1.0-0
+# Date: 2019-03-27
+# Title: Categorical Randomized Block Data Analysis
+# Author: David Allingham, D.J. Best
+# Maintainer: David Allingham <David.Allingham@newcastle.edu.au>
+# Description: Implements a statistical test for comparing bar plots or histograms of categorical data derived from a randomized block repeated measures layout.
+# License: GPL-3
+# URL: https://carma.newcastle.edu.au/davida/
+# Imports: stats, utils
+# NeedsCompilation: no
+# Packaged: 2019-04-02 00:47:01 UTC; davida
+# Repository: CRAN
+# Date/Publication: 2019-04-02 07:50:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

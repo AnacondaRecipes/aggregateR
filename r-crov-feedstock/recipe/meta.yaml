@@ -1,0 +1,92 @@
+{% set version = '0.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-crov
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/crov_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/crov/crov_{{ version }}.tar.gz
+  sha256: b0d4a447041280b7ecb00f2110f697f88e4b1ee64af46faecd7ed446539c793f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-vgam >=1.0_5
+    - r-gtools >=3.5.0
+
+  run:
+    - r-base
+    - r-vgam >=1.0_5
+    - r-gtools >=3.5.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('crov')"           # [not win]
+    - "\"%R%\" -e \"library('crov')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=crov
+  license: GPL-2
+  summary: Fits a constrained regression model for an ordinal response with ordinal predictors
+    and possibly others, Espinosa and Hennig (2018) <arXiv:1804.08715>. The parameter
+    estimates associated with an ordinal predictor are constrained to be monotonic.
+    If a monotonicity direction (isotonic or antitonic) is not specified for an ordinal
+    predictor by the user, then the monotonicity direction classification procedure
+    establishes it. A monotonicity test is also available to test the null hypothesis
+    of monotonicity over a set of parameters associated with an ordinal predictor.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: crov
+# Type: Package
+# Title: Constrained Regression Model for an Ordinal Response and Ordinal Predictors
+# Version: 0.1.3
+# Author: Javier Espinosa <javier.espinosa@ucl.ac.uk>
+# Maintainer: Javier Espinosa <javier.espinosa@ucl.ac.uk>
+# Description: Fits a constrained regression model for an ordinal response with ordinal predictors and possibly others, Espinosa and Hennig (2018) <arXiv:1804.08715>. The parameter estimates associated with an ordinal predictor are constrained to be monotonic. If a monotonicity direction (isotonic or antitonic) is not specified for an ordinal predictor by the user, then the monotonicity direction classification procedure establishes it. A monotonicity test is also available to test the null hypothesis of monotonicity over a set of parameters associated with an ordinal predictor.
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: TRUE
+# Imports: VGAM (>= 1.0-5), gtools (>= 3.5.0), stats (>= 3.4.3)
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-10-30 17:29:13 UTC; Hulk
+# Repository: CRAN
+# Date/Publication: 2018-11-02 19:00:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

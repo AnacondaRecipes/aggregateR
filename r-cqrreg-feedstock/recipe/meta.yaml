@@ -1,0 +1,97 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cqrreg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cqrReg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cqrReg/cqrReg_{{ version }}.tar.gz
+  sha256: 8a91dad69aaa8efd3dbd562d3e4352a10c328e0e5eb8a6fda2a88085d7bcc8ea
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.10.0
+    - r-rcpparmadillo
+    - r-quantreg
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.10.0
+    - r-rcpparmadillo
+    - r-quantreg
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cqrReg')"           # [not win]
+    - "\"%R%\" -e \"library('cqrReg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cqrReg
+  license: GPL-2
+  summary: Estimate quantile regression(QR) and composite quantile regression (cqr) and with
+    adaptive lasso penalty using interior point (IP), majorize and minimize(MM), coordinate
+    descent (CD), and alternating direction method of multipliers algorithms(ADMM).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cqrReg
+# Type: Package
+# Title: Quantile, Composite Quantile Regression and Regularized Versions
+# Version: 1.2
+# Date: 2015-04-07
+# Author: Jueyu Gao & Linglong Kong
+# Maintainer: Jueyu Gao <jueyu@ualberta.ca>
+# Description: Estimate quantile regression(QR) and composite quantile regression (cqr) and with adaptive lasso penalty using interior point (IP), majorize and minimize(MM), coordinate descent (CD), and alternating direction method of multipliers algorithms(ADMM).
+# License: GPL (>= 2)
+# Depends: Rcpp (>= 0.10.0),quantreg,R (>= 2.6)
+# LinkingTo: Rcpp,RcppArmadillo
+# NeedsCompilation: yes
+# Packaged: 2015-04-07 23:31:21 UTC; billy
+# Repository: CRAN
+# Date/Publication: 2015-04-08 07:35:09
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

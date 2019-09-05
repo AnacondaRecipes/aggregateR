@@ -1,0 +1,91 @@
+{% set version = '1.5.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-binnonnor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BinNonNor_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BinNonNor/BinNonNor_{{ version }}.tar.gz
+  sha256: 86cae86dc0cd2ff9a013d16710f8b633cff413f5b2883dfc3c7cebc62870dda9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bb
+    - r-matrix
+    - r-corpcor
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-bb
+    - r-matrix
+    - r-corpcor
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BinNonNor')"           # [not win]
+    - "\"%R%\" -e \"library('BinNonNor')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=BinNonNor
+  license: GPL-2 | GPL-3
+  summary: Generation of multiple binary and continuous non-normal variables simultaneously  given
+    the marginal characteristics and association structure based on the methodology  proposed
+    by Demirtas et al. (2012) <DOI:10.1002/sim.5362>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: BinNonNor
+# Type: Package
+# Title: Data Generation with Binary and Continuous Non-Normal Components
+# Version: 1.5.1
+# Date: 2019-05-15
+# Author: Gul Inan, Hakan Demirtas, Ran Gao
+# Maintainer: Ran Gao <rgao8@uic.edu>
+# Description: Generation of multiple binary and continuous non-normal variables simultaneously  given the marginal characteristics and association structure based on the methodology  proposed by Demirtas et al. (2012) <DOI:10.1002/sim.5362>.
+# License: GPL-2 | GPL-3
+# Depends: BB, corpcor, mvtnorm, Matrix
+# NeedsCompilation: no
+# Packaged: 2019-05-16 02:38:56 UTC; rangao
+# Repository: CRAN
+# Date/Publication: 2019-05-16 05:00:13 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

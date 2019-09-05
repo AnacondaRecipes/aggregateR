@@ -1,0 +1,92 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-coxphmic
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/coxphMIC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/coxphMIC/coxphMIC_{{ version }}.tar.gz
+  sha256: cddcc9200976bce6f5d037b78766c771fbcd77559e28dc8539f933f67951b552
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-numderiv >=2014.2_1
+    - r-survival >=2.38
+
+  run:
+    - r-base
+    - r-numderiv >=2014.2_1
+    - r-survival >=2.38
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('coxphMIC')"           # [not win]
+    - "\"%R%\" -e \"library('coxphMIC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=coxphMIC
+  license: GPL-2
+  summary: Sparse estimation for Cox PH models is done via Minimum approximated Information Criterion
+    (MIC) by Su, Wijayasinghe,  Fan, and Zhang (2016) <DOI:10.1111/biom.12484>. MIC
+    mimics the best  subset selection using a penalized likelihood approach yet with
+    no need  of a tuning parameter. The problem is further reformulated with a  re-parameterization
+    step so that it reduces to one unconstrained non-convex yet smooth programming problem,
+    which can be solved efficiently. Furthermore, the re-parameterization tactic yields
+    an additional advantage in terms of circumventing post-selection inference.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: coxphMIC
+# Type: Package
+# Title: Sparse Estimation of Cox Proportional Hazards Models via Approximated Information Criterion
+# Version: 0.1.0
+# Author: Xiaogang Su and Razieh Nabi Abdolyousefi
+# Maintainer: Xiaogang Su <xiaogangsu@gmail.com>
+# Description: Sparse estimation for Cox PH models is done via Minimum approximated Information Criterion (MIC) by Su, Wijayasinghe,  Fan, and Zhang (2016) <DOI:10.1111/biom.12484>. MIC mimics the best  subset selection using a penalized likelihood approach yet with no need  of a tuning parameter. The problem is further reformulated with a  re-parameterization step so that it reduces to one unconstrained non-convex yet smooth programming problem, which can be solved efficiently. Furthermore, the re-parameterization tactic yields an additional advantage in terms of circumventing post-selection inference.
+# License: GPL-2
+# Depends: R (>= 3.1.0), stats (>= 3.2.5), graphics (>= 3.2.5), utils (>= 3.2.5)
+# Imports: survival (>= 2.38), numDeriv (>= 2014.2-1)
+# LazyData: TRUE
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-04-26 05:39:44 UTC; xsu
+# Repository: CRAN
+# Date/Publication: 2017-04-26 05:56:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

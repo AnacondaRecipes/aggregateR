@@ -1,0 +1,87 @@
+{% set version = '1.0-22' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cts
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cts_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cts/cts_{{ version }}.tar.gz
+  sha256: 3e77808d4b0b4f4c86aaa1695599c98cbe8c737648566bbeb61b86aeddbd8b4d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cts')"           # [not win]
+    - "\"%R%\" -e \"library('cts')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cts
+  license: GPL-2
+  summary: Functions to fit continuous time autoregressive models with the Kalman filter (Wang
+    (2013) <doi:10.18637/jss.v053.i05>).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cts
+# Title: Continuous Time Autoregressive Models
+# Version: 1.0-22
+# Date: 2019-01-11
+# Author: Fortran original by G. Tunnicliffe-Wilson and Zhu Wang, R port by Zhu Wang with contribution from John Nash, Netlib and NAG authors
+# Description: Functions to fit continuous time autoregressive models with the Kalman filter (Wang (2013) <doi:10.18637/jss.v053.i05>).
+# Maintainer: Zhu Wang <wangz1@uthscsa.edu>
+# License: GPL (>= 2)
+# Packaged: 2019-01-14 17:40:49 UTC; zhu
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2019-01-14 20:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

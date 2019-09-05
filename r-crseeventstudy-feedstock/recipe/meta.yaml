@@ -1,0 +1,100 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-crseeventstudy
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/crseEventStudy_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/crseEventStudy/crseEventStudy_{{ version }}.tar.gz
+  sha256: fefc72b9f4b443886bfdb231101e318cc8c20e0cd881bee702d39172d191f2b9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-sandwich
+
+  run:
+    - r-base
+    - r-sandwich
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('crseEventStudy')"           # [not win]
+    - "\"%R%\" -e \"library('crseEventStudy')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/skoestlmeier/crseEventStudy
+  license: BSD_3_clause
+  summary: Based on Dutta et al. (2018) <doi:10.1016/j.jempfin.2018.02.004>, this package provides
+    their standardized test for abnormal returns in long-horizon event studies. The
+    methods used improve the major weaknesses of size, power, and robustness of long-run
+    statistical tests described in Kothari/Warner (2007) <doi:10.1016/B978-0-444-53265-7.50015-9>.
+    Abnormal returns are weighted by their statistical precision (i.e., standard deviation),
+    resulting in abnormal standardized returns. This procedure efficiently captures
+    the heteroskedasticity problem. Clustering techniques following Cameron et al. (2011)
+    <10.1198/jbes.2010.07136> are adopted for computing cross-sectional correlation
+    robust standard errors. The statistical tests in this package therefore accounts
+    for potential biases arising from returns' cross-sectional correlation, autocorrelation,
+    and volatility clustering without power loss.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_3_clause'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: crseEventStudy
+# Type: Package
+# Title: A Robust and Powerful Test of Abnormal Stock Returns in Long-Horizon Event Studies
+# Version: 1.2
+# Date: 2019-08-20
+# Authors@R: c(person(given = "Siegfried", family = "Kostlmeier", role = c("aut", "cre"), email = "siegfried.koestlmeier@gmail.com", comment = c(ORCID = "0000-0002-7221-6981")), person(given = "Seppo", family = "Pynnonen", role = c("aut"), email = "sjp@uwasa.fi"))
+# Maintainer: Siegfried Kostlmeier <siegfried.koestlmeier@gmail.com>
+# Description: Based on Dutta et al. (2018) <doi:10.1016/j.jempfin.2018.02.004>, this package provides their standardized test for abnormal returns in long-horizon event studies. The methods used improve the major weaknesses of size, power, and robustness of long-run statistical tests described in Kothari/Warner (2007) <doi:10.1016/B978-0-444-53265-7.50015-9>. Abnormal returns are weighted by their statistical precision (i.e., standard deviation), resulting in abnormal standardized returns. This procedure efficiently captures the heteroskedasticity problem. Clustering techniques following Cameron et al. (2011) <10.1198/jbes.2010.07136> are adopted for computing cross-sectional correlation robust standard errors. The statistical tests in this package therefore accounts for potential biases arising from returns' cross-sectional correlation, autocorrelation, and volatility clustering without power loss.
+# License: BSD_3_clause + file LICENSE
+# URL: https://github.com/skoestlmeier/crseEventStudy
+# Imports: methods, stats, sandwich
+# Suggests: testthat
+# Depends: R (>= 3.5)
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2019-08-20 08:17:49 UTC; LocalAdmin
+# Author: Siegfried Kostlmeier [aut, cre] (<https://orcid.org/0000-0002-7221-6981>), Seppo Pynnonen [aut]
+# Repository: CRAN
+# Date/Publication: 2019-08-20 10:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

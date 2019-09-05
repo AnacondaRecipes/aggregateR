@@ -1,0 +1,91 @@
+{% set version = '2.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-binnor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BinNor_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BinNor/BinNor_{{ version }}.tar.gz
+  sha256: bda43d959ceeade67960e1f9a0874c61b1a0e6522f27826a6bef2e9dac45c01d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-corpcor
+    - r-mvtnorm
+    - r-psych
+
+  run:
+    - r-base
+    - r-matrix
+    - r-corpcor
+    - r-mvtnorm
+    - r-psych
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BinNor')"           # [not win]
+    - "\"%R%\" -e \"library('BinNor')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=BinNor
+  license: GPL-2
+  summary: Generating multiple binary and normal variables simultaneously given marginal characteristics
+    and association structure based on the methodology proposed by Demirtas and Doganay
+    (2012) <DOI:10.1080/10543406.2010.521874>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: BinNor
+# Type: Package
+# Title: Simultaneous Generation of Multivariate Binary and Normal Variates
+# Version: 2.3.1
+# Date: 2019-05-14
+# Author: Anup Amatya, Hakan Demirtas, Ran Gao
+# Maintainer: Ran Gao <rgao8@uic.edu>
+# Depends: mvtnorm, corpcor, psych, Matrix
+# Description: Generating multiple binary and normal variables simultaneously given marginal characteristics and association structure based on the methodology proposed by Demirtas and Doganay (2012) <DOI:10.1080/10543406.2010.521874>.
+# License: GPL-2
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2019-05-14 20:43:32 UTC; rangao
+# Repository: CRAN
+# Date/Publication: 2019-05-14 21:00:34 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

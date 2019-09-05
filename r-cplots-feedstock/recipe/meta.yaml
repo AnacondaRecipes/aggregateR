@@ -1,0 +1,89 @@
+{% set version = '0.4-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cplots
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cplots_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cplots/cplots_{{ version }}.tar.gz
+  sha256: f688f422e302f460fc2338c595a9e613bd8d8daaf0dbbc424a4d707af85793cc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-circular
+
+  run:
+    - r-base
+    - r-circular
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cplots')"           # [not win]
+    - "\"%R%\" -e \"library('cplots')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cplots
+  license: GPL-2
+  summary: Provides functions to produce some circular plots for circular data, in a height-
+    or area-proportional manner. They include barplots, smooth density plots, stacked
+    dot plots, histograms, multi-class stacked smooth density plots, and multi-class
+    stacked histograms. The new methodology for general area-proportional circular visualization
+    is described in an article submitted (after revision) to Journal of Computational
+    and Graphical Statistics.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cplots
+# Title: Plots for Circular Data
+# Version: 0.4-0
+# Date: 2019-04-05
+# Author: Danli Xu <dxu452@aucklanduni.ac.nz>, Yong Wang <yongwang@auckland.ac.nz>
+# Maintainer: Yong Wang <yongwang@auckland.ac.nz>
+# Imports: circular, grDevices, graphics, stats
+# Description: Provides functions to produce some circular plots for circular data, in a height- or area-proportional manner. They include barplots, smooth density plots, stacked dot plots, histograms, multi-class stacked smooth density plots, and multi-class stacked histograms. The new methodology for general area-proportional circular visualization is described in an article submitted (after revision) to Journal of Computational and Graphical Statistics.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: no
+# RoxygenNote: 6.1.1
+# Packaged: 2019-04-05 01:41:26 UTC; yong
+# Repository: CRAN
+# Date/Publication: 2019-04-05 11:22:46 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

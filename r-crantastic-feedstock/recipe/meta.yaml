@@ -1,0 +1,80 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-crantastic
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/crantastic_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/crantastic/crantastic_{{ version }}.tar.gz
+  sha256: c511fb9f477924965232ae9ea3b94f5864314f58314b8e05f7965200c24b5c78
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('crantastic')"           # [not win]
+    - "\"%R%\" -e \"library('crantastic')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/hadley/crantastic/tree/R-package, http://crantastic.org
+  license: GPL-2
+  summary: Various R tools for http://crantastic.org/
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: crantastic
+# Type: Package
+# Title: Various R tools for http://crantastic.org/
+# Version: 0.1
+# Date: 2009-07-15
+# Author: Bjorn Arild Maeland <bjorn.maeland@gmail.com>
+# Maintainer: Bjorn Arild Maeland <bjorn.maeland@gmail.com>
+# Description: Various R tools for http://crantastic.org/
+# URL: http://github.com/hadley/crantastic/tree/R-package, http://crantastic.org
+# License: GPL-2
+# Packaged: 2009-08-08 16:12:35 UTC; bjorn
+# Repository: CRAN
+# Date/Publication: 2009-08-08 16:58:39
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-crone
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/crone_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/crone/crone_{{ version }}.tar.gz
+  sha256: 826851b3e1f4750080cf6032e11ed03a756dd39b92f8eee6a01990446bb71f0f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('crone')"           # [not win]
+    - "\"%R%\" -e \"library('crone')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=crone
+  license: GPL-2
+  summary: 'Functions to carry out the most important crystallographic calculations for crystal  structures
+    made of 1d Gaussian-shaped atoms, especially useful for methods development. Main
+    reference: E. Smith, G. Evans, J. Foadi (2017) <doi:10.1088/1361-6404/aa8188>.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: crone
+# Type: Package
+# Title: Structural Crystallography in 1d
+# Version: 0.1.1
+# Date: 2019-08-25
+# Authors@R: person("James","Foadi",email="j.foadi@bath.ac.uk",role=c("cre","aut"))
+# Description: Functions to carry out the most important crystallographic calculations for crystal  structures made of 1d Gaussian-shaped atoms, especially useful for methods development. Main reference: E. Smith, G. Evans, J. Foadi (2017) <doi:10.1088/1361-6404/aa8188>.
+# License: GPL-2
+# LazyLoad: yes
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Suggests: knitr
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# Depends: R (>= 3.5.0)
+# NeedsCompilation: no
+# Packaged: 2019-08-24 14:15:46 UTC; james
+# Author: James Foadi [cre, aut]
+# Maintainer: James Foadi <j.foadi@bath.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2019-08-24 14:40:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

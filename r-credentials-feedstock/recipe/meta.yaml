@@ -1,0 +1,105 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-credentials
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/credentials_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/credentials/credentials_{{ version }}.tar.gz
+  sha256: 0d8b364ee63368003c50563053013be319362fbeea1fd9346f7d565ffdd4fc47
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-askpass
+    - r-curl
+    - r-jsonlite
+    - r-openssl >=1.2
+    - r-sys >=2.1
+
+  run:
+    - r-base
+    - r-askpass
+    - r-curl
+    - r-jsonlite
+    - r-openssl >=1.2
+    - r-sys >=2.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('credentials')"           # [not win]
+    - "\"%R%\" -e \"library('credentials')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/r-lib/credentials
+  license: MIT
+  summary: Setup and retrieve HTTPS and SSH credentials for use with 'git' and  other services.
+    For HTTPS remotes the package interfaces the 'git-credential'  utility which 'git'
+    uses to store HTTP usernames and passwords. For SSH  remotes we provide convenient
+    functions to find or generate appropriate SSH  keys. The package both helps the
+    user to setup a local git installation, and also provides a back-end for git/ssh
+    client libraries to authenticate with  existing user credentials.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: credentials
+# Type: Package
+# Title: Tools for Managing SSH and Git Credentials
+# Version: 1.1
+# Authors@R: person("Jeroen", "Ooms", role = c("aut", "cre"),  email = "jeroen@berkeley.edu", comment = c(ORCID = "0000-0002-4035-0289"))
+# Description: Setup and retrieve HTTPS and SSH credentials for use with 'git' and  other services. For HTTPS remotes the package interfaces the 'git-credential'  utility which 'git' uses to store HTTP usernames and passwords. For SSH  remotes we provide convenient functions to find or generate appropriate SSH  keys. The package both helps the user to setup a local git installation, and also provides a back-end for git/ssh client libraries to authenticate with  existing user credentials.
+# License: MIT + file LICENSE
+# SystemRequirements: git (optional)
+# Encoding: UTF-8
+# Imports: openssl (>= 1.2), sys (>= 2.1), curl, jsonlite, askpass
+# Suggests: testthat, knitr, rmarkdown
+# RoxygenNote: 6.1.1
+# VignetteBuilder: knitr
+# Language: en-US
+# URL: https://github.com/r-lib/credentials
+# BugReports: https://github.com/r-lib/credentials/issues
+# NeedsCompilation: no
+# Packaged: 2019-03-12 12:30:11 UTC; jeroen
+# Author: Jeroen Ooms [aut, cre] (<https://orcid.org/0000-0002-4035-0289>)
+# Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
+# Repository: CRAN
+# Date/Publication: 2019-03-12 13:06:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
