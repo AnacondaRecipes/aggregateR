@@ -1,0 +1,80 @@
+{% set version = '0.1-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cumplyr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cumplyr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cumplyr/cumplyr_{{ version }}.tar.gz
+  sha256: 226ec3f2e10dafe4b2f14045a5698e9bdcdc669e767b7ccc5c7d0eea330f5f1f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cumplyr')"           # [not win]
+    - "\"%R%\" -e \"library('cumplyr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cumplyr
+  license: MIT
+  summary: Extends ddply to allow calculation of cumulative quantities.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cumplyr
+# Type: Package
+# Title: Extends ddply to allow calculation of cumulative quantities.
+# Version: 0.1-1
+# Date: 2012-05-02
+# Author: John Myles White
+# Maintainer: John Myles White <jmw@johnmyleswhite.com>
+# Description: Extends ddply to allow calculation of cumulative quantities.
+# License: MIT
+# Packaged: 2012-05-13 02:46:31 UTC; johnmyleswhite
+# Repository: CRAN
+# Date/Publication: 2012-05-14 15:58:39
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

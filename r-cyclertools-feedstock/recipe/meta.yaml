@@ -1,0 +1,102 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cyclertools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cycleRtools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cycleRtools/cycleRtools_{{ version }}.tar.gz
+  sha256: 60d5ee4ec1882b537a5b245058eda0e6c596dbbc81ec825ab389044d2a15fcd0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: changepoint, minpack.lm, RCurl, raster, pspline, leaflet, knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-xml2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-xml2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cycleRtools')"           # [not win]
+    - "\"%R%\" -e \"library('cycleRtools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jmackie4/cycleRtools
+  license: MIT
+  summary: A suite of functions for analysing cycling data.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cycleRtools
+# Title: Tools for Cycling Data Analysis
+# Version: 1.1.1
+# Authors@R: person("Jordan", "Mackie", email = "jmackie@protonmail.com", role = c("aut", "cre"))
+# Description: A suite of functions for analysing cycling data.
+# Depends: R (>= 3.2.1)
+# SystemRequirements: Java (>= 1.5)
+# License: MIT + file LICENSE
+# LazyData: true
+# LinkingTo: Rcpp
+# Imports: Rcpp, xml2, stats, graphics, grDevices, utils
+# Suggests: changepoint, minpack.lm, RCurl, raster, pspline, leaflet, knitr, rmarkdown
+# VignetteBuilder: knitr
+# URL: https://github.com/jmackie4/cycleRtools
+# RoxygenNote: 5.0.1
+# NeedsCompilation: yes
+# Packaged: 2016-01-18 08:01:46 UTC; jordan
+# Author: Jordan Mackie [aut, cre]
+# Maintainer: Jordan Mackie <jmackie@protonmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-01-18 17:29:02
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

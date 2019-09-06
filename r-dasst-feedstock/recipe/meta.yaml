@@ -1,0 +1,87 @@
+{% set version = '0.3.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dasst
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Dasst_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Dasst/Dasst_{{ version }}.tar.gz
+  sha256: 941dcedaddb8c09068cad81a06af2e46dbf7aa1bf166821293c18bfc1ddb2c5b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Dasst')"           # [not win]
+    - "\"%R%\" -e \"library('Dasst')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Dasst
+  license: GPL-2
+  summary: Provides methods for reading, displaying, processing and writing files originally
+    arranged for the 'DSSAT-CSM' fixed width format. The 'DSSAT-CSM'  cropping system
+    model is described at J.W. Jones, G. Hoogenboomb, C.H. Porter, K.J. Boote, W.D.
+    Batchelor, L.A. Hunt, P.W. Wilkens, U. Singh, A.J. Gijsman,  J.T. Ritchie (2003)
+    <doi:10.1016/S1161-0301(02)00107-7>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Dasst
+# Version: 0.3.3
+# Date: 2017-11-12
+# Title: Tools for Reading, Processing and Writing 'DSSAT' Files
+# Authors@R: c(person("Homero", "Lozza", role = c("aut", "cre"), email = "homerolozza@gmail.com"))
+# Author: Homero Lozza [aut, cre]
+# Maintainer: Homero Lozza <homerolozza@gmail.com>
+# Depends: R (>= 2.14.0)
+# Description: Provides methods for reading, displaying, processing and writing files originally arranged for the 'DSSAT-CSM' fixed width format. The 'DSSAT-CSM'  cropping system model is described at J.W. Jones, G. Hoogenboomb, C.H. Porter, K.J. Boote, W.D. Batchelor, L.A. Hunt, P.W. Wilkens, U. Singh, A.J. Gijsman,  J.T. Ritchie (2003) <doi:10.1016/S1161-0301(02)00107-7>.
+# License: GPL (>= 2)
+# Imports: methods
+# Collate: 'Class-Dasst.R' 'Dasst-methods.R' 'Dasst.R' 'dasstOptions.R' 'extractData.R' 'extractHeader.R' 'buildContents.R' 'data.R' 'gatherTables.R' 'read.dssat.R' 'stackTables.R' 'write.dssat.R'
+# NeedsCompilation: no
+# Packaged: 2017-11-12 19:11:16 UTC; lozza
+# Repository: CRAN
+# Date/Publication: 2017-11-13 11:37:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,84 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cvmgof
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cvmgof_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cvmgof/cvmgof_{{ version }}.tar.gz
+  sha256: d2ec74ecb57bee589d084639845e85e0db121d816aa061eb5d305f89593ccd66
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lattice
+
+  run:
+    - r-base
+    - r-lattice
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cvmgof')"           # [not win]
+    - "\"%R%\" -e \"library('cvmgof')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cvmgof
+  license: CeCILL
+  summary: It is devoted to Cramer-von Mises goodness-of-fit tests. It implements three statistical
+    methods based on Cramer-von Mises statistics to estimate and test a regression model.
+  license_family: OTHER
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Title: Cramer-von Mises Goodness-of-Fit Tests
+# Package: cvmgof
+# Type: Package
+# Version: 1.0.0
+# Author: Romain Azais, Sandie Ferrigno and Marie-Jose Martinez
+# Maintainer: Romain Azais <romain.azais@inria.fr>
+# Description: It is devoted to Cramer-von Mises goodness-of-fit tests. It implements three statistical methods based on Cramer-von Mises statistics to estimate and test a regression model.
+# License: CeCILL
+# Encoding: UTF-8
+# LazyData: FALSE
+# Imports: lattice
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-11-29 12:48:23 UTC; romain
+# Repository: CRAN
+# Date/Publication: 2018-12-03 19:50:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

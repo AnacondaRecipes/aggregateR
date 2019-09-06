@@ -1,0 +1,91 @@
+{% set version = '4.5.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-decompr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/decompr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/decompr/decompr_{{ version }}.tar.gz
+  sha256: 330503c28a422d17f6cd96a93d5caecc0929bcfc5d4ef7748844867cc32773cd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: gvc, testthat, knitr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('decompr')"           # [not win]
+    - "\"%R%\" -e \"library('decompr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://qua.st/decompr, https://github.com/bquast/decompr
+  license: GPL-3
+  summary: Two global-value-chain decompositions are implemented. Firstly, the Wang-Wei-Zhu (Wang,
+    Wei, and Zhu, 2013) algorithm splits bilateral gross exports into 16 value-added
+    components. Secondly, the Leontief decomposition (default) derives the value added
+    origin of exports by country and industry, which is also based on Wang, Wei, and
+    Zhu (Wang, Z., S.-J. Wei, and K. Zhu. 2013. "Quantifying International Production
+    Sharing at the Bilateral and Sector Levels.").
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: decompr
+# Version: 4.5.0
+# Title: Global-Value-Chain Decomposition
+# Description: Two global-value-chain decompositions are implemented. Firstly, the Wang-Wei-Zhu (Wang, Wei, and Zhu, 2013) algorithm splits bilateral gross exports into 16 value-added components. Secondly, the Leontief decomposition (default) derives the value added origin of exports by country and industry, which is also based on Wang, Wei, and Zhu (Wang, Z., S.-J. Wei, and K. Zhu. 2013. "Quantifying International Production Sharing at the Bilateral and Sector Levels.").
+# Authors@R: c( person("Bastiaan", "Quast", email = "bquast@gmail.com", role = c("aut", "cre") ), person("Fei", "Wang", role = "aut"), person("Victor", "Kummritz", role = "aut"), person("Oliver", "Reiter", role = "ctb") )
+# Maintainer: Bastiaan Quast <bquast@gmail.com>
+# Depends: R (>= 2.10)
+# License: GPL-3
+# URL: http://qua.st/decompr, https://github.com/bquast/decompr
+# BugReports: https://github.com/bquast/decompr/issues
+# Suggests: gvc, testthat, knitr
+# VignetteBuilder: knitr
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-08-17 09:19:58 UTC; quast
+# Author: Bastiaan Quast [aut, cre], Fei Wang [aut], Victor Kummritz [aut], Oliver Reiter [ctb]
+# Repository: CRAN
+# Date/Publication: 2016-08-17 11:47:36
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,81 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cumstats
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cumstats_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cumstats/cumstats_{{ version }}.tar.gz
+  sha256: e877e2d7123d2614bb25b159ac93cbf1a2a5105d37a131bdbce6b5f443393c85
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cumstats')"           # [not win]
+    - "\"%R%\" -e \"library('cumstats')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cumstats
+  license: GPL-3
+  summary: Cumulative descriptive statistics for (arithmetic, geometric, harmonic) mean, median,
+    mode, variance, skewness and kurtosis.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cumstats
+# Type: Package
+# Title: Cumulative Descriptive Statistics
+# Version: 1.0
+# Date: 2017-01-13
+# Author: Arturo Erdely and Ian Castillo
+# Maintainer: Arturo Erdely <arturo.erdely@comunidad.unam.mx>
+# Description: Cumulative descriptive statistics for (arithmetic, geometric, harmonic) mean, median, mode, variance, skewness and kurtosis.
+# License: GPL-3
+# NeedsCompilation: no
+# Packaged: 2017-01-15 23:19:59 UTC; aerde
+# Repository: CRAN
+# Date/Publication: 2017-01-16 08:13:00
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

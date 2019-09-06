@@ -1,0 +1,89 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cutpointsoehr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CutpointsOEHR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CutpointsOEHR/CutpointsOEHR_{{ version }}.tar.gz
+  sha256: 725b6601d44dc69adbd1d653fd6eea97a8b5eff6160a671d9b0a8477d617e764
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival
+
+  run:
+    - r-base
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CutpointsOEHR')"           # [not win]
+    - "\"%R%\" -e \"library('CutpointsOEHR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CutpointsOEHR
+  license: GPL-3
+  summary: Use optimal equal-HR method to determine two optimal cutpoints of a continuous predictor
+    that has a U-shaped relationship with survival outcomes based on Cox regression
+    model. The optimal equal-HR method estimates two optimal cut-points that have approximately
+    the same log hazard value based on Cox regression model and divides individuals
+    into different groups according to their HR values.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: CutpointsOEHR
+# Type: Package
+# Title: Optimal Equal-HR Method to Find Two Cutpoints for U-Shaped Relationships in Cox Model
+# Version: 0.1.2
+# Author: Yimin Chen, Zhang Jinxin
+# Maintainer: Yimin Chen <chenyimin0226@126.com>
+# Description: Use optimal equal-HR method to determine two optimal cutpoints of a continuous predictor that has a U-shaped relationship with survival outcomes based on Cox regression model. The optimal equal-HR method estimates two optimal cut-points that have approximately the same log hazard value based on Cox regression model and divides individuals into different groups according to their HR values.
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Imports: survival
+# NeedsCompilation: no
+# RoxygenNote: 6.1.0.9000
+# Packaged: 2018-10-10 04:10:48 UTC; ad
+# Repository: CRAN
+# Date/Publication: 2018-10-10 11:50:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

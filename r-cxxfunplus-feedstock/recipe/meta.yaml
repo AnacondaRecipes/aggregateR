@@ -1,0 +1,87 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cxxfunplus
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cxxfunplus_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cxxfunplus/cxxfunplus_{{ version }}.tar.gz
+  sha256: 0d59a265569cd9d9c1de41a11b36d973fe41dd5db467dce48cfcd8f9a02ede4f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Rcpp (>= 0.8.0)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-inline
+
+  run:
+    - r-base
+    - r-inline
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cxxfunplus')"           # [not win]
+    - "\"%R%\" -e \"library('cxxfunplus')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/maverickg/cxxfunplus
+  license: GPL-3
+  summary: extend cxxfunction by saving the dynamic shared objects for reusing across R sessions
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cxxfunplus
+# Type: Package
+# Title: extend cxxfunction by saving the dynamic shared objects
+# Version: 1.0
+# Date: 2012-08-16
+# Depends: inline
+# Imports: methods
+# Suggests: Rcpp (>= 0.8.0)
+# Author: Jiqiang Guo <guojq28@gmail.com>
+# Maintainer: Jiqiang Guo <guojq28@gmail.com>
+# Description: extend cxxfunction by saving the dynamic shared objects for reusing across R sessions
+# License: GPL-3
+# URL: https://github.com/maverickg/cxxfunplus
+# Packaged: 2012-08-19 01:57:39 UTC; jq
+# Repository: CRAN
+# Date/Publication: 2012-08-19 05:26:34
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

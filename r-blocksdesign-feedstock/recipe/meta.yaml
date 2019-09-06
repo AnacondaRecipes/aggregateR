@@ -1,0 +1,104 @@
+{% set version = '3.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-blocksdesign
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/blocksdesign_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/blocksdesign/blocksdesign_{{ version }}.tar.gz
+  sha256: ed1f9d8512e8df9788b93f52cec8449927f2b9ea8bd20e441263e0e140577a11
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, R.rsp
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-crossdes
+    - r-lme4
+    - r-plyr
+
+  run:
+    - r-base
+    - r-crossdes
+    - r-lme4
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('blocksdesign')"           # [not win]
+    - "\"%R%\" -e \"library('blocksdesign')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=blocksdesign
+  license: GPL-2
+  summary: 'Constructs D-optimal or near D-optimal nested and crossed  block designs for unstructured
+    or general factorial treatment designs.  The treatment design, if required, is found
+    from a model matrix design formula and can be added sequentially, if required. The
+    block design is found from a defined set of block factors and is conditional on
+    the defined treatment design.    The block factors are added in sequence and each
+    added block factor is optimized conditional on all previously added block factors.
+    The block design can have repeated nesting down to any required  depth of nesting
+    with either simple nested blocks or a crossed blocks design at each level of nesting.
+    Outputs include a table showing the allocation of treatments to blocks and tables
+    showing the achieved D-efficiency factors for each block and treatment design. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: blocksdesign
+# Type: Package
+# Title: Nested and Crossed Block Designs for Factorial, Fractional Factorial and Unstructured Treatment Sets
+# Version: 3.5
+# Date: 2019-05-28"
+# Author: R. N. Edmondson.
+# Maintainer: Rodney Edmondson <rodney.edmondson@gmail.com>
+# Depends: R (>= 3.1.0)
+# Description: Constructs D-optimal or near D-optimal nested and crossed  block designs for unstructured or general factorial treatment designs.  The treatment design, if required, is found from a model matrix design formula and can be added sequentially, if required. The block design is found from a defined set of block factors and is conditional on the defined treatment design.    The block factors are added in sequence and each added block factor is optimized conditional on all previously added block factors. The block design can have repeated nesting down to any required  depth of nesting with either simple nested blocks or a crossed blocks design at each level of nesting. Outputs include a table showing the allocation of treatments to blocks and tables showing the achieved D-efficiency factors for each block and treatment design.
+# License: GPL (>= 2)
+# Imports: lme4, plyr, crossdes
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# Suggests: knitr, rmarkdown, R.rsp
+# VignetteBuilder: knitr,R.rsp
+# NeedsCompilation: no
+# Packaged: 2019-05-28 11:17:21 UTC; rne
+# Repository: CRAN
+# Date/Publication: 2019-05-28 11:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,84 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cumseg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cumSeg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cumSeg/cumSeg_{{ version }}.tar.gz
+  sha256: f3f3328246383617b4a4f8cc635fe62cf5b68a19cd437fef4de95802f878a847
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lars
+
+  run:
+    - r-base
+    - r-lars
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cumSeg')"           # [not win]
+    - "\"%R%\" -e \"library('cumSeg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cumSeg
+  license: GPL-3
+  summary: Estimation of number and location of change points in mean-shift (piecewise constant)
+    models. Particularly useful to model genomic sequences of continuous measurements.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cumSeg
+# Type: Package
+# Title: Change Point Detection in Genomic Sequences
+# Version: 1.2
+# Date: 2019-01-18
+# Author: Vito M.R. Muggeo
+# Maintainer: Vito M.R. Muggeo <vito.muggeo@unipa.it>
+# Description: Estimation of number and location of change points in mean-shift (piecewise constant) models. Particularly useful to model genomic sequences of continuous measurements.
+# Depends: lars
+# License: GPL
+# NeedsCompilation: no
+# Packaged: 2019-01-18 12:31:22 UTC; enea
+# Repository: CRAN
+# Date/Publication: 2019-01-18 12:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,83 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-daime
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DAIME_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DAIME/DAIME_{{ version }}.tar.gz
+  sha256: 19dc0dc9a4e05d21f171045fe74ac528d457428a8ab3ac8a682e58deded1fa4d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DAIME')"           # [not win]
+    - "\"%R%\" -e \"library('DAIME')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DAIME
+  license: CC BY 4.0
+  summary: Reverse and model the effects of changing deposition rates on geological data and
+    rates. Based on Hohmann (2018) <doi:10.13140/RG.2.2.23372.51841> .
+  license_family: CC
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DAIME
+# Type: Package
+# Title: Effects of Changing Deposition Rates
+# Version: 1.1
+# Date: 2019-05-16
+# Author: Niklas Hohmann
+# Maintainer: Niklas Hohmann <Niklas.Hohmann@fau.de>
+# Description: Reverse and model the effects of changing deposition rates on geological data and rates. Based on Hohmann (2018) <doi:10.13140/RG.2.2.23372.51841> .
+# License: CC BY 4.0
+# Depends: stats, utils
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-06-11 02:48:52 UTC; nick
+# Repository: CRAN
+# Date/Publication: 2019-06-11 04:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

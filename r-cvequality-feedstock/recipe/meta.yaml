@@ -1,0 +1,94 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cvequality
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cvequality_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cvequality/cvequality_{{ version }}.tar.gz
+  sha256: 22a5d4c4616746d286d1eb5987901580faf9ed5640e42d2ebcd463f7771aa8c6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, ggplot2, rmarkdown, testthat, dplyr, tidyr, ggbeeswarm, covr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cvequality')"           # [not win]
+    - "\"%R%\" -e \"library('cvequality')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/benmarwick/cvequality
+  license: MIT
+  summary: Contains functions for testing for significant differences between multiple coefficients
+    of variation. Includes Feltz and Miller's (1996) <DOI:10.1002/(SICI)1097-0258(19960330)15:6%3C647::AID-SIM184%3E3.0.CO;2-P>
+    asymptotic test and Krishnamoorthy and Lee's (2014) <DOI:10.1007/s00180-013-0445-2>
+    modified signed-likelihood ratio test. See the vignette for more, including full
+    details of citations.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cvequality
+# Type: Package
+# Title: Tests for the Equality of Coefficients of Variation from Multiple Groups
+# Version: 0.2.0
+# Authors@R: c(person("Ben", "Marwick", email = "benmarwick@gmail.com", role = c("aut", "cre")), person("Kalimuthu", "Krishnamoorthy", email = "krishna@louisiana.edu", role = c("aut")))
+# Maintainer: Ben Marwick <benmarwick@gmail.com>
+# Description: Contains functions for testing for significant differences between multiple coefficients of variation. Includes Feltz and Miller's (1996) <DOI:10.1002/(SICI)1097-0258(19960330)15:6%3C647::AID-SIM184%3E3.0.CO;2-P> asymptotic test and Krishnamoorthy and Lee's (2014) <DOI:10.1007/s00180-013-0445-2> modified signed-likelihood ratio test. See the vignette for more, including full details of citations.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Suggests: knitr, ggplot2, rmarkdown, testthat, dplyr, tidyr, ggbeeswarm, covr
+# VignetteBuilder: knitr
+# URL: https://github.com/benmarwick/cvequality
+# BugReports: https://github.com/benmarwick/cvequality/issues
+# Date: 2019-01-05
+# NeedsCompilation: no
+# Packaged: 2019-01-07 07:30:25 UTC; rstudio-user
+# Author: Ben Marwick [aut, cre], Kalimuthu Krishnamoorthy [aut]
+# Repository: CRAN
+# Date/Publication: 2019-01-07 15:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,95 @@
+{% set version = '2.3.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cusp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cusp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cusp/cusp_{{ version }}.tar.gz
+  sha256: 1c2a6500a8d4d02dcc075a76f71d527a2bca31a727bcebca0de12e447404158c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: plot3D
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cusp')"           # [not win]
+    - "\"%R%\" -e \"library('cusp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cusp
+  license: GPL-2
+  summary: Cobb's maximum likelihood method for cusp-catastrophe modeling (Grasman, van der Maas,
+    & Wagenmakers, 2009, JSS, 32:8; Cobb, L, 1981, Behavioral Science, 26:1, 75--78).
+    Includes a cusp() function for model fitting, and several utility functions for
+    plotting, and for comparing the model to linear regression and logistic curve models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: cusp
+# Type: Package
+# Title: Cusp-Catastrophe Model Fitting Using Maximum Likelihood
+# Version: 2.3.3
+# Imports: stats, graphics, grDevices, utils
+# Author: Raoul P. P. P. Grasman [aut, cre, cph]
+# Maintainer: Raoul Grasman <rgrasman@uva.nl>
+# LazyData: yes
+# NeedsCompilation: yes
+# Suggests: plot3D
+# Description: Cobb's maximum likelihood method for cusp-catastrophe modeling (Grasman, van der Maas, & Wagenmakers, 2009, JSS, 32:8; Cobb, L, 1981, Behavioral Science, 26:1, 75--78). Includes a cusp() function for model fitting, and several utility functions for plotting, and for comparing the model to linear regression and logistic curve models.
+# License: GPL-2
+# Repository: CRAN
+# Repository/R-Forge/Project: cusp
+# Repository/R-Forge/Revision: 21
+# Repository/R-Forge/DateTimeStamp: 2015-07-29 11:18:21
+# Date/Publication: 2015-08-10 18:31:48
+# Packaged: 2015-07-29 11:25:54 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
