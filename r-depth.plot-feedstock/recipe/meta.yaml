@@ -1,0 +1,87 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-depth.plot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/depth.plot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/depth.plot/depth.plot_{{ version }}.tar.gz
+  sha256: 5b9afcc423778546482f789b8aac79daa63966a5470a9e18dfd3b28a7d4c4f7e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('depth.plot')"           # [not win]
+    - "\"%R%\" -e \"library('depth.plot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=depth.plot
+  license: GPL-2
+  summary: Could be used to obtain spatial depths, spatial ranks and outliers of multivariate
+    random variables. Could also be used to visualize DD-plots (a multivariate generalization
+    of QQ-plots).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: depth.plot
+# Type: Package
+# Title: Multivariate Analogy of Quantiles
+# Version: 0.1
+# Date: 2015-12-19
+# Authors@R: c(person("Omker","Mahalanobish",email="omker.scorpio@gmail.com",role="aut"),person("Somedip","Karmakar",email="somedip@yahoo.co.in",role=c("cre","aut")))
+# Maintainer: Somedip Karmakar <somedip@yahoo.co.in>
+# Description: Could be used to obtain spatial depths, spatial ranks and outliers of multivariate random variables. Could also be used to visualize DD-plots (a multivariate generalization of QQ-plots).
+# Imports: mvtnorm , stats , graphics
+# License: GPL-2
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2015-12-20 11:01:29 UTC; omahala
+# Author: Omker Mahalanobish [aut], Somedip Karmakar [cre, aut]
+# Repository: CRAN
+# Date/Publication: 2015-12-20 15:33:19
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

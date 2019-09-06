@@ -1,0 +1,90 @@
+{% set version = '3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-depend.truncation
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/depend.truncation_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/depend.truncation/depend.truncation_{{ version }}.tar.gz
+  sha256: 99d5ae14e033ca76888b0565c6a44978a422f0000d9d22f09a64a3deb128d5cb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('depend.truncation')"           # [not win]
+    - "\"%R%\" -e \"library('depend.truncation')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=depend.truncation
+  license: GPL-2
+  summary: Estimation and testing methods for dependently truncated data. Semi-parametric methods
+    are based on Emura et al. (2011)<Stat Sinica 21:349-67>, Emura & Wang (2012)<doi:10.1016/j.jmva.2012.03.012>,
+    and Emura & Murotani (2015)<doi:10.1007/s11749-015-0432-8>. Parametric approaches
+    are based on Emura & Konno (2012)<doi:10.1007/s00362-014-0626-2> and Emura & Pan
+    (2017)<doi:10.1007/s00362-017-0947-z>. A regression approach is based on Emura &
+    Wang (2016)<doi:10.1007/s10463-015-0526-9>. Quasi-independence tests are based on
+    Emura & Wang (2010)<doi:10.1016/j.jmva.2009.07.006>. Right-truncated data for Japanese
+    male centenarians are given by Emura & Murotani (2015)<doi:10.1007/s11749-015-0432-8>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: depend.truncation
+# Type: Package
+# Title: Statistical Methods for the Analysis of Dependently Truncated Data
+# Version: 3.0
+# Date: 2018-02-27
+# Author: Takeshi Emura
+# Maintainer: Takeshi Emura <takeshiemura@gmail.com>
+# Description: Estimation and testing methods for dependently truncated data. Semi-parametric methods are based on Emura et al. (2011)<Stat Sinica 21:349-67>, Emura & Wang (2012)<doi:10.1016/j.jmva.2012.03.012>, and Emura & Murotani (2015)<doi:10.1007/s11749-015-0432-8>. Parametric approaches are based on Emura & Konno (2012)<doi:10.1007/s00362-014-0626-2> and Emura & Pan (2017)<doi:10.1007/s00362-017-0947-z>. A regression approach is based on Emura & Wang (2016)<doi:10.1007/s10463-015-0526-9>. Quasi-independence tests are based on Emura & Wang (2010)<doi:10.1016/j.jmva.2009.07.006>. Right-truncated data for Japanese male centenarians are given by Emura & Murotani (2015)<doi:10.1007/s11749-015-0432-8>.
+# License: GPL-2
+# Depends: mvtnorm
+# NeedsCompilation: no
+# Packaged: 2018-02-27 09:46:18 UTC; user
+# Repository: CRAN
+# Date/Publication: 2018-02-27 12:43:41 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

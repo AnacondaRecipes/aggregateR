@@ -1,0 +1,85 @@
+{% set version = '2018.2-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dfoptim
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dfoptim_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dfoptim/dfoptim_{{ version }}.tar.gz
+  sha256: 63fd151797219baab932ccf9da42e6ade79baa6906e8c6f424c04b85ba06cabf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dfoptim')"           # [not win]
+    - "\"%R%\" -e \"library('dfoptim')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.jhsph.edu/agingandhealth/People/Faculty_personal_pages/Varadhan.html
+  license: GPL-2
+  summary: Derivative-Free optimization algorithms. These algorithms do not require gradient
+    information. More importantly, they can be used to solve non-smooth optimization
+    problems.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: dfoptim
+# Type: Package
+# Title: Derivative-Free Optimization
+# Description: Derivative-Free optimization algorithms. These algorithms do not require gradient information. More importantly, they can be used to solve non-smooth optimization problems.
+# Depends: R (>= 2.10.1)
+# Version: 2018.2-1
+# Date: 2018-02-18
+# Author: Ravi Varadhan, Johns Hopkins University, and Hans W. Borchers, ABB Corporate Research.
+# Maintainer: Ravi Varadhan <ravi.varadhan@jhu.edu>
+# URL: http://www.jhsph.edu/agingandhealth/People/Faculty_personal_pages/Varadhan.html
+# License: GPL (>= 2)
+# LazyLoad: yes
+# Repository: CRAN
+# NeedsCompilation: no
+# Packaged: 2018-04-01 23:02:47 UTC; rvaradhan
+# Date/Publication: 2018-04-02 09:37:48 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,92 @@
+{% set version = '2.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-det
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DET_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DET/DET_{{ version }}.tar.gz
+  sha256: a5bd2ef74a88d4f9591ab1cd761d40c059fafd5953d545feac5b4a2930ec4dc9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-doparallel
+    - r-proc
+
+  run:
+    - r-base
+    - r-doparallel
+    - r-proc
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DET')"           # [not win]
+    - "\"%R%\" -e \"library('DET')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DET
+  license: GPL-2
+  summary: ' Builds both ROC (Receiver Operating Characteristic) and DET (Detection Error Tradeoff)
+    curves from a set of predictors, which are the results of a binary classification
+    system. The curves give a general vision of the performance of the classifier, and
+    are useful for comparing performance of different systems.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DET
+# Type: Package
+# Title: Representation of DET Curve with Confidence Intervals
+# Version: 2.0.1
+# Authors@R: c( person("Garcia-Rodenas, Alvaro", role = c("aut","cre"), email = "alvaro.garcia9@um.es"), person("Franco, Manuel", role = c("aut"), email = "mfranco@um.es"), person("Vivo, Juana-Maria", role = c("aut"), email = "jmvivomo@um.es"), person("Fernandez-Breis, Jesualdo T.", role = c("aut"), email = "jfernand@um.es"), person("Font, Roberto", role = c("aut"), email = "roberto.font@biometricvox.com"))
+# Description:  Builds both ROC (Receiver Operating Characteristic) and DET (Detection Error Tradeoff) curves from a set of predictors, which are the results of a binary classification system. The curves give a general vision of the performance of the classifier, and are useful for comparing performance of different systems.
+# License: GPL-2
+# Encoding: UTF-8
+# Depends: R (>= 2.10)
+# Imports: pROC, doParallel, parallel
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-06-14 15:27:06 UTC; meteo
+# Author: Garcia-Rodenas, Alvaro [aut, cre], Franco, Manuel [aut], Vivo, Juana-Maria [aut], Fernandez-Breis, Jesualdo T. [aut], Font, Roberto [aut]
+# Maintainer: "Garcia-Rodenas, Alvaro" <alvaro.garcia9@um.es>
+# Repository: CRAN
+# Date/Publication: 2019-06-14 15:50:32 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

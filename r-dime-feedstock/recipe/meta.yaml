@@ -1,0 +1,89 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dime
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DIME_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DIME/DIME_{{ version }}.tar.gz
+  sha256: 80f794d0b3062cbdb0c2fe927cc5bb6bb598c1229347826d8617cf11cdac8686
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DIME')"           # [not win]
+    - "\"%R%\" -e \"library('DIME')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DIME
+  license: GPL-2
+  summary: A robust differential identification method that considers an ensemble of finite mixture
+    models combined with a local false discovery rate (fdr) to analyze ChIP-seq (high-throughput
+    genomic)data comparing two samples allowing for flexible modeling of data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DIME
+# Type: Package
+# Title: DIME (Differential Identification using Mixture Ensemble)
+# Version: 1.2
+# Date: 2013-12-03
+# Author: Cenny Taslim <taslim.2@osu.edu>, with contributions from  Dustin Potter, Abbasali Khalili and Shili Lin <shili@stat.osu.edu>.
+# Maintainer: Cenny Taslim <taslim.2@osu.edu>
+# License: GPL (>= 2)
+# Description: A robust differential identification method that considers an ensemble of finite mixture models combined with a local false discovery rate (fdr) to analyze ChIP-seq (high-throughput genomic)data comparing two samples allowing for flexible modeling of data.
+# LazyLoad: yes
+# Packaged: 2013-12-09 20:41:45 UTC; cenny
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2013-12-09 23:08:40
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

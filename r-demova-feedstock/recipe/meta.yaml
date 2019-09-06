@@ -1,0 +1,93 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-demova
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DEMOVA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DEMOVA/DEMOVA_{{ version }}.tar.gz
+  sha256: e4ba5f14df8364677a523db71c21de1830fe0b26b8c14aaf6d105e182184b825
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-leaps
+
+  run:
+    - r-base
+    - r-leaps
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DEMOVA')"           # [not win]
+    - "\"%R%\" -e \"library('DEMOVA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DEMOVA
+  license: GPL-2
+  summary: 'Tool for the development of multi-linear QSPR/QSAR models (Quantitative structure-property/activity
+    relationship). Theses models are used in chemistry, biology and pharmacy to find
+    a relationship between the structure of a molecule and its property (such as activity,
+    toxicology but also physical properties). The various functions of this package
+    allows: selection of descriptors based of variances, intercorrelation and user expertise;
+    selection of the best multi-linear regression in terms of correlation and robustness;
+    methods of internal validation (Leave-One-Out, Leave-Many-Out, Y-scrambling) and
+    external using test sets.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DEMOVA
+# Type: Package
+# Title: DEvelopment (of Multi-Linear QSPR/QSAR) MOdels VAlidated using Test Set
+# Version: 1.0
+# Date: 2016-03-15
+# Author: Vinca Prana
+# Maintainer: Vinca Prana <vinca.prana@free.fr>
+# Description: Tool for the development of multi-linear QSPR/QSAR models (Quantitative structure-property/activity relationship). Theses models are used in chemistry, biology and pharmacy to find a relationship between the structure of a molecule and its property (such as activity, toxicology but also physical properties). The various functions of this package allows: selection of descriptors based of variances, intercorrelation and user expertise; selection of the best multi-linear regression in terms of correlation and robustness; methods of internal validation (Leave-One-Out, Leave-Many-Out, Y-scrambling) and external using test sets.
+# License: GPL (>= 2)
+# Depends: leaps
+# Suggests: testthat
+# NeedsCompilation: no
+# Packaged: 2016-03-15 16:07:15 UTC
+# Repository: CRAN
+# Date/Publication: 2016-03-15 19:54:06
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

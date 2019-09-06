@@ -1,0 +1,87 @@
+{% set version = '0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-depthtools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/depthTools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/depthTools/depthTools_{{ version }}.tar.gz
+  sha256: 1e80d99fe921e4b19b61ee24ae3cd0fd30edb095823bd5d3a7f9e91920c82999
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('depthTools')"           # [not win]
+    - "\"%R%\" -e \"library('depthTools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=depthTools
+  license: GPL-2
+  summary: depthTools is a package that implements different statistical tools for the description
+    and analysis of gene expression data based on the concept of data depth, namely,
+    the scale curves for visualizing the dispersion of one or various groups of samples
+    (e.g. types of tumors), a rank test to decide whether two groups of samples come
+    from a single distribution and two methods of supervised classification techniques,
+    the DS and TAD methods. All these techniques are based on the Modified Band Depth,
+    which is a recent notion of depth with a low computational cost, what renders it
+    very appropriate for high dimensional data such as gene expression data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: depthTools
+# Version: 0.4
+# Date: 2013-05-23
+# Title: Depth Tools Package
+# Author: Sara Lopez-Pintado <sl2929@columbia.edu> and Aurora Torrente <etorrent@est-econ.uc3m.es>.
+# Maintainer: Aurora Torrente <etorrent@est-econ.uc3m.es>
+# Depends: R (>= 2.8.0)
+# Description: depthTools is a package that implements different statistical tools for the description and analysis of gene expression data based on the concept of data depth, namely, the scale curves for visualizing the dispersion of one or various groups of samples (e.g. types of tumors), a rank test to decide whether two groups of samples come from a single distribution and two methods of supervised classification techniques, the DS and TAD methods. All these techniques are based on the Modified Band Depth, which is a recent notion of depth with a low computational cost, what renders it very appropriate for high dimensional data such as gene expression data.
+# License: GPL (>= 2)
+# Packaged: 2013-06-13 14:52:15 UTC; migueltardio
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-06-13 18:16:59
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

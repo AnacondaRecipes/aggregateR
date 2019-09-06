@@ -1,0 +1,93 @@
+{% set version = '0.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-densratio
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/densratio_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/densratio/densratio_{{ version }}.tar.gz
+  sha256: 374793174d2534d4293987443eeea3adc5b4eb22f20c8fb5fcbfd5d2dd1c6374
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: graphics, knitr, mvtnorm, rmarkdown, stats, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('densratio')"           # [not win]
+    - "\"%R%\" -e \"library('densratio')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/hoxo-m/densratio
+  license: MIT
+  summary: Density ratio estimation. The estimated density ratio function can be used in many
+    applications such as anomaly detection, change-point detection, covariate shift
+    adaptation. The implemented methods are uLSIF (Hido et al. (2011) <doi:10.1007/s10115-010-0283-2>),
+    RuLSIF (Yamada et al. (2011) <doi:10.1162/NECO_a_00442>), and KLIEP (Sugiyama et
+    al. (2007) <doi:10.1007/s10463-008-0197-x>).
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: densratio
+# Type: Package
+# Version: 0.2.1
+# Title: Density Ratio Estimation
+# Description: Density ratio estimation. The estimated density ratio function can be used in many applications such as anomaly detection, change-point detection, covariate shift adaptation. The implemented methods are uLSIF (Hido et al. (2011) <doi:10.1007/s10115-010-0283-2>), RuLSIF (Yamada et al. (2011) <doi:10.1162/NECO_a_00442>), and KLIEP (Sugiyama et al. (2007) <doi:10.1007/s10463-008-0197-x>).
+# Authors@R:  person("Koji", "Makiyama", , "hoxo.smile@gmail.com", c("aut", "cre"))
+# URL: https://github.com/hoxo-m/densratio
+# BugReports: https://github.com/hoxo-m/densratio/issues
+# License: MIT + file LICENSE
+# Imports: utils
+# Suggests: graphics, knitr, mvtnorm, rmarkdown, stats, testthat
+# RoxygenNote: 6.1.1
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2019-06-30 10:55:36 UTC; kmakiyam
+# Author: Koji Makiyama [aut, cre]
+# Maintainer: Koji Makiyama <hoxo.smile@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-06-30 17:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

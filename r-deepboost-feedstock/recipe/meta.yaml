@@ -1,0 +1,101 @@
+{% set version = '0.1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-deepboost
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/deepboost_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/deepboost/deepboost_{{ version }}.tar.gz
+  sha256: ea25bd5e5b5d8d82b81523288132c76b768b1e2d708fccce6f82ca97a67cc9d9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, ada, caret
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('deepboost')"           # [not win]
+    - "\"%R%\" -e \"library('deepboost')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/dmarcous/CRAN_deepboost
+  license: Apache License (== 2.0)
+  summary: Provides deep boosting models training, evaluation, predicting and hyper parameter
+    optimising using grid search and cross validation. Based on Google's Deep Boosting
+    algorithm, and Google's C++ implementation. Cortes, C., Mohri, M., & Syed, U. (2014)
+    <http://machinelearning.wustl.edu/mlpapers/papers/icml2014c2_cortesb14>.
+  license_family: APACHE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: deepboost
+# Type: Package
+# Title: Deep Boosting Ensemble Modeling
+# Version: 0.1.6
+# Date: 2017-11-08
+# Author: Daniel Marcous [aut, cre], Yotam Sandbank [aut], Google Inc. [cph]
+# Maintainer: Daniel Marcous <dmarcous@gmail.com>
+# Authors@R: c( person("Daniel", "Marcous", email = "dmarcous@gmail.com", role = c("aut","cre")), person("Yotam", "Sandbank", email = "yotamsandbank@gmail.com", role = "aut"), person("Google Inc.", role = "cph") )
+# Description: Provides deep boosting models training, evaluation, predicting and hyper parameter optimising using grid search and cross validation. Based on Google's Deep Boosting algorithm, and Google's C++ implementation. Cortes, C., Mohri, M., & Syed, U. (2014) <http://machinelearning.wustl.edu/mlpapers/papers/icml2014c2_cortesb14>.
+# URL: https://github.com/dmarcous/CRAN_deepboost
+# BugReports: https://github.com/dmarcous/CRAN_deepboost/issues
+# License: Apache License (== 2.0)
+# LazyData: TRUE
+# Suggests: testthat, ada, caret
+# Depends: R (>= 3.1)
+# Imports: Rcpp (>= 0.12.2), methods
+# LinkingTo: Rcpp
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2017-11-08 18:07:09 UTC; dmarcous
+# Repository: CRAN
+# Date/Publication: 2017-11-08 18:22:33 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,92 @@
+{% set version = '0.3.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dendsort
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dendsort_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dendsort/dendsort_{{ version }}.tar.gz
+  sha256: d54713cb230a7523cb87f1c7f2d68d9c570c01e61b551457bd71bb7bd38198d4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, RColorBrewer, gplots, heatmap.plus, seriation, gapmap
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dendsort')"           # [not win]
+    - "\"%R%\" -e \"library('dendsort')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://bitbucket.org/vda-lab/dendsort/, http://f1000research.com/articles/3-177/v1
+  license: GPL-2 | GPL-3
+  summary: An implementation of functions to optimize ordering of nodes in a dendrogram, without
+    affecting the meaning of the dendrogram. A dendrogram can be sorted based on the
+    average distance of subtrees, or based on the smallest distance value. These sorting
+    methods improve readability and interpretability of tree structure, especially for
+    tasks such as comparison of different distance measures or linkage types and identification
+    of tight clusters and outliers. As a result, it also introduces more meaningful
+    reordering for a coupled heatmap visualization.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: dendsort
+# Type: Package
+# Title: Modular Leaf Ordering Methods for Dendrogram Nodes
+# Version: 0.3.3
+# Date: 2015-12-14
+# Author: Ryo Sakai
+# Maintainer: Ryo Sakai <ryo@vda-lab.be>
+# Description: An implementation of functions to optimize ordering of nodes in a dendrogram, without affecting the meaning of the dendrogram. A dendrogram can be sorted based on the average distance of subtrees, or based on the smallest distance value. These sorting methods improve readability and interpretability of tree structure, especially for tasks such as comparison of different distance measures or linkage types and identification of tight clusters and outliers. As a result, it also introduces more meaningful reordering for a coupled heatmap visualization.
+# License: GPL-2 | GPL-3
+# URL: https://bitbucket.org/vda-lab/dendsort/, http://f1000research.com/articles/3-177/v1
+# Suggests: knitr, RColorBrewer, gplots, heatmap.plus, seriation, gapmap
+# VignetteBuilder: knitr
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2015-12-14 09:55:50 UTC; ryosakai
+# Repository: CRAN
+# Date/Publication: 2015-12-14 12:39:17
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

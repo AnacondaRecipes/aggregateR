@@ -1,0 +1,108 @@
+{% set version = '1.7-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dfmta
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dfmta_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dfmta/dfmta_{{ version }}.tar.gz
+  sha256: b2cce728b1c3bdac3ae193d6a257c86cb4c8d091a96708e8c413df3cb1722532
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh >=1.55
+    - r-rcpp
+    - r-rcpparmadillo >=0.7.100.3.1
+    - r-rcppprogress >=0.2.1
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.55
+    - r-rcpp
+    - r-rcpparmadillo >=0.7.100.3.1
+    - r-rcppprogress >=0.2.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dfmta')"           # [not win]
+    - "\"%R%\" -e \"library('dfmta')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=dfmta
+  license: GPL-3
+  summary: 'Phase I/II adaptive dose-finding design for single-agent Molecularly Targeted Agent
+    (MTA), according to the paper "Phase I/II Dose-Finding Design for Molecularly Targeted
+    Agent: Plateau Determination using Adaptive Randomization", Riviere Marie-Karelle
+    et al. (2016) <doi:10.1177/0962280216631763>.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: dfmta
+# Type: Package
+# Title: Phase I/II Adaptive Dose-Finding Design for MTA
+# Version: 1.7-0
+# Date: 2018-05-24
+# Author: Marie-Karelle Riviere and Jacques-Henri Jourdan
+# Maintainer: Jacques-Henri Jourdan <jacques-henri.jourdan@normalesup.org>
+# Copyright: All files in src/CppBugs are copyright Whit Armstrong. All other files are copyright Institut de Recherches Internationales Servier and Institut national de la sante et de la recherche medicale.
+# Description: Phase I/II adaptive dose-finding design for single-agent Molecularly Targeted Agent (MTA), according to the paper "Phase I/II Dose-Finding Design for Molecularly Targeted Agent: Plateau Determination using Adaptive Randomization", Riviere Marie-Karelle et al. (2016) <doi:10.1177/0962280216631763>.
+# License: GPL-3
+# Depends: R (>= 3.4.0)
+# LinkingTo: RcppArmadillo (>= 0.7.100.3.1), BH (>= 1.55), RcppProgress (>= 0.2.1), Rcpp
+# NeedsCompilation: yes
+# Packaged: 2018-05-24 12:44:25 UTC; jjourdan
+# Repository: CRAN
+# Date/Publication: 2018-05-24 17:37:52 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

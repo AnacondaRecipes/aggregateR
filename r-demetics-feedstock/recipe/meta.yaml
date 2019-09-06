@@ -1,0 +1,86 @@
+{% set version = '0.8-7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-demetics
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DEMEtics_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DEMEtics/DEMEtics_{{ version }}.tar.gz
+  sha256: 5dca2d86c0403bc41102b62a9d3c3bb5ddd57a5d8d29d973b98f34606ac4a9e8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DEMEtics')"           # [not win]
+    - "\"%R%\" -e \"library('DEMEtics')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DEMEtics
+  license: GPL-2
+  summary: This package allows to calculate the fixation index Gst (Nei, 1973) and the differentiation
+    index D (Jost, 2008) pairwise between or averaged over several populations.  P-values,
+    stating the significance of differentiation, and 95 percent confidence intervals
+    can be estimated using bootstrap resamplings. In the case that more than two populations
+    are compared pairwise, the p-values are adjusted by bonferroni correction and in
+    several other ways due to the multiple comparison from one data set.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DEMEtics
+# Type: Package
+# Title: Evaluating the genetic differentiation between populations based on Gst and D values.
+# Version: 0.8-7
+# Date: 2013-12-02
+# Author: Alexander Jueterbock, Philipp Kraemer, Gabriele Gerlach and Jana Deppermann
+# Maintainer: Alexander Jueterbock <Alexander-Jueterbock@web.de>
+# Depends: R (>= 2.8.0)
+# Description: This package allows to calculate the fixation index Gst (Nei, 1973) and the differentiation index D (Jost, 2008) pairwise between or averaged over several populations.  P-values, stating the significance of differentiation, and 95 percent confidence intervals can be estimated using bootstrap resamplings. In the case that more than two populations are compared pairwise, the p-values are adjusted by bonferroni correction and in several other ways due to the multiple comparison from one data set.
+# License: GPL (>= 2)
+# Packaged: 2013-12-03 10:31:57 UTC; alj
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-12-03 11:59:32
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

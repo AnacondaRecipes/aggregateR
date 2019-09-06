@@ -1,0 +1,85 @@
+{% set version = '0.7.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-devore7
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Devore7_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Devore7/Devore7_{{ version }}.tar.gz
+  sha256: dca20848e10879b2a3839fadf555020aadbfd3905e4e27b0029bec9d20ba28d4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-lattice
+
+  run:
+    - r-base
+    - r-mass
+    - r-lattice
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Devore7')"           # [not win]
+    - "\"%R%\" -e \"library('Devore7')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Devore7
+  license: GPL-2
+  summary: Data sets and sample analyses from Jay L. Devore (2008), "Probability and Statistics
+    for Engineering and the Sciences (7th ed)", Thomson.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Devore7
+# Version: 0.7.6
+# Title: Data sets from Devore's "Prob and Stat for Eng (7th ed)"
+# Maintainer: John Verzani <jverzani@gmail.com>
+# Author: Original by Jay L. Devore, modifications by Douglas Bates <bates@stat.wisc.edu>, modifications  for 7th edition by John Verzani.
+# Description: Data sets and sample analyses from Jay L. Devore (2008), "Probability and Statistics for Engineering and the Sciences (7th ed)", Thomson.
+# Depends: R(>= 2.4.0), MASS, lattice
+# LazyData: TRUE
+# License: GPL (>= 2)
+# Packaged: 2014-03-25 01:44:18 UTC; verzani
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-03-25 05:37:06
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-devfunc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/devFunc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/devFunc/devFunc_{{ version }}.tar.gz
+  sha256: 185914c23438e794fdb68cff0712a6ff1e6873d09afd0355bdcaa6a9f52b5a38
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-plyr >=1.8.4
+    - r-stringr >=1.1.0
+
+  run:
+    - r-base
+    - r-plyr >=1.8.4
+    - r-stringr >=1.1.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('devFunc')"           # [not win]
+    - "\"%R%\" -e \"library('devFunc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=devFunc
+  license: GPL-3
+  summary: A concise check of the format of one or multiple input arguments (data type, length
+    or value) is provided. Since multiple input arguments can be tested simultaneously,
+    a lengthly list of checks at the beginning of your function can be avoided, hereby
+    enhancing the readability and maintainability of your code.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: devFunc
+# Type: Package
+# Title: Clear and Condense Argument Check for User-Defined Functions
+# Version: 0.1
+# Author: Robin Van Oirbeek
+# Maintainer: Robin Van Oirbeek <robin.vanoirbeek@gmail.com>
+# Description: A concise check of the format of one or multiple input arguments (data type, length or value) is provided. Since multiple input arguments can be tested simultaneously, a lengthly list of checks at the beginning of your function can be avoided, hereby enhancing the readability and maintainability of your code.
+# License: GPL-3
+# Encoding: UTF-8
+# Depends: R (>= 3.3.0)
+# Imports: plyr (>= 1.8.4), stringr (>= 1.1.0)
+# LazyData: true
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-01-24 17:24:02 UTC; Robin
+# Repository: CRAN
+# Date/Publication: 2018-01-24 18:30:38 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

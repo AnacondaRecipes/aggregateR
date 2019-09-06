@@ -1,0 +1,101 @@
+{% set version = '1.0-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-difconet
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/difconet_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/difconet/difconet_{{ version }}.tar.gz
+  sha256: 788d5f48985f3f83f74b8587e25afb40435b4be10d5cbf51f0d55d5b496c4a32
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-gplots
+    - r-mvtnorm
+    - r-stringr
+
+  run:
+    - r-base
+    - r-data.table
+    - r-gplots
+    - r-mvtnorm
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('difconet')"           # [not win]
+    - "\"%R%\" -e \"library('difconet')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://bioinformatica.mty.itesm.mx/difconet
+  license: GPL-2
+  summary: Estimation of DIFferential COexpressed NETworks using diverse and user metrics. This
+    package is basically used for three functions related to the estimation of differential
+    coexpression.  First, to estimate differential coexpression where the coexpression
+    is estimated, by default, by Spearman correlation. For this, a metric to compare
+    two correlation distributions is needed. The package includes 6 metrics. Some of
+    them needs a threshold. A new metric can also be specified as a user function with
+    specific parameters (see difconet.run). The significance is be estimated by permutations.
+    Second, to generate datasets with controlled differential correlation data. This  is
+    done by either adding noise, or adding specific correlation structure. Third, to
+    show the results of differential correlation analyses. Please see <http://bioinformatica.mty.itesm.mx/difconet>
+    for further information.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: difconet
+# Version: 1.0-4
+# Date: 2017-05-26
+# Title: Differential Coexpressed Networks
+# Authors@R: c(person("Elpidio-Emmanuel", "Gonzalez-Valbuena", role = c("aut")),  person("Victor", "Trevino", role = c("aut", "cre"),email = "vtrevino@itesm.mx"))
+# Depends: R (>= 3.1.0), gplots
+# Imports: stats, utils, stringr, data.table, mvtnorm, graphics, grDevices
+# Description: Estimation of DIFferential COexpressed NETworks using diverse and user metrics. This package is basically used for three functions related to the estimation of differential coexpression.  First, to estimate differential coexpression where the coexpression is estimated, by default, by Spearman correlation. For this, a metric to compare two correlation distributions is needed. The package includes 6 metrics. Some of them needs a threshold. A new metric can also be specified as a user function with specific parameters (see difconet.run). The significance is be estimated by permutations. Second, to generate datasets with controlled differential correlation data. This  is done by either adding noise, or adding specific correlation structure. Third, to show the results of differential correlation analyses. Please see <http://bioinformatica.mty.itesm.mx/difconet> for further information.
+# License: GPL (>= 2)
+# URL: http://bioinformatica.mty.itesm.mx/difconet
+# NeedsCompilation: no
+# Packaged: 2017-05-30 20:26:59 UTC; victortrevino
+# Author: Elpidio-Emmanuel Gonzalez-Valbuena [aut], Victor Trevino [aut, cre]
+# Maintainer: Victor Trevino <vtrevino@itesm.mx>
+# Repository: CRAN
+# Date/Publication: 2017-05-31 06:24:37 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

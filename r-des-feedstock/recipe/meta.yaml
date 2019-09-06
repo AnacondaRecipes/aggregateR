@@ -1,0 +1,88 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-des
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DES_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DES/DES_{{ version }}.tar.gz
+  sha256: 61f879d14950fe35611e1f629eec092ba82b256fb02566b87c88f1e95144e39a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests:
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DES')"           # [not win]
+    - "\"%R%\" -e \"library('DES')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DES
+  license: MIT
+  summary: Discrete event simulation (DES) involves modeling of systems having discrete, i.e.
+    abrupt, state changes. For instance, when a job arrives to a queue, the queue length
+    abruptly increases by 1.  This package is an R implementation of the event-oriented
+    approach to DES; see the tutorial in Matloff (2008)  <http://heather.cs.ucdavis.edu/~matloff/156/PLN/DESimIntro.pdf>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DES
+# Version: 1.0.0
+# Author: Norm Matloff <normmatloff@gmail.com>
+# Maintainer: Norm Matloff <normmatloff@gmail.com>
+# Date: 2017-9-13
+# Title: Discrete Event Simulation
+# Description: Discrete event simulation (DES) involves modeling of systems having discrete, i.e. abrupt, state changes. For instance, when a job arrives to a queue, the queue length abruptly increases by 1.  This package is an R implementation of the event-oriented approach to DES; see the tutorial in Matloff (2008)  <http://heather.cs.ucdavis.edu/~matloff/156/PLN/DESimIntro.pdf>.
+# Depends: stats,utils
+# Imports:
+# Suggests:
+# LazyLoad: no
+# License: MIT + file LICENSE
+# NeedsCompilation: no
+# Packaged: 2017-09-14 19:21:34 UTC; matloff
+# Repository: CRAN
+# Date/Publication: 2017-09-16 20:11:57 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

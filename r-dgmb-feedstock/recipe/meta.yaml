@@ -1,0 +1,93 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dgmb
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dgmb_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dgmb/dgmb_{{ version }}.tar.gz
+  sha256: b3a870530a5ac39674ce4c5d860c3b080ea6f77507f5612c3afd467e426ab5e4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-abind
+
+  run:
+    - r-base
+    - r-mass
+    - r-abind
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dgmb')"           # [not win]
+    - "\"%R%\" -e \"library('dgmb')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=dgmb
+  license: GPL-2
+  summary: A set of functions have been implemented to generate random data to perform Monte
+    Carlo simulations on structural models with formative constructs and interaction
+    and nonlinear effects (Two-Step PLS Mode B structural models). The setup of the
+    true model considers a simple structure with three formative exogenous constructs
+    related to one formative endogenous construct. The routines take into account the
+    interaction and nonlinear effects of the exogenous constructs on the endogenous
+    construct.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: dgmb
+# Type: Package
+# Title: Simulating Data for PLS Mode B Structural Models
+# Version: 1.2
+# Date: 2015-10-02
+# Author: Alba Martinez-Ruiz <amartine@ucsc.cl> and Claudia Martinez-Araneda <cmartinez@ucsc.cl>
+# Maintainer: Alba Martinez-Ruiz <amartine@ucsc.cl>
+# Depends: R (>= 3.1.0), tcltk, MASS, abind
+# Description: A set of functions have been implemented to generate random data to perform Monte Carlo simulations on structural models with formative constructs and interaction and nonlinear effects (Two-Step PLS Mode B structural models). The setup of the true model considers a simple structure with three formative exogenous constructs related to one formative endogenous construct. The routines take into account the interaction and nonlinear effects of the exogenous constructs on the endogenous construct.
+# SystemRequirements: tktable, BWidget
+# License: GPL (>= 2)
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2015-10-20 20:33:04 UTC; docente
+# Repository: CRAN
+# Date/Publication: 2015-10-22 15:23:16
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
