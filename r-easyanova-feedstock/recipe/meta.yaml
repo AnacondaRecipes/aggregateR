@@ -1,0 +1,86 @@
+{% set version = '7.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-easyanova
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/easyanova_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/easyanova/easyanova_{{ version }}.tar.gz
+  sha256: a55805f44e0e60ba181c67427bb3599810a6947008de8f1f0cc1821cf280fcfe
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-nlme
+
+  run:
+    - r-base
+    - r-nlme
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('easyanova')"           # [not win]
+    - "\"%R%\" -e \"library('easyanova')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=easyanova
+  license: GPL-2
+  summary: Perform analysis of variance and other important complementary analyses.  The functions
+    are easy to use.  Performs analysis in various designs, with balanced and unbalanced
+    data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: easyanova
+# Type: Package
+# Title: Analysis of Variance and Other Important Complementary Analyses
+# Version: 7.0
+# Date: 2019-07-23
+# Author: Emmanuel Arnhold
+# Maintainer: Emmanuel Arnhold <emmanuelarnhold@yahoo.com.br>
+# Description: Perform analysis of variance and other important complementary analyses.  The functions are easy to use.  Performs analysis in various designs, with balanced and unbalanced data.
+# Depends: R (>= 3.0.0)
+# Imports: nlme
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2019-07-27 19:09:27 UTC; emmanuel
+# Repository: CRAN
+# Date/Publication: 2019-07-27 19:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,82 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dynamicdistribution
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DynamicDistribution_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DynamicDistribution/DynamicDistribution_{{ version }}.tar.gz
+  sha256: c561e6625f99347265fba265b4cee4c32e894d4031d8d8e3265af62be485e8e8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DynamicDistribution')"           # [not win]
+    - "\"%R%\" -e \"library('DynamicDistribution')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DynamicDistribution
+  license: GPL-2
+  summary: The package is aimed at dynamically visualizing probability distributions and their
+    moments and all the commonly used distributions are included.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DynamicDistribution
+# Title: Dynamically visualized probability distributions and their moments
+# Description: The package is aimed at dynamically visualizing probability distributions and their moments and all the commonly used distributions are included.
+# Version: 1.1
+# Author: Lei ZHANG, Hao JIANG and Chen XUE(Equally contributed, the order is decided by the time the author joined the project. )
+# Maintainer: Hao JIANG <lucius.hao.jiang@gmail.com>
+# Depends: R (>= 3.0.2)
+# License: GPL (>= 2)
+# Packaged: 2013-12-05 02:30:41 UTC; Administrator
+# Repository: CRAN
+# LazyData: true
+# Collate: 'DynCon.R' 'DynDis.R' 'internal.R' 'DynamicDistribution-package.r'
+# NeedsCompilation: no
+# Date/Publication: 2013-12-05 07:50:41
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

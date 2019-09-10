@@ -1,0 +1,82 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-easyahp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/easyAHP_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/easyAHP/easyAHP_{{ version }}.tar.gz
+  sha256: cdfaffc82197173f121643ff98e6d9ac5904190c46d67344ba01de2441b23598
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('easyAHP')"           # [not win]
+    - "\"%R%\" -e \"library('easyAHP')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=easyAHP
+  license: GPL-3
+  summary: Given the scores from decision makers, the analytic hierarchy process can be conducted
+    easily.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: easyAHP
+# Type: Package
+# Title: Analytic Hierarchy Process (AHP)
+# Version: 0.1.1
+# Author: Zhicheng Du, Yuantao Hao
+# Maintainer: Zhicheng Du<dgdzc@hotmail.com>
+# Description: Given the scores from decision makers, the analytic hierarchy process can be conducted easily.
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2017-11-18 12:51:16 UTC; dgdzc
+# Repository: CRAN
+# Date/Publication: 2017-11-18 12:59:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

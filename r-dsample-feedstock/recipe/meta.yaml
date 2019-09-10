@@ -1,0 +1,91 @@
+{% set version = '0.91.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dsample
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dsample_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dsample/dsample_{{ version }}.tar.gz
+  sha256: 019e62ff90b4dd115cd4332d20bb165e52721a67d1523eeb4c763d8e55ff80a1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dsample')"           # [not win]
+    - "\"%R%\" -e \"library('dsample')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://r-forge.r-project.org/projects/wanglee/
+  license: GPL-2
+  summary: Two discretization-based Monte Carlo algorithms, namely the Fu-Wang algorithm and
+    the Wang-Lee algorithm, are provided for random sample generation from a high dimensional
+    distribution of complex structure.  The normalizing constant of the target distribution
+    needs not to be known.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: dsample
+# Type: Package
+# Title: Discretization-Based Direct Random Sample Generation
+# Version: 0.91.2.2
+# Date: 2015-11-13
+# Authors@R: c(person(given = "Chel Hee", family = "Lee", role = c("aut", "cre"), email="gnustats@gmail.com"), person(given = "Liqun", family = "Wang", role = c("aut"), email="liqun.wang@umanitoba.ca"))
+# Author: Chel Hee Lee [aut, cre],  Liqun Wang [aut]
+# Maintainer: Chel Hee Lee <gnustats@gmail.com>
+# Contact: Chel Hee Lee <chl948@mail.usask.ca>
+# Description: Two discretization-based Monte Carlo algorithms, namely the Fu-Wang algorithm and the Wang-Lee algorithm, are provided for random sample generation from a high dimensional distribution of complex structure.  The normalizing constant of the target distribution needs not to be known.
+# Depends: R (>= 2.7.0)
+# Imports: stats, graphics, MASS
+# License: GPL (>= 2)
+# URL: https://r-forge.r-project.org/projects/wanglee/
+# BugReports: chl948@mail.usask.ca
+# NeedsCompilation: no
+# Packaged: 2015-11-30 01:41:09 UTC; chel
+# Repository: CRAN
+# Date/Publication: 2015-11-30 06:13:11
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

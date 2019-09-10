@@ -1,0 +1,86 @@
+{% set version = '0.1-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dtmcpack
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DTMCPack_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DTMCPack/DTMCPack_{{ version }}.tar.gz
+  sha256: 2120d3d5cfd1b34a95b10ccd035ee6091be89da002a74e06c2d800c78a562b2e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DTMCPack')"           # [not win]
+    - "\"%R%\" -e \"library('DTMCPack')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DTMCPack
+  license: GPL-2
+  summary: A series of functions which aid in both simulating and determining the properties
+    of finite, discrete-time, discrete state markov chains.  Two functions (DTMC, MultDTMC)
+    produce n iterations of a Markov Chain(s) based on transition probabilities and
+    an initial distribution.  The function FPTime determines the first passage time
+    into each state.  The function statdistr determines the stationary distribution
+    of a Markov Chain.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DTMCPack
+# Type: Package
+# Title: Suite of functions related to discrete-time discrete-state Markov Chains
+# Version: 0.1-2
+# Date: 2013-05-22
+# Author: William Nicholson
+# Maintainer: William Nicholson<wbnicholson@gmail.com>
+# Description: A series of functions which aid in both simulating and determining the properties of finite, discrete-time, discrete state markov chains.  Two functions (DTMC, MultDTMC) produce n iterations of a Markov Chain(s) based on transition probabilities and an initial distribution.  The function FPTime determines the first passage time into each state.  The function statdistr determines the stationary distribution of a Markov Chain.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# Packaged: 2013-05-28 14:33:14 UTC; will
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-05-28 16:40:32
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

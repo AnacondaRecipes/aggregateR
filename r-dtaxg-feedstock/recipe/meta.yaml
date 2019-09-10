@@ -1,0 +1,84 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dtaxg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DTAXG_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DTAXG/DTAXG_{{ version }}.tar.gz
+  sha256: eeb40ef0ccc9ab72d54a504d86be35b74a1c9144c950695b07b18c0f7a04aacb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DTAXG')"           # [not win]
+    - "\"%R%\" -e \"library('DTAXG')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DTAXG
+  license: GPL-3
+  summary: To calculate the sensitivity and specificity in the absence of gold standard using
+    the Bayesian method. The Bayesian method can be referenced at Haiyan Gu and Qiguang
+    Chen (1999) <doi:10.3969/j.issn.1002-3674.1999.04.004>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DTAXG
+# Type: Package
+# Title: Diagnostic Test Assessment in the Absence of Gold Standard
+# Version: 0.1.0
+# Author: Zhicheng Du, Yuantao Hao
+# Maintainer: Zhicheng Du <dgdzc@hotmail.com>
+# Description: To calculate the sensitivity and specificity in the absence of gold standard using the Bayesian method. The Bayesian method can be referenced at Haiyan Gu and Qiguang Chen (1999) <doi:10.3969/j.issn.1002-3674.1999.04.004>.
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Imports: stats
+# NeedsCompilation: no
+# Packaged: 2019-03-06 23:59:13 UTC; dgdzc
+# Repository: CRAN
+# Date/Publication: 2019-03-07 17:32:59 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

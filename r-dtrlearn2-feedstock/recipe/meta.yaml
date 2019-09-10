@@ -1,0 +1,98 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dtrlearn2
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DTRlearn2_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DTRlearn2/DTRlearn2_{{ version }}.tar.gz
+  sha256: e17f992ff2c2f47916ec87d306a328e8ef265e64597d1a9493fadde7fd429e2a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-foreach
+    - r-glmnet
+    - r-kernlab
+
+  run:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-foreach
+    - r-glmnet
+    - r-kernlab
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DTRlearn2')"           # [not win]
+    - "\"%R%\" -e \"library('DTRlearn2')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DTRlearn2
+  license: GPL-2
+  summary: We provide a comprehensive software to estimate general K-stage DTRs from SMARTs with
+    Q-learning and a variety of outcome-weighted learning methods. Penalizations are
+    allowed for variable selection and model regularization. With the outcome-weighted
+    learning scheme, different loss functions - SVM hinge loss, SVM ramp loss, binomial
+    deviance loss, and L2 loss - are adopted to solve the weighted classification problem
+    at each stage; augmentation in the outcomes is allowed to improve efficiency. The
+    estimated DTR can be easily applied to a new sample for individualized treatment
+    recommendations or DTR evaluation.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DTRlearn2
+# Title: Statistical Learning Methods for Optimizing Dynamic Treatment Regimes
+# Version: 1.0
+# Author: Yuan Chen, Ying Liu, Donglin Zeng, Yuanjia Wang
+# Maintainer: Yuan Chen <irene.yuan.chen@gmail.com>
+# Description: We provide a comprehensive software to estimate general K-stage DTRs from SMARTs with Q-learning and a variety of outcome-weighted learning methods. Penalizations are allowed for variable selection and model regularization. With the outcome-weighted learning scheme, different loss functions - SVM hinge loss, SVM ramp loss, binomial deviance loss, and L2 loss - are adopted to solve the weighted classification problem at each stage; augmentation in the outcomes is allowed to improve efficiency. The estimated DTR can be easily applied to a new sample for individualized treatment recommendations or DTR evaluation.
+# Depends: kernlab,MASS,Matrix,foreach,glmnet, R (>= 2.10)
+# License: GPL-2
+# Encoding: UTF-8
+# RoxygenNote: 6.0.1.9000
+# NeedsCompilation: no
+# Packaged: 2019-01-02 16:34:17 UTC; YChen
+# Repository: CRAN
+# Date/Publication: 2019-01-03 17:00:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

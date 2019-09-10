@@ -1,0 +1,87 @@
+{% set version = '2.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ebgenotyping
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ebGenotyping_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ebGenotyping/ebGenotyping_{{ version }}.tar.gz
+  sha256: ac339e8fd38874aecfddaa85ab91599e52238ce7fb418c34cf93ed3d0ffb94ca
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ebGenotyping')"           # [not win]
+    - "\"%R%\" -e \"library('ebGenotyping')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ebGenotyping
+  license: GPL-2
+  summary: Genotyping the population using next generation sequencing data is essentially important
+    for the rare variant detection. In order to distinguish the genomic structural variation
+    from sequencing error, we propose a statistical model which involves the genotype
+    effect through a latent variable to depict the distribution of non-reference allele
+    frequency data among different samples and different genome loci, while decomposing
+    the sequencing error into sample effect and positional effect. An ECM algorithm
+    is implemented to estimate the model parameters, and then the genotypes and SNPs
+    are inferred based on the empirical Bayes method.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ebGenotyping
+# Type: Package
+# Title: Genotyping and SNP Detection using Next Generation Sequencing Data
+# Version: 2.0.1
+# Date: 2016-04-07
+# Author: Na You <youn@mail.sysu.edu.cn> and Gongyi Huang<53hgy@163.com>
+# Maintainer: Gongyi Huang<53hgy@163.com>
+# Description: Genotyping the population using next generation sequencing data is essentially important for the rare variant detection. In order to distinguish the genomic structural variation from sequencing error, we propose a statistical model which involves the genotype effect through a latent variable to depict the distribution of non-reference allele frequency data among different samples and different genome loci, while decomposing the sequencing error into sample effect and positional effect. An ECM algorithm is implemented to estimate the model parameters, and then the genotypes and SNPs are inferred based on the empirical Bayes method.
+# License: GPL-2
+# Packaged: 2016-04-12 14:20:14 UTC; huanggongyi
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2016-04-13 09:28:12
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,93 @@
+{% set version = '0.1-6.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dsl
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DSL_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DSL/DSL_{{ version }}.tar.gz
+  sha256: ac566fd967dfc450bb97ba1710f378a5a79642d1e86b95831d66adff6e1bfcfd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: hive (>= 0.1-14), parallel
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DSL')"           # [not win]
+    - "\"%R%\" -e \"library('DSL')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DSL
+  license: GPL-3
+  summary: An abstract DList class helps storing large list-type objects in a distributed manner.
+    Corresponding high-level functions and methods for handling distributed storage
+    (DStorage) and lists allows for processing such DLists on distributed systems efficiently.
+    In doing so it uses a well defined storage backend implemented based on the DStorage
+    class.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DSL
+# Version: 0.1-6.1
+# Date: 2015-07-02
+# Title: Distributed Storage and List
+# Description: An abstract DList class helps storing large list-type objects in a distributed manner. Corresponding high-level functions and methods for handling distributed storage (DStorage) and lists allows for processing such DLists on distributed systems efficiently. In doing so it uses a well defined storage backend implemented based on the DStorage class.
+# Authors@R: c(person("Ingo", "Feinerer", role = "aut"), person("Stefan", "Theussl", role = c("aut", "cre"), email = "Stefan.Theussl@R-project.org"), person("Christian", "Buchta", role = "ctb"))
+# License: GPL-3
+# Imports: methods, utils
+# Suggests: hive (>= 0.1-14), parallel
+# NeedsCompilation: yes
+# Packaged: 2019-07-02 06:54:56 UTC; ripley
+# Author: Ingo Feinerer [aut], Stefan Theussl [aut, cre], Christian Buchta [ctb]
+# Maintainer: Stefan Theussl <Stefan.Theussl@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2019-07-02 09:21:53
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

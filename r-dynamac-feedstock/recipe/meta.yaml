@@ -1,0 +1,99 @@
+{% set version = '0.1.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dynamac
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dynamac_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dynamac/dynamac_{{ version }}.tar.gz
+  sha256: b74a9ec830939121c81418c91611573f9adbdaf726b44e4f7f374fe9b4c3d7b9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: urca, knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-lmtest
+
+  run:
+    - r-base
+    - r-mass
+    - r-lmtest
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dynamac')"           # [not win]
+    - "\"%R%\" -e \"library('dynamac')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/andyphilips/dynamac/
+  license: GPL-2
+  summary: While autoregressive distributed lag (ARDL) models allow for extremely flexible dynamics,
+    interpreting substantive significance of complex lag structures remains difficult.
+    This package is designed to assist users in dynamically simulating and plotting
+    the results of various ARDL models. It also contains post-estimation diagnostics,
+    including a test for cointegration when estimating the error-correction variant
+    of the autoregressive distributed lag model (Pesaran, Shin, and Smith 2001 <doi:10.1002/jae.616>).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: dynamac
+# Title: Dynamic Simulation and Testing for Single-Equation ARDL Models
+# Version: 0.1.8
+# Authors@R: c(person("Soren", "Jordan", email = "sorenjordanpols@gmail.com", role = c("aut", "cre","cph")), person("Andrew Q.", "Philips", email = "andrew.philips@colorado.edu", role = c("aut")))
+# Maintainer: Soren Jordan <sorenjordanpols@gmail.com>
+# Description: While autoregressive distributed lag (ARDL) models allow for extremely flexible dynamics, interpreting substantive significance of complex lag structures remains difficult. This package is designed to assist users in dynamically simulating and plotting the results of various ARDL models. It also contains post-estimation diagnostics, including a test for cointegration when estimating the error-correction variant of the autoregressive distributed lag model (Pesaran, Shin, and Smith 2001 <doi:10.1002/jae.616>).
+# URL: https://github.com/andyphilips/dynamac/
+# BugReports: https://github.com/andyphilips/dynamac/issues
+# Imports: MASS, lmtest
+# Suggests: urca, knitr, rmarkdown, testthat
+# Depends: R (>= 3.0.1)
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# BuildManual: yes
+# RoxygenNote: 6.1.1
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-04-09 17:43:32 UTC; scj0014
+# Author: Soren Jordan [aut, cre, cph], Andrew Q. Philips [aut]
+# Repository: CRAN
+# Date/Publication: 2019-04-09 21:36:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

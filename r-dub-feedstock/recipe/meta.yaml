@@ -1,0 +1,93 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dub
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dub_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dub/dub_{{ version }}.tar.gz
+  sha256: bcc765f192708a139e8445d682e83f3a133514598df47d82ab000d42a6ffd418
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dub')"           # [not win]
+    - "\"%R%\" -e \"library('dub')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/egnha/dub
+  license: MIT
+  summary: Provides an operator for assigning nested components of a list to names via a concise
+    pattern matching syntax. This is especially convenient for assigning individual
+    names to the multiple values that a function may return in the form of a list, and
+    for extracting deeply nested list components.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: dub
+# Type: Package
+# Title: Unpacking Assignment for Lists via Pattern Matching
+# Version: 0.2.0
+# Authors@R: person("Eugene", "Ha", , "eha@posteo.de", c("aut", "cre"))
+# Description: Provides an operator for assigning nested components of a list to names via a concise pattern matching syntax. This is especially convenient for assigning individual names to the multiple values that a function may return in the form of a list, and for extracting deeply nested list components.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# ByteCompile: true
+# Suggests: covr, testthat
+# URL: https://github.com/egnha/dub
+# BugReports: https://github.com/egnha/dub/issues
+# Collate: 'util.R' 'assert.R' 'tree.R' 'names.R' 'assign.R'
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-10-27 11:35:55 UTC; eha
+# Author: Eugene Ha [aut, cre]
+# Maintainer: Eugene Ha <eha@posteo.de>
+# Repository: CRAN
+# Date/Publication: 2018-10-27 12:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

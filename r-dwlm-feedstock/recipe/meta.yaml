@@ -1,0 +1,85 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dwlm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dwlm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dwlm/dwlm_{{ version }}.tar.gz
+  sha256: 2c831d5a3e5426419b5aab6e911bb8213280ff42dbf201757cc4fb8d138dad58
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dwlm')"           # [not win]
+    - "\"%R%\" -e \"library('dwlm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=dwlm
+  license: GPL-2
+  summary: This linear model solution is useful when both predictor and response have associated
+    uncertainty. The doubly weights linear model solution is invariant on which quantity
+    is used as predictor or response. Based on the results by Reed(1989) <doi:10.1119/1.15963>
+    and Ripley & Thompson(1987) <doi:10.1039/AN9871200377>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: dwlm
+# Type: Package
+# Title: Doubly Weighted Linear Model
+# Version: 0.1.0
+# Date: 2019-09-01
+# Author: Hugo Gasca-Aragon [aut,cre]
+# Maintainer: Hugo Gasca-Aragon <hugo_gasca_aragon@hotmail.com>
+# Description: This linear model solution is useful when both predictor and response have associated uncertainty. The doubly weights linear model solution is invariant on which quantity is used as predictor or response. Based on the results by Reed(1989) <doi:10.1119/1.15963> and Ripley & Thompson(1987) <doi:10.1039/AN9871200377>.
+# Depends: stats (>= 3.4.0), R (>= 3.4.0)
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2019-09-06 11:18:30 UTC; hugo_
+# Repository: CRAN
+# Date/Publication: 2019-09-09 10:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

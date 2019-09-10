@@ -1,0 +1,98 @@
+{% set version = '0.5.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ecosolver
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ECOSolveR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ECOSolveR/ECOSolveR_{{ version }}.tar.gz
+  sha256: 17ed6957ac522d56aadc5600b8498e6b0aed11624b1d84c5c2ca2654765e006a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, Matrix, covr, slam
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ECOSolveR')"           # [not win]
+    - "\"%R%\" -e \"library('ECOSolveR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://bnaras.github.io/ECOSolveR
+  license: GPL-3
+  summary: R interface to the Embedded COnic Solver (ECOS), an efficient and robust C library
+    for convex problems. Conic and equality constraints can be specified in addition
+    to integer and boolean variable constraints for mixed-integer problems. This R interface
+    is inspired by the python interface and has similar calling conventions.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ECOSolveR
+# Type: Package
+# Title: Embedded Conic Solver in R
+# Version: 0.5.2
+# Date: 2019-05-09
+# VignetteBuilder: knitr
+# Authors@R: c(person("Anqi", "Fu", role = c("aut"), email = "anqi.fu.1987@gmail.com"), person("Balasubramanian", "Narasimhan", role = c("aut", "cre"), email = "naras@stat.Stanford.EDU"), person("Florian", "Schwendinger", role = c("ctb"), email = "FlorianSchwendinger@gmx.at"))
+# SystemRequirements: GNU make
+# URL: https://bnaras.github.io/ECOSolveR
+# BugReports: https://github.com/bnaras/ECOSolveR/issues
+# Suggests: knitr, rmarkdown, testthat, Matrix, covr, slam
+# Description: R interface to the Embedded COnic Solver (ECOS), an efficient and robust C library for convex problems. Conic and equality constraints can be specified in addition to integer and boolean variable constraints for mixed-integer problems. This R interface is inspired by the python interface and has similar calling conventions.
+# License: GPL (>= 3)
+# Encoding: UTF-8
+# RoxygenNote: 6.1.1
+# NeedsCompilation: yes
+# Packaged: 2019-05-10 00:30:51 UTC; naras
+# Author: Anqi Fu [aut], Balasubramanian Narasimhan [aut, cre], Florian Schwendinger [ctb]
+# Maintainer: Balasubramanian Narasimhan <naras@stat.Stanford.EDU>
+# Repository: CRAN
+# Date/Publication: 2019-05-10 08:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

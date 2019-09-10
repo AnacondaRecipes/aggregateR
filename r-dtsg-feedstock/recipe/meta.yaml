@@ -1,0 +1,109 @@
+{% set version = '0.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dtsg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DTSg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DTSg/DTSg_{{ version }}.tar.gz
+  sha256: 12f5c5db44605bee9b5be301cb7870649f9da4f6556a30afcd6798839d37ff37
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dygraphs, fasttime, knitr, magrittr, RColorBrewer, rmarkdown, testthat, xts
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-assertive.base
+    - r-assertive.numbers
+    - r-assertive.sets
+    - r-assertive.types
+    - r-data.table
+
+  run:
+    - r-base
+    - r-r6
+    - r-assertive.base
+    - r-assertive.numbers
+    - r-assertive.sets
+    - r-assertive.types
+    - r-data.table
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DTSg')"           # [not win]
+    - "\"%R%\" -e \"library('DTSg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/gisler/DTSg
+  license: MIT
+  summary: Basic time series functionalities such as listing of missing values, application of
+    arbitrary aggregation as well as rolling window functions and automatic detection
+    of periodicity. As it is mainly based on 'data.table', it is fast and - in combination
+    with the 'R6' package - offers reference semantics. In addition to its native R6
+    interface, it provides an S3 interface inclusive an S3 wrapper method generator
+    for those who prefer the latter.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DTSg
+# Type: Package
+# Title: A Class for Working with Time Series Based on 'data.table' and 'R6' with Largely Optional Reference Semantics
+# Version: 0.1.3
+# Authors@R: person("Gerold", "Hepp", email = "ghepp@iwag.tuwien.ac.at", role = c("aut", "cre"))
+# Description: Basic time series functionalities such as listing of missing values, application of arbitrary aggregation as well as rolling window functions and automatic detection of periodicity. As it is mainly based on 'data.table', it is fast and - in combination with the 'R6' package - offers reference semantics. In addition to its native R6 interface, it provides an S3 interface inclusive an S3 wrapper method generator for those who prefer the latter.
+# License: MIT + file LICENSE
+# URL: https://github.com/gisler/DTSg
+# BugReports: https://github.com/gisler/DTSg/issues
+# Encoding: UTF-8
+# LazyData: true
+# ByteCompile: true
+# Depends: R (>= 3.2.0)
+# Imports: assertive.base, assertive.numbers, assertive.sets, assertive.types, data.table, methods, R6
+# Suggests: dygraphs, fasttime, knitr, magrittr, RColorBrewer, rmarkdown, testthat, xts
+# RoxygenNote: 6.1.1
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-08-28 16:14:44 UTC; ghepp
+# Author: Gerold Hepp [aut, cre]
+# Maintainer: Gerold Hepp <ghepp@iwag.tuwien.ac.at>
+# Repository: CRAN
+# Date/Publication: 2019-08-29 16:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,89 @@
+{% set version = '0.1-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dwdlarger
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DWDLargeR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DWDLargeR/DWDLargeR_{{ version }}.tar.gz
+  sha256: be21c217b7278e76e714690f6639639694258287fe4a8b92ec627734e4dbadaf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-sparsem
+
+  run:
+    - r-base
+    - r-matrix
+    - r-sparsem
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DWDLargeR')"           # [not win]
+    - "\"%R%\" -e \"library('DWDLargeR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://arxiv.org/pdf/1604.05473.pdf
+  license: GPL-2
+  summary: Solving large scale distance weighted discrimination. The main algorithm is a symmetric
+    Gauss-Seidel based alternating direction method of multipliers (ADMM) method. See
+    Lam, X.Y., Marron, J.S., Sun, D.F., and Toh, K.C. (2018) <arXiv:1604.05473> for
+    more details.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DWDLargeR
+# Version: 0.1-0
+# Date: 2018-02-06
+# Title: Fast Algorithms for Large Scale Generalized Distance Weighted Discrimination
+# Author: Xin-Yee Lam, J.S. Marron, Defeng Sun, and Kim-Chuan Toh
+# Maintainer: Kim-Chuan Toh <mattohkc@nus.edu.sg>
+# Depends: R (>= 2.10), Matrix, SparseM
+# Imports: methods, stats
+# Description: Solving large scale distance weighted discrimination. The main algorithm is a symmetric Gauss-Seidel based alternating direction method of multipliers (ADMM) method. See Lam, X.Y., Marron, J.S., Sun, D.F., and Toh, K.C. (2018) <arXiv:1604.05473> for more details.
+# License: GPL-2
+# URL: https://arxiv.org/pdf/1604.05473.pdf
+# NeedsCompilation: no
+# Packaged: 2018-02-06 06:42:36 UTC; a0074534
+# Repository: CRAN
+# Date/Publication: 2018-02-06 10:48:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,82 @@
+{% set version = '0.1-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dtt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dtt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dtt/dtt_{{ version }}.tar.gz
+  sha256: b6ee86fb571b3ee04ac1d8d04fbc76b12515c09afee688d56a4f39ea63910f59
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dtt')"           # [not win]
+    - "\"%R%\" -e \"library('dtt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.r-project.org, http://www.komsta.net/
+  license: GPL-2
+  summary: This package provides functions for 1D and 2D Discrete Cosine Transform (DCT), Discrete
+    Sine Transform (DST) and Discrete Hartley Transform (DHT).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: dtt
+# Type: Package
+# Title: Discrete Trigonometric Transforms
+# Version: 0.1-2
+# Date: 20013-12-30
+# Author: Lukasz Komsta
+# Maintainer: Lukasz Komsta <lukasz.komsta@umlub.pl>
+# License: GPL (>= 2)
+# URL: http://www.r-project.org, http://www.komsta.net/
+# Description: This package provides functions for 1D and 2D Discrete Cosine Transform (DCT), Discrete Sine Transform (DST) and Discrete Hartley Transform (DHT).
+# Packaged: 2013-12-30 09:08:52 UTC; luke
+# Repository: CRAN
+# Date/Publication: 2013-12-30 11:44:32
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,84 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ecovirtual
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/EcoVirtual_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/EcoVirtual/EcoVirtual_{{ version }}.tar.gz
+  sha256: f2a50416de7f0cc0fe55b6712875a5697753693c8254fb284863aab2b4a03eab
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('EcoVirtual')"           # [not win]
+    - "\"%R%\" -e \"library('EcoVirtual')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http//ecovirtual.ib.usp.br
+  license: GPL-2
+  summary: Computer simulations of classical ecological models as a learning resource.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: EcoVirtual
+# Type: Package
+# Title: Simulation of Ecological Models
+# Version: 1.1
+# Date: 2018-10-10
+# Author: Alexandre Adalardo de Oliveira and Paulo Inacio Prado <ecovirtualpackage@gmail.com>
+# Maintainer: Alexandre Adalardo de Oliveira <ecovirtualpackage@gmail.com>
+# Description: Computer simulations of classical ecological models as a learning resource.
+# Depends: tcltk
+# License: GPL (>= 2)
+# URL: http//ecovirtual.ib.usp.br
+# LazyLoad: yes
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2018-10-10 23:47:04 UTC; aao
+# Repository: CRAN
+# Date/Publication: 2018-10-11 04:20:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
