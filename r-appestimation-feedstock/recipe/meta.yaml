@@ -1,0 +1,86 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-appestimation
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/APPEstimation_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/APPEstimation/APPEstimation_{{ version }}.tar.gz
+  sha256: ac8847280f3b57fb23098170b921dd9f59fc90198e4031fd6b7dcc1189aae9ad
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-densratio
+
+  run:
+    - r-base
+    - r-densratio
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('APPEstimation')"           # [not win]
+    - "\"%R%\" -e \"library('APPEstimation')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=APPEstimation
+  license: GPL-2
+  summary: 'Calculating predictive model performance measures adjusted for predictor distributions
+    using density ratio method (Sugiyama et al., (2012, ISBN:9781139035613)). L1 and
+    L2 error for continuous outcome and C-statistics for binomial outcome are computed. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: APPEstimation
+# Type: Package
+# Title: Adjusted Prediction Model Performance Estimation
+# Version: 0.1.1
+# Depends: densratio
+# Date: 2018-1-4
+# Author: Eisuke Inoue, Hajime Uno
+# Maintainer: Eisuke Inoue <eisuke.inoue@marianna-u.ac.jp>
+# Description: Calculating predictive model performance measures adjusted for predictor distributions using density ratio method (Sugiyama et al., (2012, ISBN:9781139035613)). L1 and L2 error for continuous outcome and C-statistics for binomial outcome are computed.
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2018-01-05 02:55:47 UTC; inoue
+# Repository: CRAN
+# Date/Publication: 2018-01-05 12:30:40 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

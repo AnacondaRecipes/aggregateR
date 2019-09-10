@@ -1,0 +1,86 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-distributiontest
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DistributionTest_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DistributionTest/DistributionTest_{{ version }}.tar.gz
+  sha256: 7d3563e967b185e8479fbbc66a98bd9edce15a313279eec7b8c686886667403d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DistributionTest')"           # [not win]
+    - "\"%R%\" -e \"library('DistributionTest')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DistributionTest
+  license: GPL-3
+  summary: 'Provides new types of omnibus tests which are generally much more powerful than traditional
+    tests (including the Kolmogorov-Smirnov, Cramer-von Mises and Anderson-Darling tests),see
+    Zhang (2002) <doi:10.1111/1467-9868.00337>. '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DistributionTest
+# Type: Package
+# Title: Powerful Goodness-of-Fit Tests Based on the Likelihood Ratio
+# Version: 1.0
+# Date: 2019-08-02
+# Author: Ning Cui [aut, cre], Maoyuan Zhou [ctb]
+# Maintainer: Ning Cui <2433971953@qq.com>
+# Description: Provides new types of omnibus tests which are generally much more powerful than traditional tests (including the Kolmogorov-Smirnov, Cramer-von Mises and Anderson-Darling tests),see Zhang (2002) <doi:10.1111/1467-9868.00337>.
+# License: GPL (>= 3)
+# Imports: stats, MASS
+# Repository: CRAN
+# NeedsCompilation: no
+# Packaged: 2019-08-07 03:44:52 UTC; Lenovo
+# Date/Publication: 2019-08-07 15:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

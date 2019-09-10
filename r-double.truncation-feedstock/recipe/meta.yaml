@@ -1,0 +1,84 @@
+{% set version = '1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-double.truncation
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/double.truncation_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/double.truncation/double.truncation_{{ version }}.tar.gz
+  sha256: a9ca97e0fb0d6f1cce87f546b04ec7bc29049b61b8023cbf8e95f91402e50ea4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('double.truncation')"           # [not win]
+    - "\"%R%\" -e \"library('double.truncation')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=double.truncation
+  license: GPL-2
+  summary: Likelihood-based inference methods with doubly-truncated data are developed under
+    various models. Nonparametric models are based on Efron and Petrosian (1999) <doi:10.1080/01621459.1999.10474187>
+    and Emura, Konno, and Michimae (2015) <doi:10.1007/s10985-014-9297-5>. Parametric
+    models from the special exponential family (SEF) are based on Hu and Emura (2015)
+    <doi:10.1007/s00180-015-0564-z> and Emura, Hu and Konno (2017) <doi:10.1007/s00362-015-0730-y>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: double.truncation
+# Type: Package
+# Title: Analysis of Doubly-Truncated Data
+# Version: 1.4
+# Date: 2019-1-14
+# Author: Takeshi Emura, Ya-Hsuan Hu, Chung-Yan Huang
+# Maintainer: Takeshi Emura <takeshiemura@gmail.com>
+# Description: Likelihood-based inference methods with doubly-truncated data are developed under various models. Nonparametric models are based on Efron and Petrosian (1999) <doi:10.1080/01621459.1999.10474187> and Emura, Konno, and Michimae (2015) <doi:10.1007/s10985-014-9297-5>. Parametric models from the special exponential family (SEF) are based on Hu and Emura (2015) <doi:10.1007/s00180-015-0564-z> and Emura, Hu and Konno (2017) <doi:10.1007/s00362-015-0730-y>.
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2019-01-14 11:11:01 UTC; user
+# Repository: CRAN
+# Date/Publication: 2019-01-14 11:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

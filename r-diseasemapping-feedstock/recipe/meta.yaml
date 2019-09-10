@@ -1,0 +1,94 @@
+{% set version = '1.4.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-diseasemapping
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/diseasemapping_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/diseasemapping/diseasemapping_{{ version }}.tar.gz
+  sha256: 541f472a9d45b5874cc0a30a416f64348f62abd0e3658a57c382102c31e2c29b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: spdep, mgcv, geostatsp, mapmisc (>= 1.0), knitr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-sp
+
+  run:
+    - r-base
+    - r-sp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('diseasemapping')"           # [not win]
+    - "\"%R%\" -e \"library('diseasemapping')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=diseasemapping
+  license: GPL-3
+  summary: Formatting of population and case data, calculation of Standardized Incidence Ratios,
+    and fitting the BYM model using INLA.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: diseasemapping
+# Type: Package
+# Title: Modelling Spatial Variation in Disease Risk for Areal Data
+# Version: 1.4.6
+# Date: 2018-07-11
+# Depends: R (>= 3.2)
+# Imports: stats, utils, sp, methods
+# Suggests: spdep, mgcv, geostatsp, mapmisc (>= 1.0), knitr
+# Enhances: INLA, XML
+# Additional_repositories: https://inla.r-inla-download.org/R/testing
+# Author: Patrick Brown <patrick.brown@utoronto.ca>, Lutong Zhou
+# Maintainer: Patrick Brown <patrick.brown@utoronto.ca>
+# Description: Formatting of population and case data, calculation of Standardized Incidence Ratios, and fitting the BYM model using INLA.
+# License: GPL
+# VignetteBuilder: knitr
+# RoxygenNote: 5.0.1
+# Repository: CRAN
+# Repository/R-Forge/Project: diseasemapping
+# Repository/R-Forge/Revision: 2001
+# Repository/R-Forge/DateTimeStamp: 2018-07-11 19:59:27
+# Date/Publication: 2018-07-12 14:00:11 UTC
+# NeedsCompilation: no
+# Packaged: 2018-07-11 20:10:22 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

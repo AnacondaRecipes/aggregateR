@@ -1,0 +1,89 @@
+{% set version = '0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-distance.sample.size
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/distance.sample.size_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/distance.sample.size/distance.sample.size_{{ version }}.tar.gz
+  sha256: 9aad173da42299d28d1a1d66b0de7564430db6cd6392dba77de16532ee1c8e42
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('distance.sample.size')"           # [not win]
+    - "\"%R%\" -e \"library('distance.sample.size')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=distance.sample.size
+  license: GPL-2 | GPL-3
+  summary: Calculates the study size (either number of detections, or proportion of region that
+    should be covered) to achieve a target precision for the estimated abundance. The
+    calculation allows for the penalty due to unknown detection function, and for overdispersion.
+    The user must specify a guess at the true detection function.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: distance.sample.size
+# Type: Package
+# Title: Calculates Study Size Required for Distance Sampling
+# Version: 0.0
+# Date: 2015-12-17
+# Author: Robert Clark
+# Maintainer: Robert Clark <rclark@uow.edu.au>
+# Description: Calculates the study size (either number of detections, or proportion of region that should be covered) to achieve a target precision for the estimated abundance. The calculation allows for the penalty due to unknown detection function, and for overdispersion. The user must specify a guess at the true detection function.
+# License: GPL-2 | GPL-3
+# LazyData: TRUE
+# Imports: MASS
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-01-24 00:29:12 UTC; rclark
+# Repository: CRAN
+# Date/Publication: 2016-01-26 07:44:17
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

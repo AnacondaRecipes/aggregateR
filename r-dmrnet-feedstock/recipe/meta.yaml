@@ -1,0 +1,93 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dmrnet
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DMRnet_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DMRnet/DMRnet_{{ version }}.tar.gz
+  sha256: 84cba3bc1447ee68ac8699dcdf3f80599c3af569e5985ff80344444a38526be5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-glmnet
+    - r-grpreg
+
+  run:
+    - r-base
+    - r-glmnet
+    - r-grpreg
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DMRnet')"           # [not win]
+    - "\"%R%\" -e \"library('DMRnet')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DMRnet
+  license: GPL-2
+  summary: "Model selection algorithms for regression and classification, where the predictors
+    can be numerical and categorical and the number of regressors exceeds the number
+    of observations. The selected model consists of a subset of numerical regressors
+    and partitions of levels of factors. Aleksandra Maj-Ka\u0144ska, Piotr Pokarowski
+    and Agnieszka Prochenka (2015) <doi:10.1214/15-EJS1050>. Piotr Pokarowski and Jan
+    Mielniczuk (2015) <http://www.jmlr.org/papers/volume16/pokarowski15a/pokarowski15a.pdf>. "
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DMRnet
+# Type: Package
+# Title: Delete or Merge Regressors Algorithms for Linear and Logistic Model Selection and High-Dimensional Data
+# Version: 0.2.0
+# Author: Agnieszka Prochenka-Sotys, Piotr Pokarowski
+# Maintainer: Agnieszka Prochenka-Sotys <ap220756@mimuw.edu.pl>
+# Description: Model selection algorithms for regression and classification, where the predictors can be numerical and categorical and the number of regressors exceeds the number of observations. The selected model consists of a subset of numerical regressors and partitions of levels of factors. Aleksandra Maj-Kanska, Piotr Pokarowski and Agnieszka Prochenka (2015) <doi:10.1214/15-EJS1050>. Piotr Pokarowski and Jan Mielniczuk (2015) <http://www.jmlr.org/papers/volume16/pokarowski15a/pokarowski15a.pdf>.
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: false
+# Imports: glmnet, grpreg, stats, graphics, utils
+# RoxygenNote: 5.0.1
+# Packaged: 2018-03-24 10:09:13 UTC; Aga
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2018-03-24 10:45:01 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

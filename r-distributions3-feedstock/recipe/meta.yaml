@@ -1,0 +1,97 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-distributions3
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/distributions3_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/distributions3/distributions3_{{ version }}.tar.gz
+  sha256: ca827426ba5e6a56fda5941077c515a743577c6757beefbe06208b7e86f58e1b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, cowplot, ggplot2, knitr, rmarkdown, testthat (>= 2.1.0)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-ellipsis
+    - r-glue
+
+  run:
+    - r-base
+    - r-ellipsis
+    - r-glue
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('distributions3')"           # [not win]
+    - "\"%R%\" -e \"library('distributions3')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/alexpghayes/distributions3
+  license: MIT
+  summary: Tools to create and manipulate probability distributions using S3.  Generics random(),
+    pdf(), cdf() and quantile() provide replacements for base R's r/d/p/q style functions.
+    Functions and arguments have been named carefully to minimize confusion for students
+    in intro stats courses. The documentation for each distribution contains detailed
+    mathematical notes.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: distributions3
+# Title: Probability Distributions as S3 Objects
+# Version: 0.1.1
+# Authors@R:  c(person(given = "Alex", family = "Hayes", role = c("aut", "cre"), email = "alexpghayes@gmail.com", comment = c(ORCID = "0000-0002-4985-5160")), person(given = "Ralph", family = "Moller-Trane", role = "aut"), person(given = "Emil", family = "Hvitfeldt", role = "ctb", email = "emilhhvitfeldt@gmail.com", comment = c(ORCID = "0000-0002-0679-1945")), person(given = "Daniel", family = "Jordan", role = "ctb", email = "dandermotj@gmail.com"), person(given = "Bruna", family = "Wundervald", role = "ctb", email = "brunadaviesw@gmail.com"))
+# Description: Tools to create and manipulate probability distributions using S3.  Generics random(), pdf(), cdf() and quantile() provide replacements for base R's r/d/p/q style functions. Functions and arguments have been named carefully to minimize confusion for students in intro stats courses. The documentation for each distribution contains detailed mathematical notes.
+# License: MIT + file LICENSE
+# URL: https://github.com/alexpghayes/distributions3
+# BugReports: https://github.com/alexpghayes/distributions3/issues
+# Imports: ellipsis, glue
+# Suggests: covr, cowplot, ggplot2, knitr, rmarkdown, testthat (>= 2.1.0)
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-09-02 17:10:00 UTC; alex
+# Author: Alex Hayes [aut, cre] (<https://orcid.org/0000-0002-4985-5160>), Ralph Moller-Trane [aut], Emil Hvitfeldt [ctb] (<https://orcid.org/0000-0002-0679-1945>), Daniel Jordan [ctb], Bruna Wundervald [ctb]
+# Maintainer: Alex Hayes <alexpghayes@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-09-03 16:10:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

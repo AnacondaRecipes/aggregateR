@@ -1,0 +1,106 @@
+{% set version = '3.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-document
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/document_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/document/document_{{ version }}.tar.gz
+  sha256: 86f13be58e17708475109c3a9c735dbe93e8ce159052d059bb6b72993dd09315
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, devtools, RUnit, testthat, datasets, rprojroot, covr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-callr
+    - r-checkmate
+    - r-desc
+    - r-rcmdcheck
+    - r-roxygen2
+    - r-rstudioapi
+    - r-withr
+
+  run:
+    - r-base
+    - r-callr
+    - r-checkmate
+    - r-desc
+    - r-rcmdcheck
+    - r-roxygen2
+    - r-rstudioapi
+    - r-withr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('document')"           # [not win]
+    - "\"%R%\" -e \"library('document')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://gitlab.com/fvafrCU/document
+  license: BSD_2_clause
+  summary: 'Have you ever been tempted to create ''roxygen2''-style documentation comments for
+    one of your functions that was not part of one of your packages (yet)? This is exactly
+    what this package is about: running ''roxygen2'' on (chunks of) a single code file.'
+
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_2_clause'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: document
+# Title: Run 'roxygen2' on (Chunks of) Single Code Files
+# Version: 3.1.0
+# Authors@R: person(given = c("Andreas", "Dominik"), family = "Cullmann", email = "fvafrcu@mailbox.org", role = c("aut","cre"))
+# Description: Have you ever been tempted to create 'roxygen2'-style documentation comments for one of your functions that was not part of one of your packages (yet)? This is exactly what this package is about: running 'roxygen2' on (chunks of) a single code file.
+# Depends: R (>= 3.3.0)
+# License: BSD_2_clause + file LICENSE
+# URL: https://gitlab.com/fvafrCU/document
+# Encoding: UTF-8
+# LazyData: true
+# Imports: roxygen2, callr, rcmdcheck, checkmate, rstudioapi, desc, withr
+# Suggests: knitr, rmarkdown, devtools, RUnit, testthat, datasets, rprojroot, covr
+# VignetteBuilder: knitr
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2018-11-25 19:27:56 UTC; qwer
+# Author: Andreas Dominik Cullmann [aut, cre]
+# Maintainer: Andreas Dominik Cullmann <fvafrcu@mailbox.org>
+# Repository: CRAN
+# Date/Publication: 2018-11-25 20:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

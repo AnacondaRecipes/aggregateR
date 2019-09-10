@@ -1,0 +1,86 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dragonking
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dragonking_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dragonking/dragonking_{{ version }}.tar.gz
+  sha256: 2d868a7b4243d23d207e71eade8fca58c1bfae70cb4de092d268091d1a0f6005
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dragonking')"           # [not win]
+    - "\"%R%\" -e \"library('dragonking')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/rrrlw/dragonking
+  license: GPL-3
+  summary: Statistical tests and test statistics to identify events in a dataset that are dragon
+    kings (DKs). The statistical methods in this package were reviewed in Wheatley &
+    Sornette (2015) <doi:10.2139/ssrn.2645709>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: dragonking
+# Type: Package
+# Title: Statistical Tools to Identify Dragon Kings
+# Version: 0.1.0
+# Authors@R: c(person("Raoul", "Wadhwa", email = "raoulwadhwa@gmail.com", role = c("aut", "cre")), person("Christian", "Kelley", role = "aut"), person("Daniel", "Qin", role = "aut"), person("Osaulenko", "Viacheslav", role = "aut"), person("Judit", "Szente", role = "aut"), person("Peter", "Erdi", role = "aut"))
+# Description: Statistical tests and test statistics to identify events in a dataset that are dragon kings (DKs). The statistical methods in this package were reviewed in Wheatley & Sornette (2015) <doi:10.2139/ssrn.2645709>.
+# License: GPL-3
+# Encoding: UTF-8
+# URL: https://github.com/rrrlw/dragonking
+# BugReports: https://github.com/rrrlw/dragonking/issues
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-06-17 23:06:56 UTC; rrrlw
+# Author: Raoul Wadhwa [aut, cre], Christian Kelley [aut], Daniel Qin [aut], Osaulenko Viacheslav [aut], Judit Szente [aut], Peter Erdi [aut]
+# Maintainer: Raoul Wadhwa <raoulwadhwa@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-06-18 16:32:59 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

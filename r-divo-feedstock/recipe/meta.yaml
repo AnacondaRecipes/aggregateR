@@ -1,0 +1,93 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-divo
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/divo_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/divo/divo_{{ version }}.tar.gz
+  sha256: 5dfa2ed57361dda36d83aa43516783ce029c1face3fcb27e9b3a3fd177f7c477
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-cluster
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-cluster
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('divo')"           # [not win]
+    - "\"%R%\" -e \"library('divo')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=divo
+  license: GPL-3
+  summary: 'A set of tools for empirical analysis of diversity (a number and frequency of different
+    types in population) and similarity (a number and frequency of shared types in two
+    populations) in biological or ecological systems. '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: divo
+# Version: 1.0.0
+# Type: Package
+# Date: 2017-09-24
+# Title: Tools for Analysis of Diversity and Similarity in Biological Systems
+# Author: Christoph Sadee, Maciej Pietrzak, Michal Seweryn, Grzegorz Rempala
+# Maintainer: Maciej Pietrzak <pietrzak.20@osu.edu>
+# Depends: R (>= 3.3.0), cluster
+# Description: A set of tools for empirical analysis of diversity (a number and frequency of different types in population) and similarity (a number and frequency of shared types in two populations) in biological or ecological systems.
+# Imports: grDevices, graphics, stats, utils
+# License: GPL (>= 3)
+# NeedsCompilation: yes
+# Packaged: 2017-10-18 00:47:02 UTC; Maciej
+# Repository: CRAN
+# Date/Publication: 2017-10-18 03:19:47 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

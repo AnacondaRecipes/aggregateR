@@ -1,0 +1,100 @@
+{% set version = '0.1.7.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-distances
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/distances_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/distances/distances_{{ version }}.tar.gz
+  sha256: 157bc059f9744f7a26cf5b47bf774bc86950d072ed7a03f035f28a55256418a2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('distances')"           # [not win]
+    - "\"%R%\" -e \"library('distances')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/fsavje/distances
+  license: GPL-3
+  summary: Provides tools for constructing, manipulating and using distance metrics.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: distances
+# Type: Package
+# Title: Tools for Distance Metrics
+# Version: 0.1.7.2
+# Date: 2019-03-18
+# Authors@R: c(person("Fredrik", "Savje", email = "fredrik.savje@yale.edu", role = c("aut", "cre")))
+# Description: Provides tools for constructing, manipulating and using distance metrics.
+# Depends: R (>= 3.4.0)
+# Imports: stats
+# Suggests: testthat
+# NeedsCompilation: yes
+# License: GPL (>= 3)
+# LicenseNote: The distances packages includes the ANN library (distributed under the LGPLv2.1 license).
+# URL: https://github.com/fsavje/distances
+# BugReports: https://github.com/fsavje/distances/issues
+# Encoding: UTF-8
+# RoxygenNote: 6.1.1
+# Packaged: 2019-09-01 18:56:26 UTC; ripley
+# Author: Fredrik Savje [aut, cre]
+# Maintainer: ORPHANED
+# Repository: CRAN
+# Date/Publication: 2019-09-01 19:01:11 UTC
+# X-CRAN-Original-Maintainer: Fredrik Savje <fredrik.savje@yale.edu>
+# X-CRAN-Comment: Orphaned on 2019-09-01 as deprecated use of C++98 was not corrected in time.
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

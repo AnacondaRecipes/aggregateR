@@ -1,0 +1,89 @@
+{% set version = '0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-doestrare
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DoEstRare_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DoEstRare/DoEstRare_{{ version }}.tar.gz
+  sha256: 477d67051badbf9af661a42476b3d97dee771700046b15790e5392100eaf3e79
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DoEstRare')"           # [not win]
+    - "\"%R%\" -e \"library('DoEstRare')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DoEstRare
+  license: GPL-2
+  summary: Rare variant association test integrating variant position information. It aims to
+    identify the presence of clusters of disease-risk variants in specific gene regions.
+    For more details, please read the publication from Persyn et al. (2017)  <doi:10.1371/journal.pone.0179364>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DoEstRare
+# Type: Package
+# Title: Rare Variant Association Test Based on Position Density Estimation
+# Version: 0.2
+# Date: 2017-07-26
+# Author: Elodie Persyn
+# Maintainer: Elodie Persyn <elodie.persyn@univ-nantes.fr>
+# Depends: R (>= 2.15)
+# Description: Rare variant association test integrating variant position information. It aims to identify the presence of clusters of disease-risk variants in specific gene regions. For more details, please read the publication from Persyn et al. (2017)  <doi:10.1371/journal.pone.0179364>.
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2017-08-01 13:00:25 UTC; E14E934Z
+# Repository: CRAN
+# Date/Publication: 2017-08-01 13:24:30 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

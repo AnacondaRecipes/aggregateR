@@ -1,0 +1,90 @@
+{% set version = '0.6-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-documair
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/documair_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/documair/documair_{{ version }}.tar.gz
+  sha256: 22a614cf65af3bc84ecd4fbc37e8ba0ff3abdce7d9ed7714b23d5990fa62f0de
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('documair')"           # [not win]
+    - "\"%R%\" -e \"library('documair')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=documair
+  license: GPL (>= 2.15)
+  summary: Production of R packages from tagged comments introduced within the code  and a minimum
+    of additional documentation files.
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: documair
+# Version: 0.6-0
+# Date: 2014-09-06
+# Type: Package
+# Title: Automatic Documentation for R packages
+# Author: Jean-Baptiste Denis <Jean-Baptiste.Denis@jouy.inra.fr>, Regis Pouillot <RPouillot@yahoo.fr>, Kien Kieu <Kien.Kieu@jouy.inra.fr>
+# Maintainer: Jean-Baptiste Denis <Jean-Baptiste.Denis@jouy.inra.fr>
+# Description: Production of R packages from tagged comments introduced within the code  and a minimum of additional documentation files.
+# License: GPL (>= 2.15)
+# Packaged: 2014-09-17 09:35:38 UTC; rforge
+# Repository: CRAN
+# Repository/R-Forge/Project: riskassessment
+# Repository/R-Forge/Revision: 283
+# Repository/R-Forge/DateTimeStamp: 2014-09-17 09:16:39
+# Date/Publication: 2014-09-22 17:22:20
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

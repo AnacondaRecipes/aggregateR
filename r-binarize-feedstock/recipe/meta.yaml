@@ -1,0 +1,93 @@
+{% set version = '1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-binarize
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Binarize_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Binarize/Binarize_{{ version }}.tar.gz
+  sha256: bac5e3639213ecb0a0b74edf739f5b72f10fa3a92af9676f3f7bbeed1dedaf76
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-diptest
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-diptest
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Binarize')"           # [not win]
+    - "\"%R%\" -e \"library('Binarize')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Binarize
+  license: Artistic-2.0
+  summary: Provides methods for the binarization of one-dimensional data and some visualization
+    functions.
+  license_family: OTHER
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/Artistic-2.0'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Binarize
+# Type: Package
+# Title: Binarization of One-Dimensional Data
+# Version: 1.3
+# Date: 2019-04-02
+# Author: Stefan Mundus, Christoph Mussel, Florian Schmid, Ludwig Lausser, Tamara J. Blatte, Martin Hopfensitz, Hans A. Kestler
+# Maintainer: Hans Kestler <hans.kestler@uni-ulm.de>
+# Description: Provides methods for the binarization of one-dimensional data and some visualization functions.
+# License: Artistic-2.0
+# LazyLoad: yes
+# Imports: graphics, stats
+# Depends: methods, diptest
+# Encoding: UTF-8
+# Packaged: 2019-04-04 15:50:50 UTC; robin
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2019-04-07 09:02:50 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

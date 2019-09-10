@@ -1,0 +1,92 @@
+{% set version = '0.8.20' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dmt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dmt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dmt/dmt_{{ version }}.tar.gz
+  sha256: fc8474b0f8b330d0a33c7bd07037a3aa4b2f5e50c88fa5a98686783113458c67
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dmt')"           # [not win]
+    - "\"%R%\" -e \"library('dmt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=dmt
+  license: BSD_2_clause
+  summary: 'Probabilistic dependency modeling toolkit. '
+
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_2_clause'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: dmt
+# Type: Package
+# Title: Dependency Modeling Toolkit
+# Version: 0.8.20
+# Date: 2013-12-10
+# Author: Leo Lahti and Olli-Pekka Huovilainen
+# Maintainer: Leo Lahti <leo.lahti@iki.fi>
+# Description: Probabilistic dependency modeling toolkit.
+# License: BSD_2_clause + file LICENSE
+# Collate: AllClasses.R AllGenerics.R DependencyModel-accessors.R dependency.score.R fit.dependency.model.R toydata.R internals.R show-methods.R utilities.R set.M.R set.beta.R get.W.R firstlib.R drcca-functions.R optimize.parameters.R update.phi.R update.W.R z.expectation.R
+# LazyLoad: yes
+# Depends: R (>= 2.15.0), methods, mvtnorm, MASS
+# Imports: Matrix
+# Packaged: 2013-12-11 20:30:37 UTC; antagomir
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-12-12 01:20:16
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

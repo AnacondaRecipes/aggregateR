@@ -1,0 +1,97 @@
+{% set version = '1.0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dlib
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dlib_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dlib/dlib_{{ version }}.tar.gz
+  sha256: 624cf48ff713231cadde864ac765fccbe64aae591990d7a33f5608c75f9048c7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: inline, magick
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dlib')"           # [not win]
+    - "\"%R%\" -e \"library('dlib')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=dlib
+  license: BSL-1.0
+  summary: Interface for 'Rcpp' users to 'dlib' <http://dlib.net> which is a 'C++' toolkit containing
+    machine learning algorithms and computer vision tools. It is used in a wide range
+    of domains including robotics, embedded devices, mobile phones, and large high performance
+    computing environments. This package allows R users to use 'dlib' through 'Rcpp'.
+  license_family: OTHER
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: dlib
+# Type: Package
+# Title: Allow Access to the 'Dlib' C++ Library
+# License: BSL-1.0
+# Version: 1.0.3
+# Date: 2018-05-07
+# Maintainer: Jan Wijffels <jwijffels@bnosac.be>
+# Author: Jan Wijffels, BNOSAC, Davis King and dlib package authors (see file AUTHORS)
+# Description: Interface for 'Rcpp' users to 'dlib' <http://dlib.net> which is a 'C++' toolkit containing machine learning algorithms and computer vision tools. It is used in a wide range of domains including robotics, embedded devices, mobile phones, and large high performance computing environments. This package allows R users to use 'dlib' through 'Rcpp'.
+# LinkingTo: Rcpp
+# Copyright: see file COPYRIGHTS
+# Imports: Rcpp
+# Suggests: inline, magick
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2018-05-07 08:50:13 UTC; Jan
+# Repository: CRAN
+# Date/Publication: 2018-05-07 11:58:37 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

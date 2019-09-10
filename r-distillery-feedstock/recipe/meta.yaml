@@ -1,0 +1,83 @@
+{% set version = '1.0-6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-distillery
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/distillery_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/distillery/distillery_{{ version }}.tar.gz
+  sha256: 4910e2952f767c1062d7cbe648c90a97009e2b3da316c6b33f6d022cd38b23d6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('distillery')"           # [not win]
+    - "\"%R%\" -e \"library('distillery')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.ral.ucar.edu/staff/ericg
+  license: GPL-2
+  summary: Some very simple method functions for confidence interval calculation, bootstrap resampling,
+    and to distill pertinent information from a potentially complex object; primarily
+    used in common with packages extRemes and SpatialVx.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: distillery
+# Version: 1.0-6
+# Date: 2019-03-28
+# Title: Method Functions for Confidence Intervals and to Distill Information from an Object
+# Author: Eric Gilleland
+# Maintainer: Eric Gilleland <ericg@ucar.edu>
+# Depends: R (>= 2.10.0)
+# Description: Some very simple method functions for confidence interval calculation, bootstrap resampling, and to distill pertinent information from a potentially complex object; primarily used in common with packages extRemes and SpatialVx.
+# License: GPL (>= 2)
+# URL: http://www.ral.ucar.edu/staff/ericg
+# NeedsCompilation: no
+# Packaged: 2019-04-02 17:12:03 UTC; eric
+# Repository: CRAN
+# Date/Publication: 2019-04-02 19:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

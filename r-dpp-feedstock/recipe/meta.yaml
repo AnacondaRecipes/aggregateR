@@ -1,0 +1,104 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dpp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DPP_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DPP/DPP_{{ version }}.tar.gz
+  sha256: f53cbc46302c9ac7cf03e39b4dc0ac1d61c6861817b403fcc50340fe486554e1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: R.rsp
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.4
+    - r-coda
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.4
+    - r-coda
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DPP')"           # [not win]
+    - "\"%R%\" -e \"library('DPP')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DPP
+  license: MIT
+  summary: This MCMC method takes a data numeric vector (Y) and assigns the elements of Y to
+    a (potentially infinite) number of normal distributions. The individual normal distributions
+    from a mixture of normals can be inferred. Following the method described in Escobar
+    (1994) <doi:10.2307/2291223> we use a Dirichlet Process Prior (DPP) to describe
+    stochastically our prior assumptions about the dimensionality of the data.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: DPP
+# Type: Package
+# Title: Inference of Parameters of Normal Distributions from a Mixture of Normals
+# Version: 0.1.2
+# Authors@R: c( person("Luis M.", "Avila", email = "lmavila@gmail.com", role = c("aut","cre")), person("Michael R.", "May", email = "mikeryanmay@ucdavis.edu", role = "aut"), person("Jeff", "Ross-Ibarra", email = "rossibarra@ucdavis.edu", role = "aut"))
+# Description: This MCMC method takes a data numeric vector (Y) and assigns the elements of Y to a (potentially infinite) number of normal distributions. The individual normal distributions from a mixture of normals can be inferred. Following the method described in Escobar (1994) <doi:10.2307/2291223> we use a Dirichlet Process Prior (DPP) to describe stochastically our prior assumptions about the dimensionality of the data.
+# License: MIT + file LICENSE
+# Depends: methods, Rcpp (>= 0.12.4), coda, stats
+# Suggests: R.rsp
+# VignetteBuilder: R.rsp
+# LinkingTo: Rcpp
+# RcppModules: DPPmcmc,Models
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2018-05-24 06:17:07 UTC; lavila
+# Author: Luis M. Avila [aut, cre], Michael R. May [aut], Jeff Ross-Ibarra [aut]
+# Maintainer: Luis M. Avila <lmavila@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-05-24 08:38:30 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,86 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dotenv
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dotenv_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dotenv/dotenv_{{ version }}.tar.gz
+  sha256: 5ae1fc7ea28c5c976da3485d4e633392faa899ba82e49e6bed36e1976b6c288e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dotenv')"           # [not win]
+    - "\"%R%\" -e \"library('dotenv')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/gaborcsardi/dotenv
+  license: MIT
+  summary: Load configuration from a '.env' file, that is in the current working directory, into
+    environment variables.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: dotenv
+# Title: Load Environment Variables from '.env'
+# Version: 1.0.2
+# Authors@R: c(person("Gabor", "Csardi", role = c("aut", "cre", "cph"), email = "csardi.gabor@gmail.com"))
+# Description: Load configuration from a '.env' file, that is in the current working directory, into environment variables.
+# License: MIT + file LICENSE
+# LazyData: true
+# URL: https://github.com/gaborcsardi/dotenv
+# BugReports: https://github.com/gaborcsardi/dotenv/issues
+# RoxygenNote: 5.0.1.9000
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2017-03-01 13:08:36 UTC; gaborcsardi
+# Author: Gabor Csardi [aut, cre, cph]
+# Maintainer: Gabor Csardi <csardi.gabor@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-03-01 19:05:47
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
