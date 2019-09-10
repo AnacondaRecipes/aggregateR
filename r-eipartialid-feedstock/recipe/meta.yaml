@@ -1,0 +1,99 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-eipartialid
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/eiPartialID_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/eiPartialID/eiPartialID_{{ version }}.tar.gz
+  sha256: 6570c559f151a0420146fc2c5c585a34797736298e7eb3c4b75f7e4a13ba411c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-eco
+    - r-sandwich
+
+  run:
+    - r-base
+    - r-mass
+    - r-eco
+    - r-sandwich
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('eiPartialID')"           # [not win]
+    - "\"%R%\" -e \"library('eiPartialID')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=eiPartialID
+  license: MIT
+  summary: Estimate district-level bounds for 2x2 ecological inference based on the approach  described
+    in the forthcoming article Jiang et al. (2019), "Ecological Regression with Partial
+    Identification", Political Analysis. Interval data regression is used to bound the  nonidentified
+    regression parameter in a linear contextual effects model, from which  district-level
+    bounds are derived. The approach here can be useful as a baseline of comparison
+    for future work on ecological inference.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: eiPartialID
+# Type: Package
+# Title: Ecological Regression with Partial Identification
+# Version: 0.1.2
+# Author: Wenxin Jiang, Gary King, Allen Schmaltz, Martin A. Tanner
+# Maintainer: Allen Schmaltz <schmaltz@fas.harvard.edu>
+# Contact: <wjiang@northwestern.edu,king@harvard.edu,schmaltz@fas.harvard.edu,mat132@northwestern.edu>
+# Description: Estimate district-level bounds for 2x2 ecological inference based on the approach  described in the forthcoming article Jiang et al. (2019), "Ecological Regression with Partial Identification", Political Analysis. Interval data regression is used to bound the  nonidentified regression parameter in a linear contextual effects model, from which  district-level bounds are derived. The approach here can be useful as a baseline of comparison for future work on ecological inference.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# Imports: sandwich, stats, MASS, eco
+# RoxygenNote: 6.1.1.9000
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-04-11 00:08:22 UTC; a
+# Repository: CRAN
+# Date/Publication: 2019-04-11 16:32:38 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

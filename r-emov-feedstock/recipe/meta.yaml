@@ -1,0 +1,84 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-emov
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/emov_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/emov/emov_{{ version }}.tar.gz
+  sha256: aa10a73f004ffd6ca8b6f7dd9299c78ff4b3923cd7af718a9f64b9ddbd5c8013
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('emov')"           # [not win]
+    - "\"%R%\" -e \"library('emov')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/schw4b/emov
+  license: GPL-3
+  summary: Fixation and saccade detection in eye movement recordings. This package implements
+    a dispersion-based algorithm (I-DT) proposed by Salvucci & Goldberg (2000) which
+    detects fixation duration and position.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: emov
+# Version: 0.1.1
+# Date: 2016-04-04
+# Title: Eye Movement Analysis Package for Fixation and Saccade Detection
+# Author: Simon Schwab <schw4b@gmail.com>
+# Maintainer: Simon Schwab <schw4b@gmail.com>
+# Depends: R (>= 1.8.0)
+# Description: Fixation and saccade detection in eye movement recordings. This package implements a dispersion-based algorithm (I-DT) proposed by Salvucci & Goldberg (2000) which detects fixation duration and position.
+# License: GPL-3
+# URL: https://github.com/schw4b/emov
+# BugReports: https://github.com/schw4b/emov/issues
+# NeedsCompilation: no
+# Packaged: 2016-04-04 12:55:20 UTC; simon
+# Repository: CRAN
+# Date/Publication: 2016-04-04 18:39:38
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,99 @@
+{% set version = '1.6.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-endorse
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/endorse_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/endorse/endorse_{{ version }}.tar.gz
+  sha256: d790a03160776b9712b5ad40ba4a615e683dc962685c9e8db13845b8cbcafc18
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-coda
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-coda
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('endorse')"           # [not win]
+    - "\"%R%\" -e \"library('endorse')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/SensitiveQuestions/endorse/
+  license: GPL-2
+  summary: 'Fit the hierarchical and non-hierarchical Bayesian measurement models proposed by
+    Bullock, Imai, and Shapiro (2011) <DOI:10.1093/pan/mpr031> to analyze endorsement
+    experiments.  Endorsement experiments are a survey methodology for eliciting truthful
+    responses to sensitive questions.  This methodology is helpful when measuring support
+    for socially sensitive political actors such as militant groups.  The model is fitted
+    with a Markov chain Monte Carlo algorithm and produces the output containing draws
+    from the posterior distribution. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: endorse
+# Version: 1.6.1
+# Date: 2018-11-4
+# Title: Bayesian Measurement Models for Analyzing Endorsement Experiments
+# Authors@R: c(person("Yuki", "Shiraito", role = c("aut","cre"), email = "shiraito@umich.edu"), person("Kosuke", "Imai", role = "aut", email = "imai@harvard.edu"), person("Bryn", "Rosenfeld", role = "ctb", email = "brosenfe@usc.edu"))
+# Author: Yuki Shiraito [aut, cre], Kosuke Imai [aut], Bryn Rosenfeld [ctb]
+# Maintainer: Yuki Shiraito <shiraito@umich.edu>
+# Depends: coda, utils
+# Description: Fit the hierarchical and non-hierarchical Bayesian measurement models proposed by Bullock, Imai, and Shapiro (2011) <DOI:10.1093/pan/mpr031> to analyze endorsement experiments.  Endorsement experiments are a survey methodology for eliciting truthful responses to sensitive questions.  This methodology is helpful when measuring support for socially sensitive political actors such as militant groups.  The model is fitted with a Markov chain Monte Carlo algorithm and produces the output containing draws from the posterior distribution.
+# LazyLoad: yes
+# LazyData: yes
+# License: GPL (>= 2)
+# URL: https://github.com/SensitiveQuestions/endorse/
+# NeedsCompilation: yes
+# Packaged: 2018-11-05 04:18:37 UTC; yuki
+# Repository: CRAN
+# Date/Publication: 2018-11-06 15:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,97 @@
+{% set version = '0.3.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-epanet2toolkit
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/epanet2toolkit_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/epanet2toolkit/epanet2toolkit_{{ version }}.tar.gz
+  sha256: 4214870fefa1bbf1e96ebd4fd22997fee860aa1ca49938510d5bace363ccc448
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, epanetReader
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('epanet2toolkit')"           # [not win]
+    - "\"%R%\" -e \"library('epanet2toolkit')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/bradleyjeck/epanet2toolkit
+  license: MIT
+  summary: 'Enables simulation of water piping networks using ''EPANET''. The package provides
+    functions from the ''EPANET'' programmer''s toolkit as R functions so that basic
+    or customized simulations can be carried out from R. The package uses ''EPANET''
+    version 2.1 from Open Water Analytics <https://github.com/OpenWaterAnalytics/EPANET/releases/tag/v2.1>.  '
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: epanet2toolkit
+# Type: Package
+# Title: Call 'EPANET' Functions to Simulate Pipe Networks
+# Version: 0.3.2
+# Date: 2018-07-27
+# Authors@R: c( person("Ernesto", "Arandia", email="earandia.ie@gmail.com", role='aut'), person("Bradley", "Eck", email="brad@bradeck.net", role = c('aut','cre')), person("Lew", "Rossman", role='aut'),  person("Michael Tryby", role = 'ctb'), person("Feng","Shang", role = 'ctb'), person("James","Uber", role = 'ctb'), person("Tom","Taxon", role = 'ctb'),  person("Sam","Hatchett", role = 'ctb'), person("Hyoungmin","Woo", role = 'ctb'), person("Jinduan","Chen", role = 'ctb'), person("Yunier","Soad", role = 'ctb'), person("Mike","Kane", role = 'ctb'), person("Demetrios","Eliades", role = 'ctb'), person("Will","Furnass", role = 'ctb'), person("Steffen","Macke", role = 'ctb'), person("Mariosmsk", role = 'ctb'), person("Elad","Salomons", role = 'ctb'), person("Maurizio","Cingi", role = 'ctb'), person("Bryant","McDonnell", role = 'ctb'), person("IBM Corp.", role = 'cph'), person("Open Water Analytics", role = 'cph') )
+# Suggests: testthat, epanetReader
+# Description: Enables simulation of water piping networks using 'EPANET'. The package provides functions from the 'EPANET' programmer's toolkit as R functions so that basic or customized simulations can be carried out from R. The package uses 'EPANET' version 2.1 from Open Water Analytics <https://github.com/OpenWaterAnalytics/EPANET/releases/tag/v2.1>.
+# License: MIT + file LICENSE
+# Copyright: COPYRIGHTS
+# URL: https://github.com/bradleyjeck/epanet2toolkit
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2018-07-27 10:07:31 UTC; brad
+# Author: Ernesto Arandia [aut], Bradley Eck [aut, cre], Lew Rossman [aut], Michael Tryby [ctb], Feng Shang [ctb], James Uber [ctb], Tom Taxon [ctb], Sam Hatchett [ctb], Hyoungmin Woo [ctb], Jinduan Chen [ctb], Yunier Soad [ctb], Mike Kane [ctb], Demetrios Eliades [ctb], Will Furnass [ctb], Steffen Macke [ctb], Mariosmsk [ctb], Elad Salomons [ctb], Maurizio Cingi [ctb], Bryant McDonnell [ctb], IBM Corp. [cph], Open Water Analytics [cph]
+# Maintainer: Bradley Eck <brad@bradeck.net>
+# Repository: CRAN
+# Date/Publication: 2018-07-27 15:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

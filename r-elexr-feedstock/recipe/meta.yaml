@@ -1,0 +1,86 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-elexr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/elexr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/elexr/elexr_{{ version }}.tar.gz
+  sha256: 103bf025de5001645df327a77dc61c78d3a8f3e84391d7f41dd3fc522efdb9f6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('elexr')"           # [not win]
+    - "\"%R%\" -e \"library('elexr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=elexr
+  license: MIT
+  summary: Provides R access to election results data. Wraps elex (https://github.com/newsdev/elex/),
+    a Python package and command line tool for fetching and parsing Associated Press
+    election results.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: elexr
+# Type: Package
+# Title: Load Associated Press Election Results with Elex
+# Version: 1.0
+# Date: 2016-02-02
+# Author: Geoff Hing
+# Maintainer: Geoff Hing <geoffhing@gmail.com>
+# Description: Provides R access to election results data. Wraps elex (https://github.com/newsdev/elex/), a Python package and command line tool for fetching and parsing Associated Press election results.
+# License: MIT + file LICENSE
+# Imports: utils
+# SystemRequirements: Python (>= 2.7 or >= 3.5) and elex package
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-02-04 12:19:20 UTC; ghing
+# Repository: CRAN
+# Date/Publication: 2016-02-04 15:11:37
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

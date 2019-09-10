@@ -1,0 +1,88 @@
+{% set version = '1.0-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ensemblepp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ensemblepp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ensemblepp/ensemblepp_{{ version }}.tar.gz
+  sha256: fb92a6178afc469edd2361390d8c6ac9eaabce0374293adb01f9697183d96722
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ensembleBMA, crch, gamlss, ensembleMOS, SpecsVerification, scoringRules, glmx, ordinal, pROC, mvtnorm
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ensemblepp')"           # [not win]
+    - "\"%R%\" -e \"library('ensemblepp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ensemblepp
+  license: GPL-2 | GPL-3
+  summary: Data sets for the chapter "Ensemble Postprocessing with R" of the book Stephane Vannitsem,
+    Daniel S. Wilks, and Jakob W. Messner (2018) "Statistical Postprocessing of Ensemble
+    Forecasts", Elsevier, 362pp. These data sets contain temperature and precipitation
+    ensemble weather forecasts and corresponding observations at Innsbruck/Austria.
+    Additionally, a demo with the full code of the book chapter is provided.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ensemblepp
+# Title: Ensemble Postprocessing Data Sets
+# Version: 1.0-0
+# Date: 2019-05-03
+# Authors@R: c(person(given = "Jakob", family = "Messner", role = c("aut", "cre"), email = "jakob.messner@posteo.net"))
+# Author: Jakob Messner [aut, cre]
+# Maintainer: Jakob Messner <jakob.messner@posteo.net>
+# Depends: R (>= 2.10.0)
+# Suggests: ensembleBMA, crch, gamlss, ensembleMOS, SpecsVerification, scoringRules, glmx, ordinal, pROC, mvtnorm
+# Description: Data sets for the chapter "Ensemble Postprocessing with R" of the book Stephane Vannitsem, Daniel S. Wilks, and Jakob W. Messner (2018) "Statistical Postprocessing of Ensemble Forecasts", Elsevier, 362pp. These data sets contain temperature and precipitation ensemble weather forecasts and corresponding observations at Innsbruck/Austria. Additionally, a demo with the full code of the book chapter is provided.
+# License: GPL-2 | GPL-3
+# NeedsCompilation: no
+# Packaged: 2019-05-03 11:00:30 UTC; jakob
+# Repository: CRAN
+# Date/Publication: 2019-05-08 07:50:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

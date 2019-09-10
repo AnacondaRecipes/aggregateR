@@ -1,0 +1,101 @@
+{% set version = '1.5-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-edma
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/eDMA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/eDMA/eDMA_{{ version }}.tar.gz
+  sha256: d29c7a61919d4dabd9eed43e19375d7e612162a4879167f1d59151137540d773
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.5
+    - r-rcpparmadillo
+    - r-xts
+    - r-zoo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.5
+    - r-rcpparmadillo
+    - r-xts
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('eDMA')"           # [not win]
+    - "\"%R%\" -e \"library('eDMA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=eDMA
+  license: GPL-2
+  summary: Perform dynamic model averaging with grid search as in Dangl and Halling (2012) <doi:10.1016/j.jfineco.2012.04.003>
+    using parallel computing.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: eDMA
+# Type: Package
+# Title: Dynamic Model Averaging with Grid Search
+# Version: 1.5-3
+# Author: Leopoldo Catania [aut,cre], Nima Nonejad  [aut]
+# Maintainer: Leopoldo Catania <leopoldo.catania@econ.au.dk>
+# Description: Perform dynamic model averaging with grid search as in Dangl and Halling (2012) <doi:10.1016/j.jfineco.2012.04.003> using parallel computing.
+# SystemRequirements: Requires the OpenMP library for parallel computing. If the OpenMP library is not available, the code is executed sequentially and a warning is printed.
+# License: GPL (>= 2)
+# LazyData: TRUE
+# Imports: Rcpp (>= 0.12.5)
+# LinkingTo: Rcpp,RcppArmadillo
+# Depends: zoo,xts,methods,parallel
+# NeedsCompilation: yes
+# Packaged: 2018-08-27 08:41:46 UTC; Leopoldo
+# Repository: CRAN
+# Date/Publication: 2018-08-27 09:54:27 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

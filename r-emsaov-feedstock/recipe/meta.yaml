@@ -1,0 +1,89 @@
+{% set version = '2.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-emsaov
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/EMSaov_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/EMSaov/EMSaov_{{ version }}.tar.gz
+  sha256: 05fc4f60b3365fc7c60490c2dcb34cc8ef811052c426897451ffd0096be4fbc2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-shiny
+
+  run:
+    - r-base
+    - r-shiny
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('EMSaov')"           # [not win]
+    - "\"%R%\" -e \"library('EMSaov')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=EMSaov
+  license: GPL-2
+  summary: 'Provides the analysis of variance table including the expected mean squares (EMS)
+    for various types of experimental design. When some variables are random effects
+    or we use special experimental design such as nested design, repeated-measures design,
+    or split-plot design, it is not easy to find the appropriate test, especially denominator
+    for F-statistic which depends on EMS. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: EMSaov
+# Type: Package
+# Title: The Analysis of Variance with EMS
+# Version: 2.3
+# Date: 2018-05-09
+# Author: Eun-Kyung Lee, Hye-Min Choe
+# Maintainer: Eun-Kyung Lee <lee.eunk@gmail.com>
+# Description: Provides the analysis of variance table including the expected mean squares (EMS) for various types of experimental design. When some variables are random effects or we use special experimental design such as nested design, repeated-measures design, or split-plot design, it is not easy to find the appropriate test, especially denominator for F-statistic which depends on EMS.
+# License: GPL (>= 2)
+# Imports: shiny, graphics
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-05-09 00:51:40 UTC; EKLee
+# Repository: CRAN
+# Date/Publication: 2018-05-09 03:54:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

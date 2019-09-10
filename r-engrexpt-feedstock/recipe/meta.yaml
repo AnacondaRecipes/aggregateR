@@ -1,0 +1,85 @@
+{% set version = '0.1-8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-engrexpt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/EngrExpt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/EngrExpt/EngrExpt_{{ version }}.tar.gz
+  sha256: 17e2978ed8fc39c9d0105f5ad68c17740b7128930ca2a2dd24f2442127db947d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lattice
+
+  run:
+    - r-base
+    - r-lattice
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('EngrExpt')"           # [not win]
+    - "\"%R%\" -e \"library('EngrExpt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=EngrExpt
+  license: GPL-2
+  summary: Datasets from Nelson, Coffin and Copeland "Introductory Statistics for Engineering
+    Experimentation" (Elsevier, 2003) with sample code.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: EngrExpt
+# Version: 0.1-8
+# Date: 2009-08-21
+# Title: Data sets from "Introductory Statistics for Engineering Experimentation"
+# Maintainer: Douglas Bates <bates@stat.wisc.edu>
+# Author: R port by Douglas Bates <bates@stat.wisc.edu> and Karen A.F. Copeland <karen@boulderstats.com>
+# Description: Datasets from Nelson, Coffin and Copeland "Introductory Statistics for Engineering Experimentation" (Elsevier, 2003) with sample code.
+# Depends: R (>= 2.9.0), lattice
+# LazyLoad: yes
+# LazyData: yes
+# License: GPL (>= 2)
+# Packaged: 2012-10-29 08:57:01 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2012-10-29 08:57:01
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

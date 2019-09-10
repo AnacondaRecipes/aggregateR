@@ -1,0 +1,91 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-endogenous
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/endogenous_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/endogenous/endogenous_{{ version }}.tar.gz
+  sha256: 08a6f987ebb2a8569877ab47e3c5e3aa259f5fed31d4823f40c0bd44bbab2e1d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('endogenous')"           # [not win]
+    - "\"%R%\" -e \"library('endogenous')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=endogenous
+  license: GPL-2
+  summary: Likelihood-based approaches to estimate linear regression parameters and treatment
+    effects in the presence of endogeneity. Specifically, this package includes James
+    Heckman's classical simultaneous equation models-the sample selection model for
+    outcome selection bias and hybrid model with structural shift for endogenous treatment.
+    For more information, see the seminal paper of Heckman (1978) <DOI:10.3386/w0177>
+    in which the details of these models are provided. This package accommodates repeated
+    measures on subjects with a working independence approach. The hybrid model further
+    accommodates treatment effect modification.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: endogenous
+# Type: Package
+# Title: Classical Simultaneous Equation Models
+# Version: 1.0
+# Date: 2016-10-25
+# Maintainer: Andrew J. Spieker <aspieker@upenn.edu>
+# Authors@R: person(given = "Andrew J.", family = "Spieker", role = c("aut", "cre"), email = "aspieker@upenn.edu")
+# Description: Likelihood-based approaches to estimate linear regression parameters and treatment effects in the presence of endogeneity. Specifically, this package includes James Heckman's classical simultaneous equation models-the sample selection model for outcome selection bias and hybrid model with structural shift for endogenous treatment. For more information, see the seminal paper of Heckman (1978) <DOI:10.3386/w0177> in which the details of these models are provided. This package accommodates repeated measures on subjects with a working independence approach. The hybrid model further accommodates treatment effect modification.
+# Imports: mvtnorm
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2016-10-28 12:44:07 UTC; Andrew
+# Author: Andrew J. Spieker [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2016-10-29 10:48:20
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

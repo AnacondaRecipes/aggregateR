@@ -1,0 +1,84 @@
+{% set version = '1.0.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-emg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/emg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/emg/emg_{{ version }}.tar.gz
+  sha256: 15a0b2447475441e07cb4a779ffb32cd093ccca112e3e0ce086a9928d94c94b4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('emg')"           # [not win]
+    - "\"%R%\" -e \"library('emg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=emg
+  license: GPL-2
+  summary: Provides basic distribution functions for a mixture model of a Gaussian and exponential
+    distribution.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: emg
+# Type: Package
+# Title: Exponentially Modified Gaussian (EMG) Distribution
+# Version: 1.0.7
+# Date: 2018-05-17
+# Author: Shawn Garbett, Mark Kozdoba
+# Maintainer: Shawn Garbett <Shawn@Garbett.org>
+# Depends: R (>= 1.8.0), stats, stats4
+# Description: Provides basic distribution functions for a mixture model of a Gaussian and exponential distribution.
+# License: GPL-2 | file LICENSE
+# LazyLoad: yes
+# NeedsCompilation: no
+# Repository: CRAN
+# Packaged: 2018-05-17 20:08:03 UTC; garbetsp
+# Date/Publication: 2018-05-17 20:37:51 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

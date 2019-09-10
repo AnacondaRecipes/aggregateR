@@ -1,0 +1,97 @@
+{% set version = '2.5.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-allelematch
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/allelematch_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/allelematch/allelematch_{{ version }}.tar.gz
+  sha256: 8c57f8420c80dc6908fc8c45f93fa2496b918b9256f82d33e94adf00243b2100
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: R.rsp
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-dynamictreecut
+
+  run:
+    - r-base
+    - r-dynamictreecut
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('allelematch')"           # [not win]
+    - "\"%R%\" -e \"library('allelematch')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=allelematch
+  license: GPL-3
+  summary: Tools for the identification of unique of multilocus genotypes when both genotyping
+    error and missing data may be present. The package is targeted at those working
+    with large datasets and databases containing multiple samples of each individual,
+    a situation that is common in conservation genetics, and particularly in non-invasive
+    wildlife sampling applications. Functions explicitly incorporate missing data, and
+    can tolerate allele mismatches created by genotyping error. If you use this tool,
+    please cite the package using the journal article in Molecular Ecology Resources
+    (Galpern et al., 2012). Please use citation('allelematch') to call the full citation.
+    For users with access to the associated journal article, tutorial material is also
+    available as supplementary material to the article describing this software, the
+    citation for which can be called using citation('allelematch').
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: allelematch
+# Title: Identifying Unique Multilocus Genotypes where Genotyping Error and Missing Data may be Present
+# Version: 2.5.1
+# Authors@R: c( person("Paul", "Galpern", email = "pgalpern@gmail.com", role = "aut"),  person("Todd", "Cross", email = "todd.cross@gmail.com", role = c("cre", "ctb")),  person("Katie", "Zarn", email = "katie.zarn@gmail.com", role = "ctb") )
+# Maintainer: Todd Cross <todd.cross@gmail.com>
+# Description: Tools for the identification of unique of multilocus genotypes when both genotyping error and missing data may be present. The package is targeted at those working with large datasets and databases containing multiple samples of each individual, a situation that is common in conservation genetics, and particularly in non-invasive wildlife sampling applications. Functions explicitly incorporate missing data, and can tolerate allele mismatches created by genotyping error. If you use this tool, please cite the package using the journal article in Molecular Ecology Resources (Galpern et al., 2012). Please use citation('allelematch') to call the full citation. For users with access to the associated journal article, tutorial material is also available as supplementary material to the article describing this software, the citation for which can be called using citation('allelematch').
+# Depends: graphics, stats, utils
+# Imports: dynamicTreeCut
+# Suggests: R.rsp
+# VignetteBuilder: R.rsp
+# License: GPL-3
+# LazyLoad: yes
+# Packaged: 2019-04-15 16:01:22 UTC; tbcross
+# NeedsCompilation: no
+# Repository: CRAN
+# Author: Paul Galpern [aut], Todd Cross [cre, ctb], Katie Zarn [ctb]
+# Date/Publication: 2019-04-15 21:22:47 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,92 @@
+{% set version = '0.4-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-envirostat
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/EnviroStat_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/EnviroStat/EnviroStat_{{ version }}.tar.gz
+  sha256: 1aa65f2cec4391a25751fab5a17b2af5eea9516ea1da20ec677c833eb7e96a32
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('EnviroStat')"           # [not win]
+    - "\"%R%\" -e \"library('EnviroStat')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=EnviroStat
+  license: AGPL-3
+  summary: Functions and datasets to support the book by Nhu D Le and James V Zidek, Springer
+    (2006).
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: EnviroStat
+# Type: Package
+# Title: Statistical Analysis of Environmental Space-Time Processes
+# Version: 0.4-2
+# Date: 2015-06-03
+# Author: Nhu Le, Jim Zidek, Rick White, and Davor Cubranic, with Fortran code for Sampson-Guttorp estimation authored by Paul D. Sampson, Peter Guttorp, Wendy Meiring, and Catherine Hurley, and Runge-Kutta-Fehlberg method implementation by H.A. Watts and L.F. Shampine.
+# Maintainer: Davor Cubranic <cubranic@stat.ubc.ca>
+# Description: Functions and datasets to support the book by Nhu D Le and James V Zidek, Springer (2006).
+# License: AGPL (>= 3)
+# Imports: MASS
+# NeedsCompilation: yes
+# Packaged: 2015-06-03 19:44:12 UTC; vagrant
+# Repository: CRAN
+# Date/Publication: 2015-06-03 22:38:07
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

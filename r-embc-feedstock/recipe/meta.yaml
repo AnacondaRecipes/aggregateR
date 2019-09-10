@@ -1,0 +1,114 @@
+{% set version = '2.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-embc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/EMbC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/EMbC/EMbC_{{ version }}.tar.gz
+  sha256: 75507bb481cbb6a7031e54b279cd09df9bc45161d06971cf9b925c5f5366ca48
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: move, rgl, knitr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcolorbrewer
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo
+    - r-maptools
+    - r-mnormt
+    - r-sp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcolorbrewer
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo
+    - r-maptools
+    - r-mnormt
+    - r-sp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('EMbC')"           # [not win]
+    - "\"%R%\" -e \"library('EMbC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: <doi:10.1371/journal.pone.0151984>
+  license: GPL-3
+  summary: Unsupervised, multivariate, binary clustering for meaningful annotation of data, taking
+    into account the uncertainty in the data. A specific constructor for trajectory
+    analysis in movement ecology yields behavioural annotation of trajectories based
+    on estimated local measures of velocity and turning angle, eventually with solar
+    position covariate as a daytime indicator, ("Expectation-Maximization Binary Clustering
+    for Behavioural Annotation").
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: EMbC
+# Type: Package
+# Title: Expectation-Maximization Binary Clustering
+# Version: 2.0.2
+# Date: 2019-09-01
+# Author: Joan Garriga, John R.B. Palmer, Aitana Oltra, Frederic Bartumeus
+# Maintainer: Joan Garriga <jgarriga@ceab.csic.es>
+# Description: Unsupervised, multivariate, binary clustering for meaningful annotation of data, taking into account the uncertainty in the data. A specific constructor for trajectory analysis in movement ecology yields behavioural annotation of trajectories based on estimated local measures of velocity and turning angle, eventually with solar position covariate as a daytime indicator, ("Expectation-Maximization Binary Clustering for Behavioural Annotation").
+# URL: <doi:10.1371/journal.pone.0151984>
+# License: GPL-3 | file LICENSE
+# Imports: Rcpp (>= 0.11.0), sp, methods, RColorBrewer, mnormt, maptools
+# Suggests: move, rgl, knitr
+# LinkingTo: Rcpp, RcppArmadillo
+# LazyData: true
+# VignetteBuilder: knitr
+# RoxygenNote: 6.1.1
+# NeedsCompilation: yes
+# Packaged: 2019-09-04 16:17:14 UTC; jgarriga
+# Repository: CRAN
+# Date/Publication: 2019-09-04 16:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

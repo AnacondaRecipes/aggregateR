@@ -1,0 +1,90 @@
+{% set version = '0.0.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-eiadata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/EIAdata_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/EIAdata/EIAdata_{{ version }}.tar.gz
+  sha256: 71d8d94c0c44ac60cad63a39590ee2d04dbd3c377edc625c86a555a5a14ee5b5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-xml
+    - r-xts
+    - r-zoo
+
+  run:
+    - r-base
+    - r-xml
+    - r-xts
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('EIAdata')"           # [not win]
+    - "\"%R%\" -e \"library('EIAdata')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/Matt-Brigida/EIAdata
+  license: GPL-2
+  summary: An R wrapper to allow the user to query categories and Series IDs, and import data,
+    from the EIA's API <https://www.eia.gov/opendata/>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: EIAdata
+# Type: Package
+# Title: R Wrapper for the Energy Information Administration (EIA) API
+# Version: 0.0.5
+# Date: 2019-08-14
+# Author: Matthew Brigida and others (see GitHub)
+# Maintainer: Matthew Brigida <mdbrigida@gmail.com>
+# URL: https://github.com/Matt-Brigida/EIAdata
+# BugReports: https://github.com/Matt-Brigida/EIAdata/issues
+# Description: An R wrapper to allow the user to query categories and Series IDs, and import data, from the EIA's API <https://www.eia.gov/opendata/>.
+# Depends: R (>= 2.11.0), XML, xts, zoo
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2019-08-23 16:10:48 UTC; matt
+# Repository: CRAN
+# Date/Publication: 2019-08-23 22:40:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
