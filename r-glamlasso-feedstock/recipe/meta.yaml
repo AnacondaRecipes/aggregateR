@@ -1,0 +1,106 @@
+{% set version = '3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-glamlasso
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/glamlasso_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/glamlasso/glamlasso_{{ version }}.tar.gz
+  sha256: acb54489c6d0f9846fbe5295bc323522a71f468fc652022aa245c0890ca2d0fa
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.2
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.2
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('glamlasso')"           # [not win]
+    - "\"%R%\" -e \"library('glamlasso')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=glamlasso
+  license: GPL-3
+  summary: 'Functions capable of performing  efficient design matrix free  penalized estimation
+    in large scale 2 and 3-dimensional generalized linear array model framework. The
+    generic glamlasso() function solves the penalized maximum likelihood estimation
+    (PMLE) problem in a pure generalized linear array model (GLAM) as well as in a GLAM
+    containing a non-tensor component. Currently Lasso or Smoothly Clipped Absolute
+    Deviation (SCAD) penalized estimation is possible for the followings models: The
+    Gaussian model with identity link, the Binomial model with logit link, the Poisson
+    model with log link and the Gamma model with log link. Furthermore this package
+    also contains two  functions  that can be used to fit special cases of GLAMs, see
+    glamlassoRR() and glamlassoS(). The procedure underlying these functions is based
+    on the gdpg algorithm from Lund et al. (2017) <doi:10.1080/10618600.2017.1279548>.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: glamlasso
+# Type: Package
+# Title: Penalization in Large Scale Generalized Linear Array Models
+# Version: 3.0
+# Date: 2018-01-18
+# Author: Adam Lund
+# Maintainer: Adam Lund <adam.lund@math.ku.dk>
+# Description: Functions capable of performing  efficient design matrix free  penalized estimation in large scale 2 and 3-dimensional generalized linear array model framework. The generic glamlasso() function solves the penalized maximum likelihood estimation (PMLE) problem in a pure generalized linear array model (GLAM) as well as in a GLAM containing a non-tensor component. Currently Lasso or Smoothly Clipped Absolute Deviation (SCAD) penalized estimation is possible for the followings models: The Gaussian model with identity link, the Binomial model with logit link, the Poisson model with log link and the Gamma model with log link. Furthermore this package also contains two  functions  that can be used to fit special cases of GLAMs, see glamlassoRR() and glamlassoS(). The procedure underlying these functions is based on the gdpg algorithm from Lund et al. (2017) <doi:10.1080/10618600.2017.1279548>.
+# License: GPL-3
+# Imports: Rcpp (>= 0.11.2)
+# LinkingTo: Rcpp, RcppArmadillo
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2018-01-19 13:06:30 UTC; adamlund
+# Repository: CRAN
+# Date/Publication: 2018-01-19 14:48:29 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

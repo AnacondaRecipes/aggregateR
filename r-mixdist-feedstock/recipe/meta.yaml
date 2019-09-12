@@ -1,0 +1,83 @@
+{% set version = '0.5-5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mixdist
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mixdist_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mixdist/mixdist_{{ version }}.tar.gz
+  sha256: 2fa98a24583754b3c53b0d771cd71589e1b0ff688f130c4b1abf8fd1b48790f1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mixdist')"           # [not win]
+    - "\"%R%\" -e \"library('mixdist')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.r-project.org/, https://ms.mcmaster.ca/peter/mix/mix.html
+  license: GPL-2
+  summary: Fit finite mixture distribution models to grouped data and conditional data by maximum
+    likelihood using a combination of a Newton-type algorithm and the EM algorithm.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mixdist
+# Version: 0.5-5
+# Date: 2018-06-04
+# Title: Finite Mixture Distribution Models
+# Packaged: 2018-06-04 18:18:27 UTC; pdmmac1
+# Author: Peter Macdonald <pdmmac@mcmaster.ca>, with contributions from Juan Du <duduyy@hotmail.com>
+# Maintainer: Peter Macdonald <pdmmac@mcmaster.ca>
+# Depends: R (>= 1.4.0)
+# Imports: graphics, stats
+# Description: Fit finite mixture distribution models to grouped data and conditional data by maximum likelihood using a combination of a Newton-type algorithm and the EM algorithm.
+# License: GPL (>= 2)
+# URL: https://www.r-project.org/, https://ms.mcmaster.ca/peter/mix/mix.html
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2018-06-04 18:30:51 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

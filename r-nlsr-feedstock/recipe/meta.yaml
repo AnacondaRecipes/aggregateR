@@ -1,0 +1,93 @@
+{% set version = '2019.9.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nlsr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/nlsr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/nlsr/nlsr_{{ version }}.tar.gz
+  sha256: e4e1d5bda31eacfcc06a87f2270ad1975ac0ec4f6a7e698698a2c199c0b60efe
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: minpack.lm, optimx, Rvmmin, Rcgmin, numDeriv, knitr, rmarkdown, Ryacas, Deriv
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-digest
+
+  run:
+    - r-base
+    - r-digest
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('nlsr')"           # [not win]
+    - "\"%R%\" -e \"library('nlsr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=nlsr
+  license: GPL-2
+  summary: Provides tools for working with nonlinear least squares problems. It is intended to
+    eventually supersede the 'nls()' function in the R distribution. For example, 'nls()'
+    specifically does NOT deal with small  or zero residual problems as its Gauss-Newton
+    method frequently stops with 'singular gradient' messages. 'nlsr' is based on the
+    now-deprecated package 'nlmrt', and has refactored functions and R-language symbolic
+    derivative features.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: nlsr
+# Type: Package
+# Title: Functions for Nonlinear Least Squares Solutions
+# Version: 2019.9.7
+# Date: 2019-09-07
+# Authors@R: c( person(given = c("John", "C"), family = "Nash", role = c("aut", "cre"), email = "nashjc@uottawa.ca"),  person(given = "Duncan", family = "Murdoch", role = "aut", email = "murdoch.duncan@gmail.com") )
+# Maintainer: John C Nash <nashjc@uottawa.ca>
+# Description: Provides tools for working with nonlinear least squares problems. It is intended to eventually supersede the 'nls()' function in the R distribution. For example, 'nls()' specifically does NOT deal with small  or zero residual problems as its Gauss-Newton method frequently stops with 'singular gradient' messages. 'nlsr' is based on the now-deprecated package 'nlmrt', and has refactored functions and R-language symbolic derivative features.
+# License: GPL-2
+# Depends: R (>= 3.0)
+# Imports: digest
+# Suggests: minpack.lm, optimx, Rvmmin, Rcgmin, numDeriv, knitr, rmarkdown, Ryacas, Deriv
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-09-08 14:53:00 UTC; john
+# Author: John C Nash [aut, cre], Duncan Murdoch [aut]
+# Repository: CRAN
+# Date/Publication: 2019-09-08 16:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

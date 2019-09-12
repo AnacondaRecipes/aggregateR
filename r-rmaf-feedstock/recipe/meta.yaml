@@ -1,0 +1,83 @@
+{% set version = '3.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rmaf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rmaf_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rmaf/rmaf_{{ version }}.tar.gz
+  sha256: 471e7d1761f9e89470e2efd82298d854fca83e15ac5c734ac92b3e5e553d4470
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rmaf')"           # [not win]
+    - "\"%R%\" -e \"library('rmaf')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rmaf
+  license: GPL-2
+  summary: 'Uses refined moving average filter based on the optimal and data-driven moving average
+    lag q or smoothing spline to estimate trend and seasonal components, as well as
+    irregularity (residuals) for univariate time series or data. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rmaf
+# Type: Package
+# Title: Refined Moving Average Filter
+# Version: 3.0.1
+# Date: 2015-04-14
+# Author: Debin Qiu
+# Maintainer: Debin Qiu <debinqiu@uga.edu>
+# Description: Uses refined moving average filter based on the optimal and data-driven moving average lag q or smoothing spline to estimate trend and seasonal components, as well as irregularity (residuals) for univariate time series or data.
+# License: GPL (>= 2)
+# Packaged: 2015-04-15 19:30:37 UTC; Deman
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-04-15 22:05:20
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

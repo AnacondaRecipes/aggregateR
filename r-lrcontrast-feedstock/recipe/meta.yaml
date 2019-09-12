@@ -1,0 +1,92 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lrcontrast
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LRcontrast_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LRcontrast/LRcontrast_{{ version }}.tar.gz
+  sha256: 987467754078ce644b33d5c1ae7558300d7f0fd2bb2a2634b782e451d035403b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-dosefinding
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-dosefinding
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LRcontrast')"           # [not win]
+    - "\"%R%\" -e \"library('LRcontrast')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=LRcontrast
+  license: GPL-3
+  summary: Provides functions for calculating test statistics, simulating quantiles  and simulating
+    p-values of likelihood ratio contrast tests in regression models  with a lack of
+    identifiability.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LRcontrast
+# Type: Package
+# Title: Dose Response Signal Detection under Model Uncertainty
+# Version: 1.0
+# Date: 2015-11-06
+# Author: Kevin Kokot
+# Depends: R (>= 3.1.2)
+# Imports: DoseFinding
+# Maintainer: Kevin Kokot <kevin.kokot@ruhr-uni-bochum.de>
+# Description: Provides functions for calculating test statistics, simulating quantiles  and simulating p-values of likelihood ratio contrast tests in regression models  with a lack of identifiability.
+# License: GPL-3
+# NeedsCompilation: yes
+# Packaged: 2015-11-06 17:11:35 UTC; Kevin
+# Repository: CRAN
+# Date/Publication: 2015-11-07 00:19:46
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

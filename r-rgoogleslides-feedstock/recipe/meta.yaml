@@ -1,0 +1,97 @@
+{% set version = '0.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rgoogleslides
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rgoogleslides_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rgoogleslides/rgoogleslides_{{ version }}.tar.gz
+  sha256: 0568983ee4eebccde27a88a85fd9e7b780ec4adff62edad741578115b3a4211a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-assertthat
+    - r-httr >=1.1.0
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-r6
+    - r-assertthat
+    - r-httr >=1.1.0
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rgoogleslides')"           # [not win]
+    - "\"%R%\" -e \"library('rgoogleslides')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rgoogleslides
+  license: MIT
+  summary: Previously, when one is working with in the Google Ecosystem (Using Google Drive etc),
+    there is hardly any good workflow of getting the values calculated from R and getting
+    that into Google Slides. The normal and easy way out would be to just copy your
+    work over but when you have a number of analysis to present with a lot of changes
+    between each environment, it just becomes quite cumbersome.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rgoogleslides
+# Type: Package
+# Title: R Interface to Google Slides
+# Version: 0.3.1
+# Author: Hairizuan Bin Noorazman
+# Maintainer: Hairizuan Noorazman <hairizuanbinnoorazman@gmail.com>
+# Description: Previously, when one is working with in the Google Ecosystem (Using Google Drive etc), there is hardly any good workflow of getting the values calculated from R and getting that into Google Slides. The normal and easy way out would be to just copy your work over but when you have a number of analysis to present with a lot of changes between each environment, it just becomes quite cumbersome.
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Imports: httr (>= 1.1.0), jsonlite, assertthat, R6
+# Suggests: knitr, rmarkdown, testthat
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-08-29 23:49:17 UTC; hairizuannoorazman
+# Repository: CRAN
+# Date/Publication: 2018-09-03 08:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

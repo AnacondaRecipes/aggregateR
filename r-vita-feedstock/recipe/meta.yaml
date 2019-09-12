@@ -1,0 +1,110 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-vita
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/vita_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/vita/vita_{{ version }}.tar.gz
+  sha256: 3b69597345102f4d544daa758542ac143f956d9375920f1c3236a3cc3e159784
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: mnormt
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.6
+    - r-randomforest
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.6
+    - r-randomforest
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('vita')"           # [not win]
+    - "\"%R%\" -e \"library('vita')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=vita
+  license: GPL-2
+  summary: Implements the novel testing approach by Janitza et al.(2015) <http://nbn-resolving.de/urn/resolver.pl?urn=nbn:de:bvb:19-epub-25587-4>
+    for the permutation variable importance measure in a random forest and the PIMP-algorithm
+    by Altmann et al.(2010) <doi:10.1093/bioinformatics/btq134>. Janitza et al.(2015)
+    <http://nbn-resolving.de/urn/resolver.pl?urn=nbn:de:bvb:19-epub-25587-4> do not
+    use the "standard" permutation variable importance but the cross-validated permutation
+    variable importance for the novel test approach. The cross-validated permutation
+    variable importance is not based on the out-of-bag observations but uses a similar
+    strategy which is inspired by the cross-validation procedure. The novel test approach
+    can be applied for classification trees as well as for regression trees. However,
+    the use of the novel testing approach has not been tested for regression trees so
+    far, so this routine is meant for the expert user only and its current state is
+    rather experimental.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: vita
+# Type: Package
+# Title: Variable Importance Testing Approaches
+# Version: 1.0.0
+# Date: 2015-12-12
+# Authors@R: person("Ender", "Celik", email = "celik.p.ender@gmail.com", role = c("aut", "cre"))
+# Author: Ender Celik [aut, cre]
+# Maintainer: Ender Celik <celik.p.ender@gmail.com>
+# Description: Implements the novel testing approach by Janitza et al.(2015) <http://nbn-resolving.de/urn/resolver.pl?urn=nbn:de:bvb:19-epub-25587-4> for the permutation variable importance measure in a random forest and the PIMP-algorithm by Altmann et al.(2010) <doi:10.1093/bioinformatics/btq134>. Janitza et al.(2015) <http://nbn-resolving.de/urn/resolver.pl?urn=nbn:de:bvb:19-epub-25587-4> do not use the "standard" permutation variable importance but the cross-validated permutation variable importance for the novel test approach. The cross-validated permutation variable importance is not based on the out-of-bag observations but uses a similar strategy which is inspired by the cross-validation procedure. The novel test approach can be applied for classification trees as well as for regression trees. However, the use of the novel testing approach has not been tested for regression trees so far, so this routine is meant for the expert user only and its current state is rather experimental.
+# Depends: R (>= 3.1.0)
+# License: GPL (>= 2)
+# LazyData: TRUE
+# Imports: Rcpp (>= 0.11.6),parallel,randomForest,stats
+# LinkingTo: Rcpp
+# Suggests: mnormt
+# NeedsCompilation: yes
+# Packaged: 2015-12-14 17:52:38 UTC; ender
+# Repository: CRAN
+# Date/Publication: 2015-12-14 19:05:44
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,89 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stv
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/STV_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/STV/STV_{{ version }}.tar.gz
+  sha256: 7a669a3dd848836890044c998d53ec7bd2bbd6e53285ba9f72033d4cf421febf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, crayon
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('STV')"           # [not win]
+    - "\"%R%\" -e \"library('STV')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jayemerson/STV
+  license: LGPL-3
+  summary: Implementations of the Single Transferable Vote counting  system. By default, it uses
+    the Cambridge method for surplus allocation and Droop method for quota calculation.  Fractional
+    surplus allocation and the Hare quota are available as options.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: STV
+# Type: Package
+# Title: Single Transferable Vote Counting
+# Version: 1.0.1
+# Authors@R: c( person("John", "Emerson", email = "john.emerson@yale.edu", role = c("cre", "aut")), person("Saksham", "Chandra", role = "aut"), person("Lilla", "Orr", role = "aut"), person("Efim", "Abrikosov", role = "ctb"), person("Shadie", "Khubba", role = "ctb"), person("William", "Meyerson", role = "ctb"), person("Shylee", "Ezroni", role = "ctb"), person("Junchao", "Ma", role = "ctb"))
+# Maintainer: John Emerson <john.emerson@yale.edu>
+# URL: https://github.com/jayemerson/STV
+# BugReports: https://github.com/jayemerson/STV/issues
+# Description: Implementations of the Single Transferable Vote counting  system. By default, it uses the Cambridge method for surplus allocation and Droop method for quota calculation.  Fractional surplus allocation and the Hare quota are available as options.
+# License: LGPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: testthat, crayon
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2019-03-07 20:54:32 UTC; jay
+# Author: John Emerson [cre, aut], Saksham Chandra [aut], Lilla Orr [aut], Efim Abrikosov [ctb], Shadie Khubba [ctb], William Meyerson [ctb], Shylee Ezroni [ctb], Junchao Ma [ctb]
+# Repository: CRAN
+# Date/Publication: 2019-03-07 21:22:51 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

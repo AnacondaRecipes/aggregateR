@@ -1,0 +1,94 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pcsinr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PCSinR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PCSinR/PCSinR_{{ version }}.tar.gz
+  sha256: 64ad93ccae46fbca975723ffc0ee30d9605f9b8d91b3ee0cdb83b0c17d961efd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PCSinR')"           # [not win]
+    - "\"%R%\" -e \"library('PCSinR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/felixhenninger/PCSinR
+  license: GPL-3
+  summary: "Parallel Constraint Satisfaction (PCS) models are an increasingly common class of
+    models in Psychology, with applications to reading and word recognition (McClelland
+    & Rumelhart, 1981), judgment and decision making (Gl\xF6ckner & Betsch, 2008; Gl\xF6ckner,
+    Hilbig, & Jekel, 2014), and several other fields (e.g. Read, Vanman, & Miller, 1997).
+    In each of these fields, they provide a quantitative model of psychological phenomena,
+    with precise predictions regarding choice probabilities, decision times, and often
+    the degree of confidence. This package provides the necessary functions to create
+    and simulate basic Parallel Constraint Satisfaction networks within R."
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PCSinR
+# Title: Parallel Constraint Satisfaction Networks in R
+# Version: 0.1.0
+# Authors@R: person("Felix", "Henninger", email = "mailbox@felixhenninger.com", role = c("aut", "cre"))
+# URL: https://github.com/felixhenninger/PCSinR
+# Description: Parallel Constraint Satisfaction (PCS) models are an increasingly common class of models in Psychology, with applications to reading and word recognition (McClelland & Rumelhart, 1981), judgment and decision making (Glockner & Betsch, 2008; Glockner, Hilbig, & Jekel, 2014), and several other fields (e.g. Read, Vanman, & Miller, 1997). In each of these fields, they provide a quantitative model of psychological phenomena, with precise predictions regarding choice probabilities, decision times, and often the degree of confidence. This package provides the necessary functions to create and simulate basic Parallel Constraint Satisfaction networks within R.
+# Depends: R (>= 3.3.1)
+# License: GPL (>= 3)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 5.0.1
+# Suggests: testthat
+# NeedsCompilation: no
+# Packaged: 2016-10-19 10:57:29 UTC; felixhenninger
+# Author: Felix Henninger [aut, cre]
+# Maintainer: Felix Henninger <mailbox@felixhenninger.com>
+# Repository: CRAN
+# Date/Publication: 2016-10-19 22:12:25
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

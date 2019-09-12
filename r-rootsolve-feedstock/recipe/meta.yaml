@@ -1,0 +1,102 @@
+{% set version = '1.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rootsolve
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rootSolve_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rootSolve/rootSolve_{{ version }}.tar.gz
+  sha256: 08b3bb63f04fc0b065cb615b6ca1ef95eb6df7a813eb9eb625bc15c6de332c22
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rootSolve')"           # [not win]
+    - "\"%R%\" -e \"library('rootSolve')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rootSolve
+  license: GPL-2
+  summary: 'Routines to find the root of nonlinear functions, and to perform steady-state and
+    equilibrium analysis of ordinary differential equations (ODE).  Includes routines
+    that: (1) generate gradient and jacobian matrices (full and banded), (2) find roots
+    of non-linear equations by the ''Newton-Raphson'' method,  (3) estimate steady-state
+    conditions of a system of (differential) equations in full, banded or sparse form,
+    using the ''Newton-Raphson'' method, or by dynamically running, (4) solve the steady-state
+    conditions for uni-and multicomponent 1-D, 2-D, and 3-D partial differential equations,
+    that have been converted to ordinary differential equations by numerical differencing
+    (using the method-of-lines approach). Includes fortran code.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rootSolve
+# Version: 1.7
+# Title: Nonlinear Root Finding, Equilibrium and Steady-State Analysis of Ordinary Differential Equations
+# Author: Karline Soetaert [aut, cre],   yale sparse matrix package authors [cph]
+# Authors@R: c(person("Karline","Soetaert", role = c("aut", "cre"),  email = "karline.soetaert@nioz.nl"), person("yale sparse matrix package authors", role = "cph"))
+# Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
+# Depends: R (>= 2.01)
+# Imports: stats, graphics, grDevices
+# Description: Routines to find the root of nonlinear functions, and to perform steady-state and equilibrium analysis of ordinary differential equations (ODE).  Includes routines that: (1) generate gradient and jacobian matrices (full and banded), (2) find roots of non-linear equations by the 'Newton-Raphson' method,  (3) estimate steady-state conditions of a system of (differential) equations in full, banded or sparse form, using the 'Newton-Raphson' method, or by dynamically running, (4) solve the steady-state conditions for uni-and multicomponent 1-D, 2-D, and 3-D partial differential equations, that have been converted to ordinary differential equations by numerical differencing (using the method-of-lines approach). Includes fortran code.
+# License: GPL (>= 2)
+# LazyData: yes
+# Packaged: 2016-12-06 08:05:38 UTC; rforge
+# Repository: CRAN
+# Repository/R-Forge/Project: rootsolve
+# Repository/R-Forge/Revision: 93
+# Repository/R-Forge/DateTimeStamp: 2016-12-06 07:46:12
+# Date/Publication: 2016-12-06 14:04:43
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

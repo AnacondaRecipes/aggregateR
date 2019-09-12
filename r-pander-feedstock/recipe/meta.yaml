@@ -1,0 +1,112 @@
+{% set version = '0.6.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pander
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pander_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pander/pander_{{ version }}.tar.gz
+  sha256: d1dbd75e5d02d58239a45920c6894b58c70de278ae4c149cabf76a0a5fd3a9ad
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: grid, lattice, ggplot2 (>= 0.9.2), sylly, sylly.en, futile.logger, survival, microbenchmark, zoo, nlme, descr, MASS, knitr, rmarkdown, tables, reshape, memisc, Epi, randomForest, tseries, gtable, rms, forecast, data.table
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-digest
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-digest
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pander')"           # [not win]
+    - "\"%R%\" -e \"library('pander')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://rapporter.github.io/pander
+  license: AGPL-3
+  summary: 'Contains some functions catching all messages, ''stdout'' and other useful information
+    while evaluating R code and other helpers to return user specified text elements
+    (like: header, paragraph, table, image, lists etc.) in ''pandoc'' markdown or several
+    type of R objects similarly automatically transformed to markdown format. Also capable
+    of exporting/converting (the resulting) complex ''pandoc'' documents to e.g. HTML,
+    ''PDF'', ''docx'' or ''odt''. This latter reporting feature is supported in brew
+    syntax or with a custom reference class with a smarty caching ''backend''.'
+
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pander
+# Authors@R: c( person("Gergely", "Daroczi", , "daroczig@rapporter.net", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3149-8537")), person("Roman", "Tsegelskyi", , "roman.tsegelskyi@gmail.com", role = c("aut")))
+# Title: An R 'Pandoc' Writer
+# Type: Package
+# Encoding: UTF-8
+# Description: Contains some functions catching all messages, 'stdout' and other useful information while evaluating R code and other helpers to return user specified text elements (like: header, paragraph, table, image, lists etc.) in 'pandoc' markdown or several type of R objects similarly automatically transformed to markdown format. Also capable of exporting/converting (the resulting) complex 'pandoc' documents to e.g. HTML, 'PDF', 'docx' or 'odt'. This latter reporting feature is supported in brew syntax or with a custom reference class with a smarty caching 'backend'.
+# Version: 0.6.3
+# Date: 2018-11-06
+# URL: http://rapporter.github.io/pander
+# BugReports: https://github.com/rapporter/pander/issues
+# License: AGPL-3 | file LICENSE
+# Depends: R (>= 2.15.0)
+# Imports: grDevices, graphics, methods, utils, stats, digest, tools, Rcpp
+# Suggests: grid, lattice, ggplot2 (>= 0.9.2), sylly, sylly.en, futile.logger, survival, microbenchmark, zoo, nlme, descr, MASS, knitr, rmarkdown, tables, reshape, memisc, Epi, randomForest, tseries, gtable, rms, forecast, data.table
+# SystemRequirements: pandoc (http://johnmacfarlane.net/pandoc) for exporting markdown files to other formats.
+# LinkingTo: Rcpp
+# VignetteBuilder: knitr
+# RoxygenNote: 6.1.0
+# NeedsCompilation: yes
+# Packaged: 2018-11-06 10:17:46 UTC; daroczig
+# Author: Gergely Daroczi [aut, cre] (<https://orcid.org/0000-0003-3149-8537>), Roman Tsegelskyi [aut]
+# Maintainer: Gergely Daroczi <daroczig@rapporter.net>
+# Repository: CRAN
+# Date/Publication: 2018-11-06 10:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

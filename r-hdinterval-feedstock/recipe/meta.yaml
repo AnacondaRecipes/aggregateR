@@ -1,0 +1,84 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hdinterval
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/HDInterval_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/HDInterval/HDInterval_{{ version }}.tar.gz
+  sha256: 349e0af81741d1b03386caebae77ac4505bc13dae194bb013b7d6cc51bc0a1f8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: coda
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('HDInterval')"           # [not win]
+    - "\"%R%\" -e \"library('HDInterval')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=HDInterval
+  license: GPL-3
+  summary: A generic function and a set of methods to calculate highest density intervals for
+    a variety of classes of objects which can specify a probability density distribution,
+    including MCMC output, fitted density objects, and functions.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: HDInterval
+# Type: Package
+# Title: Highest (Posterior) Density Intervals
+# Version: 0.2.0
+# Date: 2018-06-09
+# Suggests: coda
+# Author: Mike Meredith and John Kruschke
+# Maintainer: Mike Meredith <mmeredith@wcs.org>
+# Description: A generic function and a set of methods to calculate highest density intervals for a variety of classes of objects which can specify a probability density distribution, including MCMC output, fitted density objects, and functions.
+# License: GPL-3
+# NeedsCompilation: no
+# Packaged: 2018-06-09 11:09:04 UTC; MIKE
+# Repository: CRAN
+# Date/Publication: 2018-06-09 15:46:43 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

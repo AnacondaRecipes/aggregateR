@@ -1,0 +1,97 @@
+{% set version = '1.1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-intccr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/intccr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/intccr/intccr_{{ version }}.tar.gz
+  sha256: acaeb4b80c1fd3e80555a159191b061af9f483fa8fdb5fba40625355bd2cef28
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-alabama >=2015.3.1
+    - r-doparallel
+    - r-foreach
+    - r-numderiv
+
+  run:
+    - r-base
+    - r-alabama >=2015.3.1
+    - r-doparallel
+    - r-foreach
+    - r-numderiv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('intccr')"           # [not win]
+    - "\"%R%\" -e \"library('intccr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=intccr
+  license: GPL-2
+  summary: Semiparametric regression models on the cumulative incidence function with interval-censored
+    competing risks data as described in Bakoyannis, Yu, & Yiannoutsos (2017) <doi:10.1002/sim.7350>.
+    The main function fits the proportional subdistribution hazards model (Fine-Gray
+    model), the proportional odds model, and other models that belong to the class of
+    semiparametric generalized odds rate transformation models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: intccr
+# Type: Package
+# Title: Semiparametric Competing Risks Regression under Interval Censoring
+# Version: 1.1.4
+# Author: Giorgos Bakoyannis <gbakogia@iu.edu>, Jun Park <jp84@iu.edu>
+# Maintainer: Jun Park <jp84@iu.edu>
+# Description: Semiparametric regression models on the cumulative incidence function with interval-censored competing risks data as described in Bakoyannis, Yu, & Yiannoutsos (2017) <doi:10.1002/sim.7350>. The main function fits the proportional subdistribution hazards model (Fine-Gray model), the proportional odds model, and other models that belong to the class of semiparametric generalized odds rate transformation models.
+# Date: 2019-05-09
+# Imports: alabama (>= 2015.3.1), doParallel, foreach, parallel, numDeriv, stats, utils
+# Depends: R (>= 2.14.0)
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-05-09 15:58:43 UTC; Jun
+# Repository: CRAN
+# Date/Publication: 2019-05-09 20:10:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,92 @@
+{% set version = '1.2-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-minpack.lm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/minpack.lm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/minpack.lm/minpack.lm_{{ version }}.tar.gz
+  sha256: 14cb7dba3ef2b46da0479b46d46c76198e129a31f6157cd8b37f178adb15d5a3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('minpack.lm')"           # [not win]
+    - "\"%R%\" -e \"library('minpack.lm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=minpack.lm
+  license: GPL-3
+  summary: 'The nls.lm function provides an R interface to lmder and lmdif from the MINPACK library,
+    for solving nonlinear least-squares problems by a modification of the Levenberg-Marquardt
+    algorithm, with support for lower and upper parameter bounds.  The implementation
+    can be used via nls-like calls using the nlsLM function.  '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: minpack.lm
+# Version: 1.2-1
+# Title: R Interface to the Levenberg-Marquardt Nonlinear Least-Squares Algorithm Found in MINPACK, Plus Support for Bounds
+# Author: Timur V. Elzhov, Katharine M. Mullen, Andrej-Nikolai Spiess, Ben Bolker
+# Maintainer: Katharine M. Mullen <mullenkate@gmail.com>
+# Description: The nls.lm function provides an R interface to lmder and lmdif from the MINPACK library, for solving nonlinear least-squares problems by a modification of the Levenberg-Marquardt algorithm, with support for lower and upper parameter bounds.  The implementation can be used via nls-like calls using the nlsLM function.
+# Suggests: MASS
+# License: GPL-3
+# NeedsCompilation: yes
+# Packaged: 2016-11-20 02:45:43 UTC; kmm
+# Repository: CRAN
+# Date/Publication: 2016-11-20 16:40:02
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

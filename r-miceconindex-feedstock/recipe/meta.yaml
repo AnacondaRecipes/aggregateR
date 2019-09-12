@@ -1,0 +1,86 @@
+{% set version = '0.1-6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-miceconindex
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/micEconIndex_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/micEconIndex/micEconIndex_{{ version }}.tar.gz
+  sha256: b40be93bbe2a780f3d7817c5531e772373dc3b9c46ef6989ae373c7fb1f114c6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Ecdat (>= 0.1-5), micEcon (>= 0.6-12)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-misctools >=0.6_1
+
+  run:
+    - r-base
+    - r-misctools >=0.6_1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('micEconIndex')"           # [not win]
+    - "\"%R%\" -e \"library('micEconIndex')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.micEcon.org
+  license: GPL-2
+  summary: Tools for calculating Laspeyres, Paasche, and Fisher price and quantity indices.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: micEconIndex
+# Version: 0.1-6
+# Date: 2017-04-07
+# Title: Price and Quantity Indices
+# Author: Arne Henningsen
+# Maintainer: Arne Henningsen <arne.henningsen@gmail.com>
+# Depends: R (>= 2.4.0)
+# Imports: miscTools (>= 0.6-1)
+# Suggests: Ecdat (>= 0.1-5), micEcon (>= 0.6-12)
+# Description: Tools for calculating Laspeyres, Paasche, and Fisher price and quantity indices.
+# License: GPL (>= 2)
+# URL: http://www.micEcon.org
+# NeedsCompilation: no
+# Packaged: 2017-04-07 17:18:24 UTC; arne
+# Repository: CRAN
+# Date/Publication: 2017-04-07 18:20:38 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

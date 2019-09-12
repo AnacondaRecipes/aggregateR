@@ -1,0 +1,98 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-vwr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/vwr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/vwr/vwr_{{ version }}.tar.gz
+  sha256: bb9f1eac729055eb9afad41831a854f3f62cd1c7bb511e75d0cfbac6e406e9c0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: parallel
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lattice
+    - r-latticeextra
+    - r-stringdist
+
+  run:
+    - r-base
+    - r-lattice
+    - r-latticeextra
+    - r-stringdist
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('vwr')"           # [not win]
+    - "\"%R%\" -e \"library('vwr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=vwr
+  license: GPL-3
+  summary: 'Functions and data for use in visual word recognition research:  Computation of neighbors
+    (Hamming and Levenshtein distances), average distances to neighbors (e.g., OLD20),
+    and Coltheart''s N. Also includes the LD1NN algorithm to detect bias in the composition
+    of a lexical decision task. Most of the functions support parallel execution. Supplies
+    wordlists for  several languages. Uses the string distance functions from the stringdist
+    package by Mark van der Loo.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: vwr
+# Type: Package
+# Title: Useful functions for visual word recognition research
+# Version: 0.3.0
+# Date: 2013-08-07
+# Author: Emmanuel Keuleers
+# Maintainer: Emmanuel Keuleers <emmanuel.keuleers@ugent.be>
+# Description: Functions and data for use in visual word recognition research:  Computation of neighbors (Hamming and Levenshtein distances), average distances to neighbors (e.g., OLD20), and Coltheart's N. Also includes the LD1NN algorithm to detect bias in the composition of a lexical decision task. Most of the functions support parallel execution. Supplies wordlists for  several languages. Uses the string distance functions from the stringdist package by Mark van der Loo.
+# Depends: R(>= 3.0.1), stringdist, lattice, latticeExtra
+# Suggests: parallel
+# License: GPL (>= 3)
+# LazyData: yes
+# Encoding: UTF-8
+# Packaged: 2013-08-19 09:48:23 UTC; emmanuel
+# NeedsCompilation: no
+# LazyDataCompression: xz
+# Repository: CRAN
+# Date/Publication: 2013-08-19 12:28:49
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

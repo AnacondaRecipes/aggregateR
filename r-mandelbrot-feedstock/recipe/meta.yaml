@@ -1,0 +1,95 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mandelbrot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mandelbrot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mandelbrot/mandelbrot_{{ version }}.tar.gz
+  sha256: 3aa5672a596febe589499263e8e2376cd4961e1740115432012a402425424211
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, RColorBrewer
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-reshape2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-reshape2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mandelbrot')"           # [not win]
+    - "\"%R%\" -e \"library('mandelbrot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mandelbrot
+  license: MIT
+  summary: Estimates membership for the Mandelbrot set.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mandelbrot
+# Type: Package
+# Title: Generates Views on the Mandelbrot Set
+# Version: 0.2.0
+# Authors@R: c( person("Ben", "Moore", email = "ben@blm.io", role = c("aut", "cre")), person("Mario", "dos Reis", role = c("aut")))
+# Description: Estimates membership for the Mandelbrot set.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# Imports: reshape2
+# Suggests: testthat, RColorBrewer
+# NeedsCompilation: yes
+# Packaged: 2017-07-06 07:16:26 UTC; benmoore
+# Author: Ben Moore [aut, cre], Mario dos Reis [aut]
+# Maintainer: Ben Moore <ben@blm.io>
+# Repository: CRAN
+# Date/Publication: 2017-07-06 10:06:55 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

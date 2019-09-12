@@ -1,0 +1,84 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-okcupiddata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/okcupiddata_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/okcupiddata/okcupiddata_{{ version }}.tar.gz
+  sha256: 58ad290e314b67747819a74be1263c64b87c4bf6d4a7aa04366a9cec49ce04d0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('okcupiddata')"           # [not win]
+    - "\"%R%\" -e \"library('okcupiddata')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/rudeboybert/okcupiddata
+  license: CC0
+  summary: Cleaned profile data from "OkCupid Profile Data for Introductory Statistics and Data
+    Science Courses" (Journal of Statistics Education 2015 <http://www.amstat.org/publications/jse/v23n2/kim.pdf>).
+  license_family: CC
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: okcupiddata
+# Title: OkCupid Profile Data for Introductory Statistics and Data Science Courses
+# Version: 0.1.0
+# Authors@R: c( person("Albert Y.", "Kim", email = "albert.ys.kim@gmail.com", role = c("aut", "cre")), person("Adriana", "Escobedo-Land", email = "land.escbd@gmail.com", role = "aut") )
+# Description: Cleaned profile data from "OkCupid Profile Data for Introductory Statistics and Data Science Courses" (Journal of Statistics Education 2015 <http://www.amstat.org/publications/jse/v23n2/kim.pdf>).
+# Depends: R (>= 2.10)
+# License: CC0
+# Encoding: UTF-8
+# LazyData: TRUE
+# URL: http://github.com/rudeboybert/okcupiddata
+# BugReports: https://github.com/rudeboybert/okcupiddata/issues
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-08-19 13:41:04 UTC; aykim
+# Author: Albert Y. Kim [aut, cre], Adriana Escobedo-Land [aut]
+# Maintainer: Albert Y. Kim <albert.ys.kim@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-08-19 17:05:06
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

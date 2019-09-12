@@ -1,0 +1,88 @@
+{% set version = '1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rse
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RSE_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RSE/RSE_{{ version }}.tar.gz
+  sha256: 290171f810082e81a87b8561859be3cece9b515b9b4d94936ce1aec97f9075b7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RSE')"           # [not win]
+    - "\"%R%\" -e \"library('RSE')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RSE
+  license: GPL-3
+  summary: 'A Bayesian-weighted estimator and two unweighted estimators are developed to estimate
+    the number of newly found rare species in additional ecological samples. Among these
+    methods, the Bayesian-weighted estimator and an unweighted (Chao-derived) estimator
+    are of high accuracy and recommended for practical applications. Technical details
+    of the proposed estimators have been well described in the following paper: Shen
+    TJ, Chen YH (2018) A Bayesian weighted approach to predicting the number of newly
+    discovered rare species. Conservation Biology, In press.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RSE
+# Type: Package
+# Title: Number of Newly Discovered Rare Species Estimation
+# Version: 1.3
+# Date: 2018-11-03
+# Author: Youhua Chen,Tsung-Jen Shen
+# Maintainer: Youhua Chen <haydi@126.com>
+# Description: A Bayesian-weighted estimator and two unweighted estimators are developed to estimate the number of newly found rare species in additional ecological samples. Among these methods, the Bayesian-weighted estimator and an unweighted (Chao-derived) estimator are of high accuracy and recommended for practical applications. Technical details of the proposed estimators have been well described in the following paper: Shen TJ, Chen YH (2018) A Bayesian weighted approach to predicting the number of newly discovered rare species. Conservation Biology, In press.
+# License: GPL-3
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-11-03 02:27:39 UTC; Adminstrator
+# Repository: CRAN
+# Date/Publication: 2018-11-20 05:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

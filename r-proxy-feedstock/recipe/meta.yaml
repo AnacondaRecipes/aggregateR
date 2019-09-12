@@ -1,0 +1,93 @@
+{% set version = '0.4-23' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-proxy
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/proxy_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/proxy/proxy_{{ version }}.tar.gz
+  sha256: 9dd4eb0978f40e4fcb55c8a8a26266d32eff9c63ac9dfe70cf1f664ca9c3669d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: cba
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('proxy')"           # [not win]
+    - "\"%R%\" -e \"library('proxy')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=proxy
+  license: GPL-2
+  summary: 'Provides an extensible framework for the efficient calculation of auto- and cross-proximities,
+    along with implementations of the most popular ones. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: proxy
+# Type: Package
+# Title: Distance and Similarity Measures
+# Version: 0.4-23
+# Authors@R: c(person(given = "David", family = "Meyer", role = c("aut", "cre"), email = "David.Meyer@R-project.org"), person(given = "Christian", family = "Buchta", role = "aut"))
+# Description: Provides an extensible framework for the efficient calculation of auto- and cross-proximities, along with implementations of the most popular ones.
+# Depends: R (>= 3.4.0)
+# Imports: stats, utils
+# Suggests: cba
+# Collate: registry.R database.R dist.R similarities.R dissimilarities.R util.R seal.R
+# License: GPL-2
+# NeedsCompilation: yes
+# Packaged: 2019-03-05 12:32:19 UTC; meyer
+# Author: David Meyer [aut, cre], Christian Buchta [aut]
+# Maintainer: David Meyer <David.Meyer@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2019-03-05 14:15:31 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

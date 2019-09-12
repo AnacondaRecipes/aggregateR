@@ -1,0 +1,86 @@
+{% set version = '2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rca
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RCA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RCA/RCA_{{ version }}.tar.gz
+  sha256: 30f4e9b772a1d5bf62f76e92e4f61586e93755a99c19cffd600db8fc59592d5e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-gplots
+    - r-igraph
+
+  run:
+    - r-base
+    - r-gplots
+    - r-igraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RCA')"           # [not win]
+    - "\"%R%\" -e \"library('RCA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RCA
+  license: GPL-2
+  summary: Relational Class Analysis (RCA) is a method for detecting heterogeneity in attitudinal
+    data (as described in Goldberg A., 2011, Am. J. Soc, 116(5)).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RCA
+# Type: Package
+# Title: Relational Class Analysis
+# Version: 2.0
+# Date: 2016-02-25
+# Author: Amir Goldberg, Sarah K. Stein
+# Maintainer: Amir Goldberg <amirgo@stanford.edu>
+# Depends: igraph, gplots
+# Description: Relational Class Analysis (RCA) is a method for detecting heterogeneity in attitudinal data (as described in Goldberg A., 2011, Am. J. Soc, 116(5)).
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2016-02-28 22:52:52 UTC; skstein
+# Repository: CRAN
+# Date/Publication: 2016-02-29 11:24:27
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

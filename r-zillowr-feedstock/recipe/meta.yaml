@@ -1,0 +1,94 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-zillowr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ZillowR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ZillowR/ZillowR_{{ version }}.tar.gz
+  sha256: 6b777fd9ffdd879d059b457f2fae386ce7bea2dbeef1ffb14b425f732e2a39f3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcurl
+    - r-xml
+
+  run:
+    - r-base
+    - r-rcurl
+    - r-xml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ZillowR')"           # [not win]
+    - "\"%R%\" -e \"library('ZillowR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/fascinatingfingers/ZillowR
+  license: GPL-3
+  summary: Zillow, an online real estate company, provides real estate and mortgage data for
+    the United States through a REST API. The ZillowR package provides an R function
+    for each API service, making it easy to make API calls and process the response
+    into convenient, R-friendly data structures. See <http://www.zillow.com/howto/api/APIOverview.htm>
+    for the Zillow API Documentation.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ZillowR
+# Type: Package
+# Title: R Interface to Zillow Real Estate and Mortgage Data API
+# Version: 0.1.0
+# Date: 2016-03-26
+# Author: Justin Brantley <fascinatingfingers@icloud.com>
+# Maintainer: Justin Brantley <fascinatingfingers@icloud.com>
+# URL: https://github.com/fascinatingfingers/ZillowR
+# Description: Zillow, an online real estate company, provides real estate and mortgage data for the United States through a REST API. The ZillowR package provides an R function for each API service, making it easy to make API calls and process the response into convenient, R-friendly data structures. See <http://www.zillow.com/howto/api/APIOverview.htm> for the Zillow API Documentation.
+# License: GPL-3
+# LazyData: TRUE
+# Imports: methods, utils, RCurl, XML
+# Suggests: testthat
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-03-26 09:33:22 UTC; justi
+# Repository: CRAN
+# Date/Publication: 2016-03-26 17:08:56
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,95 @@
+{% set version = '1.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-poissonseq
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PoissonSeq_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PoissonSeq/PoissonSeq_{{ version }}.tar.gz
+  sha256: 6f3dc30ad22e33e4fcfa37b3427c093d591c02f1b89a014d85e63203f6031dc2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-combinat
+
+  run:
+    - r-base
+    - r-combinat
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PoissonSeq')"           # [not win]
+    - "\"%R%\" -e \"library('PoissonSeq')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PoissonSeq
+  license: GPL-2
+  summary: 'This package implements a method for normalization, testing, and false discovery
+    rate estimation for RNA-sequencing data. The description of the method is in Li
+    J, Witten DM, Johnstone I, Tibshirani R (2012). Normalization, testing, and false
+    discovery rate estimation for RNA-sequencing data. Biostatistics 13(3): 523-38.
+    We estimate the sequencing depths of experiments using a new method based on Poisson
+    goodness-of-fit statistic, calculate a score statistic on the basis of a Poisson
+    log-linear model, and then estimate the false discovery rate using a modified version
+    of permutation plug-in method. A more detailed instruction as well as sample data
+    is available at http://www.stanford.edu/~junli07/research.html.  In this version,
+    we changed the way of calculating log foldchange for two-class data. The FDR estimation
+    part remains unchanged.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PoissonSeq
+# Type: Package
+# Title: Significance analysis of sequencing data based on a Poisson log linear model
+# Version: 1.1.2
+# Date: 2012-10-9
+# Depends: R(>= 2.10),combinat,splines
+# Author: Jun Li
+# Maintainer: Jun Li <jun.li@nd.edu>
+# Description: This package implements a method for normalization, testing, and false discovery rate estimation for RNA-sequencing data. The description of the method is in Li J, Witten DM, Johnstone I, Tibshirani R (2012). Normalization, testing, and false discovery rate estimation for RNA-sequencing data. Biostatistics 13(3): 523-38. We estimate the sequencing depths of experiments using a new method based on Poisson goodness-of-fit statistic, calculate a score statistic on the basis of a Poisson log-linear model, and then estimate the false discovery rate using a modified version of permutation plug-in method. A more detailed instruction as well as sample data is available at http://www.stanford.edu/~junli07/research.html.  In this version, we changed the way of calculating log foldchange for two-class data. The FDR estimation part remains unchanged.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# Packaged: 2012-10-10 04:33:20 UTC; jli9
+# Repository: CRAN
+# Date/Publication: 2012-10-10 15:36:34
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

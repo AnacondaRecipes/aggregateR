@@ -1,0 +1,94 @@
+{% set version = '0.2-8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tm.plugin.dc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tm.plugin.dc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tm.plugin.dc/tm.plugin.dc_{{ version }}.tar.gz
+  sha256: 6d9a76615b6712a1fce36a285c69fd2bb542e4f8b2a48bc829a757ca451c047d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: XML
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-dsl >=0.1_3
+    - r-nlp
+    - r-slam >=0.1_22
+    - r-tm >=0.6
+
+  run:
+    - r-base
+    - r-dsl >=0.1_3
+    - r-nlp
+    - r-slam >=0.1_22
+    - r-tm >=0.6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tm.plugin.dc')"           # [not win]
+    - "\"%R%\" -e \"library('tm.plugin.dc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=tm.plugin.dc
+  license: GPL-2
+  summary: A plug-in for the text mining framework tm to support text mining  in a distributed
+    way. The package provides a convenient interface for handling distributed corpus
+    objects based on distributed list objects.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: tm.plugin.dc
+# Version: 0.2-8
+# Date: 2015-08-28
+# Title: Text Mining Distributed Corpus Plug-In
+# Description: A plug-in for the text mining framework tm to support text mining  in a distributed way. The package provides a convenient interface for handling distributed corpus objects based on distributed list objects.
+# Authors@R: c(person("Ingo", "Feinerer", role = "aut"), person("Stefan", "Theussl", role = c("aut", "cre"), email = "Stefan.Theussl@R-project.org"))
+# License: GPL (>= 2)
+# Depends: DSL (>= 0.1-3), tm (>= 0.6)
+# Suggests: XML
+# Imports: NLP, slam (>= 0.1-22), utils
+# NeedsCompilation: no
+# Packaged: 2015-09-10 06:58:08 UTC; hornik
+# Author: Ingo Feinerer [aut], Stefan Theussl [aut, cre]
+# Maintainer: Stefan Theussl <Stefan.Theussl@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2015-09-10 10:19:56
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

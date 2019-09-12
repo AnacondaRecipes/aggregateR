@@ -1,0 +1,89 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-randgeo
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/randgeo_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/randgeo/randgeo_{{ version }}.tar.gz
+  sha256: b7282faae5450ff15bdf9a8daa19e60a516f7316a1770b3b708b516366821492
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rmarkdown, knitr, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('randgeo')"           # [not win]
+    - "\"%R%\" -e \"library('randgeo')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ropensci/randgeo
+  license: MIT
+  summary: 'Generate random positions (latitude/longitude),  Well-known text (''WKT'') points
+    or polygons, or ''GeoJSON'' points or  polygons. '
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: randgeo
+# Title: Generate Random 'WKT' or 'GeoJSON'
+# Description: Generate random positions (latitude/longitude),  Well-known text ('WKT') points or polygons, or 'GeoJSON' points or  polygons.
+# Version: 0.3.0
+# Authors@R: c(person("Scott", "Chamberlain", role = c("aut", "cre"), email = "myrmecocystus@gmail.com", comment = c(ORCID = "0000-0003-1444-9135")), person("Noam", "Ross", role = "aut"), person("Samuel", "Bosch", role = "aut") )
+# License: MIT + file LICENSE
+# LazyData: true
+# URL: https://github.com/ropensci/randgeo
+# BugReports: https://github.com/ropensci/randgeo/issues
+# VignetteBuilder: knitr
+# Suggests: rmarkdown, knitr, testthat
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-05-18 21:27:48 UTC; sckott
+# Author: Scott Chamberlain [aut, cre] (<https://orcid.org/0000-0003-1444-9135>), Noam Ross [aut], Samuel Bosch [aut]
+# Maintainer: Scott Chamberlain <myrmecocystus@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-05-18 23:34:28
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

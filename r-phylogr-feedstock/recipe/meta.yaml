@@ -1,0 +1,82 @@
+{% set version = '1.0.10' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-phylogr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PHYLOGR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PHYLOGR/PHYLOGR_{{ version }}.tar.gz
+  sha256: 4c208c291e5342e33ae1d715480fe04f26363e7cf6eea945a62a85522630079f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PHYLOGR')"           # [not win]
+    - "\"%R%\" -e \"library('PHYLOGR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://ligarto.org/rdiaz
+  license: GPL-2
+  summary: Manipulation and analysis of phylogenetically simulated data sets and phylogenetically
+    based analyses using GLS.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PHYLOGR
+# Version: 1.0.10
+# Date: 2018-03-20
+# Title: Functions for Phylogenetically Based Statistical Analyses
+# Author: Ramon Diaz-Uriarte <rdiaz@cnio.es> and Theodore Garland, Jr <theodore.garland@ucr.edu>
+# Maintainer: Ramon Diaz-Uriarte <rdiaz02@gmail.com>
+# Depends: R(>= 1.8.1)
+# Description: Manipulation and analysis of phylogenetically simulated data sets and phylogenetically based analyses using GLS.
+# License: GPL (>= 2)
+# URL: http://ligarto.org/rdiaz
+# NeedsCompilation: no
+# Packaged: 2018-03-20 16:13:55.067 UTC; ramon
+# Repository: CRAN
+# Date/Publication: 2018-03-20 16:42:01 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

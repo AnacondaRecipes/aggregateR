@@ -1,0 +1,85 @@
+{% set version = '1.0-16' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-scriptests
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/scriptests_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/scriptests/scriptests_{{ version }}.tar.gz
+  sha256: af650b09ce8a29c55b288063a828b9c1d33c49c2d99cc4ffe2b8cfbf5f218186
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('scriptests')"           # [not win]
+    - "\"%R%\" -e \"library('scriptests')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=scriptests
+  license: GPL-3
+  summary: Support for using .Rt (transcript) tests in the tests directory of a package.  Provides
+    more convenience and features than the standard .R/.Rout.save tests.  Tests can
+    be run under R CMD check and also interactively.  Provides source.pkg() for quickly
+    loading code, DLLs, and data from a package for use in an edit/compile/test development
+    cycle.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: scriptests
+# Type: Package
+# Title: Transcript-Based Unit Tests that are Easy to Create and Maintain
+# Version: 1.0-16
+# Date: 2016-07-19
+# Author: Tony Plate
+# Maintainer: Tony Plate <tplate@acm.org>
+# Description: Support for using .Rt (transcript) tests in the tests directory of a package.  Provides more convenience and features than the standard .R/.Rout.save tests.  Tests can be run under R CMD check and also interactively.  Provides source.pkg() for quickly loading code, DLLs, and data from a package for use in an edit/compile/test development cycle.
+# License: GPL
+# Imports: methods
+# NeedsCompilation: no
+# Packaged: 2016-07-21 23:43:31 UTC; tap
+# Repository: CRAN
+# Date/Publication: 2016-07-22 22:42:47
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

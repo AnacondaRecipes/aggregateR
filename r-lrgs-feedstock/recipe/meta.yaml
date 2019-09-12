@@ -1,0 +1,89 @@
+{% set version = '0.5.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lrgs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/lrgs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/lrgs/lrgs_{{ version }}.tar.gz
+  sha256: f21105355663a46edeb3ae7daed55157d794f9e357552204a6a2fcf1f6011f2b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('lrgs')"           # [not win]
+    - "\"%R%\" -e \"library('lrgs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/abmantz/lrgs
+  license: MIT
+  summary: Implements a Gibbs sampler to do linear regression with multiple covariates, multiple
+    responses, Gaussian measurement errors on covariates and responses, Gaussian intrinsic
+    scatter, and a covariate prior distribution which is given by either a Gaussian
+    mixture of specified size or a Dirichlet process with a Gaussian base distribution.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: lrgs
+# Type: Package
+# Title: Linear Regression by Gibbs Sampling
+# Version: 0.5.3
+# Date: 2016-12-15
+# Author: Adam Mantz
+# Maintainer: Adam Mantz <amantz@slac.stanford.edu>
+# Description: Implements a Gibbs sampler to do linear regression with multiple covariates, multiple responses, Gaussian measurement errors on covariates and responses, Gaussian intrinsic scatter, and a covariate prior distribution which is given by either a Gaussian mixture of specified size or a Dirichlet process with a Gaussian base distribution.
+# License: MIT + file LICENSE
+# LazyLoad: yes
+# Imports: mvtnorm
+# URL: https://github.com/abmantz/lrgs
+# NeedsCompilation: no
+# Packaged: 2017-12-01 22:14:52 UTC; amantz
+# Repository: CRAN
+# Date/Publication: 2017-12-01 23:14:51 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

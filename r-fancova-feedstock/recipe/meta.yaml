@@ -1,0 +1,85 @@
+{% set version = '0.5-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fancova
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fANCOVA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fANCOVA/fANCOVA_{{ version }}.tar.gz
+  sha256: 9b47753d05dde13f0f177417fe6658c4497c6faa023d1d4893ba72536b15950c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fANCOVA')"           # [not win]
+    - "\"%R%\" -e \"library('fANCOVA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=fANCOVA
+  license: GPL-3
+  summary: This package contains a collection of R functions to perform nonparametric analysis
+    of covariance for regression curves or surfaces. Testing the equality or parallelism
+    of nonparametric curves or surfaces is equivalent to analysis of variance (ANOVA)
+    or analysis of covariance (ANCOVA) for one-sample functional data. Three different
+    testing methods are available in the package, including one based on L-2 distance,
+    one based on an ANOVA statistic, and one based on variance estimators.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fANCOVA
+# Type: Package
+# Title: Nonparametric Analysis of Covariance
+# Version: 0.5-1
+# Date: 2010-10-20
+# Author: Xiao-Feng Wang
+# Maintainer: Xiao-Feng Wang <wangx6@ccf.org>
+# Description: This package contains a collection of R functions to perform nonparametric analysis of covariance for regression curves or surfaces. Testing the equality or parallelism of nonparametric curves or surfaces is equivalent to analysis of variance (ANOVA) or analysis of covariance (ANCOVA) for one-sample functional data. Three different testing methods are available in the package, including one based on L-2 distance, one based on an ANOVA statistic, and one based on variance estimators.
+# License: GPL (>= 3)
+# Packaged: 2010-10-20 04:10:18 UTC; xfwang
+# Repository: CRAN
+# Date/Publication: 2010-10-20 07:19:25
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

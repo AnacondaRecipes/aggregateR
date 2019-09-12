@@ -1,0 +1,81 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-infra
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/infra_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/infra/infra_{{ version }}.tar.gz
+  sha256: c1feabb532ad9c7c7cfa210ef7d626d4b461ae817bf563363d03cb9cabb5cc4b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('infra')"           # [not win]
+    - "\"%R%\" -e \"library('infra')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=infra
+  license: GPL-2
+  summary: Takes a data frame containing latitude and longitude coordinates and downloads images
+    from map servers to determine their file size as a proxy of infrastructure
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: infra
+# Title: An Infrastructure Proxy Function
+# Version: 0.1.2
+# Author: Steve Pickering <pickering@penguin.kobe-u.ac.jp>
+# Maintainer: Steve Pickering <pickering@penguin.kobe-u.ac.jp>
+# Description: Takes a data frame containing latitude and longitude coordinates and downloads images from map servers to determine their file size as a proxy of infrastructure
+# Depends: R (>= 3.0.2)
+# License: GPL-2
+# LazyData: true
+# Packaged: 2015-01-31 07:50:56 UTC; user3
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-01-31 11:39:26
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

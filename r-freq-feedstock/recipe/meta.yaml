@@ -1,0 +1,83 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-freq
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/FREQ_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/FREQ/FREQ_{{ version }}.tar.gz
+  sha256: 401ef2e134163ed93d96a26fc996ff105a383467f4207587690ddb75c150d906
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('FREQ')"           # [not win]
+    - "\"%R%\" -e \"library('FREQ')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=FREQ
+  license: GPL-2
+  summary: 'Real capture frequencies will be fitted to various distributions which provide the
+    basis of estimating population sizes, their standard error, and symmetric as well
+    as asymmetric confidence intervalls. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: FREQ
+# Type: Package
+# Title: FREQ: Estimate population size from capture frequencies
+# Version: 1.0
+# Date: 2013-04-22
+# Author: Annegret Grimm & Klaus Henle
+# Maintainer: Annegret Grimm <annegret.grimm@ufz.de>
+# Description: Real capture frequencies will be fitted to various distributions which provide the basis of estimating population sizes, their standard error, and symmetric as well as asymmetric confidence intervalls.
+# License: GPL-2
+# Packaged: 2013-09-10 14:20:54 UTC; agy
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-09-10 17:29:29
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

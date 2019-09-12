@@ -1,0 +1,88 @@
+{% set version = '0.1-7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-maxlike
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/maxlike_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/maxlike/maxlike_{{ version }}.tar.gz
+  sha256: 6b714d0465aa4b65ef488df941eba86631320db1040f7ab8d4a61029191c233e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dismo
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-raster
+
+  run:
+    - r-base
+    - r-raster
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('maxlike')"           # [not win]
+    - "\"%R%\" -e \"library('maxlike')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=maxlike
+  license: GPL-3
+  summary: Provides a likelihood-based approach to modeling species distributions using presence-only
+    data. In contrast to the popular software program MAXENT, this approach yields estimates
+    of the probability of occurrence, which is a natural descriptor of a species' distribution.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: maxlike
+# Type: Package
+# Title: Model Species Distributions by Estimating the Probability of Occurrence Using Presence-Only Data
+# Version: 0.1-7
+# Date: 2017-1-21
+# Depends: R (>= 2.10.0), raster
+# Suggests: dismo
+# Author: Richard Chandler, Andy Royle and Roeland Kindt
+# Maintainer: Roeland Kindt <R.KINDT@CGIAR.ORG>
+# Description: Provides a likelihood-based approach to modeling species distributions using presence-only data. In contrast to the popular software program MAXENT, this approach yields estimates of the probability of occurrence, which is a natural descriptor of a species' distribution.
+# License: GPL (>= 3)
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2017-01-22 04:42:41 UTC; RKINDT
+# Repository: CRAN
+# Date/Publication: 2017-01-22 17:02:19
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

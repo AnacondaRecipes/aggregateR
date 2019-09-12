@@ -1,0 +1,90 @@
+{% set version = '3.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sequential
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Sequential_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Sequential/Sequential_{{ version }}.tar.gz
+  sha256: d2263fcda468afd38e97425812274d6679171aeab0b7ddad1e97142619a17e93
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-boot
+
+  run:
+    - r-base
+    - r-boot
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Sequential')"           # [not win]
+    - "\"%R%\" -e \"library('Sequential')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Sequential
+  license: GPL-2
+  summary: "Functions to calculate exact critical values, statistical power, expected time to
+    signal, and required sample sizes for performing exact sequential analysis. All
+    these\tcalculations can be done for either Poisson or binomial data, for continuous
+    or group sequential analyses, and for different types of rejection boundaries. In
+    case of group sequential analyses, the group sizes do not have to be specified in
+    advance and the alpha spending can be arbitrarily settled."
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Sequential
+# Type: Package
+# Title: Exact Sequential Analysis for Poisson and Binomial Data
+# Version: 3.0.1
+# Date: 2019-02-08
+# Author: Ivair Ramos Silva and Martin Kulldorff
+# Maintainer: Ivair Ramos Silva <jamesivair@yahoo.com.br>
+# Description: Functions to calculate exact critical values, statistical power, expected time to signal, and required sample sizes for performing exact sequential analysis. All these	calculations can be done for either Poisson or binomial data, for continuous or group sequential analyses, and for different types of rejection boundaries. In case of group sequential analyses, the group sizes do not have to be specified in advance and the alpha spending can be arbitrarily settled.
+# License: GPL-2
+# LazyLoad: yes
+# Imports: boot
+# NeedsCompilation: no
+# Packaged: 2019-02-08 02:54:54 UTC; ivair
+# Repository: CRAN
+# Date/Publication: 2019-02-08 05:43:24 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

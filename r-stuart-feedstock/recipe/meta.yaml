@@ -1,0 +1,88 @@
+{% set version = '0.8.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stuart
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/stuart_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/stuart/stuart_{{ version }}.tar.gz
+  sha256: ad33d196b0fdbb4972b4cdc90e99683cb26eb20d6306d657bc0ca8bcbc0c8bc1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: parallel, lavaan (>= 0.5.18), MplusAutomation (>= 0.7-2), graphics
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('stuart')"           # [not win]
+    - "\"%R%\" -e \"library('stuart')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=stuart
+  license: GPL-3
+  summary: Construct subtests from a pool of items by using ant-colony-optimization, genetic
+    algorithms, brute force, or random sampling. Schultze (2017) <doi:10.17169/refubium-622>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: stuart
+# Type: Package
+# Title: Subtests Using Algorithmic Rummaging Techniques
+# Version: 0.8.0
+# Date: 2019-08-01
+# Authors@R: person("Martin", "Schultze", email="schultze@psych.uni-frankfurt.de", role=c('aut','cre'))
+# Description: Construct subtests from a pool of items by using ant-colony-optimization, genetic algorithms, brute force, or random sampling. Schultze (2017) <doi:10.17169/refubium-622>.
+# License: GPL-3
+# Depends: R (>= 3.5.0)
+# Imports: stats, utils
+# Suggests: parallel, lavaan (>= 0.5.18), MplusAutomation (>= 0.7-2), graphics
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2019-08-05 13:22:12 UTC; martin
+# Author: Martin Schultze [aut, cre]
+# Maintainer: Martin Schultze <schultze@psych.uni-frankfurt.de>
+# Repository: CRAN
+# Date/Publication: 2019-08-05 14:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

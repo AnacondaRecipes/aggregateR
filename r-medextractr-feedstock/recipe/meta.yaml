@@ -1,0 +1,88 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-medextractr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/medExtractR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/medExtractR/medExtractR_{{ version }}.tar.gz
+  sha256: 43c51197272c8573cac55c6fcef79d8d8857240e2dff51d8461acb3167a11f22
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-stringr
+
+  run:
+    - r-base
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('medExtractR')"           # [not win]
+    - "\"%R%\" -e \"library('medExtractR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=medExtractR
+  license: GPL-2
+  summary: Function and support for medication and dosing information extraction from free-text
+    clinical notes. Medication entities that can be extracted include drug name, strength,
+    dose amount, dose, frequency, intake time, and time of last dose.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: medExtractR
+# Title: Extraction of Medication Information from Clinical Text
+# Version: 0.1
+# Authors@R:  c(person("Hannah", "Weeks", role = c("aut", "cre"), email = "hannah.l.weeks@vanderbilt.edu"), person("Cole", "Beck", role = "aut", email = "cole.beck@vumc.org", comment = c(ORCID = "0000-0002-6849-6255")), person("Leena", "Choi", role = "aut", email = "leena.choi@Vanderbilt.Edu"))
+# Description: Function and support for medication and dosing information extraction from free-text clinical notes. Medication entities that can be extracted include drug name, strength, dose amount, dose, frequency, intake time, and time of last dose.
+# License: GPL (>= 2)
+# Depends: R (>= 2.10)
+# Encoding: UTF-8
+# LazyData: true
+# Imports: stringr
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-06-28 14:57:01 UTC; hannahweeks
+# Author: Hannah Weeks [aut, cre], Cole Beck [aut] (<https://orcid.org/0000-0002-6849-6255>), Leena Choi [aut]
+# Maintainer: Hannah Weeks <hannah.l.weeks@vanderbilt.edu>
+# Repository: CRAN
+# Date/Publication: 2019-07-01 12:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

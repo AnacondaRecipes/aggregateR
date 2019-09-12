@@ -1,0 +1,89 @@
+{% set version = '1.2.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lambda.r
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/lambda.r_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/lambda.r/lambda.r_{{ version }}.tar.gz
+  sha256: 0cd8e37ba1a0960888016a85d492da51a57df54bd65ff920b08c79a3bfbe8631
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testit
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-formatr
+
+  run:
+    - r-base
+    - r-formatr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('lambda.r')"           # [not win]
+    - "\"%R%\" -e \"library('lambda.r')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=lambda.r
+  license: LGPL-3
+  summary: A language extension to efficiently write functional programs in R. Syntax extensions
+    include multi-part function definitions, pattern matching, guard statements, built-in
+    (optional) type safety.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: lambda.r
+# Type: Package
+# Title: Modeling Data with Functional Programming
+# Version: 1.2.3
+# Date: 2018-05-17
+# Depends: R (>= 3.0.0)
+# Imports: formatR
+# Suggests: testit
+# Author: Brian Lee Yung Rowe
+# Maintainer: Brian Lee Yung Rowe <r@zatonovo.com>
+# Description: A language extension to efficiently write functional programs in R. Syntax extensions include multi-part function definitions, pattern matching, guard statements, built-in (optional) type safety.
+# License: LGPL-3
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2018-05-17 15:47:12 UTC; brian
+# Repository: CRAN
+# Date/Publication: 2018-05-17 23:32:53 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

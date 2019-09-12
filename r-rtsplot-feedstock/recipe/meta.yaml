@@ -1,0 +1,99 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rtsplot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rtsplot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rtsplot/rtsplot_{{ version }}.tar.gz
+  sha256: b7fe10ae7cd1216d055c86a3e57b4ddb263155d03579cfd975ff8c24e8457b36
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: TTR
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcolorbrewer
+    - r-quantmod
+    - r-xts
+    - r-zoo
+
+  run:
+    - r-base
+    - r-rcolorbrewer
+    - r-quantmod
+    - r-xts
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rtsplot')"           # [not win]
+    - "\"%R%\" -e \"library('rtsplot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://bitbucket.org/rtsvizteam/rtsplot
+  license: MIT
+  summary: A fast and elegant time series visualization package. In addition to the  standard
+    R plot types, this package supports candle sticks, open-high-low-close, and volume
+    plots. Useful for visualizing any time series data, e.g., stock prices and  technical
+    indicators.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rtsplot
+# Type: Package
+# Title: Time Series Plot
+# Version: 0.1.1
+# Authors@R: c(		 person(family = "RTSVizTeam", role = c("aut", "cph"), email = "rtsvizteam@gmail.com"), person("Irina", "Kapler", role = c("cre"), email = "irkapler@gmail.com") )
+# Description: A fast and elegant time series visualization package. In addition to the  standard R plot types, this package supports candle sticks, open-high-low-close, and volume plots. Useful for visualizing any time series data, e.g., stock prices and  technical indicators.
+# License: MIT + file LICENSE
+# Imports: xts, quantmod, zoo, RColorBrewer
+# Suggests: TTR
+# URL: https://bitbucket.org/rtsvizteam/rtsplot
+# BugReports: https://bitbucket.org/rtsvizteam/rtsplot/issues
+# LazyLoad: yes
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-09-15 19:29:20 UTC; pcadmin
+# Author: RTSVizTeam [aut, cph], Irina Kapler [cre]
+# Maintainer: Irina Kapler <irkapler@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-09-15 19:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

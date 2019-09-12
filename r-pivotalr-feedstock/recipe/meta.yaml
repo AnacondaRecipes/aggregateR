@@ -1,0 +1,102 @@
+{% set version = '0.1.18.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pivotalr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PivotalR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PivotalR/PivotalR_{{ version }}.tar.gz
+  sha256: 5aa1419fc99eedbfa1e4c59e4a47efae34154454255e3e6e56c401db5689eeda
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: DBI, RPostgreSQL, shiny, testthat, tools, rpart, randomForest, topicmodels
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PivotalR')"           # [not win]
+    - "\"%R%\" -e \"library('PivotalR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PivotalR
+  license: GPL-2
+  summary: Provides an R interface for the Pivotal Data stack running on 'PostgreSQL', 'Greenplum'
+    or 'Apache HAWQ (incubating)' databases with parallel and distributed computation
+    ability for big data processing. 'PivotalR' provides an R interface to various database
+    operations on tables or views. These operations are almost the same as the corresponding
+    native R operations. Thus users of R do not need to learn 'SQL' when they operate
+    on objects in the database. It also provides a wrapper for 'Apache MADlib (incubating)',
+    which is an open- source library for parallel and scalable in-database analytics.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PivotalR
+# Type: Package
+# Title: A Fast, Easy-to-Use Tool for Manipulating Tables in Databases and a Wrapper of MADlib
+# Version: 0.1.18.3.1
+# Date: 2017-2-7
+# Author: Predictive Analytics Team at Pivotal Inc. <user@madlb.incubator.apache.org>, with contributions from Data Science Team at Pivotal Inc.
+# Maintainer: Rahul Iyer <riyer@pivotal.io>
+# Contact: Predictive Analytics Team at Pivotal Inc. <user@madlb.incubator.apache.org>
+# Depends: R (>= 2.14.0), methods, Matrix
+# Suggests: DBI, RPostgreSQL, shiny, testthat, tools, rpart, randomForest, topicmodels
+# Description: Provides an R interface for the Pivotal Data stack running on 'PostgreSQL', 'Greenplum' or 'Apache HAWQ (incubating)' databases with parallel and distributed computation ability for big data processing. 'PivotalR' provides an R interface to various database operations on tables or views. These operations are almost the same as the corresponding native R operations. Thus users of R do not need to learn 'SQL' when they operate on objects in the database. It also provides a wrapper for 'Apache MADlib (incubating)', which is an open- source library for parallel and scalable in-database analytics.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# LazyData: yes
+# NeedsCompilation: yes
+# Packaged: 2019-01-05 10:10:04 UTC; hornik
+# Repository: CRAN
+# Date/Publication: 2019-01-05 10:25:24 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

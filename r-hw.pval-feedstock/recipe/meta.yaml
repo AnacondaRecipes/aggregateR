@@ -1,0 +1,84 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hw.pval
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/HW.pval_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/HW.pval/HW.pval_{{ version }}.tar.gz
+  sha256: de0f83b904eb4092e43ef7c716ac8156e1581d29cc277488b195a52638f6d592
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('HW.pval')"           # [not win]
+    - "\"%R%\" -e \"library('HW.pval')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=HW.pval
+  license: GPL-3
+  summary: HW.pval calculates plain and fully conditional root-mean-square, chi-square, and log
+    likelihood-ratio P-values for the user-provided genotypic counts to be consistent
+    with the Hardy-Weinberg equilibrium model.  For further information on the Hardy-Weinberg
+    equilibrium model and the pseudocode, refer to the paper "Testing Hardy-Weinberg
+    equilibrium with a simple root-mean-square statistic" by Rachel Ward.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: HW.pval
+# Type: Package
+# Title: Testing Hardy-Weinberg Equilibrium for Multiallelic Genes
+# Version: 1.0
+# Date: 2012-06-22
+# Author: Shubhodeep Mukherji <deep.mukherji@utexas.edu>
+# Maintainer: Shubhodeep Mukherji <deep.mukherji@utexas.edu>
+# Description: HW.pval calculates plain and fully conditional root-mean-square, chi-square, and log likelihood-ratio P-values for the user-provided genotypic counts to be consistent with the Hardy-Weinberg equilibrium model.  For further information on the Hardy-Weinberg equilibrium model and the pseudocode, refer to the paper "Testing Hardy-Weinberg equilibrium with a simple root-mean-square statistic" by Rachel Ward.
+# License: GPL-3
+# Packaged: 2012-06-22 07:15:03 UTC; smukherji
+# Repository: CRAN
+# Date/Publication: 2012-07-11 12:43:08
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

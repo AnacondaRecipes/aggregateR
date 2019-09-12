@@ -1,0 +1,100 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ibst
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/iBST_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/iBST/iBST_{{ version }}.tar.gz
+  sha256: bdc0ff2eb8448b0da945fa9cbdac1b5e46262b444c2253c80ec2651e32a3e70a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rpart
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rpart
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('iBST')"           # [not win]
+    - "\"%R%\" -e \"library('iBST')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=iBST
+  license: GPL (>= 2.0)
+  summary: Fit a bagging survival tree on a mixture of population (susceptible and nonsusceptible)
+    using either a pseudo R2 criterion or an adjusted Logrank criterion. The predictor
+    is  evaluated using the Out Of Bag Integrated Brier Score (IBS) and several scores
+    of importance are computed for variable selection. The thresholds values for variable
+    selection are  computed using a nonparametric permutation test.
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: iBST
+# Type: Package
+# Title: Improper Bagging Survival Tree
+# Version: 1.0
+# Date: 2017-01-30
+# Author: Cyprien Mbogning and Philippe Broet
+# Maintainer: Cyprien Mbogning <cyprien.mbogning@gmail.com>
+# Description: Fit a bagging survival tree on a mixture of population (susceptible and nonsusceptible) using either a pseudo R2 criterion or an adjusted Logrank criterion. The predictor is  evaluated using the Out Of Bag Integrated Brier Score (IBS) and several scores of importance are computed for variable selection. The thresholds values for variable selection are  computed using a nonparametric permutation test.
+# License: GPL (>= 2.0)
+# LazyLoad: yes
+# Depends: survival , rpart , parallel
+# Imports: Rcpp
+# LinkingTo: Rcpp
+# NeedsCompilation: yes
+# Packaged: 2017-01-31 11:21:46 UTC; abirisk
+# Repository: CRAN
+# Date/Publication: 2017-01-31 14:16:51
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

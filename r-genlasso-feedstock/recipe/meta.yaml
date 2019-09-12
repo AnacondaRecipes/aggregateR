@@ -1,0 +1,97 @@
+{% set version = '1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-genlasso
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/genlasso_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/genlasso/genlasso_{{ version }}.tar.gz
+  sha256: 0f74a1566eb69ada921fe6b0a9aaf230778fdacb112b858233993f038166e106
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-igraph
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-matrix
+    - r-igraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('genlasso')"           # [not win]
+    - "\"%R%\" -e \"library('genlasso')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/statsmaths/genlasso
+  license: GPL (>= 2.0)
+  summary: Provides fast algorithms for computing the solution path for generalized lasso problems.
+    Important use cases are the fused lasso over an arbitrary graph, and trend fitting
+    of any given polynomial order. Specialized implementations for the latter two problems
+    are given to improve stability and speed.
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: genlasso
+# Type: Package
+# Title: Path Algorithm for Generalized Lasso Problems
+# Version: 1.4
+# Date: 2019-07-11
+# Author: Taylor B. Arnold and Ryan J. Tibshirani
+# Maintainer: Taylor Arnold <taylor.arnold@acm.org>
+# Description: Provides fast algorithms for computing the solution path for generalized lasso problems. Important use cases are the fused lasso over an arbitrary graph, and trend fitting of any given polynomial order. Specialized implementations for the latter two problems are given to improve stability and speed.
+# License: GPL (>= 2.0)
+# Depends: MASS, Matrix, igraph
+# ByteCompile: TRUE
+# URL: https://github.com/statsmaths/genlasso
+# Packaged: 2019-07-11 10:00:46 UTC; taylor
+# NeedsCompilation: yes
+# Repository: CRAN
+# RoxygenNote: 6.1.1
+# Date/Publication: 2019-07-11 13:32:48 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

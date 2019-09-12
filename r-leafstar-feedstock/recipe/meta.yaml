@@ -1,0 +1,94 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-leafstar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/leafSTAR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/leafSTAR/leafSTAR_{{ version }}.tar.gz
+  sha256: ca6c5895285ffd9817950355a60877bf016e54a746846a3caca637b38154ee9b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('leafSTAR')"           # [not win]
+    - "\"%R%\" -e \"library('leafSTAR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=leafSTAR
+  license: AGPL-3
+  summary: Implementation of trigonometric functions to calculate the exposure of flat, tilted
+    surfaces, such as leaves and slopes, to direct solar radiation. It implements the
+    equations in A.G. Escribano-Rocafort, A. Ventre-Lespiaucq, C. Granado-Yela, et al.
+    (2014) <doi:10.1111/2041-210X.12141> in a few user-friendly R functions. All functions
+    handle data obtained with 'Ahmes' 1.0 for Android, as well as more traditional data
+    sources (compass, protractor, inclinometer). The main function (star()) calculates
+    the potential exposure of flat, tilted surfaces to direct solar radiation (silhouette
+    to area ratio, STAR). It is equivalent to the ratio of the leaf projected area to
+    total leaf area, but instead of using area data it uses spatial position angles,
+    such as pitch, roll and course, and information on the geographical coordinates,
+    hour, and date. The package includes additional functions to recalculate STAR with
+    custom settings of location and time, to calculate the tilt angle of a surface,
+    and the minimum angle between two non-orthogonal planes.
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: leafSTAR
+# Title: Silhouette to Area Ratio of Tilted Surfaces
+# Version: 1.0
+# Author: Agustina Ventre Lespiaucq [aut, cre], Silvia Santamaria Bueno [aut]
+# Maintainer: Agustina Ventre Lespiaucq <aguslespiaucq@gmail.com>
+# Description: Implementation of trigonometric functions to calculate the exposure of flat, tilted surfaces, such as leaves and slopes, to direct solar radiation. It implements the equations in A.G. Escribano-Rocafort, A. Ventre-Lespiaucq, C. Granado-Yela, et al. (2014) <doi:10.1111/2041-210X.12141> in a few user-friendly R functions. All functions handle data obtained with 'Ahmes' 1.0 for Android, as well as more traditional data sources (compass, protractor, inclinometer). The main function (star()) calculates the potential exposure of flat, tilted surfaces to direct solar radiation (silhouette to area ratio, STAR). It is equivalent to the ratio of the leaf projected area to total leaf area, but instead of using area data it uses spatial position angles, such as pitch, roll and course, and information on the geographical coordinates, hour, and date. The package includes additional functions to recalculate STAR with custom settings of location and time, to calculate the tilt angle of a surface, and the minimum angle between two non-orthogonal planes.
+# Depends: R (>= 3.4.1)
+# License: AGPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-09-18 13:26:03 UTC; silvia.santamaria
+# Repository: CRAN
+# Date/Publication: 2017-09-18 13:37:22 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,104 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-genodds
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/genodds_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/genodds/genodds_{{ version }}.tar.gz
+  sha256: 8de87b84c3fb05a52bb00cc91a4b14110345a394733bf662f96c298683295003
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.1.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.3
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.3
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('genodds')"           # [not win]
+    - "\"%R%\" -e \"library('genodds')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=genodds
+  license: GPL-2
+  summary: ' Calculates Agresti''s (1980) <https://www.jstor.org/stable/2530495> generalized
+    odds ratios. For a randomly selected pair of observations from two groups, calculates
+    the odds that the second group will have a higher scoring outcome than that of the
+    first group. Package provides hypothesis testing for if this odds ratio is significantly
+    different to 1 (equal chance).'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: genodds
+# Type: Package
+# Title: Generalized Odds Ratios
+# Version: 1.0.0
+# Date: 2019-08-14
+# Encoding: UTF-8
+# Authors@R: person("Hannah","Johns", role=c("aut","cre"),email="htjohns@gmail.com",comment=c(ORCID="0000-0003-2135-0504"))
+# Maintainer: Hannah Johns <htjohns@gmail.com>
+# Description:  Calculates Agresti's (1980) <https://www.jstor.org/stable/2530495> generalized odds ratios. For a randomly selected pair of observations from two groups, calculates the odds that the second group will have a higher scoring outcome than that of the first group. Package provides hypothesis testing for if this odds ratio is significantly different to 1 (equal chance).
+# License: GPL (>= 2)
+# LazyData: TRUE
+# Depends: R (>= 2.10)
+# Imports: Rcpp (>= 0.12.3)
+# LinkingTo: Rcpp
+# RoxygenNote: 6.1.1
+# Suggests: testthat (>= 2.1.0)
+# NeedsCompilation: yes
+# Packaged: 2019-08-20 14:30:17 UTC; hannah
+# Author: Hannah Johns [aut, cre] (<https://orcid.org/0000-0003-2135-0504>)
+# Repository: CRAN
+# Date/Publication: 2019-08-21 09:30:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

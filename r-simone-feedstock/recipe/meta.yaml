@@ -1,0 +1,96 @@
+{% set version = '1.0-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-simone
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/simone_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/simone/simone_{{ version }}.tar.gz
+  sha256: b1076a94b4139fedc6cfa19b88f1afc7556b32f6663662d993f5762e5e9ba825
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-blockmodels
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-blockmodels
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('simone')"           # [not win]
+    - "\"%R%\" -e \"library('simone')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://julien.cremeriefamily.info/simone.html
+  license: GPL-2
+  summary: Implements the inference of co-expression networks based on partial correlation coefficients
+    from either steady-state or time-course transcriptomic data. Note that with both
+    type of data this package can deal with samples collected in different experimental
+    conditions and therefore not identically distributed. In this particular case, multiple
+    but related networks are inferred on one simone run.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: simone
+# Version: 1.0-4
+# Date: 2019-02-06
+# Title: Statistical Inference for MOdular NEtworks (SIMoNe)
+# Authors@R: c( person("Julien", "Chiquet", role = c("aut", "cre"), email = "julien.chiquet@inra.fr", comment = c(ORCID = "0000-0002-3629-3429")), person("Gilles", "Grasseau", role = "aut", email = "grasseau@llr.in2p3.fr"), person("Christophe", "Ambroise", role = "aut", email = "christophe.ambroise@genopole.cnrs.fr"), person("Camille", "Charbonnier", role = "ctb", email = "miyu.cc@gmail.com"), person("Alexander", "Smith", role = "ctb", email = "aatsmith@orange.fr"), person("Catherine", "Matias", role = "ctb", email = "Catherine.Matias@math.cnrs.fr") )
+# Maintainer: Julien Chiquet <julien.chiquet@inra.fr>
+# Depends: R (>= 3.1.1), blockmodels
+# Description: Implements the inference of co-expression networks based on partial correlation coefficients from either steady-state or time-course transcriptomic data. Note that with both type of data this package can deal with samples collected in different experimental conditions and therefore not identically distributed. In this particular case, multiple but related networks are inferred on one simone run.
+# License: GPL (>= 2)
+# URL: http://julien.cremeriefamily.info/simone.html
+# Encoding: UTF-8
+# Packaged: 2019-02-03 20:08:45 UTC; jchiquet
+# Repository: CRAN
+# Date/Publication: 2019-02-03 23:10:03 UTC
+# RoxygenNote: 5.0.1
+# NeedsCompilation: yes
+# Author: Julien Chiquet [aut, cre] (<https://orcid.org/0000-0002-3629-3429>), Gilles Grasseau [aut], Christophe Ambroise [aut], Camille Charbonnier [ctb], Alexander Smith [ctb], Catherine Matias [ctb]
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

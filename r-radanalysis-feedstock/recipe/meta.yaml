@@ -1,0 +1,96 @@
+{% set version = '0.5.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-radanalysis
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RADanalysis_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RADanalysis/RADanalysis_{{ version }}.tar.gz
+  sha256: 4054f9a6b880fa3833353cdc7e973d5640f366950a79cf39f2f38648c43dc0df
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-scales
+    - r-sfsmisc
+
+  run:
+    - r-base
+    - r-scales
+    - r-sfsmisc
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RADanalysis')"           # [not win]
+    - "\"%R%\" -e \"library('RADanalysis')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RADanalysis
+  license: GPL-3
+  summary: It has tools for normalization of rank abundance distributions (RAD) to a desired
+    number of ranks using MaxRank Normalization method. RADs are commonly used in biology/ecology
+    and mathematically equivalent to complementary cumulative distributions (CCDFs)
+    which are used in physics, linguistics and sociology and more generally in data
+    science.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RADanalysis
+# Type: Package
+# Title: Normalization and Study of Rank Abundance Distributions
+# Version: 0.5.5
+# Date: 2016-03-14
+# Description: It has tools for normalization of rank abundance distributions (RAD) to a desired number of ranks using MaxRank Normalization method. RADs are commonly used in biology/ecology and mathematically equivalent to complementary cumulative distributions (CCDFs) which are used in physics, linguistics and sociology and more generally in data science.
+# License: GPL-3
+# LazyData: TRUE
+# RoxygenNote: 5.0.1
+# Depends: R (>= 2.10)
+# Imports: sfsmisc, scales, stats, graphics
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# Authors@R: c( person("Mohmmadkarim", "Saeedghalati", email = "m.saeedghalati@uni-due.de", role = c("aut", "cre")), person("Farnoush", "Farahpour", email = "farnoush.farahpour@uni-due.de", role = c("aut")), person("Daniel", "Hoffmann", email = "daniel.hoffmann@uni-due.de", role = c("aut")))
+# NeedsCompilation: no
+# Packaged: 2016-03-15 12:42:51 UTC; arvin
+# Author: Mohmmadkarim Saeedghalati [aut, cre], Farnoush Farahpour [aut], Daniel Hoffmann [aut]
+# Maintainer: Mohmmadkarim Saeedghalati <m.saeedghalati@uni-due.de>
+# Repository: CRAN
+# Date/Publication: 2016-03-15 15:10:40
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

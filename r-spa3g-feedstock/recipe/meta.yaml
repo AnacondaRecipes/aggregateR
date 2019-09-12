@@ -1,0 +1,83 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spa3g
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SPA3G_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SPA3G/SPA3G_{{ version }}.tar.gz
+  sha256: 222d0f290773db0bb8098fb848e14e9a6fedfbc1412051bd8b3f58cc6b44c395
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SPA3G')"           # [not win]
+    - "\"%R%\" -e \"library('SPA3G')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SPA3G
+  license: GPL-3
+  summary: The package implements the model-based kernel machine method for detecting gene-centric
+    gene-gene interactions of Li and Cui (2012).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SPA3G
+# Type: Package
+# Title: SPA3G: R package for the method of Li and Cui (2012)
+# Version: 1.0
+# Date: 2012-02-28
+# Author: Shaoyu Li and Yuehua Cui
+# Maintainer: ORPHANED
+# Description: The package implements the model-based kernel machine method for detecting gene-centric gene-gene interactions of Li and Cui (2012).
+# License: GPL (>= 3)
+# Packaged: 2012-02-28 14:29:00 UTC; segur
+# Repository: CRAN
+# Date/Publication: 2012-03-23 06:56:29
+# NeedsCompilation: no
+# X-CRAN-Original-Maintainer: Shaoyu Li<shaoyu.li@stjude.org>
+# X-CRAN-Comment: Orphaned on 2014-12-07 as maintainer address <shaoyu.li@stjude.org> bounced.
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

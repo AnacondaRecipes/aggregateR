@@ -1,0 +1,94 @@
+{% set version = '0.1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rfordummies
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rfordummies_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rfordummies/rfordummies_{{ version }}.tar.gz
+  sha256: fd1c35bcb6f064901705d0bac76a809c3a0526c6f8db505b20937714dc9fc40f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: fortunes, stringr, sos, XLConnect, reshape2, ggplot2, foreign, lattice, covr, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-openxlsx
+
+  run:
+    - r-base
+    - r-openxlsx
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rfordummies')"           # [not win]
+    - "\"%R%\" -e \"library('rfordummies')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://rfordummies.com, http://andrie.github.io/rfordummies/
+  license: GPL-2 | GPL-3
+  summary: Contains all the code examples in the book "R for Dummies" (2nd edition) by Andrie
+    de Vries and Joris Meys. You can view the table of  contents as well as the sample
+    code for each chapter.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rfordummies
+# Title: Code Examples to Accompany the Book "R for Dummies"
+# Version: 0.1.4
+# Authors@R: c(person("Andrie", "de Vries", role=c("aut", "cre"), email="apdevries@gmail.com"), person("Joris", "Meys", role = c("aut")))
+# Description: Contains all the code examples in the book "R for Dummies" (2nd edition) by Andrie de Vries and Joris Meys. You can view the table of  contents as well as the sample code for each chapter.
+# Date: 2019-03-19
+# Language: en-GB
+# URL: https://rfordummies.com, http://andrie.github.io/rfordummies/
+# BugReports: https://github.com/andrie/rfordummies/issues
+# Imports: openxlsx
+# Suggests: fortunes, stringr, sos, XLConnect, reshape2, ggplot2, foreign, lattice, covr, testthat
+# License: GPL-2 | GPL-3
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2019-03-19 16:33:28 UTC; apdev
+# Author: Andrie de Vries [aut, cre], Joris Meys [aut]
+# Maintainer: Andrie de Vries <apdevries@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-03-19 18:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

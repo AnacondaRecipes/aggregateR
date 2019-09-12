@@ -1,0 +1,93 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-luzlogr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/luzlogr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/luzlogr/luzlogr_{{ version }}.tar.gz
+  sha256: 0553209e0b649d62a5c02fc46fb69b8bb7e1fd968d3fa0ae67dcaaa848aa0c58
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-assertthat >=0.1
+
+  run:
+    - r-base
+    - r-assertthat >=0.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('luzlogr')"           # [not win]
+    - "\"%R%\" -e \"library('luzlogr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=luzlogr
+  license: MIT
+  summary: Provides flexible but lightweight logging facilities for R scripts. Supports priority
+    levels for logs and messages, flagging messages, capturing script output, switching
+    logs, and logging to files or connections.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: luzlogr
+# Type: Package
+# Title: Lightweight Logging for R Scripts
+# Version: 0.2.0
+# Date: 2016-02-25
+# Authors@R: person("Ben", "Bond-Lamberty", email = "bondlamberty@pnnl.gov", role = c("aut", "cre"))
+# Maintainer: Ben Bond-Lamberty <bondlamberty@pnnl.gov>
+# Description: Provides flexible but lightweight logging facilities for R scripts. Supports priority levels for logs and messages, flagging messages, capturing script output, switching logs, and logging to files or connections.
+# Imports: assertthat (>= 0.1)
+# Depends: R (>= 3.0)
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Suggests: testthat, knitr, rmarkdown
+# VignetteBuilder: knitr
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-02-25 16:52:58 UTC; d3x290
+# Author: Ben Bond-Lamberty [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2016-02-25 18:34:30
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,84 @@
+{% set version = '1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-xyloplot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/xyloplot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/xyloplot/xyloplot_{{ version }}.tar.gz
+  sha256: 5b9813125668e6e98ff3e1661cbe6f13b4147c0d74251a5dba8c4be7f5d82d34
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('xyloplot')"           # [not win]
+    - "\"%R%\" -e \"library('xyloplot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=xyloplot
+  license: GPL-2
+  summary: A method for creating vertical histograms sharing a y-axis using base graphics.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: xyloplot
+# Type: Package
+# Title: A Method for Creating Xylophone-Like Frequency Density Plots
+# Version: 1.6
+# Date: 2018-05-09
+# Author: Daniel Greene
+# Maintainer: Daniel Greene <dg333@cam.ac.uk>
+# Description: A method for creating vertical histograms sharing a y-axis using base graphics.
+# License: GPL (>= 2)
+# Suggests: knitr
+# VignetteBuilder: knitr
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-05-09 12:59:24 UTC; dg
+# Repository: CRAN
+# Date/Publication: 2018-05-09 13:55:33 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

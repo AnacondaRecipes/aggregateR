@@ -1,0 +1,94 @@
+{% set version = '0.6.1-25' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nscancor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/nscancor_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/nscancor/nscancor_{{ version }}.tar.gz
+  sha256: b20f71c91213f36ecf13b07c1f3c84831513029e1ad4164aac90164be9df73a0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: CCA, glmnet, MASS, PMA, roxygen2, testthat (>= 0.8)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('nscancor')"           # [not win]
+    - "\"%R%\" -e \"library('nscancor')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://sigg-iten.ch/research/
+  license: GPL-2
+  summary: Two implementations of canonical correlation analysis (CCA) that are based on iterated
+    regression. By choosing the appropriate regression algorithm for each data domain,
+    it is possible to enforce sparsity, non-negativity or other kinds of constraints
+    on the projection vectors. Multiple canonical variables are computed sequentially
+    using a generalized deflation scheme, where the additional correlation not explained
+    by previous variables is maximized. 'nscancor' is used to analyze paired data from
+    two domains, and has the same interface as the 'cancor' function from the 'stats'
+    package (plus some extra parameters). 'mcancor' is appropriate for analyzing data
+    from three or more domains. See <http://sigg-iten.ch/learningbits/2014/01/20/canonical-correlation-analysis-under-constraints/>
+    and Sigg et al. (2007) <doi:10.1109/MLSP.2007.4414315> for more details.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: nscancor
+# Authors@R: c( person("Christian", "Sigg", email = "christian@sigg-iten.ch", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-1067-9224")), person("R Core team", role = "ctb", comment = "cancor interface and documentation"))
+# Version: 0.6.1-25
+# Title: Non-Negative and Sparse CCA
+# Description: Two implementations of canonical correlation analysis (CCA) that are based on iterated regression. By choosing the appropriate regression algorithm for each data domain, it is possible to enforce sparsity, non-negativity or other kinds of constraints on the projection vectors. Multiple canonical variables are computed sequentially using a generalized deflation scheme, where the additional correlation not explained by previous variables is maximized. 'nscancor' is used to analyze paired data from two domains, and has the same interface as the 'cancor' function from the 'stats' package (plus some extra parameters). 'mcancor' is appropriate for analyzing data from three or more domains. See <http://sigg-iten.ch/learningbits/2014/01/20/canonical-correlation-analysis-under-constraints/> and Sigg et al. (2007) <doi:10.1109/MLSP.2007.4414315> for more details.
+# URL: http://sigg-iten.ch/research/
+# BugReports: https://github.com/chrsigg/nscancor/issues
+# License: GPL (>= 2)
+# Imports: stats
+# Suggests: CCA, glmnet, MASS, PMA, roxygen2, testthat (>= 0.8)
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-02-15 12:20:34 UTC; chrsigg
+# Author: Christian Sigg [aut, cre] (<https://orcid.org/0000-0003-1067-9224>), R Core team [ctb] (cancor interface and documentation)
+# Maintainer: Christian Sigg <christian@sigg-iten.ch>
+# Repository: CRAN
+# Date/Publication: 2018-02-15 22:59:38 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,88 @@
+{% set version = '1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-svapls
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/svapls_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/svapls/svapls_{{ version }}.tar.gz
+  sha256: 6fd14b4523c668343edd2537af215356d72f84fa5826b41bbca694fb3247f389
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-class
+    - r-pls
+
+  run:
+    - r-base
+    - r-class
+    - r-pls
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('svapls')"           # [not win]
+    - "\"%R%\" -e \"library('svapls')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=svapls
+  license: GPL-3
+  summary: Accurate identification of genes that are truly differentially expressed over two
+    sample varieties, after adjusting for hidden subject-specific effects of residual
+    heterogeneity.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: svapls
+# Type: Package
+# Title: Surrogate variable analysis using partial least squares in a gene expression study.
+# Version: 1.4
+# Date: 2013-09-19
+# Author: Sutirtha Chakraborty, Somnath Datta and Susmita Datta
+# Maintainer: Sutirtha Chakraborty <statistuta@gmail.com>
+# Depends: R (>= 2.0), class, stats, pls
+# Description: Accurate identification of genes that are truly differentially expressed over two sample varieties, after adjusting for hidden subject-specific effects of residual heterogeneity.
+# License: GPL-3
+# Collate: fitModel.R svpls.R hfp.R
+# Packaged: 2013-09-20 03:16:23 UTC; SUTIRTHA
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-09-20 08:13:19
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

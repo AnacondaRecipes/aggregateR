@@ -1,0 +1,85 @@
+{% set version = '1.21' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mangrove
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Mangrove_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Mangrove/Mangrove_{{ version }}.tar.gz
+  sha256: b743208725b33238c27b955895b1786f40c50d5fbcafe616766669e0be74c3e1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: kinship2
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Mangrove')"           # [not win]
+    - "\"%R%\" -e \"library('Mangrove')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Mangrove
+  license: GPL-2
+  summary: Methods for performing genetic risk prediction from genotype data.  You can use it
+    to perform risk prediction for individuals, or for families with missing data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Mangrove
+# Type: Package
+# Title: Risk Prediction on Trees
+# Version: 1.21
+# Date: 2017-02-22
+# Author: Luke Jostins
+# Maintainer: Luke Jostins <luke.jostins@kennedy.ox.ac.uk>
+# Description: Methods for performing genetic risk prediction from genotype data.  You can use it to perform risk prediction for individuals, or for families with missing data.
+# License: GPL (>= 2)
+# Suggests: kinship2
+# LazyLoad: yes
+# Packaged: 2017-02-22 13:14:51 UTC; lj4
+# Depends: R (>= 2.10)
+# Repository: CRAN
+# Date/Publication: 2017-02-22 17:15:37
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

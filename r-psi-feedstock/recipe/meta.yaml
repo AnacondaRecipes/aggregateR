@@ -1,0 +1,90 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-psi
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pSI_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pSI/pSI_{{ version }}.tar.gz
+  sha256: 0bf49ac05d9635cb2f4ad9d314006842db5edc18181e412f3bdd538c1b1a7c33
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-gdata
+
+  run:
+    - r-base
+    - r-gdata
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pSI')"           # [not win]
+    - "\"%R%\" -e \"library('pSI')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=pSI
+  license: GPL-2
+  summary: 'This package contains functions to calculate the Specificity Index statistic, which
+    can be used for comparative quantitative analysis to identify genes enriched in
+    specific cell populations across a large number of profiles, as well as perform
+    numerous post-processing operations. NOTE:Supplementary data (human & mouse expression
+    sets, calculated pSI datasets, etc.) can be found in pSI.data package located at
+    the following URL: http://genetics.wustl.edu/jdlab/psi_package/'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pSI
+# Type: Package
+# Title: Specificity Index Statistic
+# Version: 1.1
+# Date: 2014-01-30
+# Author: Xiaoxiao Xu, Alan B. Wells, David OBrien, Arye Nehorai, Joseph D. Dougherty
+# Maintainer: Alan B. Wells <awells@dsgmail.wustl.edu>
+# Description: This package contains functions to calculate the Specificity Index statistic, which can be used for comparative quantitative analysis to identify genes enriched in specific cell populations across a large number of profiles, as well as perform numerous post-processing operations. NOTE:Supplementary data (human & mouse expression sets, calculated pSI datasets, etc.) can be found in pSI.data package located at the following URL: http://genetics.wustl.edu/jdlab/psi_package/
+# License: GPL (>= 2)
+# LazyData: TRUE
+# Depends: R (>= 2.10), gdata
+# Packaged: 2014-01-30 18:03:22 UTC; alanwells
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-01-30 21:12:44
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

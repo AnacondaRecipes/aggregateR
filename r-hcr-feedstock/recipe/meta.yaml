@@ -1,0 +1,92 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hcr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/HCR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/HCR/HCR_{{ version }}.tar.gz
+  sha256: 0a3ee6ed18aa5485442cc6062921171e9a78085d8b33caf91dd7c5c17d334493
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table >=1.10.4
+
+  run:
+    - r-base
+    - r-data.table >=1.10.4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('HCR')"           # [not win]
+    - "\"%R%\" -e \"library('HCR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=HCR
+  license: GPL-2
+  summary: This code provides a method to fit the hidden compact representation model as well
+    as to identify the causal direction on discrete data.  We implement an effective
+    solution to recover the above hidden compact representation under the likelihood
+    framework.  Please see the Causal Discovery from Discrete Data using Hidden Compact
+    Representation from NIPS 2018 by Ruichu Cai, Jie Qiao, Kun Zhang, Zhenjie Zhang
+    and Zhifeng Hao (2018) <https://nips.cc/Conferences/2018/Schedule?showEvent=11274>
+    for a description of some of our methods.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: HCR
+# Type: Package
+# Title: Causal Discovery from Discrete Data using Hidden Compact Representation
+# Version: 0.1.1
+# Authors@R: c(person("Jie","Qiao",email="qiaojie.chn@gmail.com",role=c("aut","cre")), person("Ruichu","Cai",email="cairuichu@gmail.com",role=c("ths","aut")), person("Kun","Zhang",email="kunz1@andrew.cmu.edu",role=c("ths","aut")), person("Zhenjie","Zhang",email="zhenjie.zhang@yitu-inc.com",role=c("ths","aut")), person("Zhifeng","Hao",email="zfhao@gdut.edu.cn",role=c("ths","aut")) )
+# Author: Jie Qiao [aut, cre], Ruichu Cai [ths, aut], Kun Zhang [ths, aut], Zhenjie Zhang [ths, aut], Zhifeng Hao [ths, aut]
+# Maintainer: Jie Qiao <qiaojie.chn@gmail.com>
+# Description: This code provides a method to fit the hidden compact representation model as well as to identify the causal direction on discrete data.  We implement an effective solution to recover the above hidden compact representation under the likelihood framework.  Please see the Causal Discovery from Discrete Data using Hidden Compact Representation from NIPS 2018 by Ruichu Cai, Jie Qiao, Kun Zhang, Zhenjie Zhang and Zhifeng Hao (2018) <https://nips.cc/Conferences/2018/Schedule?showEvent=11274> for a description of some of our methods.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# Imports: data.table (>= 1.10.4), methods
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-10-26 14:01:50 UTC; qj
+# Repository: CRAN
+# Date/Publication: 2018-10-26 14:50:32 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

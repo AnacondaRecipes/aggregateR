@@ -1,0 +1,116 @@
+{% set version = '1.11.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mptinr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MPTinR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MPTinR/MPTinR_{{ version }}.tar.gz
+  sha256: 7055513eb565f3e68ddc357842b3617462e08eb39d0698c9f58330edd9f5d4dd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: snowfall (>= 1.84), knitr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-brobdingnag
+    - r-rcpp
+    - r-rcppeigen
+    - r-numderiv
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-brobdingnag
+    - r-rcpp
+    - r-rcppeigen
+    - r-numderiv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MPTinR')"           # [not win]
+    - "\"%R%\" -e \"library('MPTinR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MPTinR
+  license: GPL-2
+  summary: Provides a user-friendly way for the analysis of multinomial processing tree (MPT)
+    models (e.g.,  Riefer, D. M., and Batchelder, W. H. [1988]. Multinomial modeling
+    and the measurement of cognitive processes. Psychological Review, 95, 318-339) for
+    single and multiple datasets. The main functions perform model fitting and model
+    selection. Model selection can be done using AIC, BIC, or the Fisher Information
+    Approximation (FIA) a measure based on the Minimum Description Length (MDL) framework.
+    The model and restrictions can be specified in external files or within an R script
+    in an intuitive syntax or using the context-free language for MPTs. The 'classical'
+    .EQN file format for model files is also supported. Besides MPTs, this package can
+    fit a wide variety of other cognitive models such as SDT models (see fit.model).
+    It also supports multicore fitting and FIA calculation (using the snowfall package),
+    can generate or bootstrap data for simulations, and plot predicted versus observed
+    data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MPTinR
+# Type: Package
+# Title: Analyze Multinomial Processing Tree Models
+# Version: 1.11.0
+# Authors@R: c(person("Henrik", "Singmann", role = c("aut", "cre"), email = "singmann+mptinr@gmail.com"), person("David", "Kellen", role =  "aut"), person("Quentin", "Gronau", role =  "aut"), person("Christian", "Mueller", role =  "ctb"), person("Akhil S", "Bhel", role =  "ctb"))
+# Description: Provides a user-friendly way for the analysis of multinomial processing tree (MPT) models (e.g.,  Riefer, D. M., and Batchelder, W. H. [1988]. Multinomial modeling and the measurement of cognitive processes. Psychological Review, 95, 318-339) for single and multiple datasets. The main functions perform model fitting and model selection. Model selection can be done using AIC, BIC, or the Fisher Information Approximation (FIA) a measure based on the Minimum Description Length (MDL) framework. The model and restrictions can be specified in external files or within an R script in an intuitive syntax or using the context-free language for MPTs. The 'classical' .EQN file format for model files is also supported. Besides MPTs, this package can fit a wide variety of other cognitive models such as SDT models (see fit.model). It also supports multicore fitting and FIA calculation (using the snowfall package), can generate or bootstrap data for simulations, and plot predicted versus observed data.
+# License: GPL (>= 2)
+# Depends: R (>= 2.15.1)
+# Imports: numDeriv, Brobdingnag, Rcpp, stats, utils
+# Suggests: snowfall (>= 1.84), knitr
+# LinkingTo: Rcpp, RcppEigen
+# LazyLoad: yes
+# ByteCompile: yes
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2018-06-23 16:33:08 UTC; henrik
+# Author: Henrik Singmann [aut, cre], David Kellen [aut], Quentin Gronau [aut], Christian Mueller [ctb], Akhil S Bhel [ctb]
+# Maintainer: Henrik Singmann <singmann+mptinr@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-06-23 17:08:51 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

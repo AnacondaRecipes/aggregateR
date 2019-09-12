@@ -1,0 +1,92 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-harvest.tree
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Harvest.Tree_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Harvest.Tree/Harvest.Tree_{{ version }}.tar.gz
+  sha256: dfc01a2ee816442b3c2da22555650c6faa2fcb6ad2e5d8d55451dce3efad3f08
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rpart
+
+  run:
+    - r-base
+    - r-rpart
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Harvest.Tree')"           # [not win]
+    - "\"%R%\" -e \"library('Harvest.Tree')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Harvest.Tree
+  license: GPL-2
+  summary: 'Aimed at applying the Harvest classification tree algorithm, modified algorithm of
+    classic classification tree.The harvested tree has advantage of deleting redundant
+    rules in trees, leading to a simplify and more efficient tree model.It was firstly
+    used in drug discovery field, but it also performs well in other kinds of data,
+    especially when the region of a class is disconnected. This package also improves
+    the basic harvest classification tree algorithm by extending the field of data of
+    algorithm to both continuous and categorical variables. To learn more about the
+    harvest classification tree algorithm, you can go to http://www.stat.ubc.ca/Research/TechReports/techreports/220.pdf
+    for more information. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Harvest.Tree
+# Title: Harvest the Classification Tree
+# Version: 1.1
+# Date: 2015-07-30
+# Author: Bingyuan Liu/Yan Yuan/Qian Shi
+# Maintainer: Bingyuan Liu <adler1016@gmail.com>
+# Depends: R (>= 3.0.1)
+# Imports: rpart,stats
+# Description: Aimed at applying the Harvest classification tree algorithm, modified algorithm of classic classification tree.The harvested tree has advantage of deleting redundant rules in trees, leading to a simplify and more efficient tree model.It was firstly used in drug discovery field, but it also performs well in other kinds of data, especially when the region of a class is disconnected. This package also improves the basic harvest classification tree algorithm by extending the field of data of algorithm to both continuous and categorical variables. To learn more about the harvest classification tree algorithm, you can go to http://www.stat.ubc.ca/Research/TechReports/techreports/220.pdf for more information.
+# License: GPL-2
+# Packaged: 2015-07-30 17:13:18 UTC; Bingyuan
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-07-31 00:54:59
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

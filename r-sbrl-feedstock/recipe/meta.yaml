@@ -1,0 +1,103 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sbrl
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sbrl_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sbrl/sbrl_{{ version }}.tar.gz
+  sha256: a2e54871c008c2d8bf8a83d3580fd96525a3302929e7a7f086f0b1ff69150eb4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.4
+    - r-arules
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.4
+    - r-arules
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sbrl')"           # [not win]
+    - "\"%R%\" -e \"library('sbrl')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=sbrl
+  license: GPL-2
+  summary: An implementation of Scalable Bayesian Rule Lists Algorithm.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sbrl
+# Type: Package
+# Title: Scalable Bayesian Rule Lists Model
+# Version: 1.2
+# Date: 2016-07-25
+# Authors@R: c(person("Hongyu", "Yang", role = c("aut", "cre"), email = "hongyuy@mit.edu"), person("Morris", "Chen", role = "ctb", email = "Morris_CM_Chen@wistron.com"), person("Cynthia", "Rudin", role = c("aut", "ctb"), email = "rudin@cs.duke.edu"), person("Margo", "Seltzer", role = c("aut", "ctb"), email = "margo@eecs.harvard.edu"))
+# Author: Hongyu Yang [aut, cre], Morris Chen [ctb], Cynthia Rudin [aut, ctb], Margo Seltzer [aut, ctb]
+# Maintainer: Hongyu Yang <hongyuy@mit.edu>
+# Description: An implementation of Scalable Bayesian Rule Lists Algorithm.
+# License: GPL (>= 2)
+# Imports: Rcpp (>= 0.12.4), arules, methods
+# RcppModules: sbrl
+# LinkingTo: Rcpp
+# NeedsCompilation: yes
+# LazyData: yes
+# SystemRequirements: gmp (>= 4.2.0), gsl
+# Packaged: 2016-07-27 22:37:38 UTC; hongyuy
+# Repository: CRAN
+# Date/Publication: 2016-07-29 06:41:15
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

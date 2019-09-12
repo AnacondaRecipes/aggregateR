@@ -1,0 +1,91 @@
+{% set version = '0.12' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pocrm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pocrm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pocrm/pocrm_{{ version }}.tar.gz
+  sha256: 19b9607de32f31c9c21c2f0ef5916295eb34be0a864b23c9b2980e8f770a9046
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-dfcrm
+    - r-nnet
+
+  run:
+    - r-base
+    - r-dfcrm
+    - r-nnet
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pocrm')"           # [not win]
+    - "\"%R%\" -e \"library('pocrm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=pocrm
+  license: GPL-2
+  summary: Provides functions to implement and simulate the partial order continual reassessment
+    method (PO-CRM) of Wages, Conaway and O'Quigley (2011) <doi:10.1177/1740774511408748>
+    for use in Phase I trials of combinations of agents. Provides a function for generating
+    a set of initial guesses (skeleton) for the toxicity probabilities at each combination
+    that correspond to the set of possible orderings of the toxicity probabilities specified
+    by the user.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pocrm
+# Type: Package
+# Title: Dose Finding in Drug Combination Phase I Trials Using PO-CRM
+# Version: 0.12
+# Date: 2019-03-14
+# Author: Nolan A. Wages
+# Maintainer: "Varhegyi, Nikole E. (nev4g)" <nev4g@virginia.edu>
+# Depends: dfcrm, nnet
+# Imports: stats
+# Description: Provides functions to implement and simulate the partial order continual reassessment method (PO-CRM) of Wages, Conaway and O'Quigley (2011) <doi:10.1177/1740774511408748> for use in Phase I trials of combinations of agents. Provides a function for generating a set of initial guesses (skeleton) for the toxicity probabilities at each combination that correspond to the set of possible orderings of the toxicity probabilities specified by the user.
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2019-03-14 19:02:23 UTC; nev4g
+# Repository: CRAN
+# Date/Publication: 2019-03-15 06:40:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

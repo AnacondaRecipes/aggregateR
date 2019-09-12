@@ -1,0 +1,93 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-matrixstructest
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/matrixStrucTest_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/matrixStrucTest/matrixStrucTest_{{ version }}.tar.gz
+  sha256: 7380cfddfd298ee3ac0dbb246c69f993d3a1ec9a2a5442abf47187786b4f8a1a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggplot2, reshape2
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('matrixStrucTest')"           # [not win]
+    - "\"%R%\" -e \"library('matrixStrucTest')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/bdsegal/matrixStrucTest
+  license: GPL-3
+  summary: Tests for block-diagonal structure in symmetric matrices (e.g. correlation matrices)
+    under the null hypothesis of exchangeable off-diagonal elements. As described in
+    Segal et al. (2019), these tests can be useful for construct validation either by
+    themselves or as a complement to confirmatory factor analysis. Monte Carlo methods
+    are used to approximate the permutation p-value with Hubert's Gamma (Hubert, 1976)
+    and a t-statistic. This package also implements the chi-squared statistic described
+    by Steiger (1980). Please see Segal, et al. (2019) <doi:10.1007/s11336-018-9647-4>
+    for more information.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: matrixStrucTest
+# Version: 1.0.0
+# Date: 2019-07-14
+# Title: Tests of Matrix Structure for Construct Validation
+# Description: Tests for block-diagonal structure in symmetric matrices (e.g. correlation matrices) under the null hypothesis of exchangeable off-diagonal elements. As described in Segal et al. (2019), these tests can be useful for construct validation either by themselves or as a complement to confirmatory factor analysis. Monte Carlo methods are used to approximate the permutation p-value with Hubert's Gamma (Hubert, 1976) and a t-statistic. This package also implements the chi-squared statistic described by Steiger (1980). Please see Segal, et al. (2019) <doi:10.1007/s11336-018-9647-4> for more information.
+# Depends: R (>= 3.1)
+# Suggests: ggplot2, reshape2
+# Authors@R: person(given = "Brian D.", family = "Segal", email = "bdsegal@umich.edu", role = c("aut", "cre"))
+# Author: Brian D. Segal [aut, cre]
+# Maintainer: Brian D. Segal <bdsegal@umich.edu>
+# License: GPL (>= 3)
+# URL: https://github.com/bdsegal/matrixStrucTest
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-07-14 16:25:29 UTC; bsegal
+# Repository: CRAN
+# Date/Publication: 2019-07-18 06:35:48 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

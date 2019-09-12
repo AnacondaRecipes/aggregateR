@@ -1,0 +1,94 @@
+{% set version = '0.8.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-vocaldia
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/vocaldia_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/vocaldia/vocaldia_{{ version }}.tar.gz
+  sha256: de9ac3f2bf544053a2772da8320996224c29e9f0c8ef7b0ff921ae27b0266194
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: igraph, foreign
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('vocaldia')"           # [not win]
+    - "\"%R%\" -e \"library('vocaldia')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=vocaldia
+  license: GPL-3
+  summary: Create adjacency matrices of vocalisation graphs from dataframes containing sequences
+    of speech and silence intervals, transforming these matrices into Markov diagrams,
+    and generating datasets for classification of these diagrams by 'flattening' them
+    and adding global properties (functionals) etc.  Vocalisation diagrams date back
+    to early work in psychiatry (Jaffe and Feldstein, 1970) and social psychology (Dabbs
+    and Ruback, 1987) but have only recently been employed as a data representation
+    method for machine learning tasks including meeting segmentation (Luz, 2012) <doi:10.1145/2328967.2328970>
+    and classification (Luz, 2013) <doi:10.1145/2522848.2533788>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# License: GPL-3
+# LazyData: true
+# Package: vocaldia
+# Type: Package
+# Title: Create and Manipulate Vocalisation Diagrams
+# Version: 0.8.2
+# Date: 2017-04-03
+# Authors@R: person("Saturnino", "Luz", email = "luzs@acm.org", role = c("aut", "cre"))
+# Description: Create adjacency matrices of vocalisation graphs from dataframes containing sequences of speech and silence intervals, transforming these matrices into Markov diagrams, and generating datasets for classification of these diagrams by 'flattening' them and adding global properties (functionals) etc.  Vocalisation diagrams date back to early work in psychiatry (Jaffe and Feldstein, 1970) and social psychology (Dabbs and Ruback, 1987) but have only recently been employed as a data representation method for machine learning tasks including meeting segmentation (Luz, 2012) <doi:10.1145/2328967.2328970> and classification (Luz, 2013) <doi:10.1145/2522848.2533788>.
+# Depends: R (>= 3.0.0)
+# Suggests: igraph, foreign
+# Imports: graphics
+# RoxygenNote: 6.0.1.9000
+# NeedsCompilation: no
+# Packaged: 2017-08-10 10:06:55 UTC; luzs
+# Author: Saturnino Luz [aut, cre]
+# Maintainer: Saturnino Luz <luzs@acm.org>
+# Repository: CRAN
+# Date/Publication: 2017-08-10 15:12:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

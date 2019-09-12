@@ -1,0 +1,86 @@
+{% set version = '1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-igasso
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/iGasso_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/iGasso/iGasso_{{ version }}.tar.gz
+  sha256: 4242a5c1713d04f5069d93b82623722b3ef6fc570c3eca708397f54299c5bd9f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-compquadform
+    - r-lattice
+
+  run:
+    - r-base
+    - r-compquadform
+    - r-lattice
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('iGasso')"           # [not win]
+    - "\"%R%\" -e \"library('iGasso')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=iGasso
+  license: GPL-2
+  summary: A collection of statistical tests for genetic association studies.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: iGasso
+# Type: Package
+# Title: Statistical Tests and Utilities for Genetic Association
+# Version: 1.4
+# Date: 2016-06-03
+# Author: Dr. Kai Wang
+# Maintainer: Kai Wang <kai-wang@uiowa.edu>
+# Depends: lattice, CompQuadForm
+# Description: A collection of statistical tests for genetic association studies.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2016-06-03 23:02:38 UTC; kaiwang
+# Repository: CRAN
+# Date/Publication: 2016-06-04 07:52:27
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

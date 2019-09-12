@@ -1,0 +1,89 @@
+{% set version = '1.1-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mvntest
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mvnTest_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mvnTest/mvnTest_{{ version }}.tar.gz
+  sha256: d8a9afae4af7dda2b97bd49ebfe64f41db88fb820272187a0aff4b7affd4675c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mass
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mvnTest')"           # [not win]
+    - "\"%R%\" -e \"library('mvnTest')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mvnTest
+  license: GPL-2
+  summary: Routines for assessing multivariate normality. Implements three Wald's type chi-squared
+    tests; non-parametric Anderson-Darling and Cramer-von Mises tests; Doornik-Hansen
+    test,  Royston test and Henze-Zirkler test.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mvnTest
+# Version: 1.1-0
+# Authors@R: c(person("Natalya", "Pya", role = c("aut", "cre"), email = "nat.pya@gmail.com"), person("Vassilly", "Voinov", role = "aut", email = "voinovv@kimep.kz"), person("Rashid", "Makarov", role = "aut", email = "rashidm@kimep.kz"), person("Yevgeniy", "Voinov", role = "aut", email = "v.yevgeniy@yahoo.com"))
+# Author: Natalya Pya [aut, cre], Vassilly Voinov [aut], Rashid Makarov [aut], Yevgeniy     Voinov [aut]
+# Maintainer: Natalya Pya <nat.pya@gmail.com>
+# Title: Goodness of Fit Tests for Multivariate Normality
+# Date: 2016-01-25
+# Description: Routines for assessing multivariate normality. Implements three Wald's type chi-squared tests; non-parametric Anderson-Darling and Cramer-von Mises tests; Doornik-Hansen test,  Royston test and Henze-Zirkler test.
+# Depends: R (>= 2.15.0), mvtnorm
+# Imports: methods, stats, graphics, MASS
+# License: GPL (>= 2)
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2016-02-10 08:54:01 UTC; natalya
+# Repository: CRAN
+# Date/Publication: 2016-02-10 18:57:23
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

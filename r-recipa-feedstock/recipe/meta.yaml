@@ -1,0 +1,82 @@
+{% set version = '3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-recipa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ReCiPa_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ReCiPa/ReCiPa_{{ version }}.tar.gz
+  sha256: 2f583051a9b0fd018e5270e5f6f1159d2c71ff7bd83ddfe1e31463dbdfa63b05
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ReCiPa')"           # [not win]
+    - "\"%R%\" -e \"library('ReCiPa')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ReCiPa
+  license: GPL-2
+  summary: Pathways in a database could have many redundancies among them. This package allows
+    the user to set a maximum value for the proportion of these redundancies.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ReCiPa
+# Type: Package
+# Title: Redundancy Control in Pathways databases
+# Version: 3.0
+# Date: 2012-12-21
+# Author: Juan C. Vivar
+# Maintainer: Juan C. Vivar <jvivar@nccu.edu>
+# Description: Pathways in a database could have many redundancies among them. This package allows the user to set a maximum value for the proportion of these redundancies.
+# License: GPL-2
+# LazyLoad: yes
+# Packaged: 2012-12-21 18:03:20 UTC; jcvivar
+# Repository: CRAN
+# Date/Publication: 2012-12-21 19:52:57
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

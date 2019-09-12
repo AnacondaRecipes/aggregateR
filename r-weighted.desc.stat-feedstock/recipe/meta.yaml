@@ -1,0 +1,88 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-weighted.desc.stat
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Weighted.Desc.Stat_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Weighted.Desc.Stat/Weighted.Desc.Stat_{{ version }}.tar.gz
+  sha256: d25e0f656c89b9c6a512b595c1ea643adfc758ce6fccbd953949526eab08110c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Weighted.Desc.Stat')"           # [not win]
+    - "\"%R%\" -e \"library('Weighted.Desc.Stat')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Weighted.Desc.Stat
+  license: LGPL-3
+  summary: Weighted descriptive statistics is the discipline of quantitatively describing the
+    main features of real-valued fuzzy data which usually given from a fuzzy population.
+    One can summarize this special kind of fuzzy data numerically or graphically using
+    this package. To interpret some of the properties of one or several sets of real-valued
+    fuzzy data, numerically summarize is possible by some weighted statistics which
+    are designed in this package such as mean, variance, covariance and correlation
+    coefficent. Also, graphically interpretation can be given by weighted histogram
+    and weighted scatter plot using this package to describe properties of real-valued
+    fuzzy data set.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Weighted.Desc.Stat
+# Type: Package
+# Title: Weighted Descriptive Statistics
+# Version: 1.0
+# Date: 2016-02-26
+# Author: Abbas Parchami (Department of Statistics, Faculty of Mathematics and Computer, Shahid Bahonar University of Kerman, Kerman, Iran)
+# Maintainer: Abbas Parchami <parchami@uk.ac.ir>
+# Description: Weighted descriptive statistics is the discipline of quantitatively describing the main features of real-valued fuzzy data which usually given from a fuzzy population. One can summarize this special kind of fuzzy data numerically or graphically using this package. To interpret some of the properties of one or several sets of real-valued fuzzy data, numerically summarize is possible by some weighted statistics which are designed in this package such as mean, variance, covariance and correlation coefficent. Also, graphically interpretation can be given by weighted histogram and weighted scatter plot using this package to describe properties of real-valued fuzzy data set.
+# License: LGPL (>= 3)
+# NeedsCompilation: no
+# Packaged: 2016-02-29 16:50:57 UTC; Admin
+# Repository: CRAN
+# Date/Publication: 2016-02-29 23:55:53
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

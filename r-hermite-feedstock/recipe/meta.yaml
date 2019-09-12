@@ -1,0 +1,84 @@
+{% set version = '1.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hermite
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hermite_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hermite/hermite_{{ version }}.tar.gz
+  sha256: 43b54f29d55abc98828eb780b0a67ec82e2cce1ae0b89d97e7afeeb5bd3a3a49
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-maxlik
+
+  run:
+    - r-base
+    - r-maxlik
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hermite')"           # [not win]
+    - "\"%R%\" -e \"library('hermite')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=hermite
+  license: GPL-2
+  summary: Probability functions and other utilities for the generalized Hermite distribution.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: hermite
+# Type: Package
+# Title: Generalized Hermite Distribution
+# Version: 1.1.2
+# Date: 2018-05-17
+# Encoding: UTF-8
+# Author: David Morina, Manuel Higueras, Pedro Puig and Maria Oliveira
+# Maintainer: David Morina Soler <david.morina@uab.cat>
+# Description: Probability functions and other utilities for the generalized Hermite distribution.
+# Depends: R (>= 2.15.0), maxLik
+# Repository: CRAN
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2018-05-17 08:54:42 UTC; 47642555X
+# Date/Publication: 2018-05-17 13:33:53 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

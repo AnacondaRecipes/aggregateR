@@ -1,0 +1,89 @@
+{% set version = '0.1-5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mfilter
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mFilter_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mFilter/mFilter_{{ version }}.tar.gz
+  sha256: 6b1ebfe8901a6117ec77969733da0b1c84fd9c46238266273112e1c8ea48cc2a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tseries, pastecs, locfit, tseriesChaos, tsDyn, forecast
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mFilter')"           # [not win]
+    - "\"%R%\" -e \"library('mFilter')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.mbalcilar.net
+  license: GPL-2
+  summary: The mFilter package implements several time series filters useful for smoothing and
+    extracting trend and cyclical components of a time series. The routines are commonly
+    used in economics and finance, however they should also be interest to other areas.
+    Currently, Christiano-Fitzgerald, Baxter-King, Hodrick-Prescott, Butterworth, and
+    trigonometric regression filters are included in the package.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mFilter
+# Title: Miscellaneous Time Series Filters
+# Date: 2019-07-04
+# Version: 0.1-5
+# Author: Mehmet Balcilar <mehmet@mbalcilar.net>
+# Depends: R (>= 2.2.0), stats
+# Suggests: tseries, pastecs, locfit, tseriesChaos, tsDyn, forecast
+# Description: The mFilter package implements several time series filters useful for smoothing and extracting trend and cyclical components of a time series. The routines are commonly used in economics and finance, however they should also be interest to other areas. Currently, Christiano-Fitzgerald, Baxter-King, Hodrick-Prescott, Butterworth, and trigonometric regression filters are included in the package.
+# Maintainer: Mehmet Balcilar <mehmet@mbalcilar.net>
+# License: GPL (>= 2)
+# URL: http://www.mbalcilar.net
+# Encoding: UTF-8
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-06-04 20:52:13 UTC; mbalcilar
+# Repository: CRAN
+# Date/Publication: 2019-06-04 22:20:12 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

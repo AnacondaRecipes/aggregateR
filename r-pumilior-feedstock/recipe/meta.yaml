@@ -1,0 +1,89 @@
+{% set version = '1.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pumilior
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pumilioR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pumilioR/pumilioR_{{ version }}.tar.gz
+  sha256: cc2db0f4208f89b6e11449b831106103b05dbcb3c9a59f45730a9a3c69c9219d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcurl
+    - r-xml
+
+  run:
+    - r-base
+    - r-rcurl
+    - r-xml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pumilioR')"           # [not win]
+    - "\"%R%\" -e \"library('pumilioR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://ljvillanueva.github.io/pumilioR/
+  license: GPL-3
+  summary: R package to query and get data out of a Pumilio sound archive system (http://ljvillanueva.github.io/pumilio/).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pumilioR
+# Title: Pumilio in R
+# Version: 1.3.1
+# Date: 2016-11-22
+# Author: Luis J. Villanueva-Rivera
+# Maintainer: Luis J. Villanueva-Rivera <ljvillanueva@coquipr.com>
+# Description: R package to query and get data out of a Pumilio sound archive system (http://ljvillanueva.github.io/pumilio/).
+# Depends: R(>= 2.14.0), XML, RCurl
+# Suggests: knitr
+# License: GPL-3
+# URL: http://ljvillanueva.github.io/pumilioR/
+# BugReports: https://github.com/ljvillanueva/pumilioR/issues
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2016-11-23 02:53:11 UTC; ljvillanueva
+# Repository: CRAN
+# Date/Publication: 2016-11-23 09:38:50
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

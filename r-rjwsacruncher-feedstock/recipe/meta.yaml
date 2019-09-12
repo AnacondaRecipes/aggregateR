@@ -1,0 +1,96 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rjwsacruncher
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rjwsacruncher_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rjwsacruncher/rjwsacruncher_{{ version }}.tar.gz
+  sha256: 54c6936d4a205eb5fb0504315746c808964d5f7edca67ec0dea85b76a81f6e5d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-xml
+
+  run:
+    - r-base
+    - r-xml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rjwsacruncher')"           # [not win]
+    - "\"%R%\" -e \"library('rjwsacruncher')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/AQLT/rjwsacruncher
+  license: GPL-3
+  summary: '''JDemetra+'' (<https://github.com/jdemetra/jdemetra-app>) is the seasonal adjustment
+    software officially recommended to the members of the European Statistical System
+    and the European System of Central Banks. Seasonal adjustment models performed with
+    ''JDemetra+'' can be stored into workspaces. ''JWSACruncher'' (<https://github.com/jdemetra/jwsacruncher/releases>)
+    is a console tool that  re-estimates all the multi-processing defined in a workspace
+    and to export the result. ''rjwsacruncher'' allows to launch easily the ''JWSACruncher''.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rjwsacruncher
+# Title: Interface to the 'JWSACruncher' of 'JDemetra+'
+# Version: 0.1.0
+# Authors@R: c(person("Alain", "Quartier-la-Tente", role = c("aut", "cre"), email = "alain.quartier@yahoo.fr"))
+# Description: 'JDemetra+' (<https://github.com/jdemetra/jdemetra-app>) is the seasonal adjustment software officially recommended to the members of the European Statistical System and the European System of Central Banks. Seasonal adjustment models performed with 'JDemetra+' can be stored into workspaces. 'JWSACruncher' (<https://github.com/jdemetra/jwsacruncher/releases>) is a console tool that  re-estimates all the multi-processing defined in a workspace and to export the result. 'rjwsacruncher' allows to launch easily the 'JWSACruncher'.
+# URL: https://github.com/AQLT/rjwsacruncher
+# BugReports: https://github.com/AQLT/rjwsacruncher/issues
+# Imports: XML
+# Suggests: knitr, rmarkdown
+# License: GPL-3
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-06-11 19:09:51 UTC; alainquartierlatente
+# Author: Alain Quartier-la-Tente [aut, cre]
+# Maintainer: Alain Quartier-la-Tente <alain.quartier@yahoo.fr>
+# Repository: CRAN
+# Date/Publication: 2019-06-15 07:30:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

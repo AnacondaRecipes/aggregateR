@@ -1,0 +1,91 @@
+{% set version = '0.0.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pinp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pinp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pinp/pinp_{{ version }}.tar.gz
+  sha256: b7d13ff4b9ee9ba0ad0cdfe3c218c205e133e8f7845a524ed17fdcc23014b31d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-knitr
+    - r-rmarkdown
+
+  run:
+    - r-base
+    - r-knitr
+    - r-rmarkdown
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pinp')"           # [not win]
+    - "\"%R%\" -e \"library('pinp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://dirk.eddelbuettel.com/code/pinp.html
+  license: GPL-3
+  summary: A 'PNAS'-alike style for 'rmarkdown', derived from the 'Proceedings of the National
+    Academy of Sciences of the United States of America' ('PNAS', see <https://www.pnas.org>)
+    'LaTeX' style, and adapted for use with 'markdown' and 'pandoc'.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pinp
+# Type: Package
+# Title: 'pinp' is not 'PNAS'
+# Version: 0.0.8
+# Date: 2019-09-08
+# Author: Dirk Eddelbuettel and James Balamuta
+# Maintainer: Dirk Eddelbuettel <edd@debian.org>
+# Description: A 'PNAS'-alike style for 'rmarkdown', derived from the 'Proceedings of the National Academy of Sciences of the United States of America' ('PNAS', see <https://www.pnas.org>) 'LaTeX' style, and adapted for use with 'markdown' and 'pandoc'.
+# URL: http://dirk.eddelbuettel.com/code/pinp.html
+# BugReports: https://github.com/eddelbuettel/pinp/issues
+# Imports: rmarkdown, knitr
+# VignetteBuilder: knitr
+# License: GPL-3
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2019-09-08 19:50:12.285696 UTC; edd
+# Repository: CRAN
+# Date/Publication: 2019-09-08 20:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

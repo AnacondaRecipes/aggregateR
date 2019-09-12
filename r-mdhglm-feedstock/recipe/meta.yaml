@@ -1,0 +1,88 @@
+{% set version = '1.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mdhglm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mdhglm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mdhglm/mdhglm_{{ version }}.tar.gz
+  sha256: 63c9fcda45f3da4fe0a12f2e6cf8f9512025372e51b49f71a48dd3281af2d3d7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-boot
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-matrix
+    - r-boot
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mdhglm')"           # [not win]
+    - "\"%R%\" -e \"library('mdhglm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mdhglm
+  license: Unlimited
+  summary: Allows various models for multivariate response variables where each response is assumed
+    to follow double hierarchical generalized linear models. In double hierarchical
+    generalized linear models, the mean, dispersion parameters for variance of random
+    effects, and residual variance can be further modeled as random-effect models.
+  license_family: MIT
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mdhglm
+# Type: Package
+# Title: Multivariate Double Hierarchical Generalized Linear Models
+# Version: 1.8
+# Date: 2018-10-01
+# Author: Youngjo Lee, Marek Molas, Maengseok Noh
+# Maintainer: Maengseok Noh <msnoh@pknu.ac.kr>
+# Description: Allows various models for multivariate response variables where each response is assumed to follow double hierarchical generalized linear models. In double hierarchical generalized linear models, the mean, dispersion parameters for variance of random effects, and residual variance can be further modeled as random-effect models.
+# Depends: R (>= 3.4.0), methods, Matrix, boot, mvtnorm
+# License: Unlimited
+# NeedsCompilation: no
+# Packaged: 2018-10-25 05:27:15 UTC; Noh
+# Repository: CRAN
+# Date/Publication: 2018-10-25 08:00:19 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

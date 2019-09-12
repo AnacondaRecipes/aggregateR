@@ -1,0 +1,116 @@
+{% set version = '4.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tesseract
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tesseract_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tesseract/tesseract_{{ version }}.tar.gz
+  sha256: c0754a893352f52db44d47911173e7a64f83217671888f6d34adc1631171eca8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: magick (>= 1.7), spelling, knitr, tibble, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.12
+    - r-curl
+    - r-digest
+    - r-pdftools >=1.5
+    - r-rappdirs
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.12
+    - r-curl
+    - r-digest
+    - r-pdftools >=1.5
+    - r-rappdirs
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tesseract')"           # [not win]
+    - "\"%R%\" -e \"library('tesseract')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ropensci/tesseract
+  license: Apache License 2.0
+  summary: 'Bindings to ''Tesseract'' <https://opensource.google.com/projects/tesseract>:  a
+    powerful optical character recognition (OCR) engine that supports over 100 languages.
+    The engine is highly configurable in order to tune the detection algorithms and
+    obtain the best possible results.'
+
+  license_family: APACHE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: tesseract
+# Type: Package
+# Title: Open Source OCR Engine
+# Version: 4.1
+# Authors@R: person("Jeroen", "Ooms", role = c("aut", "cre"), email = "jeroen@berkeley.edu", comment = c(ORCID = "0000-0002-4035-0289"))
+# Description: Bindings to 'Tesseract' <https://opensource.google.com/projects/tesseract>:  a powerful optical character recognition (OCR) engine that supports over 100 languages. The engine is highly configurable in order to tune the detection algorithms and obtain the best possible results.
+# License: Apache License 2.0
+# URL: https://github.com/ropensci/tesseract
+# BugReports: https://github.com/ropensci/tesseract/issues
+# SystemRequirements: Tesseract >= 3.03 (libtesseract-dev / tesseract-devel) and Leptonica (libleptonica-dev / leptonica-devel). On Debian you need to install the English training data separately (tesseract-ocr-eng)
+# Imports: Rcpp (>= 0.12.12), pdftools (>= 1.5), curl, rappdirs, digest
+# LinkingTo: Rcpp
+# RoxygenNote: 6.1.0
+# Suggests: magick (>= 1.7), spelling, knitr, tibble, rmarkdown
+# Encoding: UTF-8
+# VignetteBuilder: knitr
+# Language: en-US
+# NeedsCompilation: yes
+# Packaged: 2019-07-25 20:14:12 UTC; jeroen
+# Author: Jeroen Ooms [aut, cre] (<https://orcid.org/0000-0002-4035-0289>)
+# Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
+# Repository: CRAN
+# Date/Publication: 2019-07-25 20:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

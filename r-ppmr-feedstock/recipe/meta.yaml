@@ -1,0 +1,104 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ppmr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PPMR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PPMR/PPMR_{{ version }}.tar.gz
+  sha256: 6f1ce42784a26c24d02141b8b21b10f8448398215536ce87b0b5b6c07af1d31d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.0
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.0
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PPMR')"           # [not win]
+    - "\"%R%\" -e \"library('PPMR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PPMR
+  license: GPL-3
+  summary: Efficient statistical inference of two-sample MR (Mendelian Randomization) analysis.  It
+    can account for the correlated instruments and the horizontal pleiotropy,  and can
+    provide the accurate estimates of both causal effect and horizontal  pleiotropy
+    effect as well as the two corresponding p-values. There are two main  functions
+    in the 'PPMR' package. One is PMR_individual() for individual level data,  the other
+    is PMR_summary() for summary data.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PPMR
+# Title: Probabilistic Two Sample Mendelian Randomization
+# Type: Package
+# Version: 1.0
+# Authors@R: c( person(given = "Zhongshang", family = "Yuan", role = c("aut")), person(given = "Xiang", family = "Zhou", role = c("aut"), email = "xzhousph@umich.edu"), person(given = "Michael", family = "Kleinsasser", role = c("cre"), email = "mkleinsa@umich.edu"))
+# Description: Efficient statistical inference of two-sample MR (Mendelian Randomization) analysis.  It can account for the correlated instruments and the horizontal pleiotropy,  and can provide the accurate estimates of both causal effect and horizontal  pleiotropy effect as well as the two corresponding p-values. There are two main  functions in the 'PPMR' package. One is PMR_individual() for individual level data,  the other is PMR_summary() for summary data.
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Imports: Rcpp (>= 1.0.0)
+# LinkingTo: Rcpp, RcppArmadillo
+# RoxygenNote: 6.1.1.9000
+# NeedsCompilation: yes
+# BugReports: https://github.com/umich-biostatistics/PPMR/issues
+# Packaged: 2019-08-08 13:46:00 UTC; mkleinsa
+# Author: Zhongshang Yuan [aut], Xiang Zhou [aut], Michael Kleinsasser [cre]
+# Maintainer: Michael Kleinsasser <mkleinsa@umich.edu>
+# Depends: R (>= 3.5.0)
+# Repository: CRAN
+# Date/Publication: 2019-08-09 10:20:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

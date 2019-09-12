@@ -1,0 +1,95 @@
+{% set version = '0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mvt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MVT_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MVT/MVT_{{ version }}.tar.gz
+  sha256: 2dc54fb31e08edfafc06e514b5da9356fc6e43d1afa7760f464eb5d2c6a6366e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: heavy
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MVT')"           # [not win]
+    - "\"%R%\" -e \"library('MVT')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.ies.ucv.cl/mvt/
+  license: GPL-2
+  summary: 'Routines to perform estimation and inference under the multivariate t-distribution.
+    Currently, the following methodologies are implemented: multivariate mean and covariance
+    estimation, hypothesis testing about the mean, equicorrelation and homogeneity of
+    variances, the Wilson-Hilferty transformation, QQ-plots with envelopes and random
+    variate generation. Some auxiliary functions are also provided.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MVT
+# Version: 0.3
+# Date: 2015-10-09
+# Title: Estimation and Testing for the Multivariate t-Distribution
+# Author: Felipe Osorio
+# Maintainer: Felipe Osorio <felipe.osorio@ucv.cl>
+# Description: Routines to perform estimation and inference under the multivariate t-distribution. Currently, the following methodologies are implemented: multivariate mean and covariance estimation, hypothesis testing about the mean, equicorrelation and homogeneity of variances, the Wilson-Hilferty transformation, QQ-plots with envelopes and random variate generation. Some auxiliary functions are also provided.
+# Imports: stats, utils, graphics
+# Suggests: heavy
+# License: GPL (>= 2)
+# URL: http://www.ies.ucv.cl/mvt/
+# LazyLoad: yes
+# NeedsCompilation: yes
+# Packaged: 2015-10-10 13:25:30 UTC; root
+# Repository: CRAN
+# Date/Publication: 2015-10-11 00:12:53
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,89 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fstability
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Fstability_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Fstability/Fstability_{{ version }}.tar.gz
+  sha256: 856c1b7ee7fd1a5394ab88bc3e747a0bf010103b64891022dc55d9a2736d4c4f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Fstability')"           # [not win]
+    - "\"%R%\" -e \"library('Fstability')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Fstability
+  license: GPL-3
+  summary: 'Has two functions to help with calculating feature selection stability. ''Lump''
+    is a function that groups subset vectors into a dataframe, and adds NA to shorter
+    vectors so they all have the same length. ''ASM'' is a function that takes a dataframe
+    of subset vectors and the original vector of features as inputs, and calculates
+    the Stability of the feature selection. The calculation for ''asm'' uses the Adjusted
+    Stability Measure proposed in: ''Lustgarten'', ''Gopalakrishnan'', & ''Visweswaran''
+    (2009)<https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2815476/>.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Fstability
+# Type: Package
+# Title: Calculate Feature Stability
+# Version: 0.1.2
+# Author: Nicolas Ewen
+# Maintainer: Nicolas Ewen <nicolas.ewen.math@gmail.com>
+# Description: Has two functions to help with calculating feature selection stability. 'Lump' is a function that groups subset vectors into a dataframe, and adds NA to shorter vectors so they all have the same length. 'ASM' is a function that takes a dataframe of subset vectors and the original vector of features as inputs, and calculates the Stability of the feature selection. The calculation for 'asm' uses the Adjusted Stability Measure proposed in: 'Lustgarten', 'Gopalakrishnan', & 'Visweswaran' (2009)<https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2815476/>.
+# Imports: stats
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2018-12-16 21:22:16 UTC; Nicolas
+# Repository: CRAN
+# Date/Publication: 2018-12-25 22:20:37 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

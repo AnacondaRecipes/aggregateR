@@ -1,0 +1,112 @@
+{% set version = '1.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hdf5r
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hdf5r_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hdf5r/hdf5r_{{ version }}.tar.gz
+  sha256: 58813e334fd3f9040038345a7186e5cb02090898883ac192477a76a5b8b4fe81
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, nycflights13, reshape2,
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-bit64
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-r6
+    - r-bit64
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hdf5r')"           # [not win]
+    - "\"%R%\" -e \"library('hdf5r')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://hhoeflin.github.io/hdf5r, https://github.com/hhoeflin/hdf5r
+  license: Apache License 2.0 | file LICENSE
+  summary: '''HDF5'' is a data model, library and file format for storing  and managing large
+    amounts of data. This package provides a nearly feature complete, object oriented  wrapper
+    for the ''HDF5'' API <https://support.hdfgroup.org/HDF5/doc/RM/RM_H5Front.html>
+    using R6 classes.  Additionally, functionality is added so that ''HDF5'' objects
+    behave very  similar to their corresponding R counterparts.'
+
+  license_family: APACHE
+  license_file:
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: hdf5r
+# Type: Package
+# Title: Interface to the 'HDF5' Binary Data Format
+# Version: 1.2.0
+# Authors@R: c( person("Holger", "Hoefling", email = "hhoeflin@gmail.com", role = c("aut", "cre")), person("Mario", "Annau", email = "mario.annau@gmail.com", role = "aut"), person("Novartis Institute for BioMedical Research (NIBR)", role = "cph") )
+# Description: 'HDF5' is a data model, library and file format for storing  and managing large amounts of data. This package provides a nearly feature complete, object oriented  wrapper for the 'HDF5' API <https://support.hdfgroup.org/HDF5/doc/RM/RM_H5Front.html> using R6 classes.  Additionally, functionality is added so that 'HDF5' objects behave very  similar to their corresponding R counterparts.
+# URL: https://hhoeflin.github.io/hdf5r, https://github.com/hhoeflin/hdf5r
+# BugReports: https://github.com/hhoeflin/hdf5r/issues
+# License: Apache License 2.0 | file LICENSE
+# Copyright: For the hdf5r package: Novartis Institute for BioMedical Research Inc. For HDF5: see the HDF5_COPYRIGHTS file.
+# LazyLoad: true
+# Depends: R (>= 3.2.2), methods
+# Imports: R6, bit64, utils
+# Suggests: testthat, knitr, rmarkdown, nycflights13, reshape2,
+# SystemRequirements: HDF5 (>= 1.8.13)
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# RoxygenNote: 6.1.1.9000
+# Collate: 'Common_functions.R' 'Compound.R' 'H5constants.R' 'Helper_functions.R' 'Misc.R' 'R6Classes.R' 'R6Classes_H5A.R' 'R6Classes_H5D.R' 'R6Classes_H5File.R' 'R6Classes_H5Group.R' 'R6Classes_H5P.R' 'R6Classes_H5R.R' 'R6Classes_H5S.R' 'R6Classes_H5T.R' 'adapt_during_onLoad.R' 'convert.R' 'factor_ext.R' 'globalVariables.R' 'h5errorHandling.R' 'h5wrapper.R' 'hdf5r.R' 'high_level_UI.R' 'open_objs.R' 'zzz.R'
+# Packaged: 2019-04-19 06:41:50 UTC; hhoeflin
+# Author: Holger Hoefling [aut, cre], Mario Annau [aut], Novartis Institute for BioMedical Research (NIBR) [cph]
+# Maintainer: Holger Hoefling <hhoeflin@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-04-20 16:00:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

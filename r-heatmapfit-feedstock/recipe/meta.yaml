@@ -1,0 +1,85 @@
+{% set version = '2.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-heatmapfit
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/heatmapFit_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/heatmapFit/heatmapFit_{{ version }}.tar.gz
+  sha256: 2b5bed82f587ee850bb870201949c973146bebde6c79e9af0bc2a17279b85ce7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('heatmapFit')"           # [not win]
+    - "\"%R%\" -e \"library('heatmapFit')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=heatmapFit
+  license: GPL-2
+  summary: Generates a fit plot for diagnosing misspecification in models of binary dependent
+    variables, and calculates the related heatmap fit statistic described in Esarey
+    and Pierce (2012) <DOI:10.1093/pan/mps026>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: heatmapFit
+# Title: Fit Statistic for Binary Dependent Variable Models
+# Version: 2.0.4
+# Authors@R: c(person("Justin", "Esarey", role = c("aut", "cre"), email = "justin@justinesarey.com"), person("Andrew", "Pierce", role = "aut", email = "awpierc@emory.edu"), person("Jericho", "Du", role= "aut", email = "jericho.du@gmail.com"))
+# Maintainer: Justin Esarey <justin@justinesarey.com>
+# Description: Generates a fit plot for diagnosing misspecification in models of binary dependent variables, and calculates the related heatmap fit statistic described in Esarey and Pierce (2012) <DOI:10.1093/pan/mps026>.
+# Depends: R (>= 3.1.1), stats, graphics, grDevices
+# Imports: utils
+# License: GPL (>= 2)
+# LazyData: true
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-06-06 16:35:43 UTC; justi
+# Author: Justin Esarey [aut, cre], Andrew Pierce [aut], Jericho Du [aut]
+# Repository: CRAN
+# Date/Publication: 2016-06-06 20:36:28
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

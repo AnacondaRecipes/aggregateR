@@ -1,0 +1,96 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lfdrempiricalbayes
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LFDREmpiricalBayes_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LFDREmpiricalBayes/LFDREmpiricalBayes_{{ version }}.tar.gz
+  sha256: cbf473dae33e658fa0f3acb3092442b3c67473fcbfd59636bdbedd55651bbcc6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: LFDR.MLE, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-matrixstats
+
+  run:
+    - r-base
+    - r-r6
+    - r-matrixstats
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LFDREmpiricalBayes')"           # [not win]
+    - "\"%R%\" -e \"library('LFDREmpiricalBayes')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://davidbickel.com
+  license: GPL-3
+  summary: New empirical Bayes methods aiming at analyzing the association of single nucleotide
+    polymorphisms (SNPs) to some particular disease are implemented in this package.
+    The package uses local false discovery rate (LFDR) estimates of SNPs within a sample
+    population defined as a  "reference class" and discovers if SNPs are associated
+    with the corresponding disease. Although SNPs are used throughout this document,
+    other biological data such as protein data and other gene data can be used. Karimnezhad,
+    Ali and Bickel, D. R. (2016) <http://hdl.handle.net/10393/34889>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LFDREmpiricalBayes
+# Type: Package
+# Title: Estimating Local False Discovery Rates Using Empirical Bayes Methods
+# Version: 1.0
+# Date: 2017-09-26
+# Author: Ali Karimnezhad, Johnary Kim, Anna Akpawu, Justin Chitpin and David R Bickel
+# Maintainer: Ali Karimnezhad <ali_karimnezhad@yahoo.com>
+# Description: New empirical Bayes methods aiming at analyzing the association of single nucleotide polymorphisms (SNPs) to some particular disease are implemented in this package. The package uses local false discovery rate (LFDR) estimates of SNPs within a sample population defined as a  "reference class" and discovers if SNPs are associated with the corresponding disease. Although SNPs are used throughout this document, other biological data such as protein data and other gene data can be used. Karimnezhad, Ali and Bickel, D. R. (2016) <http://hdl.handle.net/10393/34889>.
+# Depends: R(>= 2.14.2)
+# Imports: matrixStats, stats, R6
+# Suggests: LFDR.MLE, testthat
+# biocViews: Bayesian, MathematicalBiology, MultipleComparison
+# URL: https://davidbickel.com
+# License: GPL-3
+# NeedsCompilation: no
+# Packaged: 2017-09-27 01:34:32 UTC; a.karimnezhad
+# Repository: CRAN
+# Date/Publication: 2017-09-27 09:08:46 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

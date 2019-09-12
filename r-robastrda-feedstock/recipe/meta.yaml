@@ -1,0 +1,88 @@
+{% set version = '1.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-robastrda
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RobAStRDA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RobAStRDA/RobAStRDA_{{ version }}.tar.gz
+  sha256: 7f26b2fa90faa97eb824e6430293e6a9e5176f1612edafd7fa692b62639104e9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RobAStRDA')"           # [not win]
+    - "\"%R%\" -e \"library('RobAStRDA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://robast.r-forge.r-project.org/
+  license: LGPL-3
+  summary: Includes 'sysdata.rda' file for packages of the 'RobASt' - family of packages; is
+    currently used by package 'RobExtremes' only.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RobAStRDA
+# Version: 1.2.0
+# Date: 2019-03-11
+# Title: Interpolation Grids for Packages of the 'RobASt' - Family of Packages
+# Description: Includes 'sysdata.rda' file for packages of the 'RobASt' - family of packages; is currently used by package 'RobExtremes' only.
+# Depends: R (>= 2.10)
+# Authors@R: c(person("Matthias", "Kohl", role=c("aut", "cph")), person("Bernhard", "Spangl",role="ctb", comment="contributed smoothed grid values of the Lagrange multipliers"), person("Sascha", "Desmettre", role="ctb", comment="contributed smoothed grid values of the Lagrange multipliers"), person("Eugen", "Massini", role="ctb", comment="contributed an interactive smoothing routine for smoothing the Lagrange multipliers and smoothed grid values of the Lagrange multipliers"), person("Mykhailo", "Pupashenko", role="ctb", comment="helped with manual smoothing of the interpolators"), person("Daria", "Pupashenko", role="ctb", comment="helped with manual smoothing of the interpolators"), person("Gerald", "Kroisandt", role="ctb", comment="helped with manual smoothing of the interpolators"), person("Peter", "Ruckdeschel", role=c("cre", "cph", "aut"), email="peter.ruckdeschel@uni-oldenburg.de"))
+# LazyData: yes
+# ByteCompile: yes
+# License: LGPL-3
+# URL: http://robast.r-forge.r-project.org/
+# LastChangedDate: {$LastChangedDate: 2019-03-11 21:04:57 +0100 (Mo, 11 Mrz 2019) $}
+# LastChangedRevision: {$LastChangedRevision: 1201 $}
+# VCS/SVNRevision: 1200
+# NeedsCompilation: no
+# Packaged: 2019-03-11 20:05:13 UTC; ruckdesc
+# Author: Matthias Kohl [aut, cph], Bernhard Spangl [ctb] (contributed smoothed grid values of the Lagrange multipliers), Sascha Desmettre [ctb] (contributed smoothed grid values of the Lagrange multipliers), Eugen Massini [ctb] (contributed an interactive smoothing routine for smoothing the Lagrange multipliers and smoothed grid values of the Lagrange multipliers), Mykhailo Pupashenko [ctb] (helped with manual smoothing of the interpolators), Daria Pupashenko [ctb] (helped with manual smoothing of the interpolators), Gerald Kroisandt [ctb] (helped with manual smoothing of the interpolators), Peter Ruckdeschel [cre, cph, aut]
+# Maintainer: Peter Ruckdeschel <peter.ruckdeschel@uni-oldenburg.de>
+# Repository: CRAN
+# Date/Publication: 2019-03-11 21:15:52 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

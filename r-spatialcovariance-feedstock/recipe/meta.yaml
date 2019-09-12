@@ -1,0 +1,84 @@
+{% set version = '0.6-9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spatialcovariance
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/spatialCovariance_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/spatialCovariance/spatialCovariance_{{ version }}.tar.gz
+  sha256: 8bc26c0927c244b945c22c04d9eec70c6af9728eac9de14fba57a70254d206d5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('spatialCovariance')"           # [not win]
+    - "\"%R%\" -e \"library('spatialCovariance')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=spatialCovariance
+  license: GPL-3
+  summary: Functions that compute the spatial covariance matrix for the matern and power classes
+    of spatial models, for data that arise on rectangular units.  This code can also
+    be used for the change of support problem and for spatial data that arise on irregularly
+    shaped regions like counties or zipcodes by laying a fine grid of rectangles and
+    aggregating the integrals in a form of Riemann integration.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: spatialCovariance
+# Version: 0.6-9
+# Date: 2015-7-5
+# Title: Computation of Spatial Covariance Matrices for Data on Rectangles
+# Author: David Clifford <david.clifford+CRAN@gmail.com>
+# Maintainer: David Clifford <david.clifford+CRAN@gmail.com>
+# Description: Functions that compute the spatial covariance matrix for the matern and power classes of spatial models, for data that arise on rectangular units.  This code can also be used for the change of support problem and for spatial data that arise on irregularly shaped regions like counties or zipcodes by laying a fine grid of rectangles and aggregating the integrals in a form of Riemann integration.
+# License: GPL
+# SystemRequirements:
+# NeedsCompilation: no
+# Packaged: 2015-07-08 03:08:50 UTC; hua032
+# Repository: CRAN
+# Date/Publication: 2015-07-08 10:57:37
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,116 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ncpen
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ncpen_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ncpen/ncpen_{{ version }}.tar.gz
+  sha256: 4ae717497cfe8f67f677ca29e701f6588d49c1ad4cbd904cd025bba8f362846e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.2
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.2
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ncpen')"           # [not win]
+    - "\"%R%\" -e \"library('ncpen')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/zeemkr/ncpen
+  license: GPL-3
+  summary: 'An efficient unified nonconvex penalized estimation algorithm for Gaussian (linear),
+    binomial Logit (logistic), Poisson, multinomial Logit, and Cox proportional hazard
+    regression models. The unified algorithm is implemented based on the convex concave
+    procedure and the algorithm can be applied to most of the existing nonconvex penalties.
+    The algorithm also supports convex penalty: least absolute shrinkage and selection
+    operator (LASSO). Supported nonconvex penalties include smoothly clipped absolute
+    deviation (SCAD), minimax concave penalty (MCP), truncated LASSO penalty (TLP),
+    clipped LASSO (CLASSO), sparse ridge (SRIDGE), modified bridge (MBRIDGE) and modified
+    log (MLOG). For high-dimensional data (data set with many variables), the algorithm
+    selects relevant variables producing a parsimonious regression model. Kim, D., Lee,
+    S. and Kwon, S. (2018) <arXiv:1811.05061>, Lee, S., Kwon, S. and Kim, Y. (2016)
+    <doi:10.1016/j.csda.2015.08.019>, Kwon, S., Lee, S. and Kim, Y. (2015) <doi:10.1016/j.csda.2015.07.001>.
+    (This research is funded by Julian Virtue Professorship from Center for Applied
+    Research at Pepperdine Graziadio Business School and the National Research Foundation
+    of Korea.)'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ncpen
+# Type: Package
+# Title: Unified Algorithm for Non-convex Penalized Estimation for Generalized Linear Models
+# Version: 1.0.0
+# Date: 2018-11-16
+# Authors@R: c(person("Dongshin", "Kim", email = "dongshin.kim@live.com",role = c("aut", "cre", "cph")), person("Sunghoon", "Kwon", email = "shkwon0522@gmail.com",role = c("aut", "cph")), person("Sangin", "Lee", email = "sanginlee44@gmail.com",role = c("aut", "cph")))
+# Description: An efficient unified nonconvex penalized estimation algorithm for Gaussian (linear), binomial Logit (logistic), Poisson, multinomial Logit, and Cox proportional hazard regression models. The unified algorithm is implemented based on the convex concave procedure and the algorithm can be applied to most of the existing nonconvex penalties. The algorithm also supports convex penalty: least absolute shrinkage and selection operator (LASSO). Supported nonconvex penalties include smoothly clipped absolute deviation (SCAD), minimax concave penalty (MCP), truncated LASSO penalty (TLP), clipped LASSO (CLASSO), sparse ridge (SRIDGE), modified bridge (MBRIDGE) and modified log (MLOG). For high-dimensional data (data set with many variables), the algorithm selects relevant variables producing a parsimonious regression model. Kim, D., Lee, S. and Kwon, S. (2018) <arXiv:1811.05061>, Lee, S., Kwon, S. and Kim, Y. (2016) <doi:10.1016/j.csda.2015.08.019>, Kwon, S., Lee, S. and Kim, Y. (2015) <doi:10.1016/j.csda.2015.07.001>. (This research is funded by Julian Virtue Professorship from Center for Applied Research at Pepperdine Graziadio Business School and the National Research Foundation of Korea.)
+# License: GPL (>= 3)
+# URL: https://github.com/zeemkr/ncpen
+# BugReports: https://github.com/zeemkr/ncpen/issues
+# LazyData: TRUE
+# Imports: Rcpp (>= 0.11.2)
+# LinkingTo: Rcpp, RcppArmadillo
+# Depends: R(>= 3.4)
+# RoxygenNote: 6.1.1
+# Language: en-US
+# NeedsCompilation: yes
+# Packaged: 2018-11-17 17:59:55 UTC; dongshin
+# Author: Dongshin Kim [aut, cre, cph], Sunghoon Kwon [aut, cph], Sangin Lee [aut, cph]
+# Maintainer: Dongshin Kim <dongshin.kim@live.com>
+# Repository: CRAN
+# Date/Publication: 2018-11-17 18:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

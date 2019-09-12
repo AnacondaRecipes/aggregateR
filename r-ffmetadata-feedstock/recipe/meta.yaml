@@ -1,0 +1,97 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ffmetadata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ffmetadata_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ffmetadata/ffmetadata_{{ version }}.tar.gz
+  sha256: fbdab48b763bf2f35a8f81a04289500519a1c87098d09018127f823ba82b5b3e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ffmetadata')"           # [not win]
+    - "\"%R%\" -e \"library('ffmetadata')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/fragilefamilieschallenge/ffmetadata
+  license: MIT
+  summary: A collection of functions that allows users to retrieve  metadata for the Fragile
+    Families challenge via a Web API  (<http://api.metadata.fragilefamilies.princeton.edu>).   Users
+    can select and search metadata for relevant variables by  filtering on different
+    attribute names.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ffmetadata
+# Type: Package
+# Title: Access to Fragile Families Metadata
+# Version: 1.0.0
+# Authors@R: c( person("Ryan", "Vinh", email = "rvinh@princeton.edu", role = c("aut", "cre")), person("Ian", "Fellows", email = "ian@fellstat.com", role = "aut"), person("Will", "Lowe", email = "wlowe@princeton.edu", role = "ctb"))
+# Description: A collection of functions that allows users to retrieve  metadata for the Fragile Families challenge via a Web API  (<http://api.metadata.fragilefamilies.princeton.edu>).   Users can select and search metadata for relevant variables by  filtering on different attribute names.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# Imports: jsonlite, httr
+# RoxygenNote: 6.1.1
+# Suggests: testthat, knitr, rmarkdown
+# VignetteBuilder: knitr
+# URL: https://github.com/fragilefamilieschallenge/ffmetadata
+# BugReports: https://github.com/fragilefamilieschallenge/ffmetadata/issues
+# NeedsCompilation: no
+# Packaged: 2018-11-13 01:25:26 UTC; ryanvinh
+# Author: Ryan Vinh [aut, cre], Ian Fellows [aut], Will Lowe [ctb]
+# Maintainer: Ryan Vinh <rvinh@princeton.edu>
+# Repository: CRAN
+# Date/Publication: 2018-11-19 19:00:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

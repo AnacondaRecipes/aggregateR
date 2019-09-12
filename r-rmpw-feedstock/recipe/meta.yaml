@@ -1,0 +1,93 @@
+{% set version = '0.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rmpw
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rmpw_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rmpw/rmpw_{{ version }}.tar.gz
+  sha256: 74a9d34dd7dd9e956499defd8405bbd9cbb4007788e4e81ed98cd5cddbce89a8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-gtools
+
+  run:
+    - r-base
+    - r-mass
+    - r-gtools
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rmpw')"           # [not win]
+    - "\"%R%\" -e \"library('rmpw')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rmpw
+  license: GPL-2
+  summary: We implement causal mediation analysis using the methods proposed by Hong (2010) and
+    Hong, Deutsch & Hill (2015) <doi:10.3102/1076998615583902>. It allows the estimation
+    and hypothesis testing of causal mediation effects through ratio of mediator probability
+    weights (RMPW). This strategy conveniently relaxes the assumption of no treatment-by-mediator
+    interaction while greatly simplifying the outcome model specification without invoking
+    strong distributional assumptions. We also implement a sensitivity analysis by extending
+    the RMPW method to assess potential bias in the presence of omitted pretreatment
+    or posttreatment covariates. The sensitivity analysis strategy was proposed by Hong,
+    Qin, and Yang (2018) <doi:10.3102/1076998617749561>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rmpw
+# Version: 0.0.4
+# Date: 2018-07-18
+# Title: Causal Mediation Analysis Using Weighting Approach
+# Author: Xu Qin, Guanglei Hong, and Fan Yang
+# Maintainer: Xu Qin <xuqin@uchicago.edu>
+# Depends: R (>= 3.3.0), gtools, MASS
+# Description: We implement causal mediation analysis using the methods proposed by Hong (2010) and Hong, Deutsch & Hill (2015) <doi:10.3102/1076998615583902>. It allows the estimation and hypothesis testing of causal mediation effects through ratio of mediator probability weights (RMPW). This strategy conveniently relaxes the assumption of no treatment-by-mediator interaction while greatly simplifying the outcome model specification without invoking strong distributional assumptions. We also implement a sensitivity analysis by extending the RMPW method to assess potential bias in the presence of omitted pretreatment or posttreatment covariates. The sensitivity analysis strategy was proposed by Hong, Qin, and Yang (2018) <doi:10.3102/1076998617749561>.
+# License: GPL-2
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-07-18 13:23:20 UTC; Xu Qin
+# Repository: CRAN
+# Date/Publication: 2018-07-18 13:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

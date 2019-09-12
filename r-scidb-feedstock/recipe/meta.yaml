@@ -1,0 +1,107 @@
+{% set version = '2.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-scidb
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/scidb_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/scidb/scidb_{{ version }}.tar.gz
+  sha256: f494089f91055692eaafc4c38ecca06d342b58e0f981ad6551cccade759b2a1d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Matrix, knitr (>= 1.8)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bit64
+    - r-curl
+    - r-data.table
+    - r-digest
+    - r-openssl
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bit64
+    - r-curl
+    - r-data.table
+    - r-digest
+    - r-openssl
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('scidb')"           # [not win]
+    - "\"%R%\" -e \"library('scidb')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://paradigm4.github.io/SciDBR
+  license: AGPL-3
+  summary: An R interface to the 'SciDB' array database <http://scidb.org>.
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: scidb
+# Type: Package
+# Title: An R Interface to SciDB
+# Version: 2.0.0
+# Date: 2017-4-14
+# Authors@R: c( person("B. W.", "Lewis", role=c("cre","aut"), email="blewis@illposed.net"), person("Alex", "Poliakov", role=c("aut"), email="apoliakov@paradigm4.com") )
+# Copyright: Paradigm4, Inc.
+# Description: An R interface to the 'SciDB' array database <http://scidb.org>.
+# BugReports: https://github.com/Paradigm4/SciDBR/issues
+# URL: http://paradigm4.github.io/SciDBR
+# VignetteBuilder: knitr
+# Depends: R (>= 3.0.0), bit64
+# Imports: curl, data.table, digest, methods, openssl
+# Suggests: Matrix, knitr (>= 1.8)
+# License: AGPL-3
+# LazyLoad: yes
+# RoxygenNote: 6.0.1.9000
+# NeedsCompilation: yes
+# Packaged: 2017-04-14 21:33:24 UTC; blewis
+# Author: B. W. Lewis [cre, aut], Alex Poliakov [aut]
+# Maintainer: B. W. Lewis <blewis@illposed.net>
+# Repository: CRAN
+# Date/Publication: 2017-04-14 23:05:25 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

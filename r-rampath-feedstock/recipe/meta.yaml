@@ -1,0 +1,97 @@
+{% set version = '0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rampath
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RAMpath_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RAMpath/RAMpath_{{ version }}.tar.gz
+  sha256: 3bb07ed3567a749923b483045414806f4e07d726374353468342e0f8aaeb912e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-ellipse
+    - r-lavaan
+
+  run:
+    - r-base
+    - r-mass
+    - r-ellipse
+    - r-lavaan
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RAMpath')"           # [not win]
+    - "\"%R%\" -e \"library('RAMpath')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://nd.psychstat.org
+  license: GPL-2
+  summary: We rewrite of RAMpath software developed by John McArdle and Steven Boker as an R
+    package. In addition to performing regular SEM analysis through the R package lavaan,
+    RAMpath has unique features.  First, it can generate path diagrams according to
+    a given model. Second, it can display path tracing rules through path diagrams and
+    decompose total effects into their respective direct and indirect effects as well
+    as decompose variance and covariance into individual bridges. Furthermore, RAMpath
+    can fit dynamic system models automatically based on latent change scores and generate
+    vector field plots based upon results obtained from a bivariate dynamic system.
+    Starting version 0.4, RAMpath can conduct power analysis for both univariate and
+    bivariate latent change score models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RAMpath
+# Type: Package
+# Title: Structural Equation Modeling Using the Reticular Action Model (RAM) Notation
+# Version: 0.4
+# Date: 2016-10-01
+# Author: Zhiyong Zhang, Jack McArdle, Aki Hamagami, & Kevin Grimm
+# Maintainer: Zhiyong Zhang <zzhang4@nd.edu>
+# Description: We rewrite of RAMpath software developed by John McArdle and Steven Boker as an R package. In addition to performing regular SEM analysis through the R package lavaan, RAMpath has unique features.  First, it can generate path diagrams according to a given model. Second, it can display path tracing rules through path diagrams and decompose total effects into their respective direct and indirect effects as well as decompose variance and covariance into individual bridges. Furthermore, RAMpath can fit dynamic system models automatically based on latent change scores and generate vector field plots based upon results obtained from a bivariate dynamic system. Starting version 0.4, RAMpath can conduct power analysis for both univariate and bivariate latent change score models.
+# Depends: R (>= 2.0), lavaan, ellipse, MASS
+# License: GPL-2
+# URL: http://nd.psychstat.org
+# NeedsCompilation: no
+# Repository: CRAN
+# Packaged: 2016-10-05 12:58:15 UTC; root
+# Date/Publication: 2016-10-05 16:36:45
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

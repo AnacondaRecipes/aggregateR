@@ -1,0 +1,97 @@
+{% set version = '1.0-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-valorate
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/valorate_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/valorate/valorate_{{ version }}.tar.gz
+  sha256: d169bba08b8ed1e1397d6c3c9e8589acacbef7188d1a78b4ebfac679bffe6c1b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('valorate')"           # [not win]
+    - "\"%R%\" -e \"library('valorate')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://bioinformatica.mty.itesm.mx/valorate
+  license: GPL-2
+  summary: The algorithm implemented in this package was designed to quickly estimates the distribution
+    of the  log-rank especially for heavy unbalanced groups. VALORATE  estimates the
+    null distribution and the p-value of the  log-rank test based on a recent formulation.
+    For a given  number of alterations that define the size of survival  groups, the
+    estimation involves a weighted sum of  distributions that are conditional on a co-occurrence
+    term  where mutations and events are both present. The estimation  of conditional
+    distributions is quite fast allowing the  analysis of large datasets in few minutes  <http://bioinformatica.mty.itesm.mx/valorate>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: valorate
+# Version: 1.0-1
+# Date: 2016-10-08
+# Title: Velocity and Accuracy of the LOg-RAnk TEst
+# Authors@R: c(person("Victor", "Trevino", role = c("aut", "cre"), email = "vtrevino@itesm.mx"))
+# Author: Victor Trevino [aut, cre]
+# Maintainer: Victor Trevino <vtrevino@itesm.mx>
+# Depends: R (>= 3.1.0), methods
+# Imports: survival, graphics, utils, stats
+# Description: The algorithm implemented in this package was designed to quickly estimates the distribution of the  log-rank especially for heavy unbalanced groups. VALORATE  estimates the null distribution and the p-value of the  log-rank test based on a recent formulation. For a given  number of alterations that define the size of survival  groups, the estimation involves a weighted sum of  distributions that are conditional on a co-occurrence term  where mutations and events are both present. The estimation  of conditional distributions is quite fast allowing the  analysis of large datasets in few minutes  <http://bioinformatica.mty.itesm.mx/valorate>.
+# License: GPL (>= 2)
+# URL: http://bioinformatica.mty.itesm.mx/valorate
+# NeedsCompilation: yes
+# Packaged: 2016-10-09 20:35:41 UTC; victortrevino
+# Repository: CRAN
+# Date/Publication: 2016-10-09 23:23:03
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

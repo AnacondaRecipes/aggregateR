@@ -1,0 +1,110 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mixedmem
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mixedMem_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mixedMem/mixedMem_{{ version }}.tar.gz
+  sha256: fbf5f93e8b8efb39768c06d42c32520b97b0a56aaeb71bfb9cd95b051d1e1c49
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, xtable,
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh
+    - r-rcpp >=0.11.3
+    - r-rcpparmadillo
+    - r-gtools
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-rcpp >=0.11.3
+    - r-rcpparmadillo
+    - r-gtools
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mixedMem')"           # [not win]
+    - "\"%R%\" -e \"library('mixedMem')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mixedMem
+  license: GPL-2
+  summary: Fits mixed membership models with discrete multivariate data (with or without repeated
+    measures) following the general framework of Erosheva et al (2004). This package
+    uses a Variational EM approach by approximating the posterior distribution of latent
+    memberships and selecting hyperparameters through a pseudo-MLE procedure. Currently
+    supported data types are Bernoulli, multinomial and rank (Plackett-Luce). The extended
+    GoM model with fixed stayers from Erosheva et al     (2007) is now also supported.
+    See Airoldi et al (2014) for other examples of mixed membership models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mixedMem
+# Type: Package
+# Title: Tools for Discrete Multivariate Mixed Membership Models
+# Version: 1.1.0
+# Date: 2015-04-29
+# Authors@R: c( person("Y. Samuel", "Wang", email = "ysamwang@uw.edu", role = c("aut","cre")), person("Elena A.", "Erosheva", email = "erosheva@uw.edu", role = "aut"))
+# Maintainer: Y. Samuel Wang <ysamwang@uw.edu>
+# Description: Fits mixed membership models with discrete multivariate data (with or without repeated measures) following the general framework of Erosheva et al (2004). This package uses a Variational EM approach by approximating the posterior distribution of latent memberships and selecting hyperparameters through a pseudo-MLE procedure. Currently supported data types are Bernoulli, multinomial and rank (Plackett-Luce). The extended GoM model with fixed stayers from Erosheva et al     (2007) is now also supported. See Airoldi et al (2014) for other examples of mixed membership models.
+# License: GPL (>= 2)
+# Depends: R (>= 3.0.2)
+# Imports: Rcpp (>= 0.11.3), gtools
+# LazyData: TRUE
+# LinkingTo: Rcpp (>= 0.11.3), RcppArmadillo, BH
+# VignetteBuilder: knitr
+# Suggests: knitr, xtable,
+# Packaged: 2015-08-16 21:55:29 UTC; Sam
+# Author: Y. Samuel Wang [aut, cre], Elena A. Erosheva [aut]
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2015-08-17 01:15:25
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,93 @@
+{% set version = '1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-schorsch
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/schoRsch_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/schoRsch/schoRsch_{{ version }}.tar.gz
+  sha256: 275381e808dea2dbd9c64a7363725d3ea7c30deb186fdc75180de082027fd558
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ez
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('schoRsch')"           # [not win]
+    - "\"%R%\" -e \"library('schoRsch')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.tqmp.org/RegularArticles/vol12-2/p147/index.html
+  license: GPL-3
+  summary: 'Offers a helping hand to psychologists and other behavioral scientists who routinely
+    deal with experimental data from factorial experiments. It includes several functions
+    to format output from other R functions according to the style guidelines of the
+    APA (American Psychological Association). This formatted output can be copied directly
+    into manuscripts to facilitate data reporting. These features are backed up by a
+    toolkit of several small helper functions, e.g., offering out-of-the-box outlier
+    removal. The package lends its name to Georg "Schorsch" Schuessler, ingenious technician
+    at the Department of Psychology III, University of Wuerzburg. For details on the
+    implemented methods, see Roland Pfister and Markus Janczyk (2016) <doi: 10.20982/tqmp.12.2.p147>.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: schoRsch
+# Type: Package
+# Title: Tools for Analyzing Factorial Experiments
+# Version: 1.6
+# Date: 2019-05-02
+# Author: Roland Pfister, Markus Janczyk
+# Maintainer: Roland Pfister <roland.pfister@psychologie.uni-wuerzburg.de>
+# Imports: utils
+# Suggests: ez
+# Description: Offers a helping hand to psychologists and other behavioral scientists who routinely deal with experimental data from factorial experiments. It includes several functions to format output from other R functions according to the style guidelines of the APA (American Psychological Association). This formatted output can be copied directly into manuscripts to facilitate data reporting. These features are backed up by a toolkit of several small helper functions, e.g., offering out-of-the-box outlier removal. The package lends its name to Georg "Schorsch" Schuessler, ingenious technician at the Department of Psychology III, University of Wuerzburg. For details on the implemented methods, see Roland Pfister and Markus Janczyk (2016) <doi: 10.20982/tqmp.12.2.p147>.
+# URL: http://www.tqmp.org/RegularArticles/vol12-2/p147/index.html
+# License: GPL
+# NeedsCompilation: no
+# Packaged: 2019-05-02 11:29:25 UTC; RP
+# Repository: CRAN
+# Date/Publication: 2019-05-02 11:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

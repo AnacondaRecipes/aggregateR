@@ -1,0 +1,91 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-srcs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SRCS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SRCS/SRCS_{{ version }}.tar.gz
+  sha256: 397484958448ebbd329e7ec1f08efd3b1344715ad305f69343868fa2311bee8f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: R.rsp
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SRCS')"           # [not win]
+    - "\"%R%\" -e \"library('SRCS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://decsai.ugr.es/~pjvi/r-packages.html
+  license: LGPL-3
+  summary: 'Implementation of the SRCS method for a color-based visualization of the results
+    of multiple pairwise tests on a large number of problem configurations, proposed
+    in:  I.G. del Amo, D.A. Pelta. SRCS: a technique for comparing multiple algorithms
+    under several factors in dynamic optimization problems. In: E. Alba, A. Nakib, P.
+    Siarry (Eds.), Metaheuristics for Dynamic Optimization. Series: Studies in Computational
+    Intelligence 433, Springer, Berlin/Heidelberg, 2012.'
+
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SRCS
+# Title: Statistical Ranking Color Scheme for Multiple Pairwise Comparisons
+# Description: Implementation of the SRCS method for a color-based visualization of the results of multiple pairwise tests on a large number of problem configurations, proposed in:  I.G. del Amo, D.A. Pelta. SRCS: a technique for comparing multiple algorithms under several factors in dynamic optimization problems. In: E. Alba, A. Nakib, P. Siarry (Eds.), Metaheuristics for Dynamic Optimization. Series: Studies in Computational Intelligence 433, Springer, Berlin/Heidelberg, 2012.
+# Version: 1.1
+# Date: 2015-06-30
+# Author: Pablo J. Villacorta <pjvi@decsai.ugr.es>
+# Maintainer: Pablo J. Villacorta <pjvi@decsai.ugr.es>
+# Imports: parallel, graphics, stats, grDevices, methods
+# Suggests: R.rsp
+# License: LGPL (>= 3)
+# URL: http://decsai.ugr.es/~pjvi/r-packages.html
+# LazyData: true
+# VignetteBuilder: R.rsp
+# NeedsCompilation: no
+# Packaged: 2015-07-01 23:49:46 UTC; Pablo
+# Repository: CRAN
+# Date/Publication: 2015-07-02 06:47:17
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

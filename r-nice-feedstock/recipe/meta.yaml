@@ -1,0 +1,88 @@
+{% set version = '0.4-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nice
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/nice_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/nice/nice_{{ version }}.tar.gz
+  sha256: 0b17097976a3d6a63c363ecbdde624fcdb3b39c75c30d3d7964b271c6bac1bdd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  skip: True  # [not unix]
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('nice')"           # [not win]
+    - "\"%R%\" -e \"library('nice')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=nice
+  license: MIT
+  summary: Get or set UNIX priority (niceness) of running R process.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: nice
+# Version: 0.4-1
+# Date: 2016-11-27
+# Title: Get or Set UNIX Niceness
+# Author: Charles J. Geyer <charlie@stat.umn.edu>.
+# Maintainer: Charles J. Geyer <charlie@stat.umn.edu>
+# Depends: R (>= 2.10.0)
+# Description: Get or set UNIX priority (niceness) of running R process.
+# License: MIT + file LICENSE
+# NeedsCompilation: yes
+# Packaged: 2016-11-28 03:59:48 UTC; geyer
+# OS_type: unix
+# Repository: CRAN
+# Date/Publication: 2016-11-28 08:21:10
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

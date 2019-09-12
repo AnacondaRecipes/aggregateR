@@ -1,0 +1,91 @@
+{% set version = '1.6.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fcros
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fcros_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fcros/fcros_{{ version }}.tar.gz
+  sha256: 7da0a63543f00d3be080ef6ade8fc466a0612c46a7b6ddaafe8ca2a13135d913
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fcros')"           # [not win]
+    - "\"%R%\" -e \"library('fcros')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=fcros
+  license: GPL-2
+  summary: A fold change rank based method is presented to search for genes with changing expression
+    and to detect recurrent chromosomal copy number aberrations. This  method may be
+    useful for high-throughput biological data (micro-array, sequencing, ...). Probabilities
+    are associated with genes or probes in the data set and there is no problem of multiple
+    tests when using this method. For array-based comparative genomic hybridization
+    data, segmentation results are obtained by merging the significant probes detected.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fcros
+# Version: 1.6.1
+# Date: 2019-05-28
+# Title: A Method to Search for Differentially Expressed Genes and to Detect Recurrent Chromosomal Copy Number Aberrations
+# Author: Doulaye Dembele
+# Maintainer: Doulaye Dembele <doulaye@igbmc.fr>
+# Depends: R (>= 3.1.0)
+# Description: A fold change rank based method is presented to search for genes with changing expression and to detect recurrent chromosomal copy number aberrations. This  method may be useful for high-throughput biological data (micro-array, sequencing, ...). Probabilities are associated with genes or probes in the data set and there is no problem of multiple tests when using this method. For array-based comparative genomic hybridization data, segmentation results are obtained by merging the significant probes detected.
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2019-05-31 12:25:38 UTC; doulaye
+# Repository: CRAN
+# Date/Publication: 2019-05-31 12:40:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

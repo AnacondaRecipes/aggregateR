@@ -1,0 +1,93 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-geosed
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/geosed_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/geosed/geosed_{{ version }}.tar.gz
+  sha256: 79ec69a2326bdcd0e859a331d56a7ce8bb98cb55b848119f8003b9fcb4c1441e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: sp, mapview
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('geosed')"           # [not win]
+    - "\"%R%\" -e \"library('geosed')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=geosed
+  license: MIT
+  summary: ' Find the smallest circle that contains all longitude and latitude input points.
+    From the generated center and radius, variable side polygons can be created, navigation
+    based on bearing and distance can be applied, and more. Based on a modified version
+    of Welzl''s algorithm for smallest circle. Distance calculations are based on the
+    haversine formula. Calculations for distance, midpoint, bearing and more are derived
+    from <https://www.movable-type.co.uk>.'
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: geosed
+# Type: Package
+# Title: Smallest Enclosing Disc for Latitude and Longitude Points
+# Version: 0.1.1
+# Date: 2019-08-17
+# Author: Shant Sukljian <asshtnt@gmail.com>
+# Maintainer: Shant Sukljian <asshtnt@gmail.com>
+# Description:  Find the smallest circle that contains all longitude and latitude input points. From the generated center and radius, variable side polygons can be created, navigation based on bearing and distance can be applied, and more. Based on a modified version of Welzl's algorithm for smallest circle. Distance calculations are based on the haversine formula. Calculations for distance, midpoint, bearing and more are derived from <https://www.movable-type.co.uk>.
+# Imports: grDevices
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Suggests: sp, mapview
+# NeedsCompilation: no
+# Packaged: 2019-09-01 02:13:40 UTC; ssukljian
+# Repository: CRAN
+# Date/Publication: 2019-09-03 07:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

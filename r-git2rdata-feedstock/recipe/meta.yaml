@@ -1,0 +1,97 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-git2rdata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/git2rdata_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/git2rdata/git2rdata_{{ version }}.tar.gz
+  sha256: 725fa1ea88dff8b7aa293d460c39a02dfe773218dd796ea7c6bd80d977bf09db
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: spelling, ggplot2, knitr, microbenchmark, rmarkdown, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-assertthat
+    - r-git2r >=0.23.0
+    - r-yaml
+
+  run:
+    - r-base
+    - r-assertthat
+    - r-git2r >=0.23.0
+    - r-yaml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('git2rdata')"           # [not win]
+    - "\"%R%\" -e \"library('git2rdata')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ropensci/git2rdata, https://doi.org/10.5281/zenodo.1485309
+  license: GPL-3
+  summary: Make versioning of data.frame easy and efficient using git repositories.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: git2rdata
+# Title: Store and Retrieve Data.frames in a Git Repository
+# Version: 0.1
+# Authors@R: c( person( "Thierry", "Onkelinx", role = c("aut", "cre"),  email = "thierry.onkelinx@inbo.be",  comment = c(ORCID = "0000-0001-8804-4216")), person( "Floris", "Vanderhaeghe", role = "ctb",  email = "floris.vanderhaeghe@inbo.be",  comment = c(ORCID = "0000-0002-6378-6229")), person( "Peter", "Desmet", role = "ctb",  email = "peter.desmet@inbo.be",  comment = c(ORCID = "0000-0002-8442-8025")), person( "Research Institute for Nature and Forest", role = c("cph", "fnd"), email = "info@inbo.be"))
+# Description: Make versioning of data.frame easy and efficient using git repositories.
+# Depends: R (>= 3.5.0)
+# Imports: assertthat, git2r (>= 0.23.0), methods, yaml
+# Suggests: spelling, ggplot2, knitr, microbenchmark, rmarkdown, testthat
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# URL: https://github.com/ropensci/git2rdata, https://doi.org/10.5281/zenodo.1485309
+# BugReports: https://github.com/ropensci/git2rdata/issues
+# Collate: 'clean_data_path.R' 'git2rdata-package.R' 'write_vc.R' 'is_git2rdata.R' 'is_git2rmeta.R' 'list_data.R' 'meta.R' 'prune.R' 'read_vc.R' 'recent_commit.R' 'reexport.R' 'relabel.R' 'upgrade_data.R'
+# VignetteBuilder: knitr
+# Language: en-GB
+# NeedsCompilation: no
+# Packaged: 2019-06-15 09:44:56 UTC; thierry_onkelinx
+# Author: Thierry Onkelinx [aut, cre] (<https://orcid.org/0000-0001-8804-4216>), Floris Vanderhaeghe [ctb] (<https://orcid.org/0000-0002-6378-6229>), Peter Desmet [ctb] (<https://orcid.org/0000-0002-8442-8025>), Research Institute for Nature and Forest [cph, fnd]
+# Maintainer: Thierry Onkelinx <thierry.onkelinx@inbo.be>
+# Repository: CRAN
+# Date/Publication: 2019-06-17 14:20:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,79 @@
+{% set version = '1.0-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ttutils
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ttutils_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ttutils/ttutils_{{ version }}.tar.gz
+  sha256: 6cf56cabacdefc90bd07fd958897edd4959de6921b88f196a79755700018b3a2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ttutils')"           # [not win]
+    - "\"%R%\" -e \"library('ttutils')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ttutils
+  license: GPL-2
+  summary: Contains some auxiliary functions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ttutils
+# Version: 1.0-1
+# Date: 2009-06-18
+# Title: Utility functions
+# Author: Thorn Thaler <thorn.thaler@thothal.com>
+# Maintainer: Thorn Thaler <thorn.thaler@thothal.com>
+# Description: Contains some auxiliary functions.
+# License: GPL-2
+# Packaged: 2010-06-19 23:38:55 UTC; thothal
+# Repository: CRAN
+# Date/Publication: 2010-06-20 07:43:20
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

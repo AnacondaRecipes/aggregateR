@@ -1,0 +1,83 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-flowfield
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/flowfield_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/flowfield/flowfield_{{ version }}.tar.gz
+  sha256: 12943ab01b3d66264ce97d25def94a31380ab503a2135d6b0de8e03e3888a3b3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: SemiPar
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('flowfield')"           # [not win]
+    - "\"%R%\" -e \"library('flowfield')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=flowfield
+  license: GPL-3
+  summary: Flow field forecasting draws information from an interpolated flow field of the observed
+    time series to incrementally build a forecast.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: flowfield
+# Type: Package
+# Title: Forecasts future values of a univariate time series.
+# Version: 1.0
+# Date: 2014-03-05
+# Author: Kyle A. Caudle
+# Maintainer: Kyle A. Caudle <kyle.caudle@sdsmt.edu>
+# Suggests: SemiPar
+# Description: Flow field forecasting draws information from an interpolated flow field of the observed time series to incrementally build a forecast.
+# License: GPL-3
+# Packaged: 2014-03-06 16:57:16 UTC; kcaudle
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-03-06 18:51:13
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

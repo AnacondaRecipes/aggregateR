@@ -1,0 +1,105 @@
+{% set version = '1.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-shrinkcovmat
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ShrinkCovMat_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ShrinkCovMat/ShrinkCovMat_{{ version }}.tar.gz
+  sha256: 5858dab43077cec9de4653d97d04ea8595d72df4cd1dd412d93d4de9f588d947
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.1.0), covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.1
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.1
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ShrinkCovMat')"           # [not win]
+    - "\"%R%\" -e \"library('ShrinkCovMat')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/AnestisTouloumis/ShrinkCovMat
+  license: GPL-2 | GPL-3
+  summary: Provides nonparametric Steinian shrinkage estimators of the covariance matrix that
+    are suitable in high dimensional settings, that is when the number of variables
+    is larger than the sample size.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ShrinkCovMat
+# Type: Package
+# Title: Shrinkage Covariance Matrix Estimators
+# Version: 1.4.0
+# Authors@R: person("Anestis", "Touloumis", role = c("aut", "cre"), email = "A.Touloumis@brighton.ac.uk", comment = c(ORCHID = "0000-0002-5965-1639"))
+# Description: Provides nonparametric Steinian shrinkage estimators of the covariance matrix that are suitable in high dimensional settings, that is when the number of variables is larger than the sample size.
+# License: GPL-2 | GPL-3
+# Depends: R (>= 2.10)
+# LazyData: true
+# NeedsCompilation: yes
+# Encoding: UTF-8
+# URL: http://github.com/AnestisTouloumis/ShrinkCovMat
+# BugReports: http://github.com/AnestisTouloumis/ShrinkCovMat/issues
+# RoxygenNote: 6.1.1
+# Suggests: testthat (>= 2.1.0), covr
+# Imports: Rcpp (>= 1.0.1)
+# LinkingTo: Rcpp, RcppArmadillo
+# Packaged: 2019-07-30 07:30:02 UTC; at539
+# Author: Anestis Touloumis [aut, cre] (0000-0002-5965-1639)
+# Maintainer: Anestis Touloumis <A.Touloumis@brighton.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2019-07-30 08:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

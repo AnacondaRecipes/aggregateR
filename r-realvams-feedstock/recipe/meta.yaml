@@ -1,0 +1,110 @@
+{% set version = '0.4-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-realvams
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RealVAMS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RealVAMS/RealVAMS_{{ version }}.tar.gz
+  sha256: 487c97cfb8c85f033d0354a03688756deed9d7889f1300820f41afa33ece5892
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-rcpp >=0.11.2
+    - r-rcpparmadillo
+    - r-numderiv
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-rcpp >=0.11.2
+    - r-rcpparmadillo
+    - r-numderiv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RealVAMS')"           # [not win]
+    - "\"%R%\" -e \"library('RealVAMS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RealVAMS
+  license: GPL-2
+  summary: 'Fits a multivariate value-added model (VAM), see Broatch, Green, and Karl (2018)
+    <doi:10.32614/RJ-2018-033> and Broatch and Lohr (2012) <doi:10.3102/1076998610396900>,
+    with normally distributed test scores and a binary outcome indicator. A pseudo-likelihood
+    approach, Wolfinger (1993) <doi:10.1080/00949659308811554>, is used for the estimation
+    of this joint generalized linear mixed model.  The inner loop of the pseudo-likelihood
+    routine (estimation of a linear mixed model) occurs in the framework of the EM algorithm
+    presented by Karl, Yang, and Lohr (2013) <DOI:10.1016/j.csda.2012.10.004>. This
+    material is based upon work supported by the National Science Foundation under grants
+    DRL-1336027 and DRL-1336265.  '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RealVAMS
+# Type: Package
+# Title: Multivariate VAM Fitting
+# Version: 0.4-3
+# Date: 2019-04-22
+# Author: Andrew T. Karl, Jennifer Broatch, and Jennifer Green
+# Maintainer: Andrew Karl <akarl@asu.edu>
+# Description: Fits a multivariate value-added model (VAM), see Broatch, Green, and Karl (2018) <doi:10.32614/RJ-2018-033> and Broatch and Lohr (2012) <doi:10.3102/1076998610396900>, with normally distributed test scores and a binary outcome indicator. A pseudo-likelihood approach, Wolfinger (1993) <doi:10.1080/00949659308811554>, is used for the estimation of this joint generalized linear mixed model.  The inner loop of the pseudo-likelihood routine (estimation of a linear mixed model) occurs in the framework of the EM algorithm presented by Karl, Yang, and Lohr (2013) <DOI:10.1016/j.csda.2012.10.004>. This material is based upon work supported by the National Science Foundation under grants DRL-1336027 and DRL-1336265.
+# License: GPL-2
+# Depends: R (>= 3.0.0), Matrix
+# Imports: numDeriv, Rcpp (>= 0.11.2), methods, stats, utils, grDevices, graphics
+# LazyData: yes
+# ByteCompile: yes
+# NeedsCompilation: yes
+# LinkingTo: Rcpp, RcppArmadillo
+# Packaged: 2019-04-23 04:25:11 UTC; Andrew
+# Repository: CRAN
+# Date/Publication: 2019-04-23 04:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

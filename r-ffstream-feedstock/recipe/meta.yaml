@@ -1,0 +1,105 @@
+{% set version = '0.1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ffstream
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ffstream_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ffstream/ffstream_{{ version }}.tar.gz
+  sha256: 6d0ed51981b4737208a762a688740c7c6fb587d5bcefea1e9c057902159cd10c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.0.0), knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.16
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.16
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ffstream')"           # [not win]
+    - "\"%R%\" -e \"library('ffstream')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.deanbodenham.com/ffstream
+  license: GPL-2 | GPL-3
+  summary: An implementation of the adaptive forgetting factor scheme described in Bodenham and
+    Adams (2016) <doi:10.1007/s11222-016-9684-8> which adaptively estimates the mean
+    and variance of a stream in order to detect multiple changepoints in streaming data.
+    The implementation is in C++ and uses Rcpp. Additionally, implementations of the
+    fixed forgetting factor scheme from the same paper, as well as the classic CUSUM
+    and EWMA methods, are included.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ffstream
+# Title: Forgetting Factor Methods for Change Detection in Streaming Data
+# Version: 0.1.6
+# Date: 2018-05-12
+# Author: Dean Bodenham
+# Maintainer: Dean Bodenham <deanbodenhampkgs@gmail.com>
+# Description: An implementation of the adaptive forgetting factor scheme described in Bodenham and Adams (2016) <doi:10.1007/s11222-016-9684-8> which adaptively estimates the mean and variance of a stream in order to detect multiple changepoints in streaming data. The implementation is in C++ and uses Rcpp. Additionally, implementations of the fixed forgetting factor scheme from the same paper, as well as the classic CUSUM and EWMA methods, are included.
+# Depends: R (>= 3.5.0), Rcpp (>= 0.12.16)
+# License: GPL-2 | GPL-3
+# URL: http://www.deanbodenham.com/ffstream
+# LazyData: true
+# LinkingTo: Rcpp
+# Imports: methods
+# Suggests: testthat (>= 2.0.0), knitr, rmarkdown
+# Encoding: UTF-8
+# RoxygenNote: 6.0.1
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2018-05-13 09:28:17 UTC; dean
+# Repository: CRAN
+# Date/Publication: 2018-05-14 08:03:21 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

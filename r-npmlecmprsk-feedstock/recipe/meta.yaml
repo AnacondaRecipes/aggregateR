@@ -1,0 +1,85 @@
+{% set version = '3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-npmlecmprsk
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/NPMLEcmprsk_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/NPMLEcmprsk/NPMLEcmprsk_{{ version }}.tar.gz
+  sha256: 38be2885411ccb4d9b34f2be010a54e812dfe13a25c74a8104d3e5d7b543a85a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('NPMLEcmprsk')"           # [not win]
+    - "\"%R%\" -e \"library('NPMLEcmprsk')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=NPMLEcmprsk
+  license: Artistic-2.0
+  summary: Given a failure type, the function computes covariate-specific probability of failure
+    over time and covariate-specific conditional hazard rate based on possibly right-censored
+    competing risk data. Specifically, it computes the non-parametric maximum-likelihood
+    estimates of these quantities and their asymptotic variances in a semi-parametric
+    mixture model for competing-risks data, as described in Chang et al. (2007a).
+  license_family: OTHER
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/Artistic-2.0'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: NPMLEcmprsk
+# Type: Package
+# Title: Type-Specific Failure Rate and Hazard Rate on Competing Risks Data
+# Version: 3.0
+# Date: 2018-08-03
+# Author: Chung-Hsing Chen, I-Shou Chang and Chao A. Hsiung
+# Maintainer: Chung-Hsing Chen <chchen@nhri.org.tw>
+# Description: Given a failure type, the function computes covariate-specific probability of failure over time and covariate-specific conditional hazard rate based on possibly right-censored competing risk data. Specifically, it computes the non-parametric maximum-likelihood estimates of these quantities and their asymptotic variances in a semi-parametric mixture model for competing-risks data, as described in Chang et al. (2007a).
+# License: Artistic-2.0
+# Depends: stats
+# Packaged: 2018-08-03 06:18:21 UTC; tatufish
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2018-08-03 07:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

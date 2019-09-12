@@ -1,0 +1,88 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rpclr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RPCLR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RPCLR/RPCLR_{{ version }}.tar.gz
+  sha256: 4b39820c001c5b06e7ad46d1167ad0fdf9a4c0feda8bce1d35c52ca9bff6770e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-survival
+
+  run:
+    - r-base
+    - r-mass
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RPCLR')"           # [not win]
+    - "\"%R%\" -e \"library('RPCLR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RPCLR
+  license: GPL-2
+  summary: This package implements the R-PCLR (Random-Penalized Conditional Logistic Regression)
+    algorithm for obtaining variable importance. The algorithm is applicable for the
+    analysis of high dimensional data from matched case-control studies.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RPCLR
+# Type: Package
+# Title: RPCLR (Random-Penalized Conditional Logistic Regression)
+# Version: 1.0
+# Date: 2012-08-19
+# Author: Raji Balasubramanian
+# Maintainer: Raji Balasubramanian <rbalasub@schoolph.umass.edu>
+# Depends: MASS, survival
+# Description: This package implements the R-PCLR (Random-Penalized Conditional Logistic Regression) algorithm for obtaining variable importance. The algorithm is applicable for the analysis of high dimensional data from matched case-control studies.
+# License: GPL-2
+# LazyLoad: yes
+# Packaged: Sun Aug 19 12:19:52 2012; Raji
+# Repository: CRAN
+# Date/Publication: 2012-08-19 16:38:48
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

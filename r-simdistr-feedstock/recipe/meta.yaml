@@ -1,0 +1,91 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-simdistr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/simdistr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/simdistr/simdistr_{{ version }}.tar.gz
+  sha256: 2868bbb369dc07070f22dec1847b36efd8086da0e2e0804f894798fc0591da99
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('simdistr')"           # [not win]
+    - "\"%R%\" -e \"library('simdistr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=simdistr
+  license: GPL-2
+  summary: Assessment of the distributions of baseline continuous and categorical  variables
+    in randomised trials. This method is based on the Carlisle-Stouffer  method with
+    Monte Carlo simulations. It calculates p-values for each trial  baseline variable,
+    as well as combined p-values for each trial - these p-values  measure how compatible
+    are distributions of trials baseline variables with  random sampling. This package
+    also allows for graphically plotting the  cumulative frequencies of computed p-values.
+    Please note that code was partly adapted from Carlisle JB, Loadsman JA.  (2017)
+    <doi:10.1111/anae.13650>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: simdistr
+# Type: Package
+# Title: Assessment of Data Trial Distributions According to the Carlisle-Stouffer Method
+# Version: 1.0.1
+# Authors@R: c(person("Bernardo","Sousa-Pinto",role=c("aut","cre"),email="bernardo@med.up.pt"), person("Joao Julio","Cerqueira",role="ctb"), person("Cristina","Costa-Santos",role="ctb"), person ("John B","Carlisle",role="ctb"), person ("John A","Loadsman",role="ctb"), person("Armando","Teixeira-Pinto",role="aut"), person("Hernani","Goncalves",role="aut"))
+# Author: Bernardo Sousa-Pinto [aut, cre], Joao Julio Cerqueira [ctb], Cristina Costa-Santos [ctb], John B Carlisle [ctb], John A Loadsman [ctb], Armando Teixeira-Pinto [aut], Hernani Goncalves [aut]
+# Maintainer: Bernardo Sousa-Pinto <bernardo@med.up.pt>
+# Description: Assessment of the distributions of baseline continuous and categorical  variables in randomised trials. This method is based on the Carlisle-Stouffer  method with Monte Carlo simulations. It calculates p-values for each trial  baseline variable, as well as combined p-values for each trial - these p-values  measure how compatible are distributions of trials baseline variables with  random sampling. This package also allows for graphically plotting the  cumulative frequencies of computed p-values. Please note that code was partly adapted from Carlisle JB, Loadsman JA.  (2017) <doi:10.1111/anae.13650>.
+# Depends: R (>= 2.10)
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2019-08-02 17:03:10 UTC; Bernardo Sousa Pinto
+# Repository: CRAN
+# Date/Publication: 2019-08-02 17:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

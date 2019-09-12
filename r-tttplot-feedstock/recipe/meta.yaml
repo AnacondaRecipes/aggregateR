@@ -1,0 +1,83 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tttplot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tttplot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tttplot/tttplot_{{ version }}.tar.gz
+  sha256: a9f3610a91b21c95eff3c6497f0996da2f93ef5701f38920e007788450b8af66
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tttplot')"           # [not win]
+    - "\"%R%\" -e \"library('tttplot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=tttplot
+  license: GPL-2
+  summary: Implementation of Time to Target plot based on the work  of Ribeiro and Rosseti (2015)
+    <DOI:10.1007/s11590-014-0760-8>,  that describe a numerical method that gives the
+    probability of  an algorithm A finds a solution at least as good as a given  target
+    value in smaller computation time than algorithm B.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: tttplot
+# Type: Package
+# Title: Time to Target Plot
+# Version: 1.1.1
+# Date: 2016-03-29
+# Author: Carlos A. Martinez [aut, cre] based on the work of Ribeiro and Rosseti (2015).
+# Maintainer: Carlos A. Martinez <amartin@unal.edu.co>
+# Description: Implementation of Time to Target plot based on the work  of Ribeiro and Rosseti (2015) <DOI:10.1007/s11590-014-0760-8>,  that describe a numerical method that gives the probability of  an algorithm A finds a solution at least as good as a given  target value in smaller computation time than algorithm B.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2016-03-29 15:51:00 UTC; CarlMaMr
+# Repository: CRAN
+# Date/Publication: 2016-03-29 18:59:47
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

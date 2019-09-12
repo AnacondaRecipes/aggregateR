@@ -1,0 +1,87 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mcgibbsit
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mcgibbsit_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mcgibbsit/mcgibbsit_{{ version }}.tar.gz
+  sha256: cea7468561e37e6184937f4c3a5d4bc73b23600b601b930c8175a9f1e562cd27
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-coda
+
+  run:
+    - r-base
+    - r-coda
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mcgibbsit')"           # [not win]
+    - "\"%R%\" -e \"library('mcgibbsit')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mcgibbsit
+  license: GPL-3
+  summary: ' ''mcgibbsit'' provides an implementation of Warnes & Raftery''s MCGibbsit run-length
+    diagnostic for a set of (not-necessarily independent) MCMC samplers.  It combines
+    the estimate error-bounding approach of the Raftery and Lewis MCMC run length diagnostic
+    with the between verses within chain approach of the Gelman and Rubin MCMC convergence
+    diagnostic.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mcgibbsit
+# Title: Warnes and Raftery's MCGibbsit MCMC diagnostic
+# Version: 1.1.0
+# Date: 2012-10-23
+# Author: Gregory R. Warnes <greg@warnes.net>, Robert Burrows
+# Depends: coda
+# Description:  'mcgibbsit' provides an implementation of Warnes & Raftery's MCGibbsit run-length diagnostic for a set of (not-necessarily independent) MCMC samplers.  It combines the estimate error-bounding approach of the Raftery and Lewis MCMC run length diagnostic with the between verses within chain approach of the Gelman and Rubin MCMC convergence diagnostic.
+# Maintainer: Gregory R. Warnes <greg@warnes.net>
+# License: GPL
+# Packaged: 2013-10-23 23:56:39 UTC; warnes
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-10-24 08:40:58
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

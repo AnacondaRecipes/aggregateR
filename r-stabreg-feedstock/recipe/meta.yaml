@@ -1,0 +1,96 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stabreg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/stabreg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/stabreg/stabreg_{{ version }}.tar.gz
+  sha256: 2a0aef2f1b5ff3af5e23c51971f2c311fd86850a9b0549db4e6d8fd1c0f63dcb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-numderiv
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-numderiv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('stabreg')"           # [not win]
+    - "\"%R%\" -e \"library('stabreg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=stabreg
+  license: GPL-3
+  summary: Efficient regression for heavy-tailed and skewed data following a stable distribution.
+    Generalized regression where the skewness and tail parameter of residuals are dependent
+    on regressors is also available. Includes fast calculation of stable densities.
+    Calculation of densities is based on efficient numerical methods from Ament and
+    O'Neil (2017) <doi:10.1007/s11222-017-9725-y>. Parts of the code have been ported
+    to C from Ament's 'Matlab' code available at <https://gitlab.com/s_ament/qastable>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: stabreg
+# Type: Package
+# Title: Linear Regression with the Stable Distribution
+# Version: 0.1.2
+# Authors@R: c(person("Oleg Kopylov", role = c("aut", "cre"), email = "okopy@protonmail.com"), person("Sebastian Ament", role = "ctb"))
+# Maintainer: Oleg Kopylov <okopy@protonmail.com>
+# Description: Efficient regression for heavy-tailed and skewed data following a stable distribution. Generalized regression where the skewness and tail parameter of residuals are dependent on regressors is also available. Includes fast calculation of stable densities. Calculation of densities is based on efficient numerical methods from Ament and O'Neil (2017) <doi:10.1007/s11222-017-9725-y>. Parts of the code have been ported to C from Ament's 'Matlab' code available at <https://gitlab.com/s_ament/qastable>.
+# Encoding: UTF-8
+# LazyData: true
+# License: GPL-3
+# NeedsCompilation: yes
+# Imports: numDeriv
+# Packaged: 2019-06-05 17:21:06 UTC; oleg
+# Author: Oleg Kopylov [aut, cre], Sebastian Ament [ctb]
+# Repository: CRAN
+# Date/Publication: 2019-06-06 14:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

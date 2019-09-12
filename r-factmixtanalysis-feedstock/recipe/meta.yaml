@@ -1,0 +1,85 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-factmixtanalysis
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/FactMixtAnalysis_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/FactMixtAnalysis/FactMixtAnalysis_{{ version }}.tar.gz
+  sha256: 7974a10635320bc59430c685a3c1d3506a04f02fed4a33db46e39d95c6759cd0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mass
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('FactMixtAnalysis')"           # [not win]
+    - "\"%R%\" -e \"library('FactMixtAnalysis')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=FactMixtAnalysis
+  license: GPL-2
+  summary: The package estimates Factor Mixture Analysis via the EM algorithm
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: FactMixtAnalysis
+# Type: Package
+# Title: Factor Mixture Analysis with covariates
+# Version: 1.0
+# Date: 2011-12-01
+# Author: Cinzia Viroli
+# Maintainer: Cinzia Viroli <cinzia.viroli@unibo.it>
+# Description: The package estimates Factor Mixture Analysis via the EM algorithm
+# License: GPL-2
+# Depends: R (>= 2.0.1), MASS, mvtnorm
+# Packaged: 2012-10-29 08:57:04 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2012-10-29 08:57:04
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,86 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nlms
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/nlMS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/nlMS/nlMS_{{ version }}.tar.gz
+  sha256: 9f272e6c616776c8300482d6e917743be78fe1e8fae2032f7a0de47157783206
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-nlme
+
+  run:
+    - r-base
+    - r-nlme
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('nlMS')"           # [not win]
+    - "\"%R%\" -e \"library('nlMS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=nlMS
+  license: GPL-3
+  summary: 'Package to select best model  among several linear and nonlinear models. The main
+    function uses the gnls() function from the ''nlme'' package to fit the data to nine
+    regression models, named: "linear", "quadratic", "cubic", "logistic", "exponential",
+    "power", "monod", "haldane", "logit".'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: nlMS
+# Type: Package
+# Title: Non-Linear Model Selection
+# Version: 1.1
+# Author: Carme Font <carme.font.moragon@gmail.com>
+# Maintainer: Carme Font <carme.font.moragon@gmail.com>
+# Description: Package to select best model  among several linear and nonlinear models. The main function uses the gnls() function from the 'nlme' package to fit the data to nine regression models, named: "linear", "quadratic", "cubic", "logistic", "exponential", "power", "monod", "haldane", "logit".
+# License: GPL-3
+# Imports: nlme, stats, graphics, grDevices
+# NeedsCompilation: no
+# Packaged: 2019-06-20 14:01:22 UTC; cfont
+# Repository: CRAN
+# Date/Publication: 2019-06-21 15:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

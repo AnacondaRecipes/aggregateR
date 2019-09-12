@@ -1,0 +1,102 @@
+{% set version = '0.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-offlinechange
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/offlineChange_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/offlineChange/offlineChange_{{ version }}.tar.gz
+  sha256: baeb6553f95a0ae2e3562dd5bcbd1f9c3554aec22799e9dc622e3c542baa12b5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.1
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('offlineChange')"           # [not win]
+    - "\"%R%\" -e \"library('offlineChange')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: ''
+
+  license: GPL-3
+  summary: Detect the number and locations of change points. The locations can be either exact
+    or in terms of ranges,  depending on the available computational resource. The method
+    is based on Jie Ding, Yu Xiang, Lu Shen, Vahid Tarokh (2016) <arXiv:1605.00346v2>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: offlineChange
+# Title: Detect Multiple Change Points from Time Series
+# Version: 0.0.2
+# Authors@R: c( person("Jiahuan", "Ye", email = "jiahuanye431@gmail.com", role = c("aut","trl","cre")), person("Jie", "Ding", email = "dingj@umn.edu", role = c("aut")))
+# Description: Detect the number and locations of change points. The locations can be either exact or in terms of ranges,  depending on the available computational resource. The method is based on Jie Ding, Yu Xiang, Lu Shen, Vahid Tarokh (2016) <arXiv:1605.00346v2>.
+# Depends: R (>= 3.5.0)
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Imports: graphics, utils, stats, Rcpp (>= 1.0.1)
+# LinkingTo: Rcpp
+# RoxygenNote: 6.1.1
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# URL:
+# NeedsCompilation: yes
+# Packaged: 2019-07-27 02:26:29 UTC; Jiahuan
+# Author: Jiahuan Ye [aut, trl, cre], Jie Ding [aut]
+# Maintainer: Jiahuan Ye <jiahuanye431@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-07-27 22:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

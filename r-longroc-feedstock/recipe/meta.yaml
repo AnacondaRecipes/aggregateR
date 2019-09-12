@@ -1,0 +1,89 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-longroc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/longROC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/longROC/longROC_{{ version }}.tar.gz
+  sha256: a822849125a05d0ca4e1470001b3f1ea15164ddbed7fa84f4bc94312f10e41bb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival
+
+  run:
+    - r-base
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('longROC')"           # [not win]
+    - "\"%R%\" -e \"library('longROC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=longROC
+  license: GPL-2
+  summary: 'Time-dependent Receiver Operating Characteristic curves, Area Under the Curve, and
+    Net Reclassification Indexes for repeated measures. It is based on methods in Barbati
+    and Farcomeni (2017) <doi:10.1007/s10260-017-0410-2>. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: longROC
+# Type: Package
+# Title: Time-Dependent Prognostic Accuracy with Multiply Evaluated Bio Markers or Scores
+# Version: 1.0
+# Date: 2017-11-18
+# Author: Alessio Farcomeni
+# Maintainer: Alessio Farcomeni <alessio.farcomeni@uniroma1.it>
+# Description: Time-dependent Receiver Operating Characteristic curves, Area Under the Curve, and Net Reclassification Indexes for repeated measures. It is based on methods in Barbati and Farcomeni (2017) <doi:10.1007/s10260-017-0410-2>.
+# License: GPL (>= 2)
+# Depends: R (>= 3.1.2)
+# Imports: survival
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2017-11-19 15:54:49 UTC; afarcome
+# Repository: CRAN
+# Date/Publication: 2017-11-20 12:17:47 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,87 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lpower
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LPower_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LPower/LPower_{{ version }}.tar.gz
+  sha256: 1d451da97b3bc7e9970f1cef7c1df16950ed8d948919884fe29fd031892e3e3d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-nlme
+
+  run:
+    - r-base
+    - r-mass
+    - r-nlme
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LPower')"           # [not win]
+    - "\"%R%\" -e \"library('LPower')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=LPower
+  license: Unlimited
+  summary: Computes power, or sample size or the detectable difference for a repeated measures
+    model with attrition. It requires the variance covariance matrix of the observations
+    but can compute this matrix for several common random effects models. See Diggle,
+    P, Liang, KY and Zeger, SL (1994, ISBN:9780198522843).
+  license_family: MIT
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LPower
+# Type: Package
+# Title: Calculates Power, Sample Size, or Detectable Effect for Longitudinal Analyses
+# Version: 0.1.0
+# Author: David A. Schoenfeld
+# Maintainer: David A. Schoenfeld <Dschoenfeld@mgh.harvard.edu>
+# Imports: nlme, MASS,stats
+# Description: Computes power, or sample size or the detectable difference for a repeated measures model with attrition. It requires the variance covariance matrix of the observations but can compute this matrix for several common random effects models. See Diggle, P, Liang, KY and Zeger, SL (1994, ISBN:9780198522843).
+# License: Unlimited
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2018-05-11 13:29:10 UTC; das15
+# Repository: CRAN
+# Date/Publication: 2018-05-11 14:03:26 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

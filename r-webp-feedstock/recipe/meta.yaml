@@ -1,0 +1,103 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-webp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/webp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/webp/webp_{{ version }}.tar.gz
+  sha256: 8da10925b202523ff5c4d46155af6ee7d6d690a9a947c3c3d2371aacbe7827c0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: jpeg, png
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('webp')"           # [not win]
+    - "\"%R%\" -e \"library('webp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jeroen/webp#readme https://developers.google.com/speed/webp
+  license: MIT
+  summary: Lossless webp images are 26% smaller in size compared to PNG. Lossy webp images are
+    25-34% smaller in size compared to JPEG. This package reads and writes webp images
+    into a 3 (rgb) or 4 (rgba) channel bitmap array using conventions from the 'jpeg'
+    and 'png' packages.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: webp
+# Type: Package
+# Title: A New Format for Lossless and Lossy Image Compression
+# Version: 1.0
+# Author: Jeroen Ooms
+# Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
+# Description: Lossless webp images are 26% smaller in size compared to PNG. Lossy webp images are 25-34% smaller in size compared to JPEG. This package reads and writes webp images into a 3 (rgb) or 4 (rgba) channel bitmap array using conventions from the 'jpeg' and 'png' packages.
+# License: MIT + file LICENSE
+# URL: https://github.com/jeroen/webp#readme https://developers.google.com/speed/webp
+# BugReports: https://github.com/jeroen/webp/issues
+# SystemRequirements: libwebp
+# LazyData: TRUE
+# Encoding: UTF-8
+# Suggests: jpeg, png
+# RoxygenNote: 6.1.1
+# Language: en-GB
+# NeedsCompilation: yes
+# Packaged: 2019-03-04 13:17:38 UTC; jeroen
+# Repository: CRAN
+# Date/Publication: 2019-03-04 14:10:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

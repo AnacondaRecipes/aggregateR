@@ -1,0 +1,87 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-t2eq
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/T2EQ_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/T2EQ/T2EQ_{{ version }}.tar.gz
+  sha256: 2fb24b28597ab2a62381773168b651525fb13ea34145aa7be8ee0ec37d9e73ea
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('T2EQ')"           # [not win]
+    - "\"%R%\" -e \"library('T2EQ')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=T2EQ
+  license: GPL-3
+  summary: Contains functions for applying the T^2-test for equivalence. The T^2-test for equivalence
+    is a multivariate two-sample equivalence test.  Distance measure of the test is
+    the Mahalanobis distance. For multivariate normally distributed data the T^2-test
+    for equivalence  is exact and UMPI. The function T2EQ() implements the T^2-test
+    for equivalence  according to Wellek (2010) <DOI:10.1201/ebk1439808184>. The function
+    T2EQ.dissolution.profiles.hoffelder() implements a variant  of the T^2-test for
+    equivalence according to Hoffelder (2016)  <http://www.ecv.de/suse_item.php?suseId=Z|pi|8430>
+    for the  equivalence comparison of highly variable dissolution profiles.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: T2EQ
+# Type: Package
+# Title: Functions for Applying the T^2-Test for Equivalence
+# Version: 1.1
+# Date: 2016-08-31
+# Author: Thomas Hoffelder
+# Maintainer: Thomas Hoffelder <thomas.hoffelder@boehringer-ingelheim.com>
+# Description: Contains functions for applying the T^2-test for equivalence. The T^2-test for equivalence is a multivariate two-sample equivalence test.  Distance measure of the test is the Mahalanobis distance. For multivariate normally distributed data the T^2-test for equivalence  is exact and UMPI. The function T2EQ() implements the T^2-test for equivalence  according to Wellek (2010) <DOI:10.1201/ebk1439808184>. The function T2EQ.dissolution.profiles.hoffelder() implements a variant  of the T^2-test for equivalence according to Hoffelder (2016)  <http://www.ecv.de/suse_item.php?suseId=Z|pi|8430> for the  equivalence comparison of highly variable dissolution profiles.
+# License: GPL-3
+# NeedsCompilation: no
+# Packaged: 2016-08-31 13:14:47 UTC; hoffelde
+# Repository: CRAN
+# Date/Publication: 2016-08-31 20:46:12
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

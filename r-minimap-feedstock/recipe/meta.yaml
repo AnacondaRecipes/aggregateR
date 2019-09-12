@@ -1,0 +1,90 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-minimap
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/minimap_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/minimap/minimap_{{ version }}.tar.gz
+  sha256: 79941c801f7701d57eb152085bd0954cc66995d70251fb02d0fff29b58fcbe78
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('minimap')"           # [not win]
+    - "\"%R%\" -e \"library('minimap')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/seankross/minimap
+  license: MIT
+  summary: Create tile grid maps, which are like choropleth maps except each region is represented
+    with equal visual space.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: minimap
+# Type: Package
+# Title: Create Tile Grid Maps
+# Version: 0.1.0
+# Date: 2016-02-17
+# Authors@R: person("Sean", "Kross", , "sean@seankross.com", c("aut", "cre"))
+# Description: Create tile grid maps, which are like choropleth maps except each region is represented with equal visual space.
+# Depends: R (>= 3.1.0), graphics
+# Suggests: testthat
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Encoding: UTF-8
+# URL: http://github.com/seankross/minimap
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-02-18 04:41:10 UTC; sean
+# Author: Sean Kross [aut, cre]
+# Maintainer: Sean Kross <sean@seankross.com>
+# Repository: CRAN
+# Date/Publication: 2016-02-18 06:51:34
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

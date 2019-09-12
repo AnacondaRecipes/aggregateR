@@ -1,0 +1,85 @@
+{% set version = '2.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-merror
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/merror_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/merror/merror_{{ version }}.tar.gz
+  sha256: f8207764913b97a21f2122dff581e0ca1c04c854e1abfead4451fd8172c9a98d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('merror')"           # [not win]
+    - "\"%R%\" -e \"library('merror')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=merror
+  license: GPL-2
+  summary: N>=3 methods are used to measure each of n items.  The data are used to estimate simultaneously
+    systematic error (bias) and random error (imprecision). Observed measurements for
+    each method or device are assumed to be linear functions of the unknown true values
+    and the errors are assumed normally distributed. Maximum likelihood  estimation
+    is used for the imprecision standard deviation estimates.  Pairwise calibration
+    curves and plots can be easily generated.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: merror
+# Version: 2.0.2
+# Date: 2015-10-20
+# Author: Richard A. Bilonick <rabilonick@gmail.com>
+# Title: Accuracy and Precision of Measurements
+# Description: N>=3 methods are used to measure each of n items.  The data are used to estimate simultaneously systematic error (bias) and random error (imprecision). Observed measurements for each method or device are assumed to be linear functions of the unknown true values and the errors are assumed normally distributed. Maximum likelihood  estimation is used for the imprecision standard deviation estimates.  Pairwise calibration curves and plots can be easily generated.
+# Maintainer: Richard A. Bilonick <rabilonick@gmail.com>
+# License: GPL (>= 2)
+# Imports: graphics, grDevices, stats, utils
+# NeedsCompilation: no
+# Packaged: 2015-11-02 17:20:23 UTC; rick
+# Repository: CRAN
+# Date/Publication: 2015-11-03 10:21:06
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

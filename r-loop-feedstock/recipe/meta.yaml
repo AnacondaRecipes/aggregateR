@@ -1,0 +1,86 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-loop
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/loop_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/loop/loop_{{ version }}.tar.gz
+  sha256: b5958c0d7202d8ff041805ed51f9e653f2ef80876469d874802e8b54dd2922bf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('loop')"           # [not win]
+    - "\"%R%\" -e \"library('loop')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=loop
+  license: GPL-2
+  summary: The program can perform loop analysis and plot network structure (especially for food
+    webs),including minimum spanning tree, loop decomposition of weighted directed graphs,
+    and other network properties which may be related to food chain properties in ecology.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: loop
+# Type: Package
+# Title: loop decomposition of weighted directed graphs for life cycle analysis, providing flexbile network plotting methods, and analyzing food chain properties in ecology
+# Version: 1.1
+# Date: 2012-09-30
+# Author: Youhua Chen
+# Maintainer: Youhua Chen <haydi@126.com>
+# Description: The program can perform loop analysis and plot network structure (especially for food webs),including minimum spanning tree, loop decomposition of weighted directed graphs, and other network properties which may be related to food chain properties in ecology.
+# License: GPL-2
+# LazyLoad: yes
+# Depends: grid,MASS
+# Packaged: 2012-09-30 21:11:34 UTC; Owner
+# Repository: CRAN
+# Date/Publication: 2012-10-01 05:51:43
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

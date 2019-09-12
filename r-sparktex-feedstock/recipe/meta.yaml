@@ -1,0 +1,82 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sparktex
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sparktex_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sparktex/sparktex_{{ version }}.tar.gz
+  sha256: 5dce5c0b684a264b2d85315fc942c6004f5b5dc54a2f6961bbc604e992b5d264
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sparktex')"           # [not win]
+    - "\"%R%\" -e \"library('sparktex')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://thomasleeper.com/software.html
+  license: GPL-2
+  summary: Generate syntax for use with the sparklines package for LaTeX.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sparktex
+# Version: 0.1
+# Date: 2013-06-06
+# Title: Generate LaTeX sparklines in R
+# Authors@R: c(person("Thomas", "Leeper", role = c("aut", "cre"), email = "thosjleeper@gmail.com"), person("Andy", "Barbour", role = "ctb"))
+# Depends: R (>= 3.0.0)
+# Description: Generate syntax for use with the sparklines package for LaTeX.
+# License: GPL-2
+# URL: http://thomasleeper.com/software.html
+# Packaged: 2013-06-09 20:58:58 UTC; Thomas
+# Author: Thomas Leeper [aut, cre], Andy Barbour [ctb]
+# Maintainer: Thomas Leeper <thosjleeper@gmail.com>
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-06-10 07:54:02
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

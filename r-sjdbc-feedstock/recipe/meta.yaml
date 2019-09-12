@@ -1,0 +1,82 @@
+{% set version = '1.6.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sjdbc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sjdbc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sjdbc/sjdbc_{{ version }}.tar.gz
+  sha256: 8ccdaa6f07162a21f53388c588ce25f0047f1edafdb5c0061f565ea1857ccc9e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rjava
+
+  run:
+    - r-base
+    - r-rjava
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sjdbc')"           # [not win]
+    - "\"%R%\" -e \"library('sjdbc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=sjdbc
+  license: BSD_3_clause
+  summary: Provides a database-independent JDBC interface.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_3_clause'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sjdbc
+# Version: 1.6.0
+# Title: JDBC Driver Interface
+# Author: TIBCO Software Inc.
+# Maintainer: Stephen Kaluzny <skaluzny@tibco.com>
+# Description: Provides a database-independent JDBC interface.
+# License: BSD_3_clause + file LICENSE
+# Depends: rJava
+# NeedsCompilation: no
+# Packaged: 2016-12-16 20:38:12 UTC; spk
+# Repository: CRAN
+# Date/Publication: 2016-12-16 22:40:39
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

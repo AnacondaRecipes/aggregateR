@@ -1,0 +1,92 @@
+{% set version = '1.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-games
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/games_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/games/games_{{ version }}.tar.gz
+  sha256: 6e618cfb983db273d152b54ba66052b79476619480b6db559225760d455e0b06
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula >=0.2_0
+    - r-mass
+    - r-maxlik >=0.7_0
+    - r-stringr
+
+  run:
+    - r-base
+    - r-formula >=0.2_0
+    - r-mass
+    - r-maxlik >=0.7_0
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('games')"           # [not win]
+    - "\"%R%\" -e \"library('games')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=games
+  license: GPL-2
+  summary: Provides estimation and analysis functions for strategic statistical models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: games
+# Title: Statistical Estimation of Game-Theoretic Models
+# Version: 1.1.2
+# Date: 2015-02-22
+# Authors@R: c(person(c("Curtis", "S."), "Signorino", role = "aut"), person("Brenton", "Kenkel", role = c("aut", "cre"), email = "brenton.kenkel@gmail.com"))
+# Description: Provides estimation and analysis functions for strategic statistical models.
+# License: GPL (>= 2)
+# Depends: maxLik (>= 0.7-0), Formula (>= 0.2-0), MASS
+# Imports: stringr
+# Suggests: testthat
+# Packaged: 2015-02-22 20:21:27 UTC; brenton
+# Author: Curtis S. Signorino [aut], Brenton Kenkel [aut, cre]
+# Maintainer: Brenton Kenkel <brenton.kenkel@gmail.com>
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-02-23 00:24:37
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

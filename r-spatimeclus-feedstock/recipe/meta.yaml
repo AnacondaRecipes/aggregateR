@@ -1,0 +1,101 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spatimeclus
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SpaTimeClus_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SpaTimeClus/SpaTimeClus_{{ version }}.tar.gz
+  sha256: 4cb63429439049bb3c43b45633b126fa52e2d2f0dd08b018ef3784e6d12240d0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.1
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.1
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SpaTimeClus')"           # [not win]
+    - "\"%R%\" -e \"library('SpaTimeClus')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SpaTimeClus
+  license: GPL-2
+  summary: Mixture model is used to achieve the clustering goal. Each component is itself a mixture
+    model of polynomial autoregressive regressions whose the logistic weights consider
+    the spatial and temporal information.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SpaTimeClus
+# Type: Package
+# Title: Model-Based Clustering of Spatio-Temporal Data
+# Version: 1.0
+# Date: 2016-12-21
+# Author: Cheam A., Marbac M., and McNicholas P.
+# Maintainer: Matthieu Marbac <matthieu.marbac@gmail.com>
+# Description: Mixture model is used to achieve the clustering goal. Each component is itself a mixture model of polynomial autoregressive regressions whose the logistic weights consider the spatial and temporal information.
+# Imports: methods, Rcpp (>= 0.11.1), parallel
+# LinkingTo: Rcpp, RcppArmadillo
+# License: GPL (>= 2)
+# Depends: R (>= 3.0.2)
+# RoxygenNote: 5.0.1
+# Repository: CRAN
+# Repository/R-Forge/Project: spatimeclus
+# Repository/R-Forge/Revision: 19
+# Repository/R-Forge/DateTimeStamp: 2016-12-21 11:08:44
+# Date/Publication: 2016-12-21 17:02:04
+# NeedsCompilation: yes
+# Packaged: 2016-12-21 11:25:25 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

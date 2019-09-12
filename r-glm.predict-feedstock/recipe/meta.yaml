@@ -1,0 +1,93 @@
+{% set version = '3.1-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-glm.predict
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/glm.predict_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/glm.predict/glm.predict_{{ version }}.tar.gz
+  sha256: 64310b3a5d366606048bab0705e61185979235e468f7f82122bd36bfa5a15099
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-nnet
+
+  run:
+    - r-base
+    - r-mass
+    - r-nnet
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('glm.predict')"           # [not win]
+    - "\"%R%\" -e \"library('glm.predict')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://benjaminschlegel.ch/r/glm.predict/
+  license: GPL-2
+  summary: 'Functions to calculate predicted values and the difference between the two cases
+    with confidence interval for lm() [linear model], glm() [general linear model],
+    glm.nb() [negative binomial model], polr() [ordinal logistic model] and multinom()
+    [multinomial model] using Monte Carlo simulations. Reference: Bennet A. Zelner (2009)
+    <doi:10.1002/smj.783>.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: glm.predict
+# Type: Package
+# Title: Predicted Values and Discrete Changes for GLM
+# Version: 3.1-0
+# Date: 2019-08-26
+# Author: Benjamin Schlegel [aut,cre]
+# Maintainer: Benjamin Schlegel <kontakt@benjaminschlegel.ch>
+# Description: Functions to calculate predicted values and the difference between the two cases with confidence interval for lm() [linear model], glm() [general linear model], glm.nb() [negative binomial model], polr() [ordinal logistic model] and multinom() [multinomial model] using Monte Carlo simulations. Reference: Bennet A. Zelner (2009) <doi:10.1002/smj.783>.
+# License: GPL (>= 2)
+# Depends: R (>= 3.1.0), stats, MASS, parallel
+# Imports: nnet
+# URL: https://benjaminschlegel.ch/r/glm.predict/
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2019-09-04 11:56:49 UTC; Benjamin Schlegel
+# Repository: CRAN
+# Date/Publication: 2019-09-05 02:10:14 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

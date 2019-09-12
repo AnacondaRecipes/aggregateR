@@ -1,0 +1,93 @@
+{% set version = '1.0-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mondrian
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Mondrian_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Mondrian/Mondrian_{{ version }}.tar.gz
+  sha256: b24eeb255683b24b2e2bd844c8f1324d13aedc26fc8692a2823736140a26261f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcolorbrewer
+
+  run:
+    - r-base
+    - r-rcolorbrewer
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Mondrian')"           # [not win]
+    - "\"%R%\" -e \"library('Mondrian')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/aursiber/Mondrian
+  license: GPL (>= 2.0)
+  summary: "The unique function of this package allows representing in a single graph the relative
+    occurrence and co-occurrence of events measured in a sample.  As examples, the package
+    was applied to describe the occurrence and co-occurrence of different species of
+    bacterial or viral symbionts infecting arthropods at the individual level. The graphics
+    allows determining the prevalence of each symbiont and the patterns of multiple
+    infections (i.e. how different symbionts share or not the same individual hosts).
+    \ We named the package after the famous painter as the graphical output recalls
+    Mondrian\u2019s paintings."
+
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Mondrian
+# Type: Package
+# Title: A Simple Graphical Representation of the Relative Occurrence and Co-Occurrence of Events
+# Description: The unique function of this package allows representing in a single graph the relative occurrence and co-occurrence of events measured in a sample.  As examples, the package was applied to describe the occurrence and co-occurrence of different species of bacterial or viral symbionts infecting arthropods at the individual level. The graphics allows determining the prevalence of each symbiont and the patterns of multiple infections (i.e. how different symbionts share or not the same individual hosts).  We named the package after the famous painter as the graphical output recalls Mondrians paintings.
+# Version: 1.0-0
+# Date: 2016-03-04
+# Author: Aurelie Siberchicot, Delphine Charif, Gabriel Terraz and Fabrice Vavre
+# Maintainer: Aurelie Siberchicot <aurelie.siberchicot@univ-lyon1.fr>
+# Imports: RColorBrewer
+# License: GPL (>= 2.0)
+# LazyData: yes
+# Encoding: UTF-8
+# URL: https://github.com/aursiber/Mondrian
+# BugReports: https://github.com/aursiber/Mondrian/issues
+# NeedsCompilation: no
+# Packaged: 2016-03-04 14:55:19 UTC; aurelie
+# Repository: CRAN
+# Date/Publication: 2016-03-04 17:34:11
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

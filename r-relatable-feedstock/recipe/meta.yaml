@@ -1,0 +1,96 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-relatable
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/relatable_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/relatable/relatable_{{ version }}.tar.gz
+  sha256: f168223559109390ce066602a883b74f70e088c94a6bf5ce7be6d8666c7c8704
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, tibble
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-compare >=0.2_6
+
+  run:
+    - r-base
+    - r-compare >=0.2_6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('relatable')"           # [not win]
+    - "\"%R%\" -e \"library('relatable')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/domjarkey/relatable
+  license: MIT
+  summary: Functions to safely map from a vector of keys to a vector of values, determine properties
+    of a given relation, or ensure a relation conforms to a given type, such as many-to-many,
+    one-to-many, injective, surjective, or bijective. Permits default return values
+    for use similar to a vectorised switch statement, as well as safely handling large
+    vectors, NAs, and duplicate mappings.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: relatable
+# Type: Package
+# Title: Functions for Mapping Key-Value Pairs, Many-to-Many, One-to-Many, and Many-to-One Relations
+# Version: 1.0.0
+# Authors@R: person("Dominic", "Jarkey", email = "dominic.jarkey@gmail.com", role = c("aut", "cre"))
+# Description: Functions to safely map from a vector of keys to a vector of values, determine properties of a given relation, or ensure a relation conforms to a given type, such as many-to-many, one-to-many, injective, surjective, or bijective. Permits default return values for use similar to a vectorised switch statement, as well as safely handling large vectors, NAs, and duplicate mappings.
+# Depends: R (>= 3.4)
+# Imports: compare (>= 0.2-6)
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# Suggests: testthat, knitr, rmarkdown, tibble
+# VignetteBuilder: knitr
+# URL: https://github.com/domjarkey/relatable
+# NeedsCompilation: no
+# Packaged: 2018-01-30 15:13:31 UTC; dom
+# Author: Dominic Jarkey [aut, cre]
+# Maintainer: Dominic Jarkey <dominic.jarkey@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-01-30 16:56:41 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

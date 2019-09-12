@@ -1,0 +1,100 @@
+{% set version = '0.1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rsaucelabs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RSauceLabs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RSauceLabs/RSauceLabs_{{ version }}.tar.gz
+  sha256: 31dd562cffc04717e549ff772ba79cd1056bf4c0835d57df2bdc3c6ab7e1f0dc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-httr
+    - r-jsonlite
+    - r-whisker
+    - r-xml2
+
+  run:
+    - r-base
+    - r-data.table
+    - r-httr
+    - r-jsonlite
+    - r-whisker
+    - r-xml2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RSauceLabs')"           # [not win]
+    - "\"%R%\" -e \"library('RSauceLabs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://johndharrison.github.io/RSauceLabs/
+  license: GPL-3
+  summary: Retrieve, update, delete job information from <https://saucelabs.com/>. Poll the 'SauceLabs'
+    services current status and access supported platforms. Send and retrieve files
+    from 'SauceLabs' and manage tunnels associated with 'SauceConnect'.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RSauceLabs
+# Type: Package
+# Title: R Wrapper for 'SauceLabs' REST API
+# Version: 0.1.6
+# Authors@R: c(person("John", "Harrison", , "johndharrison0@gmail.com", role = c("aut", "cre")))
+# Description: Retrieve, update, delete job information from <https://saucelabs.com/>. Poll the 'SauceLabs' services current status and access supported platforms. Send and retrieve files from 'SauceLabs' and manage tunnels associated with 'SauceConnect'.
+# Depends: R (>= 3.0.0),httr,jsonlite,xml2,whisker,data.table
+# Suggests: covr, testthat
+# Encoding: UTF-8
+# License: GPL-3
+# RoxygenNote: 5.0.1
+# URL: http://johndharrison.github.io/RSauceLabs/
+# URLNote: https://github.com/johndharrison/RSauceLabs
+# BugReports: https://github.com/johndharrison/RSauceLabs/issues
+# NeedsCompilation: no
+# Packaged: 2016-09-26 17:15:17 UTC; john
+# Author: John Harrison [aut, cre]
+# Maintainer: John Harrison <johndharrison0@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-09-27 00:44:35
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

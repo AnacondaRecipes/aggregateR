@@ -1,0 +1,91 @@
+{% set version = '1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-survregcenscov
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SurvRegCensCov_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SurvRegCensCov/SurvRegCensCov_{{ version }}.tar.gz
+  sha256: a27e7bd2e980d736a5252eba357048211b6a48ea8f663a4c9a74662b153df946
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-numderiv
+    - r-survival
+
+  run:
+    - r-base
+    - r-numderiv
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SurvRegCensCov')"           # [not win]
+    - "\"%R%\" -e \"library('SurvRegCensCov')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SurvRegCensCov
+  license: GPL-2
+  summary: The main function of this package allows estimation of a Weibull Regression for a
+    right-censored endpoint, one interval-censored covariate, and an arbitrary number
+    of non-censored covariates. Additional functions allow to switch between different
+    parametrizations of Weibull regression used by different R functions, inference
+    for the mean difference of two arbitrarily censored Normal samples, and estimation
+    of canonical parameters from censored samples for several distributional assumptions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SurvRegCensCov
+# Type: Package
+# Title: Weibull Regression for a Right-Censored Endpoint with Interval-Censored Covariate
+# Version: 1.4
+# Date: 2015-10-02
+# Author: Stanislas Hubeaux <stanislas.hubeaux@alumni.epfl.ch> and Kaspar Rufibach <kaspar.rufibach@gmail.com>
+# Maintainer: Stanislas Hubeaux <stanislas.hubeaux@alumni.epfl.ch>
+# Depends: R (>= 2.10), survival, stats, graphics
+# Imports: numDeriv
+# Description: The main function of this package allows estimation of a Weibull Regression for a right-censored endpoint, one interval-censored covariate, and an arbitrary number of non-censored covariates. Additional functions allow to switch between different parametrizations of Weibull regression used by different R functions, inference for the mean difference of two arbitrarily censored Normal samples, and estimation of canonical parameters from censored samples for several distributional assumptions.
+# License: GPL (>= 2)
+# Packaged: 2015-10-08 12:51:45 UTC; hubeauxs
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-10-08 20:17:22
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,93 @@
+{% set version = '0.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-maxact
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MaXact_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MaXact/MaXact_{{ version }}.tar.gz
+  sha256: 11c8985965286b642fd3560bf9bb654540c9d27a48898913c84b92f2e671ead8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mnormt
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mnormt
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MaXact')"           # [not win]
+    - "\"%R%\" -e \"library('MaXact')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MaXact
+  license: GPL-2
+  summary: Perform exact MAX3 or MAX2 test for one-locus genetic association analysis and trend
+    test for dominant, recessive and additive models. It can also calculate approximated
+    p-value with the normal approximation method.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MaXact
+# Type: Package
+# Title: Exact max-type Cochran-Armitage trend test(CATT)
+# Version: 0.2.1
+# Date: 2013-12-01
+# Author: Jianan Tian <jiant17@gmail.com>, Chenliang Xu <lucky.random@gmail.com>
+# Maintainer: Chenliang Xu <lucky.random@gmail.com>
+# Depends: R (>= 2.2.0), mnormt
+# Description: Perform exact MAX3 or MAX2 test for one-locus genetic association analysis and trend test for dominant, recessive and additive models. It can also calculate approximated p-value with the normal approximation method.
+# License: GPL-2
+# Repository: CRAN
+# Packaged: 2013-12-02 01:27:54 UTC; luckyrand
+# NeedsCompilation: yes
+# Date/Publication: 2013-12-05 00:42:52
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

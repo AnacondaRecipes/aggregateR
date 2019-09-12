@@ -1,0 +1,95 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-irg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/irg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/irg/irg_{{ version }}.tar.gz
+  sha256: 556dddaed361241d6bfff0aa4cdd9107a8ccac919edc886c32620a1ca182b93c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, DiagrammeR, ggplot2
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpproll
+    - r-data.table
+
+  run:
+    - r-base
+    - r-rcpproll
+    - r-data.table
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('irg')"           # [not win]
+    - "\"%R%\" -e \"library('irg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://irg.robitalec.ca/
+  license: GPL-3
+  summary: 'Fits a double logistic function to NDVI time series and calculates  instantaneous
+    rate of green (IRG) according to methods described in Bischoff et al. (2012) <doi:10.1086/667590>. '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: irg
+# Title: Instantaneous Rate of Green Up
+# Version: 0.1.1
+# Authors@R:  person(given = "Alec L.", family = "Robitaille", role = c("aut", "cre"), email = "robit.alec@gmail.com", comment = c(ORCID = "0000-0002-4706-1762"))
+# Description: Fits a double logistic function to NDVI time series and calculates  instantaneous rate of green (IRG) according to methods described in Bischoff et al. (2012) <doi:10.1086/667590>.
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Suggests: testthat, knitr, rmarkdown, DiagrammeR, ggplot2
+# Depends: R (>= 2.10)
+# Imports: data.table, RcppRoll, stats
+# VignetteBuilder: knitr
+# URL: http://irg.robitalec.ca/
+# BugReports: https://gitlab.com/robit.a/irg/issues
+# NeedsCompilation: no
+# Packaged: 2019-02-13 22:29:08 UTC; alecr
+# Author: Alec L. Robitaille [aut, cre] (<https://orcid.org/0000-0002-4706-1762>)
+# Maintainer: Alec L. Robitaille <robit.alec@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-02-15 15:20:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

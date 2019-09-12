@@ -1,0 +1,87 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-plde
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/plde_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/plde/plde_{{ version }}.tar.gz
+  sha256: 50882e11986d8520fd1e88fd08a2f7279b269155b3e991999cee75e79f0e2bbc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('plde')"           # [not win]
+    - "\"%R%\" -e \"library('plde')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=plde
+  license: GPL-2
+  summary: We present a penalized log-density estimation method using Legendre polynomials with
+    lasso penalty to adjust estimate's smoothness. Re-expressing the logarithm of the
+    density estimator via a linear combination of Legendre polynomials, we can estimate
+    parameters by maximizing the penalized log-likelihood function. Besides, we proposed
+    an implementation strategy that builds on the coordinate decent algorithm, together
+    with the Bayesian information criterion (BIC).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: plde
+# Type: Package
+# Title: Penalized Log-Density Estimation Using Legendre Polynomials
+# Version: 0.1.2
+# Date: 2018-05-31
+# Author: JungJun Lee, Jae-Hwan Jhong, Young-Rae Cho, SungHwan Kim, Ja-yong Koo
+# Maintainer: JungJun Lee <ljjoj@korea.ac.kr>
+# Description: We present a penalized log-density estimation method using Legendre polynomials with lasso penalty to adjust estimate's smoothness. Re-expressing the logarithm of the density estimator via a linear combination of Legendre polynomials, we can estimate parameters by maximizing the penalized log-likelihood function. Besides, we proposed an implementation strategy that builds on the coordinate decent algorithm, together with the Bayesian information criterion (BIC).
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2018-06-26 02:01:15 UTC; jjlee
+# Repository: CRAN
+# Date/Publication: 2018-07-01 13:30:23 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

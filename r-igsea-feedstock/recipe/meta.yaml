@@ -1,0 +1,88 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-igsea
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/iGSEA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/iGSEA/iGSEA_{{ version }}.tar.gz
+  sha256: 062004d9151a97cb4984c375b7a4624c51b9eb3eaa727924f63c5bdc57459ff6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('iGSEA')"           # [not win]
+    - "\"%R%\" -e \"library('iGSEA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=iGSEA
+  license: GPL-2
+  summary: 'To integrate multiple GSEA studies, we propose a hybrid strategy, iGSEA-AT, for choosing
+    random effects (RE) versus fixed effect (FE) models, with an attempt to achieve
+    the potential maximum statistical efficiency as  well as stability in performance
+    in various practical situations. In addition to iGSEA-AT, this package also provides
+    options to perform integrative GSEA with testing based on a FE model (iGSEA-FE)
+    and testing based on a RE model (iGSEA-RE). The approaches account for different
+    set sizes when testing a database of gene sets. The function is easy to use, and
+    the three approaches can be applied to both binary and continuous phenotypes. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: iGSEA
+# Type: Package
+# Title: Integrative Gene Set Enrichment Analysis Approaches
+# Version: 1.2
+# Date: 2017-05-07
+# Author: Wentao Lu, Xinlei Wang, Xiaowei Zhan
+# Maintainer: Wentao Lu <wlu1026@yahoo.com>
+# Description: To integrate multiple GSEA studies, we propose a hybrid strategy, iGSEA-AT, for choosing random effects (RE) versus fixed effect (FE) models, with an attempt to achieve the potential maximum statistical efficiency as  well as stability in performance in various practical situations. In addition to iGSEA-AT, this package also provides options to perform integrative GSEA with testing based on a FE model (iGSEA-FE) and testing based on a RE model (iGSEA-RE). The approaches account for different set sizes when testing a database of gene sets. The function is easy to use, and the three approaches can be applied to both binary and continuous phenotypes.
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2017-05-12 21:50:13 UTC; zhanxw
+# Repository: CRAN
+# Date/Publication: 2017-05-12 23:12:53 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

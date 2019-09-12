@@ -1,0 +1,93 @@
+{% set version = '2017.08.15' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-peaksegdp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PeakSegDP_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PeakSegDP/PeakSegDP_{{ version }}.tar.gz
+  sha256: 7cc20c25f85e5699a16a43b54b6a60e49f73b81434ce502688d8b3194923aed9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggplot2 (>= 2.0), testthat, penaltyLearning
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PeakSegDP')"           # [not win]
+    - "\"%R%\" -e \"library('PeakSegDP')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PeakSegDP
+  license: GPL-3
+  summary: 'A quadratic time dynamic programming algorithm can be used to compute an approximate
+    solution to the problem of finding the most likely changepoints with respect to
+    the Poisson likelihood, subject to a constraint on the number of segments, and the
+    changes which must alternate: up, down, up, down, etc. For more info read <http://proceedings.mlr.press/v37/hocking15.html>
+    "PeakSeg: constrained optimal segmentation and supervised penalty learning for peak
+    detection in count data" by TD Hocking et al, proceedings of ICML2015.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PeakSegDP
+# Maintainer: Toby Dylan Hocking <toby.hocking@r-project.org>
+# Author: Toby Dylan Hocking, Guillem Rigaill
+# Version: 2017.08.15
+# License: GPL-3
+# Title: Dynamic Programming Algorithm for Peak Detection in ChIP-Seq Data
+# Description: A quadratic time dynamic programming algorithm can be used to compute an approximate solution to the problem of finding the most likely changepoints with respect to the Poisson likelihood, subject to a constraint on the number of segments, and the changes which must alternate: up, down, up, down, etc. For more info read <http://proceedings.mlr.press/v37/hocking15.html> "PeakSeg: constrained optimal segmentation and supervised penalty learning for peak detection in count data" by TD Hocking et al, proceedings of ICML2015.
+# Suggests: ggplot2 (>= 2.0), testthat, penaltyLearning
+# Depends: R (>= 2.10)
+# NeedsCompilation: yes
+# Packaged: 2017-08-15 13:21:05 UTC; tdhock
+# Repository: CRAN
+# Date/Publication: 2017-08-15 21:39:42 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

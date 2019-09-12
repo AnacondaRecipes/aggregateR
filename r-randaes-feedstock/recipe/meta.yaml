@@ -1,0 +1,88 @@
+{% set version = '0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-randaes
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/randaes_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/randaes/randaes_{{ version }}.tar.gz
+  sha256: 3d44d90928f5a678f84fca9a4e7414118374d73b66137b2b6aad03ffb21a0091
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests:
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('randaes')"           # [not win]
+    - "\"%R%\" -e \"library('randaes')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=randaes
+  license: GPL-2
+  summary: The deterministic part of the Fortuna cryptographic pseudorandom number generator,
+    described by Schneier & Ferguson "Practical Cryptography"
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: randaes
+# Title: Random number generator based on AES cipher
+# Description: The deterministic part of the Fortuna cryptographic pseudorandom number generator, described by Schneier & Ferguson "Practical Cryptography"
+# Version: 0.3
+# Author: Thomas Lumley
+# Maintainer: Thomas Lumley <tlumley@u.washington.edu>
+# License: GPL-2
+# Depends:
+# Suggests:
+# Packaged: 2012-01-13 01:22:39 UTC; tlum005
+# Repository: CRAN
+# Date/Publication: 2012-01-13 08:06:00
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

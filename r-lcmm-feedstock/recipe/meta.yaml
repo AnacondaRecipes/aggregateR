@@ -1,0 +1,99 @@
+{% set version = '1.8.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lcmm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/lcmm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/lcmm/lcmm_{{ version }}.tar.gz
+  sha256: 08ece2b284647bb1bc5e4ffb959781ce18d32db0af0ca846895f58945125efd8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr,rmarkdown,lattice,NormPsy
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival >=2.37_2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-survival >=2.37_2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('lcmm')"           # [not win]
+    - "\"%R%\" -e \"library('lcmm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=lcmm
+  license: GPL (>= 2.0)
+  summary: Estimation of various extensions of the mixed models including latent class mixed
+    models, joint latent latent class mixed models and mixed models for curvilinear
+    univariate or multivariate longitudinal outcomes using a maximum likelihood estimation
+    method.
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: lcmm
+# Type: Package
+# Title: Extended Mixed Models Using Latent Classes and Latent Processes
+# Version: 1.8.1
+# Date: 2019-06-25
+# Author: Cecile Proust-Lima, Viviane Philipps, Amadou Diakite and Benoit Liquet
+# Maintainer: Cecile Proust-Lima <cecile.proust-lima@inserm.fr>
+# Description: Estimation of various extensions of the mixed models including latent class mixed models, joint latent latent class mixed models and mixed models for curvilinear univariate or multivariate longitudinal outcomes using a maximum likelihood estimation method.
+# License: GPL (>= 2.0)
+# Depends: R (>= 2.14.0), survival (>= 2.37-2)
+# Suggests: knitr,rmarkdown,lattice,NormPsy
+# BugReports: https://github.com/CecileProust-Lima/lcmm/issues
+# LazyLoad: yes
+# LazyData: true
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# RoxygenNote: 6.0.1
+# Packaged: 2019-06-25 13:21:04 UTC; cp1
+# Repository: CRAN
+# Date/Publication: 2019-06-26 10:00:23 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

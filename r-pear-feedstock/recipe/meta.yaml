@@ -1,0 +1,88 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pear
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pear_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pear/pear_{{ version }}.tar.gz
+  sha256: 2285d53d3e185443ae26b8354841c2610e500afc1d55b15dc6286871eaf7b5c7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pear')"           # [not win]
+    - "\"%R%\" -e \"library('pear')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.stats.uwo.ca/faculty/aim
+  license: GPL-2
+  summary: 'Package for estimating periodic autoregressive models. Datasets: monthly ozone and
+    Fraser riverflow. Plots: periodic versions of boxplot, auto/partial correlations,
+    moving-average expansion.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pear
+# Version: 1.2
+# Date: 2011-05-18
+# Title: Package for Periodic Autoregression Analysis
+# Author: A. I. McLeod <aim@uwo.ca> and Mehmet Balcilar <mehmet@mbalcilar.net>.
+# Maintainer: A.I. McLeod <aimcleod@uwo.ca>
+# Depends: R (>= 2.1.0)
+# Description: Package for estimating periodic autoregressive models. Datasets: monthly ozone and Fraser riverflow. Plots: periodic versions of boxplot, auto/partial correlations, moving-average expansion.
+# LazyLoad: yes
+# LazyData: yes
+# Classification/ACM: G.3, G.4, I.5.1
+# Classification/MSC: 62M10, 91B84
+# License: GPL (>= 2)
+# URL: http://www.stats.uwo.ca/faculty/aim
+# Packaged: 2011-05-18 13:18:57 UTC; aim
+# Repository: CRAN
+# Date/Publication: 2011-05-18 13:31:42
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

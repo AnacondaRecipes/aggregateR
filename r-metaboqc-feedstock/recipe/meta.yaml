@@ -1,0 +1,86 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-metaboqc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MetaboQC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MetaboQC/MetaboQC_{{ version }}.tar.gz
+  sha256: 4291db5da2213ba4fe7f895a5eb03acdb7bda95277be889ef79105d578b3a0c2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-plyr
+
+  run:
+    - r-base
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MetaboQC')"           # [not win]
+    - "\"%R%\" -e \"library('MetaboQC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MetaboQC
+  license: GPL-2
+  summary: Takes QC signal for each day and normalize metabolomic data that has been acquired
+    in a certain period of time. At least three QC per day are required.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MetaboQC
+# Type: Package
+# Title: Normalize Metabolomic Data using QC Signal
+# Version: 1.0
+# Date: 2016-09-15
+# Author: Monica Calderon-Santiago
+# Maintainer: Monica Calderon-Santiago <b42casam@uco.es>
+# Description: Takes QC signal for each day and normalize metabolomic data that has been acquired in a certain period of time. At least three QC per day are required.
+# License: GPL-2
+# Depends: R (>= 3.1.3)
+# Imports: plyr
+# RoxygenNote: 5.0.1
+# Packaged: 2016-09-15 14:07:32 UTC; M<c3><b3>nica
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2016-09-15 17:49:28
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

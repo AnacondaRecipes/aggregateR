@@ -1,0 +1,109 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-strider
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/strider_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/strider/strider_{{ version }}.tar.gz
+  sha256: 66b143228e9872df9701a963bedd37f43fbc9625bc835ab20f244e80be55dc4d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, microbenchmark, ggplot2, dplyr, covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh
+    - r-rcpp >=0.12.13
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-rcpp >=0.12.13
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('strider')"           # [not win]
+    - "\"%R%\" -e \"library('strider')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/thk686/strider
+  license: MIT
+  summary: The strided iterator adapts multidimensional buffers to work with  the C++ standard
+    library and range-based for-loops. Given a pointer or iterator into a multidimensional
+    data buffer, one can generate an iterator range using make_strided to construct
+    strided versions of the standard library's begin and end. For constructing range-based
+    for-loops, a strided_range class is provided. These help authors to avoid integer-based
+    indexing, which in some cases can impede algorithm performance and introduce indexing
+    errors. This library exists primarily to expose the header file to other R projects.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: strider
+# Type: Package
+# Title: Strided Iterator and Range
+# Version: 1.2
+# Date: 2019-1-17
+# Authors@R: person("Tim", "Keitt", email = "tkeitt@gmail.com", role = c("aut", "cre"))
+# Description: The strided iterator adapts multidimensional buffers to work with  the C++ standard library and range-based for-loops. Given a pointer or iterator into a multidimensional data buffer, one can generate an iterator range using make_strided to construct strided versions of the standard library's begin and end. For constructing range-based for-loops, a strided_range class is provided. These help authors to avoid integer-based indexing, which in some cases can impede algorithm performance and introduce indexing errors. This library exists primarily to expose the header file to other R projects.
+# License: MIT + file LICENSE
+# Imports: Rcpp (>= 0.12.13)
+# LinkingTo: Rcpp, BH
+# Suggests: knitr, rmarkdown, testthat, microbenchmark, ggplot2, dplyr, covr
+# VignetteBuilder: knitr
+# URL: https://github.com/thk686/strider
+# BugReports: https://github.com/thk686/strider/issues
+# SystemRequirements: C++11
+# RoxygenNote: 6.1.0
+# NeedsCompilation: yes
+# Packaged: 2019-01-25 21:13:20 UTC; tkeitt
+# Author: Tim Keitt [aut, cre]
+# Maintainer: Tim Keitt <tkeitt@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-01-26 05:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

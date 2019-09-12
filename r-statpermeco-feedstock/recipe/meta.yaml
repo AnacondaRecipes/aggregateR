@@ -1,0 +1,88 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-statpermeco
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/StatPerMeCo_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/StatPerMeCo/StatPerMeCo_{{ version }}.tar.gz
+  sha256: 635ec8b8d3d6e18316e54bfd18677577784592982e3f852deaf24023695ea6da
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('StatPerMeCo')"           # [not win]
+    - "\"%R%\" -e \"library('StatPerMeCo')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=StatPerMeCo
+  license: GPL-2
+  summary: Statistical performance measures used in the econometric literature to evaluate conditional
+    covariance/correlation matrix estimates (MSE, MAE, Euclidean distance, Frobenius
+    distance, Stein distance, asymmetric loss function, eigenvalue loss function and
+    the loss function defined in Eq. (4.6) of Engle et al. (2016) <doi:10.2139/ssrn.2814555>).
+    Additionally, compute Eq. (3.1) and (4.2) of Li et al. (2016) <doi:10.1080/07350015.2015.1092975>
+    to compare the factor loading matrix. The statistical performance measures implemented
+    have been previously used in, for instance, Laurent et al. (2012) <doi:10.1002/jae.1248>,  Amendola
+    et al. (2015) <doi:10.1002/for.2322> and  Becker et al. (2015) <doi:10.1016/j.ijforecast.2013.11.007>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: StatPerMeCo
+# Type: Package
+# Title: Statistical Performance Measures to Evaluate Covariance Matrix Estimates
+# Version: 0.1.0
+# Date: 2017-04-13
+# Author: Carlos Trucios
+# Maintainer: Carlos Trucios <ctrucios@gmail.com>
+# Description: Statistical performance measures used in the econometric literature to evaluate conditional covariance/correlation matrix estimates (MSE, MAE, Euclidean distance, Frobenius distance, Stein distance, asymmetric loss function, eigenvalue loss function and the loss function defined in Eq. (4.6) of Engle et al. (2016) <doi:10.2139/ssrn.2814555>). Additionally, compute Eq. (3.1) and (4.2) of Li et al. (2016) <doi:10.1080/07350015.2015.1092975> to compare the factor loading matrix. The statistical performance measures implemented have been previously used in, for instance, Laurent et al. (2012) <doi:10.1002/jae.1248>,  Amendola et al. (2015) <doi:10.1002/for.2322> and  Becker et al. (2015) <doi:10.1016/j.ijforecast.2013.11.007>.
+# License: GPL (>= 2)
+# Note: The author acknowledges financial support from Sao Paulo Research Foundation (FAPESP) grant 2016/18599-4
+# NeedsCompilation: no
+# Packaged: 2017-04-14 17:27:22 UTC; ctruciosm
+# Repository: CRAN
+# Date/Publication: 2017-04-14 18:05:37 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

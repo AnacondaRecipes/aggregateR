@@ -1,0 +1,91 @@
+{% set version = '0.12.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-globals
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/globals_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/globals/globals_{{ version }}.tar.gz
+  sha256: 7985356ad75afa1f795f8267a20dee847020c0207252dc075c614cef55d8fe6b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-codetools
+
+  run:
+    - r-base
+    - r-codetools
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('globals')"           # [not win]
+    - "\"%R%\" -e \"library('globals')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/HenrikBengtsson/globals
+  license: LGPL-2.1
+  summary: Identifies global ("unknown" or "free") objects in R expressions by code inspection
+    using various strategies, e.g. conservative or liberal. The objective of this package
+    is to make it as simple as possible to identify global objects for the purpose of
+    exporting them in distributed compute environments.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-2.1'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: globals
+# Version: 0.12.4
+# Depends: R (>= 3.1.2)
+# Imports: codetools
+# Title: Identify Global Objects in R Expressions
+# Authors@R: c( person("Henrik", "Bengtsson", role=c("aut", "cre", "cph"), email="henrikb@braju.com"))
+# Description: Identifies global ("unknown" or "free") objects in R expressions by code inspection using various strategies, e.g. conservative or liberal. The objective of this package is to make it as simple as possible to identify global objects for the purpose of exporting them in distributed compute environments.
+# License: LGPL (>= 2.1)
+# LazyLoad: TRUE
+# ByteCompile: TRUE
+# URL: https://github.com/HenrikBengtsson/globals
+# BugReports: https://github.com/HenrikBengtsson/globals/issues
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-10-11 22:07:02 UTC; hb
+# Author: Henrik Bengtsson [aut, cre, cph]
+# Maintainer: Henrik Bengtsson <henrikb@braju.com>
+# Repository: CRAN
+# Date/Publication: 2018-10-11 22:30:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

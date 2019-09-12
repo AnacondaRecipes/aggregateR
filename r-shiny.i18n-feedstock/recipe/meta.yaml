@@ -1,0 +1,95 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-shiny.i18n
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/shiny.i18n_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/shiny.i18n/shiny.i18n_{{ version }}.tar.gz
+  sha256: 7b3348379b31a93fb112b012bf59f1c00cdb06665ca425c6a4d9f4ec49e69496
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-jsonlite
+    - r-yaml
+
+  run:
+    - r-base
+    - r-jsonlite
+    - r-yaml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('shiny.i18n')"           # [not win]
+    - "\"%R%\" -e \"library('shiny.i18n')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/Appsilon/shiny.i18n
+  license: MIT
+  summary: It provides easy internationalization of Shiny applications. It can be used as standalone
+    translation package to translate reports, interactive visualizations or graphical
+    elements as well.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: shiny.i18n
+# Title: Shiny Applications Internationalization
+# Version: 0.1.0
+# Authors@R: c(person("Dominik", "Krzeminski", email = "dominik@appsilon.com", role = c("cre", "aut")) )
+# Description: It provides easy internationalization of Shiny applications. It can be used as standalone translation package to translate reports, interactive visualizations or graphical elements as well.
+# Depends: R (>= 3.3.2)
+# Imports: yaml, jsonlite, methods
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# URL: http://github.com/Appsilon/shiny.i18n
+# BugReports: http://github.com/Appsilon/shiny.i18n/issues
+# RoxygenNote: 6.0.1
+# Suggests: knitr, rmarkdown, testthat
+# NeedsCompilation: no
+# Packaged: 2018-09-03 09:50:25 UTC; dominik
+# Author: Dominik Krzeminski [cre, aut]
+# Maintainer: Dominik Krzeminski <dominik@appsilon.com>
+# Repository: CRAN
+# Date/Publication: 2018-09-13 16:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

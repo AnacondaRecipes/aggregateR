@@ -1,0 +1,100 @@
+{% set version = '0.7-11' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-phmm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/phmm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/phmm/phmm_{{ version }}.tar.gz
+  sha256: da1b16b9fe09a6efd3284e9dc38a549ff73edb96ab8ac05ee5359c6905ab207b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, lme4 (>= 1.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-lattice
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-lattice
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('phmm')"           # [not win]
+    - "\"%R%\" -e \"library('phmm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mcdonohue/phmm
+  license: GPL-3
+  summary: Fits proportional hazards model incorporating random effects using an EM algorithm
+    using Markov Chain Monte Carlo at E-step. Vaida and Xu (2000) <DOI:10.1002/1097-0258(20001230)19:24%3C3309::AID-SIM825%3E3.0.CO;2-9>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: phmm
+# Version: 0.7-11
+# Date: 2019-03-05
+# Title: Proportional Hazards Mixed-Effects Model
+# Authors@R: c(person(given="Michael", family="Donohue", role = c("aut", "cre"), email = "mdonohue@usc.edu"), person(given="Ronghui", family="Xu", role = "aut"))
+# Maintainer: Michael Donohue <mdonohue@usc.edu>
+# Depends: survival, lattice, Matrix
+# VignetteBuilder: knitr
+# URL: https://github.com/mcdonohue/phmm
+# Suggests: knitr, lme4 (>= 1.0)
+# Description: Fits proportional hazards model incorporating random effects using an EM algorithm using Markov Chain Monte Carlo at E-step. Vaida and Xu (2000) <DOI:10.1002/1097-0258(20001230)19:24%3C3309::AID-SIM825%3E3.0.CO;2-9>.
+# License: GPL-3
+# Collate: 'phmm-package.R' 'formula.R' 'linear.predictors.R' 'phmm.R' 'pseudoPoisPHMM.R' 'traceHat.R'
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2019-03-08 03:10:08 UTC; mdonohue
+# Author: Michael Donohue [aut, cre], Ronghui Xu [aut]
+# Repository: CRAN
+# Date/Publication: 2019-03-08 13:40:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

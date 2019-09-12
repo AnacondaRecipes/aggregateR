@@ -1,0 +1,92 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sodavis
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sodavis_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sodavis/sodavis_{{ version }}.tar.gz
+  sha256: 5c1253bb10578274dc2f68da0b059791d4465ef43b8755f6bbb4e35068d5c5c9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-mvtnorm
+    - r-nnet
+
+  run:
+    - r-base
+    - r-mass
+    - r-mvtnorm
+    - r-nnet
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sodavis')"           # [not win]
+    - "\"%R%\" -e \"library('sodavis')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=sodavis
+  license: GPL-2
+  summary: Variable and interaction selection are essential to classification in high-dimensional
+    setting. In this package, we provide the implementation of SODA procedure, which
+    is a forward-backward algorithm that selects both main and interaction effects under
+    logistic regression and quadratic discriminant analysis. We also provide an extension,
+    S-SODA, for dealing with the variable selection problem for semi-parametric models
+    with continuous responses.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sodavis
+# Type: Package
+# Title: SODA: Main and Interaction Effects Selection for Logistic Regression, Quadratic Discriminant and General Index Models
+# Version: 1.2
+# Depends: R (>= 3.0.0), nnet, MASS, mvtnorm
+# Date: 2018-05-12
+# Author: Yang Li, Jun S. Liu
+# Maintainer: Yang Li <yangli.stat@gmail.com>
+# Description: Variable and interaction selection are essential to classification in high-dimensional setting. In this package, we provide the implementation of SODA procedure, which is a forward-backward algorithm that selects both main and interaction effects under logistic regression and quadratic discriminant analysis. We also provide an extension, S-SODA, for dealing with the variable selection problem for semi-parametric models with continuous responses.
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2018-05-13 02:42:04 UTC; yangli
+# Repository: CRAN
+# Date/Publication: 2018-05-13 21:24:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

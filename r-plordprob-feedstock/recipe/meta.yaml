@@ -1,0 +1,99 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-plordprob
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PLordprob_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PLordprob/PLordprob_{{ version }}.tar.gz
+  sha256: d73b45141b8ceedab3c80e4e3d3e1744edf5df36952a5750d62cbd20c28043bc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mnormt
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mnormt
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PLordprob')"           # [not win]
+    - "\"%R%\" -e \"library('PLordprob')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PLordprob
+  license: GPL-2
+  summary: Multivariate ordered probit model, i.e. the extension of the scalar ordered probit
+    model where the observed variables have dimension greater than one. Estimation of
+    the parameters is done via maximization of the pairwise likelihood, a special case
+    of the composite likelihood obtained as product of bivariate marginal distributions.
+    The package uses the Fortran 77 subroutine SADMVN by Alan Genz, with minor adaptations
+    made by Adelchi Azzalini in his "mvnormt" package for evaluating the two-dimensional
+    Gaussian integrals involved in the pairwise log-likelihood. Optimization of the
+    latter objective function  is performed via quasi-Newton box-constrained optimization
+    algorithm, as implemented in nlminb.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PLordprob
+# Type: Package
+# Title: Multivariate Ordered Probit Model via Pairwise Likelihood
+# Version: 1.1
+# Date: 2018-06-05
+# Author: Euloge Clovis Kenne Pagui [aut,cre], Antonio Canale [aut], Alan Genz [ctb],  Adelchi Azzalini [ctb]
+# Maintainer: Euloge Clovis Kenne Pagui <kenne@stat.unipd.it>
+# Depends: mnormt
+# Description: Multivariate ordered probit model, i.e. the extension of the scalar ordered probit model where the observed variables have dimension greater than one. Estimation of the parameters is done via maximization of the pairwise likelihood, a special case of the composite likelihood obtained as product of bivariate marginal distributions. The package uses the Fortran 77 subroutine SADMVN by Alan Genz, with minor adaptations made by Adelchi Azzalini in his "mvnormt" package for evaluating the two-dimensional Gaussian integrals involved in the pairwise log-likelihood. Optimization of the latter objective function  is performed via quasi-Newton box-constrained optimization algorithm, as implemented in nlminb.
+# License: GPL-2
+# NeedsCompilation: yes
+# Packaged: 2018-06-05 15:06:38 UTC; kenne
+# Repository: CRAN
+# Date/Publication: 2018-06-05 16:34:18 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

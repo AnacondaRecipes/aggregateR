@@ -1,0 +1,87 @@
+{% set version = '0.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-monreg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/monreg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/monreg/monreg_{{ version }}.tar.gz
+  sha256: e3394b3a56429c37f022cf748bae270d62791c58283de4f163c128e7ba782c23
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('monreg')"           # [not win]
+    - "\"%R%\" -e \"library('monreg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=monreg
+  license: GPL-2
+  summary: Estimates monotone regression and variance functions in a nonparametric model.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: monreg
+# Version: 0.1.3
+# Date: 2015-03-04
+# Title: Nonparametric Monotone Regression
+# Author: This version Kay Pilz and Steffanie Titoff. Earlier developements by Holger Dette and Kay Pilz.
+# Maintainer: Scott Kostyshak <skostysh@princeton.edu>
+# Depends: R (>= 2.0.0)
+# Description: Estimates monotone regression and variance functions in a nonparametric model.
+# Encoding: latin1
+# License: GPL (>= 2)
+# Packaged: 2015-03-04 18:45:00 UTC; scott
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2015-03-04 21:31:31
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

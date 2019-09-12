@@ -1,0 +1,99 @@
+{% set version = '2018.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-turboem
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/turboEM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/turboEM/turboEM_{{ version }}.tar.gz
+  sha256: 46d965a9477212e89f39979d6d7abc1aec2ef3ea9dde9831751611db9ba857f6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: setRNG
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-doparallel
+    - r-foreach
+    - r-iterators
+    - r-numderiv
+    - r-quantreg
+
+  run:
+    - r-base
+    - r-doparallel
+    - r-foreach
+    - r-iterators
+    - r-numderiv
+    - r-quantreg
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('turboEM')"           # [not win]
+    - "\"%R%\" -e \"library('turboEM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.jhsph.edu/agingandhealth/People/Faculty_personal_pages/Varadhan.html
+  license: GPL-2
+  summary: Algorithms for accelerating the convergence of slow, monotone sequences from smooth,
+    contraction mapping such as the EM and MM algorithms. It can be used to accelerate
+    any smooth, linearly convergent acceleration scheme.  A tutorial style introduction
+    to this package is available in a vignette on the CRAN download page or, when the
+    package is loaded in an R session, with vignette("turboEM").
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: turboEM
+# Title: A Suite of Convergence Acceleration Schemes for EM, MM and Other Fixed-Point Algorithms
+# Description: Algorithms for accelerating the convergence of slow, monotone sequences from smooth, contraction mapping such as the EM and MM algorithms. It can be used to accelerate any smooth, linearly convergent acceleration scheme.  A tutorial style introduction to this package is available in a vignette on the CRAN download page or, when the package is loaded in an R session, with vignette("turboEM").
+# Depends: R (>= 2.12.0), doParallel, foreach, numDeriv, quantreg
+# Imports: iterators
+# Suggests: setRNG
+# Version: 2018.1
+# LazyLoad: yes
+# License: GPL-2
+# Author: Jennifer F. Bobb [aut], Ravi Varadhan [aut, cre], Hui Zhao [ctb]
+# Maintainer: Ravi Varadhan <ravi.varadhan@jhu.edu>
+# Authors@R: c( person(given = c("Jennifer", "F."), family = "Bobb", role = "aut", email = "jbobb@hsph.harvard.edu"), person(given = "Ravi", family = "Varadhan", role = c("aut", "cre"), email = "ravi.varadhan@jhu.edu"), person(given = "Hui", family = "Zhao", role = "ctb"))
+# URL: http://www.jhsph.edu/agingandhealth/People/Faculty_personal_pages/Varadhan.html
+# Repository: CRAN
+# Packaged: 2018-05-03 16:10:34 UTC; rvaradh1
+# NeedsCompilation: no
+# Date/Publication: 2018-05-03 18:18:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

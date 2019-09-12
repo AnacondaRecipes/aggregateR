@@ -1,0 +1,94 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-iabin
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/IAbin_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/IAbin/IAbin_{{ version }}.tar.gz
+  sha256: dd6bce2f1acac1602d5488e5c32f621ab4c28584762d899a079b58717a15f2b2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, evaluate, knitr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('IAbin')"           # [not win]
+    - "\"%R%\" -e \"library('IAbin')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=IAbin
+  license: GPL-2
+  summary: 'In randomized-controlled trials, interim analyses are often planned for possible
+    early  trial termination to claim superiority or futility of a new therapy. Blinded
+    data also have  information about the potential treatment difference between the
+    groups. We developed a blinded  data monitoring tool that enables investigators
+    to predict whether they observe such an unblinded  interim analysis results that
+    supports early termination of the trial. Investigators may skip  some of the planned
+    interim analyses if an early termination is unlikely.  This tool will provide reference
+    information about N: Sample size at interim analysis, and T: Total  number of responders
+    at interim analysis for decision on performing an interim analysis.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: IAbin
+# Type: Package
+# Title: Plotting N-T Plane for Decision on Performing an Interim Analysis
+# Version: 1.0
+# Date: 2017-08-11
+# Author: Kyongsun Pak
+# Maintainer: Kyongsun Pak <pakk@pharm.kitasato-u.ac.jp>
+# Description: In randomized-controlled trials, interim analyses are often planned for possible early  trial termination to claim superiority or futility of a new therapy. Blinded data also have  information about the potential treatment difference between the groups. We developed a blinded  data monitoring tool that enables investigators to predict whether they observe such an unblinded  interim analysis results that supports early termination of the trial. Investigators may skip  some of the planned interim analyses if an early termination is unlikely.  This tool will provide reference information about N: Sample size at interim analysis, and T: Total  number of responders at interim analysis for decision on performing an interim analysis.
+# License: GPL (>= 2)
+# VignetteBuilder: knitr
+# RoxygenNote: 6.0.1
+# Suggests: testthat, evaluate, knitr
+# Imports: graphics, stats
+# NeedsCompilation: no
+# Packaged: 2017-08-11 18:17:36 UTC; pakk
+# Repository: CRAN
+# Date/Publication: 2017-08-11 18:52:55 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

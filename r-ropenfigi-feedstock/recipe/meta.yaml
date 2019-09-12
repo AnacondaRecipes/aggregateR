@@ -1,0 +1,91 @@
+{% set version = '0.2.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ropenfigi
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ROpenFIGI_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ROpenFIGI/ROpenFIGI_{{ version }}.tar.gz
+  sha256: 527562cff8f1a26fb883f9344496ff5e4f5c9e72960a4db61cf14dac77116d3b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, dplyr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ROpenFIGI')"           # [not win]
+    - "\"%R%\" -e \"library('ROpenFIGI')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/HuangRicky/ROpenFIGI
+  license: GPL-3
+  summary: Provide a simple interface to Bloomberg's OpenFIGI API. Please see <https://openfigi.com>
+    for API details and registration. You may be eligible to have an API key to accelerate
+    your loading process.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ROpenFIGI
+# Type: Package
+# Title: R Interface to OpenFIGI
+# Version: 0.2.8
+# Author: Ruokun Huang <hruokun.2008@gmail.com>
+# Maintainer: Ruokun Huang <hruokun.2008@gmail.com>
+# Description: Provide a simple interface to Bloomberg's OpenFIGI API. Please see <https://openfigi.com> for API details and registration. You may be eligible to have an API key to accelerate your loading process.
+# License: GPL (>= 3)
+# LazyData: TRUE
+# URL: https://github.com/HuangRicky/ROpenFIGI
+# Imports: httr, jsonlite
+# Suggests: testthat, dplyr
+# RoxygenNote: 5.0.1
+# Packaged: 2016-06-03 00:51:28 UTC; hrk
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2016-06-04 08:38:44
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

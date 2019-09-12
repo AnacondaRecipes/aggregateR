@@ -1,0 +1,82 @@
+{% set version = '3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-swcrtdesign
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/swCRTdesign_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/swCRTdesign/swCRTdesign_{{ version }}.tar.gz
+  sha256: fd8c201eb0b0795d2c69464249bf844840a70104dad096c190c16cd8603b6d14
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('swCRTdesign')"           # [not win]
+    - "\"%R%\" -e \"library('swCRTdesign')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=swCRTdesign
+  license: GPL-2
+  summary: A set of tools for examining the design and analysis aspects of stepped wedge cluster
+    randomized trials (SW CRT) based on a repeated cross-sectional sampling scheme (Hussey
+    MA and Hughes JP (2007) Contemporary Clinical Trials 28:182-191. <doi:10.1016/j.cct.2006.05.007>).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: swCRTdesign
+# Type: Package
+# Title: Stepped Wedge Cluster Randomized Trial (SW CRT) Design
+# Version: 3.0
+# Date: 2019-8-5
+# Maintainer: Jim Hughes <jphughes@uw.edu>
+# Author: Jim Hughes, Navneet R. Hakhu, and Emily Voldal
+# Description: A set of tools for examining the design and analysis aspects of stepped wedge cluster randomized trials (SW CRT) based on a repeated cross-sectional sampling scheme (Hussey MA and Hughes JP (2007) Contemporary Clinical Trials 28:182-191. <doi:10.1016/j.cct.2006.05.007>).
+# License: GPL-2
+# NeedsCompilation: no
+# Repository: CRAN
+# Packaged: 2019-08-08 06:31:45 UTC; emvol
+# Date/Publication: 2019-08-08 17:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

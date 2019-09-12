@@ -1,0 +1,92 @@
+{% set version = '0.1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-reports
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/reports_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/reports/reports_{{ version }}.tar.gz
+  sha256: b05b17b8f95bb5a428e9014147d2d926fead1f5abdcd055de9a22bdcaa74e464
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: pander, knitr, knitcitations, ProjectTemplate
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('reports')"           # [not win]
+    - "\"%R%\" -e \"library('reports')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://trinker.github.com/reports/
+  license: GPL-2
+  summary: Assists in writing reports and presentations by providing a frame work that brings
+    together existing R, LaTeX/.docx and Pandoc tools. The package is designed to be
+    used with RStudio, MiKTex/Tex Live/LibreOffice, knitr, knitcitations, Pandoc and
+    pander. The user will want to download these free programs/packages to maximize
+    the effectiveness of the reports package.  Functions with two letter names are general
+    text formatting functions for copying text from articles for inclusion as a citation.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: reports
+# Type: Package
+# Title: Assist the Workflow of Writing Academic Articles and Other Reports
+# Version: 0.1.4
+# Date: 2013-02-18
+# Author: Tyler Rinker
+# Maintainer: Tyler Rinker <tyler.rinker@gmail.com>
+# Description: Assists in writing reports and presentations by providing a frame work that brings together existing R, LaTeX/.docx and Pandoc tools. The package is designed to be used with RStudio, MiKTex/Tex Live/LibreOffice, knitr, knitcitations, Pandoc and pander. The user will want to download these free programs/packages to maximize the effectiveness of the reports package.  Functions with two letter names are general text formatting functions for copying text from articles for inclusion as a citation.
+# License: GPL-2
+# URL: http://trinker.github.com/reports/
+# BugReports: http://github.com/trinker/reports/issues
+# LazyData: TRUE
+# Depends: R (>= 2.15)
+# Suggests: pander, knitr, knitcitations, ProjectTemplate
+# Collate: 'CA.R' 'clean.R' 'CW.R' 'delete.R' 'doc_temp.R' 'GQ.R' 'LL.R' 'mgsub.R' 'new_report.R' 'pad.R' 'paste2.R' 'presentation.R' 'reducer.R' 'reports-package.R' 'scrubber.R' 'strWrap.R' 'templates.R' 'tex2docx.R' 'Trim.R' 'unblanker.R' 'update_bib.R' 'wc.R' 'wheresPandoc.R' 'install_pandoc.R' 'repo2github.R' 'US.R' 'reveal.js.R' 'genX.R' 'genXtract.R' 'html5.R'
+# Packaged: 2014-12-20 21:40:31 UTC; trinker
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-12-21 06:54:55
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

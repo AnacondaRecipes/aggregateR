@@ -1,0 +1,101 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-idiogramfish
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/idiogramFISH_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/idiogramFISH/idiogramFISH_{{ version }}.tar.gz
+  sha256: 22043aed1925c27ca274e52011fd3e0d4c6f8a568d101c9bd710eb3c7d16c724
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-crayon
+    - r-knitr
+
+  run:
+    - r-base
+    - r-crayon
+    - r-knitr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('idiogramFISH')"           # [not win]
+    - "\"%R%\" -e \"library('idiogramFISH')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://ferroao.gitlab.io/manualidiogramfish/
+  license: GPL-2
+  summary: Plot idiograms of several karyotypes having a set of dataframes for chromosome data
+    and optionally mark data. Includes also a function to plot holocentrics and its
+    marks supporting micrometers and Mb. Marks can have square or dot form, its legend
+    (label) can be drawn inline  or to the right of karyotypes. It is possible to calculate
+    chromosome indices by Levan et al. (1964) <doi:10.1111/j.1601-5223.1964.tb01953.x>
+    ,  karyotype indices of Watanabe et al. (1999) <doi:10.1007/PL00013869> and  Romero-Zarco
+    (1986) <doi:10.2307/1221906> and classify chromosomes by morphology Guerra (1986)
+    and Levan et al. (1964).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: idiogramFISH
+# Title: Idiograms with Marks and Karyotype Indices
+# Version: 1.0.0
+# Date: 2019-08-18
+# Authors@R: c(person("Fernando", "Roa", email = "froao@unal.edu.co", role = c("aut", "cre") ),  person(given="Mariana PC Telles", email = "", role = c("ctb"))  )
+# Description: Plot idiograms of several karyotypes having a set of dataframes for chromosome data and optionally mark data. Includes also a function to plot holocentrics and its marks supporting micrometers and Mb. Marks can have square or dot form, its legend (label) can be drawn inline  or to the right of karyotypes. It is possible to calculate chromosome indices by Levan et al. (1964) <doi:10.1111/j.1601-5223.1964.tb01953.x> ,  karyotype indices of Watanabe et al. (1999) <doi:10.1007/PL00013869> and  Romero-Zarco (1986) <doi:10.2307/1221906> and classify chromosomes by morphology Guerra (1986) and Levan et al. (1964).
+# Depends: R (>= 3.0)
+# Imports: crayon, knitr
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: rmarkdown
+# VignetteBuilder: knitr
+# URL: https://ferroao.gitlab.io/manualidiogramfish/
+# BugReports: https://gitlab.com/ferroao/idiogramFISH/issues
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-08-22 22:01:55 UTC; fernando
+# Author: Fernando Roa [aut, cre], Mariana PC Telles [ctb]
+# Maintainer: Fernando Roa <froao@unal.edu.co>
+# Repository: CRAN
+# Date/Publication: 2019-08-24 10:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

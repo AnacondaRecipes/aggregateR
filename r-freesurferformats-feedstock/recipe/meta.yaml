@@ -1,0 +1,96 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-freesurferformats
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/freesurferformats_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/freesurferformats/freesurferformats_{{ version }}.tar.gz
+  sha256: 40d553f10dcaca0d0f6b9fe7053d0d05941e3eee5a01389500f749dbab603b30
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat (>= 2.1.0)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('freesurferformats')"           # [not win]
+    - "\"%R%\" -e \"library('freesurferformats')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=freesurferformats
+  license: MIT
+  summary: 'Provides functions to read data from neuroimaging files in ''FreeSurfer'' <http://freesurfer.net/>
+    binary formats. This includes the following file formats: 1) MGH/MGZ format files,
+    which can contain multi-dimensional images or other data. Typically they contain
+    time-series of three-dimensional brain scans acquired by magnetic resonance imaging
+    (MRI). They can also contain vertex-wise measures of surface morphometry data. The
+    MGH format is named after the Massachusetts General Hospital, and the MGZ format
+    is a compressed version of the same format. 2) ''FreeSurfer'' morphometry data files
+    in binary ''curv'' format. These contain vertex-wise surface measures, i.e., one
+    scalar value for each vertex of a brain surface mesh. These are typically values
+    like the cortical thickness or brain surface area at each vertex.'
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: freesurferformats
+# Type: Package
+# Title: Read 'FreeSurfer' Neuroimaging File Formats
+# Version: 0.1.0
+# Author: Tim Schafer
+# Maintainer: Tim Schafer <ts+code@rcmd.org>
+# Description: Provides functions to read data from neuroimaging files in 'FreeSurfer' <http://freesurfer.net/> binary formats. This includes the following file formats: 1) MGH/MGZ format files, which can contain multi-dimensional images or other data. Typically they contain time-series of three-dimensional brain scans acquired by magnetic resonance imaging (MRI). They can also contain vertex-wise measures of surface morphometry data. The MGH format is named after the Massachusetts General Hospital, and the MGZ format is a compressed version of the same format. 2) 'FreeSurfer' morphometry data files in binary 'curv' format. These contain vertex-wise surface measures, i.e., one scalar value for each vertex of a brain surface mesh. These are typically values like the cortical thickness or brain surface area at each vertex.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: knitr, rmarkdown, testthat (>= 2.1.0)
+# VignetteBuilder: knitr
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-09-02 08:50:18 UTC; timschaefer
+# Repository: CRAN
+# Date/Publication: 2019-09-04 08:20:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

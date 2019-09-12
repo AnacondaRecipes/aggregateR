@@ -1,0 +1,81 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-xhwe
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/XHWE_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/XHWE/XHWE_{{ version }}.tar.gz
+  sha256: b444fd72d36734bf0a6fad5276e7626bdee170b6c2bc90ec066d083370f248b1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('XHWE')"           # [not win]
+    - "\"%R%\" -e \"library('XHWE')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=XHWE
+  license: GPL-2
+  summary: Conduct the likelihood ratio tests for Hardy-Weinberg equilibrium at marker loci on
+    the X chromosome.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: XHWE
+# Type: Package
+# Title: X Chromosome Hardy-Weinberg Equilibrium
+# Version: 1.0
+# Date: 2015-06-02
+# Author: Xiao-Ping You, Qi-Lei Zou, Jian-Long Li, Ji-Yuan Zhou
+# Maintainer: Xiao-Ping You <13268259225@163.com>
+# Description: Conduct the likelihood ratio tests for Hardy-Weinberg equilibrium at marker loci on the X chromosome.
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2015-06-03 07:08:25 UTC; Administrator
+# Repository: CRAN
+# Date/Publication: 2015-06-03 11:47:55
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

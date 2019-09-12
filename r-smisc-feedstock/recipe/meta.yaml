@@ -1,0 +1,99 @@
+{% set version = '0.3.9.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-smisc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Smisc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Smisc/Smisc_{{ version }}.tar.gz
+  sha256: 06e8872d2a6ef9dd6286917b5c54e056766597e676cc4ab2801d24c3cfb04fb7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, foreach
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-doparallel
+    - r-plyr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-doparallel
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Smisc')"           # [not win]
+    - "\"%R%\" -e \"library('Smisc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://pnnl.github.io/Smisc
+  license: BSD_3_clause
+  summary: A collection of functions for statistical computing and data manipulation in R.  Includes
+    routines for data ingestion, operating on dataframes and matrices, conversion to
+    and  from lists, converting factors, filename manipulation, programming utilities,
+    parallelization, plotting,  statistical and mathematical operations, and time series.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_3_clause'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Smisc
+# Title: Sego Miscellaneous
+# Version: 0.3.9.1
+# Date: 2017-11-20
+# Authors@R: c(person("Landon", "Sego", role = c("aut", "cre"), email = "LHS@byu.net"))
+# URL: https://pnnl.github.io/Smisc
+# Description: A collection of functions for statistical computing and data manipulation in R.  Includes routines for data ingestion, operating on dataframes and matrices, conversion to and  from lists, converting factors, filename manipulation, programming utilities, parallelization, plotting,  statistical and mathematical operations, and time series.
+# NeedsCompilation: yes
+# Imports: parallel, utils, plyr, doParallel, methods
+# Suggests: testthat, foreach
+# License: BSD_3_clause + file LICENSE
+# RoxygenNote: 6.0.1
+# Packaged: 2019-04-21 08:02:40 UTC; ripley
+# Author: Landon Sego [aut, cre]
+# Maintainer: Landon Sego <LHS@byu.net>
+# Repository: CRAN
+# Date/Publication: 2019-04-22 06:54:29 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,96 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rip46
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Rip46_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Rip46/Rip46_{{ version }}.tar.gz
+  sha256: 8787856ec7b2384c9228ac230d36fbc4fa929adcb03060a7c4b2be5aaa33d771
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  skip: True  # [not unix]
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.6
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Rip46')"           # [not win]
+    - "\"%R%\" -e \"library('Rip46')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/nfultz/Rip46
+  license: GPL-3
+  summary: Utility functions and S3 classes for IPv4 and IPv6 addresses, including  conversion
+    to and from binary representation.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Rip46
+# Type: Package
+# Title: Utils for IP4 and IP6 Addresses
+# Version: 1.0.2
+# Date: 2015-09-20
+# Author: Neal Fultz
+# Maintainer: Neal Fultz <nfultz@gmail.com>
+# Copyright: ZestFinance Inc 2015
+# URL: https://github.com/nfultz/Rip46
+# Description: Utility functions and S3 classes for IPv4 and IPv6 addresses, including  conversion to and from binary representation.
+# License: GPL-3
+# Imports: Rcpp (>= 0.11.6), methods
+# LinkingTo: Rcpp
+# OS_type: unix
+# NeedsCompilation: yes
+# Packaged: 2015-09-20 20:48:11.94 UTC; nfultz
+# Repository: CRAN
+# Date/Publication: 2015-09-21 11:19:15
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

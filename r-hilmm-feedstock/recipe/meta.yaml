@@ -1,0 +1,80 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hilmm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/HiLMM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/HiLMM/HiLMM_{{ version }}.tar.gz
+  sha256: bfd09b0895001c2d18a8ed6a6be25acc58dc0236a8ee48dbdf194f13392b2324
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('HiLMM')"           # [not win]
+    - "\"%R%\" -e \"library('HiLMM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=HiLMM
+  license: GPL-2
+  summary: Estimation of heritability with confidence intervals in linear mixed models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: HiLMM
+# Type: Package
+# Title: Estimation of Heritability in Linear Mixed Models
+# Version: 1.1
+# Date: 2015-04-13
+# Author: Anna Bonnet
+# Maintainer: Anna Bonnet <anna.bonnet@agroparistech.fr>
+# Description: Estimation of heritability with confidence intervals in linear mixed models.
+# License: GPL-2
+# Packaged: 2015-04-13 15:00:49 UTC; loic
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-04-13 22:50:52
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

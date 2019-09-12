@@ -1,0 +1,103 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-synlik
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/synlik_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/synlik/synlik_{{ version }}.tar.gz
+  sha256: ba7a9bb6fd6cf1ccadb2b1ff395ee1ec28de92f0eec470f7c0979f5e1e764cdf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, stabledist
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-rcpp >=0.12.0
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-rcpp >=0.12.0
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('synlik')"           # [not win]
+    - "\"%R%\" -e \"library('synlik')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://mfasiolo.github.io/synlik_release
+  license: GPL-2
+  summary: Framework to perform synthetic likelihood inference for models where the likelihood
+    function is unavailable or intractable.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: synlik
+# Type: Package
+# Title: Synthetic Likelihood Methods for Intractable Likelihoods
+# Version: 0.1.2
+# Date: 2018-05-22
+# Author: Matteo Fasiolo and Simon Wood
+# Maintainer: Matteo Fasiolo <matteo.fasiolo@gmail.com>
+# Description: Framework to perform synthetic likelihood inference for models where the likelihood function is unavailable or intractable.
+# URL: http://mfasiolo.github.io/synlik_release
+# License: GPL (>= 2)
+# Depends: R (>= 2.10), Rcpp (>= 0.12.0)
+# Imports: methods, graphics, Matrix, compiler, stats, parallel
+# Suggests: knitr, stabledist
+# LinkingTo: Rcpp, RcppArmadillo
+# VignetteBuilder: knitr
+# RoxygenNote: 5.0.1
+# NeedsCompilation: yes
+# Packaged: 2018-05-23 13:39:35 UTC; teo
+# Repository: CRAN
+# Date/Publication: 2018-05-23 14:05:17 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,87 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gstream
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gStream_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gStream/gStream_{{ version }}.tar.gz
+  sha256: cb0c1f46c958faa01d713309bab7a3b806a2ef8b5f41a5aa843ea5bad5b29db8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gStream')"           # [not win]
+    - "\"%R%\" -e \"library('gStream')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=gStream
+  license: GPL-2
+  summary: 'Uses an approach based on k-nearest neighbor information to sequentially detect change-points.
+    Offers analytic approximations for false discovery control given user-specified
+    average run length.  Can be applied to any type of data (high-dimensional, non-Euclidean,
+    etc.) as long as a reasonable similarity measure is available.  See references (1)
+    Chen, H. (2019) Sequential change-point detection based on nearest neighbors. The
+    Annals of Statistics, 47(3):1381-1407. (2) Chu, L. and Chen, H. (2018) Sequential
+    change-point detection for high-dimensional and non-Euclidean data <arXiv:1810.05973>. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gStream
+# Version: 0.2.0
+# Date: 2019-04-28
+# Title: Graph-Based Sequential Change-Point Detection for Streaming Data
+# Author: Hao Chen and Lynna Chu
+# Maintainer: Hao Chen <hxchen@ucdavis.edu>
+# Depends: R (>= 3.0.1)
+# Description: Uses an approach based on k-nearest neighbor information to sequentially detect change-points. Offers analytic approximations for false discovery control given user-specified average run length.  Can be applied to any type of data (high-dimensional, non-Euclidean, etc.) as long as a reasonable similarity measure is available.  See references (1) Chen, H. (2019) Sequential change-point detection based on nearest neighbors. The Annals of Statistics, 47(3):1381-1407. (2) Chu, L. and Chen, H. (2018) Sequential change-point detection for high-dimensional and non-Euclidean data <arXiv:1810.05973>.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2019-04-30 21:27:32 UTC; haochen
+# Repository: CRAN
+# Date/Publication: 2019-05-01 22:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '0.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-jlctree
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/jlctree_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/jlctree/jlctree_{{ version }}.tar.gz
+  sha256: 2a29748de7a47e8ba58970877f87149eb77c5341011eef5584667376984cc39e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lme4
+    - r-rpart
+    - r-survival
+
+  run:
+    - r-base
+    - r-lme4
+    - r-rpart
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('jlctree')"           # [not win]
+    - "\"%R%\" -e \"library('jlctree')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=jlctree
+  license: GPL-3
+  summary: Implements the tree-based approach to joint modeling of time-to-event and longitudinal
+    data. This approach looks for a tree-based partitioning such that within each estimated
+    latent class defined by a terminal node, the time-to-event and longitudinal responses
+    display a lack of association. See Zhang and Simonoff (2018) <arXiv:1812.01774>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: jlctree
+# Title: Joint Latent Class Trees for Joint Modeling of Time-to-Event and Longitudinal Data
+# Date: 2018-11-20
+# Version: 0.0.1
+# Author: Ningshan Zhang and Jeffrey S. Simonoff
+# Maintainer: Ningshan Zhang <nzhang@stern.nyu.edu>
+# Depends: survival, rpart, lme4
+# Encoding: UTF-8
+# License: GPL
+# Description: Implements the tree-based approach to joint modeling of time-to-event and longitudinal data. This approach looks for a tree-based partitioning such that within each estimated latent class defined by a terminal node, the time-to-event and longitudinal responses display a lack of association. See Zhang and Simonoff (2018) <arXiv:1812.01774>.
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2018-12-17 16:42:57 UTC; nzhang
+# Repository: CRAN
+# Date/Publication: 2018-12-27 23:20:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

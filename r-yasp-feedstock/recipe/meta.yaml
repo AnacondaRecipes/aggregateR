@@ -1,0 +1,92 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-yasp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/yasp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/yasp/yasp_{{ version }}.tar.gz
+  sha256: b12950768e9ada043b81a2dd924e8c449a064eca846f26abceaaf2e01344ea3b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('yasp')"           # [not win]
+    - "\"%R%\" -e \"library('yasp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/t-kalinowski/yasp
+  license: MIT
+  summary: 'A collection of string functions designed for writing  compact and expressive R code.
+    ''yasp'' (Yet Another String Package) is simple, fast, dependency-free, and written
+    in pure R. The package provides: a coherent set of abbreviations for paste() from
+    package ''base'' with a variety of defaults, such as p() for "paste" and pcc() for
+    "paste and collapse with commas"; wrap(), bracket(), and others for wrapping a string
+    in flanking characters; unwrap() for removing pairs of characters (at any position
+    in a string); and sentence() for cleaning whitespace around punctuation and capitalization
+    appropriate for prose sentences.'
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: yasp
+# Type: Package
+# Title: String Functions for Compact R Code
+# Version: 0.2.0
+# Authors@R: person("Tomasz", "Kalinowski", email = "tkalinow@asu.edu", role = c("aut", "cre"))
+# Description: A collection of string functions designed for writing  compact and expressive R code. 'yasp' (Yet Another String Package) is simple, fast, dependency-free, and written in pure R. The package provides: a coherent set of abbreviations for paste() from package 'base' with a variety of defaults, such as p() for "paste" and pcc() for "paste and collapse with commas"; wrap(), bracket(), and others for wrapping a string in flanking characters; unwrap() for removing pairs of characters (at any position in a string); and sentence() for cleaning whitespace around punctuation and capitalization appropriate for prose sentences.
+# License: MIT + file LICENSE
+# URL: https://github.com/t-kalinowski/yasp
+# BugReports: https://github.com/t-kalinowski/yasp/issues
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-05-29 22:25:55 UTC; tomasz
+# Author: Tomasz Kalinowski [aut, cre]
+# Maintainer: Tomasz Kalinowski <tkalinow@asu.edu>
+# Repository: CRAN
+# Date/Publication: 2018-05-29 22:46:45 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

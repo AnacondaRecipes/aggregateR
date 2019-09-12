@@ -1,0 +1,83 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sprt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SPRT_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SPRT/SPRT_{{ version }}.tar.gz
+  sha256: 1b644144ae6371cc4f166dcbed031976568a3c0bbdccfb308a5b9589207697e4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SPRT')"           # [not win]
+    - "\"%R%\" -e \"library('SPRT')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SPRT
+  license: BSD_2_clause
+  summary: Perform Wald's Sequential Probability Ratio Test on variables with a Normal, Bernoulli,
+    Exponential and Poisson distribution. Plot acceptance and continuation regions,
+    or create your own with the help of closures.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_2_clause'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SPRT
+# Type: Package
+# Title: Wald's Sequential Probability Ratio Test
+# Version: 1.0
+# Date: 2015-04-14
+# Author: Stephane Mikael Bottine
+# Maintainer: Stephane Mikael Bottine <stephane.bottine@gmail.com>
+# Description: Perform Wald's Sequential Probability Ratio Test on variables with a Normal, Bernoulli, Exponential and Poisson distribution. Plot acceptance and continuation regions, or create your own with the help of closures.
+# License: BSD_2_clause + file LICENSE
+# Packaged: 2015-04-14 15:26:52 UTC; BOTTINES
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-04-15 01:01:11
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,77 @@
+{% set version = '4.0-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lsd
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LSD_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LSD/LSD_{{ version }}.tar.gz
+  sha256: 038a9cc692c67141da066251110e326faf6e1751dd9b367f4d2c5a9bf91d573b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LSD')"           # [not win]
+    - "\"%R%\" -e \"library('LSD')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=LSD
+  license: Unlimited
+  summary: Create lots of colorful plots in a plethora of variations. Try the LSD demotour().
+  license_family: MIT
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LSD
+# Version: 4.0-0
+# Date: 2018-01-25
+# Title: Lots of Superior Depictions
+# Author: Bjoern Schwalb [aut, cre], Achim Tresch [aut], Phillipp Torkler [ctb], Sebastian Duemcke [ctb], Carina Demel [ctb], Brian Ripley [ctb], Bill Venables [ctb]
+# Maintainer: Bjoern Schwalb <schwalb.bjoern@gmail.com>
+# Description: Create lots of colorful plots in a plethora of variations. Try the LSD demotour().
+# License: Unlimited
+# Packaged: 2018-01-26 16:55:13 UTC; bschwal
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2018-01-26 17:08:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

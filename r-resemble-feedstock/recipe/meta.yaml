@@ -1,0 +1,106 @@
+{% set version = '1.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-resemble
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/resemble_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/resemble/resemble_{{ version }}.tar.gz
+  sha256: 9ab1ab6dedbbd35873c9b87dc4ddd235ecd144fb0a7b869c4b1c88e3c3322aa1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: prospectr, parallel, doParallel
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.0
+    - r-rcpparmadillo
+    - r-foreach
+    - r-iterators
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.0
+    - r-rcpparmadillo
+    - r-foreach
+    - r-iterators
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('resemble')"           # [not win]
+    - "\"%R%\" -e \"library('resemble')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://l-ramirez-lopez.github.io/resemble/
+  license: GPL-3
+  summary: Implementation of functions for spectral similarity/dissimilarity analysis and memory-based
+    learning (MBL) for non-linear modeling in complex spectral datasets. In chemometrics
+    MBL is also known as local modeling.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: resemble
+# Type: Package
+# Title: Regression and Similarity Evaluation for Memory-Based Learning in Spectral Chemometrics
+# Version: 1.2.2
+# Date: 2016-03-04
+# Author: Leonardo Ramirez-Lopez [aut, cre], Antoine Stevens [aut]
+# Maintainer: Leonardo Ramirez-Lopez <ramirez.lopez.leo@gmail.com>
+# BugReports: https://github.com/l-ramirez-lopez/resemble/issues
+# Description: Implementation of functions for spectral similarity/dissimilarity analysis and memory-based learning (MBL) for non-linear modeling in complex spectral datasets. In chemometrics MBL is also known as local modeling.
+# License: GPL (>= 3)
+# URL: http://l-ramirez-lopez.github.io/resemble/
+# Depends: R (>= 3.2.2)
+# Imports: foreach, iterators, Rcpp (>= 0.12.0)
+# Suggests: prospectr, parallel, doParallel
+# LinkingTo: Rcpp, RcppArmadillo
+# NeedsCompilation: yes
+# Repository: CRAN
+# RoxygenNote: 5.0.1
+# Packaged: 2016-03-03 23:00:28 UTC; raml
+# Date/Publication: 2016-03-04 00:11:00
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

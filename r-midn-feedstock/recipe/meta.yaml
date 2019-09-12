@@ -1,0 +1,83 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-midn
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MIDN_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MIDN/MIDN_{{ version }}.tar.gz
+  sha256: 0f7c9d9d1e3c21104bfa7690d20398a5d04973bc122a336e8d2572afaafb2922
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-biasedurn
+
+  run:
+    - r-base
+    - r-biasedurn
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MIDN')"           # [not win]
+    - "\"%R%\" -e \"library('MIDN')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MIDN
+  license: CC0
+  summary: Implementation of the mid-n algorithms presented in  Wellek S (2015) <DOI:10.1111/stan.12063>
+    Statistica Neerlandica 69, 358-373 for exact  sample size calculation for superiority
+    trials with binary outcome.
+  license_family: CC
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MIDN
+# Type: Package
+# Title: Nearly Exact Sample Size Calculation for Exact Powerful Nonrandomized Tests for Differences Between Binomial Proportions
+# Version: 1.0
+# Date: 2016-10-18
+# Author: Stefan Wellek, Peter Ziegler
+# Maintainer: Peter Ziegler <peter.ziegler@zi-mannheim.de>
+# Description: Implementation of the mid-n algorithms presented in  Wellek S (2015) <DOI:10.1111/stan.12063> Statistica Neerlandica 69, 358-373 for exact  sample size calculation for superiority trials with binary outcome.
+# License: CC0
+# Depends: BiasedUrn
+# NeedsCompilation: no
+# Packaged: 2016-10-28 07:46:54 UTC; ziegler
+# Repository: CRAN
+# Date/Publication: 2016-10-28 11:31:15
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

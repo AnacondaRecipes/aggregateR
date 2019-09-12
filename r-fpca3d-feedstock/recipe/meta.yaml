@@ -1,0 +1,84 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fpca3d
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/FPCA3D_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/FPCA3D/FPCA3D_{{ version }}.tar.gz
+  sha256: 4591814be9660c574a3a310a1f269c05a94254849db2547a33478ba6144b33c3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('FPCA3D')"           # [not win]
+    - "\"%R%\" -e \"library('FPCA3D')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=FPCA3D
+  license: GPL-2 | GPL-3
+  summary: Run three dimensional functional principal component analysis and return the three
+    dimensional functional principal component scores. The details of the method are
+    explained in Lin et al.(2015) <doi:10.1371/journal.pone.0132945>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: FPCA3D
+# Type: Package
+# Title: Three Dimensional Functional Component Analysis
+# Version: 1.0
+# Date: 2018-07-09
+# Author: Nan Lin, Momiao Xiong
+# Maintainer: Nan Lin <edmondlinnan@gmail.com>
+# Description: Run three dimensional functional principal component analysis and return the three dimensional functional principal component scores. The details of the method are explained in Lin et al.(2015) <doi:10.1371/journal.pone.0132945>.
+# License: GPL-2 | GPL-3
+# Depends: graphics, grDevices, stats, utils
+# NeedsCompilation: no
+# Packaged: 2018-07-09 22:49:27 UTC; nan
+# Repository: CRAN
+# Date/Publication: 2018-07-10 15:20:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

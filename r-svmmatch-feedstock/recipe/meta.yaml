@@ -1,0 +1,103 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-svmmatch
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SVMMatch_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SVMMatch/SVMMatch_{{ version }}.tar.gz
+  sha256: 897d23ae8996e232f91f143cfaa204f3c18685377b0ed88d211a921629cc7cfa
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SVMMatch')"           # [not win]
+    - "\"%R%\" -e \"library('SVMMatch')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SVMMatch
+  license: GPL-2
+  summary: Causal effect estimation in observational data often requires identifying a set of
+    untreated observations that are comparable to some treated group of interest.  This
+    package provides a suite of functions for identifying such a set of observations
+    and for implementing standard and new diagnostics tools.  The primary function,
+    svmmatch(), uses support vector machines to identify a region of common support
+    between treatment and control groups.  A sensitivity analysis, balance checking,
+    and assessment of the region of overlap between treated and control groups is included.  The
+    Bayesian implementation allows for recovery of uncertainty estimates for the treatment
+    effect and all other parameters.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SVMMatch
+# Type: Package
+# Title: Causal Effect Estimation and Diagnostics with Support Vector Machines
+# Version: 1.1
+# Date: 2015-02-05
+# Author: Marc Ratkovic
+# Maintainer: Marc Ratkovic <ratkovic@princeton.edu>
+# Description: Causal effect estimation in observational data often requires identifying a set of untreated observations that are comparable to some treated group of interest.  This package provides a suite of functions for identifying such a set of observations and for implementing standard and new diagnostics tools.  The primary function, svmmatch(), uses support vector machines to identify a region of common support between treatment and control groups.  A sensitivity analysis, balance checking, and assessment of the region of overlap between treated and control groups is included.  The Bayesian implementation allows for recovery of uncertainty estimates for the treatment effect and all other parameters.
+# License: GPL (>= 2)
+# Depends: R (>= 3.0.2)
+# Imports: Rcpp (>= 0.11.0)
+# LinkingTo: Rcpp, RcppArmadillo
+# Packaged: 2015-02-08 08:22:33 UTC; ripley
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2015-02-08 09:24:56
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

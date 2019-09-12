@@ -1,0 +1,92 @@
+{% set version = '1.19' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-qkerntool
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/qkerntool_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/qkerntool/qkerntool_{{ version }}.tar.gz
+  sha256: 1af4a2224dc6dbeab3e00fa59d2304316f127339940d2f3cf0756e0c85cf3692
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-class
+
+  run:
+    - r-base
+    - r-class
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('qkerntool')"           # [not win]
+    - "\"%R%\" -e \"library('qkerntool')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=qkerntool
+  license: GPL-2
+  summary: Nonlinear machine learning tool for classification, clustering and dimensionality
+    reduction. It integrates 12 q-kernel functions and 15 conditional negative definite
+    kernel functions and includes the  q-kernel and conditional negative definite kernel
+    version of density-based spatial clustering of applications with noise, spectral
+    clustering, generalized discriminant analysis, principal component analysis, multidimensional
+    scaling, locally linear embedding, sammon's mapping and t-Distributed stochastic
+    neighbor embedding.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: qkerntool
+# Title: Q-Kernel-Based and Conditionally Negative Definite Kernel-Based Machine Learning Tools
+# Version: 1.19
+# Authors@R: c(person("Yusen", "Zhang", role = c("aut", "cre"), email = "yusenzhang@126.com", comment = c(ORCID = "0000-0003-3842-1153")), person("Daolin","Pang", role = c("ctb")), person("Jinghao", "Wang", role = c("ctb")), person("Jialin", "Zhang", role = c("ctb")))
+# Description: Nonlinear machine learning tool for classification, clustering and dimensionality reduction. It integrates 12 q-kernel functions and 15 conditional negative definite kernel functions and includes the  q-kernel and conditional negative definite kernel version of density-based spatial clustering of applications with noise, spectral clustering, generalized discriminant analysis, principal component analysis, multidimensional scaling, locally linear embedding, sammon's mapping and t-Distributed stochastic neighbor embedding.
+# Depends: R (>= 3.0.1)
+# Imports: stats, class, graphics, methods
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# Maintainer: Yusen Zhang <yusenzhang@126.com>
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2019-04-13 04:27:58 UTC; Administrator
+# Author: Yusen Zhang [aut, cre] (<https://orcid.org/0000-0003-3842-1153>), Daolin Pang [ctb], Jinghao Wang [ctb], Jialin Zhang [ctb]
+# Repository: CRAN
+# Date/Publication: 2019-04-13 23:02:44 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,90 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gwrpvr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gwrpvr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gwrpvr/gwrpvr_{{ version }}.tar.gz
+  sha256: a39a2d803c359d6057e25811d6c96834abcf1e34d8e8470960296d77c5b62574
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gwrpvr')"           # [not win]
+    - "\"%R%\" -e \"library('gwrpvr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://doi.org/10.1101/204727
+  license: GPL-3
+  summary: Computes the sample probability value (p-value) for the estimated coefficient from
+    a standard genome-wide univariate regression.  It computes the exact finite-sample
+    p-value under the assumption that the measured phenotype (the dependent variable
+    in the regression) has a known Bernoulli-normal mixture distribution. Finite-sample
+    genome-wide regression p-values (Gwrpv) with a non-normally distributed phenotype
+    (Gregory Connor and Michael O'Neill, bioRxiv 204727 <doi:10.1101/204727>).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gwrpvr
+# Type: Package
+# Title: Genome-Wide Regression P-Value (Gwrpv)
+# Version: 1.0
+# Date: 2017-10-13
+# Authors@R: c( person("Gregory", "Connor", email = "gregory.connor@nuim.ie ", role = c("aut")), person("Michael", "O'Neill", email = "m.oneill@ucd.ie", role = c("trl", "aut", "cre")))
+# Author: Gregory Connor [aut], Michael O'Neill [trl, aut, cre]
+# Maintainer: Michael O'Neill <m.oneill@ucd.ie>
+# Description: Computes the sample probability value (p-value) for the estimated coefficient from a standard genome-wide univariate regression.  It computes the exact finite-sample p-value under the assumption that the measured phenotype (the dependent variable in the regression) has a known Bernoulli-normal mixture distribution. Finite-sample genome-wide regression p-values (Gwrpv) with a non-normally distributed phenotype (Gregory Connor and Michael O'Neill, bioRxiv 204727 <doi:10.1101/204727>).
+# URL: https://doi.org/10.1101/204727
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 5.0.1
+# Packaged: 2017-10-19 17:05:56 UTC; mike
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2017-10-19 17:47:54 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

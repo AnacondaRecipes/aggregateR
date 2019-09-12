@@ -1,0 +1,100 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stressr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/stressr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/stressr/stressr_{{ version }}.tar.gz
+  sha256: 47fa298143afd99667509a623f4732eeb3dca2c44ec336e2c9a5c900dd1b6901
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-xml
+    - r-lattice
+    - r-latticeextra
+    - r-xts
+
+  run:
+    - r-base
+    - r-xml
+    - r-lattice
+    - r-latticeextra
+    - r-xts
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('stressr')"           # [not win]
+    - "\"%R%\" -e \"library('stressr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mrbcuda/stressr
+  license: MIT
+  summary: Forms queries to submit to the Cleveland Federal Reserve Bank web site's financial
+    stress index data site.  Provides query functions for both the composite stress
+    index and the components data. By default the download includes daily time series
+    data starting September 25, 1991.  The functions return a class of either type easing
+    or cfsi which contain a list of items related to the query and its graphical presentation.  The
+    list includes the time series data as an xts object.  The package provides four
+    lattice time series plots to render the time series data in a manner similar to
+    the bank's own presentation.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: stressr
+# Title: Fetch and plot financial stress index and component data.
+# Version: 1.0.0
+# Date: 2014-06-29
+# Author: Matt Barry <mrb@softisms.com>
+# Maintainer: Matt Barry <mrb@softisms.com>
+# Description: Forms queries to submit to the Cleveland Federal Reserve Bank web site's financial stress index data site.  Provides query functions for both the composite stress index and the components data. By default the download includes daily time series data starting September 25, 1991.  The functions return a class of either type easing or cfsi which contain a list of items related to the query and its graphical presentation.  The list includes the time series data as an xts object.  The package provides four lattice time series plots to render the time series data in a manner similar to the bank's own presentation.
+# License: MIT + file LICENSE
+# URL: https://github.com/mrbcuda/stressr
+# BugReports: https://github.com/mrbcuda/stressr/issues
+# Imports: xts, XML, lattice, latticeExtra
+# Suggests: testthat
+# Packaged: 2014-06-30 03:33:30 UTC; mrb
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-06-30 10:59:21
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,92 @@
+{% set version = '0.99' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tdpanalysis
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/TDPanalysis_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/TDPanalysis/TDPanalysis_{{ version }}.tar.gz
+  sha256: e01784ac0913a0524eb83ad4107549f3c5b458273f43434bc96fd47933d1d0cf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-plyr
+
+  run:
+    - r-base
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('TDPanalysis')"           # [not win]
+    - "\"%R%\" -e \"library('TDPanalysis')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=TDPanalysis
+  license: GPL-2
+  summary: 'Set of functions designed to help in the analysis of TDP sensors. Features includes
+    dates and time conversion, weather data interpolation, daily maximum of tension
+    analysis and calculations required to convert sap flow density data to sap flow
+    rates at the tree and plot scale (For more information see : Granier (1985) <DOI:10.1051/forest:19850204>
+    & Granier (1987) <DOI:10.1093/treephys/3.4.309>).'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: TDPanalysis
+# Type: Package
+# Title: Granier's Sap Flow Sensors (TDP) Analysis
+# Version: 0.99
+# Date: 2016-10-12
+# Author: Maxime Durand
+# Maintainer: Maxime Durand <duran1211@gmail.com>
+# Description: Set of functions designed to help in the analysis of TDP sensors. Features includes dates and time conversion, weather data interpolation, daily maximum of tension analysis and calculations required to convert sap flow density data to sap flow rates at the tree and plot scale (For more information see : Granier (1985) <DOI:10.1051/forest:19850204> & Granier (1987) <DOI:10.1093/treephys/3.4.309>).
+# Imports: stats, plyr, graphics
+# Depends: R (>= 2.10)
+# Encoding: UTF-8
+# LazyData: true
+# License: GPL-2
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-10-18 09:49:19 UTC; mxdurand
+# Repository: CRAN
+# Date/Publication: 2016-10-18 14:39:13
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

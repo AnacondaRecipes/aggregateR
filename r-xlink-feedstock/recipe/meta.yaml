@@ -1,0 +1,99 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-xlink
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/xlink_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/xlink/xlink_{{ version }}.tar.gz
+  sha256: 383d322921b263fe4b12c13650e451a118c44bbfc9880d397b22f95b957c5009
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival >=2.41.3
+
+  run:
+    - r-base
+    - r-survival >=2.41.3
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('xlink')"           # [not win]
+    - "\"%R%\" -e \"library('xlink')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/qiuanzhu/xlink
+  license: GPL-2
+  summary: 'The expression of X-chromosome undergoes three possible biological processes: X-chromosome
+    inactivation (XCI), escape of the X-chromosome inactivation (XCI-E),and skewed X-chromosome                     inactivation
+    (XCI-S). To analyze the X-linked genetic association for phenotype such as                          continuous,
+    binary, and time-to-event outcomes with the actual process unknown, we propose a
+    unified             approach of maximizing the likelihood or partial likelihood
+    over all of the potential biological              processes. The methods are described
+    in Wei Xu, Meiling Hao (2017) <doi:10.1002/gepi.22097>. And  also see Dongxiao Han,
+    Meiling Hao, Lianqiang Qu, Wei Xu (2019) <doi:10.1177/0962280219859037>.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: xlink
+# Title: Genetic Association Models for X-Chromosome SNPS on Continuous, Binary and Survival Outcomes
+# Version: 1.0.1
+# Authors@R: c( person(given = "Wei", family = "Xu", role = c("aut"), email = "Wei.Xu@uhnresearch.ca"), person(given = "Meiling", family = "Hao", role = c("aut"), email = "Meiling.Hao@uhnresearch.ca"), person(given = "Yi", family = "Zhu", role = c("cre"), email = "yizhu87@gmail.com"))
+# Maintainer: Yi Zhu <yizhu87@gmail.com>
+# URL: https://github.com/qiuanzhu/xlink
+# BugReports: https://github.com/qiuanzhu/xlink/issues
+# Description: The expression of X-chromosome undergoes three possible biological processes: X-chromosome inactivation (XCI), escape of the X-chromosome inactivation (XCI-E),and skewed X-chromosome                     inactivation (XCI-S). To analyze the X-linked genetic association for phenotype such as                          continuous, binary, and time-to-event outcomes with the actual process unknown, we propose a unified             approach of maximizing the likelihood or partial likelihood over all of the potential biological              processes. The methods are described in Wei Xu, Meiling Hao (2017) <doi:10.1002/gepi.22097>. And  also see Dongxiao Han, Meiling Hao, Lianqiang Qu, Wei Xu (2019) <doi:10.1177/0962280219859037>.
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 3.1.0)
+# Imports: survival (>= 2.41.3)
+# RoxygenNote: 6.1.1
+# Suggests: knitr, rmarkdown, testthat
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-08-20 14:44:08 UTC; Yi
+# Author: Wei Xu [aut], Meiling Hao [aut], Yi Zhu [cre]
+# Repository: CRAN
+# Date/Publication: 2019-08-20 21:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

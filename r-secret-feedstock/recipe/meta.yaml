@@ -1,0 +1,100 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-secret
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/secret_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/secret/secret_{{ version }}.tar.gz
+  sha256: b4edf0615b6eb4947bd12fdb1e1d0a074f4f556ebe2dabd63a26b0668f436225
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, mockery, testthat, knitr, rmarkdown, withr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-assertthat
+    - r-curl
+    - r-jsonlite
+    - r-openssl
+    - r-rprojroot
+
+  run:
+    - r-base
+    - r-assertthat
+    - r-curl
+    - r-jsonlite
+    - r-openssl
+    - r-rprojroot
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('secret')"           # [not win]
+    - "\"%R%\" -e \"library('secret')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/gaborcsardi/secret#readme
+  license: MIT
+  summary: Allow sharing sensitive information, for example passwords, 'API' keys, etc., in R
+    packages, using public key cryptography.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: secret
+# Title: Share Sensitive Information in R Packages
+# Version: 1.0.0
+# Authors@R: c(person("Gabor", "Csardi", role=c("aut", "cre"),  email="csardi.gabor@gmail.com"), person("Andrie", "de Vries", role=c("aut"),  email="apdevries@gmail.com"))
+# Description: Allow sharing sensitive information, for example passwords, 'API' keys, etc., in R packages, using public key cryptography.
+# License: MIT + file LICENSE
+# LazyData: true
+# URL: https://github.com/gaborcsardi/secret#readme
+# BugReports: https://github.com/gaborcsardi/secret/issues
+# RoxygenNote: 6.0.1.9000
+# Imports: assertthat, openssl, rprojroot, curl, jsonlite
+# Suggests: covr, mockery, testthat, knitr, rmarkdown, withr
+# Encoding: UTF-8
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2017-06-17 09:01:46 UTC; gaborcsardi
+# Author: Gabor Csardi [aut, cre], Andrie de Vries [aut]
+# Maintainer: Gabor Csardi <csardi.gabor@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-06-17 14:33:35 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

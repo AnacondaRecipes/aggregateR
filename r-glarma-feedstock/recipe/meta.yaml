@@ -1,0 +1,101 @@
+{% set version = '1.6-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-glarma
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/glarma_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/glarma/glarma_{{ version }}.tar.gz
+  sha256: 59850fe84f4c4b56b755f30a81088f0c01934d27426836d0f00317b83bd91558
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: RUnit, knitr, zoo
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('glarma')"           # [not win]
+    - "\"%R%\" -e \"library('glarma')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=glarma
+  license: GPL-2
+  summary: Functions are provided for estimation, testing, diagnostic checking and forecasting
+    of generalized linear autoregressive moving average (GLARMA) models for discrete
+    valued time series with regression variables.  These are a class of observation
+    driven non-linear non-Gaussian state space models. The state vector consists of
+    a linear regression component plus an observation driven component consisting of
+    an autoregressive-moving average (ARMA) filter of past predictive residuals. Currently
+    three distributions (Poisson, negative binomial and binomial) can be used for the
+    response series. Three options (Pearson, score-type and unscaled) for the residuals
+    in the observation driven component are available. Estimation is via maximum likelihood
+    (conditional on initializing values for the ARMA process) optimized using Fisher
+    scoring or Newton Raphson iterative methods. Likelihood ratio and Wald tests for
+    the observation driven component allow testing for serial dependence in generalized
+    linear model settings. Graphical diagnostics including model fits, autocorrelation
+    functions and probability integral transform residuals are included in the package.
+    Several standard data sets are included in the package.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: glarma
+# Type: Package
+# Title: Generalized Linear Autoregressive Moving Average Models
+# Version: 1.6-0
+# Date: 2018-02-07
+# Author: William T.M. Dunsmuir <w.dunsmuir@unsw.edu.au>, Cenanning Li <cli113@aucklanduni.ac.nz>, and David J. Scott <d.scott@auckland.ac.nz>
+# Maintainer: "William T.M. Dunsmuir" <w.dunsmuir@unsw.edu.au>
+# Depends: R (>= 2.3.0)
+# Imports: MASS
+# Suggests: RUnit, knitr, zoo
+# VignetteBuilder: knitr
+# Description: Functions are provided for estimation, testing, diagnostic checking and forecasting of generalized linear autoregressive moving average (GLARMA) models for discrete valued time series with regression variables.  These are a class of observation driven non-linear non-Gaussian state space models. The state vector consists of a linear regression component plus an observation driven component consisting of an autoregressive-moving average (ARMA) filter of past predictive residuals. Currently three distributions (Poisson, negative binomial and binomial) can be used for the response series. Three options (Pearson, score-type and unscaled) for the residuals in the observation driven component are available. Estimation is via maximum likelihood (conditional on initializing values for the ARMA process) optimized using Fisher scoring or Newton Raphson iterative methods. Likelihood ratio and Wald tests for the observation driven component allow testing for serial dependence in generalized linear model settings. Graphical diagnostics including model fits, autocorrelation functions and probability integral transform residuals are included in the package. Several standard data sets are included in the package.
+# License: GPL (>= 2)
+# Packaged: 2018-02-07 03:40:49 UTC; dsco036
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2018-02-07 04:26:47 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '2.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-htree
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/htree_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/htree/htree_{{ version }}.tar.gz
+  sha256: 8b3709dc0ead4ac46859a660a5174c5dc843083a5a84392e8cf02972052b7195
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('htree')"           # [not win]
+    - "\"%R%\" -e \"library('htree')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=htree
+  license: GPL-2
+  summary: Historical regression trees are an extension of standard trees,  producing a non-parametric
+    estimate of how the response depends on  all of its prior realizations as well as
+    that of any time-varying predictor  variables. The method applies equally to regularly
+    as well as irregularly  sampled data. The package implements random forest and boosting
+    ensembles  based on historical regression trees, suitable for longitudinal data.  Standard
+    error estimation and Z-score variable importance is also implemented.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: htree
+# Version: 2.0.0
+# Date: 2018-06-23
+# Depends: R (>= 2.9.0), parallel
+# Title: Historical Tree Ensembles for Longitudinal Data
+# Author: Joe Sexton <joesexton0@gmail.com>
+# Description: Historical regression trees are an extension of standard trees,  producing a non-parametric estimate of how the response depends on  all of its prior realizations as well as that of any time-varying predictor  variables. The method applies equally to regularly as well as irregularly  sampled data. The package implements random forest and boosting ensembles  based on historical regression trees, suitable for longitudinal data.  Standard error estimation and Z-score variable importance is also implemented.
+# Maintainer: Joe Sexton <joesexton0@gmail.com>
+# License: GPL (>= 2)
+# Repository: CRAN
+# NeedsCompilation: yes
+# Packaged: 2018-07-13 14:16:12 UTC; joe
+# Date/Publication: 2018-07-13 15:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

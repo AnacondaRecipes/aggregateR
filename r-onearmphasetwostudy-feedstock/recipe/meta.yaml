@@ -1,0 +1,103 @@
+{% set version = '1.0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-onearmphasetwostudy
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/OneArmPhaseTwoStudy_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/OneArmPhaseTwoStudy/OneArmPhaseTwoStudy_{{ version }}.tar.gz
+  sha256: 68dcd262a8eb236158dfd13f16293250b7883ccdb00f84f9be116019f4180f61
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.9.11
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.9.11
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('OneArmPhaseTwoStudy')"           # [not win]
+    - "\"%R%\" -e \"library('OneArmPhaseTwoStudy')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=OneArmPhaseTwoStudy
+  license: GPL-2
+  summary: Purpose of this package is it to plan, monitor and evaluate oncological phase II studies.
+    In general this kind of studies are single-arm trials with planned interim analysis
+    and binary endpoint. To meet the resulting requirements, the package provides functions
+    to calculate and evaluate 'Simon's two-stage designs' and 'so-called' 'subset designs'.
+    If you are unfamiliar with this package a good starting point is to take a closer
+    look at the functions getSolutions() and getSolutionsSub1().The web-based tool (<https://imbi.shinyapps.io/phaseII-app/>)
+    extends the functionality of our R package by means of a proper dealing with over-
+    and underrunning. The R function binom.test of the 'stats' R package and the package
+    'binom' might be  helpful to assess the performance of the corresponding one-stage
+    design as a reference.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: OneArmPhaseTwoStudy
+# Type: Package
+# Title: Planning, Conducting, and Analysing Single-Arm Phase II Studies
+# Version: 1.0.3
+# Date: 2017-11-13
+# Author: Marius Wirths
+# Maintainer: Johannes Krisam <krisam@imbi.uni-heidelberg.de>
+# Description: Purpose of this package is it to plan, monitor and evaluate oncological phase II studies. In general this kind of studies are single-arm trials with planned interim analysis and binary endpoint. To meet the resulting requirements, the package provides functions to calculate and evaluate 'Simon's two-stage designs' and 'so-called' 'subset designs'. If you are unfamiliar with this package a good starting point is to take a closer look at the functions getSolutions() and getSolutionsSub1().The web-based tool (<https://imbi.shinyapps.io/phaseII-app/>) extends the functionality of our R package by means of a proper dealing with over- and underrunning. The R function binom.test of the 'stats' R package and the package 'binom' might be  helpful to assess the performance of the corresponding one-stage design as a reference.
+# License: GPL (>= 2)
+# Depends: methods, stats, Rcpp (>= 0.9.11), R (>= 3.1.0)
+# LinkingTo: Rcpp
+# RcppModules: simon, sub1
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2017-11-13 11:41:10 UTC; admin
+# Repository: CRAN
+# Date/Publication: 2017-11-13 11:54:38 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

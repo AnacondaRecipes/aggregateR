@@ -1,0 +1,91 @@
+{% set version = '0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-vhdclassification
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/VHDClassification_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/VHDClassification/VHDClassification_{{ version }}.tar.gz
+  sha256: 64afb3449492f150e3ca1456f3b1ad09182c9e1e6c0e7270aa35adfedf8044c6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: pamr,randomForest
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-e1071
+    - r-lattice
+
+  run:
+    - r-base
+    - r-e1071
+    - r-lattice
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('VHDClassification')"           # [not win]
+    - "\"%R%\" -e \"library('VHDClassification')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=VHDClassification
+  license: GPL-2
+  summary: 'This package provides an implementation of Linear discriminant analysis and quadratic
+    discriminant analysis that works fine in very high dimension (when there are many
+    more variables than observations). '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: VHDClassification
+# Type: Package
+# Title: Discrimination/Classification in very high dimension with linear and quadratic rules.
+# Version: 0.3
+# Date: 2013-12-11
+# Author: Robin Girard
+# Maintainer: Robin Girard <robin.girard@mines-paristech.fr>
+# Description: This package provides an implementation of Linear discriminant analysis and quadratic discriminant analysis that works fine in very high dimension (when there are many more variables than observations).
+# License: GPL-2
+# LazyLoad: yes
+# Depends: methods, e1071, lattice, stats
+# Suggests: pamr,randomForest
+# Packaged: 2013-12-11 14:42:03 UTC; robin.girard
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-12-18 14:13:37
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '0.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-vbdm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/vbdm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/vbdm/vbdm_{{ version }}.tar.gz
+  sha256: a335b3874ae6f52d42b4cc459f4e6653586283e6235f5eb071cc2d0839706ee5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('vbdm')"           # [not win]
+    - "\"%R%\" -e \"library('vbdm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=vbdm
+  license: GPL-2
+  summary: Efficient algorithm for solving discrete mixture regression model for rare variant
+    association analysis. Uses variational Bayes algorithm to efficiently search over
+    model space.  Outputs an approximate likelihood ratio test as well as variant level
+    posterior probabilities of association.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: vbdm
+# Type: Package
+# Title: Variational Bayes Discrete Mixture Model
+# Version: 0.0.4
+# Date: 2014-02-01
+# Author: Benjamin Logsdon
+# Maintainer: Benjamin Logsdon <blogsdon@uw.edu>
+# Depends: R (>= 3.0.0)
+# Description: Efficient algorithm for solving discrete mixture regression model for rare variant association analysis. Uses variational Bayes algorithm to efficiently search over model space.  Outputs an approximate likelihood ratio test as well as variant level posterior probabilities of association.
+# License: GPL-2
+# Copyright: Benjamin Logsdon 2014
+# Packaged: 2014-02-01 09:11:31 UTC; aeberhart
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2014-02-01 11:18:59
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

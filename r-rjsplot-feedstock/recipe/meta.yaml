@@ -1,0 +1,83 @@
+{% set version = '2.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rjsplot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RJSplot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RJSplot/RJSplot_{{ version }}.tar.gz
+  sha256: d43377f8f16d76559cccea6744cfffce1f17ebfb12633ec0a1d2dd24f0c25f5c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: IRdisplay
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RJSplot')"           # [not win]
+    - "\"%R%\" -e \"library('RJSplot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://rjsplot.net
+  license: CC BY-NC-SA 4.0
+  summary: Creates interactive graphs with 'R'. It joins the data analysis power of R and the
+    visualization libraries of JavaScript in one package.
+  license_family: CC
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RJSplot
+# Type: Package
+# Version: 2.5
+# Date: 2017-10-31
+# Title: Interactive Graphs with R
+# Description: Creates interactive graphs with 'R'. It joins the data analysis power of R and the visualization libraries of JavaScript in one package.
+# URL: http://rjsplot.net
+# License: CC BY-NC-SA 4.0
+# Depends: R (>= 3.0.0)
+# Suggests: IRdisplay
+# NeedsCompilation: no
+# Author: Carlos Prieto <cprietos@usal.es>, David Barrios <metal@usal.es>
+# Maintainer: Carlos Prieto <cprietos@usal.es>
+# Packaged: 2017-10-31 15:14:59 UTC; cprieto
+# Repository: CRAN
+# Date/Publication: 2017-11-02 11:19:32 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

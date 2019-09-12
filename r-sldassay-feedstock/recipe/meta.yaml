@@ -1,0 +1,89 @@
+{% set version = '1.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sldassay
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SLDAssay_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SLDAssay/SLDAssay_{{ version }}.tar.gz
+  sha256: 77adc2ce669a761d06f4101e7f5621be5d37490926f4e3ea2a6fdf99f491d313
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SLDAssay')"           # [not win]
+    - "\"%R%\" -e \"library('SLDAssay')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SLDAssay
+  license: GPL-3
+  summary: Calculates maximum likelihood estimate, exact and asymptotic confidence intervals,
+    and exact and asymptotic goodness of fit p-values for concentration of infectious
+    units from serial limiting dilution assays. This package uses the likelihood equation,
+    exact goodness of fit p-values, and exact confidence intervals described in Meyers
+    et al. (1994) <http://jcm.asm.org/content/32/3/732.full.pdf>. This software is also
+    implemented as a web application through the Shiny R package <https://iupm.shinyapps.io/sldassay/>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SLDAssay
+# Type: Package
+# Title: Software for Analyzing Limiting Dilution Assays
+# Version: 1.8
+# Date: 2017-11-01
+# Author: Michael Hudgens, Ilana Trumble, Andrew Allmon
+# Maintainer: Ilana Trumble <itrumble@unc.edu>
+# Description: Calculates maximum likelihood estimate, exact and asymptotic confidence intervals, and exact and asymptotic goodness of fit p-values for concentration of infectious units from serial limiting dilution assays. This package uses the likelihood equation, exact goodness of fit p-values, and exact confidence intervals described in Meyers et al. (1994) <http://jcm.asm.org/content/32/3/732.full.pdf>. This software is also implemented as a web application through the Shiny R package <https://iupm.shinyapps.io/sldassay/>.
+# License: GPL-3
+# LazyData: TRUE
+# Imports: compiler
+# Depends: R (>= 3.2.1)
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2017-11-02 00:44:23 UTC; ilanatrumble
+# Repository: CRAN
+# Date/Publication: 2017-11-02 04:10:21 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

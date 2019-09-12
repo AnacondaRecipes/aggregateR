@@ -1,0 +1,94 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-itop
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/iTOP_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/iTOP/iTOP_{{ version }}.tar.gz
+  sha256: 87c8766a8c19c6d11c3b5b2561545f468666353ef93fe6f5b4c340d16ba5d6d8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, NMF, pcalg, Rgraphviz
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-corpcor
+
+  run:
+    - r-base
+    - r-matrix
+    - r-corpcor
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('iTOP')"           # [not win]
+    - "\"%R%\" -e \"library('iTOP')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=iTOP
+  license: GPL-2
+  summary: Infers a topology of relationships between different datasets, such as multi-omics
+    and phenotypic data recorded on the same samples. We based this methodology on the
+    RV coefficient (Robert & Escoufier, 1976, <doi:10.2307/2347233>), a measure of matrix
+    correlation, which we have extended for partial matrix correlations and binary data
+    (Aben et al., 2018, <doi:10.1101/293993>).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: iTOP
+# Type: Package
+# Title: Inferring the Topology of Omics Data
+# Version: 1.0.2
+# Author: Nanne Aben
+# Maintainer: Nanne Aben <nanne.aben@gmail.com>
+# Description: Infers a topology of relationships between different datasets, such as multi-omics and phenotypic data recorded on the same samples. We based this methodology on the RV coefficient (Robert & Escoufier, 1976, <doi:10.2307/2347233>), a measure of matrix correlation, which we have extended for partial matrix correlations and binary data (Aben et al., 2018, <doi:10.1101/293993>).
+# Imports: Matrix, corpcor
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: knitr, rmarkdown, NMF, pcalg, Rgraphviz
+# VignetteBuilder: knitr
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-06-13 08:58:43 UTC; n.aben
+# Repository: CRAN
+# Date/Publication: 2018-06-13 09:16:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

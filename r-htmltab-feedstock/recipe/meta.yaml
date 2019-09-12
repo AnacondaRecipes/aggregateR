@@ -1,0 +1,101 @@
+{% set version = '0.7.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-htmltab
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/htmltab_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/htmltab/htmltab_{{ version }}.tar.gz
+  sha256: 4caa5446ae50b6208bde6be2494508e4cc19c340b1e3e75b03f69b7fea53d553
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, tidyr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-xml >=3.98.1.3
+    - r-httr >=1.0.0
+
+  run:
+    - r-base
+    - r-xml >=3.98.1.3
+    - r-httr >=1.0.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('htmltab')"           # [not win]
+    - "\"%R%\" -e \"library('htmltab')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/crubba/htmltab
+  license: MIT
+  summary: HTML tables are a valuable data source but extracting and recasting these data into
+    a useful format can be tedious. This package allows to collect structured information
+    from HTML tables. It is similar to readHTMLTable() of the XML package but provides
+    three major advantages. First, the function automatically expands row and column
+    spans in the header and body cells. Second, users are given more control over the
+    identification of header and body rows which will end up in the R table, including
+    semantic header information that appear throughout the body. Third, the function
+    preprocesses table code, corrects common types of malformations, removes unneeded
+    parts and so helps to alleviate the need for tedious post-processing.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: htmltab
+# Title: Assemble Data Frames from HTML Tables
+# Version: 0.7.1
+# Authors@R: person("Christian", "Rubba", email = "christian.rubba@gmail.com", role = c("aut", "cre"))
+# Description: HTML tables are a valuable data source but extracting and recasting these data into a useful format can be tedious. This package allows to collect structured information from HTML tables. It is similar to readHTMLTable() of the XML package but provides three major advantages. First, the function automatically expands row and column spans in the header and body cells. Second, users are given more control over the identification of header and body rows which will end up in the R table, including semantic header information that appear throughout the body. Third, the function preprocesses table code, corrects common types of malformations, removes unneeded parts and so helps to alleviate the need for tedious post-processing.
+# Depends: R (>= 3.0.0)
+# Imports: XML (>= 3.98.1.3), httr (>= 1.0.0)
+# License: MIT + file LICENSE
+# LazyData: true
+# Suggests: testthat, knitr, tidyr
+# URL: https://github.com/crubba/htmltab
+# BugReports: https://github.com/crubba/htmltab/issues
+# VignetteBuilder: knitr
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-12-28 22:12:19 UTC; cr
+# Author: Christian Rubba [aut, cre]
+# Maintainer: Christian Rubba <christian.rubba@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-12-29 01:06:12
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

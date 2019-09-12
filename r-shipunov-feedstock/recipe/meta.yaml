@@ -1,0 +1,94 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-shipunov
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/shipunov_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/shipunov/shipunov_{{ version }}.tar.gz
+  sha256: 712d04aae9701c6132976a1f7b167135f722b5a7074eada305dc995970731d08
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: adabag, apcluster, ape, class, cluster, dbscan, e1071, effsize, grid, ips, kernlab, MASS, mclust, meanShiftR, neuralnet, nnet, PBSmapping, randomForest, rpart, scales, smirnov, tapkee, tree, vegan
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('shipunov')"           # [not win]
+    - "\"%R%\" -e \"library('shipunov')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=shipunov
+  license: GPL-2
+  summary: 'A collection of functions for data manipulation, plotting and statistical computing,
+    to use separately or with the book "Visual Statistics. Use R!": Shipunov (2019)
+    <http://ashipunov.info/shipunov/software/r/r-en.htm>. Most useful functions are
+    probably Bclust(), Jclust() and BootA() which bootstrap hierarchical clustering;
+    Recode...() which multiple recode in a fast, flexible and simple way; Misclass()
+    which outputs confusion matrix even if classes are not concerted; Overlap() which
+    calculates overlaps of convex hulls from any projection; and Pleiad() which is fast
+    and flexible correlogram. In fact, there are much more useful functions, please
+    see documentation.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: shipunov
+# Type: Package
+# Title: Miscellaneous Functions from Alexey Shipunov
+# Version: 1.2
+# Date: 2019-06-11
+# Author: Alexey Shipunov [aut, cre], Paul Murrell [ctb], Marcello D'Orazio [ctb], Stephen Turner [ctb], Eugeny Altshuler [ctb], Roland Rau [ctb], Marcus W Beck [ctb], Sebastian Gibb [ctb], Weiliang Qiu [ctb], Emmanuel Paradis [ctb], Roger Koenker [ctb], R Core Team [ctb]
+# Maintainer: Alexey Shipunov <dactylorhiza@gmail.com>
+# Description: A collection of functions for data manipulation, plotting and statistical computing, to use separately or with the book "Visual Statistics. Use R!": Shipunov (2019) <http://ashipunov.info/shipunov/software/r/r-en.htm>. Most useful functions are probably Bclust(), Jclust() and BootA() which bootstrap hierarchical clustering; Recode...() which multiple recode in a fast, flexible and simple way; Misclass() which outputs confusion matrix even if classes are not concerted; Overlap() which calculates overlaps of convex hulls from any projection; and Pleiad() which is fast and flexible correlogram. In fact, there are much more useful functions, please see documentation.
+# Suggests: adabag, apcluster, ape, class, cluster, dbscan, e1071, effsize, grid, ips, kernlab, MASS, mclust, meanShiftR, neuralnet, nnet, PBSmapping, randomForest, rpart, scales, smirnov, tapkee, tree, vegan
+# Imports: methods
+# License: GPL (>= 2)
+# LazyLoad: yes
+# LazyData: yes
+# NeedsCompilation: no
+# Packaged: 2019-06-12 00:30:18 UTC; alexey
+# Repository: CRAN
+# Date/Publication: 2019-06-12 05:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

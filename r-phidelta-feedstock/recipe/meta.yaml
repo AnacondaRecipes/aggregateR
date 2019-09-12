@@ -1,0 +1,85 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-phidelta
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/phiDelta_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/phiDelta/phiDelta_{{ version }}.tar.gz
+  sha256: 7b3d712038f05bfd360b6e551167e81aad9863cbe578bdaf7b21a26b42292f3c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('phiDelta')"           # [not win]
+    - "\"%R%\" -e \"library('phiDelta')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=phiDelta
+  license: GPL-2
+  summary: Analysis of features by phi delta diagrams. In particular, functions for reading data
+    and calculating phi and delta as well as the functionality to plot it. Moreover
+    it is possible to do further analysis on the data by generating rankings. For more
+    information on phi delta diagrams, see also Giuliano Armano (2015) <doi:10.1016/j.ins.2015.07.028>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: phiDelta
+# Type: Package
+# Title: Tool for Phi Delta Analysis of Features
+# Version: 1.0.1
+# Author: Nikolas Rothe and Ursula Neumann
+# Maintainer: Ursula Neumann <ursula.neumann@uni-marburg.de>
+# Description: Analysis of features by phi delta diagrams. In particular, functions for reading data and calculating phi and delta as well as the functionality to plot it. Moreover it is possible to do further analysis on the data by generating rankings. For more information on phi delta diagrams, see also Giuliano Armano (2015) <doi:10.1016/j.ins.2015.07.028>.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1.9000
+# NeedsCompilation: no
+# Packaged: 2018-05-07 13:25:59 UTC; ursula
+# Repository: CRAN
+# Date/Publication: 2018-05-08 08:27:22 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

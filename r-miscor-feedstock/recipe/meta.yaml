@@ -1,0 +1,91 @@
+{% set version = '0.1-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-miscor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/miscor_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/miscor/miscor_{{ version }}.tar.gz
+  sha256: 6ba0044eeb03ac4fea00faaffa0c6418b875f33cf0acd6b8975f072722c0c0ee
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('miscor')"           # [not win]
+    - "\"%R%\" -e \"library('miscor')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=miscor
+  license: GPL-3
+  summary: 'Statistical test for the product-moment correlation coefficient based on H0: rho
+    = rho0  including sample size computation, statistical test for comparing the product-moment  correlation
+    coefficient in independent ad dependent samples, sequential triangular test for
+    the product-moment correlation coefficient, partial and semipartial correlation,
+    simulation of bivariate normal and non-normal distribution with a specified correlation.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: miscor
+# Type: Package
+# Title: Miscellaneous Functions for the Correlation Coefficient
+# Version: 0.1-1
+# Date: 2017-04-02
+# Authors@R: person(given = "Takuya", family = "Yanagida", email="takuya.yanagida@univie.ac.at", role = c("cre","aut"))
+# Author: Takuya Yanagida [cre, aut]
+# Maintainer: Takuya Yanagida <takuya.yanagida@univie.ac.at>
+# Description: Statistical test for the product-moment correlation coefficient based on H0: rho = rho0  including sample size computation, statistical test for comparing the product-moment  correlation coefficient in independent ad dependent samples, sequential triangular test for the product-moment correlation coefficient, partial and semipartial correlation, simulation of bivariate normal and non-normal distribution with a specified correlation.
+# License: GPL-3
+# LazyLoad: yes
+# LazyData: true
+# Imports: methods
+# Depends: R (>= 3.0)
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-04-02 12:39:07 UTC; Takuya
+# Repository: CRAN
+# Date/Publication: 2017-04-02 15:27:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

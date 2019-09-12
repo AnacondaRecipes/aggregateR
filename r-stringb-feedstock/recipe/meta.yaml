@@ -1,0 +1,101 @@
+{% set version = '0.1.13' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stringb
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/stringb_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/stringb/stringb_{{ version }}.tar.gz
+  sha256: 3da884e6f3dd9de989e4d9b2600ef889967fb09be49cb40122f965e8cbb98b00
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-backports
+
+  run:
+    - r-base
+    - r-backports
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('stringb')"           # [not win]
+    - "\"%R%\" -e \"library('stringb')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/petermeissner/stringb
+  license: MIT
+  summary: Base R already ships with string handling capabilities 'out- of-the-box' but lacks
+    streamlined function names and workflow. The 'stringi' ('stringr') package on the
+    other hand has well named functions, extensive Unicode support and allows for a
+    streamlined workflow. On the other hand it adds dependencies and regular expression
+    interpretation between base R functions and 'stringi' functions might differ. This
+    packages aims at providing a solution to the use case of unwanted dependencies on
+    the one hand but the need for streamlined text processing on the other. The packages'
+    functions are solely based on wrapping base R functions into 'stringr'/'stringi'
+    like function names. Along the way it adds one or two extra functions and last but
+    not least provides all functions as generics, therefore allowing for adding methods
+    for other text structures besides plain character vectors.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: stringb
+# Title: Convenient Base R String Handling
+# Date: 2016-11-01
+# Version: 0.1.13
+# Authors@R: c( person( "Peter", "Meissner", email = "retep.meissner@gmail.com", role = c("aut", "cre") ) )
+# Description: Base R already ships with string handling capabilities 'out- of-the-box' but lacks streamlined function names and workflow. The 'stringi' ('stringr') package on the other hand has well named functions, extensive Unicode support and allows for a streamlined workflow. On the other hand it adds dependencies and regular expression interpretation between base R functions and 'stringi' functions might differ. This packages aims at providing a solution to the use case of unwanted dependencies on the one hand but the need for streamlined text processing on the other. The packages' functions are solely based on wrapping base R functions into 'stringr'/'stringi' like function names. Along the way it adds one or two extra functions and last but not least provides all functions as generics, therefore allowing for adding methods for other text structures besides plain character vectors.
+# Depends: R (>= 3.0.0)
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Imports: graphics, tools, backports
+# Suggests: testthat, knitr, rmarkdown
+# BugReports: https://github.com/petermeissner/stringb/issues
+# URL: https://github.com/petermeissner/stringb
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-11-01 11:18:49 UTC; peter
+# Author: Peter Meissner [aut, cre]
+# Maintainer: Peter Meissner <retep.meissner@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-11-01 15:18:21
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

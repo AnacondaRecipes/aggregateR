@@ -1,0 +1,92 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pagi
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PAGI_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PAGI/PAGI_{{ version }}.tar.gz
+  sha256: 6e5cbf6f150769bd077095ebe9f2a122046a1087b5459f2ebf546318cb6f4106
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Matrix
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-igraph
+
+  run:
+    - r-base
+    - r-igraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PAGI')"           # [not win]
+    - "\"%R%\" -e \"library('PAGI')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PAGI
+  license: GPL-2
+  summary: The package can identify the dysregulated KEGG pathways based on global influence
+    from the internal effect of pathways and crosstalk between pathways. (1) The PAGI
+    package can prioritize the pathways associated with two biological states by statistical
+    significance or FDR. (2) The PAGI package can evaluated the global influence factor
+    (GIF) score in the global gene-gene network constructed based on the relationships
+    of genes extracted from each pathway in KEGG database and the overlapped genes between
+    pathways.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PAGI
+# Version: 1.0
+# Title: The package can identify the dysregulated KEGG pathways based on global influence from the internal effect of pathways and crosstalk between pathways.
+# Author: Junwei Han,Yanjun Xu,Haixiu Yang,Chunquan Li and Xia Li
+# Maintainer: Junwei Han <hanjunwei1981@163.com>
+# Description: The package can identify the dysregulated KEGG pathways based on global influence from the internal effect of pathways and crosstalk between pathways. (1) The PAGI package can prioritize the pathways associated with two biological states by statistical significance or FDR. (2) The PAGI package can evaluated the global influence factor (GIF) score in the global gene-gene network constructed based on the relationships of genes extracted from each pathway in KEGG database and the overlapped genes between pathways.
+# Depends: R (>= 2.15.1),igraph
+# Suggests: Matrix
+# Collate: PAGI.1.0.R getExample.R
+# LazyData: Yes
+# License: GPL (>= 2)
+# biocViews: Statistics, crosstalk, Pathways, Graphs, Networks
+# Packaged: 2013-11-01 07:20:37 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2013-11-01 08:31:57
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

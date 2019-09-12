@@ -1,0 +1,94 @@
+{% set version = '0.0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gettz
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gettz_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gettz/gettz_{{ version }}.tar.gz
+  sha256: aae5968b94689fa7b6e0a74c747db58ba627de5f19724e110e231081aab306c4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gettz')"           # [not win]
+    - "\"%R%\" -e \"library('gettz')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://dirk.eddelbuettel.com/code/gettz.html
+  license: GPL-2
+  summary: A function to retrieve the system timezone on Unix systems which has been found to
+    find an answer when 'Sys.timezone()' has failed. It is based on an answer by Duane
+    McCully posted on 'StackOverflow', and adapted to be callable from R. The package
+    also builds on Windows, but just returns NULL.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gettz
+# Type: Package
+# Title: Get the Timezone Information
+# Version: 0.0.3
+# Date: 2016-11-05
+# Author: Dirk Eddelbuettel
+# Maintainer: Dirk Eddelbuettel <edd@debian.org>
+# Description: A function to retrieve the system timezone on Unix systems which has been found to find an answer when 'Sys.timezone()' has failed. It is based on an answer by Duane McCully posted on 'StackOverflow', and adapted to be callable from R. The package also builds on Windows, but just returns NULL.
+# URL: http://dirk.eddelbuettel.com/code/gettz.html
+# BugReports: https://github.com/eddelbuettel/gettz/issues
+# License: GPL (>= 2)
+# RoxygenNote: 5.0.1
+# NeedsCompilation: yes
+# Packaged: 2016-11-05 13:13:24.914588 UTC; edd
+# Repository: CRAN
+# Date/Publication: 2016-11-05 20:56:39
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

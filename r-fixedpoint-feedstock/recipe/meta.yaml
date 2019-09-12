@@ -1,0 +1,93 @@
+{% set version = '0.6.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fixedpoint
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/FixedPoint_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/FixedPoint/FixedPoint_{{ version }}.tar.gz
+  sha256: adb82c7a59b4ba5a90058a680ed52ba3139b07720788dec3eeeb840e7349ba3b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, schumaker, cubature, knitr, foreach, doParallel, SQUAREM
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('FixedPoint')"           # [not win]
+    - "\"%R%\" -e \"library('FixedPoint')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=FixedPoint
+  license: MIT
+  summary: For functions that take and return vectors (or scalars), this package provides 8 algorithms
+    for finding fixed point vectors (vectors for which the inputs and outputs to the
+    function are the same vector). These algorithms include Anderson (1965) acceleration
+    <doi:10.1145/321296.321305>, epsilon extrapolation methods (Wynn 1962 <doi:10.2307/2004051>)
+    and minimal polynomial methods (Cabay and Jackson 1976 <doi:10.1137/0713060>).
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: FixedPoint
+# Type: Package
+# Title: Algorithms for Finding Fixed Point Vectors of Functions
+# Version: 0.6.1
+# Author: Stuart Baumann & Margaryta Klymak
+# Maintainer: Stuart Baumann <Stuart@StuartBaumann.com>
+# Description: For functions that take and return vectors (or scalars), this package provides 8 algorithms for finding fixed point vectors (vectors for which the inputs and outputs to the function are the same vector). These algorithms include Anderson (1965) acceleration <doi:10.1145/321296.321305>, epsilon extrapolation methods (Wynn 1962 <doi:10.2307/2004051>) and minimal polynomial methods (Cabay and Jackson 1976 <doi:10.1137/0713060>).
+# License: MIT + file LICENSE
+# Depends: MASS
+# Suggests: testthat, schumaker, cubature, knitr, foreach, doParallel, SQUAREM
+# LazyData: TRUE
+# VignetteBuilder: knitr
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2019-03-11 23:55:24 UTC; stuar
+# Repository: CRAN
+# Date/Publication: 2019-03-12 09:47:19 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

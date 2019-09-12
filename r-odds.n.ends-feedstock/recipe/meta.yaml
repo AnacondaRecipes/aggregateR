@@ -1,0 +1,86 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-odds.n.ends
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/odds.n.ends_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/odds.n.ends/odds.n.ends_{{ version }}.tar.gz
+  sha256: e442ad0a6c789a3aa3896b62e274997d022bbdc4428b0996098a40122ad9ed4d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('odds.n.ends')"           # [not win]
+    - "\"%R%\" -e \"library('odds.n.ends')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=odds.n.ends
+  license: CC0
+  summary: Computes odds ratios and 95% confidence intervals from a generalized linear model
+    object. It also computes model significance with the chi-squared statistic and p-value
+    and it computes model fit using a contingency table to determine the percent of
+    observations for which the model correctly predicts the value of the outcome. Calculates
+    model sensitivity and specificity.
+  license_family: CC
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: odds.n.ends
+# Title: Odds Ratios, Contingency Table, and Model Significance from a Generalized Linear Model Object
+# Version: 0.1.1
+# Imports: MASS
+# Authors@R:  person(given = "Jenine", family = "Harris", role = c("aut", "cre"), email = "harrisj@wustl.edu")
+# Description: Computes odds ratios and 95% confidence intervals from a generalized linear model object. It also computes model significance with the chi-squared statistic and p-value and it computes model fit using a contingency table to determine the percent of observations for which the model correctly predicts the value of the outcome. Calculates model sensitivity and specificity.
+# License: CC0
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2019-07-12 20:19:20 UTC; jenine
+# Author: Jenine Harris [aut, cre]
+# Maintainer: Jenine Harris <harrisj@wustl.edu>
+# Repository: CRAN
+# Date/Publication: 2019-07-12 20:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,89 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-migration.indices
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/migration.indices_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/migration.indices/migration.indices_{{ version }}.tar.gz
+  sha256: 8d57330eff8fde3212880053aae90cf059c505142e503e767ef7737024931e40
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-calibrate
+
+  run:
+    - r-base
+    - r-calibrate
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('migration.indices')"           # [not win]
+    - "\"%R%\" -e \"library('migration.indices')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/daroczig/migration.indices
+  license: AGPL-3
+  summary: This package provides various indices, like Crude Migration Rate, different Gini indices
+    or the Coefficient of Variation among others, to show the (un)equality of migration.
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: migration.indices
+# Maintainer: Gergely Daroczi <daroczig@rapporter.net>
+# License: AGPL-3
+# BugReports: https://github.com/daroczig/migration.indices/issues
+# Title: Migration indices
+# LazyData: no
+# Type: Package
+# Author: Lajos Balint <balint@demografia.hu> and Gergely Daroczi <daroczig@rapporter.net>
+# Description: This package provides various indices, like Crude Migration Rate, different Gini indices or the Coefficient of Variation among others, to show the (un)equality of migration.
+# Version: 0.3.0
+# Imports: calibrate
+# URL: http://github.com/daroczig/migration.indices
+# Date: 2013-06-18
+# Encoding: UTF-8
+# Collate: 'gini.R' 'migration.indices.R' 'crude.R' 'others.R' 'acv.R' 'graph.R'
+# Packaged: 2013-10-07 06:59:08 UTC; daroczig
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-10-07 09:09:13
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

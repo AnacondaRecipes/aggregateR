@@ -1,0 +1,98 @@
+{% set version = '0.8-13' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-simecol
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/simecol_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/simecol/simecol_{{ version }}.tar.gz
+  sha256: 08e38de5c2df984db932857f2fdb6e7f6280444c0f1705725bb306180bc48118
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tcltk, FME, lattice
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-desolve
+    - r-minqa
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-desolve
+    - r-minqa
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('simecol')"           # [not win]
+    - "\"%R%\" -e \"library('simecol')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.simecol.de/
+  license: GPL-2
+  summary: An object oriented framework to simulate ecological (and other) dynamic systems. It
+    can be used for differential equations, individual-based (or agent-based) and other
+    models as well. It supports structuring of simulation scenarios (to avoid copy and
+    paste) and aims to improve readability and re-usability of code.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: simecol
+# Version: 0.8-13
+# Title: Simulation of Ecological (and Other) Dynamic Systems
+# Authors@R: c(person("Thomas","Petzoldt", role = c("aut", "cre"), email = "thomas.petzoldt@tu-dresden.de", comment = c(ORCID = "0000-0002-4951-6468")))
+# Author: Thomas Petzoldt [aut, cre] (<https://orcid.org/0000-0002-4951-6468>)
+# Depends: R (>= 3.2), deSolve, methods
+# Imports: graphics, grDevices, stats, utils, minqa
+# Suggests: tcltk, FME, lattice
+# LazyLoad: yes
+# Maintainer: Thomas Petzoldt <thomas.petzoldt@tu-dresden.de>
+# Description: An object oriented framework to simulate ecological (and other) dynamic systems. It can be used for differential equations, individual-based (or agent-based) and other models as well. It supports structuring of simulation scenarios (to avoid copy and paste) and aims to improve readability and re-usability of code.
+# License: GPL (>= 2)
+# URL: http://www.simecol.de/
+# NeedsCompilation: yes
+# Packaged: 2019-07-15 20:53:54 UTC; thpe
+# Repository: CRAN
+# Date/Publication: 2019-07-15 21:20:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

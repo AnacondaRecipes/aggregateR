@@ -1,0 +1,92 @@
+{% set version = '2.0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nlsylinks
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/NlsyLinks_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/NlsyLinks/NlsyLinks_{{ version }}.tar.gz
+  sha256: 4fda32570de2f05814ebfc5b7b405a2a9d8e17358a8dd763e864ce29b98bb8cd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: devtools, ggplot2, knitr, plyr, scales, testit, testthat, xtable
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lavaan
+
+  run:
+    - r-base
+    - r-lavaan
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('NlsyLinks')"           # [not win]
+    - "\"%R%\" -e \"library('NlsyLinks')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://liveoak.github.io/NlsyLinks, https://github.com/LiveOak/NlsyLinks, https://r-forge.r-project.org/projects/nlsylinks
+  license: GPL-3
+  summary: Utilities and kinship information for behavior genetics and developmental research
+    using the National Longitudinal Survey of Youth (NLSY; <http://www.bls.gov/nls/>).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: NlsyLinks
+# Type: Package
+# Title: Utilities and Kinship Information for Research with the NLSY
+# Version: 2.0.6
+# Date: 2016-04-18
+# Author: Will Beasley, Joe Rodgers, David Bard, Michael Hunter, S. Mason Garrison, and Kelly Meredith
+# Maintainer: Will Beasley <wibeasley@hotmail.com>
+# Description: Utilities and kinship information for behavior genetics and developmental research using the National Longitudinal Survey of Youth (NLSY; <http://www.bls.gov/nls/>).
+# URL: http://liveoak.github.io/NlsyLinks, https://github.com/LiveOak/NlsyLinks, https://r-forge.r-project.org/projects/nlsylinks
+# BugReports: https://github.com/LiveOak/NlsyLinks/issues
+# Depends: R (>= 3.0.0), stats
+# Imports: lavaan, methods
+# Suggests: devtools, ggplot2, knitr, plyr, scales, testit, testthat, xtable
+# License: GPL
+# LazyData: TRUE
+# VignetteBuilder: knitr
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-04-19 06:38:21 UTC; wibeasley
+# Repository: CRAN
+# Date/Publication: 2016-04-19 13:50:00
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

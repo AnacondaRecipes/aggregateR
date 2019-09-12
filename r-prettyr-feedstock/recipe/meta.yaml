@@ -1,0 +1,81 @@
+{% set version = '2.2-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-prettyr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/prettyR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/prettyR/prettyR_{{ version }}.tar.gz
+  sha256: 197aa6b8c2a7841924e3aebff1c3fc9fe3406e05e9c24bc4f1d9b7922b0349e7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('prettyR')"           # [not win]
+    - "\"%R%\" -e \"library('prettyR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=prettyR
+  license: GPL-2
+  summary: Functions for conventionally formatting descriptive stats, reshaping data frames and
+    formatting R output as HTML.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: prettyR
+# Version: 2.2-3
+# Title: Pretty Descriptive Stats
+# Date: 2019-04-08
+# Author: Jim Lemon <drjimlemon@gmail.com>, Philippe Grosjean <phgrosjean@sciviews.org>
+# Maintainer: Jim Lemon <drjimlemon@gmail.com>
+# Description: Functions for conventionally formatting descriptive stats, reshaping data frames and formatting R output as HTML.
+# Imports: grDevices, stats, utils
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2019-04-08 03:30:00 UTC; root
+# Repository: CRAN
+# Date/Publication: 2019-04-09 05:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

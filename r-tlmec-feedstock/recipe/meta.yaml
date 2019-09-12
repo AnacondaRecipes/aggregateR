@@ -1,0 +1,83 @@
+{% set version = '0.0-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tlmec
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tlmec_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tlmec/tlmec_{{ version }}.tar.gz
+  sha256: 872f9c05da6688a3b29824c0d1c3560fa2ba0e649e1aa9e02ac04957fb4653bd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm >=0.9_9991
+
+  run:
+    - r-base
+    - r-mvtnorm >=0.9_9991
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tlmec')"           # [not win]
+    - "\"%R%\" -e \"library('tlmec')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=tlmec
+  license: GPL (>= 3.0)
+  summary: Fit a linear mixed effects model for censored data with Student-t or normal distributions.
+    The errors are assumed independent and identically distributed.
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: tlmec
+# Type: Package
+# Title: Linear Student-t Mixed-Effects Models with Censored Data
+# Version: 0.0-2
+# Date: 2011-12-01
+# Author: Larissa Matos <larissa.amatos@gmail.com>, Marcos Prates <marcosop@ime.unicamp.br> and Victor Lachos <hlachos@ime.unicamp.br>
+# Depends: R (>= 1.9.0), mvtnorm (>= 0.9-9991)
+# Maintainer: Larissa Matos <larissa.amatos@gmail.com>
+# Description: Fit a linear mixed effects model for censored data with Student-t or normal distributions. The errors are assumed independent and identically distributed.
+# License: GPL (>= 3.0)
+# LazyLoad: yes
+# Packaged: 2012-01-27 19:50:32 UTC; marcosop
+# Repository: CRAN
+# Date/Publication: 2012-01-28 17:52:22
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

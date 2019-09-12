@@ -1,0 +1,95 @@
+{% set version = '0.7.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-regressionfactory
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RegressionFactory_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RegressionFactory/RegressionFactory_{{ version }}.tar.gz
+  sha256: cc2bdfb646685d13debb3dec937ed27446942ba72eaf19b7c2317641b0ba43bc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: sns, MfUSampler, dglm
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RegressionFactory')"           # [not win]
+    - "\"%R%\" -e \"library('RegressionFactory')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RegressionFactory
+  license: GPL-2
+  summary: The expander functions rely on the mathematics developed for the Hessian-definiteness
+    invariance theorem for linear projection transformations of variables, described
+    in authors' paper, to generate the full, high-dimensional gradient and Hessian from
+    the lower-dimensional derivative objects. This greatly relieves the computational
+    burden of generating the regression-function derivatives, which in turn can be fed
+    into any optimization routine that utilizes such derivatives. The theorem guarantees
+    that Hessian definiteness is preserved, meaning that reasoning about this property
+    can be performed in the low-dimensional space of the base distribution. This is
+    often a much easier task than its equivalent in the full, high-dimensional space.
+    Definiteness of Hessian can be useful in selecting optimization/sampling algorithms
+    such as Newton-Raphson optimization or its sampling equivalent, the Stochastic Newton
+    Sampler. Finally, in addition to being a computational tool, the regression expansion
+    framework is of conceptual value by offering new opportunities to generate novel
+    regression problems.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RegressionFactory
+# Type: Package
+# Title: Expander Functions for Generating Full Gradient and Hessian from Single-Slot and Multi-Slot Base Distributions
+# Version: 0.7.2
+# Date: 2016-09-07
+# Author: Alireza S. Mahani, Mansour T.A. Sharabiani
+# Maintainer: Alireza S. Mahani <alireza.s.mahani@gmail.com>
+# Description: The expander functions rely on the mathematics developed for the Hessian-definiteness invariance theorem for linear projection transformations of variables, described in authors' paper, to generate the full, high-dimensional gradient and Hessian from the lower-dimensional derivative objects. This greatly relieves the computational burden of generating the regression-function derivatives, which in turn can be fed into any optimization routine that utilizes such derivatives. The theorem guarantees that Hessian definiteness is preserved, meaning that reasoning about this property can be performed in the low-dimensional space of the base distribution. This is often a much easier task than its equivalent in the full, high-dimensional space. Definiteness of Hessian can be useful in selecting optimization/sampling algorithms such as Newton-Raphson optimization or its sampling equivalent, the Stochastic Newton Sampler. Finally, in addition to being a computational tool, the regression expansion framework is of conceptual value by offering new opportunities to generate novel regression problems.
+# License: GPL (>= 2)
+# Suggests: sns, MfUSampler, dglm
+# NeedsCompilation: no
+# Packaged: 2016-09-08 00:46:00 UTC; asmahani
+# Repository: CRAN
+# Date/Publication: 2016-09-08 07:33:43
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

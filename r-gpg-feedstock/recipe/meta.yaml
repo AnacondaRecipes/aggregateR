@@ -1,0 +1,108 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gpg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gpg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gpg/gpg_{{ version }}.tar.gz
+  sha256: 3989f258556fba4d14858420079d78ba9f4ec02a524b264c30a54c3615f5fbdc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-askpass
+    - r-curl
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-askpass
+    - r-curl
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gpg')"           # [not win]
+    - "\"%R%\" -e \"library('gpg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jeroen/gpg
+  license: MIT
+  summary: Bindings to GnuPG for working with OpenGPG (RFC4880) cryptographic methods. Includes
+    utilities for public key encryption, creating and verifying digital signatures,
+    and managing your local keyring. Note that some functionality depends on the version
+    of  GnuPG that is installed on the system. On Windows this package can be used together
+    with 'GPG4Win' which provides a GUI for managing keys and entering passphrases.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gpg
+# Type: Package
+# Title: GNU Privacy Guard for R
+# Version: 1.2
+# Authors@R: person("Jeroen", "Ooms", email = "jeroen@berkeley.edu",  comment = c(ORCID = "0000-0002-4035-0289"), role = c("aut", "cre"))
+# Description: Bindings to GnuPG for working with OpenGPG (RFC4880) cryptographic methods. Includes utilities for public key encryption, creating and verifying digital signatures, and managing your local keyring. Note that some functionality depends on the version of  GnuPG that is installed on the system. On Windows this package can be used together with 'GPG4Win' which provides a GUI for managing keys and entering passphrases.
+# License: MIT + file LICENSE
+# SystemRequirements: GPGME: libgpgme-dev / libgpgme11-dev (deb), gpgme-devel (rpm) gpgme (brew). On Linux 'haveged' is recommended for generating entropy when using the GPG key generator.
+# RoxygenNote: 6.1.1
+# Imports: curl, askpass
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# URL: https://github.com/jeroen/gpg
+# BugReports: https://github.com/jeroen/gpg/issues
+# NeedsCompilation: yes
+# Packaged: 2019-04-30 22:07:53 UTC; jeroen
+# Author: Jeroen Ooms [aut, cre] (<https://orcid.org/0000-0002-4035-0289>)
+# Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
+# Repository: CRAN
+# Date/Publication: 2019-05-01 18:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

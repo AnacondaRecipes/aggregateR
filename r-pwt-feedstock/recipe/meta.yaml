@@ -1,0 +1,85 @@
+{% set version = '7.1-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pwt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pwt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pwt/pwt_{{ version }}.tar.gz
+  sha256: cac5469dbc25de7034cdb4024820580f660e0094d149bb3efdb5515e79dc4624
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pwt')"           # [not win]
+    - "\"%R%\" -e \"library('pwt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=pwt
+  license: GPL-2
+  summary: The Penn World Table provides purchasing power parity and national income accounts
+    converted to international prices for 189 countries for some or all of the years
+    1950-2010.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pwt
+# Version: 7.1-1
+# Date: 2013-07-28
+# Title: Penn World Table (Versions 5.6, 6.x, 7.x)
+# Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org"), person(given = "Guan", family = "Yang", role = "aut"))
+# Description: The Penn World Table provides purchasing power parity and national income accounts converted to international prices for 189 countries for some or all of the years 1950-2010.
+# LazyData: yes
+# LazyDataCompression: xz
+# Depends: R (>= 2.10.0)
+# License: GPL-2
+# Packaged: 2013-07-27 22:55:10 UTC; zeileis
+# Author: Achim Zeileis [aut, cre], Guan Yang [aut]
+# Maintainer: Achim Zeileis <Achim.Zeileis@R-project.org>
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-07-28 08:20:11
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

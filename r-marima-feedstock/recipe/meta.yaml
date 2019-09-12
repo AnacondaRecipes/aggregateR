@@ -1,0 +1,82 @@
+{% set version = '2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-marima
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/marima_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/marima/marima_{{ version }}.tar.gz
+  sha256: a6328dfcd3463f80921629e884052901f26740601f4b4f50a4a200924782db0e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('marima')"           # [not win]
+    - "\"%R%\" -e \"library('marima')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=marima
+  license: GPL-2
+  summary: Multivariate ARIMA and ARIMA-X estimation using Spliid's  algorithm (marima()) and
+    simulation (marima.sim()).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: marima
+# Type: Package
+# Title: Multivariate ARIMA and ARIMA-X Analysis
+# Version: 2.2
+# Date: 2017-01-13
+# Author: Henrik Spliid
+# Maintainer: Henrik Spliid <hspl@dtu.dk>
+# Description: Multivariate ARIMA and ARIMA-X estimation using Spliid's  algorithm (marima()) and simulation (marima.sim()).
+# License: GPL-2
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2017-01-13 20:34:32 UTC; hspl
+# Repository: CRAN
+# Date/Publication: 2017-01-14 00:59:20
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

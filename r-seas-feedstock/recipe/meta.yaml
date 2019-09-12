@@ -1,0 +1,98 @@
+{% set version = '0.5-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-seas
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/seas_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/seas/seas_{{ version }}.tar.gz
+  sha256: 5e01fda3038216a5ae4fdcb9ef8e45c6e065ba0e720f7a1af3fe07c05a69c442
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('seas')"           # [not win]
+    - "\"%R%\" -e \"library('seas')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mwtoews/seas
+  license: GPL-2
+  summary: Capable of deriving seasonal statistics, such as "normals", and analysis of seasonal
+    data, such as departures. This package also has graphics capabilities for representing
+    seasonal data, including boxplots for seasonal parameters, and bars for summed normals.
+    There are many specific functions related to climatology, including precipitation
+    normals, temperature normals, cumulative precipitation departures and precipitation
+    interarrivals. However, this package is designed to represent any time-varying parameter
+    with a discernible seasonal signal, such as found in hydrology and ecology.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: seas
+# Type: Package
+# Version: 0.5-2
+# Date: 2018-06-02
+# Title: Seasonal Analysis and Graphics, Especially for Climatology
+# Authors@R: person("Mike", "Toews", role = c("aut", "cre"), email = "mwtoews@gmail.com")
+# Author: Mike Toews [aut, cre]
+# Maintainer: Mike Toews <mwtoews@gmail.com>
+# Depends: R(>= 2.15.0), MASS
+# Description: Capable of deriving seasonal statistics, such as "normals", and analysis of seasonal data, such as departures. This package also has graphics capabilities for representing seasonal data, including boxplots for seasonal parameters, and bars for summed normals. There are many specific functions related to climatology, including precipitation normals, temperature normals, cumulative precipitation departures and precipitation interarrivals. However, this package is designed to represent any time-varying parameter with a discernible seasonal signal, such as found in hydrology and ecology.
+# License: GPL (>= 2)
+# URL: https://github.com/mwtoews/seas
+# BugReports: https://github.com/mwtoews/seas/issues
+# NeedsCompilation: yes
+# Packaged: 2018-06-02 06:30:37 UTC; mtoews
+# Repository: CRAN
+# Date/Publication: 2018-06-02 06:52:57 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,94 @@
+{% set version = '0.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-prevederer
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/prevederer_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/prevederer/prevederer_{{ version }}.tar.gz
+  sha256: 4e8cbf3680338cba1e447a6d4f38a37d475f962e2bd392e8ea66dc47b34d7d6e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.1.0), knitr, covr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+
+  run:
+    - r-base
+    - r-httr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('prevederer')"           # [not win]
+    - "\"%R%\" -e \"library('prevederer')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/wkdavis/prevederer, https://api.prevedere.com/index.html, https://www.prevedere.com/
+  license: MIT
+  summary: Easy and efficient access to the API provided by 'Prevedere',  an industry insights
+    and predictive analytics company. Query and  download indicators, models and workbenches
+    built with 'Prevedere' for further  analysis and reporting <https://www.prevedere.com/>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: prevederer
+# Type: Package
+# Title: Wrapper for the 'Prevedere' API
+# Version: 0.0.1
+# Authors@R: c( person("Wil","Davis",,"davis.3243@osu.edu",role=c("aut","cre"),comment = c(ORCID = "0000-0001-9780-2576")), person("Hiram","Foster",,"hiramfoster.co@gmail.com",role=c("ctb")), person("Ted","Dickinson",,"tmdickinson@gmail.com",role=c("ctb")) )
+# Description: Easy and efficient access to the API provided by 'Prevedere',  an industry insights and predictive analytics company. Query and  download indicators, models and workbenches built with 'Prevedere' for further  analysis and reporting <https://www.prevedere.com/>.
+# License: MIT + file LICENSE
+# URL: https://github.com/wkdavis/prevederer, https://api.prevedere.com/index.html, https://www.prevedere.com/
+# BugReports: https://github.com/wkdavis/prevederer/issues
+# Depends: R (>= 3.2.0)
+# Imports: httr
+# Suggests: testthat (>= 2.1.0), knitr, covr
+# Encoding: UTF-8
+# LazyData: yes
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-07-19 11:08:24 UTC; wkdavis
+# Author: Wil Davis [aut, cre] (<https://orcid.org/0000-0001-9780-2576>), Hiram Foster [ctb], Ted Dickinson [ctb]
+# Maintainer: Wil Davis <davis.3243@osu.edu>
+# Repository: CRAN
+# Date/Publication: 2019-07-23 09:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

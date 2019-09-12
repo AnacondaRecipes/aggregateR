@@ -1,0 +1,95 @@
+{% set version = '2.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tpauc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tpAUC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tpAUC/tpAUC_{{ version }}.tar.gz
+  sha256: ac793fc55f72f656957a2594f1f6a438b5a6eccd751d08b1eb47b6c8384e3d72
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-proc
+
+  run:
+    - r-base
+    - r-proc
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tpAUC')"           # [not win]
+    - "\"%R%\" -e \"library('tpAUC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://arxiv.org/abs/1508.00298 http://www3.stat.sinica.edu.tw/statistica/j27n1/j27n117/j27n117.html
+    http://www.ncbi.nlm.nih.gov/pubmed/20729218
+  license: GPL-2
+  summary: 'Tools for estimating and inferring two-way partial area under receiver operating
+    characteristic curves (two-way pAUC), partial area under receiver operating characteristic
+    curves (pAUC), and partial area under ordinal dominance curves (pODC). Methods includes
+    Mann-Whitney statistic and Jackknife, etc. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: tpAUC
+# Type: Package
+# Title: Estimation and Inference of Two-Way pAUC, pAUC and pODC
+# Version: 2.1.1
+# Date: 2017-1-12
+# Author: Hanfang Yang, Kun Lu, Xiang Lyu, Feifang Hu, Yichuan Zhao
+# Maintainer: Xiang Lyu <lyu17@purdue.edu>
+# Description: Tools for estimating and inferring two-way partial area under receiver operating characteristic curves (two-way pAUC), partial area under receiver operating characteristic curves (pAUC), and partial area under ordinal dominance curves (pODC). Methods includes Mann-Whitney statistic and Jackknife, etc.
+# Imports: pROC, stats, graphics
+# Depends: R (>= 3.1.1)
+# License: GPL (>= 2)
+# LazyData: true
+# RoxygenNote: 5.0.1
+# URL: http://arxiv.org/abs/1508.00298 http://www3.stat.sinica.edu.tw/statistica/j27n1/j27n117/j27n117.html http://www.ncbi.nlm.nih.gov/pubmed/20729218
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2017-04-09 00:48:04 UTC; xianglyu
+# Repository: CRAN
+# Date/Publication: 2017-04-09 13:38:34 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,89 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-inspectr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/inspectr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/inspectr/inspectr_{{ version }}.tar.gz
+  sha256: 6fd25b678a0238fa708a26312225f547cccebbcfed88e11369a1b72b55c93713
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-openxlsx
+
+  run:
+    - r-base
+    - r-openxlsx
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('inspectr')"           # [not win]
+    - "\"%R%\" -e \"library('inspectr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=inspectr
+  license: CC BY-SA 4.0
+  summary: Check one column or multiple columns of a dataframe using the preset basic checks
+    or your own functions. Enables checks without knowledge of lapply() or sapply().
+  license_family: CC
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: inspectr
+# Type: Package
+# Title: Perform Basic Checks of Dataframes
+# Version: 1.0.0
+# Authors@R: person("Jennifer", "Brussow", email = "jbrussow@gmail.com",  role = c("aut", "cre"))
+# Maintainer: Jennifer Brussow <jbrussow@gmail.com>
+# Description: Check one column or multiple columns of a dataframe using the preset basic checks or your own functions. Enables checks without knowledge of lapply() or sapply().
+# License: CC BY-SA 4.0
+# Encoding: UTF-8
+# LazyData: true
+# Imports: openxlsx
+# Depends: R (>= 3.0.1)
+# RoxygenNote: 5.0.1
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2017-01-30 15:02:30 UTC; jbrussow
+# Author: Jennifer Brussow [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2017-01-30 21:41:32
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

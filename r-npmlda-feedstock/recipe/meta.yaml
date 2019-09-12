@@ -1,0 +1,91 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-npmlda
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/npmlda_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/npmlda/npmlda_{{ version }}.tar.gz
+  sha256: 85d513fc7f645a7aa58d21b2fe0fd40753e3f390157eb4bc4c882976ac2a22b7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('npmlda')"           # [not win]
+    - "\"%R%\" -e \"library('npmlda')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/npmldabook/npmlda/
+  license: GPL-2
+  summary: 'Support the book: Wu CO and Tian X (2018). Nonparametric Models for Longitudinal
+    Data.  Chapman & Hall/CRC (to appear); and provide fit for using global and local
+    smoothing methods for the conditional-mean and conditional-distribution based models
+    with longitudinal Data.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: npmlda
+# Type: Package
+# Title: Nonparametric Models for Longitudinal Data
+# Version: 1.0.0
+# Date: 2018-02-12
+# Author: Xin Tian, Colin Wu
+# Maintainer: Xin Tian <tianxtt@gmail.com>
+# Description: Support the book: Wu CO and Tian X (2018). Nonparametric Models for Longitudinal Data.  Chapman & Hall/CRC (to appear); and provide fit for using global and local smoothing methods for the conditional-mean and conditional-distribution based models with longitudinal Data.
+# License: GPL (>= 2)
+# BugReports: https://github.com/npmldabook/npmlda/issues
+# URL: https://github.com/npmldabook/npmlda/
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 3.0)
+# Imports: splines
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-02-12 05:26:15 UTC; tianx
+# Repository: CRAN
+# Date/Publication: 2018-02-12 12:34:47 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,103 @@
+{% set version = '0.1-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gscounts
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gscounts_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gscounts/gscounts_{{ version }}.tar.gz
+  sha256: 012320a0769b65531eea518848a18cd4b10daa59b85630aa4a14155495dd9af5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, MASS, knitr, rmarkdown, dplyr, gsDesign, mvtnorm
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.9
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.9
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gscounts')"           # [not win]
+    - "\"%R%\" -e \"library('gscounts')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/tobiasmuetze/gscounts
+  license: GPL-2
+  summary: "Design and analysis of group sequential designs for negative binomial outcomes, as
+    described by T M\u7AEFtze, E Glimm, H Schmidli, T Friede (2018) <doi:10.1177/0962280218773115>."
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gscounts
+# Type: Package
+# Title: Group Sequential Designs with Negative Binomial Outcomes
+# Version: 0.1-3
+# Authors@R: person("Tobias", "Mtze", role=c("aut","cre"), email="tobias.muetze@outlook.com", comment = c(ORCID = "0000-0002-4111-1941"))
+# Maintainer: Tobias Mtze <tobias.muetze@outlook.com>
+# Description: Design and analysis of group sequential designs for negative binomial outcomes, as described by T Mtze, E Glimm, H Schmidli, T Friede (2018) <doi:10.1177/0962280218773115>.
+# Depends: R (>= 3.0.0)
+# Imports: stats, Rcpp(>= 0.12.9)
+# Suggests: testthat, MASS, knitr, rmarkdown, dplyr, gsDesign, mvtnorm
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# URL: https://github.com/tobiasmuetze/gscounts
+# BugReports: https://github.com/tobiasmuetze/gscounts/issues
+# VignetteBuilder: knitr
+# LazyData: true
+# LinkingTo: Rcpp
+# Encoding: UTF-8
+# RoxygenNote: 6.1.1
+# Packaged: 2019-04-02 13:40:31 UTC; tobiasmuetze
+# Author: Tobias Mtze [aut, cre] (<https://orcid.org/0000-0002-4111-1941>)
+# Repository: CRAN
+# Date/Publication: 2019-04-02 17:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

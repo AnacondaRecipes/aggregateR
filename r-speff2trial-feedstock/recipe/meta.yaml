@@ -1,0 +1,91 @@
+{% set version = '1.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-speff2trial
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/speff2trial_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/speff2trial/speff2trial_{{ version }}.tar.gz
+  sha256: fc0ab7a00f612b507c6aa1d3811e5a4aab9c46969084fd6424d2dca605ac4536
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-leaps
+    - r-survival
+
+  run:
+    - r-base
+    - r-leaps
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('speff2trial')"           # [not win]
+    - "\"%R%\" -e \"library('speff2trial')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=speff2trial
+  license: GPL-2
+  summary: The package performs estimation and testing of the treatment effect in a 2-group randomized
+    clinical trial with a quantitative, dichotomous, or right-censored time-to-event
+    endpoint. The method improves efficiency by leveraging baseline predictors of the
+    endpoint. The inverse probability weighting technique of Robins, Rotnitzky, and
+    Zhao (JASA, 1994) is used to provide unbiased estimation when the endpoint is missing
+    at random.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: speff2trial
+# Version: 1.0.4
+# Date: 2012-10-30
+# Title: Semiparametric efficient estimation for a two-sample treatment effect
+# Author: Michal Juraska <mjuraska@u.washington.edu>, with contributions from Peter B. Gilbert <pgilbert@scharp.org>, Xiaomin Lu <xlu2@phhp.ufl.edu>, Min Zhang <mzhangst@umich.edu>, Marie Davidian <davidian@stat.ncsu.edu>, and Anastasios A. Tsiatis <tsiatis@stat.ncsu.edu>
+# Maintainer: Michal Juraska <mjuraska@u.washington.edu>
+# Depends: R (>= 2.7.2), leaps, survival
+# Description: The package performs estimation and testing of the treatment effect in a 2-group randomized clinical trial with a quantitative, dichotomous, or right-censored time-to-event endpoint. The method improves efficiency by leveraging baseline predictors of the endpoint. The inverse probability weighting technique of Robins, Rotnitzky, and Zhao (JASA, 1994) is used to provide unbiased estimation when the endpoint is missing at random.
+# License: GPL-2
+# LazyLoad: yes
+# LazyData: yes
+# Packaged: 2012-10-30 19:03:35 UTC; mjuraska
+# Repository: CRAN
+# Date/Publication: 2012-10-30 19:58:36
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

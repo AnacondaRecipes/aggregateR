@@ -1,0 +1,94 @@
+{% set version = '1.9.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-x12
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/x12_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/x12/x12_{{ version }}.tar.gz
+  sha256: 8239ea045ece32ba90a8673c694bd22f0bde9d6514889049cee57a515ae02c43
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: parallel, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-stringr
+    - r-x13binary
+
+  run:
+    - r-base
+    - r-stringr
+    - r-x13binary
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('x12')"           # [not win]
+    - "\"%R%\" -e \"library('x12')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/statistikat/x12
+  license: GPL-2
+  summary: The 'X13-ARIMA-SEATS' <https://www.census.gov/srd/www/x13as/> methodology and software
+    is a widely used software and developed by the US Census Bureau. It can be accessed
+    from 'R' with this package and 'X13-ARIMA-SEATS' binaries are provided by the 'R'
+    package 'x13binary'.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: x12
+# Version: 1.9.0
+# Date: 2017-12-05
+# Title: Interface to 'X12-ARIMA'/'X13-ARIMA-SEATS' and Structure for Batch Processing of Seasonal Adjustment
+# Author: Alexander Kowarik <alexander.kowarik@statistik.gv.at>, Angelika Meraner
+# Maintainer: Alexander Kowarik <alexander.kowarik@statistik.gv.at>
+# Depends: R (>= 2.14.0),stats,utils,grDevices,x13binary
+# Imports: stringr,methods
+# Suggests: parallel, testthat
+# Description: The 'X13-ARIMA-SEATS' <https://www.census.gov/srd/www/x13as/> methodology and software is a widely used software and developed by the US Census Bureau. It can be accessed from 'R' with this package and 'X13-ARIMA-SEATS' binaries are provided by the 'R' package 'x13binary'.
+# License: GPL (>= 2)
+# LazyData: TRUE
+# ByteCompile: TRUE
+# URL: https://github.com/statistikat/x12
+# Collate: 'class.R' 'crossVal-methods.R' 'env_functions.R' 'ggplot2Fn.R' 'parameter-methods.R' 'plot-methods.R' 'plotFunctions.R' 'readSpc.R' 'summary-methods.R' 'summary.output.x12.R' 'summary.x12.R' 'times.R' 'x12-methods.R' 'x12work.R' 'readx12Out.R' 'zzz.R'
+# NeedsCompilation: no
+# Packaged: 2017-12-05 14:06:31 UTC; kowarik
+# Repository: CRAN
+# Date/Publication: 2017-12-05 17:52:47 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

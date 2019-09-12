@@ -1,0 +1,90 @@
+{% set version = '0.5.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-geozoo
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/geozoo_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/geozoo/geozoo_{{ version }}.tar.gz
+  sha256: 118b2881fdb357cb187d6f877709cde2c9c9721499aede29b82bf07f1ef4213d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tourr, roxygen2 (>= 5.0.0), testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bitops
+
+  run:
+    - r-base
+    - r-bitops
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('geozoo')"           # [not win]
+    - "\"%R%\" -e \"library('geozoo')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://schloerke.github.io/geozoo/, http://www.ggobi.org, https://github.com/schloerke/geozoo
+  license: GPL-2
+  summary: Geometric objects defined in 'geozoo' can be simulated or displayed in the R package
+    'tourr'.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: geozoo
+# Version: 0.5.1
+# Date: 2016-05-06
+# Title: Zoo of Geometric Objects
+# Description: Geometric objects defined in 'geozoo' can be simulated or displayed in the R package 'tourr'.
+# Authors@R: c( person("Barret", "Schloerke", role = c("aut", "cre"), email = "schloerke@gmail.com"), person("Di", "Cook", role = "ths", email = "dicook@monash.edu"), person("Hadley", "Wickham", role = "ths", email = "h.wickham@gmail.com") )
+# URL: http://schloerke.github.io/geozoo/, http://www.ggobi.org, https://github.com/schloerke/geozoo
+# BugReports: https://github.com/schloerke/geozoo/issues
+# Depends: R (>= 1.8.0)
+# Imports: bitops, stats
+# Suggests: tourr, roxygen2 (>= 5.0.0), testthat
+# License: GPL-2
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-05-06 03:12:17 UTC; barret
+# Author: Barret Schloerke [aut, cre], Di Cook [ths], Hadley Wickham [ths]
+# Maintainer: Barret Schloerke <schloerke@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-05-07 00:36:41
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

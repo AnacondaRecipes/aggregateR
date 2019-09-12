@@ -1,0 +1,94 @@
+{% set version = '0.4.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-reactr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/reactR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/reactR/reactR_{{ version }}.tar.gz
+  sha256: bb734160c17b6df8e857a50e97b36e3a35b2c734e3c71e507bc60c9d3c06fd3b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: htmlwidgets (>= 0.6.0), rmarkdown, shiny, V8, knitr, usethis, jsonlite
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-htmltools
+
+  run:
+    - r-base
+    - r-htmltools
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('reactR')"           # [not win]
+    - "\"%R%\" -e \"library('reactR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/react-R/reactR
+  license: MIT
+  summary: Make it easy to use 'React' in R with 'htmlwidget' scaffolds, helper dependency functions,
+    an embedded 'Babel' 'transpiler', and examples.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: reactR
+# Type: Package
+# Title: React Helpers
+# Version: 0.4.1
+# Date: 2019-07-03
+# Authors@R: c( person( "Facebook", "Inc" , role = c("aut", "cph") , comment = "React library in lib, https://facebook.github.io/react; see AUTHORS for full list of contributors" ), person( "Michel","Weststrate", , role = c("aut", "cph") , comment = "mobx library in lib, https://github.com/mobxjs" ), person( "Kent", "Russell" , role = c("aut", "cre") , comment = "R interface" , email = "kent.russell@timelyportfolio.com" ), person( "Alan", "Dipert" , role = c("aut") , comment = "R interface" , email = "alan@rstudio.com" ) )
+# Maintainer: Kent Russell <kent.russell@timelyportfolio.com>
+# Description: Make it easy to use 'React' in R with 'htmlwidget' scaffolds, helper dependency functions, an embedded 'Babel' 'transpiler', and examples.
+# URL: https://github.com/react-R/reactR
+# BugReports: https://github.com/react-R/reactR/issues
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Encoding: UTF-8
+# Imports: htmltools
+# Suggests: htmlwidgets (>= 0.6.0), rmarkdown, shiny, V8, knitr, usethis, jsonlite
+# RoxygenNote: 6.1.1
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-07-07 14:03:35 UTC; kentr
+# Author: Facebook Inc [aut, cph] (React library in lib, https://facebook.github.io/react; see AUTHORS for full list of contributors), Michel Weststrate [aut, cph] (mobx library in lib, https://github.com/mobxjs), Kent Russell [aut, cre] (R interface), Alan Dipert [aut] (R interface)
+# Repository: CRAN
+# Date/Publication: 2019-07-07 14:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

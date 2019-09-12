@@ -1,0 +1,87 @@
+{% set version = '2.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ipdmeta
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ipdmeta_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ipdmeta/ipdmeta_{{ version }}.tar.gz
+  sha256: 4227002622732cbcc37df863efbd6ccdaf269441fbb79ad738b0e19debc53c4d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-nlme
+
+  run:
+    - r-base
+    - r-nlme
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ipdmeta')"           # [not win]
+    - "\"%R%\" -e \"library('ipdmeta')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ipdmeta
+  license: GPL-2
+  summary: This package provides functions to estimate an IPD linear mixed effects model for
+    a continuous outcome and any categorical covariate from study summary statistics.
+    There are also functions for estimating the power of a treatment-covariate interaction
+    test in an individual patient data meta-analysis from aggregate data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ipdmeta
+# Type: Package
+# Title: Tools for subgroup analyses with multiple trial data using aggregate statistics
+# Version: 2.4
+# Date: 2012-08-10
+# Author: S. Kovalchik
+# Maintainer: S. Kovalchik <s.a.kovalchik@gmail.com>
+# Description: This package provides functions to estimate an IPD linear mixed effects model for a continuous outcome and any categorical covariate from study summary statistics. There are also functions for estimating the power of a treatment-covariate interaction test in an individual patient data meta-analysis from aggregate data.
+# License: GPL-2
+# Depends: nlme, methods
+# LazyLoad: yes
+# Packaged: 2012-09-04 16:59:23 UTC; kovalchiksa
+# Repository: CRAN
+# Date/Publication: 2012-09-04 19:06:36
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

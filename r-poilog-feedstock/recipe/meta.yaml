@@ -1,0 +1,88 @@
+{% set version = '0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-poilog
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/poilog_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/poilog/poilog_{{ version }}.tar.gz
+  sha256: fabddeae342f477b39220e23c98e3db568581545f1a01d6f5b99d85c5a1ee02d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('poilog')"           # [not win]
+    - "\"%R%\" -e \"library('poilog')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=poilog
+  license: GPL-3
+  summary: Functions for obtaining the density, random deviates  and maximum likelihood estimates
+    of the Poisson lognormal  distribution and the bivariate Poisson lognormal distribution.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: poilog
+# Type: Package
+# Title: Poisson lognormal and bivariate Poisson lognormal distribution
+# Version: 0.4
+# Date: 2008-04-29
+# Author: Vidar Grtan and Steinar Engen
+# Maintainer: Vidar Grtan <vidar.grotan@bio.ntnu.no>
+# Description: Functions for obtaining the density, random deviates  and maximum likelihood estimates of the Poisson lognormal  distribution and the bivariate Poisson lognormal distribution.
+# License: GPL-3
+# Encoding: latin1
+# Packaged: Tue Apr 29 16:02:57 2008; vidargr
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2008-04-29 20:16:14
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

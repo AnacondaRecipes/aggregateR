@@ -1,0 +1,104 @@
+{% set version = '0.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mlr3misc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mlr3misc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mlr3misc/mlr3misc_{{ version }}.tar.gz
+  sha256: cb7f0ceba5ef1f85cd897290189f113204e6d2dbd2131e0aaa9d6adc3ea21e4b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: callr, evaluate, paradox, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-backports
+    - r-checkmate
+    - r-data.table
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-r6
+    - r-backports
+    - r-checkmate
+    - r-data.table
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mlr3misc')"           # [not win]
+    - "\"%R%\" -e \"library('mlr3misc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://mlr3misc.mlr-org.com, https://github.com/mlr-org/mlr3misc
+  license: LGPL-3
+  summary: Frequently used helper functions and assertions used in 'mlr3' and its companion packages.
+    Comes with helper functions for functional programming, for printing, to work with
+    'data.table', as well as some generally useful 'R6' classes. This package also supersedes
+    the package 'BBmisc'.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mlr3misc
+# Title: Helper Functions for 'mlr3'
+# Version: 0.1.3
+# Authors@R:  person(given = "Michel", family = "Lang", role = c("cre", "aut"), email = "michellang@gmail.com", comment = c(ORCID = "0000-0001-9754-0393"))
+# Description: Frequently used helper functions and assertions used in 'mlr3' and its companion packages. Comes with helper functions for functional programming, for printing, to work with 'data.table', as well as some generally useful 'R6' classes. This package also supersedes the package 'BBmisc'.
+# License: LGPL-3
+# URL: https://mlr3misc.mlr-org.com, https://github.com/mlr-org/mlr3misc
+# BugReports: https://github.com/mlr-org/mlr3misc/issues
+# Depends: R (>= 3.1.0)
+# Imports: backports, checkmate, data.table, R6
+# Suggests: callr, evaluate, paradox, testthat
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# RoxygenNote: 6.1.1
+# Packaged: 2019-08-22 20:24:16 UTC; michel
+# Author: Michel Lang [cre, aut] (<https://orcid.org/0000-0001-9754-0393>)
+# Maintainer: Michel Lang <michellang@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-08-22 20:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

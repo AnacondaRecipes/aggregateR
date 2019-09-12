@@ -1,0 +1,82 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ops
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ops_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ops/ops_{{ version }}.tar.gz
+  sha256: 45cc0c0a22774341d94e4a04a094b3843aaaab47937064a3469d96af8bf57c33
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ops')"           # [not win]
+    - "\"%R%\" -e \"library('ops')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ops
+  license: Apache License 2.0
+  summary: Comparison of data by Pearson product-moment correlation coefficients is prone to
+    outliers. The problem can be alleviated by normalizing data with outliers before
+    computing the Pearson correlation coefficient. The sample provides such normalization
+    by optimal power space transformation.
+  license_family: APACHE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ops
+# Type: Package
+# Title: Optimal Power Space Transformation
+# Version: 1.0
+# Date: 2012-02-12
+# Author: Micha Sammeth
+# Maintainer: Micha Sammeth <micha@sammeth.net>
+# Description: Comparison of data by Pearson product-moment correlation coefficients is prone to outliers. The problem can be alleviated by normalizing data with outliers before computing the Pearson correlation coefficient. The sample provides such normalization by optimal power space transformation.
+# License: Apache License 2.0
+# LazyLoad: yes
+# Packaged: 2012-02-19 23:47:21 UTC; karina
+# Repository: CRAN
+# Date/Publication: 2012-02-20 06:28:20
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,84 @@
+{% set version = '0.1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-momentchi2
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/momentchi2_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/momentchi2/momentchi2_{{ version }}.tar.gz
+  sha256: 691a95c0788c2e89c5e74f46dda2e878339b84bc6e79a55ba2b312cd799560bb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('momentchi2')"           # [not win]
+    - "\"%R%\" -e \"library('momentchi2')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=momentchi2
+  license: GPL-2 | GPL-3
+  summary: A collection of moment-matching methods for computing the cumulative distribution
+    function of a positively-weighted sum of chi-squared random variables. Methods include
+    the Satterthwaite-Welch method, Hall-Buckley-Eagleson method, Wood's F method, and
+    the Lindsay-Pilla-Basak method.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: momentchi2
+# Title: Moment-Matching Methods for Weighted Sums of Chi-Squared Random Variables
+# Version: 0.1.5
+# Author: Dean Bodenham
+# Maintainer: Dean Bodenham <deanbodenhambsse@gmail.com>
+# Description: A collection of moment-matching methods for computing the cumulative distribution function of a positively-weighted sum of chi-squared random variables. Methods include the Satterthwaite-Welch method, Hall-Buckley-Eagleson method, Wood's F method, and the Lindsay-Pilla-Basak method.
+# Depends: R (>= 3.1.2)
+# License: GPL-2 | GPL-3
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2016-09-23 14:42:23 UTC; dean
+# Repository: CRAN
+# Date/Publication: 2016-09-26 13:27:37
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

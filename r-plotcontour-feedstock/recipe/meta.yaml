@@ -1,0 +1,87 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-plotcontour
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PlotContour_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PlotContour/PlotContour_{{ version }}.tar.gz
+  sha256: 3fc1d1f86160c16507cb70d1d9968072d74b0c52a526edbc433accd06bcf5f4a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-kernsmooth >=2.23_15
+    - r-mass >=7.3_33
+
+  run:
+    - r-base
+    - r-kernsmooth >=2.23_15
+    - r-mass >=7.3_33
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PlotContour')"           # [not win]
+    - "\"%R%\" -e \"library('PlotContour')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PlotContour
+  license: GPL-2
+  summary: This function plots a contour line with a user-defined probability and tightness of
+    fit.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PlotContour
+# Type: Package
+# Title: Plot Contour Line
+# Version: 0.1.0
+# Author: Olivia Cheronet
+# Maintainer: Olivia Cheronet <cheronetolivia@gmail.com>
+# Depends: KernSmooth (>= 2.23-15), MASS (>= 7.3-33)
+# Description: This function plots a contour line with a user-defined probability and tightness of fit.
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2019-05-01 15:37:02 UTC; Olivia
+# Repository: CRAN
+# Date/Publication: 2019-05-03 09:50:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

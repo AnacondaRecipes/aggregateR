@@ -1,0 +1,101 @@
+{% set version = '0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lightsout
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/lightsout_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/lightsout/lightsout_{{ version }}.tar.gz
+  sha256: 2bb151a15469a12f7eb3b342ee8af0b064c8fa3b8d9f22536b654c9e1c8ef67a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr (>= 1.7), testthat (>= 0.9.1), rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-magrittr >=1.5
+    - r-shiny >=0.10.0
+    - r-shinyjs >=0.3.0
+
+  run:
+    - r-base
+    - r-magrittr >=1.5
+    - r-shiny >=0.10.0
+    - r-shinyjs >=0.3.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('lightsout')"           # [not win]
+    - "\"%R%\" -e \"library('lightsout')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/daattali/lightsout
+  license: MIT
+  summary: Lights Out is a puzzle game consisting of a grid of lights that are either on or off.
+    Pressing any light will toggle it and its adjacent lights. The goal of the game
+    is to switch all the lights off. This package provides an interface to play the
+    game on different board sizes, both through the command line or with a visual application.
+    Puzzles can also be solved using the automatic solver included. View a demo online
+    at http://daattali.com/shiny/lightsout/.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: lightsout
+# Title: Implementation of the 'Lights Out' Puzzle Game
+# Version: 0.3
+# Authors@R: c( person("Dean", "Attali", , "daattali@gmail.com", role = c("aut", "cre")) )
+# Description: Lights Out is a puzzle game consisting of a grid of lights that are either on or off. Pressing any light will toggle it and its adjacent lights. The goal of the game is to switch all the lights off. This package provides an interface to play the game on different board sizes, both through the command line or with a visual application. Puzzles can also be solved using the automatic solver included. View a demo online at http://daattali.com/shiny/lightsout/.
+# URL: https://github.com/daattali/lightsout
+# BugReports: https://github.com/daattali/lightsout/issues
+# Depends: R (>= 3.0.0)
+# Imports: magrittr (>= 1.5), shiny (>= 0.10.0), shinyjs (>= 0.3.0), stats, utils
+# Suggests: knitr (>= 1.7), testthat (>= 0.9.1), rmarkdown
+# License: MIT + file LICENSE
+# SystemRequirements: pandoc with https support
+# LazyData: true
+# VignetteBuilder: knitr
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-07-26 02:55:48 UTC; Dean
+# Author: Dean Attali [aut, cre]
+# Maintainer: Dean Attali <daattali@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-07-26 12:09:35
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

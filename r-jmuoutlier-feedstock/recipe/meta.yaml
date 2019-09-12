@@ -1,0 +1,88 @@
+{% set version = '2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-jmuoutlier
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/jmuOutlier_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/jmuOutlier/jmuOutlier_{{ version }}.tar.gz
+  sha256: 437369a5e37019c87f81532e2f7f2392a08a47ac530805e871001da761b049ee
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: agricolae, coin, fastGraph
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('jmuOutlier')"           # [not win]
+    - "\"%R%\" -e \"library('jmuOutlier')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=jmuOutlier
+  license: GPL-3
+  summary: Performs a permutation test on the difference between two location parameters, a permutation
+    correlation test, a permutation F-test, the Siegel-Tukey test, a ratio mean deviance
+    test.  Also performs some graphing techniques, such as for confidence intervals,
+    vector addition, and Fourier analysis; and includes functions related to the Laplace
+    (double exponential) and triangular distributions.  Performs power calculations
+    for the binomial test.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: jmuOutlier
+# Type: Package
+# Title: Permutation Tests for Nonparametric Statistics
+# Version: 2.2
+# Author: Steven T. Garren
+# Maintainer: Steven T. Garren <GARRENST@JMU.EDU>
+# Date: 2019-08-05
+# Packaged: 2019-08-05 20:16:14 UTC; garrenst
+# Description: Performs a permutation test on the difference between two location parameters, a permutation correlation test, a permutation F-test, the Siegel-Tukey test, a ratio mean deviance test.  Also performs some graphing techniques, such as for confidence intervals, vector addition, and Fourier analysis; and includes functions related to the Laplace (double exponential) and triangular distributions.  Performs power calculations for the binomial test.
+# License: GPL-3
+# Depends: R (>= 2.0)
+# Suggests: agricolae, coin, fastGraph
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2019-08-05 20:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

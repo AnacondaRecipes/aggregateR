@@ -1,0 +1,84 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-finana
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/FinAna_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/FinAna/FinAna_{{ version }}.tar.gz
+  sha256: bbddf3ca4e6fc1b45e885c5489133a11dfa1ad818fab826004696f517e795b27
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('FinAna')"           # [not win]
+    - "\"%R%\" -e \"library('FinAna')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=FinAna
+  license: GPL-2
+  summary: Functions for financial analysis and financial modeling,  including batch graphs generation,
+    beta calculation,  descriptive statistics, annuity calculation, bond pricing  and
+    financial data download.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: FinAna
+# Type: Package
+# Title: Financial Analysis and Regression Diagnostic Analysis
+# Version: 0.1.2
+# Author: Xuanhua(Peter) Yin <peteryin.sju@hotmail.com>
+# Maintainer: Xuanhua(Peter) Yin <peteryin.sju@hotmail.com>
+# Description: Functions for financial analysis and financial modeling,  including batch graphs generation, beta calculation,  descriptive statistics, annuity calculation, bond pricing  and financial data download.
+# Note: Few parts are still preliminary and might be changed in the near future. And more functions will be add as easier tools to higher efficiency in analyzing.
+# License: GPL (>= 2)
+# LazyData: TRUE
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-10-25 23:53:36 UTC; PeterYin
+# Repository: CRAN
+# Date/Publication: 2017-10-26 03:08:49 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

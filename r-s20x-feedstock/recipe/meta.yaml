@@ -1,0 +1,84 @@
+{% set version = '3.1-28' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-s20x
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/s20x_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/s20x/s20x_{{ version }}.tar.gz
+  sha256: 6618d9cd771a2535aa6c348d2fa547208e909addacb7dc8125981dff0c10a5bb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('s20x')"           # [not win]
+    - "\"%R%\" -e \"library('s20x')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=s20x
+  license: GPL-2
+  summary: A set of functions used in teaching STATS 201/208 Data Analysis at the University
+    of Auckland. The functions are designed to make parts of R more accessible to a
+    large undergraduate population who are mostly not statistics majors.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: s20x
+# Version: 3.1-28
+# Date: 2019-05-23
+# Title: Functions for University of Auckland Course STATS 201/208 Data Analysis
+# Author: Andrew Balemi, Dineika Chandra, James Curran, Brant Deppa, Mike Forster, Brendan McArdle, Ben Stevenson, Chris Wild
+# Maintainer: James Curran <j.curran@auckland.ac.nz>
+# Description: A set of functions used in teaching STATS 201/208 Data Analysis at the University of Auckland. The functions are designed to make parts of R more accessible to a large undergraduate population who are mostly not statistics majors.
+# Imports: stats, graphics, methods
+# License: GPL-2 | file LICENSE
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-05-23 03:36:01 UTC; jcur002
+# Repository: CRAN
+# Date/Publication: 2019-05-23 05:00:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

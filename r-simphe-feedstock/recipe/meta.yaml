@@ -1,0 +1,90 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-simphe
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SimPhe_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SimPhe/SimPhe_{{ version }}.tar.gz
+  sha256: 3e77243fd895618ad1348b1fa0238bca8bc1d304502426349a32100ed5f57f06
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SimPhe')"           # [not win]
+    - "\"%R%\" -e \"library('SimPhe')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/beibeiJ/SimPhe
+  license: GPL-2
+  summary: Provides functions to simulate single or multiple, independent or correlated phenotype(s)
+    with additive, dominance effects and their interactions. Also includes functions
+    to generate phenotype(s) with specific heritability. Flexible and user-friendly
+    options for simulation.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SimPhe
+# Type: Package
+# Title: Tools to Simulate Phenotype(s) with Epistatic Interaction
+# Version: 0.2.0
+# Author: Beibei Jiang <beibei_jiang@psych.mpg.de> and Benno PA14tz
+# Maintainer: Beibei Jiang <beibei_jiang@psych.mpg.de>
+# Description: Provides functions to simulate single or multiple, independent or correlated phenotype(s) with additive, dominance effects and their interactions. Also includes functions to generate phenotype(s) with specific heritability. Flexible and user-friendly options for simulation.
+# BugReports: https://github.com/beibeiJ/SimPhe/issues/new
+# URL: https://github.com/beibeiJ/SimPhe
+# License: GPL (>= 2)
+# LazyData: TRUE
+# RoxygenNote: 6.1.0
+# VignetteBuilder: knitr
+# Suggests: testthat, knitr, rmarkdown
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2018-09-13 14:16:02 UTC; beibei_jiang
+# Repository: CRAN
+# Date/Publication: 2018-09-13 14:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

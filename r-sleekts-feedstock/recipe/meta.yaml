@@ -1,0 +1,81 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sleekts
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sleekts_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sleekts/sleekts_{{ version }}.tar.gz
+  sha256: b31cf9c108df9d623b62c330f20db3c1fa09e68ffcd4aecb8768ebdc0911d36b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sleekts')"           # [not win]
+    - "\"%R%\" -e \"library('sleekts')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=sleekts
+  license: GPL-3
+  summary: Compute Time series Resistant Smooth 4253H, twice smoothing method.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sleekts
+# Type: Package
+# Title: 4253H, Twice Smoothing
+# Version: 1.0.2
+# Depends: R (>= 3.2.0), stats
+# Date: 2015-11-26
+# Author: Muntashir-Al-Arefin, Prof. Md. Ayub Al.
+# Maintainer: Muntashir-Al-Arefin <sheen4783@gmail.com>
+# Description: Compute Time series Resistant Smooth 4253H, twice smoothing method.
+# License: GPL-3
+# Repository: CRAN
+# NeedsCompilation: no
+# Packaged: 2015-12-04 20:58:06 UTC; Sheen
+# Date/Publication: 2015-12-05 00:03:08
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,84 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ldtests
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LDtests_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LDtests/LDtests_{{ version }}.tar.gz
+  sha256: a12d5ee401caf191c62621e527b94967b7c5f3ee00dd8ef83e1ba64bffc998cb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LDtests')"           # [not win]
+    - "\"%R%\" -e \"library('LDtests')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=LDtests
+  license: GPL-3
+  summary: Exact tests for Linkage Disequilibrium (LD) and Hardy-Weinberg Equilibrium (HWE).
+    - 2-sided LD tests based on different measures of LD (Kulinskaya and Lewin 2008)
+    - 1-sided Fisher's exact test for LD - 2-sided Haldane test for HWE (Wiggington
+    2005) - 1-sided test for inbreeding - conditional p-values proposed in Kulinskaya
+    (2008) to overcome the problems of asymetric distributions (for both LD and HWE)
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LDtests
+# Type: Package
+# Title: Exact tests for Linkage Disequilibrium and Hardy-Weinberg Equilibrium
+# Version: 1.0
+# Date: 2008-06-07
+# Author: Alex Lewin
+# Maintainer: Alex Lewin <a.m.lewin@imperial.ac.uk>
+# Description: Exact tests for Linkage Disequilibrium (LD) and Hardy-Weinberg Equilibrium (HWE). - 2-sided LD tests based on different measures of LD (Kulinskaya and Lewin 2008) - 1-sided Fisher's exact test for LD - 2-sided Haldane test for HWE (Wiggington 2005) - 1-sided test for inbreeding - conditional p-values proposed in Kulinskaya (2008) to overcome the problems of asymetric distributions (for both LD and HWE)
+# License: GPL
+# Packaged: Mon Jun  9 10:25:16 2008; alewin
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2008-06-09 20:13:30
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

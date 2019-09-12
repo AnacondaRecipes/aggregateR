@@ -1,0 +1,97 @@
+{% set version = '0.2.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-wisam
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/wISAM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/wISAM/wISAM_{{ version }}.tar.gz
+  sha256: 1f29441910d66974a5fe86cf5973e0a4eec88e08e0f12435f3f35f185162b130
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('wISAM')"           # [not win]
+    - "\"%R%\" -e \"library('wISAM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=wISAM
+  license: GPL-3
+  summary: 'In the course of a genome-wide association study, the situation often arises that
+    some phenotypes are known with greater precision than others. It could be that some
+    individuals are known to harbor more micro-environmental variance than others. In
+    the case of inbred strains of model organisms, it could be the case that more organisms
+    were observed from some strains than others, so the strains with more organisms
+    have better-estimated means. Package ''wISAM'' handles this situation by allowing
+    for weighting of each observation according to residual variance. Specifically,
+    the ''weight'' parameter to the function conduct_scan() takes the precision of each
+    observation (one over the variance). '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: wISAM
+# Type: Package
+# Title: Weighted Inbred Strain Association Mapping
+# Version: 0.2.8
+# Author: Robert W. Cort <rcorty@gmail.com>
+# Maintainer: Robert W. Cort <rcorty@gmail.com>
+# Description: In the course of a genome-wide association study, the situation often arises that some phenotypes are known with greater precision than others. It could be that some individuals are known to harbor more micro-environmental variance than others. In the case of inbred strains of model organisms, it could be the case that more organisms were observed from some strains than others, so the strains with more organisms have better-estimated means. Package 'wISAM' handles this situation by allowing for weighting of each observation according to residual variance. Specifically, the 'weight' parameter to the function conduct_scan() takes the precision of each observation (one over the variance).
+# License: GPL-3
+# Encoding: UTF-8
+# Depends: R (>= 3.0.0)
+# LazyData: true
+# Suggests: testthat
+# RoxygenNote: 6.0.1
+# Imports: methods, MASS
+# NeedsCompilation: no
+# Packaged: 2018-05-31 17:18:15 UTC; rcorty
+# Repository: CRAN
+# Date/Publication: 2018-06-04 08:12:54 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

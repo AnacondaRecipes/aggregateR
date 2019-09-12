@@ -1,0 +1,85 @@
+{% set version = '2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-flexpm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/flexPM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/flexPM/flexPM_{{ version }}.tar.gz
+  sha256: 0cfd99be7cecd7f43aa002bf7a6504c48fa4873c3fb680896056b09b78d27840
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival
+
+  run:
+    - r-base
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('flexPM')"           # [not win]
+    - "\"%R%\" -e \"library('flexPM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=flexPM
+  license: GPL-2
+  summary: Estimation of flexible parametric models for survival data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: flexPM
+# Type: Package
+# Title: Flexible Parametric Models for Censored and Truncated Data
+# Version: 2.0
+# Date: 2015-11-21
+# Author: Paolo Frumento <paolo.frumento@ki.se>
+# Maintainer: Paolo Frumento <paolo.frumento@ki.se>
+# Description: Estimation of flexible parametric models for survival data.
+# Depends: survival
+# Imports: splines, stats
+# License: GPL-2
+# RoxygenNote: 5.0.0
+# Packaged: 2015-11-23 17:18:00 UTC; paofru
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-11-23 18:30:43
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

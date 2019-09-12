@@ -1,0 +1,85 @@
+{% set version = '4.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nplplot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/nplplot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/nplplot/nplplot_{{ version }}.tar.gz
+  sha256: f0f5ae3c94606293a33c35137097848a5f21c33f652051e407fb91b124d0ebb6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('nplplot')"           # [not win]
+    - "\"%R%\" -e \"library('nplplot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://watson.hgen.pitt.edu/register
+  license: GPL-3
+  summary: 'This package provides routines for plotting linkage and association results along
+    a chromosome, with marker names displayed along the top border. There are also routines
+    for generating BED and BedGraph custom tracks for viewing in the UCSC genome browser.
+    The data reformatting program Mega2 uses this package to plot output from a variety
+    of programs.  '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: nplplot
+# Version: 4.5
+# Date: 2014-04-30
+# Title: Plotting linkage and association results
+# Author: Robert V Baron <rvb5@pitt.edu>, Nandita Mukhopadhyay, Xinyu Tang, Daniel E. Weeks <weeks@pitt.edu>
+# Maintainer: Daniel E. Weeks <weeks@pitt.edu>
+# Description: This package provides routines for plotting linkage and association results along a chromosome, with marker names displayed along the top border. There are also routines for generating BED and BedGraph custom tracks for viewing in the UCSC genome browser. The data reformatting program Mega2 uses this package to plot output from a variety of programs.
+# License: GPL (>= 3)
+# URL: http://watson.hgen.pitt.edu/register
+# Packaged: 2014-04-30 15:17:41 UTC; dweeks
+# Repository: CRAN
+# Date/Publication: 2014-05-01 09:32:57
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

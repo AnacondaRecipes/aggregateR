@@ -1,0 +1,87 @@
+{% set version = '0.1-11' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-textutils
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/textutils_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/textutils/textutils_{{ version }}.tar.gz
+  sha256: a43820954e35db2847a51b2ea4ed2bd9d958c8e8387825e09947cb4466427d8b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('textutils')"           # [not win]
+    - "\"%R%\" -e \"library('textutils')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://enricoschumann.net/R/packages/textutils/, https://github.com/enricoschumann/textutils
+  license: GPL-3
+  summary: Utilities for handling character vectors that store human-readable text (either plain
+    or with markup, such as HTML or LaTeX). The package provides, in particular, functions
+    that help with the preparation of plain-text reports (e.g. for expanding and aligning
+    strings that form the lines of such reports); the package also provides generic
+    functions for transforming R objects to HTML and to plain text.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: textutils
+# Type: Package
+# Title: Utilities for Handling Strings and Text
+# Version: 0.1-11
+# Date: 2019-05-01
+# Imports: utils
+# Maintainer: Enrico Schumann <es@enricoschumann.net>
+# Authors@R: person("Enrico", "Schumann", role  = c("aut", "cre"), email = "es@enricoschumann.net", comment = c(ORCID = "0000-0001-7601-6576"))
+# Description: Utilities for handling character vectors that store human-readable text (either plain or with markup, such as HTML or LaTeX). The package provides, in particular, functions that help with the preparation of plain-text reports (e.g. for expanding and aligning strings that form the lines of such reports); the package also provides generic functions for transforming R objects to HTML and to plain text.
+# License: GPL-3
+# URL: http://enricoschumann.net/R/packages/textutils/, https://github.com/enricoschumann/textutils
+# NeedsCompilation: no
+# Packaged: 2019-05-01 08:57:07 UTC; es19
+# Author: Enrico Schumann [aut, cre] (<https://orcid.org/0000-0001-7601-6576>)
+# Repository: CRAN
+# Date/Publication: 2019-05-01 20:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

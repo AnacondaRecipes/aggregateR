@@ -1,0 +1,96 @@
+{% set version = '0.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-patentsview
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/patentsview_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/patentsview/patentsview_{{ version }}.tar.gz
+  sha256: df7022d485a0b0b543e56e5c6a49f8268c2c4e4b8bee3e1282ba29f35b637700
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, tidyr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('patentsview')"           # [not win]
+    - "\"%R%\" -e \"library('patentsview')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://ropensci.github.io/patentsview/index.html
+  license: MIT
+  summary: Provides functions to simplify the 'PatentsView' API (<http://www.patentsview.org/api/doc.html>)
+    query language, send GET and POST requests to the API's seven endpoints, and parse
+    the data that comes back.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: patentsview
+# Type: Package
+# Title: An R Client to the 'PatentsView' API
+# Version: 0.2.2
+# Authors@R: person("Christopher", "Baker", email = "chriscrewbaker@gmail.com", role = c("aut", "cre"))
+# Encoding: UTF-8
+# Description: Provides functions to simplify the 'PatentsView' API (<http://www.patentsview.org/api/doc.html>) query language, send GET and POST requests to the API's seven endpoints, and parse the data that comes back.
+# URL: https://ropensci.github.io/patentsview/index.html
+# BugReports: https://github.com/ropensci/patentsview/issues
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Depends: R (>= 3.1)
+# Imports: httr, jsonlite, utils
+# Suggests: knitr, rmarkdown, testthat, tidyr
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2019-01-28 21:17:22 UTC; cbaker
+# Author: Christopher Baker [aut, cre]
+# Maintainer: Christopher Baker <chriscrewbaker@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-01-28 21:30:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

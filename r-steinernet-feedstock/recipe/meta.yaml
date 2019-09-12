@@ -1,0 +1,92 @@
+{% set version = '3.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-steinernet
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SteinerNet_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SteinerNet/SteinerNet_{{ version }}.tar.gz
+  sha256: b6b3b25c597b977a523a7f44e66eaf21d0c757d6adae90dd0fb120a921d87bca
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-igraph >=0.6.0
+
+  run:
+    - r-base
+    - r-igraph >=0.6.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SteinerNet')"           # [not win]
+    - "\"%R%\" -e \"library('SteinerNet')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/krashkov/SteinerNet
+  license: GPL-3
+  summary: A set of functions for finding and analysing Steiner trees. It has applications in
+    biological pathway network analysis. Sadeghi (2013) <doi:10.1186/1471-2105-14-144>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SteinerNet
+# Type: Package
+# Version: 3.0.1
+# Date: 2018-08-18
+# Title: Steiner Tree Approach for Graph Analysis
+# Description: A set of functions for finding and analysing Steiner trees. It has applications in biological pathway network analysis. Sadeghi (2013) <doi:10.1186/1471-2105-14-144>.
+# Author: Afshin Sadeghi <sadeghi.afshin@gmail.com>
+# Maintainer: Aleksei Krasikov <krasikov.as@phystech.edu>
+# URL: https://github.com/krashkov/SteinerNet
+# BugReports: https://github.com/krashkov/SteinerNet/issues
+# Depends: R (>= 3.1.0), igraph (>= 0.6.0)
+# Imports: grDevices, stats, utils, graphics
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# License: GPL-3
+# Repository: CRAN
+# NeedsCompilation: no
+# Encoding: UTF-8
+# RoxygenNote: 6.1.0
+# Packaged: 2018-08-19 00:34:14 UTC; cat
+# Date/Publication: 2018-08-19 04:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

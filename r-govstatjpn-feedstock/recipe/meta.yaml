@@ -1,0 +1,82 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-govstatjpn
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/govStatJPN_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/govStatJPN/govStatJPN_{{ version }}.tar.gz
+  sha256: d4e5aacaa620f4e6826fde8be13028e83e5bfed7ae8233f6a62b179a8fe25e0f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('govStatJPN')"           # [not win]
+    - "\"%R%\" -e \"library('govStatJPN')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=govStatJPN
+  license: GPL-3
+  summary: This package purposes to deal with public survey data of Japanese government via their
+    Application Programming Interface (http://statdb.nstac.go.jp/)
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: govStatJPN
+# Type: Package
+# Title: functions to get public survey data in Japan
+# Version: 0.1
+# Date: 2013-06-11
+# Author: Yuichiro Otani
+# Maintainer: Yuichiro Otani <yuichiro@otani.co>
+# Description: This package purposes to deal with public survey data of Japanese government via their Application Programming Interface (http://statdb.nstac.go.jp/)
+# License: GPL
+# LazyLoad: yes
+# Packaged: 2013-06-13 07:07:52 UTC; yuichiro
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-06-13 09:40:18
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

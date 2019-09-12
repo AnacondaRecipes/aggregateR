@@ -1,0 +1,90 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mogavs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mogavs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mogavs/mogavs_{{ version }}.tar.gz
+  sha256: 02e42bf87074518976fdb7b82b9b07869314e3c9d21830913c7b859476e31552
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-cvtools
+
+  run:
+    - r-base
+    - r-cvtools
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mogavs')"           # [not win]
+    - "\"%R%\" -e \"library('mogavs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mogavs
+  license: GPL-2
+  summary: Functions for exploring the best subsets in regression with a genetic algorithm. The
+    package is much faster than methods relying on complete enumeration, and is suitable
+    for data sets with large number of variables. For more information, see Sinha, Malo
+    & Kuosmanen (2015) <doi:10.1080/10618600.2014.899236>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mogavs
+# Type: Package
+# Title: Multiobjective Genetic Algorithm for Variable Selection in Regression
+# Version: 1.1.0
+# Date: 2017-4-11
+# Authors@R: c(person("Tommi","Pajala",role=c("aut","cre"), email="tommi.pajala@aalto.fi"), person("Pekka","Malo",role="aut"),person("Ankur","Sinha",role="aut"),person("Timo","Kuosmanen",role="ctb"))
+# Imports: cvTools
+# Depends: R (>= 2.10)
+# Description: Functions for exploring the best subsets in regression with a genetic algorithm. The package is much faster than methods relying on complete enumeration, and is suitable for data sets with large number of variables. For more information, see Sinha, Malo & Kuosmanen (2015) <doi:10.1080/10618600.2014.899236>.
+# License: GPL-2
+# LazyData: yes
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-01-26 08:31:16 UTC; Tommi-local
+# Author: Tommi Pajala [aut, cre], Pekka Malo [aut], Ankur Sinha [aut], Timo Kuosmanen [ctb]
+# Maintainer: Tommi Pajala <tommi.pajala@aalto.fi>
+# Repository: CRAN
+# Date/Publication: 2018-01-26 22:06:01 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

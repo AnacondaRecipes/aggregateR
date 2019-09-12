@@ -1,0 +1,109 @@
+{% set version = '0.6.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-osqp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/osqp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/osqp/osqp_{{ version }}.tar.gz
+  sha256: 15ff7fc890a96a6fe0c8b8c8555fce01c5a336aeb92019b3486bc0a9d6338551
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-r6
+    - r-rcpp >=0.12.14
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-r6
+    - r-rcpp >=0.12.14
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('osqp')"           # [not win]
+    - "\"%R%\" -e \"library('osqp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.osqp.org
+  license: Apache License 2.0 | file LICENSE
+  summary: Provides bindings to the 'OSQP' solver. The 'OSQP' solver is a numerical optimization
+    package or solving convex quadratic programs written in 'C' and based on the alternating
+    direction method of multipliers. See <arXiv:1711.08013> for details.
+  license_family: APACHE
+  license_file:
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: osqp
+# Title: Quadratic Programming Solver using the 'OSQP' Library
+# Version: 0.6.0.2
+# Date: 2019-09-09
+# Authors@R: c( person("Bartolomeo", "Stellato", role = c("aut", "ctb", "cph")), person("Goran", "Banjac", role = c("aut", "ctb", "cph")), person("Paul", "Goulart", role = c("cre", "aut", "ctb", "cph"), email = "paul.goulart@eng.ox.ac.uk"), person("Stephen", "Boyd", role = c("aut", "ctb", "cph")), person("Eric", "Anderson", role=c("ctb")))
+# Copyright: file COPYRIGHT
+# Description: Provides bindings to the 'OSQP' solver. The 'OSQP' solver is a numerical optimization package or solving convex quadratic programs written in 'C' and based on the alternating direction method of multipliers. See <arXiv:1711.08013> for details.
+# License: Apache License 2.0 | file LICENSE
+# Imports: Rcpp (>= 0.12.14), methods, Matrix, R6
+# LinkingTo: Rcpp
+# RoxygenNote: 6.1.1
+# Collate: 'RcppExports.R' 'osqp-package.R' 'solve.R' 'osqp.R' 'params.R'
+# NeedsCompilation: yes
+# Suggests: testthat
+# URL: https://www.osqp.org
+# Packaged: 2019-09-10 17:02:19 UTC; pgoulart
+# Author: Bartolomeo Stellato [aut, ctb, cph], Goran Banjac [aut, ctb, cph], Paul Goulart [cre, aut, ctb, cph], Stephen Boyd [aut, ctb, cph], Eric Anderson [ctb]
+# Maintainer: Paul Goulart <paul.goulart@eng.ox.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2019-09-11 04:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

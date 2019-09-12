@@ -1,0 +1,97 @@
+{% set version = '1.0-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-genomic.autocorr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/genomic.autocorr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/genomic.autocorr/genomic.autocorr_{{ version }}.tar.gz
+  sha256: f5112006efbd01f36fd37d9dbae7245a9f3a02f228360cb724bc5317becc2dd2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-magrittr
+    - r-reshape
+
+  run:
+    - r-base
+    - r-data.table
+    - r-magrittr
+    - r-reshape
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('genomic.autocorr')"           # [not win]
+    - "\"%R%\" -e \"library('genomic.autocorr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/chr1swallace/genomic.autocorr
+  license: GPL-2
+  summary: Local structure in genomic data often induces dependence between observations taken
+    at different genomic locations.  Ignoring this dependence leads to underestimation
+    of the standard error of parameter estimates.  This package uses block bootstrapping
+    to estimate asymptotically correct standard errors of parameters from any standard
+    generalised linear model that may be fit by the glm() function.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: genomic.autocorr
+# Title: Models Dealing with Spatial Dependency in Genomic Data
+# Version: 1.0-1
+# Authors@R: c(person("Chris", "Wallace", email = "cew54@cam.ac.uk", role = c("aut", "cre")), person("Oliver", "Burren", email = "ob219@cam.ac.uk", role = c("aut")))
+# Description: Local structure in genomic data often induces dependence between observations taken at different genomic locations.  Ignoring this dependence leads to underestimation of the standard error of parameter estimates.  This package uses block bootstrapping to estimate asymptotically correct standard errors of parameters from any standard generalised linear model that may be fit by the glm() function.
+# Date: 2017-10-17
+# Depends: R (>= 3.2.2)
+# License: GPL-2
+# LazyData: true
+# RoxygenNote: 6.0.1
+# Imports: data.table, magrittr, reshape, parallel
+# Suggests: testthat
+# URL: https://github.com/chr1swallace/genomic.autocorr
+# NeedsCompilation: no
+# Packaged: 2017-10-19 20:51:01 UTC; chris
+# Author: Chris Wallace [aut, cre], Oliver Burren [aut]
+# Maintainer: Chris Wallace <cew54@cam.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2017-10-20 09:17:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

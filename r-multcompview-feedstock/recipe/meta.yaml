@@ -1,0 +1,87 @@
+{% set version = '0.1-7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-multcompview
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/multcompView_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/multcompView/multcompView_{{ version }}.tar.gz
+  sha256: f1dc100d602a82694e97bf4329af7220b8395b17340d4047d0f2bbd7dbb0eea1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: multcomp, pgirmess, MASS
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('multcompView')"           # [not win]
+    - "\"%R%\" -e \"library('multcompView')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=multcompView
+  license: GPL-3
+  summary: Convert a logical vector or a vector of p-values or a correlation, difference, or
+    distance matrix into a display identifying the pairs for which the differences were
+    not significantly different.  Designed for use in conjunction with the output of
+    functions like TukeyHSD, dist{stats}, simint, simtest, csimint, csimtest{multcomp},
+    friedmanmc, kruskalmc{pgirmess}.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: multcompView
+# Type: Package
+# Title: Visualizations of Paired Comparisons
+# Version: 0.1-7
+# Date: 2015-07-25
+# Author: Spencer Graves, Hans-Peter Piepho and Luciano Selzer with help from Sundar Dorai-Raj
+# Maintainer: Luciano Selzer <luciano.selzer@gmail.com>
+# Description: Convert a logical vector or a vector of p-values or a correlation, difference, or distance matrix into a display identifying the pairs for which the differences were not significantly different.  Designed for use in conjunction with the output of functions like TukeyHSD, dist{stats}, simint, simtest, csimint, csimtest{multcomp}, friedmanmc, kruskalmc{pgirmess}.
+# License: GPL
+# Imports: grid
+# Suggests: multcomp, pgirmess, MASS
+# Packaged: 2015-07-31 15:43:44 UTC; Luciano
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-07-31 18:40:25
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

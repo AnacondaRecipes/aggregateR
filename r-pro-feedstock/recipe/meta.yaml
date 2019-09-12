@@ -1,0 +1,89 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pro
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pro_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pro/pro_{{ version }}.tar.gz
+  sha256: 4fbdbd5f1af543e30b536f58c05c5794b028e9567c4910e108c3c17570a41138
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: cin
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pro')"           # [not win]
+    - "\"%R%\" -e \"library('pro')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=pro
+  license: GPL-2
+  summary: Optogenetics is a new tool to study neuronal circuits that have been genetically modified
+    to allow stimulation by flashes of light.  This package implements the methodological
+    framework, Point-process Response model for Optogenetics (PRO), for analyzing data
+    from these experiments.  This method provides explicit nonlinear transformations
+    to link the flash point-process with the spiking point-process.  Such response functions
+    can be used to provide important and interpretable scientific insights into the
+    properties of the biophysical process that governs neural spiking in response to
+    optogenetic stimulation.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pro
+# Type: Package
+# Title: Point-Process Response Model for Optogenetics
+# Version: 0.1.1
+# Date: 2015-09-17
+# Author: Xi (Rossi) LUO with contributions from Dylan Small and Vikaas Sohal
+# Maintainer: Xi (Rossi) LUO <xi.rossi.luo@gmail.com>
+# Suggests: cin
+# Description: Optogenetics is a new tool to study neuronal circuits that have been genetically modified to allow stimulation by flashes of light.  This package implements the methodological framework, Point-process Response model for Optogenetics (PRO), for analyzing data from these experiments.  This method provides explicit nonlinear transformations to link the flash point-process with the spiking point-process.  Such response functions can be used to provide important and interpretable scientific insights into the properties of the biophysical process that governs neural spiking in response to optogenetic stimulation.
+# License: GPL-2
+# Packaged: 2015-09-17 18:02:47 UTC; xluo
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-09-17 22:50:12
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

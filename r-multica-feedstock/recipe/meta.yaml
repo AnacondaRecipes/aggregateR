@@ -1,0 +1,94 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-multica
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/multiCA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/multiCA/multiCA_{{ version }}.tar.gz
+  sha256: 34336684e0b5f743afb29f0102b73975d15c878e23bee93b440f04ecd808ebed
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bitops
+    - r-multcomp
+
+  run:
+    - r-base
+    - r-bitops
+    - r-multcomp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('multiCA')"           # [not win]
+    - "\"%R%\" -e \"library('multiCA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=multiCA
+  license: GPL-2
+  summary: Implements a generalization of the Cochran-Armitage trend test to multinomial data.
+    In addition to an overall test, multiple testing adjusted p-values for trend in
+    individual outcomes and power calculation is available.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: multiCA
+# Type: Package
+# Title: Multinomial Cochran-Armitage Trend Test
+# Version: 1.1
+# Date: 2017-08-07
+# Author: Aniko Szabo
+# Depends: R(>= 2.10)
+# Imports: bitops, multcomp
+# Maintainer: Aniko Szabo <aszabo@mcw.edu>
+# Description: Implements a generalization of the Cochran-Armitage trend test to multinomial data. In addition to an overall test, multiple testing adjusted p-values for trend in individual outcomes and power calculation is available.
+# License: GPL (>= 2)
+# RoxygenNote: 5.0.1
+# Suggests: testthat
+# Repository: CRAN
+# Repository/R-Forge/Project: corrbin
+# Repository/R-Forge/Revision: 106
+# Repository/R-Forge/DateTimeStamp: 2017-08-07 16:05:30
+# Date/Publication: 2017-08-07 19:36:33 UTC
+# NeedsCompilation: no
+# Packaged: 2017-08-07 16:25:12 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

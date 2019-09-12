@@ -1,0 +1,83 @@
+{% set version = '0.1-14' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-kulife
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/kulife_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/kulife/kulife_{{ version }}.tar.gz
+  sha256: 6def27c9e95ea4243c31cc6329fbe84c5c5da2b0334a2a25b3daa6ec8cf70a1c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lme4, XML
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('kulife')"           # [not win]
+    - "\"%R%\" -e \"library('kulife')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=kulife
+  license: GPL-2
+  summary: 'Provides various functions and data sets from experiments at the Faculty of Life
+    Sciences, University of Copenhagen. This package will be discontinued and archived,
+    and the functions and datasets will be maintained and updated in the MESS package '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: kulife
+# Version: 0.1-14
+# Title: Datasets and functions from the (now non-existing) Faculty of Life Sciences, University of Copenhagen
+# Author: Claus Ekstrom <ekstrom@sund.ku.dk>, Ib M. Skovgaard <ims@life.ku.dk>, Torben Martinussen <tma@sund.ku.dk>
+# Maintainer: Claus Ekstrom <ekstrom@sund.ku.dk>
+# Suggests: lme4, XML
+# Description: Provides various functions and data sets from experiments at the Faculty of Life Sciences, University of Copenhagen. This package will be discontinued and archived, and the functions and datasets will be maintained and updated in the MESS package
+# License: GPL-2
+# Packaged: 2013-10-01 16:32:15 UTC; claus
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-10-01 19:30:50
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

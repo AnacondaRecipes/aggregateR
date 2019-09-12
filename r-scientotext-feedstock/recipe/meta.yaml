@@ -1,0 +1,89 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-scientotext
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/scientoText_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/scientoText/scientoText_{{ version }}.tar.gz
+  sha256: 41b4f590c9df6a23c23ba0728e64d7f65a0f7d215b6207e85b8b82a2d3832838
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-stringr
+    - r-tm
+
+  run:
+    - r-base
+    - r-stringr
+    - r-tm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('scientoText')"           # [not win]
+    - "\"%R%\" -e \"library('scientoText')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=scientoText
+  license: GPL-3
+  summary: It involves bibliometric indicators calculation from bibliometric data.It also deals
+    pattern analysis using the text part of bibliometric data.The bibliometric data
+    are obtained from mainly Web of Science and Scopus.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: scientoText
+# Type: Package
+# Title: Text & Scientometric Analytics
+# Version: 0.1
+# Date: 2016-07-20
+# Author: Ashraf Uddin
+# Maintainer: Ashraf Uddin <mdaakib18@gmail.com>
+# Description: It involves bibliometric indicators calculation from bibliometric data.It also deals pattern analysis using the text part of bibliometric data.The bibliometric data are obtained from mainly Web of Science and Scopus.
+# License: GPL-3
+# LazyData: TRUE
+# Imports: stringr, tm, utils
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-07-20 16:52:06 UTC; rajesh
+# Repository: CRAN
+# Date/Publication: 2016-07-20 23:55:39
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,81 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-geotools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/geotools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/geotools/geotools_{{ version }}.tar.gz
+  sha256: edeae0f953affe2a4f02be8ea1ab112a6f24d5c7a85cad774466e7bc5b721b34
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests:
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('geotools')"           # [not win]
+    - "\"%R%\" -e \"library('geotools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=geotools
+  license: GPL-3
+  summary: Tools
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: geotools
+# Version: 0.1
+# Date: 2007-10-03
+# Suggests:
+# Title: Geo tools
+# Author: Antoine Lucas
+# Maintainer: Antoine Lucas <antoinelucas@gmail.com>
+# Description: Tools
+# License: GPL
+# Packaged: 2012-01-28 11:49:33 UTC; antoine
+# Repository: CRAN
+# Date/Publication: 2012-01-28 18:08:23
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

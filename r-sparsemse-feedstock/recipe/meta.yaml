@@ -1,0 +1,94 @@
+{% set version = '1.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sparsemse
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SparseMSE_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SparseMSE/SparseMSE_{{ version }}.tar.gz
+  sha256: 910ad597c025b156202b2823c9d64613c862685d6e19f45ad205e3855059f7b6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lpsolve
+
+  run:
+    - r-base
+    - r-lpsolve
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SparseMSE')"           # [not win]
+    - "\"%R%\" -e \"library('SparseMSE')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://arxiv.org/abs/1902.05156
+  license: GPL-2
+  summary: 'Implements the routines and algorithms developed and analysed in "Multiple systems
+    estimation for Sparse Capture Data: Inferential Challenges when there are Non-Overlapping
+    Lists" Chan, L, Silverman, B. W., Vincent, K (2019) <arXiv:1902.05156>. This package
+    explicitly handles situations where there are pairs of lists which have no observed
+    individuals in common.  '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SparseMSE
+# Title: Multiple Systems Estimation for Sparse Capture Data
+# Version: 1.2.1
+# Authors@R: c( person("Lax", "Chan", email = "lax.chan1@nottingham.ac.uk", role = c("aut","cre")), person("Bernard", "Silverman", email = "mail@bernardsilverman.co.uk", role = c("aut")), person("Kyle", "Vincent", email = "kyle.shane.vincent@gmail.com", role= c("aut")))
+# Author: Lax Chan [aut, cre], Bernard Silverman [aut], Kyle Vincent [aut]
+# Maintainer: Lax Chan <lax.chan1@nottingham.ac.uk>
+# Description: Implements the routines and algorithms developed and analysed in "Multiple systems estimation for Sparse Capture Data: Inferential Challenges when there are Non-Overlapping Lists" Chan, L, Silverman, B. W., Vincent, K (2019) <arXiv:1902.05156>. This package explicitly handles situations where there are pairs of lists which have no observed individuals in common.
+# URL: https://arxiv.org/abs/1902.05156
+# Depends: R (>= 3.5.0)
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Suggests: rmarkdown
+# Imports: lpSolve
+# NeedsCompilation: no
+# Packaged: 2019-02-24 22:13:33 UTC; pmzllc
+# Repository: CRAN
+# Date/Publication: 2019-03-04 16:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

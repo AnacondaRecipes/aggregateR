@@ -1,0 +1,108 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hdbinseg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hdbinseg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hdbinseg/hdbinseg_{{ version }}.tar.gz
+  sha256: 24e1cc572c92a170d37478f62be39a3b6f9d42aba6bc6ec79addeae73366c93b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: RcppArmadillo
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.10
+    - r-rcpparmadillo
+    - r-doparallel
+    - r-foreach
+    - r-iterators
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.10
+    - r-rcpparmadillo
+    - r-doparallel
+    - r-foreach
+    - r-iterators
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hdbinseg')"           # [not win]
+    - "\"%R%\" -e \"library('hdbinseg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=hdbinseg
+  license: GPL-3
+  summary: Binary segmentation methods for detecting and estimating  multiple change-points in
+    the mean or second-order structure  of high-dimensional time series as described
+    in Cho and Fryzlewicz (2014) <doi:10.1111/rssb.12079> and Cho (2016) <doi:10.1214/16-EJS1155>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: hdbinseg
+# Type: Package
+# Title: Change-Point Analysis of High-Dimensional Time Series via Binary Segmentation
+# Version: 1.0.1
+# Date: 2018-05-18
+# Authors@R: c( person('Haeran', 'Cho', email='haeran.cho@bristol.ac.uk', role=c('aut', 'cre')), person('Piotr', 'Fryzlewicz', email='p.fryzlewicz@lse.ac.uk', role='aut'))
+# Description: Binary segmentation methods for detecting and estimating  multiple change-points in the mean or second-order structure  of high-dimensional time series as described in Cho and Fryzlewicz (2014) <doi:10.1111/rssb.12079> and Cho (2016) <doi:10.1214/16-EJS1155>.
+# Depends: R (>= 3.4.0)
+# License: GPL (>= 3)
+# LazyData: TRUE
+# Suggests: RcppArmadillo
+# Imports: Rcpp (>= 0.12.10), foreach, iterators, doParallel
+# LinkingTo: Rcpp, RcppArmadillo
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2018-05-28 12:02:41 UTC; mahrc
+# Author: Haeran Cho [aut, cre], Piotr Fryzlewicz [aut]
+# Maintainer: Haeran Cho <haeran.cho@bristol.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2018-05-29 08:59:41 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

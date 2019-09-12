@@ -1,0 +1,94 @@
+{% set version = '0.1-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-glmx
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/glmx_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/glmx/glmx_{{ version }}.tar.gz
+  sha256: 066aadedc2df9b2122e0d08bc76f396497a6186e3b65099dc5809b905fc7621b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: AER, gld, numDeriv, pscl
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+    - r-mass
+    - r-lmtest
+    - r-sandwich
+
+  run:
+    - r-base
+    - r-formula
+    - r-mass
+    - r-lmtest
+    - r-sandwich
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('glmx')"           # [not win]
+    - "\"%R%\" -e \"library('glmx')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=glmx
+  license: GPL-2 | GPL-3
+  summary: Extended techniques for generalized linear models (GLMs), especially for binary responses,
+    including parametric links and heteroskedastic latent variables.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: glmx
+# Version: 0.1-1
+# Date: 2015-11-19
+# Title: Generalized Linear Models Extended
+# Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org"), person(given = "Roger", family = "Koenker", role = "aut"), person(given = "Philipp", family = "Doebler", role = "aut"))
+# Description: Extended techniques for generalized linear models (GLMs), especially for binary responses, including parametric links and heteroskedastic latent variables.
+# Depends: R (>= 2.14.0)
+# Imports: stats, MASS, Formula, lmtest, sandwich
+# Suggests: AER, gld, numDeriv, pscl
+# License: GPL-2 | GPL-3
+# NeedsCompilation: no
+# Packaged: 2015-11-19 11:28:55 UTC; zeileis
+# Author: Achim Zeileis [aut, cre], Roger Koenker [aut], Philipp Doebler [aut]
+# Maintainer: Achim Zeileis <Achim.Zeileis@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2015-11-19 13:13:51
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,88 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-grapfa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gRapfa_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gRapfa/gRapfa_{{ version }}.tar.gz
+  sha256: d873a80265158d3668ab3d06bfdb616ebeb10df59c9bd99bfdbedda4ece7df1f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-igraph
+
+  run:
+    - r-base
+    - r-igraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gRapfa')"           # [not win]
+    - "\"%R%\" -e \"library('gRapfa')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=gRapfa
+  license: GPL-2
+  summary: 'gRapfa is for modelling discrete longitudinal data using acyclic probabilistic finite
+    automata (APFA). The package contains functions for constructing APFA models from
+    a given data using penalized likelihood methods. For graphical display of APFA models,
+    gRapfa depends on ''igraph package''. gRapfa also contains an interface function
+    to Beagle software that implements an efficient model selection algorithm. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gRapfa
+# Type: Package
+# Title: Acyclic Probabilistic Finite Automata
+# Version: 1.0
+# Date: 2014-04-10
+# Author: Smitha Ankinakatte <Smitha.AA@agrsci.dk> and David Edwards <David.Edwards@agrsci.dk>
+# Maintainer: Smitha Ankinakatte <Smitha.AA@agrsci.dk>
+# Description: gRapfa is for modelling discrete longitudinal data using acyclic probabilistic finite automata (APFA). The package contains functions for constructing APFA models from a given data using penalized likelihood methods. For graphical display of APFA models, gRapfa depends on 'igraph package'. gRapfa also contains an interface function to Beagle software that implements an efficient model selection algorithm.
+# License: GPL (>= 2)
+# Depends: R (>= 3.0.2), igraph
+# Packaged: 2014-04-11 12:02:26 UTC; SMAA
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-04-11 22:47:57
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

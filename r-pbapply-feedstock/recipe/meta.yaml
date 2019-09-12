@@ -1,0 +1,88 @@
+{% set version = '1.4-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pbapply
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pbapply_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pbapply/pbapply_{{ version }}.tar.gz
+  sha256: ac19f209f36f4fa3d0f5b14b6cc5b0c279996fb9d3e86c848c0f6d03c025b3f6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pbapply')"           # [not win]
+    - "\"%R%\" -e \"library('pbapply')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/psolymos/pbapply
+  license: GPL-2
+  summary: A lightweight package that adds progress bar to vectorized R functions ('*apply').
+    The implementation can easily be added to functions where showing the progress is
+    useful (e.g. bootstrap). The type and style of the progress bar (with percentages
+    or remaining time) can be set through options. Supports several parallel processing
+    backends.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pbapply
+# Type: Package
+# Title: Adding Progress Bar to '*apply' Functions
+# Version: 1.4-2
+# Date: 2019-08-30
+# Author: Peter Solymos [aut, cre], Zygmunt Zawadzki [aut]
+# Maintainer: Peter Solymos <solymos@ualberta.ca>
+# Description: A lightweight package that adds progress bar to vectorized R functions ('*apply'). The implementation can easily be added to functions where showing the progress is useful (e.g. bootstrap). The type and style of the progress bar (with percentages or remaining time) can be set through options. Supports several parallel processing backends.
+# Depends: R (>= 3.2.0)
+# Imports: parallel
+# License: GPL-2
+# URL: https://github.com/psolymos/pbapply
+# BugReports: https://github.com/psolymos/pbapply/issues
+# NeedsCompilation: no
+# Packaged: 2019-08-31 02:39:23 UTC; Peter
+# Repository: CRAN
+# Date/Publication: 2019-08-31 05:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,106 @@
+{% set version = '1.4.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hsdm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hSDM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hSDM/hSDM_{{ version }}.tar.gz
+  sha256: b7ef9ae042ffa7e2cfb86653388bfd95e0ebcd3e01e22b05fc93dd0ff29798cb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, raster, sp, rmarkdown, bookdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-coda
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-coda
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hSDM')"           # [not win]
+    - "\"%R%\" -e \"library('hSDM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://ecology.ghislainv.fr/hSDM, https://github.com/ghislainv/hSDM
+  license: GPL-3
+  summary: User-friendly and fast set of functions for estimating parameters of hierarchical
+    Bayesian species distribution models (Latimer et al. 2006 <doi:10.1890/04-0609>).
+    Such models allow interpreting the observations (occurrence and abundance of a species)
+    as a result of several hierarchical processes including ecological processes (habitat
+    suitability, spatial dependence and anthropogenic disturbance) and observation processes
+    (species detectability). Hierarchical species distribution models are essential
+    for accurately characterizing the environmental response of species, predicting
+    their probability of occurrence, and assessing uncertainty in the model results.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: hSDM
+# Type: Package
+# Title: Hierarchical Bayesian Species Distribution Models
+# Version: 1.4.1
+# Date: 2019-05-12
+# Imports: coda
+# Suggests: knitr, raster, sp, rmarkdown, bookdown
+# Authors@R: c( person("Ghislain", "Vieilledent", role=c("aut","cre"),  email="ghislain.vieilledent@cirad.fr", comment=c(ORCID="0000-0002-1685-4997")), person("Matthieu", "Autier", role="ctb"), person("Alan E.", "Gelfand", role="ctb"), person("Jerome", "Guelat", role="ctb"), person("Marc", "Kery", role="ctb"), person("Andrew M.", "Latimer", role="ctb"), person("Cory", "Merow", role="ctb"),  person("Frederic", "Mortier", role="ctb"), person("John A.", "Silander Jr.", role="ctb"), person("Adam M.", "Wilson", role="ctb"), person("Shanshan", "Wu", role="ctb"), person("CIRAD", role=c("cph", "fnd")) )
+# Maintainer: Ghislain Vieilledent <ghislain.vieilledent@cirad.fr>
+# Description: User-friendly and fast set of functions for estimating parameters of hierarchical Bayesian species distribution models (Latimer et al. 2006 <doi:10.1890/04-0609>). Such models allow interpreting the observations (occurrence and abundance of a species) as a result of several hierarchical processes including ecological processes (habitat suitability, spatial dependence and anthropogenic disturbance) and observation processes (species detectability). Hierarchical species distribution models are essential for accurately characterizing the environmental response of species, predicting their probability of occurrence, and assessing uncertainty in the model results.
+# License: GPL-3 | file LICENSE
+# URL: https://ecology.ghislainv.fr/hSDM, https://github.com/ghislainv/hSDM
+# BugReports: https://github.com/ghislainv/hSDM/issues
+# LazyLoad: yes
+# Encoding: UTF-8
+# RoxygenNote: 6.1.1
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2019-05-12 19:08:15 UTC; ghislain
+# Author: Ghislain Vieilledent [aut, cre] (<https://orcid.org/0000-0002-1685-4997>), Matthieu Autier [ctb], Alan E. Gelfand [ctb], Jerome Guelat [ctb], Marc Kery [ctb], Andrew M. Latimer [ctb], Cory Merow [ctb], Frederic Mortier [ctb], John A. Silander Jr. [ctb], Adam M. Wilson [ctb], Shanshan Wu [ctb], CIRAD [cph, fnd]
+# Repository: CRAN
+# Date/Publication: 2019-05-12 23:30:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

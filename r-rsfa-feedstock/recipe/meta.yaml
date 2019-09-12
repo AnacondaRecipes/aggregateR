@@ -1,0 +1,86 @@
+{% set version = '1.04' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rsfa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rSFA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rSFA/rSFA_{{ version }}.tar.gz
+  sha256: fa01fa9e0b48a576bd33c314cafa45df5bdcceadcd49b45d26602deb4394a63d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rSFA')"           # [not win]
+    - "\"%R%\" -e \"library('rSFA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://gociop.de/research-projects/sfa/
+  license: GPL-2
+  summary: Slow Feature Analysis in R, ported to R based on the matlab versions SFA toolkit 1.0
+    by Pietro Berkes and SFA toolkit 2.8 by Wolfgang Konen for matlab.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rSFA
+# Maintainer: Martin Zaefferer <martin.zaefferer@gmx.de>
+# License: GPL (>= 2)
+# Title: Slow Feature Analysis in R
+# Type: Package
+# Author: Wolfgang Konen <wolfgang.konen@fh-koeln.de>, Martin Zaefferer, Patrick Koch; Bug hunting and testing by Ayodele Fasika, Ashwin Kumar, Prawyn Jebakumar
+# Description: Slow Feature Analysis in R, ported to R based on the matlab versions SFA toolkit 1.0 by Pietro Berkes and SFA toolkit 2.8 by Wolfgang Konen for matlab.
+# Version: 1.04
+# URL: http://gociop.de/research-projects/sfa/
+# Date: 2014-Dec-17
+# Depends: R (>= 2.0.0)
+# Imports: stats, MASS
+# Packaged: 2014-12-17 10:56:53 UTC; Martin
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-12-17 13:07:15
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

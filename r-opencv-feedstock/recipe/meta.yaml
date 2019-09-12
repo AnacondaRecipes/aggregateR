@@ -1,0 +1,109 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-opencv
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/opencv_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/opencv/opencv_{{ version }}.tar.gz
+  sha256: 905333c412f1e5d95be3623c26fbe9df2faee4f59fa12e25b5fd3133cd4bc454
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-magrittr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-magrittr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('opencv')"           # [not win]
+    - "\"%R%\" -e \"library('opencv')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ropensci/opencv
+  license: MIT
+  summary: Experimenting with computer vision and machine learning in R. This  package exposes
+    some of the available 'OpenCV' vision algorithms, such as edge,  body or face detection.
+    These can either be applied to analyze static images, or to filter live video footage
+    from a camera device.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: opencv
+# Type: Package
+# Title: Bindings to 'OpenCV' Computer Vision Library
+# Version: 0.1
+# Authors@R: c(person("Jeroen", "Ooms", role = c("aut", "cre"),  email = "jeroen@berkeley.edu", comment = c(ORCID = "0000-0002-4035-0289")))
+# Description: Experimenting with computer vision and machine learning in R. This  package exposes some of the available 'OpenCV' vision algorithms, such as edge,  body or face detection. These can either be applied to analyze static images, or to filter live video footage from a camera device.
+# License: MIT + file LICENSE
+# SystemRequirements: OpenCV: libopencv-dev (Debian, Ubuntu) or opencv-devel (Fedora)
+# URL: https://github.com/ropensci/opencv
+# BugReports: https://github.com/ropensci/opencv/issues
+# LinkingTo: Rcpp
+# Imports: Rcpp, magrittr
+# LazyData: true
+# Encoding: UTF-8
+# RoxygenNote: 6.1.1
+# NeedsCompilation: yes
+# Packaged: 2019-04-01 14:08:54 UTC; jeroen
+# Author: Jeroen Ooms [aut, cre] (<https://orcid.org/0000-0002-4035-0289>)
+# Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
+# Repository: CRAN
+# Date/Publication: 2019-04-01 18:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

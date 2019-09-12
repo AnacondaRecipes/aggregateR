@@ -1,0 +1,87 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spcadjust
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/spcadjust_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/spcadjust/spcadjust_{{ version }}.tar.gz
+  sha256: 806a61a54b9be04d9c9bba97af41a8413a7b8aead1911f2de90020acd41fd104
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, parallel, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('spcadjust')"           # [not win]
+    - "\"%R%\" -e \"library('spcadjust')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=spcadjust
+  license: GPL-2
+  summary: Calibration of thresholds of control charts such as CUSUM charts based on past data,
+    taking estimation error into account.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: spcadjust
+# Version: 1.1
+# Date: 2015-11-20
+# Title: Functions for Calibrating Control Charts
+# Author: Axel Gandy <a.gandy@imperial.ac.uk> and Jan Terje Kvaloy <jan.t.kvaloy@uis.no>.
+# Maintainer: Axel Gandy <a.gandy@imperial.ac.uk>
+# Depends: R (>= 2.5.0)
+# Imports: methods, stats, utils, graphics
+# Description: Calibration of thresholds of control charts such as CUSUM charts based on past data, taking estimation error into account.
+# License: GPL (>= 2)
+# Suggests: knitr, parallel, testthat
+# VignetteBuilder: knitr
+# Collate: 'CUSUMlib.R' 'model.R' 'main.R' 'CUSUM.R' 'EWMAlib.R' 'EWMA.R' 'data.R' 'lm.R' 'logreg.R' 'shewhart.R'
+# RoxygenNote: 5.0.1
+# Packaged: 2016-09-29 08:54:58 UTC; agandy
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2016-09-29 11:37:35
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

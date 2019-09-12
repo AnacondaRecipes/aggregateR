@@ -1,0 +1,88 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-foretell
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/foretell_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/foretell/foretell_{{ version }}.tar.gz
+  sha256: f705f6dcd9aa1ccfc33228a4e067b572ed67df313c320bdd8f0f2062d12071a3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-nloptr
+
+  run:
+    - r-base
+    - r-nloptr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('foretell')"           # [not win]
+    - "\"%R%\" -e \"library('foretell')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=foretell
+  license: GPL-3
+  summary: Project Customer Retention based on Beta Geometric, Beta Discrete Weibull and Latent
+    Class  Discrete Weibull Models.This package is based on Fader and Hardie (2007)  <doi:10.1002/dir.20074>
+    and Fader and Hardie et al. (2018) <doi:10.1016/j.intmar.2018.01.002>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: foretell
+# Type: Package
+# Title: Projecting Customer Retention Based on Fader and Hardie Probability Models
+# Version: 0.2.0
+# Author: Srihari Jaganathan
+# Maintainer: Srihari Jaganathan <sriharitn@gmail.com>
+# Description: Project Customer Retention based on Beta Geometric, Beta Discrete Weibull and Latent Class  Discrete Weibull Models.This package is based on Fader and Hardie (2007)  <doi:10.1002/dir.20074> and Fader and Hardie et al. (2018) <doi:10.1016/j.intmar.2018.01.002>.
+# Depends: R (>= 3.0.1)
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Imports: stats,nloptr
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-04-08 04:40:25 UTC; haria
+# Repository: CRAN
+# Date/Publication: 2019-04-08 05:02:53 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

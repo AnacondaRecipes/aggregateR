@@ -1,0 +1,87 @@
+{% set version = '0.1-8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-operators
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/operators_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/operators/operators_{{ version }}.tar.gz
+  sha256: ddb641e3bcb2d3c080fed7e186381a5c7e4200d163b4051bd9d86343b0d8ec7d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('operators')"           # [not win]
+    - "\"%R%\" -e \"library('operators')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/romainfrancois/operators
+  license: MIT
+  summary: A set of binary operators for common tasks such as regex manipulation.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: operators
+# Type: Package
+# Title: Additional Binary Operators
+# Version: 0.1-8
+# Date: 2015-07-10
+# Author: Romain Francois <romain@r-enthusiasts.com>
+# Maintainer: Romain Francois <romain@r-enthusiasts.com>
+# Depends: R (>= 3.1.0)
+# Imports: utils
+# Suggests: testthat
+# Description: A set of binary operators for common tasks such as regex manipulation.
+# License: MIT + file LICENSE
+# URL: https://github.com/romainfrancois/operators
+# BugReports: https://github.com/romainfrancois/operators/issues
+# NeedsCompilation: no
+# Packaged: 2015-07-11 15:49:41 UTC; romain
+# Repository: CRAN
+# Date/Publication: 2015-07-11 18:32:07
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

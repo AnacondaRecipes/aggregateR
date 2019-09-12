@@ -1,0 +1,94 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tstr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/TSTr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/TSTr/TSTr_{{ version }}.tar.gz
+  sha256: 4e67f532c1bd295658006eaa60e35461869aa6f8d9ddac048ae77d9e359e925a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-stringdist
+    - r-stringr
+
+  run:
+    - r-base
+    - r-data.table
+    - r-stringdist
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('TSTr')"           # [not win]
+    - "\"%R%\" -e \"library('TSTr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=TSTr
+  license: GPL-2
+  summary: A ternary search tree is a type of prefix tree with up to three children and the ability
+    for incremental string search. The package uses this ability for word auto-completion
+    and spell checking. Includes a dataset with the 10001 most frequent English words.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: TSTr
+# Type: Package
+# Title: Ternary Search Tree for Auto-Completion and Spell Checking
+# Version: 1.2
+# Date: 2015-10-07
+# Author: Ricardo Merino [aut, cre], Samantha Fernandez [ctb]
+# Maintainer: Ricardo Merino <ricardo.merino.raldua@gmail.com>
+# Description: A ternary search tree is a type of prefix tree with up to three children and the ability for incremental string search. The package uses this ability for word auto-completion and spell checking. Includes a dataset with the 10001 most frequent English words.
+# License: GPL-2
+# LazyData: yes
+# Depends: R (>= 3.2.0)
+# Imports: stringr, stringdist, stats, data.table
+# Suggests: knitr
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2015-10-31 11:28:33 UTC; Ricardo
+# Repository: CRAN
+# Date/Publication: 2015-10-31 19:26:02
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

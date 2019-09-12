@@ -1,0 +1,97 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pijavski
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Pijavski_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Pijavski/Pijavski_{{ version }}.tar.gz
+  sha256: c1112a6579e0257f9fe12ff2550c10e98a39a8910025a8fa4f799d306ba54780
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.3
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.3
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Pijavski')"           # [not win]
+    - "\"%R%\" -e \"library('Pijavski')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Pijavski
+  license: LGPL-3
+  summary: Global univariate minimization of Lipschitz functions is performed by using Pijavski
+    method, which was published in Pijavski (1972) <DOI:10.1016/0041-5553(72)90115-2>.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Pijavski
+# Type: Package
+# Title: Global Univariate Minimization
+# Version: 1.0
+# Date: 2016-02-29
+# Authors@R: c(person("Gleb", "Beliakov", role = c("aut", "cre"), email = "gleb@deakin.edu.au"), person("Gita", "Das", role = "aut"), person("Jonathan", "Wells", role = "ctb"), person("Hewlett-Packard", "Company", role = "ctb"), person("Silicon Graphics Computer Systems", "Inc.", role = "ctb"))
+# Maintainer: Gleb Beliakov <gleb@deakin.edu.au>
+# Author: Gleb Beliakov [aut, cre], Gita Das [aut], Jonathan Wells [ctb],	 Hewlett-Packard Company [ctb], Silicon Graphics Computer Systems Inc. [ctb]
+# Description: Global univariate minimization of Lipschitz functions is performed by using Pijavski method, which was published in Pijavski (1972) <DOI:10.1016/0041-5553(72)90115-2>.
+# License: LGPL-3
+# LazyData: TRUE
+# Imports: Rcpp (>= 0.12.3)
+# LinkingTo: Rcpp
+# RoxygenNote: 5.0.1
+# NeedsCompilation: yes
+# Copyright: Implementation of the binary heap is by Hewlett-Packard Company (1994), Silicon Graphics Computer Systems, Inc.(1996-1999). Modifications to the code by Johnathan Wells (2002)
+# Packaged: 2016-03-01 03:24:35 UTC; gitad
+# Repository: CRAN
+# Date/Publication: 2016-03-12 08:51:11
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

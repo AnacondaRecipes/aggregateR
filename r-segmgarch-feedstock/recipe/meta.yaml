@@ -1,0 +1,115 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-segmgarch
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/segMGarch_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/segMGarch/segMGarch_{{ version }}.tar.gz
+  sha256: a9d5197c4753a98e0d1e635327d31987542f70436db83c144f6aca2260201c32
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.12
+    - r-rcpparmadillo
+    - r-corpcor
+    - r-doparallel
+    - r-fgarch
+    - r-foreach
+    - r-iterators
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.12
+    - r-rcpparmadillo
+    - r-corpcor
+    - r-doparallel
+    - r-fgarch
+    - r-foreach
+    - r-iterators
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('segMGarch')"           # [not win]
+    - "\"%R%\" -e \"library('segMGarch')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=segMGarch
+  license: GPL-2
+  summary: 'Implements a segmentation algorithm for multiple change-point detection in high-dimensional
+    GARCH processes. It simultaneously segments GARCH processes by identifying ''common''
+    change-points, each of which can be shared by a subset or all of the component time
+    series as a change-point in their within-series and/or cross-sectional correlation
+    structure. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: segMGarch
+# Type: Package
+# Title: Multiple Change-Point Detection for High-Dimensional GARCH Processes
+# Version: 1.2
+# Date: 2018-12-10
+# Author: Haeran Cho and  Karolos Korkas
+# Maintainer: Karolos Korkas <kkorkas@yahoo.co.uk>
+# Description: Implements a segmentation algorithm for multiple change-point detection in high-dimensional GARCH processes. It simultaneously segments GARCH processes by identifying 'common' change-points, each of which can be shared by a subset or all of the component time series as a change-point in their within-series and/or cross-sectional correlation structure.
+# License: GPL (>= 2)
+# Imports: Rcpp (>= 0.12.12), foreach, iterators, doParallel, fGarch, corpcor, mvtnorm, methods
+# Suggests: MASS
+# LinkingTo: Rcpp,RcppArmadillo
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2019-01-17 22:14:49 UTC; korkas2
+# Repository: CRAN
+# Date/Publication: 2019-01-17 22:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

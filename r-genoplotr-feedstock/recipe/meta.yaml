@@ -1,0 +1,88 @@
+{% set version = '0.8.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-genoplotr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/genoPlotR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/genoPlotR/genoPlotR_{{ version }}.tar.gz
+  sha256: ba4cdc7e2417c460f78d1d0ce11313787b6d14ad1da30b54a3ee7f2a360e201d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-ade4
+
+  run:
+    - r-base
+    - r-ade4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('genoPlotR')"           # [not win]
+    - "\"%R%\" -e \"library('genoPlotR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://genoplotr.r-forge.r-project.org/
+  license: GPL-2
+  summary: Draws gene or genome maps and comparisons between these, in a  publication-grade manner.
+    Starting from simple, common files, it will  draw postscript or PDF files that can
+    be sent as such to journals.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: genoPlotR
+# Type: Package
+# Title: Plot Publication-Grade Gene and Genome Maps
+# Version: 0.8.9
+# Date: 2019-01-16
+# Author: Lionel Guy <lionel.guy@imbim.uu.se>
+# URL: http://genoplotr.r-forge.r-project.org/
+# Depends: R (>= 2.10.0), ade4, grid
+# Imports: methods
+# Maintainer: Lionel Guy <lionel.guy@imbim.uu.se>
+# Description: Draws gene or genome maps and comparisons between these, in a  publication-grade manner. Starting from simple, common files, it will  draw postscript or PDF files that can be sent as such to journals.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2019-01-25 08:24:54 UTC; lionel
+# Repository: CRAN
+# Date/Publication: 2019-01-25 10:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

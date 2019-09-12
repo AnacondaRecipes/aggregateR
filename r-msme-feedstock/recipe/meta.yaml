@@ -1,0 +1,87 @@
+{% set version = '0.5.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-msme
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/msme_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/msme/msme_{{ version }}.tar.gz
+  sha256: 70dde5f9dd35e41ad3ddf42d553774503d1d6972716d4b973d4807adda3f0557
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-lattice
+
+  run:
+    - r-base
+    - r-mass
+    - r-lattice
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('msme')"           # [not win]
+    - "\"%R%\" -e \"library('msme')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=msme
+  license: GPL-3
+  summary: Functions and datasets from Hilbe, J.M., and Robinson, A.P. 2013. Methods of Statistical
+    Model Estimation. Chapman & Hall / CRC.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: msme
+# Type: Package
+# Title: Functions and Datasets for "Methods of Statistical Model Estimation"
+# Version: 0.5.3
+# Date: 2018-03-16
+# Author: Joseph Hilbe and Andrew Robinson
+# Maintainer: Andrew Robinson <apro@unimelb.edu.au>
+# Depends: R (>= 2.10), MASS, lattice
+# Description: Functions and datasets from Hilbe, J.M., and Robinson, A.P. 2013. Methods of Statistical Model Estimation. Chapman & Hall / CRC.
+# License: GPL-3
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2018-03-18 20:13:05 UTC; andrewpr
+# Repository: CRAN
+# Date/Publication: 2018-03-18 22:31:41 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,88 @@
+{% set version = '0.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rgabriel
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rgabriel_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rgabriel/rgabriel_{{ version }}.tar.gz
+  sha256: fdfbe97c85738a2b9e8e7246dca2bf7263e8b999a19451f379f8857aafe3cab0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rgabriel')"           # [not win]
+    - "\"%R%\" -e \"library('rgabriel')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/yufree/rgabriel
+  license: GPL-2
+  summary: 'This package was created to analyze multi-level one-way experimental designs. It
+    is designed to handle vectorized observation and factor data where there are unequal
+    sample sizes and population variance homogeneity can not be assumed. To conduct
+    the Gabriel test, create two vectors: one for your  observations and one for the
+    factor level of each observation.  The function, rgabriel, conduct the test and
+    save the output as a vector to input into the gabriel.plot function, which produces  a
+    confidence interval plot for Multiple Comparison.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rgabriel
+# Type: Package
+# Title: Gabriel Multiple Comparison Test and Plot the Confidence Interval on Barplot
+# Version: 0.7
+# Date: 2013-12-28
+# Author: Yihui XIE, Miao YU
+# Maintainer: Miao YU <yufreecas@gmail.com>
+# Description: This package was created to analyze multi-level one-way experimental designs. It is designed to handle vectorized observation and factor data where there are unequal sample sizes and population variance homogeneity can not be assumed. To conduct the Gabriel test, create two vectors: one for your  observations and one for the factor level of each observation.  The function, rgabriel, conduct the test and save the output as a vector to input into the gabriel.plot function, which produces  a confidence interval plot for Multiple Comparison.
+# URL: https://github.com/yufree/rgabriel
+# License: GPL (>= 2)
+# Packaged: 2013-12-28 07:19:31 UTC; yufree
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-12-28 09:08:33
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

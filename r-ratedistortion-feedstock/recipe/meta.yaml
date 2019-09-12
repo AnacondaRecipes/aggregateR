@@ -1,0 +1,92 @@
+{% set version = '1.01' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ratedistortion
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RateDistortion_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RateDistortion/RateDistortion_{{ version }}.tar.gz
+  sha256: e5807a77e370caa7bd8951a0884f10a8268ee75ba787174a5665871c17952cd6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RateDistortion')"           # [not win]
+    - "\"%R%\" -e \"library('RateDistortion')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RateDistortion
+  license: GPL-2
+  summary: 'An implementation of routines for solving rate-distortion problems. Rate-distortion
+    theory is a field within information theory that examines optimal lossy compression.
+    That is, given that some information must be lost, how can a communication channel
+    be designed that minimizes the cost of communication error? Rate-distortion theory
+    is concerned with the optimal  (minimal cost) solution to such tradeoffs. An important
+    tool for solving rate-distortion problems is the Blahut algorithm, developed by
+    Richard Blahut and described in: . Blahut, R. E. (1972). Computation of channel
+    capacity and rate-distortion functions. IEEE Transactions on Information Theory,
+    IT-18(4), 460-473. . This package implements the basic Blahut algorithm, and additionally
+    contains a number of `helper'' functions, including a routine for searching for
+    an information channel that minimizes cost subject to a constraint on information
+    rate.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RateDistortion
+# Type: Package
+# Title: Routines for Solving Rate-Distortion Problems
+# Version: 1.01
+# Date: 2015-08-10
+# Author: Chris R. Sims
+# Maintainer: Chris R. Sims <chris.sims@drexel.edu>
+# Description: An implementation of routines for solving rate-distortion problems. Rate-distortion theory is a field within information theory that examines optimal lossy compression. That is, given that some information must be lost, how can a communication channel be designed that minimizes the cost of communication error? Rate-distortion theory is concerned with the optimal  (minimal cost) solution to such tradeoffs. An important tool for solving rate-distortion problems is the Blahut algorithm, developed by Richard Blahut and described in: . Blahut, R. E. (1972). Computation of channel capacity and rate-distortion functions. IEEE Transactions on Information Theory, IT-18(4), 460-473. . This package implements the basic Blahut algorithm, and additionally contains a number of `helper' functions, including a routine for searching for an information channel that minimizes cost subject to a constraint on information rate.
+# License: GPL-2
+# Packaged: 2015-08-10 20:48:16 UTC; chris_r_sims
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-08-11 08:22:22
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

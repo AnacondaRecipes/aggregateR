@@ -1,0 +1,91 @@
+{% set version = '1.0-5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-survauc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/survAUC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/survAUC/survAUC_{{ version }}.tar.gz
+  sha256: f9ff65742d827f37cdac799e81939726d50047dfeb2740b1d4008615054a922d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rms
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('survAUC')"           # [not win]
+    - "\"%R%\" -e \"library('survAUC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=survAUC
+  license: GPL-2
+  summary: The package provides a variety of functions to estimate time-dependent true/false
+    positive rates and AUC curves from a set of censored survival data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: survAUC
+# Version: 1.0-5
+# Title: Estimators of prediction accuracy for time-to-event data.
+# Author: Sergej Potapov, Werner Adler and Matthias Schmid.
+# Description: The package provides a variety of functions to estimate time-dependent true/false positive rates and AUC curves from a set of censored survival data.
+# Maintainer: Sergej Potapov <sergej.potapov@gmail.com>
+# Depends: R (>= 2.6.0), survival
+# Suggests: rms
+# Date: 04.09.2012
+# License: GPL-2
+# Packaged: 2012-09-04 11:57:44 UTC; sergejpotapov
+# Repository: CRAN
+# Date/Publication: 2012-09-04 14:24:45
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

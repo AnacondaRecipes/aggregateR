@@ -1,0 +1,92 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mixspe
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mixSPE_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mixSPE/mixSPE_{{ version }}.tar.gz
+  sha256: f4e347baff0d54f3e2c92c43c2702f9e4b47ceb12c693d953e33fbccc9c97480
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mixSPE')"           # [not win]
+    - "\"%R%\" -e \"library('mixSPE')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mixSPE
+  license: GPL-2
+  summary: 'Mixtures of skewed and elliptical distributions are implemented using mixtures of
+    multivariate skew  power exponential and power exponential distributions, respectively.
+    A generalized expectation-maximization  framework is used for parameter estimation.
+    Methodology for mixtures of power exponential distributions is  from Dang et al.
+    (2015) <doi: 10.1111/biom.12351>.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mixSPE
+# Type: Package
+# Title: Mixtures of Power Exponential and Skew Power Exponential Distributions for Use in Model-Based Clustering and Classification
+# Version: 0.1.1
+# Date: 2019-06-18
+# Author: Utkarsh J. Dang[aut, cre], Michael P. B. Gallaugher[ctb], Ryan P. Browne[aut, cre], and Paul D. McNicholas[aut]
+# Maintainer: Utkarsh J. Dang <udang@binghamton.edu>
+# Description: Mixtures of skewed and elliptical distributions are implemented using mixtures of multivariate skew  power exponential and power exponential distributions, respectively. A generalized expectation-maximization  framework is used for parameter estimation. Methodology for mixtures of power exponential distributions is  from Dang et al. (2015) <doi: 10.1111/biom.12351>.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# Imports: mvtnorm
+# Suggests: testthat
+# NeedsCompilation: no
+# Packaged: 2019-06-18 15:20:36 UTC; udang
+# Repository: CRAN
+# Date/Publication: 2019-06-19 09:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

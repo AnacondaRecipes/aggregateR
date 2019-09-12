@@ -1,0 +1,83 @@
+{% set version = '1.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nlwaldtest
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/nlWaldTest_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/nlWaldTest/nlWaldTest_{{ version }}.tar.gz
+  sha256: 9090e1dfce47dfc33e12cce7dafb0124fe04a4a82fe4a7c96ff2c58dd16ff7b2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('nlWaldTest')"           # [not win]
+    - "\"%R%\" -e \"library('nlWaldTest')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=nlWaldTest
+  license: GPL-2
+  summary: Wald Test for nonlinear restrictions on model parameters and confidence intervals
+    for nonlinear functions  of parameters using delta-method.  Applicable after ANY
+    model, provided parameters estimates and their covariance matrix are available.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: nlWaldTest
+# Version: 1.1.3
+# Date: 2016-03-22
+# Title: Wald Test of Nonlinear Restrictions and Nonlinear CI
+# Description: Wald Test for nonlinear restrictions on model parameters and confidence intervals for nonlinear functions  of parameters using delta-method.  Applicable after ANY model, provided parameters estimates and their covariance matrix are available.
+# Author: Oleh Komashko
+# Maintainer: Oleh Komashko <oleg_komashko@ukr.net>
+# Depends: R (>= 3.0.2)
+# License: GPL (>= 2)
+# LazyData: yes
+# Repository: CRAN
+# NeedsCompilation: no
+# Packaged: 2016-03-24 09:42:58 UTC; oleh
+# Date/Publication: 2016-03-25 00:12:23
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

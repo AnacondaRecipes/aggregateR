@@ -1,0 +1,96 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ryandextranslate
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RYandexTranslate_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RYandexTranslate/RYandexTranslate_{{ version }}.tar.gz
+  sha256: 3a6084b3c7622000e4fb71953a51724962a00df9e444d3f7d1aed8696d2d3b63
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcurl
+    - r-httr
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-rcurl
+    - r-httr
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RYandexTranslate')"           # [not win]
+    - "\"%R%\" -e \"library('RYandexTranslate')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mukul13/RYandexTranslate
+  license: MIT
+  summary: '''Yandex Translate'' (https://translate.yandex.com/) is a statistical machine translation
+    system. The system translates separate words, complete texts, and webpages. This
+    package can be used to detect language from text and to translate it to supported
+    target language. For more info: https://tech.yandex.com/translate/doc/dg/concepts/About-docpage/
+    .'
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RYandexTranslate
+# Type: Package
+# Title: R Interface to Yandex Translate API
+# Version: 1.0
+# Date: 2016-02-28
+# Author: Mukul Chaware[aut,cre]
+# Maintainer: Mukul Chaware <mukul.chaware13@gmail.com>
+# Description: 'Yandex Translate' (https://translate.yandex.com/) is a statistical machine translation system. The system translates separate words, complete texts, and webpages. This package can be used to detect language from text and to translate it to supported target language. For more info: https://tech.yandex.com/translate/doc/dg/concepts/About-docpage/ .
+# URL: https://github.com/mukul13/RYandexTranslate
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Imports: httr,RCurl,jsonlite
+# RoxygenNote: 5.0.1.9000
+# NeedsCompilation: no
+# Packaged: 2016-02-29 11:03:06 UTC; mukul
+# Repository: CRAN
+# Date/Publication: 2016-02-29 18:39:32
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,101 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-testassay
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/testassay_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/testassay/testassay_{{ version }}.tar.gz
+  sha256: db65d27b0fe0eac32641bebd7d3baf7e8c1d8c28a24443929d855402e6d0f319
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, ggplot2, dplyr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('testassay')"           # [not win]
+    - "\"%R%\" -e \"library('testassay')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=testassay
+  license: MIT
+  summary: 'A common way of validating a biological assay for is through a procedure, where m
+    levels of an analyte are measured with n replicates at each level, and if all m
+    estimates of the coefficient of variation (CV) are less than some prespecified level,
+    then the assay is declared validated for precision within the range of the m analyte
+    levels. Two limitations of this procedure are: there is no clear statistical statement
+    of precision upon passing, and it is unclear how to modify the procedure for assays
+    with constant standard deviation. We provide tools to convert such a procedure into
+    a set of m hypothesis tests. This reframing motivates the m:n:q procedure, which
+    upon completion delivers a 100q% upper confidence limit on the CV. Additionally,
+    for a post-validation assay output of y, the method gives an ``effective standard
+    deviation interval'''' of log(y) plus or minus r, which is a 68% confidence interval
+    on log(mu), where mu is the expected value of the assay output for that sample.
+    Further, the m:n:q procedure can be straightforwardly applied to constant standard
+    deviation assays. We illustrate these tools by applying them to a growth inhibition
+    assay.'
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: testassay
+# Type: Package
+# Title: A Hypothesis Testing Framework for Validating an Assay for Precision
+# Version: 0.1.0
+# Author: Michael C Sachs and Michael P Fay
+# Maintainer: Michael C Sachs <sachsmc@gmail.com>
+# Description: A common way of validating a biological assay for is through a procedure, where m levels of an analyte are measured with n replicates at each level, and if all m estimates of the coefficient of variation (CV) are less than some prespecified level, then the assay is declared validated for precision within the range of the m analyte levels. Two limitations of this procedure are: there is no clear statistical statement of precision upon passing, and it is unclear how to modify the procedure for assays with constant standard deviation. We provide tools to convert such a procedure into a set of m hypothesis tests. This reframing motivates the m:n:q procedure, which upon completion delivers a 100q% upper confidence limit on the CV. Additionally, for a post-validation assay output of y, the method gives an ``effective standard deviation interval'' of log(y) plus or minus r, which is a 68% confidence interval on log(mu), where mu is the expected value of the assay output for that sample. Further, the m:n:q procedure can be straightforwardly applied to constant standard deviation assays. We illustrate these tools by applying them to a growth inhibition assay.
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Depends: R (>= 2.10)
+# Suggests: knitr, rmarkdown, ggplot2, dplyr
+# VignetteBuilder: knitr
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-11-29 14:31:42 UTC; micsac
+# Repository: CRAN
+# Date/Publication: 2016-11-29 18:10:38
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,101 @@
+{% set version = '1.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gckrig
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gcKrig_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gcKrig/gcKrig_{{ version }}.tar.gz
+  sha256: 5d6eda11d6fc7c887001ef1afd8f85567ae2551a8c432258d45ebe79f0ae36a3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: EQL, FNN, lattice, latticeExtra, Matrix, MASS, numDeriv, scatterplot3d, snowfall, sp
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.0
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.0
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gcKrig')"           # [not win]
+    - "\"%R%\" -e \"library('gcKrig')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=gcKrig
+  license: GPL-2
+  summary: Provides a variety of functions to analyze and model geostatistical count data with
+    Gaussian copulas, including 1) data simulation and visualization;  2) correlation
+    structure assessment (here also known as the Normal To Anything);  3) calculate
+    multivariate normal rectangle probabilities;  4) likelihood inference and parallel
+    prediction at predictive locations.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gcKrig
+# Type: Package
+# Title: Analysis of Geostatistical Count Data using Gaussian Copulas
+# Version: 1.1.3
+# Author: Zifei Han
+# Maintainer: Zifei Han <hanzifei1@gmail.com>
+# Description: Provides a variety of functions to analyze and model geostatistical count data with Gaussian copulas, including 1) data simulation and visualization;  2) correlation structure assessment (here also known as the Normal To Anything);  3) calculate multivariate normal rectangle probabilities;  4) likelihood inference and parallel prediction at predictive locations.
+# License: GPL (>= 2)
+# LazyData: TRUE
+# Depends: R (>= 3.2.5)
+# Imports: Rcpp (>= 0.12.0)
+# LinkingTo: Rcpp, RcppArmadillo
+# Suggests: EQL, FNN, lattice, latticeExtra, Matrix, MASS, numDeriv, scatterplot3d, snowfall, sp
+# NeedsCompilation: yes
+# Packaged: 2018-12-20 23:20:52 UTC; zifeihan
+# Repository: CRAN
+# Date/Publication: 2018-12-21 12:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

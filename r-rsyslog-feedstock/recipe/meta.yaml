@@ -1,0 +1,95 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rsyslog
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rsyslog_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rsyslog/rsyslog_{{ version }}.tar.gz
+  sha256: c40bb578da4abfef19c2d835e4d2905f8cf2022cc86edd233b539284f65d63c4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  skip: True  # [not unix]
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rsyslog')"           # [not win]
+    - "\"%R%\" -e \"library('rsyslog')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/atheriel/rsyslog
+  license: GPL-2
+  summary: Functions to write messages to the 'syslog' system logger API, available on all 'POSIX'-compatible
+    operating systems. Features include tagging messages with a priority level and application
+    type, as well as masking (hiding) messages below a given priority level.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rsyslog
+# Title: Interface to the 'syslog' System Logger
+# Version: 1.0.1
+# Authors@R: c( person("Aaron", "Jacobs", role = c("aut", "cre"), email = "atheriel@gmail.com"), person("Crescendo Technology Ltd.", role = "cph") )
+# Maintainer: Aaron Jacobs <atheriel@gmail.com>
+# Description: Functions to write messages to the 'syslog' system logger API, available on all 'POSIX'-compatible operating systems. Features include tagging messages with a priority level and application type, as well as masking (hiding) messages below a given priority level.
+# License: GPL (>= 2)
+# URL: https://github.com/atheriel/rsyslog
+# BugReports: https://github.com/atheriel/rsyslog/issues
+# ByteCompile: true
+# Encoding: UTF-8
+# LazyData: true
+# OS_type: unix
+# RoxygenNote: 6.0.1
+# SystemRequirements: POSIX.1-2001
+# NeedsCompilation: yes
+# Packaged: 2018-07-03 19:00:45 UTC; rstudio
+# Author: Aaron Jacobs [aut, cre], Crescendo Technology Ltd. [cph]
+# Repository: CRAN
+# Date/Publication: 2018-07-03 19:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

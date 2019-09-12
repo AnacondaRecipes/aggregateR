@@ -1,0 +1,93 @@
+{% set version = '3.1-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-icestaf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/icesTAF_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/icesTAF/icesTAF_{{ version }}.tar.gz
+  sha256: 150ee5593002e35c0bd12ab79ecea3bf4e1941ba33f74afe1cf9c5bcc551d57b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bibtex
+    - r-lattice
+    - r-remotes
+
+  run:
+    - r-base
+    - r-bibtex
+    - r-lattice
+    - r-remotes
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('icesTAF')"           # [not win]
+    - "\"%R%\" -e \"library('icesTAF')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://taf.ices.dk
+  license: GPL-2
+  summary: Functions to support the ICES Transparent Assessment Framework <http://taf.ices.dk>
+    to organize data, methods, and results used in ICES assessments. ICES is an organization
+    facilitating international collaboration in marine science.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: icesTAF
+# Version: 3.1-1
+# Date: 2019-05-24
+# Title: Functions to Support the ICES Transparent Assessment Framework
+# Authors@R: c(person("Arni", "Magnusson", role=c("aut","cre"), email="arni.magnusson@ices.dk"), person("Colin", "Millar", role="aut"), person("Alexandros", "Kokkalis", role="ctb"))
+# Imports: grDevices, lattice, stats, tools, utils, bibtex, remotes
+# LazyData: yes
+# Description: Functions to support the ICES Transparent Assessment Framework <http://taf.ices.dk> to organize data, methods, and results used in ICES assessments. ICES is an organization facilitating international collaboration in marine science.
+# License: GPL (>= 2)
+# URL: http://taf.ices.dk
+# Encoding: UTF-8
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-05-24 13:51:55 UTC; arnima
+# Author: Arni Magnusson [aut, cre], Colin Millar [aut], Alexandros Kokkalis [ctb]
+# Maintainer: Arni Magnusson <arni.magnusson@ices.dk>
+# Repository: CRAN
+# Date/Publication: 2019-05-24 16:11:33 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

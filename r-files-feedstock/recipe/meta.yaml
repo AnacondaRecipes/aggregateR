@@ -1,0 +1,85 @@
+{% set version = '0.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-files
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/files_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/files/files_{{ version }}.tar.gz
+  sha256: 6c2649bf8b13d684c17423d1cd59dd830ff37705810e3b9b72662d29315710ee
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('files')"           # [not win]
+    - "\"%R%\" -e \"library('files')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=files
+  license: GPL-3
+  summary: Functions for printing the contents of a folder as columns in a ragged-bottom data.frame
+    and for viewing the details (size, time created, time modified, etc.) of a folder's
+    top level contents.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: files
+# Title: Effective File Navigation from the R Console
+# Version: 0.0.1
+# Authors@R: person(c("Ronald", "E."), "Robertson",, "robertson.ron@husky.neu.edu", c("cre", "aut"))
+# Description: Functions for printing the contents of a folder as columns in a ragged-bottom data.frame and for viewing the details (size, time created, time modified, etc.) of a folder's top level contents.
+# Depends: R (>= 3.3.1)
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-07-27 19:31:23 UTC; rer
+# Author: Ronald E. Robertson [cre, aut]
+# Maintainer: Ronald E. Robertson <robertson.ron@husky.neu.edu>
+# Repository: CRAN
+# Date/Publication: 2016-07-28 23:52:33
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

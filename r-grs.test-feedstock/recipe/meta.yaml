@@ -1,0 +1,84 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-grs.test
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GRS.test_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GRS.test/GRS.test_{{ version }}.tar.gz
+  sha256: d6d4459b7cbe5df9167ead24b1dd120476d87158f2f43898b1ea17994721e9aa
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GRS.test')"           # [not win]
+    - "\"%R%\" -e \"library('GRS.test')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=GRS.test
+  license: GPL-2
+  summary: 'Computational resources for test proposed by Gibbons, Ross, Shanken (1989)<DOI:10.2307/1913625>.
+    It also has the functions for the power analysis and the choice of the optimal level
+    of significance. The optimal level is determined by minimizing the expected loss
+    from hypothesis testing. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: GRS.test
+# Type: Package
+# Title: GRS Test for Portfolio Efficiency, Its Statistical Power Analysis, and Optimal Significance Level Calculation
+# Version: 1.1
+# Date: 2017-11-20
+# Author: Jae H. Kim <J.Kim@latrobe.edu.au>
+# Maintainer: Jae H. Kim <J.Kim@latrobe.edu.au>
+# Description: Computational resources for test proposed by Gibbons, Ross, Shanken (1989)<DOI:10.2307/1913625>. It also has the functions for the power analysis and the choice of the optimal level of significance. The optimal level is determined by minimizing the expected loss from hypothesis testing.
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2017-12-04 03:26:30 UTC; JKim
+# Repository: CRAN
+# Date/Publication: 2017-12-04 04:53:27 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

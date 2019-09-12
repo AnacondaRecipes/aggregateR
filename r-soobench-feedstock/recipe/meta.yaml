@@ -1,0 +1,87 @@
+{% set version = '1.0-73' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-soobench
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/soobench_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/soobench/soobench_{{ version }}.tar.gz
+  sha256: 14f8e4d845cb3c5e1df157f8ed63930748253c1eaba1fbda04799276830159f8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rgl
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('soobench')"           # [not win]
+    - "\"%R%\" -e \"library('soobench')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=soobench
+  license: BSD
+  summary: Collection of different single objective test functions useful for benchmarks and
+    algorithm development.
+  license_family: BSD
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: soobench
+# Title: Single Objective Optimization Benchmark Functions
+# Description: Collection of different single objective test functions useful for benchmarks and algorithm development.
+# Author: Olaf Mersmann <olafm@p-value.net> Bernd Bischl <bischl@statistik.tu-dortmund.de>
+# Maintainer: Olaf Mersmann <olafm@p-value.net>
+# License: BSD
+# LazyData: yes
+# Version: 1.0-73
+# Suggests: rgl
+# Collate: 'counting_function.R' 'f_ackley.R' 'f_bbob2009.R' 'f_branin.R' 'f_discus.R' 'f_double_sum.R' 'f_ellipsoidal.R' 'f_goldstein_price.R' 'f_griewank.R' 'f_kotancheck.R' 'f_mexican_hat.R' 'f_rastrigin.R' 'f_rosenbrock.R' 'f_sphere.R' 'f_weierstrass.R' 'generics.R' 'is_soo_function.R' 'persp3d_soo_function.R' 'plot_soo_function.R' 'print_soo_function.R' 'rotate_parameter_space.R'
+# Packaged: 2012-03-05 16:05:45 UTC; olafm
+# Repository: CRAN
+# Date/Publication: 2012-03-05 16:44:07
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

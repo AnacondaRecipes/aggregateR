@@ -1,0 +1,97 @@
+{% set version = '1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ri2by2
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RI2by2_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RI2by2/RI2by2_{{ version }}.tar.gz
+  sha256: 09142a5caf53bfe7ee13e21d0641955680eef172548bfe138c055b959603ac6a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-gtools
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-gtools
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RI2by2')"           # [not win]
+    - "\"%R%\" -e \"library('RI2by2')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RI2by2
+  license: GPL-3
+  summary: Computes attributable effects based confidence interval, permutation test confidence
+    interval, or asymptotic confidence interval for the the average treatment effect
+    on a binary outcome.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RI2by2
+# Type: Package
+# Title: Randomization Inference for Treatment Effects on a Binary Outcome
+# Version: 1.3
+# Author: Joseph Rigdon, Wen Wei Loh, Michael G. Hudgens
+# Maintainer: Wen Wei Loh <wwloh@email.unc.edu>
+# Imports: compiler, gtools, Rcpp
+# LinkingTo: Rcpp
+# Description: Computes attributable effects based confidence interval, permutation test confidence interval, or asymptotic confidence interval for the the average treatment effect on a binary outcome.
+# License: GPL (>= 3)
+# Suggests: testthat
+# NeedsCompilation: yes
+# Packaged: 2016-10-19 15:00:05 UTC; wloh
+# Repository: CRAN
+# Date/Publication: 2016-10-21 10:42:34
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

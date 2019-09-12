@@ -1,0 +1,92 @@
+{% set version = '0.1-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pade
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Pade_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Pade/Pade_{{ version }}.tar.gz
+  sha256: 819ceae7305355e96638a5e69f2dcc777c488853e2a1097d5d83f4d1fac5a5cf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Pade')"           # [not win]
+    - "\"%R%\" -e \"library('Pade')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://bitbucket.org/aadler/pade
+  license: GPL-2 | BSD_2_clause
+  summary: "Given a vector of Taylor series coefficients of sufficient length as input, the function
+    returns the numerator and denominator coefficients for the Pad\xE9 approximant of
+    appropriate order."
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_2_clause'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Pade
+# Type: Package
+# Title: Pade Approximant Coefficients
+# Version: 0.1-4
+# Date: 2015-07-29
+# Authors@R: c(person(given="Avraham", family="Adler", role=c("aut", "cph", "cre"), email="Avraham.Adler@gmail.com"))
+# Description: Given a vector of Taylor series coefficients of sufficient length as input, the function returns the numerator and denominator coefficients for the Pade approximant of appropriate order.
+# License: GPL (>= 2) | BSD_2_clause + file LICENSE
+# Imports: utils
+# Suggests: testthat
+# URL: https://bitbucket.org/aadler/pade
+# BugReports: https://bitbucket.org/aadler/pade/issues
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2015-07-29 17:24:47 UTC; aadler00
+# Author: Avraham Adler [aut, cph, cre]
+# Maintainer: Avraham Adler <Avraham.Adler@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2015-07-29 20:48:44
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

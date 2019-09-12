@@ -1,0 +1,86 @@
+{% set version = '2.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-multirich
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/multirich_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/multirich/multirich_{{ version }}.tar.gz
+  sha256: d0770fb8c2378bacf60561fbb661914c06e3ab6822fceef515121cddb62c5912
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('multirich')"           # [not win]
+    - "\"%R%\" -e \"library('multirich')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=multirich
+  license: GPL-2
+  summary: Functions to calculate Unique Trait Combinations (UTC) and scaled Unique Trait Combinations
+    (sUTC) as measures of multivariate richness. The package can also calculate beta-diversity
+    for trait richness and can partition this into nestedness-related and turnover components.
+    The code will also calculate several measures of overlap.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: multirich
+# Type: Package
+# Title: Calculate Multivariate Richness via UTC and sUTC
+# Version: 2.1.1
+# Date: 2015-09-14
+# Author: Alexander Keyel
+# Maintainer: Alexander Keyel <skeyel@gmail.com>
+# Description: Functions to calculate Unique Trait Combinations (UTC) and scaled Unique Trait Combinations (sUTC) as measures of multivariate richness. The package can also calculate beta-diversity for trait richness and can partition this into nestedness-related and turnover components. The code will also calculate several measures of overlap.
+# License: GPL (>= 2)
+# Suggests: knitr
+# VignetteBuilder: knitr
+# Packaged: 2015-09-14 11:43:46 UTC; akeyel
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-09-17 22:50:10
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

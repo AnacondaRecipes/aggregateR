@@ -1,0 +1,94 @@
+{% set version = '0.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tidetables
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/TideTables_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/TideTables/TideTables_{{ version }}.tar.gz
+  sha256: b48030f2c9f8e193308a363cc35b8cfdf62cce7b9a50fc5013ba9f6b934e35bf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-chron >=2.3_47
+    - r-data.table >=1.9.6
+
+  run:
+    - r-base
+    - r-chron >=2.3_47
+    - r-data.table >=1.9.6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('TideTables')"           # [not win]
+    - "\"%R%\" -e \"library('TideTables')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=TideTables
+  license: GPL-3
+  summary: Tide analysis and prediction of predominantly semi-diurnal tides with two high waters
+    and two low waters during one lunar day (~24.842 hours, ~1.035 days). The analysis
+    should preferably cover an observation period of at least 19 years. For shorter
+    periods, for example, the nodal cycle can not be taken into account, which particularly
+    affects the height calculation. The main objective of this package is to produce
+    tide tables.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: TideTables
+# Type: Package
+# Title: Tide Analysis and Prediction of Predominantly Semi-Diurnal Tides
+# Version: 0.0.2
+# Date: 2017-09-11
+# Authors@R: c( person("Moritz","Mueller-Navarra", email="muellernavarra@gmail.com",role=c("aut","cre")), person("Sylvin","Mueller-Navarra", email="4@sylvin.de",role="aut"), person("Andreas", "Boesch", role="ctb"))
+# Description: Tide analysis and prediction of predominantly semi-diurnal tides with two high waters and two low waters during one lunar day (~24.842 hours, ~1.035 days). The analysis should preferably cover an observation period of at least 19 years. For shorter periods, for example, the nodal cycle can not be taken into account, which particularly affects the height calculation. The main objective of this package is to produce tide tables.
+# Imports: chron (>= 2.3-47), data.table (>= 1.9.6)
+# Depends: R (>= 3.2.2)
+# LazyData: true
+# License: GPL-3
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-09-11 21:44:59 UTC; Moritz
+# Author: Moritz Mueller-Navarra [aut, cre], Sylvin Mueller-Navarra [aut], Andreas Boesch [ctb]
+# Maintainer: Moritz Mueller-Navarra <muellernavarra@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-09-11 21:54:13 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

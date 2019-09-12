@@ -1,0 +1,93 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hues
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hues_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hues/hues_{{ version }}.tar.gz
+  sha256: a0f63878ad02ae4727c803a8b1cff4f5f4f54924f377c648ffd809221a25de2c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-colorspace
+
+  run:
+    - r-base
+    - r-colorspace
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hues')"           # [not win]
+    - "\"%R%\" -e \"library('hues')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/johnbaums/hues
+  license: LGPL-3
+  summary: Creating effective colour palettes for figures is  challenging. This package generates
+    and plot palettes of optimally  distinct colours in perceptually uniform colour
+    space, based on  'iwanthue' <http://tools.medialab.sciences-po.fr/iwanthue/>.  This
+    is done through k-means clustering of CIE Lab colour space,  according to user-selected
+    constraints on hue, chroma, and  lightness.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: hues
+# Type: Package
+# Version: 0.1
+# Title: Distinct Colours Palettes Based on 'iwanthue'
+# Description: Creating effective colour palettes for figures is  challenging. This package generates and plot palettes of optimally  distinct colours in perceptually uniform colour space, based on  'iwanthue' <http://tools.medialab.sciences-po.fr/iwanthue/>.  This is done through k-means clustering of CIE Lab colour space,  according to user-selected constraints on hue, chroma, and  lightness.
+# Date: 2017-11-01
+# Depends: R (>= 3.2.0)
+# Imports: colorspace, methods
+# Authors@R: person("John", "Baumgartner", email = "johnbaums@gmail.com", role = c("aut", "cre"))
+# URL: https://github.com/johnbaums/hues
+# BugReports: https://github.com/johnbaums/hues/issues
+# License: LGPL (>= 3)
+# LazyData: true
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-11-02 11:26:58 UTC; john
+# Author: John Baumgartner [aut, cre]
+# Maintainer: John Baumgartner <johnbaums@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-11-07 13:16:23 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

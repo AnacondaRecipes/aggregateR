@@ -1,0 +1,84 @@
+{% set version = '1.4.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-utility
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/utility_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/utility/utility_{{ version }}.tar.gz
+  sha256: 4ff5b627b28577da9133e0ebac488632c3c3ecb941eda1fca05ac4ff7bf2e289
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('utility')"           # [not win]
+    - "\"%R%\" -e \"library('utility')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=utility
+  license: GPL-3
+  summary: Construct and plot objective hierarchies and associated value and utility functions.  Evaluate
+    the values and utilities and visualize the results as colored objective hierarchies
+    or tables.  Visualize uncertainty by plotting median and quantile intervals within
+    the nodes of objective hierarchies. Get numerical results of the evaluations in
+    standard R data types for further processing.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: utility
+# Type: Package
+# Title: Construct, Evaluate and Plot Value and Utility Functions
+# Version: 1.4.3
+# Date: 2018-09-27
+# Author: Peter Reichert <peter.reichert@eawag.ch>  with contributions by Nele Schuwirth <nele.schuwirth@eawag.ch>
+# Maintainer: Peter Reichert <peter.reichert@eawag.ch>
+# Description: Construct and plot objective hierarchies and associated value and utility functions.  Evaluate the values and utilities and visualize the results as colored objective hierarchies or tables.  Visualize uncertainty by plotting median and quantile intervals within the nodes of objective hierarchies. Get numerical results of the evaluations in standard R data types for further processing.
+# License: GPL-3
+# NeedsCompilation: no
+# Packaged: 2018-09-27 19:53:03 UTC; Peter
+# Repository: CRAN
+# Date/Publication: 2018-09-27 23:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

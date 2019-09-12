@@ -1,0 +1,89 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hail
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hail_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hail/hail_{{ version }}.tar.gz
+  sha256: 702feb0ac442500be386a4b56dbea09d6bbcac2a07a16ba2c0b1788f754d2cdb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hail')"           # [not win]
+    - "\"%R%\" -e \"library('hail')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ironholds/hail
+  license: MIT
+  summary: Read data from the City of Portland's 'HYDRA' <http://or.water.usgs.gov/precip/> rainfall
+    datasets within R.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: hail
+# Type: Package
+# Title: Read HYDRA Rainfall Data
+# Version: 0.1.1
+# Date: 2017-01-03
+# Author: Oliver Keyes
+# Maintainer: Oliver Keyes <ironholds@gmail.com>
+# Description: Read data from the City of Portland's 'HYDRA' <http://or.water.usgs.gov/precip/> rainfall datasets within R.
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Suggests: testthat
+# URL: https://github.com/ironholds/hail
+# BugReports: https://github.com/ironholds/hail/issues
+# RoxygenNote: 5.0.1
+# Depends: R (>= 2.10)
+# NeedsCompilation: no
+# Packaged: 2017-01-05 00:17:10 UTC; ironholds
+# Repository: CRAN
+# Date/Publication: 2017-01-05 10:39:51
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

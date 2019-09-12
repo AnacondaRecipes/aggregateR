@@ -1,0 +1,92 @@
+{% set version = '0.4-12' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rarcinfo
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RArcInfo_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RArcInfo/RArcInfo_{{ version }}.tar.gz
+  sha256: 447de2418bc5b1201a4ffac40af5dd1d231277fc8012e7a8e6ddd627de112cc8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcolorbrewer
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcolorbrewer
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RArcInfo')"           # [not win]
+    - "\"%R%\" -e \"library('RArcInfo')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://sourceforge.net/projects/rarcinfo/,http://avce00.maptools.org/docs/v7_bin_cover.html
+  license: GPL-2
+  summary: This package uses the functions written by Daniel  Morissette <danmo@videotron.ca>
+    to read geographical information in Arc/Info  V 7.x format and E00 files to import
+    the coverages into R variables.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RArcInfo
+# Version: 0.4-12
+# Date: 2011-11-06
+# Encoding: latin1
+# Title: Functions to import data from Arc/Info V7.x binary coverages
+# Author: Virgilio Gomez-Rubio <virgilio.gomez@uv.es>
+# Maintainer: Virgilio Gomez-Rubio <virgilio.gomez@uv.es>
+# Depends: R (>= 2.3.0), RColorBrewer
+# Description: This package uses the functions written by Daniel  Morissette <danmo@videotron.ca> to read geographical information in Arc/Info  V 7.x format and E00 files to import the coverages into R variables.
+# License: GPL (>= 2)
+# URL: http://sourceforge.net/projects/rarcinfo/,http://avce00.maptools.org/docs/v7_bin_cover.html
+# Packaged: 2011-11-06 22:41:05 UTC; virgil
+# Repository: CRAN
+# Date/Publication: 2011-11-07 14:05:13
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

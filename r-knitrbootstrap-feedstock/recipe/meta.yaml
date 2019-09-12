@@ -1,0 +1,94 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-knitrbootstrap
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/knitrBootstrap_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/knitrBootstrap/knitrBootstrap_{{ version }}.tar.gz
+  sha256: 4363467ea3bf28f3e0ab8046788375f4cc7d965dcee6e680089a3de08e0446aa
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, roxygen2, corrplot, ggplot2, igraph, maps, mapproj, maptools, plyr, reshape2, xtable
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-knitr >=1.5.25
+    - r-markdown
+    - r-rmarkdown
+
+  run:
+    - r-base
+    - r-knitr >=1.5.25
+    - r-markdown
+    - r-rmarkdown
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('knitrBootstrap')"           # [not win]
+    - "\"%R%\" -e \"library('knitrBootstrap')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jimhester/knitrBootstrap#readme
+  license: MIT
+  summary: A framework to create Bootstrap <http://getbootstrap.com/> HTML reports from 'knitr'
+    'rmarkdown'.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: knitrBootstrap
+# Version: 1.0.2
+# Maintainer: Jim Hester <james.f.hester@gmail.com>
+# Author: Jim Hester
+# Title: 'knitr' Bootstrap Framework
+# Description: A framework to create Bootstrap <http://getbootstrap.com/> HTML reports from 'knitr' 'rmarkdown'.
+# Depends: R (>= 3.0.0)
+# Imports: knitr (>= 1.5.25), rmarkdown, markdown
+# Suggests: testthat, roxygen2, corrplot, ggplot2, igraph, maps, mapproj, maptools, plyr, reshape2, xtable
+# License: MIT + file LICENSE
+# URL: https://github.com/jimhester/knitrBootstrap#readme
+# BugReports: https://github.com/jimhester/knitrBootstrap/issues
+# VignetteBuilder: knitr
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-05-24 18:09:05 UTC; jhester
+# Repository: CRAN
+# Date/Publication: 2018-05-24 18:20:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

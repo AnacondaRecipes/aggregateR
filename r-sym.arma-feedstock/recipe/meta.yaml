@@ -1,0 +1,84 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sym.arma
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sym.arma_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sym.arma/sym.arma_{{ version }}.tar.gz
+  sha256: c978663a4faa21306989f4b5038bc34d929c15b1d69a9abea5bc82d2feabd08d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sym.arma')"           # [not win]
+    - "\"%R%\" -e \"library('sym.arma')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=sym.arma
+  license: GPL-2
+  summary: 'Functions for fitting the Autoregressive and Moving Average Symmetric Model for univariate
+    time series introduced by Maior and Cysneiros (2018), <doi:10.1007/s00362-016-0753-z>.
+    Fitting method: conditional maximum likelihood estimation. For details see: Wei
+    (2006), Time Series Analysis: Univariate and Multivariate Methods, Section 7.2.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sym.arma
+# Type: Package
+# Title: Autoregressive and Moving Average Symmetric Models
+# Version: 1.0
+# Date: 2018-09-23
+# Author: Vinicius Quintas Souto Maior [aut,cre,cph] and Francisco Jose A Cysneiros [aut]
+# Maintainer: Vinicius Quintas Souto Maior <vinicius@de.ufpe.br>
+# Description: Functions for fitting the Autoregressive and Moving Average Symmetric Model for univariate time series introduced by Maior and Cysneiros (2018), <doi:10.1007/s00362-016-0753-z>. Fitting method: conditional maximum likelihood estimation. For details see: Wei (2006), Time Series Analysis: Univariate and Multivariate Methods, Section 7.2.
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2018-09-23 14:24:51 UTC; vinicius
+# Repository: CRAN
+# Date/Publication: 2018-09-30 15:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

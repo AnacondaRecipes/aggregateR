@@ -1,0 +1,101 @@
+{% set version = '0.8.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-neurohcp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/neurohcp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/neurohcp/neurohcp_{{ version }}.tar.gz
+  sha256: e01f0b54bf101a15aafb84b87d71a99b205b351dee241d4f26d2f17af36c0907
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dplyr, knitr, rmarkdown, covr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-base64enc
+    - r-digest
+    - r-httr
+    - r-xml2 >=1.0.1
+
+  run:
+    - r-base
+    - r-base64enc
+    - r-digest
+    - r-httr
+    - r-xml2 >=1.0.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('neurohcp')"           # [not win]
+    - "\"%R%\" -e \"library('neurohcp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://db.humanconnectome.org
+  license: GPL-2
+  summary: Downloads and reads data from Human 'Connectome' Project  <https://db.humanconnectome.org>
+    using Amazon Web Services ('AWS')  'S3' buckets.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: neurohcp
+# Type: Package
+# Title: Human 'Connectome' Project Interface
+# Version: 0.8.1
+# Date: 2018-05-24
+# Authors@R: c(person(given = "John", family = "Muschelli", email = "muschellij2@gmail.com", role = c("aut", "cre")), person(given = "Adi", family = "Gherman", email = "adrian.gherman@gmail.com", role = c("ctb")))
+# Description: Downloads and reads data from Human 'Connectome' Project  <https://db.humanconnectome.org> using Amazon Web Services ('AWS')  'S3' buckets.
+# License: GPL-2
+# LazyData: true
+# LazyLoad: true
+# Depends: R (>= 2.10)
+# Imports: digest, httr, utils, xml2 (>= 1.0.1), base64enc
+# Suggests: dplyr, knitr, rmarkdown, covr
+# RoxygenNote: 6.0.1
+# URL: https://db.humanconnectome.org
+# BugReports: https://github.com/muschellij2/neurohcp/issues
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2018-05-24 18:00:54 UTC; johnmuschelli
+# Author: John Muschelli [aut, cre], Adi Gherman [ctb]
+# Maintainer: John Muschelli <muschellij2@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-05-24 18:22:59 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

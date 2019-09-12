@@ -1,0 +1,91 @@
+{% set version = '0.1-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-factorqr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/factorQR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/factorQR/factorQR_{{ version }}.tar.gz
+  sha256: 645372bdc158e1aacd1e1ad3bf0fd80c2d50f2dc06f94217b6d03b5caa0b80ee
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lattice
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-lattice
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('factorQR')"           # [not win]
+    - "\"%R%\" -e \"library('factorQR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=factorQR
+  license: GPL-2
+  summary: Package to fit Bayesian quantile regression models that assume a factor structure
+    for at least part of the design matrix.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: factorQR
+# Version: 0.1-4
+# Date: 2010-09-28
+# Title: Bayesian quantile regression factor models
+# Author: Lane Burgette <lb131@stat.duke.edu>,
+# Maintainer: Lane Burgette <lb131@stat.duke.edu>
+# Depends: R (>= 2.1), lattice
+# Description: Package to fit Bayesian quantile regression models that assume a factor structure for at least part of the design matrix.
+# LazyLoad: yes
+# LazyData: yes
+# License: GPL (>= 2)
+# Packaged: 2010-09-28 22:08:14 UTC; lburgette
+# Repository: CRAN
+# Date/Publication: 2010-09-29 08:00:41
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

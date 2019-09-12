@@ -1,0 +1,96 @@
+{% set version = '2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-saemix
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/saemix_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/saemix/saemix_{{ version }}.tar.gz
+  sha256: ac74ee9ec8761ff054f0b710b45455f5a5e72927d7456b724b980d9c38efe9be
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 0.3)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('saemix')"           # [not win]
+    - "\"%R%\" -e \"library('saemix')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=saemix
+  license: GPL-2
+  summary: 'The SAEMIX package implements the Stochastic Approximation EM algorithm for parameter
+    estimation in (non)linear mixed effects models. The SAEM algorithm: - computes the
+    maximum likelihood estimator of the population parameters, without any approximation
+    of the model (linearisation, quadrature approximation,...), using the Stochastic
+    Approximation Expectation Maximization (SAEM) algorithm, - provides standard errors
+    for the maximum likelihood estimator - estimates the conditional modes, the conditional
+    means and the conditional standard deviations of the individual parameters, using
+    the Hastings-Metropolis algorithm. Several applications of SAEM in agronomy, animal
+    breeding and PKPD analysis have been published by members of the Monolix group (<http://group.monolix.org/>).'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: saemix
+# Type: Package
+# Title: Stochastic Approximation Expectation Maximization (SAEM) Algorithm
+# Version: 2.2
+# Date: 2018-10-05
+# Author: Emmanuelle Comets, Audrey Lavenu, Marc Lavielle (2017) <doi:10.18637/jss.v080.i03>
+# Maintainer: Emmanuelle Comets <emmanuelle.comets@inserm.fr>
+# Description: The SAEMIX package implements the Stochastic Approximation EM algorithm for parameter estimation in (non)linear mixed effects models. The SAEM algorithm: - computes the maximum likelihood estimator of the population parameters, without any approximation of the model (linearisation, quadrature approximation,...), using the Stochastic Approximation Expectation Maximization (SAEM) algorithm, - provides standard errors for the maximum likelihood estimator - estimates the conditional modes, the conditional means and the conditional standard deviations of the individual parameters, using the Hastings-Metropolis algorithm. Several applications of SAEM in agronomy, animal breeding and PKPD analysis have been published by members of the Monolix group (<http://group.monolix.org/>).
+# License: GPL (>= 2)
+# LazyLoad: yes
+# LazyData: yes
+# Suggests: testthat (>= 0.3)
+# Imports: graphics, stats, methods
+# Collate: 'aaa_generics.R' 'SaemixData.R' 'SaemixModel.R' 'SaemixRes.R' 'SaemixObject.R' 'compute_LL.R' 'func_FIM.R' 'func_aux.R' 'func_distcond.R' 'func_plots.R' 'func_simulations.R' 'main.R' 'main_estep.R' 'main_initialiseMainAlgo.R' 'main_mstep.R' 'zzz.R'
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-10-10 13:09:15 UTC; eco
+# Repository: CRAN
+# Date/Publication: 2018-10-10 16:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,93 @@
+{% set version = '0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sscor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sscor_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sscor/sscor_{{ version }}.tar.gz
+  sha256: 8c80e02e4bed72a7447eb17fd6d7a35637e2f8842ddec12626d3bcce40ca99cd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+    - r-pcapp
+    - r-robustbase
+
+  run:
+    - r-base
+    - r-mvtnorm
+    - r-pcapp
+    - r-robustbase
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sscor')"           # [not win]
+    - "\"%R%\" -e \"library('sscor')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=sscor
+  license: GPL-2 | GPL-3
+  summary: Provides the spatial sign correlation and the two-stage spatial sign correlation as
+    well as a one-sample test for the correlation coefficient.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sscor
+# Type: Package
+# Title: Robust Correlation Estimation and Testing Based on Spatial Signs
+# Version: 0.2
+# Date: 2016-01-19
+# Authors@R: c( person("Alexander", "Duerre", role=c("aut","cre"), email="alexander.duerre@tu-dortmund.de"), person("Daniel", "Vogel", role=c("aut"), email="daniel.vogel@abdn.ac.uk"))
+# Depends: pcaPP, robustbase, mvtnorm
+# Description: Provides the spatial sign correlation and the two-stage spatial sign correlation as well as a one-sample test for the correlation coefficient.
+# License: GPL-2 | GPL-3
+# ByteCompile: true
+# LazyData: true
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2016-01-28 10:58:55 UTC; alexander
+# Author: Alexander Duerre [aut, cre], Daniel Vogel [aut]
+# Maintainer: Alexander Duerre <alexander.duerre@tu-dortmund.de>
+# Repository: CRAN
+# Date/Publication: 2016-01-28 20:45:58
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,116 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spinbayes
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/spinBayes_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/spinBayes/spinBayes_{{ version }}.tar.gz
+  sha256: 485e4e0df26e43848a9b6d711e110a85716a241635c703f090fc044b66eff8e1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-glmnet
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-glmnet
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('spinBayes')"           # [not win]
+    - "\"%R%\" -e \"library('spinBayes')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jrhub/spinBayes
+  license: GPL-2
+  summary: "Many complex diseases are known to be affected by the interactions between  genetic
+    variants and environmental exposures beyond the main genetic and environmental  effects.
+    Existing Bayesian methods for gene-environment (G\xD7E) interaction studies are
+    \ challenged by the high-dimensional nature of the study and the complexity of environmental
+    \ influences. We have developed a novel and powerful semi-parametric Bayesian variable
+    \ selection method that can accommodate linear and nonlinear G\xD7E interactions
+    simultaneously  (Ren et al. (2019) <arXiv:1906.01057>). Furthermore, the proposed
+    method can conduct  structural identification by distinguishing nonlinear interactions
+    from main effects only  case within Bayesian framework. Spike-and-slab priors are
+    incorporated on both individual  and group level to shrink coefficients corresponding
+    to irrelevant main and interaction  effects to zero exactly. The Markov chain Monte
+    Carlo algorithms of the proposed and  alternative methods are  efficiently implemented
+    in C++. "
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: spinBayes
+# Type: Package
+# Title: Semi-Parametric Gene-Environment Interaction via Bayesian Variable Selection
+# Version: 0.1.0
+# Author: Jie Ren, Fei Zhou, Xiaoxi Li, Cen Wu, Yu Jiang
+# Maintainer: Jie Ren <jieren@ksu.edu>
+# Description: Many complex diseases are known to be affected by the interactions between  genetic variants and environmental exposures beyond the main genetic and environmental  effects. Existing Bayesian methods for gene-environment (GE) interaction studies are  challenged by the high-dimensional nature of the study and the complexity of environmental  influences. We have developed a novel and powerful semi-parametric Bayesian variable  selection method that can accommodate linear and nonlinear GE interactions simultaneously  (Ren et al. (2019) <arXiv:1906.01057>). Furthermore, the proposed method can conduct  structural identification by distinguishing nonlinear interactions from main effects only  case within Bayesian framework. Spike-and-slab priors are incorporated on both individual  and group level to shrink coefficients corresponding to irrelevant main and interaction  effects to zero exactly. The Markov chain Monte Carlo algorithms of the proposed and  alternative methods are  efficiently implemented in C++.
+# Depends: R (>= 3.5.0)
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# LinkingTo: Rcpp, RcppArmadillo
+# Imports: Rcpp, splines, MASS, glmnet, utils
+# URL: https://github.com/jrhub/spinBayes
+# BugReports: https://github.com/jrhub/spinBayes/issues
+# RoxygenNote: 6.1.1
+# NeedsCompilation: yes
+# Packaged: 2019-06-05 19:52:21 UTC; JieRen
+# Repository: CRAN
+# Date/Publication: 2019-06-06 14:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

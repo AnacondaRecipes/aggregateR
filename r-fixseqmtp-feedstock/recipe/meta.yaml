@@ -1,0 +1,95 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fixseqmtp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/FixSeqMTP_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/FixSeqMTP/FixSeqMTP_{{ version }}.tar.gz
+  sha256: d7ba581c04eef87005e026f27a69f32f62b395b988477e6ab3ea5df510e62c6c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: multxpert, multcomp, MHTdiscrete
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('FixSeqMTP')"           # [not win]
+    - "\"%R%\" -e \"library('FixSeqMTP')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=FixSeqMTP
+  license: GPL-2
+  summary: Several generalized / directional Fixed Sequence Multiple Testing Procedures (FSMTPs)
+    are developed for testing a sequence of pre-ordered hypotheses while controlling
+    the FWER, FDR and Directional Error (mdFWER). All three FWER controlling generalized
+    FSMTPs are designed under arbitrary dependence, which allow any number of acceptances.
+    Two FDR controlling generalized FSMTPs are respectively designed under arbitrary
+    dependence and independence, which allow more but a given number of acceptances.
+    Two mdFWER controlling directional FSMTPs are respectively designed under arbitrary
+    dependence and independence, which can also make directional decisions based on
+    the signs of the test statistics. The main functions for each proposed generalized
+    / directional FSMTPs are designed to calculate adjusted p-values and critical values,
+    respectively. For users' convenience, the functions also provide the output option
+    for printing decision rules.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: FixSeqMTP
+# Type: Package
+# Title: Fixed Sequence Multiple Testing Procedures
+# Version: 0.1.2
+# Suggests: multxpert, multcomp, MHTdiscrete
+# Author: Yalin Zhu, Wenge Guo
+# Maintainer: Yalin Zhu <yalin.zhu@outlook.com>
+# BugReports: https://github.com/allenzhuaz/FixSeqMTP/issues
+# Description: Several generalized / directional Fixed Sequence Multiple Testing Procedures (FSMTPs) are developed for testing a sequence of pre-ordered hypotheses while controlling the FWER, FDR and Directional Error (mdFWER). All three FWER controlling generalized FSMTPs are designed under arbitrary dependence, which allow any number of acceptances. Two FDR controlling generalized FSMTPs are respectively designed under arbitrary dependence and independence, which allow more but a given number of acceptances. Two mdFWER controlling directional FSMTPs are respectively designed under arbitrary dependence and independence, which can also make directional decisions based on the signs of the test statistics. The main functions for each proposed generalized / directional FSMTPs are designed to calculate adjusted p-values and critical values, respectively. For users' convenience, the functions also provide the output option for printing decision rules.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: TRUE
+# NeedsCompilation: no
+# Packaged: 2017-01-05 03:09:31 UTC; yalinzhu
+# Repository: CRAN
+# Date/Publication: 2017-01-05 10:39:11
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

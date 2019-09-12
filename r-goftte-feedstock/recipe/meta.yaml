@@ -1,0 +1,94 @@
+{% set version = '1.0.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-goftte
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/goftte_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/goftte/goftte_{{ version }}.tar.gz
+  sha256: 1ca6b4005e9f53da953f3844ca293b078fd1fb6fee527bf9c018c93b915e1157
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: cmprsk, rms, gof
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('goftte')"           # [not win]
+    - "\"%R%\" -e \"library('goftte')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=goftte
+  license: GPL-3
+  summary: Extension of 'gof' package to survival models.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: goftte
+# Type: Package
+# Title: Goodness-of-Fit for Time-to-Event Data
+# Version: 1.0.5
+# Date: 2017-11-30
+# Author: Patrick Sfumato and Jean-Marie Boher.
+# Maintainer: Patrick Sfumato <sfumatop@gmail.com>
+# Description: Extension of 'gof' package to survival models.
+# Depends: survival, R (>= 3.0.3)
+# Suggests: cmprsk, rms, gof
+# License: GPL
+# LazyLoad: yes
+# Packaged: 2017-11-30 09:16:01 UTC; SFUMATOP
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2017-11-30 09:26:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

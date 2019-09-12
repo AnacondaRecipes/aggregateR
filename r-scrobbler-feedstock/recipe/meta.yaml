@@ -1,0 +1,96 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-scrobbler
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/scrobbler_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/scrobbler/scrobbler_{{ version }}.tar.gz
+  sha256: 2ab24e4d8cfee9aa17a2f2dc92fcc832d18ca104ab9793889f68077e938ad998
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-anytime
+
+  run:
+    - r-base
+    - r-anytime
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('scrobbler')"           # [not win]
+    - "\"%R%\" -e \"library('scrobbler')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/condwanaland/scrobbler
+  license: GPL-3
+  summary: '''Last.fm''<https://www.last.fm> is a music platform focussed on building a  detailed
+    profile of a users listening habits. It does this by ''scrobbling'' (recording)  every
+    track you listen to on other platforms (''spotify'', ''youtube'', ''soundcloud''
+    etc) and transferring them to your ''Last.fm'' database. This allows ''Last.fm''
+    to act as a  complete record of your entire listening history. ''scrobbler'' provides
+    helper functions to download and analyse your listening history in R.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: scrobbler
+# Type: Package
+# Title: Download 'Scrobbles' from 'Last.fm'
+# Version: 0.1.0
+# Author: Conor Neilson
+# Maintainer: Conor Neilson <condwanaland@gmail.com>
+# Description: 'Last.fm'<https://www.last.fm> is a music platform focussed on building a  detailed profile of a users listening habits. It does this by 'scrobbling' (recording)  every track you listen to on other platforms ('spotify', 'youtube', 'soundcloud' etc) and transferring them to your 'Last.fm' database. This allows 'Last.fm' to act as a  complete record of your entire listening history. 'scrobbler' provides helper functions to download and analyse your listening history in R.
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Suggests: testthat, knitr, rmarkdown
+# URL: https://github.com/condwanaland/scrobbler
+# BugReports: https://github.com/condwanaland/scrobbler/issues
+# Imports: anytime
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-01-03 10:49:40 UTC; apple
+# Repository: CRAN
+# Date/Publication: 2019-01-08 16:40:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

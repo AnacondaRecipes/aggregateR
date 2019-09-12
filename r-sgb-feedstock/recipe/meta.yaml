@@ -1,0 +1,105 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sgb
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SGB_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SGB/SGB_{{ version }}.tar.gz
+  sha256: 82be13759b8d9a4bcfeae3c89573cf6b6e3a11d9e3a6d6ee9b36b140c46aa087
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, goftest
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+    - r-mass
+    - r-alabama
+    - r-numderiv
+
+  run:
+    - r-base
+    - r-formula
+    - r-mass
+    - r-alabama
+    - r-numderiv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SGB')"           # [not win]
+    - "\"%R%\" -e \"library('SGB')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SGB
+  license: GPL-2
+  summary: 'Main properties and regression procedures using a generalization of the Dirichlet
+    distribution called Simplicial Generalized Beta distribution. It is a new distribution
+    on the simplex (i.e. on the space of compositions or positive vectors with sum of
+    components equal to 1). The Dirichlet distribution can be constructed from a random
+    vector of independent Gamma variables divided by their sum. The SGB follows the
+    same construction with generalized Gamma instead of Gamma variables. The Dirichlet
+    exponents are supplemented by an overall shape parameter and a vector of scales.
+    The scale vector is itself a composition and can be modeled with auxiliary variables
+    through a log-ratio transformation. Graf, M. (2017, ISBN: 978-84-947240-0-8). See
+    also the vignette enclosed in the package.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SGB
+# Type: Package
+# Title: Simplicial Generalized Beta Regression
+# Version: 1.0
+# Date: 2019-05-09
+# Author: Monique Graf
+# Maintainer: Monique Graf <monique.p.n.graf@bluewin.ch>
+# Description: Main properties and regression procedures using a generalization of the Dirichlet distribution called Simplicial Generalized Beta distribution. It is a new distribution on the simplex (i.e. on the space of compositions or positive vectors with sum of components equal to 1). The Dirichlet distribution can be constructed from a random vector of independent Gamma variables divided by their sum. The SGB follows the same construction with generalized Gamma instead of Gamma variables. The Dirichlet exponents are supplemented by an overall shape parameter and a vector of scales. The scale vector is itself a composition and can be modeled with auxiliary variables through a log-ratio transformation. Graf, M. (2017, ISBN: 978-84-947240-0-8). See also the vignette enclosed in the package.
+# Depends: Formula
+# Imports: stats, MASS, numDeriv, alabama
+# Suggests: knitr, goftest
+# License: GPL (>= 2)
+# Encoding: latin1
+# LazyData: true
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-05-10 07:29:31 UTC; monique
+# Repository: CRAN
+# Date/Publication: 2019-05-13 11:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

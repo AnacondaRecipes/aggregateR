@@ -1,0 +1,93 @@
+{% set version = '0.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-unitedr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/unitedR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/unitedR/unitedR_{{ version }}.tar.gz
+  sha256: 598056fd9c0e0c0a1fc369aa7cfb16203b1ea19d41d8acfaa5ee05bb245cf41a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-plyr
+
+  run:
+    - r-base
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('unitedR')"           # [not win]
+    - "\"%R%\" -e \"library('unitedR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=unitedR
+  license: GPL-2
+  summary: United is a software tool which can be downloaded at the following website <http://www.schroepl.net/pbm/software/united/>.
+    In general, it is a virtual manager game for football teams. This package contains
+    helpful functions for determining an optimal formation for a virtual match in United.
+    E.g. knowing that the opponent has a strong defensive it is advisable to beat him
+    in the midfield. Furthermore, this package contains functions for computing the
+    optimal usage of hardness in a game.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: unitedR
+# Title: Assessment and Evaluation of Formations in United
+# Version: 0.3.1
+# Authors@R: person(given="David", family="Schindler", email="dv.schindler@gmail.com", role=c("aut","cre"))
+# Description: United is a software tool which can be downloaded at the following website <http://www.schroepl.net/pbm/software/united/>. In general, it is a virtual manager game for football teams. This package contains helpful functions for determining an optimal formation for a virtual match in United. E.g. knowing that the opponent has a strong defensive it is advisable to beat him in the midfield. Furthermore, this package contains functions for computing the optimal usage of hardness in a game.
+# Depends: R (>= 3.1.2), methods, plyr
+# License: GPL (>= 2)
+# LazyData: true
+# Collate: 'simRedCard.R' 'getLineup.R' 'formation.R' 'penaltyGoalsProb.R' 'summary.R' 'unitedRPackage.R' 'unitedRoverview.R' 'unitedSimClass.R' 'unitedSimResults.R' 'unitedSimOne.R' 'unitedSim.R'
+# Suggests: testthat, knitr
+# VignetteBuilder: knitr
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-01-05 08:05:48 UTC; David
+# Author: David Schindler [aut, cre]
+# Maintainer: David Schindler <dv.schindler@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-01-05 12:39:45 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

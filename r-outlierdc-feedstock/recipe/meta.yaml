@@ -1,0 +1,89 @@
+{% set version = '0.3-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-outlierdc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/OutlierDC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/OutlierDC/OutlierDC_{{ version }}.tar.gz
+  sha256: 816cde9da61f19288a9c04be915ccff87fec71a87a2eec5a0334c98a49ffa3ee
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+    - r-quantreg
+    - r-survival
+
+  run:
+    - r-base
+    - r-formula
+    - r-quantreg
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('OutlierDC')"           # [not win]
+    - "\"%R%\" -e \"library('OutlierDC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=OutlierDC
+  license: GPL-3
+  summary: 'This package provides three algorithms to detect outlying observations for censored
+    survival data.  '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: OutlierDC
+# Title: Outlier Detection using quantile regression for Censored Data
+# Date: 2014-03-23
+# Version: 0.3-0
+# Authors@R: c(person(given = "Soo-Heang", family = "Eo", role = c("aut","cre"),  email = "eo.sooheang@gmail.com"), person(given = "Huixia Judy", family = "Wang", role = "ctb"), person(given = "Lan", family = "Wang", role = "ctb"), person(given = "HyungJun", family = "Cho", role = "aut",  email = "hj4cho@korea.ac.kr"))
+# Description: This package provides three algorithms to detect outlying observations for censored survival data.
+# Depends: R (>= 3.0.0), methods, survival, quantreg, Formula
+# Maintainer: Soo-Heang Eo <eo.sooheang@gmail.com>
+# License: GPL-3
+# Packaged: 2014-03-24 06:22:01 UTC; HJ
+# Author: Soo-Heang Eo [aut, cre], Huixia Judy Wang [ctb], Lan Wang [ctb], HyungJun Cho [aut]
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-03-24 13:18:13
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

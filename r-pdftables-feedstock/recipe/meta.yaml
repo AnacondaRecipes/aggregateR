@@ -1,0 +1,92 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pdftables
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pdftables_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pdftables/pdftables_{{ version }}.tar.gz
+  sha256: b7581ec950d93154abcf43c85dfda2aa011e7be124fac320fb8c25946594dcbe
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+
+  run:
+    - r-base
+    - r-httr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pdftables')"           # [not win]
+    - "\"%R%\" -e \"library('pdftables')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.github.com/expersso/pdftables , https://pdftables.com
+  license: CC0
+  summary: Allows the user to convert PDF tables to formats more amenable to analysis ('.csv',
+    '.xml', or '.xlsx') by wrapping the PDFTables API. In order to use the package,
+    the user needs to sign up for an API account on the PDFTables website (<https://pdftables.com/pdf-to-excel-api>).
+    The package works by taking a PDF file as input, uploading it to PDFTables, and
+    returning a file with the extracted data.
+  license_family: CC
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pdftables
+# Type: Package
+# Title: Programmatic Conversion of PDF Tables
+# Version: 0.1
+# Date: 2016-02-15
+# Authors@R: person("Eric", "Persson", email = "expersso5@gmail.com", role = c("aut", "cre"))
+# Description: Allows the user to convert PDF tables to formats more amenable to analysis ('.csv', '.xml', or '.xlsx') by wrapping the PDFTables API. In order to use the package, the user needs to sign up for an API account on the PDFTables website (<https://pdftables.com/pdf-to-excel-api>). The package works by taking a PDF file as input, uploading it to PDFTables, and returning a file with the extracted data.
+# License: CC0
+# URL: https://www.github.com/expersso/pdftables , https://pdftables.com
+# BugReports: https://www.github.com/expersso/pdftables/issues
+# Imports: httr, tools
+# VignetteBuilder: knitr
+# Suggests: knitr, rmarkdown
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-02-15 14:33:13 UTC; persson
+# Author: Eric Persson [aut, cre]
+# Maintainer: Eric Persson <expersso5@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-02-15 16:03:15
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,106 @@
+{% set version = '0.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-iilasso
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/iilasso_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/iilasso/iilasso_{{ version }}.tar.gz
+  sha256: 622089572e435c2e6465365f879950605d150022654d3bf54f8500828a0d7510
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, MASS, parallel
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh
+    - r-matrix
+    - r-rcpp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-matrix
+    - r-rcpp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('iilasso')"           # [not win]
+    - "\"%R%\" -e \"library('iilasso')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://proceedings.mlr.press/v84/takada18a/takada18a.pdf
+  license: MIT
+  summary: ' Efficient algorithms for fitting linear / logistic regression model with Independently
+    Interpretable Lasso. Takada, M., Suzuki, T., & Fujisawa, H. (2018). Independently
+    Interpretable Lasso: A New Regularizer for Sparse Regression with Uncorrelated Variables.
+    AISTATS. <http://proceedings.mlr.press/v84/takada18a/takada18a.pdf>.'
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: iilasso
+# Type: Package
+# Title: Independently Interpretable Lasso
+# Version: 0.0.2
+# Date: 2018-06-21
+# Author: Masaaki Takada
+# Maintainer: Masaaki Takada <tkdmah@gmail.com>
+# Description:  Efficient algorithms for fitting linear / logistic regression model with Independently Interpretable Lasso. Takada, M., Suzuki, T., & Fujisawa, H. (2018). Independently Interpretable Lasso: A New Regularizer for Sparse Regression with Uncorrelated Variables. AISTATS. <http://proceedings.mlr.press/v84/takada18a/takada18a.pdf>.
+# License: MIT + file LICENSE
+# Imports: Rcpp, Matrix
+# LinkingTo: Rcpp, BH
+# RoxygenNote: 6.0.1
+# Suggests: testthat, knitr, rmarkdown, MASS, parallel
+# VignetteBuilder: knitr
+# URL: http://proceedings.mlr.press/v84/takada18a/takada18a.pdf
+# NeedsCompilation: yes
+# Packaged: 2018-06-21 14:13:32 UTC; takada
+# Repository: CRAN
+# Date/Publication: 2018-06-21 16:52:35 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

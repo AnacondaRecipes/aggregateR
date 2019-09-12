@@ -1,0 +1,104 @@
+{% set version = '1.5-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-planor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/planor_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/planor/planor_{{ version }}.tar.gz
+  sha256: 6a5a6ac78062ea6354a44c34a4bf850729b06400bdde2d7177a5d1b345b0b31b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.7
+    - r-rcpparmadillo
+    - r-bit64
+    - r-conf.design
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.7
+    - r-rcpparmadillo
+    - r-bit64
+    - r-conf.design
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('planor')"           # [not win]
+    - "\"%R%\" -e \"library('planor')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://genome.jouy.inra.fr/logiciels/planor
+  license: GPL-2
+  summary: Automatic generation of regular factorial designs, including fractional designs, orthogonal
+    block designs, row-column designs and split-plots.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: planor
+# Type: Package
+# Title: Generation of Regular Factorial Designs
+# Version: 1.5-1
+# Date: 2019-05-19
+# Author: Herve Monod [aut, cre], Annie Bouvier [aut], Andre Kobilinsky [aut], INRA [cph] (Institut National de la Recherche Agronomique, France)
+# Maintainer: Herve Monod <herve.monod@inra.fr>
+# Authors@R: c(person("Herve", "Monod", role = c("aut", "cre"), email = "herve.monod@inra.fr"), person("Annie", "Bouvier", role = "aut"), person("Andre", "Kobilinsky", role = "aut"), person("INRA", role = "cph", comment = "Institut National de la Recherche Agronomique, France"))
+# Description: Automatic generation of regular factorial designs, including fractional designs, orthogonal block designs, row-column designs and split-plots.
+# License: GPL (>= 2)
+# Imports: stats, conf.design, utils, bit64, Rcpp (>= 0.12.7)
+# LinkingTo: Rcpp, RcppArmadillo
+# Depends: methods
+# Collate: zzz.R generic.R designfactors.R keymatrix.R keyring.R listofkeyrings.R planor.R basep.R randomize.R designkey.R listofdesignkeys.R planordesign.R makedesignkey.R
+# Encoding: UTF-8
+# URL: http://genome.jouy.inra.fr/logiciels/planor
+# NeedsCompilation: yes
+# Packaged: 2019-05-19 21:36:21 UTC; hmonod
+# Repository: CRAN
+# Date/Publication: 2019-05-21 08:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

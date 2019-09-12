@@ -1,0 +1,110 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-slfm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/slfm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/slfm/slfm_{{ version }}.tar.gz
+  sha256: 5cedd2c7fd09c14ae67c326389da2b30078ac07b2a95cc2dc30e257269a890e0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo
+    - r-coda
+    - r-lattice
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo
+    - r-coda
+    - r-lattice
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('slfm')"           # [not win]
+    - "\"%R%\" -e \"library('slfm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jdanielnd/slfm
+  license: GPL-2
+  summary: 'Set of tools to find coherent patterns in microarray data using a Bayesian Sparse
+    Latent Factor Model - SLFM; see Duarte and Mayrink (2015) <DOI:10.1007/978-3-319-12454-4_15>.
+    Considerable effort has been put into making slfm fast and memory efficient, turning
+    it an interesting alternative to simpler methods in terms of execution time. It
+    implements versions of the SLFM based on two type of mixtures priors for the loadings:
+    one relying on a degenerate component at zero and the other using a small variance
+    normal distribution for the spike part of the mixture. It also implements additional
+    functions to allow pre-processing procedures for the data and to fit the model for
+    a large number of probesets or genes.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: slfm
+# Type: Package
+# Title: Tools for Fitting Sparse Latent Factor Model
+# Version: 1.0.0
+# Author: Joao Duarte and Vinicius Mayrink
+# Maintainer: Joao Duarte <jdanielnd@gmail.com>
+# Description: Set of tools to find coherent patterns in microarray data using a Bayesian Sparse Latent Factor Model - SLFM; see Duarte and Mayrink (2015) <DOI:10.1007/978-3-319-12454-4_15>. Considerable effort has been put into making slfm fast and memory efficient, turning it an interesting alternative to simpler methods in terms of execution time. It implements versions of the SLFM based on two type of mixtures priors for the loadings: one relying on a degenerate component at zero and the other using a small variance normal distribution for the spike part of the mixture. It also implements additional functions to allow pre-processing procedures for the data and to fit the model for a large number of probesets or genes.
+# URL: https://github.com/jdanielnd/slfm
+# BugReports: https://github.com/jdanielnd/slfm/issues
+# Depends: R (>= 3.1.0)
+# Imports: Rcpp (>= 0.11.0), coda, lattice
+# LinkingTo: Rcpp, RcppArmadillo
+# License: GPL-2
+# NeedsCompilation: yes
+# Packaged: 2019-07-26 12:34:39 UTC; vinicius
+# Repository: CRAN
+# Date/Publication: 2019-07-27 23:00:02 UTC
+# RoxygenNote: 6.1.1
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

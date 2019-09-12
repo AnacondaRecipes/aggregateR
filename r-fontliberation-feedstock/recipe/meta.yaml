@@ -1,0 +1,86 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fontliberation
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fontLiberation_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fontLiberation/fontLiberation_{{ version }}.tar.gz
+  sha256: acdea423e005873aa509e280074a3cef4796e4f7e9d77b3945d77b451ea039f0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fontLiberation')"           # [not win]
+    - "\"%R%\" -e \"library('fontLiberation')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=fontLiberation
+  license: file LICENSE (FOSS)
+  summary: A placeholder for the Liberation fontset intended for the `fontquiver` package. This
+    fontset covers the 12 combinations of families (sans, serif, mono) and faces (plain,
+    bold, italic, bold italic) supported in R graphics devices.
+  license_family: OTHER
+  license_file:
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fontLiberation
+# Title: Liberation Fonts
+# Version: 0.1.0
+# Authors@R: c( person("Lionel", "Henry", , "lionel@rstudio.com", "cre"), person("Pravin Satpute", role = "aut"), person("Steve Matteson", role = "aut"), person("Red Hat, Inc", role = "cph"), person("Google Corporation", role = "cph"))
+# Description: A placeholder for the Liberation fontset intended for the `fontquiver` package. This fontset covers the 12 combinations of families (sans, serif, mono) and faces (plain, bold, italic, bold italic) supported in R graphics devices.
+# Depends: R (>= 3.0)
+# License: file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-10-14 14:21:59 UTC; lionel
+# Author: Lionel Henry [cre], Pravin Satpute [aut], Steve Matteson [aut], Red Hat, Inc [cph], Google Corporation [cph]
+# Maintainer: Lionel Henry <lionel@rstudio.com>
+# Repository: CRAN
+# Date/Publication: 2016-10-15 11:24:18
+# License_is_FOSS: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

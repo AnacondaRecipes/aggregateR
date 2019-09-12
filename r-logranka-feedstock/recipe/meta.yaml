@@ -1,0 +1,83 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-logranka
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LogrankA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LogrankA/LogrankA_{{ version }}.tar.gz
+  sha256: eb454e279c5b12d00fe1dd4da7e83c0793dd93cbcfcf4bf1c6034014ff9dbf00
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, survival
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LogrankA')"           # [not win]
+    - "\"%R%\" -e \"library('LogrankA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=LogrankA
+  license: GPL-2
+  summary: LogrankA provides a logrank test across unlimited groups with the possibility to input
+    aggregated survival data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LogrankA
+# Type: Package
+# Title: Logrank Test for Aggregated Survival Data
+# Version: 1.0
+# Date: 2013-07-15
+# Author: Jonas Richter-Dumke and Roland Rau
+# Maintainer: Jonas Richter-Dumke <jrd.r.project@gmail.com>
+# Description: LogrankA provides a logrank test across unlimited groups with the possibility to input aggregated survival data.
+# Suggests: MASS, survival
+# License: GPL-2
+# Packaged: 2013-07-16 19:44:05 UTC; user1
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-07-16 22:07:31
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

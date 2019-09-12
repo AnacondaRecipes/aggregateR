@@ -1,0 +1,84 @@
+{% set version = '1.2-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-globe
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/globe_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/globe/globe_{{ version }}.tar.gz
+  sha256: 26c55c33f0dbede8964b575712dfa9b4638bea1c2e1d9369ebe701a65ac14075
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('globe')"           # [not win]
+    - "\"%R%\" -e \"library('globe')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=globe
+  license: GPL (>= 2.0)
+  summary: 'Basic functions for plotting 2D and 3D views of a sphere, by default the Earth with
+    its major coastline, and additional lines and points. '
+
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: globe
+# Type: Package
+# Title: Plot 2D and 3D Views of the Earth, Including Major Coastline
+# Version: 1.2-0
+# Date: 2016-05-12
+# Authors@R: c(person("Adrian", "Baddeley", role = c("aut", "cre"), email = "adrian.baddeley@curtin.edu.au"), person("Thomas", "Lawrence", role = "aut"), person("Ege", "Rubak", role = "aut"))
+# Maintainer: Adrian Baddeley <adrian.baddeley@curtin.edu.au>
+# Depends: R (>= 2.10), graphics, stats
+# Description: Basic functions for plotting 2D and 3D views of a sphere, by default the Earth with its major coastline, and additional lines and points.
+# License: GPL (>= 2.0)
+# LazyData: yes
+# ByteCompile: yes
+# NeedsCompilation: no
+# Packaged: 2017-05-12 05:21:53 UTC; 214132e
+# Author: Adrian Baddeley [aut, cre], Thomas Lawrence [aut], Ege Rubak [aut]
+# Repository: CRAN
+# Date/Publication: 2017-05-12 05:38:48 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

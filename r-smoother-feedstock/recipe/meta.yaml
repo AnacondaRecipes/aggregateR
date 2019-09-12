@@ -1,0 +1,86 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-smoother
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/smoother_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/smoother/smoother_{{ version }}.tar.gz
+  sha256: 91b55b82f805cfa1deedacc0a4e844a2132aa59df593f3b05676954cf70a195b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-ttr >=0.22
+
+  run:
+    - r-base
+    - r-ttr >=0.22
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('smoother')"           # [not win]
+    - "\"%R%\" -e \"library('smoother')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=smoother
+  license: GPL-2
+  summary: A collection of methods for smoothing numerical data, commencing with a port of the
+    Matlab gaussian window smoothing function. In addition, several functions typically
+    used in smoothing of financial data are included.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: smoother
+# Type: Package
+# Title: Functions Relating to the Smoothing of Numerical Data
+# Version: 1.1
+# Date: 2015-04-15
+# Author: Nicholas Hamilton
+# Maintainer: Nicholas Hamilton <n.hamilton@student.unsw.edu.au>
+# Description: A collection of methods for smoothing numerical data, commencing with a port of the Matlab gaussian window smoothing function. In addition, several functions typically used in smoothing of financial data are included.
+# License: GPL-2
+# Depends: TTR(>= 0.22)
+# Collate: 'onLoad.R' 'smoother-package.R' 'functions.R' 'smth-gaussian.R' 'smth.R'
+# Packaged: 2015-04-15 21:41:45 UTC; nick
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-04-16 08:44:43
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

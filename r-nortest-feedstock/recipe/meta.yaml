@@ -1,0 +1,81 @@
+{% set version = '1.0-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nortest
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/nortest_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/nortest/nortest_{{ version }}.tar.gz
+  sha256: a3850a048181d5d059c1e74903437569873b430c915b709808237d71fee5209f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('nortest')"           # [not win]
+    - "\"%R%\" -e \"library('nortest')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=nortest
+  license: GPL-2
+  summary: Five omnibus tests for testing the composite hypothesis of normality.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: nortest
+# Title: Tests for Normality
+# Version: 1.0-4
+# Date: 2015-07-29
+# Description: Five omnibus tests for testing the composite hypothesis of normality.
+# License: GPL (>= 2)
+# Authors@R: c(person("Juergen", "Gross", role = "aut", email = "gross@statistik.tu-dortmund.de"), person("Uwe", "Ligges", role = c("aut", "cre"), email = "ligges@statistik.tu-dortmund.de"))
+# Imports: stats
+# Packaged: 2015-07-29 21:51:34 UTC; ligges
+# Author: Juergen Gross [aut], Uwe Ligges [aut, cre]
+# Maintainer: Uwe Ligges <ligges@statistik.tu-dortmund.de>
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-07-30 00:14:57
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

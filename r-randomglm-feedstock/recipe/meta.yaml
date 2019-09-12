@@ -1,0 +1,88 @@
+{% set version = '1.02-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-randomglm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/randomGLM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/randomGLM/randomGLM_{{ version }}.tar.gz
+  sha256: 3bf7c1dbdacc68125f8ae3014b9bc546dd3328d04ad015d154781bdf3f1a230c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-doparallel
+    - r-foreach
+
+  run:
+    - r-base
+    - r-mass
+    - r-doparallel
+    - r-foreach
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('randomGLM')"           # [not win]
+    - "\"%R%\" -e \"library('randomGLM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.genetics.ucla.edu/labs/horvath/CoexpressionNetwork/
+  license: GPL-2
+  summary: The package implements a bagging predictor based on general linear models
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: randomGLM
+# Version: 1.02-1
+# Date: 2013-01-28
+# Title: Random General Linear Model Prediction
+# Author: Lin Song, Peter Langfelder
+# Maintainer: Peter Langfelder <peter.langfelder@gmail.com>
+# Depends: R (>= 2.14.0), MASS, foreach, doParallel
+# ZipData: no
+# License: GPL (>= 2)
+# Description: The package implements a bagging predictor based on general linear models
+# URL: http://www.genetics.ucla.edu/labs/horvath/CoexpressionNetwork/
+# Packaged: 2013-01-30 18:48:31 UTC; plangfelder
+# Repository: CRAN
+# Date/Publication: 2013-01-30 22:37:33
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

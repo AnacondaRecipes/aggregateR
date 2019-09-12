@@ -1,0 +1,87 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-smc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SMC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SMC/SMC_{{ version }}.tar.gz
+  sha256: 9fb2f71017cf3ed4a199d8976556052ecc0aafb140addca9bd951674e2938ae4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SMC')"           # [not win]
+    - "\"%R%\" -e \"library('SMC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SMC
+  license: GPL-2
+  summary: particle filtering, auxiliary particle filtering and sequential Monte Carlo algorithms
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SMC
+# Type: Package
+# Title: Sequential Monte Carlo (SMC) Algorithm
+# Version: 1.1
+# Date: 2011-12-09
+# Author: Gopi Goswami <goswami@stat.harvard.edu>
+# Maintainer: Gopi Goswami <grgoswami@gmail.com>
+# Depends: R (>= 1.9.0)
+# Description: particle filtering, auxiliary particle filtering and sequential Monte Carlo algorithms
+# License: GPL (>= 2)
+# Packaged: 2011-12-10 03:22:58 UTC; gopi
+# Repository: CRAN
+# Date/Publication: 2011-12-11 10:41:18
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

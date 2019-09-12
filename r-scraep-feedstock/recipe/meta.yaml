@@ -1,0 +1,88 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-scraep
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/scraEP_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/scraEP/scraEP_{{ version }}.tar.gz
+  sha256: ad1563d559ebbb6cf5a4d065e7ee4225dfad5887c0b8375a95d5ab4765db3536
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcurl
+    - r-xml
+    - r-data.table
+
+  run:
+    - r-base
+    - r-rcurl
+    - r-xml
+    - r-data.table
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('scraEP')"           # [not win]
+    - "\"%R%\" -e \"library('scraEP')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=scraEP
+  license: GPL-3
+  summary: A utility to webscrape the in-house careers of members of the European parliament,
+    from its website <http://www.europarl.europa.eu>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: scraEP
+# Type: Package
+# Title: Scrape European Parliament Careers
+# Version: 1.1
+# Date: 2018-07-01
+# Author: Julien Boelaert <jubo.stats@gmail.com>
+# Maintainer: Julien Boelaert <jubo.stats@gmail.com>
+# Description: A utility to webscrape the in-house careers of members of the European parliament, from its website <http://www.europarl.europa.eu>.
+# License: GPL (>= 3)
+# Imports: XML, RCurl, data.table
+# NeedsCompilation: no
+# Packaged: 2018-07-03 14:38:21 UTC; bart
+# Repository: CRAN
+# Date/Publication: 2018-07-03 15:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

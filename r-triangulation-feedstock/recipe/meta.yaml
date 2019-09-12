@@ -1,0 +1,87 @@
+{% set version = '0.5.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-triangulation
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/triangulation_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/triangulation/triangulation_{{ version }}.tar.gz
+  sha256: 763ad590a886dcd05b705498059af7f80bc8f515a34b33c57ff862a0c14be0fe
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('triangulation')"           # [not win]
+    - "\"%R%\" -e \"library('triangulation')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=triangulation
+  license: LGPL-3
+  summary: Measuring angles between points in a landscape is much easier than measuring distances.
+    When the location of three points is known the position of the observer can be determined
+    based solely on the angles between these points as seen by the observer. This task
+    (known as triangulation) however requires onerous calculations - these calculations
+    are automated by this package.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: triangulation
+# Type: Package
+# Title: Determine Position of Observer
+# Version: 0.5.0
+# Date: 2016-10-22
+# Authors@R: person("Mathias", "Milfeldt", email = "mathias@milfeldt.dk", role = c("aut", "cre"))
+# Description: Measuring angles between points in a landscape is much easier than measuring distances. When the location of three points is known the position of the observer can be determined based solely on the angles between these points as seen by the observer. This task (known as triangulation) however requires onerous calculations - these calculations are automated by this package.
+# License: LGPL
+# LazyData: TRUE
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-10-29 11:30:16 UTC; mat
+# Author: Mathias Milfeldt [aut, cre]
+# Maintainer: Mathias Milfeldt <mathias@milfeldt.dk>
+# Repository: CRAN
+# Date/Publication: 2016-10-29 13:47:55
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

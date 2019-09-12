@@ -1,0 +1,94 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fincovregularization
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/FinCovRegularization_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/FinCovRegularization/FinCovRegularization_{{ version }}.tar.gz
+  sha256: 399207904b39572e236078990a859565efa15ca61973f9b07d1bdf0cb4217140
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-quadprog
+
+  run:
+    - r-base
+    - r-quadprog
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('FinCovRegularization')"           # [not win]
+    - "\"%R%\" -e \"library('FinCovRegularization')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/yanyachen/FinCovRegularization
+  license: GPL-2
+  summary: 'Estimation and regularization for covariance matrix of asset returns. For covariance
+    matrix estimation, three major types of factor models are included: macroeconomic
+    factor model, fundamental factor model and statistical factor model. For covariance
+    matrix regularization, four regularized estimators are included: banding, tapering,
+    hard-thresholding and soft- thresholding. The tuning parameters of these regularized
+    estimators are selected via cross-validation.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: FinCovRegularization
+# Type: Package
+# Title: Covariance Matrix Estimation and Regularization for Finance
+# Version: 1.1.0
+# Authors@R: c( person("YaChen", "Yan", email = "yanyachen21@gmail.com", role = c("aut", "cre")), person("FangZhu", "Lin", email = "fangzhulin522@gmail.com", role = "aut") )
+# Description: Estimation and regularization for covariance matrix of asset returns. For covariance matrix estimation, three major types of factor models are included: macroeconomic factor model, fundamental factor model and statistical factor model. For covariance matrix regularization, four regularized estimators are included: banding, tapering, hard-thresholding and soft- thresholding. The tuning parameters of these regularized estimators are selected via cross-validation.
+# URL: http://github.com/yanyachen/FinCovRegularization
+# BugReports: http://github.com/yanyachen/FinCovRegularization/issues
+# Depends: R (>= 2.10)
+# Imports: stats, graphics, quadprog
+# License: GPL-2
+# LazyData: true
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-04-25 08:52:44 UTC; Administrator
+# Author: YaChen Yan [aut, cre], FangZhu Lin [aut]
+# Maintainer: YaChen Yan <yanyachen21@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-04-25 15:32:07
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

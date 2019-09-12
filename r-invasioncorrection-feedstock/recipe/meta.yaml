@@ -1,0 +1,89 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-invasioncorrection
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/InvasionCorrection_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/InvasionCorrection/InvasionCorrection_{{ version }}.tar.gz
+  sha256: 92a058067337c6a0733028f20d2a466f9381fbbe6630a5320d547ba9f5149df3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lattice
+
+  run:
+    - r-base
+    - r-lattice
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('InvasionCorrection')"           # [not win]
+    - "\"%R%\" -e \"library('InvasionCorrection')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=InvasionCorrection
+  license: GPL-3
+  summary: The correction is achieved under the assumption that non-migrating cells of the essay
+    approximately form a quadratic flow profile due to frictional effects, compare law
+    of Hagen-Poiseuille for flow in a tube. The script fits a conical plane to give
+    xyz-coordinates of the cells. It outputs the number of migrated cells and the new
+    corrected coordinates.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: InvasionCorrection
+# Type: Package
+# Title: Invasion Correction
+# Version: 0.1
+# Date: 2017-02-20
+# Author: Marcus Rosenblatt
+# Maintainer: Marcus Rosenblatt <marcus.rosenblatt@fdm.uni-freiburg.de>
+# Description: The correction is achieved under the assumption that non-migrating cells of the essay approximately form a quadratic flow profile due to frictional effects, compare law of Hagen-Poiseuille for flow in a tube. The script fits a conical plane to give xyz-coordinates of the cells. It outputs the number of migrated cells and the new corrected coordinates.
+# License: GPL-3
+# Depends: lattice, stats, utils
+# LazyData: TRUE
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2017-02-23 16:42:01 UTC; marcus
+# Repository: CRAN
+# Date/Publication: 2017-02-23 17:58:01
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

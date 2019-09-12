@@ -1,0 +1,96 @@
+{% set version = '1.1-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-qcapro
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/QCApro_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/QCApro/QCApro_{{ version }}.tar.gz
+  sha256: 189e8ce249c793340f0db1ab09d8b81c151ae9c6f4156c0fd0ac00187a588ebe
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (<= 2.0.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lpsolve
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-lpsolve
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('QCApro')"           # [not win]
+    - "\"%R%\" -e \"library('QCApro')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.alrik-thiem.net/; https://www.researchgate.net/profile/Alrik_Thiem
+  license: GPL-3
+  summary: Provides advanced functionality for performing configurational comparative research
+    with Qualitative Comparative Analysis (QCA), including crisp-set, multi-value, and
+    fuzzy-set QCA. It also offers advanced tools for sensitivity diagnostics and methodological
+    evaluations of QCA.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: QCApro
+# Version: 1.1-2
+# Date: 2018-01-10
+# Title: Advanced Functionality for Performing and Evaluating Qualitative Comparative Analysis
+# Authors@R: c(person("Alrik", "Thiem", role = c("aut", "cre", "cph"),  email = "alrik.thiem@unilu.ch"), person("Michael", "Baumgartner", role = "ctb"), person("Adrian", "Dusa", role = "ctb"), person("Reto", "Spoehel", role = "ctb") )
+# URL: http://www.alrik-thiem.net/; https://www.researchgate.net/profile/Alrik_Thiem
+# Depends: R (>= 3.0.0)
+# Suggests: testthat (<= 2.0.0)
+# Imports: lpSolve, utils
+# Description: Provides advanced functionality for performing configurational comparative research with Qualitative Comparative Analysis (QCA), including crisp-set, multi-value, and fuzzy-set QCA. It also offers advanced tools for sensitivity diagnostics and methodological evaluations of QCA.
+# License: GPL-3
+# NeedsCompilation: yes
+# Author: Alrik Thiem [aut, cre, cph], Michael Baumgartner [ctb], Adrian Dusa [ctb], Reto Spoehel [ctb]
+# Maintainer: Alrik Thiem <alrik.thiem@unilu.ch>
+# Packaged: 2018-01-10 20:18:31 UTC; Alrik
+# Repository: CRAN
+# Date/Publication: 2018-01-11 00:11:33 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

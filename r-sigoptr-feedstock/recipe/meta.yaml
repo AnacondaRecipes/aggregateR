@@ -1,0 +1,87 @@
+{% set version = '0.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sigoptr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SigOptR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SigOptR/SigOptR_{{ version }}.tar.gz
+  sha256: 46859c3ab54409ee9d704c1d1b2f8292292dabdeaca42e51267d9a0f2164d4eb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SigOptR')"           # [not win]
+    - "\"%R%\" -e \"library('SigOptR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SigOptR
+  license: MIT
+  summary: Interfaces with the 'SigOpt' API. More info at <https://sigopt.com>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SigOptR
+# Title: R API Wrapper for SigOpt
+# Version: 0.0.1
+# Author: Alexandra Johnson [aut, cre]
+# Maintainer: Alexandra Johnson <alexandra@sigopt.com>
+# Description: Interfaces with the 'SigOpt' API. More info at <https://sigopt.com>.
+# Imports: httr, jsonlite
+# Depends: R (>= 3.2.0)
+# License: MIT + file LICENSE
+# LazyData: true
+# RoxygenNote: 6.0.1.9000
+# NeedsCompilation: no
+# Packaged: 2017-03-09 22:41:37 UTC; root
+# Repository: CRAN
+# Date/Publication: 2017-03-10 08:50:09
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

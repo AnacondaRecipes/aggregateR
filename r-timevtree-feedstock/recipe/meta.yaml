@@ -1,0 +1,94 @@
+{% set version = '0.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-timevtree
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/TimeVTree_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/TimeVTree/TimeVTree_{{ version }}.tar.gz
+  sha256: 62ecd93281e2c611c4b6a4706b254ec6fdbaa67fc6a5b731916211cc7e7a9388
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival
+
+  run:
+    - r-base
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('TimeVTree')"           # [not win]
+    - "\"%R%\" -e \"library('TimeVTree')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=TimeVTree
+  license: GPL-2
+  summary: 'Estimates time varying regression effects under Cox type models in survival data
+    using classification and regression tree. The codes in this package were  originally
+    written in S-Plus for the paper "Survival Analysis with Time-Varying Regression
+    Effects Using a Tree-Based Approach," by Xu, R. and Adak, S. (2002) <doi:10.1111/j.0006-341X.2002.00305.x>,
+    Biometrics, 58: 305-315. Development of this package was supported by NIH grants
+    AG053983 and AG057707, and by the UCSD Altman Translational Research Institute,
+    NIH grant UL1TR001442. The content is solely the responsibility of the authors and
+    does not necessarily represent the official views of the NIH. The example data are
+    from the Honolulu Heart Program/Honolulu Asia Aging Study (HHP/HAAS).'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: TimeVTree
+# Type: Package
+# Title: Survival Analysis of Time Varying Coefficients Using a Tree-Based Approach
+# Version: 0.3.1
+# Date: 2018-03-12
+# Authors@R: c( person("Sudeshna", "Adak", role = "aut"), person("Ronghui", "Xu", role = "aut"), person("Euyhyun", "Lee", role = c("trl", "cre"),email = "e4lee@ucsd.edu"), person("Steven", "Edland", role = "ctb"), person("Lon", "White", role = "ctb"))
+# Imports: survival, grDevices, graphics, stats
+# Description: Estimates time varying regression effects under Cox type models in survival data using classification and regression tree. The codes in this package were  originally written in S-Plus for the paper "Survival Analysis with Time-Varying Regression Effects Using a Tree-Based Approach," by Xu, R. and Adak, S. (2002) <doi:10.1111/j.0006-341X.2002.00305.x>, Biometrics, 58: 305-315. Development of this package was supported by NIH grants AG053983 and AG057707, and by the UCSD Altman Translational Research Institute, NIH grant UL1TR001442. The content is solely the responsibility of the authors and does not necessarily represent the official views of the NIH. The example data are from the Honolulu Heart Program/Honolulu Asia Aging Study (HHP/HAAS).
+# License: GPL-2
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-03-12 17:41:37 UTC; e4lee
+# Author: Sudeshna Adak [aut], Ronghui Xu [aut], Euyhyun Lee [trl, cre], Steven Edland [ctb], Lon White [ctb]
+# Maintainer: Euyhyun Lee <e4lee@ucsd.edu>
+# Repository: CRAN
+# Date/Publication: 2018-03-12 18:01:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

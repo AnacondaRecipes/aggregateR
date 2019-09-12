@@ -1,0 +1,109 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-funreg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/funreg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/funreg/funreg_{{ version }}.tar.gz
+  sha256: 3614cc00674b5f15160bef90fdf2f8a74da05aa91988ebc9074b834815de3fa5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-mgcv
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mass
+    - r-mgcv
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('funreg')"           # [not win]
+    - "\"%R%\" -e \"library('funreg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=funreg
+  license: GPL-2
+  summary: Performs functional regression, and some related approaches, for intensive longitudinal
+    data (see the book by Walls & Schafer,  2006, Models for Intensive Longitudinal
+    Data, Oxford) when such data is not necessarily observed on an equally spaced grid
+    of times.  The approach generally follows the ideas of Goldsmith, Bobb, Crainiceanu,
+    Caffo, and Reich (2011)<DOI:10.1198/jcgs.2010.10007> and the approach taken in their
+    sample code, but with some modifications to make it more feasible to use with long
+    rather than wide, non-rectangular longitudinal datasets with unequal and potentially
+    random measurement times.  It also allows easy plotting of the correlation between
+    the smoothed covariate and the outcome as a function of time, which can add additional
+    insights on how to interpret a functional regression.  Additionally, it also provides
+    several permutation tests for the significance of the functional predictor.  The
+    heuristic interpretation of ``time'' is used to describe the index of the functional
+    predictor, but the same methods can equally be used for another unidimensional continuous
+    index, such as space along a north-south axis.  The development of this package
+    was part of a research project supported by Award R03 CA171809-01 from the National
+    Cancer Institute and Award P50 DA010075 from the National Institute on Drug Abuse.
+    The content is solely the responsibility of the authors and does not necessarily
+    represent the official views of the National Institute on Drug Abuse, the National
+    Cancer Institute, or the National Institutes of Health.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: funreg
+# Type: Package
+# Title: Functional Regression for Irregularly Timed Data
+# Version: 1.2
+# Date: 2016-08-22
+# Authors@R: c(person("John", "Dziak", role = c("aut", "cre"), email = "jjd264@psu.edu"), person("Mariya", "Shiyko", role = "aut", email = "M.Shiyko@neu.edu"))
+# Depends: R (>= 2.15.0)
+# Imports: MASS, mgcv, mvtnorm, splines
+# Copyright: The Pennsylvania State University and Northeastern University
+# Description: Performs functional regression, and some related approaches, for intensive longitudinal data (see the book by Walls & Schafer,  2006, Models for Intensive Longitudinal Data, Oxford) when such data is not necessarily observed on an equally spaced grid of times.  The approach generally follows the ideas of Goldsmith, Bobb, Crainiceanu, Caffo, and Reich (2011)<DOI:10.1198/jcgs.2010.10007> and the approach taken in their sample code, but with some modifications to make it more feasible to use with long rather than wide, non-rectangular longitudinal datasets with unequal and potentially random measurement times.  It also allows easy plotting of the correlation between the smoothed covariate and the outcome as a function of time, which can add additional insights on how to interpret a functional regression.  Additionally, it also provides several permutation tests for the significance of the functional predictor.  The heuristic interpretation of ``time'' is used to describe the index of the functional predictor, but the same methods can equally be used for another unidimensional continuous index, such as space along a north-south axis.  The development of this package was part of a research project supported by Award R03 CA171809-01 from the National Cancer Institute and Award P50 DA010075 from the National Institute on Drug Abuse. The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institute on Drug Abuse, the National Cancer Institute, or the National Institutes of Health.
+# License: GPL (>= 2)
+# LazyData: true
+# Packaged: 2016-08-24 15:50:40 UTC; jjd264
+# Author: John Dziak [aut, cre], Mariya Shiyko [aut]
+# Maintainer: John Dziak <jjd264@psu.edu>
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2016-08-24 18:38:32
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

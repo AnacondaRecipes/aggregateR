@@ -1,0 +1,92 @@
+{% set version = '0.1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mattransmix
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MatTransMix_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MatTransMix/MatTransMix_{{ version }}.tar.gz
+  sha256: 5366e16f95f80d68d5b45b94c927241e96b45376756eacd75e34339d3fad9330
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MatTransMix')"           # [not win]
+    - "\"%R%\" -e \"library('MatTransMix')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MatTransMix
+  license: GPL-2
+  summary: 'Provides matrix Gaussian mixture models, matrix transformation mixture models and
+    their model-based clustering results. The parsimonious models of the mean matrices
+    and variance covariance matrices are implemented with a total of 196 variations. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MatTransMix
+# Version: 0.1.5
+# Date: 2019-07-17
+# Title: Clustering with Matrix Gaussian and Matrix Transformation Mixture Models
+# Authors@R: c(person("Xuwen", "Zhu", role = c("aut", "cre"), email = "xuwen.zhu@louisville.edu"), person("Volodymyr", "Melnykov", role = "aut"), person("Shuchismita", "Sarkar", role = "ctb"), person("Michael", "Hutt", role = c("ctb", "cph")), person("Stephen", "Moshier", role = c("ctb", "cph")), person("Rouben", "Rostamian", role = c("ctb", "cph")), person("Carl Edward", "Rasmussen", role = c("ctb", "cph")), person("Dianne", "Cook", role = c("ctb", "cph")))
+# Depends: R (>= 3.0.0)
+# LazyLoad: yes
+# LazyData: no
+# Description: Provides matrix Gaussian mixture models, matrix transformation mixture models and their model-based clustering results. The parsimonious models of the mean matrices and variance covariance matrices are implemented with a total of 196 variations.
+# License: GPL (>= 2)
+# Packaged: 2019-07-18 15:41:08 UTC; root
+# Author: Xuwen Zhu [aut, cre], Volodymyr Melnykov [aut], Shuchismita Sarkar [ctb], Michael Hutt [ctb, cph], Stephen Moshier [ctb, cph], Rouben Rostamian [ctb, cph], Carl Edward Rasmussen [ctb, cph], Dianne Cook [ctb, cph]
+# Maintainer: Xuwen Zhu <xuwen.zhu@louisville.edu>
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2019-07-18 22:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '1.36.23' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-texreg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/texreg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/texreg/texreg_{{ version }}.tar.gz
+  sha256: db7424277215931daab3f54bff8b5b403f5a42c5d61915afcbceb3d36ac4aa7b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: nlme, survival, network, ergm, lme4 (>= 1.0), btergm, Zelig (>= 5.0-16)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('texreg')"           # [not win]
+    - "\"%R%\" -e \"library('texreg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/leifeld/texreg/
+  license: GPL-2 | GPL-3
+  summary: Converts coefficients, standard errors, significance stars, and goodness-of-fit statistics
+    of statistical models into LaTeX tables or HTML tables/MS Word documents or to nicely
+    formatted screen output for the R console for easy model comparison. A list of several
+    models can be combined in a single table. The output is highly customizable. New
+    model types can be easily implemented.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: texreg
+# Version: 1.36.23
+# Date: 2017-03-03
+# Title: Conversion of R Regression Output to LaTeX or HTML Tables
+# Author: Philip Leifeld
+# Maintainer: Philip Leifeld <philip.leifeld@glasgow.ac.uk>
+# Description: Converts coefficients, standard errors, significance stars, and goodness-of-fit statistics of statistical models into LaTeX tables or HTML tables/MS Word documents or to nicely formatted screen output for the R console for easy model comparison. A list of several models can be combined in a single table. The output is highly customizable. New model types can be easily implemented.
+# URL: http://github.com/leifeld/texreg/
+# BugReports: https://github.com/leifeld/texreg/issues
+# Suggests: nlme, survival, network, ergm, lme4 (>= 1.0), btergm, Zelig (>= 5.0-16)
+# Depends: R (>= 2.15.0)
+# Imports: methods, grDevices, graphics, stats
+# Enhances: AER, betareg, brglm, censReg, dynlm, eha, erer, fGarch, gamlss, gee, geepack, gmm, h2o, latentnet, lmtest, lqmm, MASS, mfx, mgcv, mlogit, mnlogit, MuMIn, nnet, ordinal, plm, pscl, quantreg, relevent, rms, robustbase, RSiena, sampleSelection, simex, sna, spdep, survey, systemfit, tergm, VGAM, xergm
+# License: GPL-2 | GPL-3
+# NeedsCompilation: no
+# Packaged: 2017-03-03 17:23:30 UTC; philip
+# Repository: CRAN
+# Date/Publication: 2017-03-03 21:26:00
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

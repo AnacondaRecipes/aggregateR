@@ -1,0 +1,93 @@
+{% set version = '0.9.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hashids
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hashids_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hashids/hashids_{{ version }}.tar.gz
+  sha256: 90b3c560a920a543dbec46346bb6f232ffa91f8209a6daed272fac4c3cc56308
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hashids')"           # [not win]
+    - "\"%R%\" -e \"library('hashids')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ALShum/hashids-r/, http://hashids.org
+  license: MIT
+  summary: 'An R port of the hashids library.  hashids generates YouTube-like hashes from integers
+    or vector of integers.  Hashes generated from integers are relatively short, unique
+    and non-seqential.  hashids can be used to generate unique ids for URLs and hide
+    database row numbers from the user.  By default hashids will avoid generating common
+    English cursewords by preventing certain letters being next to each other.  hashids
+    are not one-way: it is easy to encode an integer to a hashid and decode a hashid
+    back into an integer.'
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: hashids
+# Title: Generate Short Unique YouTube-Like IDs (Hashes) from Integers
+# Version: 0.9.0
+# Authors@R: c( person("Alex", "Shum", email = "Alex@ALShum.com", role = c("aut", "cre")),  person("Ivan", "Akimov", email = "ivan@barreleye.com", role= c("aut"), comment = "original author of hashids -- implemented in javascript"),  person("David", "Aurelio", email = "dev@david-aurelio.com", role = c("ctb"), comment = "implemented hashids in python 2 and 3"))
+# Description: An R port of the hashids library.  hashids generates YouTube-like hashes from integers or vector of integers.  Hashes generated from integers are relatively short, unique and non-seqential.  hashids can be used to generate unique ids for URLs and hide database row numbers from the user.  By default hashids will avoid generating common English cursewords by preventing certain letters being next to each other.  hashids are not one-way: it is easy to encode an integer to a hashid and decode a hashid back into an integer.
+# URL: https://github.com/ALShum/hashids-r/, http://hashids.org
+# BugReports: https://github.com/ALShum/hashids-r/issues
+# Depends: R (>= 3.2.2)
+# License: MIT + file LICENSE
+# LazyData: true
+# Suggests: testthat
+# NeedsCompilation: no
+# Packaged: 2015-09-11 06:11:04 UTC; MKULTRA
+# Author: Alex Shum [aut, cre], Ivan Akimov [aut] (original author of hashids -- implemented in javascript), David Aurelio [ctb] (implemented hashids in python 2 and 3)
+# Maintainer: Alex Shum <Alex@ALShum.com>
+# Repository: CRAN
+# Date/Publication: 2015-09-11 10:10:26
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

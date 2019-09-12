@@ -1,0 +1,96 @@
+{% set version = '0.6.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-googlevis
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/googleVis_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/googleVis/googleVis_{{ version }}.tar.gz
+  sha256: 7dcaf0e9d5e5598c17e8bd474141708de37eeb2578b09788431b9d871edb7eb8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: shiny (>= 0.4.0), httpuv (>= 1.2.0), knitr (>= 1.5), wbstats, data.table
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('googleVis')"           # [not win]
+    - "\"%R%\" -e \"library('googleVis')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mages/googleVis#googlevis
+  license: GPL-2
+  summary: R interface to Google's chart tools, allowing users to create interactive charts based
+    on data frames. Charts are displayed locally via the R HTTP help server. A modern
+    browser with an Internet connection is required and for some charts a Flash player.
+    The data remains local and is not uploaded to Google.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: googleVis
+# Type: Package
+# Title: R Interface to Google Charts
+# Version: 0.6.4
+# Date: 2019-05-16
+# Authors@R: c(person("Markus", "Gesmann", role = c("aut", "cre"), email = "markus.gesmann@googlemail.com"), person("Diego", "de Castillo", role = "aut", email = "decastillo@gmail.com"), person("Joe", "Cheng", role = "ctb", email = "joe@rstudio.com"), person("Ashley", "Baldry", role = "ctb"))
+# Description: R interface to Google's chart tools, allowing users to create interactive charts based on data frames. Charts are displayed locally via the R HTTP help server. A modern browser with an Internet connection is required and for some charts a Flash player. The data remains local and is not uploaded to Google.
+# Depends: R (>= 3.0.2)
+# Imports: methods, jsonlite, utils
+# Suggests: shiny (>= 0.4.0), httpuv (>= 1.2.0), knitr (>= 1.5), wbstats, data.table
+# License: GPL (>= 2)
+# URL: https://github.com/mages/googleVis#googlevis
+# BugReports: https://github.com/mages/googleVis/issues
+# LazyLoad: yes
+# LazyData: yes
+# VignetteBuilder: knitr
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-05-16 18:03:13 UTC; mages
+# Author: Markus Gesmann [aut, cre], Diego de Castillo [aut], Joe Cheng [ctb], Ashley Baldry [ctb]
+# Maintainer: Markus Gesmann <markus.gesmann@googlemail.com>
+# Repository: CRAN
+# Date/Publication: 2019-05-16 19:10:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

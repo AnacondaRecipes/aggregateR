@@ -1,0 +1,90 @@
+{% set version = '0.1-7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-wsvm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/wSVM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/wSVM/wSVM_{{ version }}.tar.gz
+  sha256: f0e08f8504db8d7d15bff6237ed5343b27079a056cb6562b5a8e3ff53e5df930
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-quadprog
+
+  run:
+    - r-base
+    - r-mass
+    - r-quadprog
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('wSVM')"           # [not win]
+    - "\"%R%\" -e \"library('wSVM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=wSVM
+  license: GPL-2
+  summary: We propose weighted SVM methods with penalization form. By adding weights to loss
+    term, we can build up weighted SVM easily and examine classification algorithm properties
+    under weighted SVM. Through comparing each of test error rates, we conclude that
+    our Weighted SVM with boosting has predominant properties than the standard SVM
+    have, as a whole.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: wSVM
+# Title: Weighted SVM with boosting algorithm for improving accuracy
+# Version: 0.1-7
+# Date: 2010-10-03
+# Author: SungHwan Kim and Soo-Heang Eo
+# Maintainer: SungHwan Kim <swiss747@korea.ac.kr>
+# Description: We propose weighted SVM methods with penalization form. By adding weights to loss term, we can build up weighted SVM easily and examine classification algorithm properties under weighted SVM. Through comparing each of test error rates, we conclude that our Weighted SVM with boosting has predominant properties than the standard SVM have, as a whole.
+# License: GPL-2
+# Depends: R (>= 2.10.1), MASS, quadprog
+# LazyData: yes
+# LazyLoad: yes
+# Packaged: 2012-10-29 08:59:59 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2012-10-29 08:59:59
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

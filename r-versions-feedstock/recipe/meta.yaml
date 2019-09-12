@@ -1,0 +1,97 @@
+{% set version = '0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-versions
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/versions_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/versions/versions_{{ version }}.tar.gz
+  sha256: 6dc52cf93dfbcffce65d05971a2f8468ea065cc189fa90bd3bfbb5828e4ca47e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('versions')"           # [not win]
+    - "\"%R%\" -e \"library('versions')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=versions
+  license: BSD_3_clause
+  summary: Installs specified versions of R packages hosted on CRAN and provides functions to
+    list available versions and the versions of currently installed packages. These
+    tools can be used to help make R projects and packages more reproducible. 'versions'
+    fits in the narrow gap between the 'devtools' install_version() function and the
+    'checkpoint' package. devtools::install_version() installs a stated package version
+    from source files stored on the CRAN archives. However CRAN does not store binary
+    versions of packages so Windows users need to have RTools installed and Windows
+    and OSX users get longer installation times. 'checkpoint' uses the Revolution Analytics
+    MRAN server to install packages (from source or binary) as they were available on
+    a given date. It also provides a helpful interface to detect the packages in use
+    in a directory and install all of those packages for a given date. 'checkpoint'
+    doesn't provide install.packages-like functionality however, and that's what 'versions'
+    aims to do, by querying MRAN. As MRAN only goes back to 2014-09-17, 'versions' can't
+    install packages archived before this date.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_3_clause'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: versions
+# Type: Package
+# Title: Query and Install Specific Versions of Packages on CRAN
+# Version: 0.3
+# Date: 2016-09-01
+# Author: Nick Golding
+# Maintainer: Nick Golding <nick.golding.research@gmail.com>
+# Description: Installs specified versions of R packages hosted on CRAN and provides functions to list available versions and the versions of currently installed packages. These tools can be used to help make R projects and packages more reproducible. 'versions' fits in the narrow gap between the 'devtools' install_version() function and the 'checkpoint' package. devtools::install_version() installs a stated package version from source files stored on the CRAN archives. However CRAN does not store binary versions of packages so Windows users need to have RTools installed and Windows and OSX users get longer installation times. 'checkpoint' uses the Revolution Analytics MRAN server to install packages (from source or binary) as they were available on a given date. It also provides a helpful interface to detect the packages in use in a directory and install all of those packages for a given date. 'checkpoint' doesn't provide install.packages-like functionality however, and that's what 'versions' aims to do, by querying MRAN. As MRAN only goes back to 2014-09-17, 'versions' can't install packages archived before this date.
+# License: BSD_3_clause + file LICENSE
+# LazyData: TRUE
+# BugReports: https://github.com/goldingn/versions/issues
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-09-01 06:16:24 UTC; nick
+# Repository: CRAN
+# Date/Publication: 2016-09-01 08:41:51
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

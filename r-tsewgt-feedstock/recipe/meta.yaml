@@ -1,0 +1,95 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tsewgt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/TSEwgt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/TSEwgt/TSEwgt_{{ version }}.tar.gz
+  sha256: 5498d8d3b970ce3597f9407c0558ea2f92176253c110921ce11b934c94dc2448
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('TSEwgt')"           # [not win]
+    - "\"%R%\" -e \"library('TSEwgt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=TSEwgt
+  license: GPL-2
+  summary: 'Calculates total survey error (TSE) for a survey under multiple, different weighting
+    schemes, using both scale-dependent and scale-independent metrics.  Package works
+    directly from the data set, with no hand calculations required: just upload a properly
+    structured data set (see TESTWGT and its documentation), properly input column names
+    (see functions documentation), and run your functions.  For more on TSE, see: Weisberg,
+    Herbert (2005, ISBN:0-226-89128-3); Biemer, Paul (2010) <doi:10.1093/poq/nfq058>;
+    Biemer, Paul et.al. (2017, ISBN:9781119041672); etc.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: TSEwgt
+# Type: Package
+# Title: Total Survey Error Under Multiple, Different Weighting Schemes
+# Version: 0.1.0
+# Authors@R: c(person("Joshua", "Miller", role = c("aut", "cre"), email = "joshlmiller@msn.com"))
+# Maintainer: Joshua Miller <joshlmiller@msn.com>
+# Description: Calculates total survey error (TSE) for a survey under multiple, different weighting schemes, using both scale-dependent and scale-independent metrics.  Package works directly from the data set, with no hand calculations required: just upload a properly structured data set (see TESTWGT and its documentation), properly input column names (see functions documentation), and run your functions.  For more on TSE, see: Weisberg, Herbert (2005, ISBN:0-226-89128-3); Biemer, Paul (2010) <doi:10.1093/poq/nfq058>; Biemer, Paul et.al. (2017, ISBN:9781119041672); etc.
+# Note: 'TSEwgt' is a companion package to 'TSE'. Each package calculates TSE, but the former for multiple, different surveys, and the latter for a single survey under multiple, different weighting schemes.
+# Imports: stats
+# Depends: R (>= 3.5)
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Suggests: knitr, rmarkdown
+# NeedsCompilation: no
+# Packaged: 2019-07-02 12:47:11 UTC; JOSHUA
+# Author: Joshua Miller [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2019-07-02 16:30:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

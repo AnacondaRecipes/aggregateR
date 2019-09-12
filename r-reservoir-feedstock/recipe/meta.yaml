@@ -1,0 +1,91 @@
+{% set version = '1.1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-reservoir
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/reservoir_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/reservoir/reservoir_{{ version }}.tar.gz
+  sha256: 3fbe3c92c0ac0d732a38b8eafff99a4121659313028d392a5ae6f62724c272e3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-gtools
+
+  run:
+    - r-base
+    - r-gtools
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('reservoir')"           # [not win]
+    - "\"%R%\" -e \"library('reservoir')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://cran.r-project.org/package=reservoir
+  license: GPL-2
+  summary: Measure single-storage water supply system performance using resilience, reliability,
+    and vulnerability metrics; assess storage-yield-reliability relationships; determine
+    no-fail storage with sequent peak analysis; optimize release decisions for water
+    supply, hydropower, and multi-objective reservoirs using deterministic and stochastic
+    dynamic programming; generate inflow replicates using parametric and non-parametric
+    models; evaluate inflow persistence using the Hurst coefficient.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: reservoir
+# Type: Package
+# Title: Tools for Analysis, Design, and Operation of Water Supply Storages
+# Version: 1.1.5
+# Date: 2016-04-14
+# Authors@R: c( person("Sean", "Turner", , "swd.turner@gmail.com", c("aut", "cre")), person("Jia Yi", "Ng", , "ngjiayi93@hotmail.com", "aut"), person("Stefano", "Galelli", , "stefano_galelli@sutd.edu.sg", "aut") )
+# URL: https://cran.r-project.org/package=reservoir
+# Description: Measure single-storage water supply system performance using resilience, reliability, and vulnerability metrics; assess storage-yield-reliability relationships; determine no-fail storage with sequent peak analysis; optimize release decisions for water supply, hydropower, and multi-objective reservoirs using deterministic and stochastic dynamic programming; generate inflow replicates using parametric and non-parametric models; evaluate inflow persistence using the Hurst coefficient.
+# License: GPL (>= 2)
+# LazyData: yes
+# Imports: gtools, stats, graphics
+# NeedsCompilation: no
+# Packaged: 2016-04-14 07:00:41 UTC; sean_turner
+# Author: Sean Turner [aut, cre], Jia Yi Ng [aut], Stefano Galelli [aut]
+# Maintainer: Sean Turner <swd.turner@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-04-14 14:50:03
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

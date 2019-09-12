@@ -1,0 +1,105 @@
+{% set version = '0.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-webchem
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/webchem_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/webchem/webchem_{{ version }}.tar.gz
+  sha256: 005e00e4e8164373328053fa4c74851241dd54f6c87927881f431f3badd34b0c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, rcdk
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcurl
+    - r-httr
+    - r-jsonlite
+    - r-rvest
+    - r-stringr
+    - r-xml2
+
+  run:
+    - r-base
+    - r-rcurl
+    - r-httr
+    - r-jsonlite
+    - r-rvest
+    - r-stringr
+    - r-xml2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('webchem')"           # [not win]
+    - "\"%R%\" -e \"library('webchem')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ropensci/webchem
+  license: MIT
+  summary: Chemical information from around the web. This package interacts with a suite of web
+    APIs for chemical information.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: webchem
+# Title: Chemical Information from the Web
+# Description: Chemical information from around the web. This package interacts with a suite of web APIs for chemical information.
+# Type: Package
+# Version: 0.4.0
+# Date: 2018-04-07
+# License: MIT + file LICENSE
+# URL: https://github.com/ropensci/webchem
+# BugReports: https://github.com/ropensci/webchem/issues
+# Authors@R: c(person("Eduard", "Szocs", role = c("aut", "cre"), email = "eduardszoecs@gmail.com"), person("Daniel", "Muench", role = "ctb"), person("Johannes", "Ranke", role = "ctb"), person("Eric", "Scott", role = "ctb"), person("Jan", "Stanstrup", role = "ctb"), person("Robert", "Allaway", role = "ctb"))
+# Maintainer: Eduard Szocs <eduardszoecs@gmail.com>
+# LazyLoad: yes
+# LazyData: yes
+# Encoding: UTF-8
+# Depends: R (>= 3.0)
+# Imports: xml2, httr, rvest, RCurl, jsonlite, stringr, methods
+# Suggests: testthat, rcdk
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-04-07 21:41:27 UTC; edisz
+# Author: Eduard Szocs [aut, cre], Daniel Muench [ctb], Johannes Ranke [ctb], Eric Scott [ctb], Jan Stanstrup [ctb], Robert Allaway [ctb]
+# Repository: CRAN
+# Date/Publication: 2018-04-07 21:55:26 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

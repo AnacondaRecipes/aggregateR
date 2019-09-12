@@ -1,0 +1,95 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sparsestep
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sparsestep_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sparsestep/sparsestep_{{ version }}.tar.gz
+  sha256: 0ffcd27db136f45775c487351d7db5e66486f4fba0e4d487d52025eb23cf7c38
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix >=1.0_6
+
+  run:
+    - r-base
+    - r-matrix >=1.0_6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sparsestep')"           # [not win]
+    - "\"%R%\" -e \"library('sparsestep')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/GjjvdBurg/SparseStep, https://arxiv.org/abs/1701.06967
+  license: GPL-2
+  summary: Implements the SparseStep model for solving regression problems with a sparsity constraint
+    on the parameters. The SparseStep  regression model was proposed in Van den Burg,
+    Groenen, and Alfons (2017)  <https://arxiv.org/abs/1701.06967>. In the model, a
+    regularization term is  added to the regression problem which approximates the counting
+    norm of  the parameters.  By iteratively improving the approximation a sparse  solution
+    to the regression problem can be obtained.  In this package both  the standard SparseStep
+    algorithm is implemented as well as a path  algorithm which uses golden section
+    search to determine solutions with  different values for the regularization parameter.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sparsestep
+# Version: 1.0.0
+# Date: 2017-01-26
+# Title: SparseStep Regression
+# Authors@R: c(person("Gertjan", "van den Burg", role=c("aut", "cre"),  email="gertjanvandenburg@gmail.com"),  person("Patrick", "Groenen", email="groenen@ese.eur.nl", role="ctb"),  person("Andreas", "Alfons", email="alfons@ese.eur.nl", role="ctb"))
+# Description: Implements the SparseStep model for solving regression problems with a sparsity constraint on the parameters. The SparseStep  regression model was proposed in Van den Burg, Groenen, and Alfons (2017)  <https://arxiv.org/abs/1701.06967>. In the model, a regularization term is  added to the regression problem which approximates the counting norm of  the parameters.  By iteratively improving the approximation a sparse  solution to the regression problem can be obtained.  In this package both  the standard SparseStep algorithm is implemented as well as a path  algorithm which uses golden section search to determine solutions with  different values for the regularization parameter.
+# License: GPL (>= 2)
+# Imports: graphics
+# Depends: R (>= 3.0.0), Matrix (>= 1.0-6)
+# Classification/MSC: 62J05, 62J07
+# URL: https://github.com/GjjvdBurg/SparseStep, https://arxiv.org/abs/1701.06967
+# BugReports: https://github.com/GjjvdBurg/SparseStep
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2017-01-26 12:15:06 UTC; gertjan
+# Author: Gertjan van den Burg [aut, cre], Patrick Groenen [ctb], Andreas Alfons [ctb]
+# Maintainer: Gertjan van den Burg <gertjanvandenburg@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-01-27 10:18:45
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,85 @@
+{% set version = '3.0.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rpart.plot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rpart.plot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rpart.plot/rpart.plot_{{ version }}.tar.gz
+  sha256: 4d8c53b07bf5d4a767d277a3f95dd33573acf313775c19d1935312c225290079
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: earth (>= 5.1.0)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rpart >=4.1_10
+
+  run:
+    - r-base
+    - r-rpart >=4.1_10
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rpart.plot')"           # [not win]
+    - "\"%R%\" -e \"library('rpart.plot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.milbo.org/rpart-plot
+  license: GPL-3
+  summary: Plot 'rpart' models. Extends plot.rpart() and text.rpart() in the 'rpart' package.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rpart.plot
+# Version: 3.0.8
+# Title: Plot 'rpart' Models: An Enhanced Version of 'plot.rpart'
+# Author: Stephen Milborrow
+# Maintainer: Stephen Milborrow <milbo@sonic.net>
+# Depends: R (>= 3.4.0), rpart (>= 4.1-10)
+# Suggests: earth (>= 5.1.0)
+# Description: Plot 'rpart' models. Extends plot.rpart() and text.rpart() in the 'rpart' package.
+# License: GPL-3
+# LazyData: yes
+# URL: http://www.milbo.org/rpart-plot
+# NeedsCompilation: no
+# Packaged: 2019-08-21 23:18:20 UTC; milbo
+# Repository: CRAN
+# Date/Publication: 2019-08-22 05:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

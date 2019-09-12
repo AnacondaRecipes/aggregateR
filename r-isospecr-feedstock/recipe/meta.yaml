@@ -1,0 +1,107 @@
+{% set version = '2.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-isospecr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/IsoSpecR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/IsoSpecR/IsoSpecR_{{ version }}.tar.gz
+  sha256: d642da12417fd83545745824c122e7a301d84068be6a2c2ef5eda2114e0f20f8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('IsoSpecR')"           # [not win]
+    - "\"%R%\" -e \"library('IsoSpecR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://matteolacki.github.io/IsoSpec/
+  license: BSD_2_clause
+  summary: IsoSpec is a fine structure calculator used for obtaining the most probable masses
+    of a chemical compound given the frequencies of the composing isotopes and their
+    masses. It finds the smallest set of isotopologues with a given probability. The
+    probability is assumed to be that of the product of multinomial distributions, each
+    corresponding to one particular element and parametrized by the frequencies of finding
+    these elements in nature. These numbers are supplied by IUPAC - the International
+    Union of Pure and Applied Chemistry.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_2_clause'
+    - LICENCE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Encoding: UTF-8
+# Package: IsoSpecR
+# Type: Package
+# Title: The IsoSpec Algorithm
+# Version: 2.0.1
+# Date: 2019-05-21
+# Author: Mateusz Krzysztof Lacki and Michal Startek
+# Maintainer: Matteo Lacki <matteo.lacki@gmail.com>
+# Description: IsoSpec is a fine structure calculator used for obtaining the most probable masses of a chemical compound given the frequencies of the composing isotopes and their masses. It finds the smallest set of isotopologues with a given probability. The probability is assumed to be that of the product of multinomial distributions, each corresponding to one particular element and parametrized by the frequencies of finding these elements in nature. These numbers are supplied by IUPAC - the International Union of Pure and Applied Chemistry.
+# License: BSD_2_clause + file LICENCE
+# URL: http://matteolacki.github.io/IsoSpec/
+# Depends: R (>= 3.0.0)
+# Imports: Rcpp (>= 0.12.0)
+# Suggests: testthat
+# LazyData: no
+# LinkingTo: Rcpp
+# NeedsCompilation: yes
+# SystemRequirements: C++14
+# RoxygenNote: 6.1.1
+# Packaged: 2019-05-21 13:28:43 UTC; mist
+# Repository: CRAN
+# Date/Publication: 2019-05-22 12:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

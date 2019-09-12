@@ -1,0 +1,118 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-modelltest
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/modeLLtest_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/modeLLtest/modeLLtest_{{ version }}.tar.gz
+  sha256: e366d451979f50121c7f72440fcacc4e12d20acdeda9f021e5ef1b1af85b00b9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-coxrobust
+    - r-quantreg
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-coxrobust
+    - r-quantreg
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('modeLLtest')"           # [not win]
+    - "\"%R%\" -e \"library('modeLLtest')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ShanaScogin/modeLLtest
+  license: GPL-3
+  summary: An implementation of the cross-validated difference in means (CVDM) test by Desmarais
+    and Harden (2014) <doi:10.1007/s11135-013-9884-7> (see also Harden and Desmarais,
+    2011 <doi:10.1177/1532440011408929>) and the cross-validated median fit (CVMF) test
+    by Desmarais and Harden (2012) <doi:10.1093/pan/mpr042>. These tests use leave-one-out
+    cross-validated log-likelihoods to assist in selecting among model estimations.
+    You can also utilize data from Golder (2010) <doi:10.1177/0010414009341714> and
+    Joshi & Mason (2008) <doi:10.1177/0022343308096155> that are included to facilitate
+    examples from real-world analysis.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: modeLLtest
+# Type: Package
+# Title: Compare Models with Cross-Validated Log-Likelihood
+# Version: 1.0.0
+# Date: 2019-06-25
+# Author: Shana Scogin <shanarscogin@gmail.com>, Sarah Petersen <sarahllpetersen@gmail.com>, Jeff Harden <jeff.harden@nd.edu>, Bruce A. Desmarais <bdesmarais@psu.edu>
+# Maintainer: Shana Scogin <shanarscogin@gmail.com>
+# Description: An implementation of the cross-validated difference in means (CVDM) test by Desmarais and Harden (2014) <doi:10.1007/s11135-013-9884-7> (see also Harden and Desmarais, 2011 <doi:10.1177/1532440011408929>) and the cross-validated median fit (CVMF) test by Desmarais and Harden (2012) <doi:10.1093/pan/mpr042>. These tests use leave-one-out cross-validated log-likelihoods to assist in selecting among model estimations. You can also utilize data from Golder (2010) <doi:10.1177/0010414009341714> and Joshi & Mason (2008) <doi:10.1177/0022343308096155> that are included to facilitate examples from real-world analysis.
+# URL: https://github.com/ShanaScogin/modeLLtest
+# License: GPL-3
+# NeedsCompilation: yes
+# Imports: stats, quantreg, survival, coxrobust, methods, MASS, Rcpp
+# Encoding: UTF-8
+# LazyData: TRUE
+# LazyLoad: TRUE
+# Suggests: knitr, rmarkdown, testthat
+# VignetteBuilder: knitr
+# SystemRequirements: GNU make
+# RoxygenNote: 6.1.1
+# LinkingTo: Rcpp, RcppArmadillo
+# Packaged: 2019-07-02 14:31:13 UTC; shanascogin
+# Repository: CRAN
+# Date/Publication: 2019-07-03 15:10:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

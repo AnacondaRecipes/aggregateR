@@ -1,0 +1,84 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-igraphtosonia
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/igraphtosonia_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/igraphtosonia/igraphtosonia_{{ version }}.tar.gz
+  sha256: 46a28b3f1a0e9442f93561e338e020850572933c858608814614992baf95c96f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-igraph
+
+  run:
+    - r-base
+    - r-igraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('igraphtosonia')"           # [not win]
+    - "\"%R%\" -e \"library('igraphtosonia')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=igraphtosonia
+  license: GPL-2
+  summary: This program facilitates exporting igraph graphs to the SoNIA file format
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: igraphtosonia
+# Type: Package
+# Version: 1.0
+# Date: 2010-08-05
+# Title: Convert iGraph graps to SoNIA .son files
+# Author: Sean J Westwood <seanjw@stanford.edu>
+# Maintainer: Sean J Westwood <seanjw@stanford.edu>
+# Depends: igraph
+# Description: This program facilitates exporting igraph graphs to the SoNIA file format
+# License: GPL (>= 2)
+# LazyLoad: yes
+# Packaged: 2012-10-29 08:59:00 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2012-10-29 08:59:00
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

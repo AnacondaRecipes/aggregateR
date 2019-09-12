@@ -1,0 +1,103 @@
+{% set version = '0.1-7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-qz
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/QZ_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/QZ/QZ_{{ version }}.tar.gz
+  sha256: d59d706c311704897a029c0a7a79987bcc4f48932c315e2af8643b14beb878f6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: fda
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('QZ')"           # [not win]
+    - "\"%R%\" -e \"library('QZ')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=QZ
+  license: Mozilla Public License 2.0
+  summary: Generalized eigenvalues and eigenvectors use QZ decomposition (generalized Schur decomposition).
+    The decomposition needs an N-by-N non-symmetric matrix A or paired matrices (A,B)
+    with eigenvalues reordering mechanism. The decomposition functions are mainly based
+    Fortran subroutines in complex*16 and double precision of LAPACK library (version
+    3.4.2. or later).
+  license_family: MOZILLA
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: QZ
+# Version: 0.1-7
+# Date: 2019-06-02
+# Title: Generalized Eigenvalues and QZ Decomposition
+# Authors@R: c(person("Wei-Chen", "Chen", role = c("aut", "cre"), email= "wccsnow@gmail.com"), person("LAPACK authors", role = c("aut", "cph")))
+# Depends: R (>= 3.6.0), methods, Matrix
+# Suggests: fda
+# LazyLoad: yes
+# LazyData: yes
+# Copyright: See QZ/inst/LAPACK_LICENSE.txt for the files in src/qz/.
+# Description: Generalized eigenvalues and eigenvectors use QZ decomposition (generalized Schur decomposition). The decomposition needs an N-by-N non-symmetric matrix A or paired matrices (A,B) with eigenvalues reordering mechanism. The decomposition functions are mainly based Fortran subroutines in complex*16 and double precision of LAPACK library (version 3.4.2. or later).
+# License: Mozilla Public License 2.0
+# NeedsCompilation: yes
+# Maintainer: Wei-Chen Chen <wccsnow@gmail.com>
+# Packaged: 2019-06-05 00:26:50 UTC; snoweye
+# Author: Wei-Chen Chen [aut, cre], LAPACK authors [aut, cph]
+# Repository: CRAN
+# Date/Publication: 2019-06-05 12:00:12 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

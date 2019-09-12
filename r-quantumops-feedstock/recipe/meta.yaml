@@ -1,0 +1,90 @@
+{% set version = '2.5.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-quantumops
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/QuantumOps_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/QuantumOps/QuantumOps_{{ version }}.tar.gz
+  sha256: e7c8932391705493ecb03e89d92e07ce098d58098215f8af164881f2f2d08e4d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('QuantumOps')"           # [not win]
+    - "\"%R%\" -e \"library('QuantumOps')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=QuantumOps
+  license: GPL-3
+  summary: Contains basic structures and operations used frequently in quantum computing. Intended
+    to be a convenient tool to help learn quantum mechanics and algorithms. Can create
+    arbitrarily sized kets and bras and implements quantum gates, inner products, and
+    tensor products. Creates arbitrarily controlled versions of all gates and can simulate
+    complete or partial measurements of kets. Has functionality to convert functions
+    into equivalent quantum gates. Includes larger applications, such as Steane error
+    correction <DOI:10.1103/physrevlett.77.793>, Quantum Fourier Transform and Shor's
+    algorithm (Shor 1999), Grover's algorithm (1996), Quantum Approximation Optimization
+    Algorithm (QAOA) (Farhi, Goldstone, and Gutmann 2014) <arXiv:1411.4028>, and a variational
+    quantum classifier (Schuld 2018) <arXiv:1804.00633>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: QuantumOps
+# Title: Performs Common Linear Algebra Operations Used in Quantum Computing and Implements Quantum Algorithms
+# Version: 2.5.3
+# Date: 2019-8-30
+# Author: Salonik Resch
+# Maintainer: Salonik Resch <resc0059@umn.edu>
+# Description: Contains basic structures and operations used frequently in quantum computing. Intended to be a convenient tool to help learn quantum mechanics and algorithms. Can create arbitrarily sized kets and bras and implements quantum gates, inner products, and tensor products. Creates arbitrarily controlled versions of all gates and can simulate complete or partial measurements of kets. Has functionality to convert functions into equivalent quantum gates. Includes larger applications, such as Steane error correction <DOI:10.1103/physrevlett.77.793>, Quantum Fourier Transform and Shor's algorithm (Shor 1999), Grover's algorithm (1996), Quantum Approximation Optimization Algorithm (QAOA) (Farhi, Goldstone, and Gutmann 2014) <arXiv:1411.4028>, and a variational quantum classifier (Schuld 2018) <arXiv:1804.00633>.
+# Depends: R (>= 3.1.0)
+# License: GPL-3
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2019-08-30 17:36:44 UTC; mike
+# Repository: CRAN
+# Date/Publication: 2019-08-30 21:40:12 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

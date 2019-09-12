@@ -1,0 +1,99 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gethr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gethr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gethr/gethr_{{ version }}.tar.gz
+  sha256: e79587d2cb429b61547952ba5c1174f26d23eb2582d6f9c518d08ae7d34af14e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gethr')"           # [not win]
+    - "\"%R%\" -e \"library('gethr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/vicegd/gethr
+  license: MIT
+  summary: Full access to the Geth command line interface for running full Ethereum nodes. With  gethr
+    it is possible to carry out different tasks such as mine ether, transfer funds,
+    create  contacts, explore block history, etc. The package also provides access to
+    all the available APIs.  The officially exposed by Ethereum blockchains (eth, shh,
+    web3, net) and some provided directly  by Geth (admin, debug, miner, personal, txpool).
+    For more details on Ethereum, access the project  website <https://www.ethereum.org/>.
+    For more details on the Geth client, access the project  website <https://github.com/ethereum/go-ethereum/wiki/geth/>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gethr
+# Type: Package
+# Title: Access to Ethereum-Based Blockchains Through Geth Nodes
+# Version: 0.1.0
+# Authors@R: person("Vicente", "Garcia Diaz", email = "garciavicente@uniovi.es", role = c("aut", "cre"))
+# Description: Full access to the Geth command line interface for running full Ethereum nodes. With  gethr it is possible to carry out different tasks such as mine ether, transfer funds, create  contacts, explore block history, etc. The package also provides access to all the available APIs.  The officially exposed by Ethereum blockchains (eth, shh, web3, net) and some provided directly  by Geth (admin, debug, miner, personal, txpool). For more details on Ethereum, access the project  website <https://www.ethereum.org/>. For more details on the Geth client, access the project  website <https://github.com/ethereum/go-ethereum/wiki/geth/>.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# URL: https://github.com/vicegd/gethr
+# BugReports: https://github.com/vicegd/gethr/issues
+# Imports: jsonlite, httr
+# Suggests: testthat
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-01-03 17:39:45 UTC; Windows
+# Author: Vicente Garcia Diaz [aut, cre]
+# Maintainer: Vicente Garcia Diaz <garciavicente@uniovi.es>
+# Repository: CRAN
+# Date/Publication: 2019-01-08 18:00:20 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

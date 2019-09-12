@@ -1,0 +1,93 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-shinyfeedback
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/shinyFeedback_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/shinyFeedback/shinyFeedback_{{ version }}.tar.gz
+  sha256: 6e9842157691b83d2b72baa22f2d0454d61790853eb41874276ceb5658391707
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-digest
+    - r-shiny
+
+  run:
+    - r-base
+    - r-digest
+    - r-shiny
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('shinyFeedback')"           # [not win]
+    - "\"%R%\" -e \"library('shinyFeedback')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=shinyFeedback
+  license: GPL-3
+  summary: Easily display user feedback next to Shiny inputs.  The feedback message is displayed
+    when the feedback condition evaluates to TRUE.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: shinyFeedback
+# Type: Package
+# Title: Displays User Feedback Next to Shiny Inputs
+# Version: 0.1.0
+# Date: 2018-08-19
+# Authors@R: person("Andy", "Merlino", email = "merlinoa88@gmail.com", role = c("aut", "cre"))
+# Description: Easily display user feedback next to Shiny inputs.  The feedback message is displayed when the feedback condition evaluates to TRUE.
+# License: GPL-3
+# LazyData: true
+# Depends: R (>= 3.1.2)
+# RoxygenNote: 6.1.0
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# Imports: shiny, digest
+# NeedsCompilation: no
+# Packaged: 2018-08-20 01:29:09 UTC; andy
+# Author: Andy Merlino [aut, cre]
+# Maintainer: Andy Merlino <merlinoa88@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-08-20 04:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

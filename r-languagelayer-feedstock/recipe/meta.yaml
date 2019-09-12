@@ -1,0 +1,99 @@
+{% set version = '1.2.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-languagelayer
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/languagelayeR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/languagelayeR/languagelayeR_{{ version }}.tar.gz
+  sha256: d3c7974bd0209cd736877bc42037f30dfd8096f78f3bbb4cb604b5c61ad402e1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, covr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-attempt
+    - r-curl
+    - r-httr
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-attempt
+    - r-curl
+    - r-httr
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('languagelayeR')"           # [not win]
+    - "\"%R%\" -e \"library('languagelayeR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ColinFay/languagelayer
+  license: MIT
+  summary: Improve your text analysis with languagelayer <https://languagelayer.com>, a powerful
+    language detection API.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: languagelayeR
+# Type: Package
+# Title: Access the 'languagelayer' API
+# Version: 1.2.4
+# Authors@R: person("Colin", "FAY", email = "contact@colinfay.me", role = c("aut", "cre"))
+# Maintainer: Colin FAY <contact@colinfay.me>
+# Description: Improve your text analysis with languagelayer <https://languagelayer.com>, a powerful language detection API.
+# URL: https://github.com/ColinFay/languagelayer
+# BugReports: https://github.com/ColinFay/languagelayer/issues
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Imports: httr, jsonlite, attempt, curl, utils
+# RoxygenNote: 6.1.0
+# Suggests: testthat, knitr, rmarkdown, covr
+# ByteCompile: true
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-02-12 08:13:43 UTC; colin
+# Author: Colin FAY [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2019-02-12 10:03:19 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

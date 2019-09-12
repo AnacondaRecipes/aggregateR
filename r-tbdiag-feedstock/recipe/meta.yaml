@@ -1,0 +1,88 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tbdiag
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tbdiag_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tbdiag/tbdiag_{{ version }}.tar.gz
+  sha256: b8983fa58da2bfb96c66fb2bff82610936957d8cc85db1a01184a0d91ee422f3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tbdiag')"           # [not win]
+    - "\"%R%\" -e \"library('tbdiag')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mmparker/tbdiag
+  license: MIT
+  summary: This package provides functions to assist researchers working in the field of tuberculosis
+    diagnostics.  Functions for the interpretation of two popular interferon-gamma release
+    assays are provided, and additional functionality is planned.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: tbdiag
+# Type: Package
+# Title: Functions for tuberculosis diagnostics research
+# Version: 0.1
+# Date: 2013-06-10
+# Author: Matt Parker
+# Maintainer: Matt Parker <mattmparker@gmail.com>
+# Description: This package provides functions to assist researchers working in the field of tuberculosis diagnostics.  Functions for the interpretation of two popular interferon-gamma release assays are provided, and additional functionality is planned.
+# License: MIT
+# URL: https://github.com/mmparker/tbdiag
+# LazyLoad: yes
+# LazyData: true
+# Suggests: testthat
+# Collate: 'equal.lengths.r' 'is.wholenumber.r' 'qft.cens.r' 'qft.criteria.070.r' 'qft.criteria.cellestis.nomito.r' 'qft.criteria.cellestis.usa.r' 'trim.output.r' 'tbdiag-package.r' 'tspot.cens.r' 'tspot.criteria.10spot.r' 'tspot.criteria.oxford.global.r' 'tspot.criteria.oxford.usa.r' 'qft.interp.R' 'tspot.interp.R'
+# Packaged: 2013-06-10 21:47:58 UTC; mparker
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-06-11 07:12:47
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

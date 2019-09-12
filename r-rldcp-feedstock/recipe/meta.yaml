@@ -1,0 +1,94 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rldcp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rLDCP_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rLDCP/rLDCP_{{ version }}.tar.gz
+  sha256: 41747bacd0ed0e233843d54b4eda323286295ae0f842080e389455ec7b60ff4c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-xml >=3.98_1.4
+
+  run:
+    - r-base
+    - r-xml >=3.98_1.4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rLDCP')"           # [not win]
+    - "\"%R%\" -e \"library('rLDCP')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://phedes.com/rLDCP
+  license: GPL-2
+  summary: Linguistic Descriptions of Complex Phenomena (LDCP) is an architecture and methodology
+    that allows us to model complex phenomena, interpreting input data, and generating
+    automatic text reports customized to the user needs (see <doi:10.1016/j.ins.2016.11.002>
+    and <doi:10.1007/s00500-016-2430-5>). The proposed package contains a set of methods
+    that facilitates the development of LDCP systems. It main goal is increasing the
+    visibility and practical use of this research line.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rLDCP
+# Type: Package
+# Title: Text Generation from Data
+# Version: 1.0.2
+# Date: 2017-11-10
+# Author: Patricia Conde-Clemente [aut, cre], Jose M. Alonso [aut], Gracian Trivino [aut]
+# Maintainer: Patricia Conde-Clemente <patricia.condeclemente@gmail.com>
+# Description: Linguistic Descriptions of Complex Phenomena (LDCP) is an architecture and methodology that allows us to model complex phenomena, interpreting input data, and generating automatic text reports customized to the user needs (see <doi:10.1016/j.ins.2016.11.002> and <doi:10.1007/s00500-016-2430-5>). The proposed package contains a set of methods that facilitates the development of LDCP systems. It main goal is increasing the visibility and practical use of this research line.
+# License: GPL (>= 2) | file LICENSE
+# URL: http://phedes.com/rLDCP
+# LazyData: FALSE
+# NeedsCompilation: no
+# RoxygenNote: 6.0.1
+# Suggests: testthat
+# Imports: XML (>= 3.98-1.4), methods
+# Packaged: 2017-11-10 14:20:08 UTC; patri
+# Repository: CRAN
+# Date/Publication: 2017-11-10 16:42:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

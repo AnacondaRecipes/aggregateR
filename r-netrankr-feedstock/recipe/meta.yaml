@@ -1,0 +1,114 @@
+{% set version = '0.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-netrankr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/netrankr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/netrankr/netrankr_{{ version }}.tar.gz
+  sha256: 54eb148ea1e2447301ac0aa2adf4c9d0ff2c7ba2a7807e267ffe5c1913884f33
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, magrittr, ggplot2, testthat, shiny (>= 0.13), miniUI (>= 0.1.1), rstudioapi (>= 0.5)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.8
+    - r-rcpparmadillo
+    - r-igraph >=1.0.1
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.8
+    - r-rcpparmadillo
+    - r-igraph >=1.0.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('netrankr')"           # [not win]
+    - "\"%R%\" -e \"library('netrankr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://schochastics.github.io/netrankr
+  license: MIT
+  summary: Implements methods for centrality related analyses of networks.  While the package
+    includes the possibility to build more than 20 indices,  its main focus lies on
+    index-free assessment of centrality via partial  rankings obtained by neighborhood-inclusion
+    or positional dominance. These  partial rankings can be analyzed with different
+    methods, including  probabilistic methods like computing expected node ranks and
+    relative  rank probabilities (how likely is it that a node is more central than
+    another?). The methodology is described in depth in the vignettes and in Schoch
+    (2018) <doi:10.1016/j.socnet.2017.12.003>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: netrankr
+# Type: Package
+# Title: Analyzing Partial Rankings in Networks
+# Version: 0.2.1
+# Authors@R: c( person("David", "Schoch", email = "david.schoch@manchester.ac.uk", role = c("aut", "cre")), person("Julian","Muller", email = "julian.mueller@gess.ethz.ch", role = "ctb"))
+# Description: Implements methods for centrality related analyses of networks.  While the package includes the possibility to build more than 20 indices,  its main focus lies on index-free assessment of centrality via partial  rankings obtained by neighborhood-inclusion or positional dominance. These  partial rankings can be analyzed with different methods, including  probabilistic methods like computing expected node ranks and relative  rank probabilities (how likely is it that a node is more central than another?). The methodology is described in depth in the vignettes and in Schoch (2018) <doi:10.1016/j.socnet.2017.12.003>.
+# URL: https://schochastics.github.io/netrankr
+# BugReports: https://github.com/schochastics/netrankr/issues
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 3.0.1)
+# Imports: igraph (>= 1.0.1), Rcpp (>= 0.12.8)
+# LinkingTo: Rcpp,RcppArmadillo
+# SystemRequirements: C++11
+# RoxygenNote: 6.0.1
+# Suggests: knitr, rmarkdown, magrittr, ggplot2, testthat, shiny (>= 0.13), miniUI (>= 0.1.1), rstudioapi (>= 0.5)
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2018-09-17 18:49:34 UTC; david
+# Author: David Schoch [aut, cre], Julian Muller [ctb]
+# Maintainer: David Schoch <david.schoch@manchester.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2018-09-18 08:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

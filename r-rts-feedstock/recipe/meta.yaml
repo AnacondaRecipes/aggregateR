@@ -1,0 +1,95 @@
+{% set version = '1.0-49' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rts
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rts_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rts/rts_{{ version }}.tar.gz
+  sha256: 62bf43e55cdc50784a1ce833e7e08ef6f44ae116f83b19261aea6c2d59a5df20
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: digest
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcurl
+    - r-raster
+    - r-sp >=1.2_0
+    - r-xts
+    - r-zoo
+
+  run:
+    - r-base
+    - r-rcurl
+    - r-raster
+    - r-sp >=1.2_0
+    - r-xts
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rts')"           # [not win]
+    - "\"%R%\" -e \"library('rts')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://r-gis.net
+  license: GPL-3
+  summary: This framework aims to provide classes and methods for manipulating and processing
+    of raster time series data (e.g. a time series of satellite images).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rts
+# Type: Package
+# Title: Raster Time Series Analysis
+# Version: 1.0-49
+# Date: 2019-02-01
+# Author: Babak Naimi
+# Depends: methods, sp (>= 1.2-0), R (>= 3.0.0), raster, xts, zoo, RCurl
+# Suggests: digest
+# Maintainer: Babak Naimi <naimi.b@gmail.com>
+# Description: This framework aims to provide classes and methods for manipulating and processing of raster time series data (e.g. a time series of satellite images).
+# License: GPL (>= 3)
+# URL: http://r-gis.net
+# NeedsCompilation: no
+# Packaged: 2019-02-03 22:12:31 UTC; babak
+# Repository: CRAN
+# Date/Publication: 2019-02-03 22:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

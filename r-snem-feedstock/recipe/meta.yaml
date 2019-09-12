@@ -1,0 +1,88 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-snem
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/snem_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/snem/snem_{{ version }}.tar.gz
+  sha256: e64c2d9c7f5b089d64c989bb3a50c2f9ec47e90192cc0367030305b91d8ac788
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: DAAG
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('snem')"           # [not win]
+    - "\"%R%\" -e \"library('snem')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=snem
+  license: GPL-2
+  summary: Efficient estimation of multivariate skew-normal distribution in closed form.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: snem
+# Type: Package
+# Title: EM Algorithm for Multivariate Skew-Normal Distribution with Overparametrization
+# Version: 0.1.0
+# Date: 2019-02-26
+# Author: Toshihiro Abe <abetosh@ss.nanzan-u.ac.jp>, Hironori Fujisawa <fujisawa@ism.ac.jp>, Takayuki Kawashima <t-kawa@ism.ac.jp>
+# Maintainer: Takayuki Kawashima <t-kawa@ism.ac.jp>
+# Imports: mvtnorm
+# Description: Efficient estimation of multivariate skew-normal distribution in closed form.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: DAAG
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2019-02-25 23:47:47 UTC; tkawashima
+# Repository: CRAN
+# Date/Publication: 2019-03-04 18:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

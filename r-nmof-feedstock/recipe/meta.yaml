@@ -1,0 +1,95 @@
+{% set version = '1.6-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nmof
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/NMOF_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/NMOF/NMOF_{{ version }}.tar.gz
+  sha256: 5484cd43c28aaf23d560c2dde8bcd8dd440a205d2214eb50e02fe0bb42ec2755
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, RUnit, datetimeutils, quadprog, readxl
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('NMOF')"           # [not win]
+    - "\"%R%\" -e \"library('NMOF')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://nmof.net, http://enricoschumann.net/NMOF
+  license: GPL-3
+  summary: Functions, examples and data from the book "Numerical Methods and Optimization in
+    Finance" by M. Gilli, D. Maringer and E. Schumann (2011), ISBN 978-0123756626. The
+    package provides implementations of several optimisation heuristics, such as Differential
+    Evolution, Genetic Algorithms and Threshold Accepting. There are also functions
+    for the valuation of financial instruments, such as bonds and options, and functions
+    that help with stochastic simulations.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: NMOF
+# Type: Package
+# Title: Numerical Methods and Optimization in Finance
+# Version: 1.6-0
+# Date: 2019-04-01
+# Maintainer: Enrico Schumann <es@enricoschumann.net>
+# Authors@R: person("Enrico", "Schumann", role  = c("aut", "cre"), email = "es@enricoschumann.net", comment = c(ORCID = "0000-0001-7601-6576"))
+# Depends: R (>= 2.14)
+# Imports: grDevices, graphics, parallel, stats, utils
+# Suggests: MASS, RUnit, datetimeutils, quadprog, readxl
+# Description: Functions, examples and data from the book "Numerical Methods and Optimization in Finance" by M. Gilli, D. Maringer and E. Schumann (2011), ISBN 978-0123756626. The package provides implementations of several optimisation heuristics, such as Differential Evolution, Genetic Algorithms and Threshold Accepting. There are also functions for the valuation of financial instruments, such as bonds and options, and functions that help with stochastic simulations.
+# License: GPL-3
+# URL: http://nmof.net, http://enricoschumann.net/NMOF
+# LazyLoad: yes
+# LazyData: yes
+# ByteCompile: no
+# Classification/JEL: C61, C63
+# NeedsCompilation: no
+# Packaged: 2019-04-01 13:53:27 UTC; es19
+# Author: Enrico Schumann [aut, cre] (<https://orcid.org/0000-0001-7601-6576>)
+# Repository: CRAN
+# Date/Publication: 2019-04-01 14:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

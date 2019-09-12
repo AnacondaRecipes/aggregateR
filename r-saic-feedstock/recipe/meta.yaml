@@ -1,0 +1,86 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-saic
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sAIC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sAIC/sAIC_{{ version }}.tar.gz
+  sha256: 45de928f683810408c5001661c142e8ba978b0173dd7c55f306ba2a41d1b06c6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, glmnet, glasso
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sAIC')"           # [not win]
+    - "\"%R%\" -e \"library('sAIC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://sites.google.com/site/shuichikawanoen/
+  license: GPL-2
+  summary: 'Computes the Akaike information criterion for the generalized linear models (logistic
+    regression, Poisson regression, and Gaussian graphical models) estimated by the
+    lasso. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sAIC
+# Type: Package
+# Title: Akaike Information Criterion for Sparse Estimation
+# Version: 1.0
+# Date: 2016-10-05
+# Author: Shuichi Kawano, Yoshiyuki Ninomiya
+# Maintainer: Shuichi Kawano <skawano@uec.ac.jp>
+# Suggests: MASS, glmnet, glasso
+# Description: Computes the Akaike information criterion for the generalized linear models (logistic regression, Poisson regression, and Gaussian graphical models) estimated by the lasso.
+# License: GPL (>= 2)
+# URL: https://sites.google.com/site/shuichikawanoen/
+# Repository: CRAN
+# NeedsCompilation: no
+# Packaged: 2016-10-05 01:16:05 UTC; kawano
+# Date/Publication: 2016-10-05 09:29:59
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

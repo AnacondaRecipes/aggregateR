@@ -1,0 +1,118 @@
+{% set version = '0.5-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rgeos
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rgeos_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rgeos/rgeos_{{ version }}.tar.gz
+  sha256: 8408973e7fe5648e39aa53f3d4bfe800638021a146a4e06f86496c0132e05488
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: maptools (>= 0.8-5), testthat, XML, maps, rgdal
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-sp >=1.1_0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-sp >=1.1_0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rgeos')"           # [not win]
+    - "\"%R%\" -e \"library('rgeos')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://r-forge.r-project.org/projects/rgeos/ http://trac.osgeo.org/geos/ http://rgeos.r-forge.r-project.org/index.html
+  license: GPL-2
+  summary: 'Interface to Geometry Engine - Open Source (''GEOS'') using the C ''API'' for topology
+    operations on geometries. The ''GEOS'' library is external to the package, and,
+    when installing the package from source, must be correctly installed first. Windows
+    and Mac Intel OS X binaries are provided on ''CRAN''. (''rgeos'' >= 0.5-1): Up to
+    and including ''GEOS'' 3.7.1, topological operations succeeded with some invalid
+    geometries for which the same operations fail from and including ''GEOS'' 3.7.2.
+    The ''checkValidity='' argument defaults and structure have been changed, from default
+    FALSE to integer default ''0L'' for ''GEOS'' < 3.7.2 (no check), ''1L'' ''GEOS''
+    >= 3.7.2 (check and warn). A value of ''2L'' is also provided that may be used,
+    assigned globally using ''set_RGEOS_CheckValidity(2L)'', or locally using the ''checkValidity=2L''
+    argument, to attempt zero-width buffer repair if invalid geometries are found. The
+    previous default (FALSE, now ''0L'') is fastest and used for ''GEOS'' < 3.7.2, but
+    will not warn users of possible problems before the failure of topological operations
+    that previously succeeded.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rgeos
+# Title: Interface to Geometry Engine - Open Source ('GEOS')
+# Version: 0.5-1
+# Date: 2019-08-03
+# Depends: R (>= 3.3.0), methods, sp (>= 1.1-0)
+# Imports: utils, stats, graphics
+# LinkingTo: sp
+# Suggests: maptools (>= 0.8-5), testthat, XML, maps, rgdal
+# NeedsCompilation: yes
+# LazyLoad: yes
+# Description: Interface to Geometry Engine - Open Source ('GEOS') using the C 'API' for topology operations on geometries. The 'GEOS' library is external to the package, and, when installing the package from source, must be correctly installed first. Windows and Mac Intel OS X binaries are provided on 'CRAN'. ('rgeos' >= 0.5-1): Up to and including 'GEOS' 3.7.1, topological operations succeeded with some invalid geometries for which the same operations fail from and including 'GEOS' 3.7.2. The 'checkValidity=' argument defaults and structure have been changed, from default FALSE to integer default '0L' for 'GEOS' < 3.7.2 (no check), '1L' 'GEOS' >= 3.7.2 (check and warn). A value of '2L' is also provided that may be used, assigned globally using 'set_RGEOS_CheckValidity(2L)', or locally using the 'checkValidity=2L' argument, to attempt zero-width buffer repair if invalid geometries are found. The previous default (FALSE, now '0L') is fastest and used for 'GEOS' < 3.7.2, but will not warn users of possible problems before the failure of topological operations that previously succeeded.
+# Authors@R: c( person("Roger", "Bivand", role = c("cre", "aut"), email = "Roger.Bivand@nhh.no", comment=c(ORCID="0000-0003-2392-6140")), person("Colin", "Rundel", role = "aut"), person("Edzer", "Pebesma", role = "ctb"), person("Rainer", "Stuetz", role = "ctb"), person("Karl Ove", "Hufthammer", role = "ctb"), person("Patrick", "Giraudoux", role = "ctb"), person("Martin", "Davis", role = c("cph", "ctb")), person("Sandro", "Santilli", role = c("cph", "ctb")))
+# License: GPL (>= 2)
+# URL: https://r-forge.r-project.org/projects/rgeos/ http://trac.osgeo.org/geos/ http://rgeos.r-forge.r-project.org/index.html
+# SystemRequirements: GEOS (>= 3.2.0); for building from source: GEOS from http://trac.osgeo.org/geos/; GEOS OSX frameworks built by William Kyngesburye at http://www.kyngchaos.com/ may be used for source installs on OSX.
+# RoxygenNote: 6.1.1
+# Packaged: 2019-08-05 08:42:50 UTC; rsb
+# Author: Roger Bivand [cre, aut] (<https://orcid.org/0000-0003-2392-6140>), Colin Rundel [aut], Edzer Pebesma [ctb], Rainer Stuetz [ctb], Karl Ove Hufthammer [ctb], Patrick Giraudoux [ctb], Martin Davis [cph, ctb], Sandro Santilli [cph, ctb]
+# Maintainer: Roger Bivand <Roger.Bivand@nhh.no>
+# Repository: CRAN
+# Date/Publication: 2019-08-05 10:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

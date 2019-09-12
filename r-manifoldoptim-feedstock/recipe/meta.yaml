@@ -1,0 +1,101 @@
+{% set version = '0.1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-manifoldoptim
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ManifoldOptim_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ManifoldOptim/ManifoldOptim_{{ version }}.tar.gz
+  sha256: 0af278d86466963e138b31b91b1000910ca4a9dd1ce2d490f6b95b6a03e0b030
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: RcppArmadillo
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.0
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.0
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ManifoldOptim')"           # [not win]
+    - "\"%R%\" -e \"library('ManifoldOptim')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ManifoldOptim
+  license: GPL-2
+  summary: An R interface to version 0.3 of the 'ROPTLIB' optimization library (see <http://www.math.fsu.edu/~whuang2>
+    for more information). Optimize real- valued functions over manifolds such as Stiefel,
+    Grassmann, and Symmetric Positive Definite matrices.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ManifoldOptim
+# Type: Package
+# Title: An R Interface to the 'ROPTLIB' Library for Riemannian Manifold Optimization
+# Version: 0.1.4
+# Date: 2017-11-19
+# Authors@R: c(person("Kofi P. Adragni", role = c("aut","cph"), email = "kofi@umbc.edu"), person("Sean R. Martin", role = c("aut","cre","cph"), email = "smarti1@umbc.edu"), person("Andrew M. Raim", role = c("aut","cph")), person("Wen Huang", role = c("aut","cph")))
+# Description: An R interface to version 0.3 of the 'ROPTLIB' optimization library (see <http://www.math.fsu.edu/~whuang2> for more information). Optimize real- valued functions over manifolds such as Stiefel, Grassmann, and Symmetric Positive Definite matrices.
+# License: GPL (>= 2)
+# Depends: Rcpp (>= 0.12.0)
+# Suggests: RcppArmadillo
+# LinkingTo: Rcpp, RcppArmadillo
+# RcppModules: ManifoldOptim_module
+# RoxygenNote: 5.0.1
+# NeedsCompilation: yes
+# Packaged: 2017-11-19 05:28:48 UTC; root
+# Author: Kofi P. Adragni [aut, cph], Sean R. Martin [aut, cre, cph], Andrew M. Raim [aut, cph], Wen Huang [aut, cph]
+# Maintainer: Sean R. Martin <smarti1@umbc.edu>
+# Repository: CRAN
+# Date/Publication: 2017-11-22 14:27:17 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

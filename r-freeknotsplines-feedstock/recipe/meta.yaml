@@ -1,0 +1,95 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-freeknotsplines
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/freeknotsplines_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/freeknotsplines/freeknotsplines_{{ version }}.tar.gz
+  sha256: 4a802eed21468443015e81f6c9c80b837085e3cba03d17762df2e6676d1e85fa
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('freeknotsplines')"           # [not win]
+    - "\"%R%\" -e \"library('freeknotsplines')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=freeknotsplines
+  license: GPL-2
+  summary: 'Algorithms for fitting free-knot splines for data with one independent variable and
+    one dependent variable.  Four free-knot spline algorithms are provided for the case
+    where the number of knots is known in advance.  A knot-search algorithm is provided
+    for the case where the number of knots is not known in advance.  In addition, methods
+    are available to compute the fitted values, the residuals, and the coefficients
+    of the splines, and to plot the results, along with a method to summarize the results. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: freeknotsplines
+# Version: 1.0.1
+# Date: 2018-05-17
+# Title: Algorithms for Implementing Free-Knot Splines
+# Author: Steven Spiriti <puzzlesteven@gmail.com>, Philip Smith <philip.smith@ttu.edu>, Pierre Lecuyer <lecuyer@iro.UMontreal.ca>,
+# Maintainer: Steven Spiriti <puzzlesteven@gmail.com>
+# Depends: R (>= 2.14.2)
+# Imports: splines, methods
+# Description: Algorithms for fitting free-knot splines for data with one independent variable and one dependent variable.  Four free-knot spline algorithms are provided for the case where the number of knots is known in advance.  A knot-search algorithm is provided for the case where the number of knots is not known in advance.  In addition, methods are available to compute the fitted values, the residuals, and the coefficients of the splines, and to plot the results, along with a method to summarize the results.
+# License: GPL (>= 2)
+# LazyData: tsrue
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2018-06-10 05:28:16 UTC; Steven
+# Repository: CRAN
+# Date/Publication: 2018-06-10 06:04:37 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

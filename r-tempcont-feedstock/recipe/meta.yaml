@@ -1,0 +1,91 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tempcont
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/TempCont_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/TempCont/TempCont_{{ version }}.tar.gz
+  sha256: f36057e6236808a152394299471ce4c50e061104d433bf4b759f1c7ef36780de
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-nlme
+
+  run:
+    - r-base
+    - r-nlme
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('TempCont')"           # [not win]
+    - "\"%R%\" -e \"library('TempCont')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/burriach/tempcont
+  license: GPL-2
+  summary: "Method to estimate the effect of the trend in predictor variables on the observed
+    trend of the response variable using mixed models with temporal autocorrelation.
+    See Fern\xE1ndez-Mart\xEDnez et al. (2017 and 2019) <doi:10.1038/s41598-017-08755-8>
+    <doi:10.1038/s41558-018-0367-7>."
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: TempCont
+# Type: Package
+# Title: Temporal Contributions on Trends using Mixed Models
+# Version: 0.1.0
+# Author: Marcos Fernandez-Martinez, Joan Maspons
+# Maintainer: Marcos Fernandez-Martinez <marcos.fernandez-martinez@uantwerpen.be>
+# Description: Method to estimate the effect of the trend in predictor variables on the observed trend of the response variable using mixed models with temporal autocorrelation. See Fernandez-Martinez et al. (2017 and 2019) <doi:10.1038/s41598-017-08755-8> <doi:10.1038/s41558-018-0367-7>.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# Depends: R (>= 2.10)
+# Imports: nlme
+# LazyData: false
+# URL: https://github.com/burriach/tempcont
+# BugReports: https://github.com/burriach/tempcont/issues
+# NeedsCompilation: no
+# Packaged: 2019-03-18 09:35:34 UTC; m.fernandez
+# Repository: CRAN
+# Date/Publication: 2019-03-19 15:13:21 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sbsdiff
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SBSDiff_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SBSDiff/SBSDiff_{{ version }}.tar.gz
+  sha256: 221f892343aaa22c4e3d580ff2c4b1722557c703f2e04bfe37bcc3da0c318157
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SBSDiff')"           # [not win]
+    - "\"%R%\" -e \"library('SBSDiff')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SBSDiff
+  license: MIT
+  summary: 'Calculates a Satorra-Bentler scaled chi-squared difference test between nested models
+    that were estimated using maximum likelihood (ML) with robust standard errors, which
+    cannot be calculated the traditional way. For details see Satorra & Bentler (2001)
+    <doi:10.1007/bf02296192> and Satorra & Bentler (2010) <doi:10.1007/s11336-009-9135-y>.
+    This package may be particularly helpful when used in conjunction with ''Mplus''
+    software, specifically when implementing the complex survey option. In such cases,
+    the model estimator in ''Mplus'' defaults to ML with robust standard errors.    '
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SBSDiff
+# Type: Package
+# Title: Satorra-Bentler Scaled Chi-Squared Difference Test
+# Version: 0.1.0
+# Author: Frank D. Mann <frankdmann@gmail.com>
+# Maintainer: Frank D. Mann <frankdmann@gmail.com>
+# Description: Calculates a Satorra-Bentler scaled chi-squared difference test between nested models that were estimated using maximum likelihood (ML) with robust standard errors, which cannot be calculated the traditional way. For details see Satorra & Bentler (2001) <doi:10.1007/bf02296192> and Satorra & Bentler (2010) <doi:10.1007/s11336-009-9135-y>. This package may be particularly helpful when used in conjunction with 'Mplus' software, specifically when implementing the complex survey option. In such cases, the model estimator in 'Mplus' defaults to ML with robust standard errors.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# Imports: stats
+# NeedsCompilation: no
+# Packaged: 2018-05-02 20:53:22 UTC; frankdmann
+# Repository: CRAN
+# Date/Publication: 2018-05-03 10:58:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

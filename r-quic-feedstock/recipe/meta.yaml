@@ -1,0 +1,96 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-quic
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/QUIC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/QUIC/QUIC_{{ version }}.tar.gz
+  sha256: 6cec0bb16016e3fb47f209fdb0760bcdec4517f32500ad2b060646b57aba2b08
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('QUIC')"           # [not win]
+    - "\"%R%\" -e \"library('QUIC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.r-project.org, http://www.cs.utexas.edu/users/sustik/QUIC
+  license: GPL-3
+  summary: 'Use Newton''s method and coordinate descent to solve the regularized inverse covariance
+    matrix estimation problem. Please refer to: Sparse Inverse Covariance Matrix Estimation
+    Using Quadratic Approximation, Cho-Jui Hsieh, Matyas A. Sustik, Inderjit S. Dhillon,
+    Pradeep Ravikumar, Advances in Neural Information Processing Systems 24, 2011, p.
+    2330--2338.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: QUIC
+# Type: Package
+# Title: Regularized sparse inverse covariance matrix estimation
+# Version: 1.1
+# Authors@R: c(person(given = "Cho-Jui", family = "Hsieh", role = "aut"), person(given = "Matyas A.", family = "Sustik", role = c("aut", "cre"), email = "sustik@cs.utexas.edu"), person(given = "Inderjit S.", family = "Dhillon", role = "aut"), person(given = "Pradeep", family = "Ravikumar", role = "aut"))
+# Description: Use Newton's method and coordinate descent to solve the regularized inverse covariance matrix estimation problem. Please refer to: Sparse Inverse Covariance Matrix Estimation Using Quadratic Approximation, Cho-Jui Hsieh, Matyas A. Sustik, Inderjit S. Dhillon, Pradeep Ravikumar, Advances in Neural Information Processing Systems 24, 2011, p. 2330--2338.
+# Depends: R (>= 2.10)
+# License: GPL-3
+# URL: http://www.r-project.org, http://www.cs.utexas.edu/users/sustik/QUIC
+# BugReports: sustik@cs.utexas.edu
+# Packaged: 2012-05-17 16:48:53 UTC; sustik
+# Author: Cho-Jui Hsieh [aut], Matyas A. Sustik [aut, cre], Inderjit S. Dhillon [aut], Pradeep Ravikumar [aut]
+# Maintainer: Matyas A. Sustik <sustik@cs.utexas.edu>
+# Repository: CRAN
+# Date/Publication: 2012-05-17 20:20:06
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

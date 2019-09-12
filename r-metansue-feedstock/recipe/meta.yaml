@@ -1,0 +1,90 @@
+{% set version = '2.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-metansue
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/metansue_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/metansue/metansue_{{ version }}.tar.gz
+  sha256: b70f5b417a543307c4dde3ef2526bf7cf8ad535433b2c4637f8e0a8348127ea3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('metansue')"           # [not win]
+    - "\"%R%\" -e \"library('metansue')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=metansue
+  license: GPL-3
+  summary: Novel method to unbiasedly include studies with Non-statistically Significant Unreported
+    Effects (NSUEs) in a meta-analysis <doi:10.1001/jamapsychiatry.2015.2196> and <doi:10.1177/0962280218811349>.
+    Briefly, the method first calculates the interval where the unreported effects (e.g.
+    t-values) should be according to the threshold of statistical significance used
+    in each study. Afterwards, maximum likelihood techniques are used to impute the
+    expected effect size of each study with NSUEs, accounting for between-study heterogeneity
+    and potential covariates. Multiple imputations of the NSUEs are then randomly created
+    based on the expected value, variance and statistical significance bounds. Finally,
+    a restricted-maximum likelihood random-effects meta-analysis is separately conducted
+    for each set of imputations, and estimations from these meta-analyses are pooled.
+    Please read the reference in 'metansue' for details of the procedure.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: metansue
+# Type: Package
+# Title: Meta-Analysis of Studies with Non-Statistically Significant Unreported Effects
+# Version: 2.3
+# Date: 2018-12-10
+# Author: Joaquim Radua
+# Maintainer: Joaquim Radua <radua@clinic.cat>
+# Description: Novel method to unbiasedly include studies with Non-statistically Significant Unreported Effects (NSUEs) in a meta-analysis <doi:10.1001/jamapsychiatry.2015.2196> and <doi:10.1177/0962280218811349>. Briefly, the method first calculates the interval where the unreported effects (e.g. t-values) should be according to the threshold of statistical significance used in each study. Afterwards, maximum likelihood techniques are used to impute the expected effect size of each study with NSUEs, accounting for between-study heterogeneity and potential covariates. Multiple imputations of the NSUEs are then randomly created based on the expected value, variance and statistical significance bounds. Finally, a restricted-maximum likelihood random-effects meta-analysis is separately conducted for each set of imputations, and estimations from these meta-analyses are pooled. Please read the reference in 'metansue' for details of the procedure.
+# License: GPL-3
+# NeedsCompilation: no
+# Packaged: 2018-12-10 13:06:48 UTC; jradua
+# Repository: CRAN
+# Date/Publication: 2018-12-10 22:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,82 @@
+{% set version = '1.0.0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gvlma
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gvlma_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gvlma/gvlma_{{ version }}.tar.gz
+  sha256: e076a5ddd8374f465687cfaf9decd1270543cc2073a63b58485af2750069b099
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gvlma')"           # [not win]
+    - "\"%R%\" -e \"library('gvlma')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=gvlma
+  license: GPL-3
+  summary: 'Methods from the paper: Pena, EA and Slate, EH, "Global Validation of Linear Model
+    Assumptions," J. American Statistical Association, 101(473):341-354, 2006.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gvlma
+# Type: Package
+# Title: Global Validation of Linear Models Assumptions
+# Version: 1.0.0.3
+# Author: Edsel A. Pena <pena@stat.sc.edu> and Elizabeth H. Slate <eslate@fsu.edu>
+# Maintainer: Elizabeth Slate <slate@stat.fsu.edu>
+# Description: Methods from the paper: Pena, EA and Slate, EH, "Global Validation of Linear Model Assumptions," J. American Statistical Association, 101(473):341-354, 2006.
+# Depends: R (>= 2.1.1)
+# License: GPL
+# NeedsCompilation: no
+# Repository: CRAN
+# Packaged: 2019-01-05 14:56:18 UTC; Elizabeth
+# Date/Publication: 2019-01-05 19:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

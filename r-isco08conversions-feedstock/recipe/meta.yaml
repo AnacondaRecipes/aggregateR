@@ -1,0 +1,86 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-isco08conversions
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ISCO08ConveRsions_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ISCO08ConveRsions/ISCO08ConveRsions_{{ version }}.tar.gz
+  sha256: 8f8ae04f0ea3188e241a63e00a75c6a249316542f89d95840f608edcf3000f4b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ISCO08ConveRsions')"           # [not win]
+    - "\"%R%\" -e \"library('ISCO08ConveRsions')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ISCO08ConveRsions
+  license: GPL-2
+  summary: 'Implementation of functions to assign corresponding common job prestige scores (SIOPS,
+    ISEI), the official job or group title and the ISCO-88 code to given ISCO-08 codes.
+    ISCO-08 is the latest version of the International Standard Classification of Occupations
+    which is used to organise information on labour and jobs. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ISCO08ConveRsions
+# Type: Package
+# Title: Converts ISCO-08 to Job Prestige Scores, ISCO-88 and Job Name
+# Version: 0.1.0
+# Date: 2019-02-21
+# Author: Nicole Schwitter
+# Maintainer: Nicole Schwitter <Nicole.Schwitter@warwick.ac.uk>
+# Description: Implementation of functions to assign corresponding common job prestige scores (SIOPS, ISEI), the official job or group title and the ISCO-88 code to given ISCO-08 codes. ISCO-08 is the latest version of the International Standard Classification of Occupations which is used to organise information on labour and jobs.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2019-02-21 12:21:55 UTC; nschwitter
+# Repository: CRAN
+# Date/Publication: 2019-02-28 17:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

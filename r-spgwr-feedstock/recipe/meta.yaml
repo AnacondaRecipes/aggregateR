@@ -1,0 +1,96 @@
+{% set version = '0.6-32' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spgwr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/spgwr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/spgwr/spgwr_{{ version }}.tar.gz
+  sha256: 5b741dece2422931fd7617831ba9bb2a953e6690bd1baf54d833b56abc07bb75
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: spdep, parallel, maptools (>= 0.7-32), rgdal
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-sp >=0.8_3
+    - r-spdata >=0.2.6.2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-sp >=0.8_3
+    - r-spdata >=0.2.6.2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('spgwr')"           # [not win]
+    - "\"%R%\" -e \"library('spgwr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=spgwr
+  license: GPL-2
+  summary: 'Functions for computing geographically weighted regressions are provided, based on
+    work by Chris Brunsdon, Martin Charlton and Stewart Fotheringham. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: spgwr
+# Version: 0.6-32
+# Date: 2017-10-28
+# Title: Geographically Weighted Regression
+# Authors@R: c( person("Roger", "Bivand", role = c("cre", "aut"), email = "Roger.Bivand@nhh.no", comment=c(ORCID="0000-0003-2392-6140")), person("Danlin", "Yu", role = "aut"), person("Tomoki", "Nakaya", role = "ctb"), person("Miquel-Angel", "Garcia-Lopez", role = "ctb"))
+# Depends: R (>= 2.14), sp (>= 0.8-3), spData (>= 0.2.6.2)
+# Imports: stats, methods
+# Suggests: spdep, parallel, maptools (>= 0.7-32), rgdal
+# Description: Functions for computing geographically weighted regressions are provided, based on work by Chris Brunsdon, Martin Charlton and Stewart Fotheringham.
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2017-10-29 19:15:54 UTC; rsb
+# Author: Roger Bivand [cre, aut] (0000-0003-2392-6140), Danlin Yu [aut], Tomoki Nakaya [ctb], Miquel-Angel Garcia-Lopez [ctb]
+# Maintainer: Roger Bivand <Roger.Bivand@nhh.no>
+# Repository: CRAN
+# Date/Publication: 2017-10-29 20:03:59 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

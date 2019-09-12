@@ -1,0 +1,94 @@
+{% set version = '1.0-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-survc1
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/survC1_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/survC1/survC1_{{ version }}.tar.gz
+  sha256: fbd002cadb221e78383715e0c31233f79e1b9f754aac20f13b4b953930942dae
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('survC1')"           # [not win]
+    - "\"%R%\" -e \"library('survC1')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=survC1
+  license: GPL-2
+  summary: Performs inference for C of risk prediction models with censored survival data, using
+    the method proposed by Uno et al. (2011). Inference for the difference in C between
+    two competing prediction models is also implemented.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: survC1
+# Type: Package
+# Title: C-statistics for risk prediction models with censored survival data
+# Version: 1.0-2
+# Date: 2013-02-14
+# Author: Hajime Uno
+# Maintainer: Hajime Uno <huno@jimmy.harvard.edu>
+# Depends: survival
+# Description: Performs inference for C of risk prediction models with censored survival data, using the method proposed by Uno et al. (2011). Inference for the difference in C between two competing prediction models is also implemented.
+# License: GPL-2
+# LazyLoad: yes
+# Packaged: 2013-02-14 10:53:30 UTC; Hajime
+# Repository: CRAN
+# Date/Publication: 2013-02-14 12:31:24
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

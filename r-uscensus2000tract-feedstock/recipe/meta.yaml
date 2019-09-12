@@ -1,0 +1,91 @@
+{% set version = '0.03' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-uscensus2000tract
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/UScensus2000tract_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/UScensus2000tract/UScensus2000tract_{{ version }}.tar.gz
+  sha256: c10a8a9ce181a4271405772b4142f3bae9af06f5bd7478fb91f07d34cbe1f786
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-foreign
+    - r-maptools
+    - r-sp
+
+  run:
+    - r-base
+    - r-foreign
+    - r-maptools
+    - r-sp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('UScensus2000tract')"           # [not win]
+    - "\"%R%\" -e \"library('UScensus2000tract')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://disasternets.calit2.uci.edu/census2000/
+  license: GPL-2
+  summary: US 2000 Census Tract shapefiles and additional demographic data from the SF1 100 percent
+    files. This data set contains polygon files in lat/lon coordinates and the corresponding
+    demographic data for a number of different variables.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: UScensus2000tract
+# Type: Package
+# Title: US Census 2000 Tract Level Shapefiles and Additional Demographic Data
+# Version: 0.03
+# Date: 2009-11-11
+# Author: Zack W. Almquist <almquist@uci.edu>
+# Maintainer: Zack W. Almquist <almquist@uci.edu>
+# Description: US 2000 Census Tract shapefiles and additional demographic data from the SF1 100 percent files. This data set contains polygon files in lat/lon coordinates and the corresponding demographic data for a number of different variables.
+# License: GPL (>= 2)
+# Depends: R (>= 2.10), maptools, sp, foreign, methods, grDevices, base, stats, utils
+# LazyLoad: yes
+# URL: http://disasternets.calit2.uci.edu/census2000/
+# Packaged: 2012-10-29 08:58:02 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2012-10-29 08:58:06
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

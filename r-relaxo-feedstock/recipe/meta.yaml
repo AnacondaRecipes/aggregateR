@@ -1,0 +1,90 @@
+{% set version = '0.1-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-relaxo
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/relaxo_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/relaxo/relaxo_{{ version }}.tar.gz
+  sha256: 1d35bba8886a7e369dc90f470fe5bb92f50d768bbc66ceb1d1e10839f0c1f5e7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lars
+
+  run:
+    - r-base
+    - r-lars
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('relaxo')"           # [not win]
+    - "\"%R%\" -e \"library('relaxo')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.stats.ox.ac.uk/~meinshau/
+  license: GPL-3
+  summary: Relaxed Lasso is a generalisation of the Lasso shrinkage technique for linear regression.
+    Both variable selection and parameter estimation is achieved by regular Lasso, yet
+    both steps do not necessarily use the same penalty parameter. The results include
+    all standard Lasso solutions but allow often for sparser models while having similar
+    or even slightly better predictive performance if many predictor variables are present.
+    The package depends on the LARS package.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: relaxo
+# Type: Package
+# Title: Relaxed Lasso
+# Version: 0.1-2
+# Date: 2012-06-01
+# Author: Nicolai Meinshausen
+# Maintainer: Nicolai Meinshausen <meinshausen@stats.ox.ac.uk>
+# Depends: lars
+# Imports: graphics, utils, stats
+# Description: Relaxed Lasso is a generalisation of the Lasso shrinkage technique for linear regression. Both variable selection and parameter estimation is achieved by regular Lasso, yet both steps do not necessarily use the same penalty parameter. The results include all standard Lasso solutions but allow often for sparser models while having similar or even slightly better predictive performance if many predictor variables are present. The package depends on the LARS package.
+# License: GPL
+# URL: http://www.stats.ox.ac.uk/~meinshau/
+# Packaged: 2012-06-01 15:48:01 UTC; meinsn
+# Repository: CRAN
+# Date/Publication: 2012-06-01 16:06:47
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

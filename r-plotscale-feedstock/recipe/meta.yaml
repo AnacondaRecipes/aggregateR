@@ -1,0 +1,91 @@
+{% set version = '0.1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-plotscale
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/plotscale_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/plotscale/plotscale_{{ version }}.tar.gz
+  sha256: b298d35436e128c1c2f25d2ab93802be72cbb92eef358f2bb6e0401a76064f40
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, lattice, ggplot2
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('plotscale')"           # [not win]
+    - "\"%R%\" -e \"library('plotscale')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=plotscale
+  license: GPL-3
+  summary: 'Figures rendered on graphics devices are usually  rescaled to fit pre-determined
+    device dimensions. ''plotscale''  implements the reverse: desired plot dimensions
+    are specified  and device dimensions are calculated to accommodate marginal material,
+    giving consistent proportions for plot elements. Default methods support grid graphics
+    such as lattice and ggplot. See "example(''devsize'')" and "vignette(''plotscale'')".'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: plotscale
+# Type: Package
+# Title: Scale Graphics Devices Using Plot Dimensions
+# Version: 0.1.6
+# Author: Tim Bergsma
+# Maintainer: Tim Bergsma <bergsmat@gmail.com>
+# Description: Figures rendered on graphics devices are usually  rescaled to fit pre-determined device dimensions. 'plotscale'  implements the reverse: desired plot dimensions are specified  and device dimensions are calculated to accommodate marginal material, giving consistent proportions for plot elements. Default methods support grid graphics such as lattice and ggplot. See "example('devsize')" and "vignette('plotscale')".
+# Imports: grid, graphics
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: knitr, rmarkdown, lattice, ggplot2
+# VignetteBuilder: knitr
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-08-27 14:56:27 UTC; tbergsma
+# Repository: CRAN
+# Date/Publication: 2018-08-31 18:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

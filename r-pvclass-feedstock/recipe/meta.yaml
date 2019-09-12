@@ -1,0 +1,89 @@
+{% set version = '1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pvclass
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pvclass_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pvclass/pvclass_{{ version }}.tar.gz
+  sha256: 2370db1afba195f8a7e311b8d1f0ff0f68564ffc10cc687bc0cbf7f17139ddbc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+
+  run:
+    - r-base
+    - r-matrix
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pvclass')"           # [not win]
+    - "\"%R%\" -e \"library('pvclass')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=pvclass
+  license: GPL-2
+  summary: Computes nonparametric p-values for the potential class memberships of new observations
+    as well as cross-validated p-values for the training data. The p-values are based
+    on permutation tests applied to an estimated Bayesian likelihood ratio, using a
+    plug-in statistic for the Gaussian model, 'k nearest neighbors', 'weighted nearest
+    neighbors' or 'penalized logistic regression'. Additionally, it provides graphical
+    displays and quantitative analyses of the p-values.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pvclass
+# Type: Package
+# Title: P-Values for Classification
+# Version: 1.4
+# Date: 2017-06-05
+# Author: Niki Zumbrunnen <niki.zumbrunnen@gmail.com>,  Lutz Duembgen <lutz.duembgen@stat.unibe.ch>.
+# Maintainer: Niki Zumbrunnen <niki.zumbrunnen@gmail.com>
+# Imports: Matrix
+# Description: Computes nonparametric p-values for the potential class memberships of new observations as well as cross-validated p-values for the training data. The p-values are based on permutation tests applied to an estimated Bayesian likelihood ratio, using a plug-in statistic for the Gaussian model, 'k nearest neighbors', 'weighted nearest neighbors' or 'penalized logistic regression'. Additionally, it provides graphical displays and quantitative analyses of the p-values.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2017-06-05 08:06:55 UTC; niki
+# Repository: CRAN
+# Date/Publication: 2017-06-05 15:13:51 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

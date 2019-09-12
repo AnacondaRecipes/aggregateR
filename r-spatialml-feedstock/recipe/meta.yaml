@@ -1,0 +1,88 @@
+{% set version = '0.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spatialml
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SpatialML_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SpatialML/SpatialML_{{ version }}.tar.gz
+  sha256: 099525036df26e6bcd025b679b6b9fdfb13de1ecaaf228428b52863627b8712a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-randomforest >=4.6_14
+
+  run:
+    - r-base
+    - r-randomforest >=4.6_14
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SpatialML')"           # [not win]
+    - "\"%R%\" -e \"library('SpatialML')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://lctools.science/
+  license: GPL-2
+  summary: Implements a spatial extension of the random forest algorithm  (Georganos et al. (2019)
+    <doi:10.1080/10106049.2019.1595177>).  Future updates include more local machine
+    learning methods  as well as a geographically weighted random forest.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SpatialML
+# Version: 0.1.3
+# Date: 2019-05-09
+# Type: Package
+# Title: Spatial Machine Learning
+# Author: Stamatis Kalogirou [aut, cre], Stefanos Georganos [aut, ctb]
+# Maintainer: Stamatis Kalogirou <stamatis@lctools.science>
+# Depends: R (>= 3.5.0), randomForest (>= 4.6-14)
+# Description: Implements a spatial extension of the random forest algorithm  (Georganos et al. (2019) <doi:10.1080/10106049.2019.1595177>).  Future updates include more local machine learning methods  as well as a geographically weighted random forest.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# URL: http://lctools.science/
+# NeedsCompilation: no
+# Packaged: 2019-05-09 07:34:18 UTC; Stamatis
+# Repository: CRAN
+# Date/Publication: 2019-05-09 15:10:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

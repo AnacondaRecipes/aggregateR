@@ -1,0 +1,86 @@
+{% set version = '1.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-md
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/md_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/md/md_{{ version }}.tar.gz
+  sha256: 86c46f15f430f7fdc4b669bf9b700d84d69affc5613954a4993b4e82ee70e88f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('md')"           # [not win]
+    - "\"%R%\" -e \"library('md')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=md
+  license: GPL-2 | GPL-3
+  summary: Selects bandwidth for the kernel density estimator with minimum distance method as
+    proposed by Devroye and Lugosi (1996). The minimum distance method directly selects
+    the optimal kernel density estimator from countably infinite kernel density estimators
+    and indirectly selects the optimal bandwidth. This package selects the optimal bandwidth
+    from finite kernel density estimators.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: md
+# Type: Package
+# Title: Selecting Bandwidth for Kernel Density Estimator with Minimum Distance Method
+# Version: 1.0.4
+# Date: 2016-02-21
+# Author: Genzo Kaga
+# Maintainer: Genzo Kaga <genzo.k-1321@ruri.waseda.jp>
+# Description: Selects bandwidth for the kernel density estimator with minimum distance method as proposed by Devroye and Lugosi (1996). The minimum distance method directly selects the optimal kernel density estimator from countably infinite kernel density estimators and indirectly selects the optimal bandwidth. This package selects the optimal bandwidth from finite kernel density estimators.
+# License: GPL-2 | GPL-3
+# LazyData: TRUE
+# Packaged: 2016-02-21 15:40:32 UTC; Genzo
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2016-02-21 17:02:45
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

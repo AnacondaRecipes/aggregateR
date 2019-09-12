@@ -1,0 +1,92 @@
+{% set version = '0.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-xlsimple
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/xlsimple_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/xlsimple/xlsimple_{{ version }}.tar.gz
+  sha256: b8e58c27c84cf86ad6b264f66a22bc0cbac434646b804f60c55a3c1dd6150bf4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: XLConnect, knitr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('xlsimple')"           # [not win]
+    - "\"%R%\" -e \"library('xlsimple')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=xlsimple
+  license: GPL-3
+  summary: Provides a simple wrapper for some 'XLConnect' functions. 'XLConnect' is a package
+    that allows for reading, writing, and manipulating Microsoft Excel files. This package,
+    'xlsimple', adds some documentation and pre-defined formatting to the outputted
+    Excel file. Individual sheets can include a description on the first row to remind
+    user what is in the data set. Auto filters and freeze rows are turned on. A brief
+    readme file is created that provides a summary listing of the created sheets and,
+    where provided, the description.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: xlsimple
+# Type: Package
+# Title: 'XLConnect' Wrapper
+# Description: Provides a simple wrapper for some 'XLConnect' functions. 'XLConnect' is a package that allows for reading, writing, and manipulating Microsoft Excel files. This package, 'xlsimple', adds some documentation and pre-defined formatting to the outputted Excel file. Individual sheets can include a description on the first row to remind user what is in the data set. Auto filters and freeze rows are turned on. A brief readme file is created that provides a summary listing of the created sheets and, where provided, the description.
+# Author: Jon Harcum, Erik Leppo
+# Maintainer: Jon Harcum <jon.harcum@tetratech.com>
+# Version: 0.0.1
+# Date: 2017-03-15
+# Depends: R (>= 3.2.0),
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: TRUE
+# RoxygenNote: 6.0.1
+# Suggests: XLConnect, knitr
+# NeedsCompilation: no
+# Packaged: 2017-03-22 12:25:11 UTC; jon.harcum
+# Repository: CRAN
+# Date/Publication: 2017-03-22 14:20:58 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

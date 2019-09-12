@@ -1,0 +1,88 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-solverationalmatrixequation
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SolveRationalMatrixEquation_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SolveRationalMatrixEquation/SolveRationalMatrixEquation_{{ version }}.tar.gz
+  sha256: 7bf07b22c485857db282959a71d243e426f5049196e8fd14ad661e2296260bd4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SolveRationalMatrixEquation')"           # [not win]
+    - "\"%R%\" -e \"library('SolveRationalMatrixEquation')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SolveRationalMatrixEquation
+  license: GPL-2
+  summary: "Given a symmetric positive definite matrix Q and a non-singular matrix L, find symmetric
+    positive definite solution X such that X = Q + L (X inv) L^T. Reference: Benner,
+    P., Fa\xDFbender, H. On the Solution of the Rational Matrix Equation. Benner, Fa\xDFbender
+    (2007) <doi:10.1155/2007/21850>."
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SolveRationalMatrixEquation
+# Type: Package
+# Title: Solve Rational Matrix Equation
+# Version: 0.1.0
+# Author: Aditi Tiwari
+# Maintainer: Aditi Tiwari <aditi.jec31@gmail.com>
+# Description: Given a symmetric positive definite matrix Q and a non-singular matrix L, find symmetric positive definite solution X such that X = Q + L (X inv) L^T. Reference: Benner, P., Fabender, H. On the Solution of the Rational Matrix Equation. Benner, Fabender (2007) <doi:10.1155/2007/21850>.
+# License: GPL-2
+# Encoding: UTF-8
+# RoxygenNote: 6.1.0
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2018-11-04 04:00:45 UTC; apple
+# Repository: CRAN
+# Date/Publication: 2018-11-14 10:40:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

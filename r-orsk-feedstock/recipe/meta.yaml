@@ -1,0 +1,97 @@
+{% set version = '1.0-5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-orsk
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/orsk_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/orsk/orsk_{{ version }}.tar.gz
+  sha256: 53fed3da4240e1999d18084e538ca6330d6bf1957d40378512a64a2e9bde77a5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: setRNG
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bb
+    - r-bhh2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bb
+    - r-bhh2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('orsk')"           # [not win]
+    - "\"%R%\" -e \"library('orsk')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=orsk
+  license: GPL-2
+  summary: Convert odds ratio to relative risk in cohort studies with partial data information
+    (Wang (2013) <doi:10.18637/jss.v055.i05>).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: orsk
+# Type: Package
+# Title: Converting Odds Ratio to Relative Risk in Cohort Studies with Partial Data Information
+# Version: 1.0-5
+# Date: 2019-01-11
+# Author: Zhu Wang
+# Maintainer: Zhu Wang <wangz1@uthscsa.edu>
+# Description: Convert odds ratio to relative risk in cohort studies with partial data information (Wang (2013) <doi:10.18637/jss.v055.i05>).
+# Imports: BB, BHH2
+# Suggests: setRNG
+# License: GPL (>= 2)
+# LazyLoad: yes
+# Packaged: 2019-01-11 23:24:27 UTC; zhu
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2019-01-12 23:02:53 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

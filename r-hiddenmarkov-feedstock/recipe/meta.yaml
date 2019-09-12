@@ -1,0 +1,94 @@
+{% set version = '1.8-11' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hiddenmarkov
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/HiddenMarkov_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/HiddenMarkov/HiddenMarkov_{{ version }}.tar.gz
+  sha256: 4a1614249eee9f428bc182ea9ced443dff4eafa7babf4259c720e5b4da2d08fa
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: parallel
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('HiddenMarkov')"           # [not win]
+    - "\"%R%\" -e \"library('HiddenMarkov')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.statsresearch.co.nz/dsh/sslib/
+  license: GPL-2
+  summary: Contains functions for the analysis of Discrete Time Hidden Markov Models, Markov
+    Modulated GLMs and the Markov Modulated Poisson Process. It includes functions for
+    simulation, parameter estimation, and the Viterbi algorithm. See the topic "HiddenMarkov"
+    for an introduction to the package, and "Change Log" for a list of recent changes.
+    The algorithms are based of those of Walter Zucchini.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: HiddenMarkov
+# Title: Hidden Markov Models
+# Version: 1.8-11
+# Date: 2017-11-01
+# Author: David Harte
+# Maintainer: David Harte <d.s.harte@gmail.com>
+# Description: Contains functions for the analysis of Discrete Time Hidden Markov Models, Markov Modulated GLMs and the Markov Modulated Poisson Process. It includes functions for simulation, parameter estimation, and the Viterbi algorithm. See the topic "HiddenMarkov" for an introduction to the package, and "Change Log" for a list of recent changes. The algorithms are based of those of Walter Zucchini.
+# Suggests: parallel
+# License: GPL (>= 2)
+# URL: http://www.statsresearch.co.nz/dsh/sslib/
+# NeedsCompilation: yes
+# Packaged: 2017-10-31 20:01:00 UTC; davidh
+# Repository: CRAN
+# Date/Publication: 2017-11-01 16:45:51 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

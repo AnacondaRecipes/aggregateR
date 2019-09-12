@@ -1,0 +1,81 @@
+{% set version = '1.2-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-wpp2010
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/wpp2010_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/wpp2010/wpp2010_{{ version }}.tar.gz
+  sha256: f3948651d79ba760cfdeef88fc24663ae6e9bed75ced7c1b40dd526259c807c1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('wpp2010')"           # [not win]
+    - "\"%R%\" -e \"library('wpp2010')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://esa.un.org/wpp
+  license: GPL-2
+  summary: Data from the United Nation's World Population Prospects 2010
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: wpp2010
+# Version: 1.2-0
+# Date: 2013-5-8
+# Title: World Population Prospects 2010
+# Author: Hana Sevcikova <hanas@uw.edu>, Patrick Gerland <gerland@un.org>
+# Maintainer: Hana Sevcikova <hanas@uw.edu>
+# Depends: R (>= 2.14.2)
+# Description: Data from the United Nation's World Population Prospects 2010
+# License: GPL (>= 2)
+# URL: http://esa.un.org/wpp
+# Packaged: 2013-05-08 23:41:32 UTC; hana
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-05-09 12:09:32
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

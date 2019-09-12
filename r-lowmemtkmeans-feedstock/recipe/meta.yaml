@@ -1,0 +1,99 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lowmemtkmeans
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/lowmemtkmeans_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/lowmemtkmeans/lowmemtkmeans_{{ version }}.tar.gz
+  sha256: 71c30638a8438767773b65796688eecffa48e73a439307bf3f84ff8c086ff023
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.5
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.5
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('lowmemtkmeans')"           # [not win]
+    - "\"%R%\" -e \"library('lowmemtkmeans')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=lowmemtkmeans
+  license: GPL-3
+  summary: Performs the trimmed k-means clustering algorithm with lower memory use. It also provides
+    a number of utility functions such as BIC calculations.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: lowmemtkmeans
+# Type: Package
+# Title: Low Memory Use Trimmed K-Means
+# Version: 0.1.2
+# Author: Andrew Thomas Jones, Hien Duy Nguyen
+# Maintainer: Andrew Thomas Jones <andrewthomasjones@gmail.com>
+# Description: Performs the trimmed k-means clustering algorithm with lower memory use. It also provides a number of utility functions such as BIC calculations.
+# License: GPL (>= 3)
+# LazyData: TRUE
+# LinkingTo: Rcpp, RcppArmadillo
+# Imports: Rcpp (>= 0.12.5)
+# SystemRequirements: C++11
+# RoxygenNote: 5.0.1
+# Suggests: testthat
+# NeedsCompilation: yes
+# Packaged: 2017-01-02 07:01:38 UTC; andrew
+# Repository: CRAN
+# Date/Publication: 2017-01-08 12:07:33
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

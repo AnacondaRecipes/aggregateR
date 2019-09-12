@@ -1,0 +1,84 @@
+{% set version = '2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-synet
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SyNet_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SyNet/SyNet_{{ version }}.tar.gz
+  sha256: 3cce56d45d039ddc8ac7ad6f848adf3b57471bf16cad418f9b75cfd6986e6955
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-tkrplot
+
+  run:
+    - r-base
+    - r-tkrplot
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SyNet')"           # [not win]
+    - "\"%R%\" -e \"library('SyNet')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SyNet
+  license: GPL-3
+  summary: Infers sympatry matrices from distributional data and analyzes them in order to identify
+    groups of species cohesively connected.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SyNet
+# Type: Package
+# Title: Inference and Analysis of Sympatry Networks
+# Version: 2.0
+# Date: 2011-11-11
+# Author: Daniel A. Dos Santos
+# Maintainer: Daniel A. Dos Santos <pseudalopex_79@yahoo.com>
+# Depends: tkrplot, tcltk
+# Description: Infers sympatry matrices from distributional data and analyzes them in order to identify groups of species cohesively connected.
+# License: GPL
+# Packaged: 2011-11-16 05:03:10 UTC; Usuario XP
+# Repository: CRAN
+# Date/Publication: 2011-11-16 12:16:33
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

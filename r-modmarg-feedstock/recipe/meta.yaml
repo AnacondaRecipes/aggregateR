@@ -1,0 +1,89 @@
+{% set version = '0.9.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-modmarg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/modmarg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/modmarg/modmarg_{{ version }}.tar.gz
+  sha256: f0ed449b8c585414ffec395298a3dd7cabf945f46011c90af4f6a059ec769eb2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, sandwich, AER
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('modmarg')"           # [not win]
+    - "\"%R%\" -e \"library('modmarg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/anniejw6/modmarg
+  license: GPL-3
+  summary: Calculate predicted levels and marginal effects, using the delta method to calculate
+    standard errors. This is an R-based version of the 'margins' command from Stata.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: modmarg
+# Title: Calculating Marginal Effects and Levels with Errors
+# Version: 0.9.2
+# Authors@R: c( person("Alex", "Gold", email = "alex.k.gold@gmail.com", role = "aut"), person("Nat", "Olin", email = "nathaniel.olin@gmail.com", role = "aut"), person("Annie", "Wang", email = "anniejw6@gmail.com", role = c("aut", "cre")) )
+# Description: Calculate predicted levels and marginal effects, using the delta method to calculate standard errors. This is an R-based version of the 'margins' command from Stata.
+# URL: https://github.com/anniejw6/modmarg
+# BugReports: https://github.com/anniejw6/modmarg/issues
+# Depends: R (>= 2.10.0)
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: knitr, rmarkdown, testthat, sandwich, AER
+# VignetteBuilder: knitr
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-02-01 16:49:11 UTC; annie
+# Author: Alex Gold [aut], Nat Olin [aut], Annie Wang [aut, cre]
+# Maintainer: Annie Wang <anniejw6@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-02-01 16:56:21 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

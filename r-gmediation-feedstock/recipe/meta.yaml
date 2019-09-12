@@ -1,0 +1,95 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gmediation
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gmediation_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gmediation/gmediation_{{ version }}.tar.gz
+  sha256: f9e6a24c81eb61116a8e03a95ed96d531d8d7e372a2a26333e86e38d9280a455
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: mediation, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-vgam >=1.0
+    - r-plyr >=1.8.4
+
+  run:
+    - r-base
+    - r-mass
+    - r-vgam >=1.0
+    - r-plyr >=1.8.4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gmediation')"           # [not win]
+    - "\"%R%\" -e \"library('gmediation')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=gmediation
+  license: GPL-2 | GPL-3
+  summary: Current version of this R package conducts mediation path analysis for multiple mediators
+    in two stages.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gmediation
+# Type: Package
+# Title: Mediation Analysis for Multiple and Multi-Stage Mediators
+# Version: 0.1.1
+# Author: Jang Ik Cho, Jeffrey Albert
+# Maintainer: Jang Ik Cho <jxc864@case.edu>
+# Description: Current version of this R package conducts mediation path analysis for multiple mediators in two stages.
+# License: GPL-2 | GPL-3
+# Encoding: UTF-8
+# LazyLoad: true
+# LazyData: true
+# Imports: plyr (>= 1.8.4), VGAM (>= 1.0), MASS
+# Suggests: mediation, knitr, rmarkdown
+# RoxygenNote: 6.0.1
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2017-06-27 13:47:28 UTC; jangikcho
+# Repository: CRAN
+# Date/Publication: 2017-06-27 14:38:01 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

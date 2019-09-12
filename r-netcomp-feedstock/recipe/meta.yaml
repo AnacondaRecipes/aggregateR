@@ -1,0 +1,94 @@
+{% set version = '1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-netcomp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/NetComp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/NetComp/NetComp_{{ version }}.tar.gz
+  sha256: 5b3b609a6ece63280d2b8a6cf2a24b81894c61dffeb0ed706ce5140b63bb3d87
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-gdata
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-gdata
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('NetComp')"           # [not win]
+    - "\"%R%\" -e \"library('NetComp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=NetComp
+  license: GPL-3
+  summary: This package contains functions to carry out high throughput data analysis and to
+    conduct data set comparisons. Similarity matrices from high throughput phenotypic
+    data containing uninformative (e.g. wild type) or missing data can be calculated
+    to report similarity of response.  A suite of graph comparisons using an adjacency
+    or correlation matrix format are included to facilitate quick network analysis.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: NetComp
+# Version: 1.6
+# Date: 2012-8-31
+# Title: Network Generation and Comparison
+# Author: Shannon M. Bell <bell.shannonm@gmail.com>, Lyle D. Burgoon <burgoon.lyle@gmail.com>
+# Maintainer: Shannon M. Bell <bell.shannonm@gmail.com>
+# Depends: R (>= 2.12.1)
+# Imports: gdata
+# LazyLoad: yes
+# Description: This package contains functions to carry out high throughput data analysis and to conduct data set comparisons. Similarity matrices from high throughput phenotypic data containing uninformative (e.g. wild type) or missing data can be calculated to report similarity of response.  A suite of graph comparisons using an adjacency or correlation matrix format are included to facilitate quick network analysis.
+# License: GPL (>= 3)
+# Packaged: 2012-08-31 16:40:35 UTC; shannon
+# Repository: CRAN
+# Date/Publication: 2012-08-31 17:17:51
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

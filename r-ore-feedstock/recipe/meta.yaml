@@ -1,0 +1,100 @@
+{% set version = '1.6.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ore
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ore_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ore/ore_{{ version }}.tar.gz
+  sha256: f5002915e91b410e3e5c8827da8a54b42fce76895c102c3794fc95fa248d3fd0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: crayon, rex, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ore')"           # [not win]
+    - "\"%R%\" -e \"library('ore')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jonclayden/ore
+  license: BSD_3_clause
+  summary: Provides an alternative to R's built-in functionality for handling regular expressions,
+    based on the Onigmo library. Offers first-class compiled regex objects, partial
+    matching and function-based substitutions, amongst other features.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_3_clause'
+    - LICENCE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ore
+# Version: 1.6.2
+# Date: 2018-08-29
+# Title: An R Interface to the Onigmo Regular Expression Library
+# Author: Jon Clayden, based on Onigmo by K. Kosako and K. Takata
+# Maintainer: Jon Clayden <code@clayden.org>
+# Suggests: crayon, rex, testthat
+# Description: Provides an alternative to R's built-in functionality for handling regular expressions, based on the Onigmo library. Offers first-class compiled regex objects, partial matching and function-based substitutions, amongst other features.
+# Encoding: UTF-8
+# License: BSD_3_clause + file LICENCE
+# Collate: workspace.R file.R dict.R ore.R match.R es.R zzz.R
+# URL: https://github.com/jonclayden/ore
+# BugReports: https://github.com/jonclayden/ore/issues
+# RoxygenNote: 5.0.1
+# NeedsCompilation: yes
+# Packaged: 2018-08-29 20:52:03 UTC; jon
+# Repository: CRAN
+# Date/Publication: 2018-08-30 04:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

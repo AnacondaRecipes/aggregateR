@@ -1,0 +1,100 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-textrank
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/textrank_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/textrank/textrank_{{ version }}.tar.gz
+  sha256: e4d8fa2d6a14f90d0d3c3f7504ea809f17b9f9e47bd5050701b9f7383ea55fea
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: textreuse, knitr, udpipe (>= 0.2)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table >=1.9.6
+    - r-digest
+    - r-igraph
+
+  run:
+    - r-base
+    - r-data.table >=1.9.6
+    - r-digest
+    - r-igraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('textrank')"           # [not win]
+    - "\"%R%\" -e \"library('textrank')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/bnosac/textrank
+  license: MPL-2.0
+  summary: The 'textrank' algorithm is an extension of the 'Pagerank' algorithm for text. The
+    algorithm allows to summarize text by calculating how sentences are related to one
+    another. This is done by looking at overlapping terminology used in sentences in
+    order to set up links between sentences. The resulting sentence network is next
+    plugged into the 'Pagerank' algorithm which identifies the most important sentences
+    in your text and ranks them.  In a similar way 'textrank' can also be used to extract
+    keywords. A word network is constructed by looking if words are following one another.
+    On top of that network the 'Pagerank' algorithm is applied to extract relevant words
+    after which relevant words which are following one another are combined to get keywords.   More
+    information can be found in the paper from Mihalcea, Rada & Tarau, Paul (2004) <http://www.aclweb.org/anthology/W04-3252>.
+  license_family: OTHER
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: textrank
+# Type: Package
+# Title: Summarize Text by Ranking Sentences and Finding Keywords
+# Version: 0.3.0
+# Maintainer: Jan Wijffels <jwijffels@bnosac.be>
+# Author: Jan Wijffels [aut, cre, cph], BNOSAC [cph]
+# Authors@R: c(person('Jan', 'Wijffels', role = c('aut', 'cre', 'cph'), email = 'jwijffels@bnosac.be'), person('BNOSAC', role = 'cph'))
+# Description: The 'textrank' algorithm is an extension of the 'Pagerank' algorithm for text. The algorithm allows to summarize text by calculating how sentences are related to one another. This is done by looking at overlapping terminology used in sentences in order to set up links between sentences. The resulting sentence network is next plugged into the 'Pagerank' algorithm which identifies the most important sentences in your text and ranks them.  In a similar way 'textrank' can also be used to extract keywords. A word network is constructed by looking if words are following one another. On top of that network the 'Pagerank' algorithm is applied to extract relevant words after which relevant words which are following one another are combined to get keywords.   More information can be found in the paper from Mihalcea, Rada & Tarau, Paul (2004) <http://www.aclweb.org/anthology/W04-3252>.
+# License: MPL-2.0
+# URL: https://github.com/bnosac/textrank
+# Encoding: UTF-8
+# Imports: utils, data.table (>= 1.9.6), igraph, digest
+# Suggests: textreuse, knitr, udpipe (>= 0.2)
+# RoxygenNote: 6.0.1
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-01-17 21:23:41 UTC; Jan
+# Repository: CRAN
+# Date/Publication: 2019-01-17 22:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

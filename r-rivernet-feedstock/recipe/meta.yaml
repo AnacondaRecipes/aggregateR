@@ -1,0 +1,86 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rivernet
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rivernet_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rivernet/rivernet_{{ version }}.tar.gz
+  sha256: cd9142aa3b810396ca497e023992a8c1c76760804fb0b5b43c2f9de3433d7453
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rivernet')"           # [not win]
+    - "\"%R%\" -e \"library('rivernet')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rivernet
+  license: GPL-3
+  summary: Functions for reading, analysing and plotting river networks. For this package, river
+    networks consist of sections and nodes with associated attributes,  e.g. to characterise
+    their morphological, chemical and biological state. The package provides functions
+    to read this data from text files, to analyse the network structure and network
+    paths and regions consisting of sections and nodes that fulfill prescribed criteria,
+    and to plot the river network and associated properties.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rivernet
+# Type: Package
+# Title: Read, Analyze and Plot River Networks
+# Version: 1.2
+# Date: 2019-03-03
+# Author: Peter Reichert
+# Maintainer: Peter Reichert <peter.reichert@eawag.ch>
+# Description: Functions for reading, analysing and plotting river networks. For this package, river networks consist of sections and nodes with associated attributes,  e.g. to characterise their morphological, chemical and biological state. The package provides functions to read this data from text files, to analyse the network structure and network paths and regions consisting of sections and nodes that fulfill prescribed criteria, and to plot the river network and associated properties.
+# License: GPL-3
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2019-03-08 08:16:41 UTC; peter
+# Repository: CRAN
+# Date/Publication: 2019-03-08 08:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

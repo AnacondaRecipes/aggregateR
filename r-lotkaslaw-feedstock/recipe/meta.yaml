@@ -1,0 +1,84 @@
+{% set version = '0.0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lotkaslaw
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LotkasLaw_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LotkasLaw/LotkasLaw_{{ version }}.tar.gz
+  sha256: e7d7c56be1518065f66935ade69171dd15958cce921e4acfad91c5adbc287886
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LotkasLaw')"           # [not win]
+    - "\"%R%\" -e \"library('LotkasLaw')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=LotkasLaw
+  license: GPL-3
+  summary: 'Running Lotka''s Law following Pao (1985)(DOI: 10.1016/0306-4573(85)90055-X). The
+    Law is based around the proof that the number of authors making n contributions
+    is about 1/n^{a} of those making one contribution.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LotkasLaw
+# Title: Runs Lotka's Law which is One of the Special Applications of Zipf's Law
+# Version: 0.0.1.0
+# Authors@R: c( person("Kenneth", "Buker", email = "KCIV4@att.net", role = c("aut", "cre")), person("Dr. Alon", "Friedman", role = c("ctb")))
+# Description: Running Lotka's Law following Pao (1985)(DOI: 10.1016/0306-4573(85)90055-X). The Law is based around the proof that the number of authors making n contributions is about 1/n^{a} of those making one contribution.
+# Depends: R (>= 3.1.1)
+# License: GPL
+# LazyData: true
+# Packaged: 2015-08-17 04:53:29 UTC; Ken
+# Author: Kenneth Buker [aut, cre], Dr. Alon Friedman [ctb]
+# Maintainer: Kenneth Buker <KCIV4@att.net>
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-08-17 07:53:29
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

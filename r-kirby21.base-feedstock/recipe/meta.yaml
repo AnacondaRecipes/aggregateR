@@ -1,0 +1,90 @@
+{% set version = '1.7.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-kirby21.base
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/kirby21.base_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/kirby21.base/kirby21.base_{{ version }}.tar.gz
+  sha256: 853afe93ab74e2f916c2bb279294554c4626a4f68a7d997639cb87e4024c3537
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-git2r
+
+  run:
+    - r-base
+    - r-git2r
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('kirby21.base')"           # [not win]
+    - "\"%R%\" -e \"library('kirby21.base')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.nitrc.org/projects/multimodal/, http://dx.doi.org/10.1016/j.neuroimage.2010.11.047
+  license: GPL-2
+  summary: Multi-modal magnetic resonance imaging ('MRI') data from the 'Kirby21' 'reproducibility'
+    study <https://www.nitrc.org/projects/multimodal/>, including functional and structural
+    imaging.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: kirby21.base
+# Type: Package
+# Title: Example Data from the Multi-Modal MRI 'Reproducibility' Resource
+# Version: 1.7.0
+# Date: 2018-08-13
+# Author: John Muschelli <muschellij2@gmail.com>
+# Maintainer: John Muschelli <muschellij2@gmail.com>
+# Description: Multi-modal magnetic resonance imaging ('MRI') data from the 'Kirby21' 'reproducibility' study <https://www.nitrc.org/projects/multimodal/>, including functional and structural imaging.
+# License: GPL-2
+# LazyData: true
+# LazyLoad: true
+# Imports: utils, stats, git2r
+# RoxygenNote: 6.1.0
+# URL: https://www.nitrc.org/projects/multimodal/, http://dx.doi.org/10.1016/j.neuroimage.2010.11.047
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2018-08-13 15:38:48 UTC; johnmuschelli
+# Repository: CRAN
+# Date/Publication: 2018-08-13 16:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

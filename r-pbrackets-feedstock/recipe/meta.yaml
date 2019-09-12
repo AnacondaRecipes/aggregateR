@@ -1,0 +1,80 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pbrackets
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pBrackets_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pBrackets/pBrackets_{{ version }}.tar.gz
+  sha256: 324fe6c4d825780e5d279517f09da4e1018efed5cb3d36b6b30add0f13309b33
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pBrackets')"           # [not win]
+    - "\"%R%\" -e \"library('pBrackets')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=pBrackets
+  license: GPL (>= 2.0)
+  summary: Adds different kinds of brackets to a plot, including braces, chevrons, parentheses
+    or square brackets.
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pBrackets
+# Version: 1.0
+# Date: 2014-10-17
+# Title: Plot Brackets
+# Author: Andreas Schulz
+# Maintainer: Andreas Schulz <ades-s@web.de>
+# Depends: R (>= 3.0.0)
+# Imports: grid
+# Description: Adds different kinds of brackets to a plot, including braces, chevrons, parentheses or square brackets.
+# License: GPL (>= 2.0)
+# Packaged: 2014-10-17 09:30:23 UTC; scu9a
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-10-17 13:08:28
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,103 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-guts
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GUTS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GUTS/GUTS_{{ version }}.tar.gz
+  sha256: 094b8f51719cc36ddc56e3412dbb146eafc93c5e8fbb2c5999c2e80ea7a7d216
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, adaptMCMC, xlsx, drc
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.16
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.16
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GUTS')"           # [not win]
+    - "\"%R%\" -e \"library('GUTS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=GUTS
+  license: GPL-2
+  summary: Given exposure and survival time series as well as parameter values, GUTS allows for
+    the fast calculation of the survival probabilities as well as the logarithm of the
+    corresponding likelihood.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: GUTS
+# Type: Package
+# Title: Fast Calculation of the Likelihood of a Stochastic Survival Model
+# Version: 1.1.1
+# Date: 2019-07-04
+# Author: Carlo Albert <carlo.albert@eawag.ch>, SAren Vogel <soeren.vogel@posteo.ch>, Oliver Jakoby <oliver.jakoby@rifcon.de>, Alexander Singer <alexander.singer@rifcon.de> and Dirk Nickisch <dirk.nickisch@rifcon.de>
+# Maintainer: Oliver Jakoby <oliver.jakoby@rifcon.de>
+# Description: Given exposure and survival time series as well as parameter values, GUTS allows for the fast calculation of the survival probabilities as well as the logarithm of the corresponding likelihood.
+# License: GPL (>= 2)
+# Depends: R (>= 3.0.0), methods, Rcpp (>= 0.12.16)
+# LinkingTo: Rcpp
+# LazyLoad: yes
+# LazyData: no
+# Encoding: UTF-8
+# Suggests: knitr, rmarkdown, adaptMCMC, xlsx, drc
+# VignetteBuilder: knitr
+# Repository: CRAN
+# Repository/R-Forge/Project: guts
+# Repository/R-Forge/Revision: 59
+# Repository/R-Forge/DateTimeStamp: 2019-07-05 12:26:52
+# Date/Publication: 2019-07-05 14:10:03 UTC
+# NeedsCompilation: yes
+# Packaged: 2019-07-05 12:53:13 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

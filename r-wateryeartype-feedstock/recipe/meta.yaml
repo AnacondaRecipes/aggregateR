@@ -1,0 +1,87 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-wateryeartype
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/waterYearType_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/waterYearType/waterYearType_{{ version }}.tar.gz
+  sha256: 06c8b7aa2abad40702fbd4ac6f9ba6685e8e0c27c8429a3ef37006d2185e7925
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('waterYearType')"           # [not win]
+    - "\"%R%\" -e \"library('waterYearType')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=waterYearType
+  license: MIT
+  summary: Provides Water Year Hydrologic Classification Indices based on measured  unimpaired
+    runoff (in million acre-feet). Data is provided by California Department of Water
+    Resources and subject to revision.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: waterYearType
+# Type: Package
+# Title: Sacramento and San Joaquin Valley Water Year Types
+# Version: 1.0.1
+# Authors@R: person("Sadie", "Gill", email = "sgill@flowwest.com", role = c("cre", "aut"))
+# Description: Provides Water Year Hydrologic Classification Indices based on measured  unimpaired runoff (in million acre-feet). Data is provided by California Department of Water Resources and subject to revision.
+# Depends: R (>= 2.10)
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2019-05-15 20:57:29 UTC; sadie
+# Author: Sadie Gill [cre, aut]
+# Maintainer: Sadie Gill <sgill@flowwest.com>
+# Repository: CRAN
+# Date/Publication: 2019-05-15 21:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

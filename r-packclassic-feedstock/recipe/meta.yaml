@@ -1,0 +1,82 @@
+{% set version = '0.5.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-packclassic
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/packClassic_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/packClassic/packClassic_{{ version }}.tar.gz
+  sha256: 72d606a674e525e0df8e6b786988f0d55ca8ee0472264c0ad6208fbed3d34111
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('packClassic')"           # [not win]
+    - "\"%R%\" -e \"library('packClassic')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: www.r-project.org
+  license: GPL (>= 2.0)
+  summary: This package comes to illustrate the book "Petit Manuel de Programmation Orientee
+    Objet sous R"
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: packClassic
+# Type: Package
+# Title: Toy example of Pack Classic
+# Version: 0.5.2
+# Date: 2009-10-15
+# Author: Christophe Genolini
+# Maintainer: Christophe Genolini <genolini@u-paris10.fr>
+# Description: This package comes to illustrate the book "Petit Manuel de Programmation Orientee Objet sous R"
+# License: GPL (>= 2.0)
+# LazyLoad: yes
+# Depends: graphics
+# URL: www.r-project.org
+# Packaged: 2009-10-11 18:17:29 UTC; Christophe
+# Repository: CRAN
+# Date/Publication: 2009-10-11 18:30:13
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

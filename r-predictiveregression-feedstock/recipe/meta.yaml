@@ -1,0 +1,81 @@
+{% set version = '0.1-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-predictiveregression
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PredictiveRegression_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PredictiveRegression/PredictiveRegression_{{ version }}.tar.gz
+  sha256: addaa8862932ddda41011ee263b030930f096d44fa8cd206b311123ca48e7397
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PredictiveRegression')"           # [not win]
+    - "\"%R%\" -e \"library('PredictiveRegression')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PredictiveRegression
+  license: file LICENSE (Restricts use)
+  summary: Three prediction algorithms described in the paper "On-line predictive linear regression"
+    Annals of Statistics 37, 1566 - 1590 (2009)
+  license_family: OTHER
+  license_file:
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PredictiveRegression
+# Version: 0.1-4
+# Date: 2012-10-29
+# Title: Prediction Intervals for Three Basic Statistical Models
+# Author: Vladimir Vovk <vovk@cs.rhul.ac.uk> and Ilia Nouretdinov <ilia@cs.rhul.ac.uk>
+# Maintainer: Vladimir Vovk <vovk@cs.rhul.ac.uk>
+# Description: Three prediction algorithms described in the paper "On-line predictive linear regression" Annals of Statistics 37, 1566 - 1590 (2009)
+# License: file LICENSE
+# Packaged: 2012-10-29 17:38:48 UTC; vovk
+# Repository: CRAN
+# Date/Publication: 2012-10-29 19:07:29
+# NeedsCompilation: no
+# License_restricts_use: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

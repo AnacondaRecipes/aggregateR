@@ -1,0 +1,103 @@
+{% set version = '1.9-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rnetcdf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RNetCDF_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RNetCDF/RNetCDF_{{ version }}.tar.gz
+  sha256: 7d5a1e47ba3f41050e92ac27fe12c9ffd8dea67e132c43ff071dcdb0fad4ae45
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RNetCDF')"           # [not win]
+    - "\"%R%\" -e \"library('RNetCDF')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://rnetcdf.r-forge.r-project.org http://www.unidata.ucar.edu/software/netcdf/
+    http://www.unidata.ucar.edu/software/udunits/
+  license: GPL-2
+  summary: An interface to the NetCDF file format designed by Unidata for efficient storage of
+    array-oriented scientific data and descriptions. The R interface is closely based
+    on the C API of the NetCDF library, and it includes calendar conversions from the
+    Unidata UDUNITS library. The current implementation supports all operations on NetCDF
+    datasets in classic and 64-bit offset file formats, and NetCDF4-classic format is
+    supported for reading and modification of existing files.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RNetCDF
+# Version: 1.9-1
+# Date: 2017-10-04
+# Title: Interface to NetCDF Datasets
+# Author: Pavel Michna, with contributions from Milton Woods
+# Maintainer: Milton Woods <mwoods@users.r-forge.r-project.org>
+# Depends: R (>= 2.5.0)
+# SystemRequirements: netcdf udunits-2
+# Description: An interface to the NetCDF file format designed by Unidata for efficient storage of array-oriented scientific data and descriptions. The R interface is closely based on the C API of the NetCDF library, and it includes calendar conversions from the Unidata UDUNITS library. The current implementation supports all operations on NetCDF datasets in classic and 64-bit offset file formats, and NetCDF4-classic format is supported for reading and modification of existing files.
+# License: GPL (>= 2) | file LICENSE
+# URL: http://rnetcdf.r-forge.r-project.org http://www.unidata.ucar.edu/software/netcdf/ http://www.unidata.ucar.edu/software/udunits/
+# NeedsCompilation: yes
+# Repository: CRAN
+# Repository/R-Forge/Project: rnetcdf
+# Repository/R-Forge/Revision: 234
+# Repository/R-Forge/DateTimeStamp: 2017-10-06 22:45:42
+# Date/Publication: 2017-10-08 22:16:10 UTC
+# Packaged: 2017-10-06 23:05:26 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

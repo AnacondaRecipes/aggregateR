@@ -1,0 +1,93 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sadeg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SADEG_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SADEG/SADEG_{{ version }}.tar.gz
+  sha256: 76f8894dda6632cbe8ccc003f29ac193cd7f311c8401d4968ea15bd5d6f4340a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SADEG')"           # [not win]
+    - "\"%R%\" -e \"library('SADEG')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SADEG
+  license: GPL-3
+  summary: We analyzed the nucleotide composition of genes with a special emphasis on stability
+    of DNA sequences. Besides, in a variety of different organisms unequal use of synonymous
+    codons, or codon usage bias, occurs which also show variation among genes in the
+    same genome. Seemingly, codon usage bias is affected by both selective constraints
+    and mutation bias which allows and enables us to examine and detect changes in these
+    two evolutionary forces between genomes or along one genome. Therefore, we determined
+    the codon adaptation index (CAI), effective number of codons (ENC) and codon usage
+    analysis with calculation of the relative synonymous codon usage (RSCU), and subsequently
+    predicted the translation efficiency and accuracy through GC-rich codon usages.
+    Furthermore, we estimated the relative stability of the DNA sequence following calculation
+    of the average free energy (Delta G) and Dimer base-stacking energy level.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SADEG
+# Type: Package
+# Title: Stability Analysis in Differentially Expressed Genes
+# Version: 1.0.0
+# Authors@R: c(person(given = "Babak", family = "Khorsand", role = c("aut", "cre"), email = "khorsand@mail.um.ac.ir"), person(given = "Ehsan", family = "Sadeghnezhad", role = "aut"), person(given = "Javad", family = "Zahiri", role = "ths"), person(given = "Mohsen", family = "Sharifi", role = "ths"), person(given = "Hassan", family = "Zare-mayvan", role = "ths"))
+# Maintainer: Babak Khorsand <khorsand@mail.um.ac.ir>
+# Description: We analyzed the nucleotide composition of genes with a special emphasis on stability of DNA sequences. Besides, in a variety of different organisms unequal use of synonymous codons, or codon usage bias, occurs which also show variation among genes in the same genome. Seemingly, codon usage bias is affected by both selective constraints and mutation bias which allows and enables us to examine and detect changes in these two evolutionary forces between genomes or along one genome. Therefore, we determined the codon adaptation index (CAI), effective number of codons (ENC) and codon usage analysis with calculation of the relative synonymous codon usage (RSCU), and subsequently predicted the translation efficiency and accuracy through GC-rich codon usages. Furthermore, we estimated the relative stability of the DNA sequence following calculation of the average free energy (Delta G) and Dimer base-stacking energy level.
+# License: GPL
+# LazyData: true
+# Depends: R(>= 2.10.0)
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2017-01-12 21:45:26 UTC; Babak
+# Author: Babak Khorsand [aut, cre], Ehsan Sadeghnezhad [aut], Javad Zahiri [ths], Mohsen Sharifi [ths], Hassan Zare-mayvan [ths]
+# Repository: CRAN
+# Date/Publication: 2017-01-13 00:43:16
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-svs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/svs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/svs/svs_{{ version }}.tar.gz
+  sha256: e696cb370dcbecf780270fa785dec625219f442d01e555cd998c80d795aee514
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, pvclust
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-gtools
+
+  run:
+    - r-base
+    - r-gtools
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('svs')"           # [not win]
+    - "\"%R%\" -e \"library('svs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=svs
+  license: GPL-3
+  summary: Various tools for semantic vector spaces, such as correspondence analysis (simple,
+    multiple and discriminant), latent semantic analysis, probabilistic latent semantic
+    analysis, non-negative matrix factorization, latent class analysis and EM clustering.
+    Furthermore, there are specialized distance measures, plotting functions and some
+    helper functions.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: svs
+# Title: Tools for Semantic Vector Spaces
+# Version: 1.1.0
+# Authors@R: person("Koen", "Plevoets", email="koen.plevoets@ugent.be", role=c("aut", "cre"))
+# Description: Various tools for semantic vector spaces, such as correspondence analysis (simple, multiple and discriminant), latent semantic analysis, probabilistic latent semantic analysis, non-negative matrix factorization, latent class analysis and EM clustering. Furthermore, there are specialized distance measures, plotting functions and some helper functions.
+# Depends: R (>= 3.1.0), graphics, stats, utils
+# Imports: gtools
+# Suggests: MASS, pvclust
+# License: GPL-3
+# LazyData: true
+# Date: 2016-01-13
+# Packaged: 2016-01-13 15:24:34 UTC; kplevoet
+# Author: Koen Plevoets [aut, cre]
+# Maintainer: Koen Plevoets <koen.plevoets@ugent.be>
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2016-01-13 17:26:11
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

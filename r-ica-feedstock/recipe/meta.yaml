@@ -1,0 +1,82 @@
+{% set version = '1.0-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ica
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ica_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ica/ica_{{ version }}.tar.gz
+  sha256: e721596fc6175d3270a60d5e0b5b98be103a8fd0dd93ef16680af21fe0b54179
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ica')"           # [not win]
+    - "\"%R%\" -e \"library('ica')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ica
+  license: GPL-2
+  summary: 'Independent Component Analysis (ICA) using various algorithms: FastICA, Information-Maximization
+    (Infomax), and Joint Approximate Diagonalization of Eigenmatrices (JADE).'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ica
+# Type: Package
+# Title: Independent Component Analysis
+# Version: 1.0-2
+# Date: 2018-05-24
+# Author: Nathaniel E. Helwig <helwig@umn.edu>
+# Maintainer: Nathaniel E. Helwig <helwig@umn.edu>
+# Description: Independent Component Analysis (ICA) using various algorithms: FastICA, Information-Maximization (Infomax), and Joint Approximate Diagonalization of Eigenmatrices (JADE).
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2018-05-24 05:50:01 UTC; Nate
+# Repository: CRAN
+# Date/Publication: 2018-05-24 06:12:53 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

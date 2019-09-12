@@ -1,0 +1,111 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mvcluster
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mvcluster_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mvcluster/mvcluster_{{ version }}.tar.gz
+  sha256: 24dfc020a8c0f543f114107379e19a267fce5761dd877db7a451bfc67418d479
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.0
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.0
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mvcluster')"           # [not win]
+    - "\"%R%\" -e \"library('mvcluster')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.labhealthinfo.uconn.edu/multi-view-analytics/
+  license: GPL-3
+  summary: 'Implementation of multi-view bi-clustering algorithms. When a sample is characterized
+    by two or more sets of input features, it creates multiple data matrices for the
+    same set of examples, each corresponding to a view. For instance, individuals who
+    are diagnosed with a disorder can be described by their clinical symptoms (one view)
+    and their genomic markers (another view). Rows of a data matrix correspond to examples
+    and columns correspond to features. A multi-view bi-clustering algorithm groups
+    examples (rows) consistently across the views and simultaneously identifies the
+    subset of features (columns) in each view that are associated with the row groups.
+    This mvcluster package includes three such methods. (1) MVSVDL1: multi-view bi-clustering
+    based on singular value decomposition where the left singular vectors are used to
+    identify row clusters and the right singular vectors are used to identify features
+    (columns) for each row cluster. Each singular vector is regularized by the L1 vector
+    norm.  (2) MVLRRL0: multi-view bi-clustering based on sparse low rank representation
+    (i.e., matrix approximation) where the decomposed components are regularized by
+    the so-called L0 vector norm (which is not really a vector norm). (3) MVLRRL1: multi-view
+    bi-clustering based on sparse low rank representation (i.e., matrix approximation)
+    where the decomposed components are regularized by the L1 vector norm.    '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mvcluster
+# Type: Package
+# Title: Multi-View Clustering
+# Version: 1.0
+# Date: 2016-04-01
+# Author: Jiangwen Sun, Jin Lu, Tingyang Xu, Joseph Muller, Jinbo Bi
+# Maintainer: Jiangwen Sun <javon@engr.uconn.edu>
+# Description: Implementation of multi-view bi-clustering algorithms. When a sample is characterized by two or more sets of input features, it creates multiple data matrices for the same set of examples, each corresponding to a view. For instance, individuals who are diagnosed with a disorder can be described by their clinical symptoms (one view) and their genomic markers (another view). Rows of a data matrix correspond to examples and columns correspond to features. A multi-view bi-clustering algorithm groups examples (rows) consistently across the views and simultaneously identifies the subset of features (columns) in each view that are associated with the row groups. This mvcluster package includes three such methods. (1) MVSVDL1: multi-view bi-clustering based on singular value decomposition where the left singular vectors are used to identify row clusters and the right singular vectors are used to identify features (columns) for each row cluster. Each singular vector is regularized by the L1 vector norm.  (2) MVLRRL0: multi-view bi-clustering based on sparse low rank representation (i.e., matrix approximation) where the decomposed components are regularized by the so-called L0 vector norm (which is not really a vector norm). (3) MVLRRL1: multi-view bi-clustering based on sparse low rank representation (i.e., matrix approximation) where the decomposed components are regularized by the L1 vector norm.
+# License: GPL (>= 3)
+# Depends: Rcpp (>= 0.12.0)
+# LinkingTo: Rcpp, RcppArmadillo
+# NeedsCompilation: yes
+# URL: http://www.labhealthinfo.uconn.edu/multi-view-analytics/
+# Repository: CRAN
+# Date/Publication: 2016-04-03 16:31:05
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

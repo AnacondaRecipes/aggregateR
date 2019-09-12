@@ -1,0 +1,83 @@
+{% set version = '1.4-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-polynom
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/polynom_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/polynom/polynom_{{ version }}.tar.gz
+  sha256: c5b788b26f7118a18d5d8e7ba93a0abf3efa6603fa48603c70ed63c038d3d4dd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('polynom')"           # [not win]
+    - "\"%R%\" -e \"library('polynom')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=polynom
+  license: GPL-2
+  summary: A collection of functions to implement a class for univariate polynomial manipulations.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: polynom
+# Version: 1.4-0
+# Title: A Collection of Functions to Implement a Class for Univariate Polynomial Manipulations
+# Authors@R: c(person("Bill", "Venables", role = c("aut", "cre"), email = "Bill.Venables@gmail.com", comment = "S original"), person("Kurt", "Hornik", role = "aut", email = "Kurt.Hornik@R-project.org", comment = "R port"), person("Martin", "Maechler", role = "aut", email = "maechler@stat.math.ethz.ch", comment = "R port"))
+# Description: A collection of functions to implement a class for univariate polynomial manipulations.
+# Imports: stats, graphics
+# License: GPL-2
+# NeedsCompilation: no
+# Author: Bill Venables [aut, cre] (S original), Kurt Hornik [aut] (R port), Martin Maechler [aut] (R port)
+# Maintainer: Bill Venables <Bill.Venables@gmail.com>
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# Packaged: 2019-03-20 22:46:48 UTC; ven037
+# Repository: CRAN
+# Date/Publication: 2019-03-22 09:50:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

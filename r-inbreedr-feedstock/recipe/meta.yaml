@@ -1,0 +1,89 @@
+{% set version = '0.3.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-inbreedr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/inbreedR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/inbreedR/inbreedR_{{ version }}.tar.gz
+  sha256: 9f40e0ebe589d6ccc165f0efec7d650f20f04a6f98d8f9629c5a583fd908d925
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 0.10.0), knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table >=1.9.6
+
+  run:
+    - r-base
+    - r-data.table >=1.9.6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('inbreedR')"           # [not win]
+    - "\"%R%\" -e \"library('inbreedR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=inbreedR
+  license: GPL-2
+  summary: A framework for analysing inbreeding and heterozygosity-fitness correlations (HFCs)
+    based on microsatellite and SNP markers.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: inbreedR
+# Title: Analysing Inbreeding Based on Genetic Markers
+# Version: 0.3.2
+# Authors@R: c( person(c("Martin", "A."), "Stoffel", email= "martin.adam.stoffel@gmail.com",  role = c("aut", "cre")), person("Mareike", "Esser", email = "messer@uni-bielefeld.de" ,role = c("aut")), person("Joseph", "Hoffman", email = "j_i_hoffman@hotmail.com", role = c("aut")), person("Marty", "Kardos", email = "marty.kardos@ebc.uu.se", role = c("aut")))
+# Description: A framework for analysing inbreeding and heterozygosity-fitness correlations (HFCs) based on microsatellite and SNP markers.
+# Depends: R (>= 3.2.1)
+# License: GPL-2
+# LazyData: true
+# Imports: data.table (>= 1.9.6), parallel, stats, graphics
+# Suggests: testthat (>= 0.10.0), knitr, rmarkdown
+# VignetteBuilder: knitr
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-09-09 08:39:31 UTC; martin
+# Author: Martin A. Stoffel [aut, cre], Mareike Esser [aut], Joseph Hoffman [aut], Marty Kardos [aut]
+# Maintainer: Martin A. Stoffel <martin.adam.stoffel@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-09-09 12:23:25
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

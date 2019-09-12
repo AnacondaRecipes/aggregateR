@@ -1,0 +1,93 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-greenclust
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/greenclust_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/greenclust/greenclust_{{ version }}.tar.gz
+  sha256: 7b0e172979d408227827420d23b18f5b4b11dc8f63744fec4608c4bf007914e3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('greenclust')"           # [not win]
+    - "\"%R%\" -e \"library('greenclust')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/JeffJetton/greenclust
+  license: MIT
+  summary: Implements a method of iteratively collapsing the rows of a contingency table, two
+    at a time, by selecting the pair of categories whose combination yields a new table
+    with the smallest loss of chi-squared, as described by Greenacre, M.J. (1988) <doi:10.1007/BF01901670>.
+    The result is compatible with the class of object returned by the 'stats' package's
+    hclust() function and can be used similarly (plotted as a dendrogram, cut, etc.).
+    Additional functions are provided for automatic cutting and diagnostic plotting.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: greenclust
+# Type: Package
+# Title: Combine Categories Using Greenacre's Method
+# Version: 1.0.0
+# Authors@R: person("Jeff", "Jetton", , "jeff.jetton@gmail.com", c("aut", "cre"))
+# Description: Implements a method of iteratively collapsing the rows of a contingency table, two at a time, by selecting the pair of categories whose combination yields a new table with the smallest loss of chi-squared, as described by Greenacre, M.J. (1988) <doi:10.1007/BF01901670>. The result is compatible with the class of object returned by the 'stats' package's hclust() function and can be used similarly (plotted as a dendrogram, cut, etc.). Additional functions are provided for automatic cutting and diagnostic plotting.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# URL: https://github.com/JeffJetton/greenclust
+# BugReports: https://github.com/JeffJetton/greenclust/issues
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Suggests: testthat, knitr, rmarkdown
+# NeedsCompilation: no
+# Packaged: 2019-07-16 12:25:43 UTC; jeffjetton
+# Author: Jeff Jetton [aut, cre]
+# Maintainer: Jeff Jetton <jeff.jetton@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-07-18 11:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,81 @@
+{% set version = '1.03.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gsa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GSA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GSA/GSA_{{ version }}.tar.gz
+  sha256: e192d4383f53680dbd556223ea5f8cad6bae62a80a337ba5fd8d05a8aee6a917
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: impute
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GSA')"           # [not win]
+    - "\"%R%\" -e \"library('GSA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www-stat.stanford.edu/~tibs/GSA
+  license: LGPL-3
+  summary: Gene Set Analysis.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: GSA
+# Title: Gene Set Analysis
+# Version: 1.03.1
+# Author: Brad Efron and R. Tibshirani
+# Description: Gene Set Analysis.
+# Maintainer: Rob Tibshirani <tibs@stat.stanford.edu>
+# Suggests: impute
+# License: LGPL
+# URL: http://www-stat.stanford.edu/~tibs/GSA
+# Packaged: 2019-01-31 16:56:00 UTC; hornik
+# Repository: CRAN
+# Date/Publication: 2019-01-31 17:27:39 UTC
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

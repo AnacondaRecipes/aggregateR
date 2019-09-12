@@ -1,0 +1,88 @@
+{% set version = '1.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-prroc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PRROC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PRROC/PRROC_{{ version }}.tar.gz
+  sha256: 479118ce47c527bc97fb58d531a31cabc094d9843d62f16922009dc62e8248d4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, ggplot2, ROCR
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PRROC')"           # [not win]
+    - "\"%R%\" -e \"library('PRROC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PRROC
+  license: GPL-3
+  summary: 'Computes the areas under the precision-recall (PR) and ROC curve for weighted (e.g.,
+    soft-labeled) and unweighted data. In contrast to other implementations, the interpolation
+    between points of the PR curve is done by a non-linear piecewise function. In addition
+    to the areas under the curves, the curves themselves can also be computed and plotted
+    by a specific S3-method. References: Davis and Goadrich (2006) <doi:10.1145/1143844.1143874>;
+    Keilwagen et al. (2014) <doi:10.1371/journal.pone.0092209>; Grau et al. (2015) <doi:10.1093/bioinformatics/btv153>.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PRROC
+# Type: Package
+# Title: Precision-Recall and ROC Curves for Weighted and Unweighted Data
+# Version: 1.3.1
+# Date: 2018-06-19
+# Author: Jan Grau and Jens Keilwagen
+# Maintainer: Jan Grau <grau@informatik.uni-halle.de>
+# Description: Computes the areas under the precision-recall (PR) and ROC curve for weighted (e.g., soft-labeled) and unweighted data. In contrast to other implementations, the interpolation between points of the PR curve is done by a non-linear piecewise function. In addition to the areas under the curves, the curves themselves can also be computed and plotted by a specific S3-method. References: Davis and Goadrich (2006) <doi:10.1145/1143844.1143874>; Keilwagen et al. (2014) <doi:10.1371/journal.pone.0092209>; Grau et al. (2015) <doi:10.1093/bioinformatics/btv153>.
+# License: GPL-3
+# Packaged: 2018-06-19 10:20:18 UTC; dev
+# Suggests: testthat, ggplot2, ROCR
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2018-06-19 10:42:55 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

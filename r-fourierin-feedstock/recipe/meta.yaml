@@ -1,0 +1,104 @@
+{% set version = '0.2.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fourierin
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fourierin_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fourierin/fourierin_{{ version }}.tar.gz
+  sha256: 1414c31f7a54dd55f208661db20def08c9051d477bb222f2c9b216486e100790
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, knitr, rmarkdown, dplyr, tidyr, purrr, ggplot2, lattice, rbenchmark
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.1
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.1
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fourierin')"           # [not win]
+    - "\"%R%\" -e \"library('fourierin')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/gbasulto/fourierin
+  license: MIT
+  summary: Computes Fourier integrals of functions of one and two variables using the Fast Fourier
+    transform. The Fourier transforms must be evaluated on a regular grid for fast evaluation.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fourierin
+# Type: Package
+# Title: Computes Numeric Fourier Integrals
+# Version: 0.2.4
+# Date: 2019-04-01
+# Author: Guillermo Basulto-Elias
+# Maintainer: Guillermo Basulto-Elias <guillermobasulto@gmail.com>
+# Description: Computes Fourier integrals of functions of one and two variables using the Fast Fourier transform. The Fourier transforms must be evaluated on a regular grid for fast evaluation.
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# LinkingTo: RcppArmadillo, Rcpp
+# Imports: Rcpp (>= 1.0.1), stats
+# Suggests: MASS, knitr, rmarkdown, dplyr, tidyr, purrr, ggplot2, lattice, rbenchmark
+# RoxygenNote: 6.1.1
+# URL: http://github.com/gbasulto/fourierin
+# BugReports: https://github.com/gbasulto/fourierin/issues
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2019-04-04 20:19:50 UTC; guillermo
+# Repository: CRAN
+# Date/Publication: 2019-04-07 12:22:43 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

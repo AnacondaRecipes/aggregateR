@@ -1,0 +1,101 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rcriteo
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RCriteo_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RCriteo/RCriteo_{{ version }}.tar.gz
+  sha256: de41afb74f9437c6a6d4015f08f246b324bbd335c7d122988125ffc4e9b2d0ef
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcurl
+    - r-xml
+    - r-httr
+    - r-plyr
+
+  run:
+    - r-base
+    - r-rcurl
+    - r-xml
+    - r-httr
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RCriteo')"           # [not win]
+    - "\"%R%\" -e \"library('RCriteo')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://jburkhardt.github.io/RCriteo/, http://www.criteo.com/, http://kb.criteo.com/advertising/content/5/27/en/api.html
+  license: GPL-2 | MIT
+  summary: Aims at loading Criteo online advertising campaign data into R. Criteo <http://www.criteo.com/>
+    is an online advertising service that enables advertisers to display commercial
+    ads to web users. The package provides an authentication process for R with the
+    Criteo API <http://kb.criteo.com/ advertising/content/5/27/en/api.html>. Moreover,
+    the package features an interface to query campaign data from the Criteo API. The
+    data can be downloaded and will be transformed into a R data frame.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RCriteo
+# Type: Package
+# Title: Loading Criteo Data into R
+# Version: 1.0.2
+# Date: 2016-06-07
+# Author: Johannes Burkhardt <johannes.burkhardt@gmail.com>
+# Maintainer: Johannes Burkhardt <johannes.burkhardt@gmail.com>
+# Description: Aims at loading Criteo online advertising campaign data into R. Criteo <http://www.criteo.com/> is an online advertising service that enables advertisers to display commercial ads to web users. The package provides an authentication process for R with the Criteo API <http://kb.criteo.com/ advertising/content/5/27/en/api.html>. Moreover, the package features an interface to query campaign data from the Criteo API. The data can be downloaded and will be transformed into a R data frame.
+# Depends: R (>= 3.1.1)
+# Imports: RCurl, XML, httr, plyr
+# License: GPL (>= 2) | MIT + file LICENSE
+# Encoding: UTF-8
+# URL: http://jburkhardt.github.io/RCriteo/, http://www.criteo.com/, http://kb.criteo.com/advertising/content/5/27/en/api.html
+# BugReports: https://github.com/jburkhardt/RCriteo/issues
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-07-07 13:23:46 UTC; jburkhardt
+# Repository: CRAN
+# Date/Publication: 2016-07-07 15:46:36
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

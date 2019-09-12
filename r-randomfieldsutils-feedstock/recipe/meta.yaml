@@ -1,0 +1,93 @@
+{% set version = '0.5.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-randomfieldsutils
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RandomFieldsUtils_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RandomFieldsUtils/RandomFieldsUtils_{{ version }}.tar.gz
+  sha256: ea823cba2e254a9f534efb4b772c0aeef2039ee9ef99744e077b969a87f8031d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RandomFieldsUtils')"           # [not win]
+    - "\"%R%\" -e \"library('RandomFieldsUtils')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://ms.math.uni-mannheim.de/de/publications/software/randomfieldsutils
+  license: GPL-3
+  summary: Various utilities are provided that might be used in spatial statistics and elsewhere.
+    It delivers a method for solving linear equations that checks the sparsity of the
+    matrix before any algorithm is used. Furthermore, it includes the Struve functions.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RandomFieldsUtils
+# Version: 0.5.3
+# Title: Utilities for the Simulation and Analysis of Random Fields
+# Author: Martin Schlather [aut, cre], Reinhard Furrer [ctb], Martin Kroll [ctb], Brian D. Ripley [ctb]
+# Maintainer: Martin Schlather <schlather@math.uni-mannheim.de>
+# Depends: R (>= 3.0)
+# Imports: utils, methods
+# Description: Various utilities are provided that might be used in spatial statistics and elsewhere. It delivers a method for solving linear equations that checks the sparsity of the matrix before any algorithm is used. Furthermore, it includes the Struve functions.
+# License: GPL (>= 3)
+# URL: http://ms.math.uni-mannheim.de/de/publications/software/randomfieldsutils
+# Packaged: 2019-03-02 22:43:06 UTC; schlather
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2019-03-04 12:00:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

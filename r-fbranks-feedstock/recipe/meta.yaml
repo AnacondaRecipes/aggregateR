@@ -1,0 +1,104 @@
+{% set version = '2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fbranks
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fbRanks_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fbRanks/fbRanks_{{ version }}.tar.gz
+  sha256: fd67471bc16e60102f0f3ce217648cd3a8e75ed6ad1a164ab2424efc6eab6b9e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: RJSONIO, RCurl, httr, XML, Rlab, xtable, tcltk, speedglm, glmnet
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-igraph
+    - r-stringr
+
+  run:
+    - r-base
+    - r-igraph
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fbRanks')"           # [not win]
+    - "\"%R%\" -e \"library('fbRanks')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.lastplanetranking.blogspot.com/
+  license: GPL-2
+  summary: This package uses time dependent Poisson regression and a record of goals scored in
+    matches to rank teams via estimated attack and defense strengths.  The statistical
+    model is based on Dixon and Coles (1997) Modeling Association Football Scores and
+    Inefficiencies in the Football Betting Market, Applied Statistics, Volume 46, Issue
+    2, 265-280.  The package has a some webscrapers to assist in the development and
+    updating of a match database.  If the match database contains unconnected clusters
+    (i.e. sets of teams that have only played each other and not played teams from other
+    sets), each cluster is ranked separately relative to the median team strength in
+    the cluster.  The package contains functions for predicting and simulating tournaments
+    and leagues from estimated models. The package allows fitting via the glm(), speedglm(),
+    and glmnet() functions.  The latter allows fast and efficient fitting of very large
+    numbers of teams.  The fitting algorithm will analyze the match data and determine
+    which teams form a cluster (a set of teams where there is a path of matches connecting
+    every team) and fit each cluster separately.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fbRanks
+# Type: Package
+# Title: Association Football (Soccer) Ranking via Poisson Regression
+# Version: 2.0
+# Date: 2013-10-21
+# Depends: stats
+# Imports: igraph, stringr
+# Suggests: RJSONIO, RCurl, httr, XML, Rlab, xtable, tcltk, speedglm, glmnet
+# Author: Eli Holmes
+# Maintainer: E Holmes <eeholmes@u.washington.edu>
+# Description: This package uses time dependent Poisson regression and a record of goals scored in matches to rank teams via estimated attack and defense strengths.  The statistical model is based on Dixon and Coles (1997) Modeling Association Football Scores and Inefficiencies in the Football Betting Market, Applied Statistics, Volume 46, Issue 2, 265-280.  The package has a some webscrapers to assist in the development and updating of a match database.  If the match database contains unconnected clusters (i.e. sets of teams that have only played each other and not played teams from other sets), each cluster is ranked separately relative to the median team strength in the cluster.  The package contains functions for predicting and simulating tournaments and leagues from estimated models. The package allows fitting via the glm(), speedglm(), and glmnet() functions.  The latter allows fast and efficient fitting of very large numbers of teams.  The fitting algorithm will analyze the match data and determine which teams form a cluster (a set of teams where there is a path of matches connecting every team) and fit each cluster separately.
+# License: GPL-2
+# URL: http://www.lastplanetranking.blogspot.com/
+# LazyData: yes
+# BuildVignettes: yes
+# Packaged: 2013-10-23 01:05:18 UTC; eli.holmes
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-10-23 07:59:42
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

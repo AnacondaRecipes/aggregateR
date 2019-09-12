@@ -1,0 +1,99 @@
+{% set version = '2.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ridge
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ridge_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ridge/ridge_{{ version }}.tar.gz
+  sha256: 1ebf59e1201007d29d044aac93e2481612e2af26b3e6c4bbd3a0a0398a3141a1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ridge')"           # [not win]
+    - "\"%R%\" -e \"library('ridge')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/SteffenMoritz/ridge
+  license: GPL-2
+  summary: Linear and logistic ridge regression functions. Additionally includes special functions
+    for  genome-wide single-nucleotide polymorphism (SNP) data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ridge
+# Title: Ridge Regression with Automatic Selection of the Penalty Parameter
+# Description: Linear and logistic ridge regression functions. Additionally includes special functions for  genome-wide single-nucleotide polymorphism (SNP) data.
+# Version: 2.4
+# Date: 2019-03-14
+# Authors@R:  c( person("Steffen", "Moritz", email="steffen.moritz10@gmail.com", role=c("aut", "cre"), comment = c(ORCID = "0000-0002-0085-1804")),person("Erika", "Cule", role=c("aut")) )
+# Author: Steffen Moritz [aut, cre] (<https://orcid.org/0000-0002-0085-1804>), Erika Cule [aut]
+# Maintainer: Steffen Moritz <steffen.moritz10@gmail.com>
+# Type: Package
+# BugReports: https://github.com/SteffenMoritz/ridge/issues
+# URL: http://github.com/SteffenMoritz/ridge
+# Repository: CRAN
+# Depends: R (>= 3.0.1)
+# Imports: stats, graphics, grDevices, utils
+# License: GPL-2
+# SystemRequirements: Gnu Scientific Library version >= 1.14
+# NeedsCompilation: yes
+# RoxygenNote: 6.0.1
+# Packaged: 2019-03-14 18:51:56 UTC; Steve
+# Date/Publication: 2019-03-15 06:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,96 @@
+{% set version = '1.0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ordfacreg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/OrdFacReg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/OrdFacReg/OrdFacReg_{{ version }}.tar.gz
+  sha256: fb524c996f3653ab38430d66f42ef30fe4f83db7bedc5a6375193573abdeaa9a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-eha
+    - r-survival
+
+  run:
+    - r-base
+    - r-mass
+    - r-eha
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('OrdFacReg')"           # [not win]
+    - "\"%R%\" -e \"library('OrdFacReg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.kasparrufibach.ch
+  license: GPL-2
+  summary: In biomedical studies, researchers are often interested in assessing the association
+    between one or more ordinal explanatory variables and an outcome variable, at the
+    same time adjusting for covariates of any type. The outcome variable may be continuous,
+    binary, or represent censored survival times. In the absence of a precise knowledge
+    of the response function, using monotonicity constraints on the ordinal variables
+    improves efficiency in estimating parameters, especially when sample sizes are small.
+    This package implements an active set algorithm that efficiently computes such estimators.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: OrdFacReg
+# Type: Package
+# Title: Least Squares, Logistic, and Cox-Regression with Ordered Predictors
+# Version: 1.0.6
+# Date: 2015-07-03
+# Author: Kaspar Rufibach
+# Maintainer: Kaspar Rufibach <kaspar.rufibach@gmail.com>
+# Depends: survival, eha, MASS
+# Imports: stats
+# Description: In biomedical studies, researchers are often interested in assessing the association between one or more ordinal explanatory variables and an outcome variable, at the same time adjusting for covariates of any type. The outcome variable may be continuous, binary, or represent censored survival times. In the absence of a precise knowledge of the response function, using monotonicity constraints on the ordinal variables improves efficiency in estimating parameters, especially when sample sizes are small. This package implements an active set algorithm that efficiently computes such estimators.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# URL: http://www.kasparrufibach.ch
+# Packaged: 2015-07-04 12:27:52 UTC; rufibach
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-07-04 15:27:12
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

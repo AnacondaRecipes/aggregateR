@@ -1,0 +1,91 @@
+{% set version = '1.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-scina
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SCINA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SCINA/SCINA_{{ version }}.tar.gz
+  sha256: 4d00f20bea743d4a012aca23134816ea521f8833fd875c4691656e2e5be469bf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-gplots
+
+  run:
+    - r-base
+    - r-mass
+    - r-gplots
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SCINA')"           # [not win]
+    - "\"%R%\" -e \"library('SCINA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://lce.biohpc.swmed.edu/scina/ https://github.com/jcao89757/SCINA
+  license: GPL-2
+  summary: An automatic cell type detection and assignment algorithm for single cell RNA-Seq
+    and Cytof/FACS data. 'SCINA' is capable of assigning cell type identities to a pool
+    of cells profiled by scRNA-Seq or Cytof/FACS data with prior knowledge of markers,
+    such as genes and protein symbols that are highly or lowly expressed in each category.
+    See Zhang Z, et al (2019) <doi:10.3390/genes10070531> for more details.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SCINA
+# Type: Package
+# Title: A Semi-Supervised Category Identification and Assignment Tool
+# Version: 1.2.0
+# Date: 2019-7-16
+# Author: Ze Zhang
+# Maintainer: Ze Zhang <Ze.Zhang@utsouthwestern.edu>
+# Depends: R (>= 2.15.0), MASS, gplots
+# Description: An automatic cell type detection and assignment algorithm for single cell RNA-Seq and Cytof/FACS data. 'SCINA' is capable of assigning cell type identities to a pool of cells profiled by scRNA-Seq or Cytof/FACS data with prior knowledge of markers, such as genes and protein symbols that are highly or lowly expressed in each category. See Zhang Z, et al (2019) <doi:10.3390/genes10070531> for more details.
+# URL: http://lce.biohpc.swmed.edu/scina/ https://github.com/jcao89757/SCINA
+# License: GPL-2
+# NeedsCompilation: no
+# RoxygenNote: 6.1.0
+# Packaged: 2019-07-17 18:39:19 UTC; s421955
+# Repository: CRAN
+# Date/Publication: 2019-07-18 06:38:25 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

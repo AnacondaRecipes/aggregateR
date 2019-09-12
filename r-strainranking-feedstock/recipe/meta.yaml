@@ -1,0 +1,89 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-strainranking
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/StrainRanking_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/StrainRanking/StrainRanking_{{ version }}.tar.gz
+  sha256: 20a6604d8c95374f639be5bc5962a1fc60e7940ff0ddd389d7154bd553dd0ae5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('StrainRanking')"           # [not win]
+    - "\"%R%\" -e \"library('StrainRanking')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=StrainRanking
+  license: GPL (>= 2.0) | file LICENSE
+  summary: Regression-based ranking of pathogen strains with respect to their contributions to
+    natural epidemics, using demographic and genetic data sampled in the curse of the
+    epidemics. This package also includes the GMCPIC test.
+  license_family: GPL3
+  license_file:
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: StrainRanking
+# Type: Package
+# Title: Ranking of Pathogen Strains
+# Version: 1.2
+# Date: 2017-11-25
+# Author: Soubeyrand, S., Tollenaere, C., Haon-Lasportes, E. and Laine, A.-L.
+# Maintainer: Samuel Soubeyrand <samuel.soubeyrand@inra.fr>
+# Description: Regression-based ranking of pathogen strains with respect to their contributions to natural epidemics, using demographic and genetic data sampled in the curse of the epidemics. This package also includes the GMCPIC test.
+# License: GPL (>= 2.0) | file LICENSE
+# Depends: R (>= 3.0.0), methods, stats, graphics
+# NeedsCompilation: yes
+# Packaged: 2017-11-27 19:48:57 UTC; samuelsoubeyrand
+# Repository: CRAN
+# Date/Publication: 2017-11-29 23:45:52 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

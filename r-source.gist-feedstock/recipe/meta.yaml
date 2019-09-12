@@ -1,0 +1,86 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-source.gist
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/source.gist_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/source.gist/source.gist_{{ version }}.tar.gz
+  sha256: d7a1c67893c9bf3b30a4350efcdcef72ed80c0a71c052e5920377dc608057b0d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcurl
+    - r-rjson
+
+  run:
+    - r-base
+    - r-rcurl
+    - r-rjson
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('source.gist')"           # [not win]
+    - "\"%R%\" -e \"library('source.gist')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=source.gist
+  license: MIT
+  summary: Analogous to source(), but works when given a Gist URL or ID.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: source.gist
+# Type: Package
+# Title: Read R code from a GitHub Gist
+# Version: 1.0.0
+# Date: 2012-12-03
+# Author: Mason Simon
+# Maintainer: Mason Simon <masonsimon@gmail.com>
+# Copyright: Verba, Inc.
+# Description: Analogous to source(), but works when given a Gist URL or ID.
+# License: MIT
+# Depends: RCurl, rjson
+# Packaged: 2012-12-04 00:39:10 UTC; mason
+# Repository: CRAN
+# Date/Publication: 2012-12-04 07:29:24
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,114 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-segmentr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/segmentr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/segmentr/segmentr_{{ version }}.tar.gz
+  sha256: 1f90a52182c615eaa52b8de6dd3e5d785fb2cffd890a25f899772ac063efb360
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, doParallel, knitr, rmarkdown, tidyr, tibble, dplyr, lubridate, magrittr, rdwd, purrr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.16
+    - r-foreach
+    - r-glue
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.16
+    - r-foreach
+    - r-glue
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('segmentr')"           # [not win]
+    - "\"%R%\" -e \"library('segmentr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/thalesmello/segmentr
+  license: MIT
+  summary: Given a likelihood provided by the user, this package applies it to a given matrix
+    dataset in order to find change points in the data that maximize the sum of the
+    likelihoods of all the segments. This package provides a handful of algorithms with
+    different time complexities and assumption compromises so the user is able to choose
+    the best one for the problem at hand. The implementation of the segmentation algorithms
+    in this package are based on the paper by Bruno M. de Castro, Florencia Leonardi
+    (2018) <arXiv:1501.01756>. The Berlin weather sample dataset was provided by Deutscher
+    Wetterdienst <https://dwd.de/>. You can find all the references in the Acknowledgments
+    section of this package's repository via the URL below.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: segmentr
+# Type: Package
+# Title: Segment Data With Maximum Likelihood
+# Version: 0.2.0
+# Authors@R: c( person("Thales", "Mello", email = "thalesmello@gmail.com", role = c("aut", "cre", "cph")), person("Florencia", "Leonardi", role = c("aut", "cph", "ths")), person("Bruno M.", "de Castro", role = c("cph")), person("Deutscher Wetterdienst", role = c("cph")) )
+# Maintainer: Thales Mello <thalesmello@gmail.com>
+# Description: Given a likelihood provided by the user, this package applies it to a given matrix dataset in order to find change points in the data that maximize the sum of the likelihoods of all the segments. This package provides a handful of algorithms with different time complexities and assumption compromises so the user is able to choose the best one for the problem at hand. The implementation of the segmentation algorithms in this package are based on the paper by Bruno M. de Castro, Florencia Leonardi (2018) <arXiv:1501.01756>. The Berlin weather sample dataset was provided by Deutscher Wetterdienst <https://dwd.de/>. You can find all the references in the Acknowledgments section of this package's repository via the URL below.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 2.10)
+# Imports: Rcpp (>= 0.12.16), foreach, glue
+# LinkingTo: Rcpp
+# Suggests: testthat, doParallel, knitr, rmarkdown, tidyr, tibble, dplyr, lubridate, magrittr, rdwd, purrr
+# RoxygenNote: 6.1.1
+# VignetteBuilder: knitr
+# Language: en-US
+# URL: https://github.com/thalesmello/segmentr
+# NeedsCompilation: yes
+# Packaged: 2019-08-28 20:36:43 UTC; thales
+# Author: Thales Mello [aut, cre, cph], Florencia Leonardi [aut, cph, ths], Bruno M. de Castro [cph], Deutscher Wetterdienst [cph]
+# Repository: CRAN
+# Date/Publication: 2019-08-28 21:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

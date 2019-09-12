@@ -1,0 +1,98 @@
+{% set version = '0.8.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hlsm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/HLSM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/HLSM/HLSM_{{ version }}.tar.gz
+  sha256: 09d27ec68d38a381d6a1f994804f4297e1a9394f69a082544a1f5803cbeec89f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-coda
+    - r-igraph
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-coda
+    - r-igraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('HLSM')"           # [not win]
+    - "\"%R%\" -e \"library('HLSM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=HLSM
+  license: GPL (> 3)
+  summary: 'Implements Hierarchical Latent Space Network Model (HLSM) for ensemble of networks
+    as described in Sweet et. al. (2012). <DOI:10.3102/1076998612458702>. '
+
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: HLSM
+# Type: Package
+# Title: Hierarchical Latent Space Network Model
+# Version: 0.8.1
+# Date: 2019-04-29
+# Author: Samrachana Adhikari, Brian Junker, Tracy Sweet, Andrew C. Thomas
+# Maintainer: Aditya Bhat<adiravbhat@gmail.com>
+# Description: Implements Hierarchical Latent Space Network Model (HLSM) for ensemble of networks as described in Sweet et. al. (2012). <DOI:10.3102/1076998612458702>.
+# Depends: R (>= 3.0.0)
+# ByteCompile: TRUE
+# License: GPL (> 3)
+# Imports: MASS, coda, igraph
+# LazyData: true
+# NeedsCompilation: yes
+# Packaged: 2019-04-30 13:52:12 UTC; adityabhat
+# Repository: CRAN
+# Date/Publication: 2019-04-30 21:00:34 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

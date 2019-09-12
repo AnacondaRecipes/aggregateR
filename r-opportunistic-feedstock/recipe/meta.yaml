@@ -1,0 +1,84 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-opportunistic
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Opportunistic_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Opportunistic/Opportunistic_{{ version }}.tar.gz
+  sha256: 999b93d429af911be352d51fa178237dfe7df29aa48b9368313bc8187f08524d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: hopbyhop, endtoend
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Opportunistic')"           # [not win]
+    - "\"%R%\" -e \"library('Opportunistic')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Opportunistic
+  license: GPL-2
+  summary: Computes the routing distribution, the expectation of the number of broadcasts, transmissions
+    and receptions considering an Opportunistic transport model. It provides theoretical
+    results and also estimated values based on Monte Carlo simulations.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Opportunistic
+# Type: Package
+# Title: Routing Distribution, Broadcasts, Transmissions and Receptions in an Opportunistic Network
+# Version: 1.2
+# Date: 2017-06-27
+# Author: Christian E. Galarza, Jonathan M. Olate
+# Maintainer: Christian E. Galarza <cgalarza88@gmail.com>
+# Description: Computes the routing distribution, the expectation of the number of broadcasts, transmissions and receptions considering an Opportunistic transport model. It provides theoretical results and also estimated values based on Monte Carlo simulations.
+# License: GPL (>= 2)
+# Suggests: hopbyhop, endtoend
+# NeedsCompilation: no
+# Packaged: 2017-06-27 21:39:12 UTC; ra143711
+# Repository: CRAN
+# Date/Publication: 2017-06-27 21:44:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,84 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rht
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RHT_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RHT/RHT_{{ version }}.tar.gz
+  sha256: 8cb9e398925f784d655b797a36d644a6305e88ea6ed043158222f921a145aebf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RHT')"           # [not win]
+    - "\"%R%\" -e \"library('RHT')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RHT
+  license: GPL-3
+  summary: This package offers functions to perform regularized Hotelling's T-square test for
+    pathway or gene set analysis. The package is tailored for but not limited to proteomics
+    data, in which sample sizes are often small, a large proportion of the data are
+    missing and/or correlations may be present.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RHT
+# Type: Package
+# Title: Regularized Hotelling's T-square Test for Pathway (Gene Set) Analysis
+# Version: 1.0
+# Date: 2011-11-14
+# Author: Lin S. Chen and Pei Wang
+# Maintainer: Lin S. Chen <lchen11@uchicago.edu>
+# Description: This package offers functions to perform regularized Hotelling's T-square test for pathway or gene set analysis. The package is tailored for but not limited to proteomics data, in which sample sizes are often small, a large proportion of the data are missing and/or correlations may be present.
+# License: GPL
+# LazyLoad: yes
+# Packaged: 2012-10-29 08:57:31 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2012-10-29 08:57:31
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

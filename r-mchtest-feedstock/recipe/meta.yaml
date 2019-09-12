@@ -1,0 +1,86 @@
+{% set version = '1.0-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mchtest
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MChtest_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MChtest/MChtest_{{ version }}.tar.gz
+  sha256: ee6a2ff5a83c025941a351e9923a5c0d75415724a00c3b15bc7ecf877c3677ac
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MChtest')"           # [not win]
+    - "\"%R%\" -e \"library('MChtest')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.niaid.nih.gov/about/brb-staff-fay
+  license: GPL-3
+  summary: Performs Monte Carlo hypothesis tests, allowing a couple of different sequential stopping
+    boundaries. For example, a truncated sequential probability ratio test boundary
+    (Fay, Kim and Hachey, 2007 <DOI:10.1198/106186007X257025>) and a boundary proposed
+    by Besag and Clifford, 1991 <DOI:10.1093/biomet/78.2.301>. Gives valid p-values
+    and confidence intervals on p-values.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MChtest
+# Type: Package
+# Title: Monte Carlo Hypothesis Tests with Sequential Stopping
+# Version: 1.0-3
+# Date: 2019-05-14
+# Author: Michael P. Fay
+# Maintainer: Michael P. Fay <mfay@niaid.nih.gov>
+# Depends: stats
+# Description: Performs Monte Carlo hypothesis tests, allowing a couple of different sequential stopping boundaries. For example, a truncated sequential probability ratio test boundary (Fay, Kim and Hachey, 2007 <DOI:10.1198/106186007X257025>) and a boundary proposed by Besag and Clifford, 1991 <DOI:10.1093/biomet/78.2.301>. Gives valid p-values and confidence intervals on p-values.
+# License: GPL
+# URL: https://www.niaid.nih.gov/about/brb-staff-fay
+# NeedsCompilation: no
+# Packaged: 2019-05-15 13:13:49 UTC; faym
+# Repository: CRAN
+# Date/Publication: 2019-05-16 13:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

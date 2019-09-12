@@ -1,0 +1,81 @@
+{% set version = '0.14' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-outliers
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/outliers_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/outliers/outliers_{{ version }}.tar.gz
+  sha256: b6ce8f1db6442481546131def8253cabdf4472116d193daea7cb935d2b76986d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('outliers')"           # [not win]
+    - "\"%R%\" -e \"library('outliers')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.r-project.org, http://www.komsta.net/
+  license: GPL-2
+  summary: A collection of some tests commonly used for identifying outliers.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: outliers
+# Version: 0.14
+# Date: 2011-01-23
+# Title: Tests for outliers
+# Author: Lukasz Komsta <lukasz.komsta@umlub.pl>
+# Maintainer: Lukasz Komsta <lukasz.komsta@umlub.pl>
+# Depends: R (>= 2.0)
+# Description: A collection of some tests commonly used for identifying outliers.
+# License: GPL (>= 2)
+# URL: http://www.r-project.org, http://www.komsta.net/
+# Packaged: 2011-01-23 21:48:52 UTC; luke
+# Repository: CRAN
+# Date/Publication: 2011-01-24 09:58:14
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

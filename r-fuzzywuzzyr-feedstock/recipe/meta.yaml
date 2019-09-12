@@ -1,0 +1,98 @@
+{% set version = '1.0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fuzzywuzzyr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fuzzywuzzyR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fuzzywuzzyR/fuzzywuzzyR_{{ version }}.tar.gz
+  sha256: 5459dfb88db6a9d9f2cab20045556afb889bd4df6464a04aaa270c426a8874cd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-reticulate
+
+  run:
+    - r-base
+    - r-r6
+    - r-reticulate
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fuzzywuzzyR')"           # [not win]
+    - "\"%R%\" -e \"library('fuzzywuzzyR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mlampros/fuzzywuzzyR
+  license: GPL-2
+  summary: 'Fuzzy string matching implementation of the ''fuzzywuzzy'' <https://github.com/seatgeek/fuzzywuzzy>
+    ''python'' package. It uses the Levenshtein Distance <https://en.wikipedia.org/wiki/Levenshtein_distance>
+    to calculate the differences between sequences. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fuzzywuzzyR
+# Type: Package
+# Title: Fuzzy String Matching
+# Version: 1.0.3
+# Date: 2018-02-26
+# Author: Lampros Mouselimis <mouselimislampros@gmail.com>
+# Maintainer: Lampros Mouselimis <mouselimislampros@gmail.com>
+# BugReports: https://github.com/mlampros/fuzzywuzzyR/issues
+# URL: https://github.com/mlampros/fuzzywuzzyR
+# Description: Fuzzy string matching implementation of the 'fuzzywuzzy' <https://github.com/seatgeek/fuzzywuzzy> 'python' package. It uses the Levenshtein Distance <https://en.wikipedia.org/wiki/Levenshtein_distance> to calculate the differences between sequences.
+# License: GPL-2
+# SystemRequirements: Python (>= 2.4), difflib, fuzzywuzzy ( >=0.15.0 ), python-Levenshtein ( >=0.12.0 ). Detailed installation instructions for each operating system can be found in the README file.
+# Depends: R(>= 3.2.3)
+# Imports: reticulate, R6
+# Suggests: testthat, covr, knitr, rmarkdown
+# Encoding: UTF-8
+# LazyData: true
+# VignetteBuilder: knitr
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-02-26 12:52:43 UTC; lampros
+# Repository: CRAN
+# Date/Publication: 2018-02-26 14:19:25 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

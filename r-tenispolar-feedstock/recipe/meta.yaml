@@ -1,0 +1,93 @@
+{% set version = '0.1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tenispolar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tenispolaR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tenispolaR/tenispolaR_{{ version }}.tar.gz
+  sha256: fa34d02739a204777ad23aea87e000259a43ca5dc2bf1e55296fda3e220cf776
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-stringr
+
+  run:
+    - r-base
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tenispolaR')"           # [not win]
+    - "\"%R%\" -e \"library('tenispolaR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/adelmofilho/tenispolaR
+  license: GPL-3
+  summary: 'Implementation of ZENIT-POLAR substitution cipher method of encryption using by default
+    the TENIS-POLAR cipher. This last cipher of encryption became famous through the
+    collection of Brazilian books "Os Karas" by the author Pedro Bandeira. For more
+    details, see "A Cryptographic Dictionary" (GC&CS, 1944). '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: tenispolaR
+# Title: Provides ZENIT-POLAR Substitution Cipher Method of Encryption
+# Version: 0.1.4
+# Authors@R:  person(given = "Adelmo", family = "Filho", role = c("aut", "cre"), email = "adelmo.aguiar.filho@gmail.com")
+# Description: Implementation of ZENIT-POLAR substitution cipher method of encryption using by default the TENIS-POLAR cipher. This last cipher of encryption became famous through the collection of Brazilian books "Os Karas" by the author Pedro Bandeira. For more details, see "A Cryptographic Dictionary" (GC&CS, 1944).
+# Encoding: UTF-8
+# LazyData: true
+# URL: https://github.com/adelmofilho/tenispolaR
+# BugReports: https://github.com/adelmofilho/tenispolaR/issues
+# Suggests: covr, testthat
+# Imports: stringr
+# RoxygenNote: 6.1.1
+# License: GPL-3
+# NeedsCompilation: no
+# Packaged: 2019-03-05 22:16:13 UTC; Adelmo Filho
+# Author: Adelmo Filho [aut, cre]
+# Maintainer: Adelmo Filho <adelmo.aguiar.filho@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-03-08 14:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

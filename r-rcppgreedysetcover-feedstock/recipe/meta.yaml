@@ -1,0 +1,103 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rcppgreedysetcover
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RcppGreedySetCover_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RcppGreedySetCover/RcppGreedySetCover_{{ version }}.tar.gz
+  sha256: 3d149a5d9b31a401a9cdfabd4ca4b02f438bcafd16474bdaabf3eeaa5f8a04ed
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh
+    - r-rcpp >=0.12.14
+    - r-data.table
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-rcpp >=0.12.14
+    - r-data.table
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RcppGreedySetCover')"           # [not win]
+    - "\"%R%\" -e \"library('RcppGreedySetCover')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/matthiaskaeding/RcppGreedySetCover
+  license: MIT
+  summary: A fast implementation of the greedy algorithm for the set cover problem using 'Rcpp'.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RcppGreedySetCover
+# Title: Greedy Set Cover
+# Version: 0.1.0
+# Authors@R: person("Matthias", "Kaeding", role = c("aut", "cre"),email="matthiaskaeding@posteo.de")
+# Description: A fast implementation of the greedy algorithm for the set cover problem using 'Rcpp'.
+# Depends: R (>= 3.2.5)
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# SystemRequirements: C++11
+# Imports: data.table, Rcpp (>= 0.12.14)
+# LinkingTo: BH, Rcpp (>= 0.12.14)
+# URL: http://github.com/matthiaskaeding/RcppGreedySetCover
+# BugReports: http://github.com/matthiaskaeding/RcppGreedySetCover/issues
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2018-01-24 07:57:05 UTC; mkaeding
+# Author: Matthias Kaeding [aut, cre]
+# Maintainer: Matthias Kaeding <matthiaskaeding@posteo.de>
+# Repository: CRAN
+# Date/Publication: 2018-01-24 12:41:12 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

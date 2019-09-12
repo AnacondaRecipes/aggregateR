@@ -1,0 +1,95 @@
+{% set version = '0.1-28' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rsymphony
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Rsymphony_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Rsymphony/Rsymphony_{{ version }}.tar.gz
+  sha256: dd9215974442043fafa44d02994db2530bb06ea28173962f004634b69e27a50b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Rsymphony')"           # [not win]
+    - "\"%R%\" -e \"library('Rsymphony')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://R-Forge.R-project.org/projects/rsymphony, https://projects.coin-or.org/SYMPHONY,
+    http://www.coin-or.org/download/source/SYMPHONY/
+  license: EPL
+  summary: An R interface to the SYMPHONY solver for mixed-integer linear programs.
+  license_family: OTHER
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Rsymphony
+# Version: 0.1-28
+# Title: SYMPHONY in R
+# Description: An R interface to the SYMPHONY solver for mixed-integer linear programs.
+# Authors@R: c(person("Reinhard", "Harter", role = "aut"), person("Kurt", "Hornik", role = c("aut", "cre"), email = "Kurt.Hornik@R-project.org"), person("Stefan", "Theussl", role = "aut"), person("Cyrille", "Szymanski", role = "ctb", email = "cnszym@gmail.com"), person("Florian", "Schwendinger", role = "ctb"))
+# License: EPL
+# Depends: R (>= 2.6.0)
+# Enhances: slam, Matrix, SparseM
+# SystemRequirements: SYMPHONY libraries and headers
+# URL: http://R-Forge.R-project.org/projects/rsymphony, https://projects.coin-or.org/SYMPHONY, http://www.coin-or.org/download/source/SYMPHONY/
+# NeedsCompilation: yes
+# Packaged: 2017-11-07 10:35:19 UTC; hornik
+# Author: Reinhard Harter [aut], Kurt Hornik [aut, cre], Stefan Theussl [aut], Cyrille Szymanski [ctb], Florian Schwendinger [ctb]
+# Maintainer: Kurt Hornik <Kurt.Hornik@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2017-11-07 10:42:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

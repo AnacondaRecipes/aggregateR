@@ -1,0 +1,100 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-facebook.s4
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/facebook.S4_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/facebook.S4/facebook.S4_{{ version }}.tar.gz
+  sha256: 327ff8c4e9707a787933d3069de43434133dec744571e91171eb1ab9fd73c3c5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr >=1.1.0
+    - r-magrittr
+    - r-plyr
+    - r-rjson
+
+  run:
+    - r-base
+    - r-httr >=1.1.0
+    - r-magrittr
+    - r-plyr
+    - r-rjson
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('facebook.S4')"           # [not win]
+    - "\"%R%\" -e \"library('facebook.S4')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://gabrielebaldassarre.com/r/facebook
+  license: MIT
+  summary: Provides an interface to the Facebook API and builds collections of elements that
+    reflects the graph architecture of Facebook. See <https://developers.facebook.com/docs/graph-api>
+    for more information.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: facebook.S4
+# Title: Access to Facebook API V2 via a Set of S4 Classes
+# Description: Provides an interface to the Facebook API and builds collections of elements that reflects the graph architecture of Facebook. See <https://developers.facebook.com/docs/graph-api> for more information.
+# Version: 1.1.0
+# Date: 2017-07-10
+# Authors@R: person("Gabriele", "Baldassarre", role = c("aut", "cre"), email = "gabriele@gabrielebaldassarre.com")
+# URL: https://gabrielebaldassarre.com/r/facebook
+# BugReports: https://github.com/theclue/facebook.S4/issues
+# Depends: R (>= 3.0)
+# Imports: httr (>= 1.1.0), magrittr, rjson, plyr, methods
+# Suggests: testthat
+# License: MIT + file LICENSE
+# NeedsCompilation: no
+# BuildKeepEmpty: TRUE
+# Collate: 'magrittr.R' 'generic-methods.R' 'FacebookGenericCollection-class.R' 'FacebookPagesCollection-class.R' 'FacebookUsersCollection-class.R' 'FacebookAlbumsCollection-class.R' 'FacebookGenericCollection.R' 'FacebookUsersCollection.R' 'FacebookPagesCollection.R' 'FacebookAlbumsCollection.R' 'FacebookPostsCollection-class.R' 'FacebookCommentsCollection-class.R' 'FacebookPostsCollection.R' 'FacebookCommentsCollection.R' 'FacebookConversationsCollection-class.R' 'FacebookConversationsCollection.R' 'FacebookEventsCollection-class.R' 'FacebookEventsCollection.R' 'FacebookGenericCollection-methods.R' 'FacebookGroupsCollection-class.R' 'FacebookGroupsCollection.R' 'FacebookLikesCollection-class.R' 'FacebookLikesCollection.R' 'FacebookMessagesCollection-class.R' 'FacebookMessagesCollection.R' 'FacebookMixedCollection-class.R' 'FacebookPhotosCollection-class.R' 'FacebookPhotosCollection.R' 'FacebookReactionsCollection-class.R' 'FacebookReactionsCollection.R' 'FacebookVideosCollection-class.R' 'FacebookVideosCollection.R' 'facebook.S4.R' 'facebook.current.accounts.R' 'utils.R' 'facebook.image.formats.R' 'facebook.object.likes.R' 'facebook.participants.R' 'facebook.permissions.R' 'facebook.search.R' 'facebook.senders.R' 'facebook.video.formats.R' 'fbOAuth.R' 'formatFbDate.R' 'onAttach.R' 'onLoad.R'
+# RoxygenNote: 6.0.1
+# Packaged: 2017-07-12 10:09:23 UTC; gabriele.baldassarre
+# Author: Gabriele Baldassarre [aut, cre]
+# Maintainer: Gabriele Baldassarre <gabriele@gabrielebaldassarre.com>
+# Repository: CRAN
+# Date/Publication: 2017-07-12 12:49:30 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

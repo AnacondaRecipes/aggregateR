@@ -1,0 +1,108 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-securitytxt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/securitytxt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/securitytxt/securitytxt_{{ version }}.tar.gz
+  sha256: dc9335aa5561fc38789d515c88d807addd434674fcb99679c19a6164186b3e7b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('securitytxt')"           # [not win]
+    - "\"%R%\" -e \"library('securitytxt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://gitlab.com/hrbrmstr/securitytxt
+  license: MIT
+  summary: When security risks in web services are discovered by independent security researchers
+    who understand the severity of the risk, they often lack the channels to properly
+    disclose them. As a result, security issues may be left unreported. The 'security.txt'
+    'Web Security Policies' specification defines an 'IETF' draft standard <https://tools.ietf.org/html/draft-foudil-securitytxt-00>
+    to help organizations define the process for security researchers to securely  disclose
+    security vulnerabilities. Tools are provided to help identify and  parse 'security.txt'
+    files to enable analysis of the usage and adoption of these policies.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: securitytxt
+# Type: Package
+# Title: Identify and Parse Web Security Policies Files
+# Version: 0.1.1
+# Date: 2019-08-18
+# Authors@R: c( person("Bob", "Rudis", email = "bob@rud.is", role = c("aut", "cre"),  comment = c(ORCID = "0000-0001-5670-2640")), person("SEOmoz", "Inc", role = c("aut", "cph"), comment = "url-cpp library, <https://github.com/seomoz/url-cpp>") )
+# Maintainer: Bob Rudis <bob@rud.is>
+# Description: When security risks in web services are discovered by independent security researchers who understand the severity of the risk, they often lack the channels to properly disclose them. As a result, security issues may be left unreported. The 'security.txt' 'Web Security Policies' specification defines an 'IETF' draft standard <https://tools.ietf.org/html/draft-foudil-securitytxt-00> to help organizations define the process for security researchers to securely  disclose security vulnerabilities. Tools are provided to help identify and  parse 'security.txt' files to enable analysis of the usage and adoption of these policies.
+# URL: https://gitlab.com/hrbrmstr/securitytxt
+# BugReports: https://gitlab.com/hrbrmstr/securitytxt/issues
+# Copyright: file inst/COPYRIGHTS
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Suggests: testthat, covr
+# Depends: R (>= 3.2.0)
+# Imports: Rcpp
+# RoxygenNote: 6.1.1
+# LinkingTo: Rcpp
+# NeedsCompilation: yes
+# Packaged: 2019-08-19 15:37:45 UTC; hrbrmstr
+# Author: Bob Rudis [aut, cre] (<https://orcid.org/0000-0001-5670-2640>), SEOmoz Inc [aut, cph] (url-cpp library, <https://github.com/seomoz/url-cpp>)
+# Repository: CRAN
+# Date/Publication: 2019-08-19 16:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

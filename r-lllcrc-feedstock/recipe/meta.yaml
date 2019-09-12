@@ -1,0 +1,96 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lllcrc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/lllcrc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/lllcrc/lllcrc_{{ version }}.tar.gz
+  sha256: 8bb148f588aa2ecb027a9d0158ab28cb25ccb4871275cf04cde58f371a73c11a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-vgam
+    - r-combinat
+    - r-data.table
+    - r-plyr
+
+  run:
+    - r-base
+    - r-vgam
+    - r-combinat
+    - r-data.table
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('lllcrc')"           # [not win]
+    - "\"%R%\" -e \"library('lllcrc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=lllcrc
+  license: GPL-2
+  summary: Applies local log-linear capture-recapture models (LLLMs) for closed populations,
+    as described in the doctoral thesis of Zachary Kurtz. The method is relevant when
+    there are 3-5 capture occasions, with auxiliary covariates available for all capture
+    occasions.  As part of estimating the number of missing population units, the method
+    estimates the "rate of missingness" as it varies over the covariate space.  In addition,
+    user-friendly functions are provided to recreate (approximately) the method of Zwane
+    and van der Heijden (2004), which applied the VGAM package in a way that is closely
+    related to LLLMs.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: lllcrc
+# Type: Package
+# Title: Local Log-linear Models for Capture-Recapture
+# Version: 1.2
+# Date: 2014-10-04
+# Author: Zach Kurtz
+# Maintainer: Zach Kurtz <zkurtz@gmail.com>
+# Description: Applies local log-linear capture-recapture models (LLLMs) for closed populations, as described in the doctoral thesis of Zachary Kurtz. The method is relevant when there are 3-5 capture occasions, with auxiliary covariates available for all capture occasions.  As part of estimating the number of missing population units, the method estimates the "rate of missingness" as it varies over the covariate space.  In addition, user-friendly functions are provided to recreate (approximately) the method of Zwane and van der Heijden (2004), which applied the VGAM package in a way that is closely related to LLLMs.
+# License: GPL-2
+# Imports: data.table, combinat, VGAM, plyr
+# Packaged: 2014-10-05 20:18:49 UTC; zach
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-10-06 00:53:14
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

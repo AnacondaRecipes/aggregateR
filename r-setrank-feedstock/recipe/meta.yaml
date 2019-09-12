@@ -1,0 +1,92 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-setrank
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SetRank_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SetRank/SetRank_{{ version }}.tar.gz
+  sha256: 9ea3609656a7b720e6b151b6fcbbad5e7f67535d6e40570377b0e802b8e6fb5c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: R.rsp
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-xml
+    - r-data.table
+    - r-igraph
+
+  run:
+    - r-base
+    - r-xml
+    - r-data.table
+    - r-igraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SetRank')"           # [not win]
+    - "\"%R%\" -e \"library('SetRank')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SetRank
+  license: GPL-3
+  summary: Implements an algorithm to conduct advanced gene set enrichment analysis on the results
+    of genomics experiments.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SetRank
+# Type: Package
+# Title: Advanced Gene Set Enrichment Analysis
+# Version: 1.1.0
+# Date: 2016-05-10
+# Author: Cedric Simillion
+# Maintainer: Cedric Simillion <cedric.simillion@dkf.unibe.ch>
+# Description: Implements an algorithm to conduct advanced gene set enrichment analysis on the results of genomics experiments.
+# License: GPL-3
+# Imports: XML, data.table, igraph
+# RoxygenNote: 5.0.1
+# Suggests: R.rsp
+# VignetteBuilder: R.rsp
+# NeedsCompilation: no
+# Packaged: 2016-05-11 08:43:17 UTC; cesim
+# Repository: CRAN
+# Date/Publication: 2016-05-11 12:06:23
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

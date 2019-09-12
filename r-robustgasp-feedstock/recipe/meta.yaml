@@ -1,0 +1,106 @@
+{% set version = '0.5.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-robustgasp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RobustGaSP_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RobustGaSP/RobustGaSP_{{ version }}.tar.gz
+  sha256: 731bc288a0f4fbcf29d32b1c923679f876ef85a4d7c5ac572891ffa2d2a151fe
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.3
+    - r-rcppeigen
+    - r-nloptr >=1.0.4
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.3
+    - r-rcppeigen
+    - r-nloptr >=1.0.4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RobustGaSP')"           # [not win]
+    - "\"%R%\" -e \"library('RobustGaSP')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RobustGaSP
+  license: GPL-2 | GPL-3
+  summary: 'Robust parameter estimation and prediction of Gaussian stochastic process emulators.
+    It allows for robust parameter estimation and prediction using Gaussian stochastic
+    process emulator. It also implements the parallel partial Gaussian stochastic process
+    emulator for computer model with massive outputs See the reference: Mengyang Gu
+    and Jim Berger, 2016, Annals of Applied Statistics; Mengyang Gu, Xiaojing Wang and
+    Jim Berger, 2018, Annals of Statistics.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RobustGaSP
+# Type: Package
+# Title: Robust Gaussian Stochastic Process Emulation
+# Version: 0.5.7
+# Date/Publication: 2019-06-05 18:20:03 UTC
+# Authors@R: c(person(given="Mengyang",family="Gu",role=c("aut","cre"),email="mgu6@jhu.edu"), person(given="Jesus",family="Palomo", role=c("aut"),email="jesus.palomo@urjc.es"), person(given="James",family="Berger", role="aut"))
+# Maintainer: Mengyang Gu <mgu6@jhu.edu>
+# Author: Mengyang Gu [aut, cre], Jesus Palomo [aut], James Berger [aut]
+# Description: Robust parameter estimation and prediction of Gaussian stochastic process emulators. It allows for robust parameter estimation and prediction using Gaussian stochastic process emulator. It also implements the parallel partial Gaussian stochastic process emulator for computer model with massive outputs See the reference: Mengyang Gu and Jim Berger, 2016, Annals of Applied Statistics; Mengyang Gu, Xiaojing Wang and Jim Berger, 2018, Annals of Statistics.
+# License: GPL-2 | GPL-3
+# LazyData: true
+# Depends: R (>= 3.5.0), methods
+# Imports: Rcpp (>= 0.12.3), nloptr (>= 1.0.4)
+# LinkingTo: Rcpp, RcppEigen
+# NeedsCompilation: yes
+# Repository: CRAN
+# Packaged: 2019-06-05 17:49:10 UTC; mengyanggu
+# RoxygenNote: 5.0.1
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

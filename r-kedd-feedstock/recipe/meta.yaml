@@ -1,0 +1,85 @@
+{% set version = '1.0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-kedd
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/kedd_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/kedd/kedd_{{ version }}.tar.gz
+  sha256: 38760abd8c8e8f69ad85ca7992803060acc44ce68358de1763bd2415fdf83c9f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('kedd')"           # [not win]
+    - "\"%R%\" -e \"library('kedd')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=kedd
+  license: GPL-2
+  summary: Smoothing techniques and computing bandwidth selectors of the nth derivative of a
+    probability density for one-dimensional data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: kedd
+# Type: Package
+# Title: Kernel Estimator and Bandwidth Selection for Density and Its Derivatives
+# Version: 1.0.3
+# Date: 2015-10-30
+# Author: Arsalane Chouaib Guidoum
+# Maintainer: Arsalane Chouaib Guidoum <acguidoum@usthb.dz>
+# Depends: R (>= 2.15.0)
+# Description: Smoothing techniques and computing bandwidth selectors of the nth derivative of a probability density for one-dimensional data.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# LazyData: yes
+# Classification/MSC: 62G05, 62G07, 65D10, 68N15
+# NeedsCompilation: no
+# Packaged: 2015-10-30 19:16:09 UTC; A.C
+# Repository: CRAN
+# Date/Publication: 2015-10-31 00:19:16
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

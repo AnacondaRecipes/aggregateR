@@ -1,0 +1,87 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-leersiecyl
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/leerSIECyL_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/leerSIECyL/leerSIECyL_{{ version }}.tar.gz
+  sha256: b4d76d0549df0c5b9dcd31e2d77780417291b07592727e30ac35696fef43a2ff
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcurl
+
+  run:
+    - r-base
+    - r-rcurl
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('leerSIECyL')"           # [not win]
+    - "\"%R%\" -e \"library('leerSIECyL')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=leerSIECyL
+  license: GPL-2
+  summary: "Functions to download data from the SIE, which is the Statistical Information System
+    (Sistema de Informaci\xF3n Estad\xEDstica) in the Statistical Portal of the Government
+    of Castilla y Le\xF3n (Spain) <https://estadistica.jcyl.es>."
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: leerSIECyL
+# Type: Package
+# Title: Read Data from the SIE
+# Version: 1.0.2
+# Date: 2018-04-17
+# Author: Jesus Maria Rodriguez Rodriguez
+# Maintainer: Jesus M. Rodriguez Rodriguez <jesusmro@ono.com>
+# Description: Functions to download data from the SIE, which is the Statistical Information System (Sistema de Informacion Estadistica) in the Statistical Portal of the Government of Castilla y Leon (Spain) <https://estadistica.jcyl.es>.
+# Depends: R (>= 3.2), RCurl
+# License: GPL-2
+# Encoding: latin1
+# NeedsCompilation: no
+# Packaged: 2018-05-08 07:06:43 UTC; rodrodje
+# Repository: CRAN
+# Date/Publication: 2018-05-08 09:34:24 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,101 @@
+{% set version = '1.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rcpphmm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RcppHMM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RcppHMM/RcppHMM_{{ version }}.tar.gz
+  sha256: c6d3ef59a1f8841f65c4273847cad79e36bb1733edd395d57a82fba06dfd8d69
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.6
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.6
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RcppHMM')"           # [not win]
+    - "\"%R%\" -e \"library('RcppHMM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RcppHMM
+  license: GPL-2
+  summary: Collection of functions to evaluate sequences, decode hidden states and estimate parameters
+    from a single or multiple sequences of a discrete time Hidden Markov Model. The
+    observed values can be modeled by a multinomial distribution for categorical/labeled
+    emissions, a mixture of Gaussians for continuous data and also a mixture of Poissons
+    for discrete values. It includes functions for random initialization, simulation,
+    backward or forward sequence evaluation, Viterbi or forward-backward decoding and
+    parameter estimation using an Expectation-Maximization approach.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RcppHMM
+# Type: Package
+# Title: Rcpp Hidden Markov Model
+# Version: 1.2.2
+# Date: 2017-11-21
+# Author: Roberto A. Cardenas-Ovando, Julieta Noguez and Claudia Rangel-Escareno
+# Maintainer: Roberto A. Cardenas-Ovando <robalecarova@gmail.com>
+# Description: Collection of functions to evaluate sequences, decode hidden states and estimate parameters from a single or multiple sequences of a discrete time Hidden Markov Model. The observed values can be modeled by a multinomial distribution for categorical/labeled emissions, a mixture of Gaussians for continuous data and also a mixture of Poissons for discrete values. It includes functions for random initialization, simulation, backward or forward sequence evaluation, Viterbi or forward-backward decoding and parameter estimation using an Expectation-Maximization approach.
+# License: GPL (>= 2)
+# Imports: Rcpp (>= 0.12.6)
+# LinkingTo: Rcpp, RcppArmadillo
+# NeedsCompilation: yes
+# SystemRequirements: C++11
+# Packaged: 2017-11-21 19:02:00 UTC; Dell
+# Repository: CRAN
+# Date/Publication: 2017-11-21 19:27:14 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

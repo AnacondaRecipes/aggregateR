@@ -1,0 +1,91 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rspincalc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RSpincalc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RSpincalc/RSpincalc_{{ version }}.tar.gz
+  sha256: fa8c867ba4d0b393982e671a5872ae097214270ab2ffbb8262ebfe15bee3d225
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RSpincalc')"           # [not win]
+    - "\"%R%\" -e \"library('RSpincalc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RSpincalc
+  license: GPL-3
+  summary: 'Conversion between attitude representations: DCM, Euler angles, Quaternions, and
+    Euler vectors. Plus conversion between 2 Euler angle set types (xyx, yzy, zxz, xzx,
+    yxy, zyz, xyz, yzx, zxy, xzy, yxz, zyx). Fully vectorized code, with warnings/errors
+    for Euler angles (singularity, out of range, invalid angle order),  DCM (orthogonality,
+    not proper, exceeded tolerance to unity determinant) and Euler vectors(not unity).
+    Also quaternion and other useful functions. Based on SpinCalc by John Fuller and
+    SpinConv by Paolo de Leva.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RSpincalc
+# Type: Package
+# Title: Conversion Between Attitude Representations of DCM, Euler Angles, Quaternions, and Euler Vectors
+# Version: 1.0.2
+# Encoding: UTF-8
+# Authors@R: c(person(given = "Jose", family = "Gama", role = c("aut","cre"),email = "rxprtgama@gmail.com"), person(given = "John", family = "Fuller", role = c("aut","cph")), person(given = "Paolo", family = "Leva", role = c("aut","cph")))
+# Description: Conversion between attitude representations: DCM, Euler angles, Quaternions, and Euler vectors. Plus conversion between 2 Euler angle set types (xyx, yzy, zxz, xzx, yxy, zyz, xyz, yzx, zxy, xzy, yxz, zyx). Fully vectorized code, with warnings/errors for Euler angles (singularity, out of range, invalid angle order),  DCM (orthogonality, not proper, exceeded tolerance to unity determinant) and Euler vectors(not unity). Also quaternion and other useful functions. Based on SpinCalc by John Fuller and SpinConv by Paolo de Leva.
+# License: GPL (>= 3)
+# Author: Jose Gama [aut, cre], John Fuller [aut, cph], Paolo Leva [aut, cph]
+# Maintainer: Jose Gama <rxprtgama@gmail.com>
+# Repository: CRAN
+# Repository/R-Forge/Project: rspincalc
+# Repository/R-Forge/Revision: 16
+# Repository/R-Forge/DateTimeStamp: 2015-07-16 22:34:34
+# Date/Publication: 2015-07-17 12:51:32
+# NeedsCompilation: no
+# Packaged: 2015-07-16 22:45:13 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

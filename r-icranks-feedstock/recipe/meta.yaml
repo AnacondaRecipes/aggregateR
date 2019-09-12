@@ -1,0 +1,100 @@
+{% set version = '3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-icranks
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ICRanks_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ICRanks/ICRanks_{{ version }}.tar.gz
+  sha256: 279de04a15b46be8825f3ce4cf95a64de16eac38373ba44daab0c4f3e4c49fef
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.11
+    - r-gmp
+    - r-multcomp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.11
+    - r-gmp
+    - r-multcomp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ICRanks')"           # [not win]
+    - "\"%R%\" -e \"library('ICRanks')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ICRanks
+  license: GPL-2
+  summary: 'Algorithms to construct simultaneous confidence intervals for the ranks of means
+    mu_1,...,mu_n based on an independent Gaussian sample using multiple testing techniques. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ICRanks
+# Type: Package
+# Title: Simultaneous Confidence Intervals for Ranks
+# Version: 3.1
+# Date: 2019-06-21
+# Author: Diaa Al Mohamad and Erik W. van Zwet and Jelle J. Goeman
+# Maintainer: Diaa Al Mohamad <diaa.almohamad@gmail.com>
+# Description: Algorithms to construct simultaneous confidence intervals for the ranks of means mu_1,...,mu_n based on an independent Gaussian sample using multiple testing techniques.
+# SystemRequirements: C++11
+# License: GPL (>= 2)
+# Imports: Rcpp (>= 0.12.11), multcomp, gmp
+# LinkingTo: Rcpp
+# RoxygenNote: 6.0.1.9000
+# NeedsCompilation: yes
+# Packaged: 2019-06-21 09:22:56 UTC; dalmohamad
+# Repository: CRAN
+# Date/Publication: 2019-06-21 22:00:58 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,106 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-genmeta
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GENMETA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GENMETA/GENMETA_{{ version }}.tar.gz
+  sha256: f70efc99b25a9182f6a070324f0c0d6106449b308d75611e0e7daff296c5bcd7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-magic
+
+  run:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-magic
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GENMETA')"           # [not win]
+    - "\"%R%\" -e \"library('GENMETA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=GENMETA
+  license: GPL-3
+  summary: Generalized meta-analysis is a technique for estimating parameters associated with
+    a multiple regression model through meta-analysis of studies which may have information
+    only on partial sets of the regressors. It estimates the effects of each variable
+    while fully adjusting for all other variables that are measured in at least one
+    of the studies. Using algebraic relationships between regression parameters in different
+    dimensions, a set of moment equations is specified for estimating the parameters
+    of a maximal model through information available on sets of parameter estimates
+    from a series of reduced models available from the different studies. The specification
+    of the equations requires a reference dataset to estimate the joint distribution
+    of the covariates. These equations are solved using the generalized method of moments
+    approach, with the optimal weighting of the equations taking into account uncertainty
+    associated with estimates of the parameters of the reduced models. The proposed
+    framework is implemented using iterated reweighted least squares algorithm for fitting
+    generalized linear regression models. For more details about the method, please
+    see pre-print version of the manuscript on generalized meta-analysis by Prosenjit
+    Kundu, Runlong Tang and Nilanjan Chatterjee (2018) <arXiv:1708.03818>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: GENMETA
+# Title: Implements Generalized Meta-Analysis Using Iterated Reweighted Least Squares Algorithm
+# Version: 0.1
+# Authors@R: c(person("Prosenjit", "Kundu", role = c("aut", "cre"), email = "pkundu@jhu.edu"), person("Runlong", "Tang", role = "aut"), person("Nilanjan", "Chatterjee", role = "aut"))
+# Description: Generalized meta-analysis is a technique for estimating parameters associated with a multiple regression model through meta-analysis of studies which may have information only on partial sets of the regressors. It estimates the effects of each variable while fully adjusting for all other variables that are measured in at least one of the studies. Using algebraic relationships between regression parameters in different dimensions, a set of moment equations is specified for estimating the parameters of a maximal model through information available on sets of parameter estimates from a series of reduced models available from the different studies. The specification of the equations requires a reference dataset to estimate the joint distribution of the covariates. These equations are solved using the generalized method of moments approach, with the optimal weighting of the equations taking into account uncertainty associated with estimates of the parameters of the reduced models. The proposed framework is implemented using iterated reweighted least squares algorithm for fitting generalized linear regression models. For more details about the method, please see pre-print version of the manuscript on generalized meta-analysis by Prosenjit Kundu, Runlong Tang and Nilanjan Chatterjee (2018) <arXiv:1708.03818>.
+# Depends: R (>= 2.15.3), MASS, graphics
+# Imports: Matrix, magic
+# License: GPL
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Collate: 'myoptim.R' 'sign.star.R' 'GENMETA.R' 'GENMETA.control.R' 'GENMETA.summary.R' 'GENMETA.plot.R'
+# NeedsCompilation: no
+# Packaged: 2018-11-21 20:37:35 UTC; prosenjitkundu
+# Author: Prosenjit Kundu [aut, cre], Runlong Tang [aut], Nilanjan Chatterjee [aut]
+# Maintainer: Prosenjit Kundu <pkundu@jhu.edu>
+# Repository: CRAN
+# Date/Publication: 2018-12-03 09:10:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

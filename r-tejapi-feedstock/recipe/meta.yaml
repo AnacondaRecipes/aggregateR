@@ -1,0 +1,93 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tejapi
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Tejapi_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Tejapi/Tejapi_{{ version }}.tar.gz
+  sha256: 332701cc5f965738817fca08a8d2962be97f1b39236e2b9ac2509b1997f400ed
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: roxygen2
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr >=0.6.1
+    - r-jsonlite >=0.9.14
+
+  run:
+    - r-base
+    - r-httr >=0.6.1
+    - r-jsonlite >=0.9.14
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Tejapi')"           # [not win]
+    - "\"%R%\" -e \"library('Tejapi')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://api.tej.com.tw
+  license: MIT
+  summary: Functions for interacting directly with the Taiwan Economic Journal API to offer data
+    in R. For more information go to <https://api.tej.com.tw>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Tejapi
+# Title: API Wrapper for Taiwan Economic Journal Data Service
+# Version: 1.0.1
+# Date: 2018-10-23
+# Authors@R: c(person("Peter","Young", role=c("aut", "cre"), email="peter_young@tej.com.tw"))
+# Author: Peter Young [aut, cre]
+# Maintainer: Peter Young <peter_young@tej.com.tw>
+# Description: Functions for interacting directly with the Taiwan Economic Journal API to offer data in R. For more information go to <https://api.tej.com.tw>.
+# Imports: httr (>= 0.6.1), jsonlite (>= 0.9.14)
+# Suggests: roxygen2
+# Depends: R (>= 2.15.0)
+# License: MIT + file LICENSE
+# URL: https://api.tej.com.tw
+# BugReports: https://api.tej.com.tw
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-11-01 00:17:52 UTC; YDS
+# Repository: CRAN
+# Date/Publication: 2018-11-04 16:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

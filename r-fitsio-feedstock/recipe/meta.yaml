@@ -1,0 +1,91 @@
+{% set version = '2.1-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fitsio
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/FITSio_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/FITSio/FITSio_{{ version }}.tar.gz
+  sha256: 576e98b6af2e81457837eb3955b990be44ad9ade2bf06e5205e7bdb8d5aa3d08
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('FITSio')"           # [not win]
+    - "\"%R%\" -e \"library('FITSio')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=FITSio
+  license: GPL-2
+  summary: 'Utilities to read and write files in the FITS (Flexible Image Transport System) format,
+    a standard format in astronomy (see e.g. <https://en.wikipedia.org/wiki/FITS> for
+    more information). Present low-level routines allow: reading, parsing, and modifying
+    FITS headers; reading FITS images (multi-dimensional arrays); reading FITS binary
+    and ASCII tables; and writing FITS images (multi-dimensional arrays).  Higher-level
+    functions allow: reading files composed of one or more headers and a single (perhaps
+    multidimensional) image or single table; reading tables into data frames; generating
+    vectors for image array axes; scaling and writing images as 16-bit integers.  Known
+    incompletenesses are reading random group extensions, as well as bit, complex, and
+    array descriptor data types in binary tables.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: FITSio
+# Type: Package
+# Title: FITS (Flexible Image Transport System) Utilities
+# Version: 2.1-0
+# Date: 2016-11-24
+# Author: Andrew Harris
+# Maintainer: Andrew Harris <harris@astro.umd.edu>
+# Depends: R (>= 3.0.0)
+# Description: Utilities to read and write files in the FITS (Flexible Image Transport System) format, a standard format in astronomy (see e.g. <https://en.wikipedia.org/wiki/FITS> for more information). Present low-level routines allow: reading, parsing, and modifying FITS headers; reading FITS images (multi-dimensional arrays); reading FITS binary and ASCII tables; and writing FITS images (multi-dimensional arrays).  Higher-level functions allow: reading files composed of one or more headers and a single (perhaps multidimensional) image or single table; reading tables into data frames; generating vectors for image array axes; scaling and writing images as 16-bit integers.  Known incompletenesses are reading random group extensions, as well as bit, complex, and array descriptor data types in binary tables.
+# License: GPL (>= 2)
+# Packaged: 2016-11-25 19:43:31 UTC; Andrew Harris
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2016-11-26 02:49:21
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

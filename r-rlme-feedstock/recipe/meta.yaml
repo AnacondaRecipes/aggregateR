@@ -1,0 +1,112 @@
+{% set version = '0.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rlme
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rlme_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rlme/rlme_{{ version }}.tar.gz
+  sha256: 2efe4e5516314c908810a68aab523959ee3bb464780304693a828af008af465c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-rcpp
+    - r-magic
+    - r-mgcv
+    - r-nlme
+    - r-quantreg
+    - r-robustbase
+    - r-stringr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-rcpp
+    - r-magic
+    - r-mgcv
+    - r-nlme
+    - r-quantreg
+    - r-robustbase
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rlme')"           # [not win]
+    - "\"%R%\" -e \"library('rlme')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rlme
+  license: GPL-2
+  summary: Estimates robust rank-based fixed effects and predicts robust random effects in two-
+    and three- level random effects nested models. The methodology is described in Bilgic
+    & Susmann (2013) <https://journal.r-project.org/archive/2013/RJ-2013-027/>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rlme
+# Type: Package
+# Title: Rank-Based Estimation and Prediction in Random Effects Nested Models
+# Version: 0.5
+# Date: 2018-01-08
+# Author: Yusuf Bilgic, Herb Susmann and Joseph McKean
+# Maintainer: Yusuf Bilgic <bilgic@geneseo.edu>
+# Description: Estimates robust rank-based fixed effects and predicts robust random effects in two- and three- level random effects nested models. The methodology is described in Bilgic & Susmann (2013) <https://journal.r-project.org/archive/2013/RJ-2013-027/>.
+# License: GPL (>= 2)
+# Imports: MASS, quantreg, nlme, mgcv, stringr, magic, robustbase, Rcpp, stats, utils, graphics
+# Suggests: testthat
+# NeedsCompilation: yes
+# LinkingTo: Rcpp
+# Repository: CRAN
+# RoxygenNote: 6.0.1
+# Packaged: 2018-01-09 15:42:36 UTC; herb
+# LazyData: true
+# Date/Publication: 2018-01-09 17:35:55 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,97 @@
+{% set version = '1.0-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stripless
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/stripless_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/stripless/stripless_{{ version }}.tar.gz
+  sha256: 59676fe7b2bc6bbcca22225f4386e2f158db423b872420cf99ab6483e7b9ad22
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: datasets,grDevices,knitr,faraway,rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lattice
+
+  run:
+    - r-base
+    - r-lattice
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('stripless')"           # [not win]
+    - "\"%R%\" -e \"library('stripless')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=stripless
+  license: GPL-2 | GPL-3
+  summary: For making Trellis-type conditioning plots without strip labels. This is useful for
+    displaying the structure of results from factorial designs and other studies when
+    many conditioning variables would clutter the display with layers of redundant strip
+    labels. Settings of the variables are encoded by layout and spacing in the trellis
+    array and decoded by a separate legend. The functionality is implemented by a single
+    S3 generic strucplot() function that is a wrapper for the Lattice package's xyplot()
+    function. This allows access to all Lattice graphics capabilities in the usual way.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: stripless
+# Type: Package
+# Title: Structured Trellis Displays Without Strips for Lattice Graphics
+# Version: 1.0-3
+# Date: 2016-09-09
+# Authors@R: person("Bert", "Gunter", email = "bgunter@comcast.net", role = c("aut","cre") )
+# Description: For making Trellis-type conditioning plots without strip labels. This is useful for displaying the structure of results from factorial designs and other studies when many conditioning variables would clutter the display with layers of redundant strip labels. Settings of the variables are encoded by layout and spacing in the trellis array and decoded by a separate legend. The functionality is implemented by a single S3 generic strucplot() function that is a wrapper for the Lattice package's xyplot() function. This allows access to all Lattice graphics capabilities in the usual way.
+# License: GPL-2 | GPL-3
+# Depends: R (>= 3.2.0), utils,lattice
+# Suggests: datasets,grDevices,knitr,faraway,rmarkdown
+# Imports: stats,graphics,grid
+# LazyData: true
+# VignetteBuilder: knitr
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-09-11 17:26:42 UTC; bgunter
+# Author: Bert Gunter [aut, cre]
+# Maintainer: Bert Gunter <bgunter@comcast.net>
+# Repository: CRAN
+# Date/Publication: 2016-09-12 08:11:45
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-loe
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/loe_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/loe/loe_{{ version }}.tar.gz
+  sha256: cc100c98bee78f6d11bc6227c8585bdc8bb7d55e4bf69ec4b16ca7d7ddbb26d8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: igraph, Matrix, vegan
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('loe')"           # [not win]
+    - "\"%R%\" -e \"library('loe')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=loe
+  license: GPL-2
+  summary: Local Ordinal embedding (LOE) is one of graph embedding methods for unweighted graphs.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: loe
+# Type: Package
+# Title: Local Ordinal Embedding
+# Version: 1.1
+# Date: 2016-02-09
+# Author: Yoshikazu Terada, Ulrike von Luxburg
+# Maintainer: Yoshikazu Terada <terada@nict.go.jp>
+# Depends: R (>= 3.2.3), MASS
+# Suggests: igraph, Matrix, vegan
+# Description: Local Ordinal embedding (LOE) is one of graph embedding methods for unweighted graphs.
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2016-02-09 10:40:11 UTC; terada
+# Repository: CRAN
+# Date/Publication: 2016-02-09 14:36:35
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

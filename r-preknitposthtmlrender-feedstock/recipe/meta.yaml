@@ -1,0 +1,94 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-preknitposthtmlrender
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PreKnitPostHTMLRender_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PreKnitPostHTMLRender/PreKnitPostHTMLRender_{{ version }}.tar.gz
+  sha256: e11527f7f05d283a6a25e4f29520d2cacc134c151a19402c708b38324e63899c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-xml >=3.98_1.4
+    - r-knitr >=1.13
+    - r-rmarkdown >=0.9.6
+
+  run:
+    - r-base
+    - r-xml >=3.98_1.4
+    - r-knitr >=1.13
+    - r-rmarkdown >=0.9.6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PreKnitPostHTMLRender')"           # [not win]
+    - "\"%R%\" -e \"library('PreKnitPostHTMLRender')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/chinsoon12/PreKnitPostHTMLRender
+  license: GPL-2
+  summary: Dynamize headers or R code within 'Rmd' files to prevent proliferation of 'Rmd' files
+    for similar reports. Add in external HTML document within 'rmarkdown' rendered HTML
+    doc.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PreKnitPostHTMLRender
+# Title: Pre-Knitting Processing and Post HTML-Rendering Processing
+# Version: 0.1.0
+# Date: 2016-06-05
+# Author: Chin Soon Lim [aut]
+# Maintainer: Chin Soon Lim <chinsoon12@hotmail.com>
+# Description: Dynamize headers or R code within 'Rmd' files to prevent proliferation of 'Rmd' files for similar reports. Add in external HTML document within 'rmarkdown' rendered HTML doc.
+# Depends: R (>= 3.3.0)
+# Imports: utils, tools, XML (>= 3.98-1.4), knitr (>= 1.13), rmarkdown (>= 0.9.6)
+# SystemRequirements: pandoc (>= 1.12.3) - http://johnmacfarlane.net/pandoc
+# License: GPL (>= 2) | file LICENSE
+# RoxygenNote: 5.0.1
+# URL: https://github.com/chinsoon12/PreKnitPostHTMLRender
+# BugReports: https://github.com/chinsoon12/PreKnitPostHTMLRender
+# NeedsCompilation: no
+# Packaged: 2016-06-06 12:11:55 UTC; ChinSoon
+# Repository: CRAN
+# Date/Publication: 2016-06-06 17:56:44
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

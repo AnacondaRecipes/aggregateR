@@ -1,0 +1,89 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-icods
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ICODS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ICODS/ICODS_{{ version }}.tar.gz
+  sha256: 29dee817c27cfed60132a6834f2a95464eba0d73516a41a0743237de7025918f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ICODS')"           # [not win]
+    - "\"%R%\" -e \"library('ICODS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ICODS
+  license: GPL-2
+  summary: Sieve semiparametric likelihood methods for analyzing  interval-censored failure time
+    data from an outcome-dependent sampling (ODS)  design and from a case-cohort design.  Zhou,
+    Q., Cai, J., and Zhou, H. (2018) <doi:10.1111/biom.12744>;  Zhou, Q., Zhou, H.,
+    and Cai, J. (2017)  <doi:10.1093/biomet/asw067>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ICODS
+# Type: Package
+# Title: Data Analysis for ODS and Case-Cohort Designs with Interval-Censoring
+# Version: 1.0
+# Date: 2019-6-05
+# Author: Shannon T. Holloway, Qingning Zhou, Jianwen Cai, Haibo Zhou
+# Maintainer: Shannon T. Holloway <sthollow@ncsu.edu>
+# Description: Sieve semiparametric likelihood methods for analyzing  interval-censored failure time data from an outcome-dependent sampling (ODS)  design and from a case-cohort design.  Zhou, Q., Cai, J., and Zhou, H. (2018) <doi:10.1111/biom.12744>;  Zhou, Q., Zhou, H., and Cai, J. (2017)  <doi:10.1093/biomet/asw067>.
+# License: GPL-2
+# Depends: methods, stats, MASS
+# NeedsCompilation: no
+# Repository: CRAN
+# Encoding: UTF-8
+# RoxygenNote: 6.1.1
+# Collate: 'myOptim.R' 'minObj.R' 'baseInfo.R' 'CaseCohort_Obj.R' 'CaseCohort_gr.R' 'CaseCohort_fn.R' 'class_ICODS.R' 'CaseCohort_class.R' 'bernstein.R' 'CaseCohortIC.R' 'CaseCohort_data.R' 'ODSDesign_Obj.R' 'ODSDesign_class.R' 'ODSDesignIC.R' 'ODSDesign_data.R' 'ODSDesign_fn.R' 'ODSDesign_gr.R' 'testInputData.R'
+# Packaged: 2019-06-05 12:16:40 UTC; sthollow
+# Date/Publication: 2019-06-05 13:00:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

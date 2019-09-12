@@ -1,0 +1,91 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stmgp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/stmgp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/stmgp/stmgp_{{ version }}.tar.gz
+  sha256: 09f1334eabc5af1b09e94192e0a1ffd784b77a2c89b21b1a40c842fd1e9b7a65
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('stmgp')"           # [not win]
+    - "\"%R%\" -e \"library('stmgp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=stmgp
+  license: GPL-2
+  summary: Rapidly build accurate genetic prediction models for genome-wide association or whole-genome
+    sequencing study data by smooth-threshold multivariate genetic prediction (STMGP)
+    method. Variable selection is performed using marginal association test p-values
+    with an optimal p-value cutoff selected by Cp-type criterion. Quantitative and binary
+    traits are modeled respectively via linear and logistic regression models. A function
+    that works through PLINK software (Purcell et al. 2007 <DOI:10.1086/519795>, Chang
+    et al. 2015 <DOI:10.1186/s13742-015-0047-8>) <https://www.cog-genomics.org/plink2>
+    is provided. Covariates can be included in regression model.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: stmgp
+# Type: Package
+# Title: Rapid and Accurate Genetic Prediction Modeling for Genome-Wide Association or Whole-Genome Sequencing Study Data
+# Version: 1.0.1
+# Date: 2019-07-24
+# Author: Masao Ueki
+# Maintainer: Masao Ueki <uekimrsd@nifty.com>
+# Description: Rapidly build accurate genetic prediction models for genome-wide association or whole-genome sequencing study data by smooth-threshold multivariate genetic prediction (STMGP) method. Variable selection is performed using marginal association test p-values with an optimal p-value cutoff selected by Cp-type criterion. Quantitative and binary traits are modeled respectively via linear and logistic regression models. A function that works through PLINK software (Purcell et al. 2007 <DOI:10.1086/519795>, Chang et al. 2015 <DOI:10.1186/s13742-015-0047-8>) <https://www.cog-genomics.org/plink2> is provided. Covariates can be included in regression model.
+# SystemRequirements: PLINK must be installed
+# License: GPL (>= 2)
+# Depends: MASS
+# NeedsCompilation: no
+# Packaged: 2019-07-26 05:54:30 UTC; uekim
+# Repository: CRAN
+# Date/Publication: 2019-07-26 06:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

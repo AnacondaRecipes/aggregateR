@@ -1,0 +1,87 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ykmeans
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ykmeans_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ykmeans/ykmeans_{{ version }}.tar.gz
+  sha256: a0608aecacda7658f8262d297dd0a1dfb972ca9e3c8f3953016c535d9d88d275
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-foreach
+    - r-plyr
+
+  run:
+    - r-base
+    - r-foreach
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ykmeans')"           # [not win]
+    - "\"%R%\" -e \"library('ykmeans')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ykmeans
+  license: GPL-3
+  summary: The clustering by k-means of using the target variable. To determine the number of
+    clusters with the variance of  the target variable in the cluster.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ykmeans
+# Type: Package
+# Title: K-means using a target variable
+# Version: 1.0
+# Date: 2014-03-14
+# Author: Yohei sato <yohei0511@gmail.com>
+# Maintainer: Yohei Sato <yohei0511@gmail.com>
+# Description: The clustering by k-means of using the target variable. To determine the number of clusters with the variance of  the target variable in the cluster.
+# License: GPL
+# Imports: plyr,foreach
+# LazyData: true
+# Packaged: 2014-03-14 01:16:17 UTC; sato_yohei
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-03-14 07:20:00
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

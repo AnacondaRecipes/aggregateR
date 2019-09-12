@@ -1,0 +1,87 @@
+{% set version = '0.2-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-r4dfp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/R4dfp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/R4dfp/R4dfp_{{ version }}.tar.gz
+  sha256: 8b7dfc3bc1903353ac463d643ed6cb8155a60045902698998890600aaffc9909
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  skip: True  # [not unix]
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('R4dfp')"           # [not win]
+    - "\"%R%\" -e \"library('R4dfp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=R4dfp
+  license: GPL-3
+  summary: This package provides an R interface with 2-part 4dfp MRI images (.4dfp.ifh and .4dfp.img
+    files.)
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: R4dfp
+# Version: 0.2-4
+# Date: 2013-01-10
+# Title: 4dfp MRI Image Read and Write Routines
+# Author: Kevin P. Barry <ta0kira@users.berlios.de> with contributions from Avi Z. Snyder <avi@npg.wustl.edu>
+# Maintainer: Aaron Benjamin Tanenbaum <tanenbauma@neuro.wustl.edu>
+# Description: This package provides an R interface with 2-part 4dfp MRI images (.4dfp.ifh and .4dfp.img files.)
+# License: GPL-3
+# Packaged: 2013-03-29 20:17:46 UTC; aaron
+# NeedsCompilation: yes
+# OS_type: unix
+# Repository: CRAN
+# Date/Publication: 2013-09-16 20:24:52
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

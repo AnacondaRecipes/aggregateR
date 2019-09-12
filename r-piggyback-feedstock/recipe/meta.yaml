@@ -1,0 +1,120 @@
+{% set version = '0.0.10' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-piggyback
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/piggyback_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/piggyback/piggyback_{{ version }}.tar.gz
+  sha256: 7f0134c234cf24ded142037f132349574851d22dc97f949784deed7a7897a721
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: spelling, readr, covr, testthat, datasets, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-clisymbols
+    - r-crayon
+    - r-fs
+    - r-gh
+    - r-git2r
+    - r-httr
+    - r-jsonlite
+    - r-lubridate
+    - r-magrittr
+    - r-memoise
+    - r-usethis
+
+  run:
+    - r-base
+    - r-clisymbols
+    - r-crayon
+    - r-fs
+    - r-gh
+    - r-git2r
+    - r-httr
+    - r-jsonlite
+    - r-lubridate
+    - r-magrittr
+    - r-memoise
+    - r-usethis
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('piggyback')"           # [not win]
+    - "\"%R%\" -e \"library('piggyback')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ropensci/piggyback
+  license: GPL-3
+  summary: Because larger (> 50 MB) data files cannot easily be committed to git, a different
+    approach is required to manage data associated with an analysis in a  GitHub repository.  This
+    package provides a simple work-around by allowing larger (up to 2 GB) data files
+    to piggyback on a repository as assets attached to individual GitHub releases.  These
+    files are not handled by git in any way, but instead are uploaded, downloaded, or
+    edited directly by calls through the GitHub API. These data files can be versioned
+    manually by creating different releases.  This approach works equally well with
+    public or private repositories.  Data can be uploaded and downloaded programmatically
+    from scripts. No authentication is required to download data from public repositories.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: piggyback
+# Version: 0.0.10
+# Title: Managing Larger Data on a GitHub Repository
+# Description: Because larger (> 50 MB) data files cannot easily be committed to git, a different approach is required to manage data associated with an analysis in a  GitHub repository.  This package provides a simple work-around by allowing larger (up to 2 GB) data files to piggyback on a repository as assets attached to individual GitHub releases.  These files are not handled by git in any way, but instead are uploaded, downloaded, or edited directly by calls through the GitHub API. These data files can be versioned manually by creating different releases.  This approach works equally well with public or private repositories.  Data can be uploaded and downloaded programmatically from scripts. No authentication is required to download data from public repositories.
+# Authors@R: c(person("Carl", "Boettiger",  email = "cboettig@gmail.com",  role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0002-1642-628X")), person("Mark", "Padgham",  role = c("ctb"), comment = c(ORCID = "0000-0003-2172-5265")), person(c('Jeffrey', 'O'), 'Hanson', role = c("ctb"), comment = c(ORCID = "0000-0002-4716-6134")))
+# URL: https://github.com/ropensci/piggyback
+# BugReports: https://github.com/ropensci/piggyback/issues
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# ByteCompile: true
+# Imports: gh, httr, jsonlite, git2r, fs, usethis, crayon, clisymbols, magrittr, lubridate, memoise
+# Suggests: spelling, readr, covr, testthat, datasets, knitr, rmarkdown
+# VignetteBuilder: knitr
+# RoxygenNote: 6.1.1
+# Language: en-US
+# NeedsCompilation: no
+# Packaged: 2019-02-07 00:21:50 UTC; cboettig
+# Author: Carl Boettiger [aut, cre, cph] (<https://orcid.org/0000-0002-1642-628X>), Mark Padgham [ctb] (<https://orcid.org/0000-0003-2172-5265>), Jeffrey O Hanson [ctb] (<https://orcid.org/0000-0002-4716-6134>)
+# Maintainer: Carl Boettiger <cboettig@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-02-07 05:50:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

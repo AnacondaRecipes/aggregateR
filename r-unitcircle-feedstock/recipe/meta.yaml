@@ -1,0 +1,84 @@
+{% set version = '0.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-unitcircle
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/UnitCircle_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/UnitCircle/UnitCircle_{{ version }}.tar.gz
+  sha256: 597f3d2f74d02981346d4565a5b5bb84335d02ad98a044b8226a168af4d5ba7c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('UnitCircle')"           # [not win]
+    - "\"%R%\" -e \"library('UnitCircle')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/BerriJ/UnitCircle
+  license: GPL-3
+  summary: The uc.check() function checks whether the roots of a given polynomial lie outside
+    the Unit circle. You can also easily draw an unit circle.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: UnitCircle
+# Type: Package
+# Title: Check if Roots of a Polynomial Lie Outside the Unit Circle
+# Version: 0.1.3
+# Author: Jonathan Berrisch
+# Maintainer: Jonathan Berrisch <Jonathan@Berrisch.biz>
+# Description: The uc.check() function checks whether the roots of a given polynomial lie outside the Unit circle. You can also easily draw an unit circle.
+# License: GPL-3
+# Encoding: UTF-8
+# RoxygenNote: 6.0.1
+# URL: https://github.com/BerriJ/UnitCircle
+# BugReports: https://github.com/BerriJ/UnitCircle/issues
+# NeedsCompilation: no
+# Packaged: 2018-07-22 21:45:15 UTC; Jonathan
+# Repository: CRAN
+# Date/Publication: 2018-07-27 21:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

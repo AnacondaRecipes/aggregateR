@@ -1,0 +1,84 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-phuassess
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/phuassess_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/phuassess/phuassess_{{ version }}.tar.gz
+  sha256: cfc23c129477b58a7251431bb3575e9aa495d8c6aa70283aa54d0c185f92f44a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('phuassess')"           # [not win]
+    - "\"%R%\" -e \"library('phuassess')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=phuassess
+  license: GPL-2
+  summary: Assessment of habitat selection by means of the permutation-based combination of sign
+    tests (Fattorini et al., 2014 <DOI:10.1007/s10651-013-0250-7>). To exemplify the
+    application of this procedure, habitat selection is assessed for a population of
+    European Brown Hares settled in central Italy.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: phuassess
+# Type: Package
+# Title: Proportional Habitat Use Assessment
+# Version: 1.1
+# Date: 2016-12-04
+# Author: Caterina Pisani [aut, cre] Lorenzo Fattorini [aut] Francesco Riga [aut] Marco Zaccaroni [aut]
+# Maintainer: Caterina Pisani <caterina.pisani@unisi.it>
+# Depends: R (>= 3.1.0), stats
+# Description: Assessment of habitat selection by means of the permutation-based combination of sign tests (Fattorini et al., 2014 <DOI:10.1007/s10651-013-0250-7>). To exemplify the application of this procedure, habitat selection is assessed for a population of European Brown Hares settled in central Italy.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2016-12-04 10:21:05 UTC; caterina
+# Repository: CRAN
+# Date/Publication: 2016-12-04 14:52:40
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

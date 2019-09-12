@@ -1,0 +1,86 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-l2boost
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/l2boost_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/l2boost/l2boost_{{ version }}.tar.gz
+  sha256: 61ce73b1bb9b5f4f769904232ca6459a68c5ea95c0d8278345d9ca7dff554f38
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('l2boost')"           # [not win]
+    - "\"%R%\" -e \"library('l2boost')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=l2boost
+  license: GPL-2
+  summary: Efficient implementation of Friedman's boosting algorithm with l2-loss function and
+    coordinate direction (design matrix columns) basis functions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: l2boost
+# Type: Package
+# Title: Friedman's Boosting Algorithm for Regularized Linear Regression
+# Version: 1.0.1
+# Date: 2017-11-01
+# Authors@R: c(person("John", "Ehrlinger", role=c("aut", "cre"), email="john.ehrlinger@gmail.com"), person("Hemant", "Ishwaran", role="aut"))
+# Description: Efficient implementation of Friedman's boosting algorithm with l2-loss function and coordinate direction (design matrix columns) basis functions.
+# License: GPL (>= 2)
+# Depends: R (>= 2.14.0), MASS, parallel
+# Packaged: 2017-11-02 12:59:23 UTC; jehrling
+# Author: John Ehrlinger [aut, cre], Hemant Ishwaran [aut]
+# Maintainer: John Ehrlinger <john.ehrlinger@gmail.com>
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2017-11-02 13:07:41 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

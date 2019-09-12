@@ -1,0 +1,87 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fixedtimeevents
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fixedTimeEvents_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fixedTimeEvents/fixedTimeEvents_{{ version }}.tar.gz
+  sha256: 528f41608698458e821a6d29d3651428ae69e78e8712d39439f292fb3d8af27c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fixedTimeEvents')"           # [not win]
+    - "\"%R%\" -e \"library('fixedTimeEvents')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=fixedTimeEvents
+  license: GPL-2
+  summary: Distribution functions and test for over-representation of short distances in the
+    Liland distribution. Simulation functions are included for comparison.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fixedTimeEvents
+# Type: Package
+# Title: The Distribution of Distances Between Discrete Events in Fixed Time
+# Version: 1.0
+# Date: 2016-10-01
+# Authors@R: c(person("Kristian Hovde", "Liland", role = c("aut","cre"), email="kristian.liland@nmbu.no"), person("Lars", "Snipen", role=c("ctb")))
+# Maintainer: Kristian Hovde Liland <kristian.liland@nmbu.no>
+# Description: Distribution functions and test for over-representation of short distances in the Liland distribution. Simulation functions are included for comparison.
+# License: GPL (>= 2)
+# Imports: stats
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-10-01 21:09:48 UTC; kristian.liland
+# Author: Kristian Hovde Liland [aut, cre], Lars Snipen [ctb]
+# Repository: CRAN
+# Date/Publication: 2016-10-02 10:12:31
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

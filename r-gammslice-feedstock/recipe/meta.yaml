@@ -1,0 +1,100 @@
+{% set version = '2.0-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gammslice
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gammSlice_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gammSlice/gammSlice_{{ version }}.tar.gz
+  sha256: de5b8cdcfb485231d5bc990400f15493de5269a07d066ee50f5fb90a7d789dce
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-kernsmooth
+    - r-lattice
+    - r-mgcv
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-kernsmooth
+    - r-lattice
+    - r-mgcv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gammSlice')"           # [not win]
+    - "\"%R%\" -e \"library('gammSlice')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=gammSlice
+  license: GPL-2
+  summary: Uses a slice sampling-based Markov chain Monte Carlo to conduct Bayesian fitting and
+    inference for generalized additive mixed models.  Generalized linear mixed models
+    and generalized  additive models are also handled as special cases of generalized
+    additive mixed models. The methodology and software is described  in Pham, T.H.
+    and Wand, M.P. (2018). Australian and New Zealand Journal of Statistics, 60, 279-330
+    <DOI:10.1111/ANZS.12241>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gammSlice
+# Version: 2.0-2
+# Date: 2019-01-03
+# Title: Generalized Additive Mixed Model Analysis via Slice Sampling
+# Authors@R: c(person("Tung H.", "Pham", role = c("aut"), email = "tungstats@gmail.com"), person("Matt P.", "Wand", role = c("aut", "cre"), email = "matt.wand@uts.edu.au"))
+# Maintainer: Matt P. Wand <matt.wand@uts.edu.au>
+# Depends: KernSmooth, lattice, mgcv
+# Description: Uses a slice sampling-based Markov chain Monte Carlo to conduct Bayesian fitting and inference for generalized additive mixed models.  Generalized linear mixed models and generalized  additive models are also handled as special cases of generalized additive mixed models. The methodology and software is described  in Pham, T.H. and Wand, M.P. (2018). Australian and New Zealand Journal of Statistics, 60, 279-330 <DOI:10.1111/ANZS.12241>.
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2019-01-03 05:30:14 UTC; mwand
+# Author: Tung H. Pham [aut], Matt P. Wand [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2019-01-03 08:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,92 @@
+{% set version = '1.2-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-robustx
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/robustX_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/robustX/robustX_{{ version }}.tar.gz
+  sha256: 190cf1c07f209bb088cc2a30a12b7cb4abf9d2a9947b5ceed361db67e8358708
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, lattice
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-robustbase >=0.92_3
+
+  run:
+    - r-base
+    - r-robustbase >=0.92_3
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('robustX')"           # [not win]
+    - "\"%R%\" -e \"library('robustX')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=robustX
+  license: GPL-2
+  summary: Robustness -- 'eXperimental', 'eXtraneous', or 'eXtraordinary' Functionality for Robust
+    Statistics.  In other words, methods which are not yet well established, often related
+    to methods in package 'robustbase'.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: robustX
+# Type: Package
+# Title: 'eXtra' / 'eXperimental' Functionality for Robust Statistics
+# Version: 1.2-4
+# Date: 2019-02-25
+# Author: Werner Stahel, Martin Maechler [aut, cre] (<https://orcid.org/0000-0002-8685-9910>) and potentially others
+# Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
+# Description: Robustness -- 'eXperimental', 'eXtraneous', or 'eXtraordinary' Functionality for Robust Statistics.  In other words, methods which are not yet well established, often related to methods in package 'robustbase'.
+# Imports: grDevices, graphics, stats, utils, robustbase (>= 0.92-3)
+# Suggests: MASS, lattice
+# Enhances: ICS
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# Repository: CRAN
+# Repository/R-Forge/Project: robustbase
+# Repository/R-Forge/Revision: 836
+# Repository/R-Forge/DateTimeStamp: 2019-02-25 09:25:22
+# Date/Publication: 2019-02-25 11:30:03 UTC
+# NeedsCompilation: no
+# Packaged: 2019-02-25 09:30:13 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

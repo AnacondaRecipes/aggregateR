@@ -1,0 +1,92 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rankingproject
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RankingProject_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RankingProject/RankingProject_{{ version }}.tar.gz
+  sha256: 046939dfc77e0fc19882072612f0af510397669d94a3005758029feaaf4022d8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr (>= 1.15.1), rmarkdown (>= 0.9.6), tikzDevice (>= 0.10-1)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RankingProject')"           # [not win]
+    - "\"%R%\" -e \"library('RankingProject')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/civilstat/RankingProject
+  license: GPL-2
+  summary: Functions to generate plots and tables for comparing independently- sampled populations.
+    Companion package to "A Primer on Visualizations for Comparing Populations, Including
+    the Issue of Overlapping Confidence Intervals" by Wright, Klein, and Wieczorek (2017,
+    in press).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RankingProject
+# Type: Package
+# Title: The Ranking Project: Visualizations for Comparing Populations
+# Version: 0.1.1
+# Date: 2017-03-16
+# Authors@R: c( person("Jerzy", "Wieczorek", email = "jerzywieczorek@gmail.com", role = c("cre", "aut")), person("Joel", "Beard", role = "ctb"), person("Andy", "Liaw", role = "ctb"), person("Robert", "Gentleman", role = "ctb"), person("Martin", "Maechler", role = "ctb"))
+# Description: Functions to generate plots and tables for comparing independently- sampled populations. Companion package to "A Primer on Visualizations for Comparing Populations, Including the Issue of Overlapping Confidence Intervals" by Wright, Klein, and Wieczorek (2017, in press).
+# License: GPL-2
+# LazyData: TRUE
+# Depends: R (>= 2.10)
+# Suggests: knitr (>= 1.15.1), rmarkdown (>= 0.9.6), tikzDevice (>= 0.10-1)
+# VignetteBuilder: knitr
+# URL: http://github.com/civilstat/RankingProject
+# BugReports: http://github.com/civilstat/RankingProject/issues
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2017-03-16 11:49:31 UTC; jerzy
+# Author: Jerzy Wieczorek [cre, aut], Joel Beard [ctb], Andy Liaw [ctb], Robert Gentleman [ctb], Martin Maechler [ctb]
+# Maintainer: Jerzy Wieczorek <jerzywieczorek@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-03-16 13:35:05
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

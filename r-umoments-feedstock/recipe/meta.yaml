@@ -1,0 +1,90 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-umoments
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Umoments_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Umoments/Umoments_{{ version }}.tar.gz
+  sha256: 6604c04167f9b2c48e9575c4ed1d3ef6aba7f89a4291c7f42823be7796dbee6d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Umoments')"           # [not win]
+    - "\"%R%\" -e \"library('Umoments')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Umoments
+  license: GPL-2
+  summary: Calculates one-sample unbiased central moment estimates and two-sample pooled estimates
+    up to 6th order, including unbiased estimates of powers and products of central
+    moments. Provides the machinery for obtaining unbiased central moment estimators
+    beyond 6th order.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Umoments
+# Type: Package
+# Title: Unbiased Central Moment Estimates
+# Version: 0.1.0
+# Author: Inna Gerlovina [aut, cre], Alan E. Hubbard [aut]
+# Maintainer: Inna Gerlovina <innager@berkeley.edu>
+# Description: Calculates one-sample unbiased central moment estimates and two-sample pooled estimates up to 6th order, including unbiased estimates of powers and products of central moments. Provides the machinery for obtaining unbiased central moment estimators beyond 6th order.
+# Depends: R (>= 3.4.0)
+# Imports: stats, utils
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.0
+# Suggests: knitr, rmarkdown, testthat
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-03-29 23:23:31 UTC; innars
+# Repository: CRAN
+# Date/Publication: 2019-04-01 16:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-unvotes
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/unvotes_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/unvotes/unvotes_{{ version }}.tar.gz
+  sha256: 2ce21f837837494e0a9fe25aa240b6d26a358f78576d819bc2d586ca77dc5671
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, dplyr, readxl, countrycode, tidyr, lubridate, devtools, rmarkdown, ggplot2
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('unvotes')"           # [not win]
+    - "\"%R%\" -e \"library('unvotes')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/dgrtwo/unvotes
+  license: MIT
+  summary: Historical voting data of the United Nations General Assembly. This includes votes
+    for each country in each roll call, as well as descriptions and topic classifications
+    for each vote.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: unvotes
+# Type: Package
+# Title: United Nations General Assembly Voting Data
+# Version: 0.2.0
+# Authors@R: person("David", "Robinson", email = "admiral.david@gmail.com", role = c("aut", "cre"))
+# Description: Historical voting data of the United Nations General Assembly. This includes votes for each country in each roll call, as well as descriptions and topic classifications for each vote.
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# URL: http://github.com/dgrtwo/unvotes
+# VignetteBuilder: knitr
+# BugReports: http://github.com/dgrtwo/unvotes/issues
+# Depends: R (>= 2.10)
+# Suggests: knitr, dplyr, readxl, countrycode, tidyr, lubridate, devtools, rmarkdown, ggplot2
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-06-18 21:48:04 UTC; drobinson
+# Author: David Robinson [aut, cre]
+# Maintainer: David Robinson <admiral.david@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-06-19 09:19:38 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

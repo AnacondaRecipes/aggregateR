@@ -1,0 +1,95 @@
+{% set version = '1.2.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-microseq
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/microseq_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/microseq/microseq_{{ version }}.tar.gz
+  sha256: f7bf03ff2b13f07756db88c10a2b50efe1015f3c6fd23106e4b7ece007b5efb2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('microseq')"           # [not win]
+    - "\"%R%\" -e \"library('microseq')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=microseq
+  license: GPL-2
+  summary: Basic functions for microbial sequence data analysis. The idea is to use the basic
+    R data structures as much as possible, without building complex data types.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: microseq
+# Type: Package
+# Title: Basic Biological Sequence Handling
+# Version: 1.2.3
+# Date: 2019-07-11
+# Author: Lars Snipen, Kristian Hovde Liland
+# Maintainer: Lars Snipen <lars.snipen@nmbu.no>
+# Description: Basic functions for microbial sequence data analysis. The idea is to use the basic R data structures as much as possible, without building complex data types.
+# License: GPL-2
+# Depends: R (>= 3.5.0)
+# Imports: Rcpp (>= 0.12.0)
+# LinkingTo: Rcpp (>= 0.12.0)
+# RoxygenNote: 6.1.1
+# NeedsCompilation: yes
+# Packaged: 2019-07-11 12:33:06 UTC; larssn
+# Repository: CRAN
+# Date/Publication: 2019-07-11 13:53:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,89 @@
+{% set version = '1.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-imputemdr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/imputeMDR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/imputeMDR/imputeMDR_{{ version }}.tar.gz
+  sha256: a7bd6ca00e7d32d09c00c7757052cb200c7368d9104569cb4f6ba7ad38514537
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('imputeMDR')"           # [not win]
+    - "\"%R%\" -e \"library('imputeMDR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=imputeMDR
+  license: GPL-2
+  summary: This package provides various approaches to handling missing values for the MDR analysis
+    to identify gene-gene interactions using biallelic marker data in genetic association
+    studies
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: imputeMDR
+# Type: Package
+# Title: The Multifactor Dimensionality Reduction (MDR) Analysis for Incomplete Data
+# Version: 1.1.2
+# Date: 2011-06-28
+# Author: Junghyun Namkung, Taeyoung Hwang, MinSeok Kwon, Sunggon Yi and Wonil Chung
+# Maintainer: Junghyun Namkung <jh.namkung@gmail.com>
+# Description: This package provides various approaches to handling missing values for the MDR analysis to identify gene-gene interactions using biallelic marker data in genetic association studies
+# License: GPL (>= 2)
+# LazyLoad: yes
+# Packaged: 2012-12-21 07:25:19 UTC; nkjh
+# Repository: CRAN
+# Date/Publication: 2012-12-21 09:01:16
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

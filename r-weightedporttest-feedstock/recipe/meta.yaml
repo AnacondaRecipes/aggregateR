@@ -1,0 +1,82 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-weightedporttest
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/WeightedPortTest_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/WeightedPortTest/WeightedPortTest_{{ version }}.tar.gz
+  sha256: 10c545f7436f833c0df76cafa361e7fd9a77045577467d74d36247ad131ffb00
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('WeightedPortTest')"           # [not win]
+    - "\"%R%\" -e \"library('WeightedPortTest')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=WeightedPortTest
+  license: GPL-3
+  summary: This packages contains the Weighted Portmanteau Tests as described in "New Weighted
+    Portmanteau Statistics for Time Series Goodness-of-Fit Testing' accepted for publication
+    by the Journal of the American Statistical Association.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: WeightedPortTest
+# Type: Package
+# Title: Weighted Portmanteau Tests for Time Series Goodness-of-fit
+# Version: 1.0
+# Date: 2012-05-24
+# Author: Thomas J. Fisher and Colin M. Gallagher
+# Maintainer: Thomas J. Fisher <fishertho@umkc.edu>
+# Description: This packages contains the Weighted Portmanteau Tests as described in "New Weighted Portmanteau Statistics for Time Series Goodness-of-Fit Testing' accepted for publication by the Journal of the American Statistical Association.
+# License: GPL (>= 3)
+# Packaged: 2012-05-24 05:14:15 UTC; tjfisher
+# Repository: CRAN
+# Date/Publication: 2012-05-24 06:24:13
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

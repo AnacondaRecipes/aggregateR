@@ -1,0 +1,105 @@
+{% set version = '3.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-jaguar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/JAGUAR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/JAGUAR/JAGUAR_{{ version }}.tar.gz
+  sha256: 0d57f73074f9cea5f83d5c19212effb686b1a614974e0362c8d127c9e342cc53
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-rcppprogress
+    - r-lme4
+    - r-plyr
+    - r-reshape2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-rcppprogress
+    - r-lme4
+    - r-plyr
+    - r-reshape2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('JAGUAR')"           # [not win]
+    - "\"%R%\" -e \"library('JAGUAR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://groups.google.com/d/forum/jaguar-r-package
+  license: GPL-2
+  summary: Implements a novel score test that measures 1) the overall shift in the gene expression
+    due to genotype (additive genetic effect), and 2) group-specific changes in gene
+    expression due to genotype (interaction effect) in a mixed-effects model framework.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: JAGUAR
+# Type: Package
+# Title: Joint Analysis of Genotype and Group-Specific Variability Using a Novel Score Test Approach to Map Expression Quantitative Trait Loci (eQTL)
+# Version: 3.0.1
+# Date: 2016-03-01
+# Author: Chaitanya R. Acharya and Andrew S. Allen
+# Maintainer: Chaitanya Acharya <c.acharya@duke.edu>
+# Depends: R (>= 3.0.0), Rcpp, plyr, lme4, reshape2
+# LinkingTo: RcppArmadillo, Rcpp, RcppProgress
+# NeedsCompilation: yes
+# Description: Implements a novel score test that measures 1) the overall shift in the gene expression due to genotype (additive genetic effect), and 2) group-specific changes in gene expression due to genotype (interaction effect) in a mixed-effects model framework.
+# License: GPL-2
+# URL: https://groups.google.com/d/forum/jaguar-r-package
+# Packaged: 2016-07-11 21:03:56 UTC; Chaitanya
+# Repository: CRAN
+# Date/Publication: 2016-07-27 02:52:37
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

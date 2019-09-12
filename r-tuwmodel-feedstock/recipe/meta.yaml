@@ -1,0 +1,97 @@
+{% set version = '1.0-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tuwmodel
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/TUWmodel_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/TUWmodel/TUWmodel_{{ version }}.tar.gz
+  sha256: 9dbc2fe56595384d053d835eebc5ed9b645b42f979299f603158087da28e07ac
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('TUWmodel')"           # [not win]
+    - "\"%R%\" -e \"library('TUWmodel')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=TUWmodel
+  license: GPL-2
+  summary: 'The model, developed at the Vienna University of Technology, is a lumped conceptual
+    rainfall-runoff model, following the structure of the HBV model.  The model can
+    also be run in a semi-distributed fashion. The model runs on a daily or shorter
+    time step and consists of a snow routine, a soil moisture routine and a flow routing
+    routine.  See Parajka, J., R. Merz, G. Bloeschl (2007) <DOI:10.1002/hyp.6253> Uncertainty
+    and multiple objective calibration in regional water balance modelling: case study
+    in 320 Austrian catchments, Hydrological Processes, 21, 435-446. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: TUWmodel
+# Type: Package
+# Title: Lumped/Semi-Distributed Hydrological Model for Education Purposes
+# Version: 1.0-2
+# Date: 2019-06-05
+# Authors@R: c(person("Alberto", "Viglione", role=c("aut", "cre"), email="viglione@hydro.tuwien.ac.at"), person("Juraj", "Parajka", role=c("aut"), email="parajka@hydro.tuwien.ac.at"))
+# Depends: R (>= 3.0.0), stats
+# Description: The model, developed at the Vienna University of Technology, is a lumped conceptual rainfall-runoff model, following the structure of the HBV model.  The model can also be run in a semi-distributed fashion. The model runs on a daily or shorter time step and consists of a snow routine, a soil moisture routine and a flow routing routine.  See Parajka, J., R. Merz, G. Bloeschl (2007) <DOI:10.1002/hyp.6253> Uncertainty and multiple objective calibration in regional water balance modelling: case study in 320 Austrian catchments, Hydrological Processes, 21, 435-446.
+# NeedsCompilation: yes
+# License: GPL (>= 2)
+# Packaged: 2019-06-07 17:50:52 UTC; alviglio
+# Author: Alberto Viglione [aut, cre], Juraj Parajka [aut]
+# Maintainer: Alberto Viglione <viglione@hydro.tuwien.ac.at>
+# Repository: CRAN
+# Date/Publication: 2019-06-07 18:51:39 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

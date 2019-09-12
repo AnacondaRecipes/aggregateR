@@ -1,0 +1,92 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sacobra
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SACOBRA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SACOBRA/SACOBRA_{{ version }}.tar.gz
+  sha256: 36d6dd1546689ed87b307d71b921f648653b09d9f3a21527a160f4aaf45c7388
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: nloptr, FNN, MASS, dfoptim, DEoptim, lhs, rgl, grDevices, scales, numDeriv, pracma, reshape2, data.table
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-mgcv
+    - r-testit
+
+  run:
+    - r-base
+    - r-r6
+    - r-mgcv
+    - r-testit
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SACOBRA')"           # [not win]
+    - "\"%R%\" -e \"library('SACOBRA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SACOBRA
+  license: GPL-2
+  summary: Performs surrogate-assisted optimization for expensive black-box constrained problems.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SACOBRA
+# Type: Package
+# Title: Self-Adjusting COBRA
+# Version: 1.1
+# Date: 2019-08-15
+# Author: Wolfgang Konen <wolfgang.konen@th-koeln.de> [aut],  Samineh Bagheri <samineh.bagheri@th-koeln.de> [aut,cre], Patrick Koch [aut], Thomas Baeck <t.h.w.baeck@liacs.leidenuniv.nl> [aut]
+# Maintainer: Samineh Bagheri <samineh.bagheri@th-koeln.de>
+# Description: Performs surrogate-assisted optimization for expensive black-box constrained problems.
+# License: GPL (>= 2)
+# Depends: R (>= 2.14.0),
+# Suggests: nloptr, FNN, MASS, dfoptim, DEoptim, lhs, rgl, grDevices, scales, numDeriv, pracma, reshape2, data.table
+# Imports: testit, methods, mgcv, R6
+# Collate: 'cobraInit.R' 'cobraPhaseI.R' 'cobraPhaseII.R' 'debugModel.R' 'defaultDebugRBF.R' 'defaultRI.R' 'defaultSAC.R' 'defaultTR.R' 'defaultCA.R' 'drawSurrogate3d.R' 'evalReal.R' 'fnArchive.R' 'getPredY.R' 'initialHjkb.R' 'innerFuncs.R' 'isres2.R' 'modifyEquCons.R' 'modelSelection.R' 'multiRunPlot.R' 'multiRunPlot_2.R' 'multiCOBRA.R' 'nmkb2.R' 'RbfInter.R' 'repairChootinan.R' 'repairInfeasRI2.R' 'SACOBRA.R' 'startCobra.R' 'trainSurrogates.R' 'trustRegion.R' 'updateSaveCobra.R' 'Gproblems.R'
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2019-08-26 16:59:22 UTC; bagheri
+# Repository: CRAN
+# Date/Publication: 2019-08-27 23:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

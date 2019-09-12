@@ -1,0 +1,82 @@
+{% set version = '12.0.0-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-unicode
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Unicode_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Unicode/Unicode_{{ version }}.tar.gz
+  sha256: a44cdc6d273bace59dba94cc931e1231cb2e5845f6ed1e7e4c2dadca6591fff2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Unicode')"           # [not win]
+    - "\"%R%\" -e \"library('Unicode')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Unicode
+  license: GPL-2
+  summary: Data from Unicode 12.0.0 and related utilities.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Unicode
+# Version: 12.0.0-1
+# Encoding: UTF-8
+# Title: Unicode Data and Utilities
+# Authors@R: person("Kurt", "Hornik", role = c("aut", "cre"), email = "Kurt.Hornik@R-project.org", comment = c(ORCID = "0000-0003-4198-9911"))
+# Description: Data from Unicode 12.0.0 and related utilities.
+# Depends: R (>= 3.2.0)
+# Imports: utils
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2019-04-23 07:24:40 UTC; hornik
+# Author: Kurt Hornik [aut, cre] (<https://orcid.org/0000-0003-4198-9911>)
+# Maintainer: Kurt Hornik <Kurt.Hornik@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2019-04-23 07:34:48 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

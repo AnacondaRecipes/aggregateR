@@ -1,0 +1,86 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lassosir
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LassoSIR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LassoSIR/LassoSIR_{{ version }}.tar.gz
+  sha256: 8321503218679808169c3824c90be0a428ff091188b42d0fd356045dcb18e82a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-glmnet
+
+  run:
+    - r-base
+    - r-glmnet
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LassoSIR')"           # [not win]
+    - "\"%R%\" -e \"library('LassoSIR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=LassoSIR
+  license: GPL-3
+  summary: Estimate the sufficient dimension reduction space using sparsed sliced inverse regression
+    via Lasso (Lasso-SIR) introduced in Lin, Zhao, and Liu (2017) <arxiv:1611.06655>.
+    The Lasso-SIR is consistent and achieve the optimal convergence rate under certain
+    sparsity conditions for the multiple index models.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LassoSIR
+# Type: Package
+# Title: Sparsed Sliced Inverse Regression via Lasso
+# Version: 0.1.1
+# Date: 2017-12-06
+# Author: Zhigen Zhao, Qian Lin, Jun Liu
+# Maintainer: Zhigen Zhao <zhigen.zhao@gmail.com>
+# Description: Estimate the sufficient dimension reduction space using sparsed sliced inverse regression via Lasso (Lasso-SIR) introduced in Lin, Zhao, and Liu (2017) <arxiv:1611.06655>. The Lasso-SIR is consistent and achieve the optimal convergence rate under certain sparsity conditions for the multiple index models.
+# License: GPL-3
+# Imports: glmnet, graphics, stats
+# NeedsCompilation: no
+# Packaged: 2017-12-06 16:40:52 UTC; zhaozhg
+# Repository: CRAN
+# Date/Publication: 2017-12-06 16:55:39 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

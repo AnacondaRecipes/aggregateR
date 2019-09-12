@@ -1,0 +1,105 @@
+{% set version = '0.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-timechange
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/timechange_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/timechange/timechange_{{ version }}.tar.gz
+  sha256: baf125fd2b1a1d9d0aafe871c916b8719ea1091ddfa6219bd2ca54154a809f14
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('timechange')"           # [not win]
+    - "\"%R%\" -e \"library('timechange')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/vspinu/timechange/
+  license: GPL-3
+  summary: Efficient routines for manipulation of date-time objects while accounting for time-zones
+    and daylight saving times. The package includes utilities for updating of date-time
+    components (year, month, day etc.), modification of time-zones, rounding of date-times,
+    period addition and subtraction etc. Parts of the 'CCTZ' source code, released under
+    the Apache 2.0 License, are included in this package. See <https://github.com/google/cctz>
+    for more details.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: timechange
+# Title: Efficient Changing of Date-Times
+# Version: 0.0.1
+# Authors@R: c(person("Vitalie", "Spinu", email = "spinuvit@gmail.com", role = c("aut", "cre")), person("Google Inc.", role = c("ctb", "cph")))
+# Description: Efficient routines for manipulation of date-time objects while accounting for time-zones and daylight saving times. The package includes utilities for updating of date-time components (year, month, day etc.), modification of time-zones, rounding of date-times, period addition and subtraction etc. Parts of the 'CCTZ' source code, released under the Apache 2.0 License, are included in this package. See <https://github.com/google/cctz> for more details.
+# Depends: R (>= 3.3)
+# License: GPL-3
+# Encoding: UTF-8
+# Imports: Rcpp (>= 0.12)
+# LinkingTo: Rcpp
+# Suggests: testthat, knitr
+# LazyData: true
+# SystemRequirements: A system with zoneinfo data (e.g. /usr/share/zoneinfo) as well as a recent-enough C++11 compiler (such as g++-4.8 or later). On Windows the zoneinfo included with R is used.
+# BugReports: https://github.com/vspinu/timechange/issues
+# URL: https://github.com/vspinu/timechange/
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2018-04-20 10:15:40 UTC; vspinu
+# Author: Vitalie Spinu [aut, cre], Google Inc. [ctb, cph]
+# Maintainer: Vitalie Spinu <spinuvit@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-04-26 10:30:14 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

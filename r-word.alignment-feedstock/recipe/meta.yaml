@@ -1,0 +1,88 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-word.alignment
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/word.alignment_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/word.alignment/word.alignment_{{ version }}.tar.gz
+  sha256: 02287578a30d2f699e141127d26959c3171ad2afca982d3eb3727e224dc2d446
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-openxlsx
+
+  run:
+    - r-base
+    - r-data.table
+    - r-openxlsx
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('word.alignment')"           # [not win]
+    - "\"%R%\" -e \"library('word.alignment')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=word.alignment
+  license: GPL-2
+  summary: For a given Sentence-Aligned Parallel Corpus, it aligns words for each sentence pair.
+    It considers one-to-many and symmetrization alignments. Moreover, it evaluates the
+    quality of word alignment based on this package and some other software. It also
+    builds an automatic dictionary of two languages based on given parallel corpus.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: word.alignment
+# Type: Package
+# Title: Computing Word Alignment Using IBM Model 1 (and Symmetrization) for a Given Parallel Corpus and Its Evaluation
+# Version: 1.1
+# Date: 2019-04-04
+# Author: Neda Daneshagr and Majid Sarmad.
+# Maintainer: Neda Daneshgar<ne_da978@stu-mail.um.ac.ir>
+# Description: For a given Sentence-Aligned Parallel Corpus, it aligns words for each sentence pair. It considers one-to-many and symmetrization alignments. Moreover, it evaluates the quality of word alignment based on this package and some other software. It also builds an automatic dictionary of two languages based on given parallel corpus.
+# Depends: R(>= 3.2.2), data.table, openxlsx
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2019-04-15 08:55:50 UTC; daneshgar
+# Repository: CRAN
+# Date/Publication: 2019-04-15 09:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

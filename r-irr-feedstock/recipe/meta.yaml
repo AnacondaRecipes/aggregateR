@@ -1,0 +1,86 @@
+{% set version = '0.84.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-irr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/irr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/irr/irr_{{ version }}.tar.gz
+  sha256: e7bae8476b723a2246564c013194e8b7fcc9b34affc0ab5fcd55875231f544c3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lpsolve
+
+  run:
+    - r-base
+    - r-lpsolve
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('irr')"           # [not win]
+    - "\"%R%\" -e \"library('irr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.r-project.org
+  license: GPL-2
+  summary: 'Coefficients of Interrater Reliability and Agreement for quantitative, ordinal and
+    nominal data: ICC, Finn-Coefficient, Robinson''s A, Kendall''s W, Cohen''s Kappa,
+    ...'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: irr
+# Version: 0.84.1
+# Date: 2012-01-22
+# Title: Various Coefficients of Interrater Reliability and Agreement
+# Author: Matthias Gamer <m.gamer@uke.uni-hamburg.de>, Jim Lemon <jim@bitwrit.com.au>, Ian Fellows <ifellows@uscd.edu> Puspendra Singh <puspendra.pusp22@gmail.com>
+# Maintainer: Matthias Gamer <m.gamer@uke.uni-hamburg.de>
+# Depends: R (>= 2.10), lpSolve
+# Description: Coefficients of Interrater Reliability and Agreement for quantitative, ordinal and nominal data: ICC, Finn-Coefficient, Robinson's A, Kendall's W, Cohen's Kappa, ...
+# License: GPL (>= 2)
+# URL: https://www.r-project.org
+# Packaged: 2019-01-26 16:15:29 UTC; hornik
+# Repository: CRAN
+# Date/Publication: 2019-01-26 17:07:15 UTC
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

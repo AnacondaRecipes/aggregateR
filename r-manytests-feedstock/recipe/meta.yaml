@@ -1,0 +1,81 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-manytests
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ManyTests_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ManyTests/ManyTests_{{ version }}.tar.gz
+  sha256: d13f1e4cb8a46485f3e59a6dfc45f3270d3b35a21bc1e08c08253536ede627d6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ManyTests')"           # [not win]
+    - "\"%R%\" -e \"library('ManyTests')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ManyTests
+  license: GPL-2
+  summary: Performs the multiple testing procedures of Cox (2011) <doi:10.5170/CERN-2011-006>
+    and Wong and Cox (2007) <doi:10.1080/02664760701240014>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ManyTests
+# Type: Package
+# Title: Multiple Testing Procedures of Cox (2011) and Wong and Cox (2007)
+# Version: 1.2
+# Date: 2016-10-30
+# Author: Christiana Kartsonaki
+# Maintainer: Christiana Kartsonaki <christiana.kartsonaki@gmail.com>
+# Description: Performs the multiple testing procedures of Cox (2011) <doi:10.5170/CERN-2011-006> and Wong and Cox (2007) <doi:10.1080/02664760701240014>.
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2016-10-31 13:57:00 UTC; home
+# Repository: CRAN
+# Date/Publication: 2016-10-31 16:53:46
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

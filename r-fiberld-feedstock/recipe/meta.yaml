@@ -1,0 +1,105 @@
+{% set version = '0.1-6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fiberld
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fiberLD_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fiberLD/fiberLD_{{ version }}.tar.gz
+  sha256: 9d34750e12349fb3a256d7f4d224d206f94d288cc9aa106840f51ca6b1a06bc4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-vgam
+    - r-doparallel
+    - r-foreach
+
+  run:
+    - r-base
+    - r-matrix
+    - r-vgam
+    - r-doparallel
+    - r-foreach
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fiberLD')"           # [not win]
+    - "\"%R%\" -e \"library('fiberLD')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=fiberLD
+  license: GPL-2
+  summary: Routines for estimating tree fiber (tracheid) length distributions in the standing
+    tree based on increment core samples. Two types of data can be used with the package,
+    increment  core data measured by means of an optical fiber analyzer (OFA), e.g.
+    such as the Kajaani  Fiber Lab, or measured by microscopy. Increment core data analyzed
+    by OFAs consist of the cell lengths of both cut and uncut fibres (tracheids) and
+    fines (such as ray parenchyma cells) without being able to identify which cells
+    are cut or if they are fines or fibres. The microscopy measured data consist of
+    the observed lengths of the uncut fibres in the increment core. A censored version
+    of a mixture of the fine and fiber length distributions is proposed to fit the OFA
+    data, under distributional assumptions (Svensson et al., 2006) <doi:10.1111/j.1467-9469.2006.00501.x>.
+    The package offers two choices for the assumptions of the underlying density functions
+    of the true fiber (fine) lenghts of those fibers (fines) that at least partially
+    appear in the increment core, being the generalized gamma and  the log normal densities.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Encoding: UTF-8
+# Package: fiberLD
+# Version: 0.1-6
+# Author: Natalya Pya Arnqvist[aut, cre],  Sara SjAstedt de Luna [aut]  Konrad Abramowicz [aut]
+# Maintainer: Natalya Pya Arnqvist <nat.pya@gmail.com>
+# Title: Fiber Length Determination
+# Date: 2019-02-08
+# Description: Routines for estimating tree fiber (tracheid) length distributions in the standing tree based on increment core samples. Two types of data can be used with the package, increment  core data measured by means of an optical fiber analyzer (OFA), e.g. such as the Kajaani  Fiber Lab, or measured by microscopy. Increment core data analyzed by OFAs consist of the cell lengths of both cut and uncut fibres (tracheids) and fines (such as ray parenchyma cells) without being able to identify which cells are cut or if they are fines or fibres. The microscopy measured data consist of the observed lengths of the uncut fibres in the increment core. A censored version of a mixture of the fine and fiber length distributions is proposed to fit the OFA data, under distributional assumptions (Svensson et al., 2006) <doi:10.1111/j.1467-9469.2006.00501.x>. The package offers two choices for the assumptions of the underlying density functions of the true fiber (fine) lenghts of those fibers (fines) that at least partially appear in the increment core, being the generalized gamma and  the log normal densities.
+# Depends: R (>= 2.15.0)
+# Imports: stats, graphics, Matrix, VGAM, parallel, foreach, doParallel
+# Suggests: MASS
+# License: GPL (>= 2)
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2019-02-08 21:07:16 UTC; natalya
+# Repository: CRAN
+# Date/Publication: 2019-02-18 10:30:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,111 @@
+{% set version = '3.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-secr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/secr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/secr/secr_{{ version }}.tar.gz
+  sha256: d804665d3a24c0da863ac815248871bdf104a696e1e313e75ebd5476d7fa2298
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: maptools, spsurvey, rgdal, knitr, gdistance, rgeos, readxl, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-abind
+    - r-mgcv
+    - r-nlme
+    - r-raster
+    - r-sp
+    - r-stringr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-abind
+    - r-mgcv
+    - r-nlme
+    - r-raster
+    - r-sp
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('secr')"           # [not win]
+    - "\"%R%\" -e \"library('secr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.otago.ac.nz/density
+  license: GPL-2
+  summary: Functions to estimate the density and size of a spatially distributed animal population
+    sampled with an array of passive detectors, such as traps, or by searching polygons
+    or transects. Models incorporating distance-dependent detection are fitted by maximizing
+    the likelihood. Tools are included for data manipulation and model selection.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: secr
+# Type: Package
+# Title: Spatially Explicit Capture-Recapture
+# Version: 3.2.1
+# Depends: R (>= 3.2.0), methods
+# Imports: abind, graphics, grDevices, MASS, utils, parallel, nlme, sp, mgcv, raster, stats, tools, stringr
+# Suggests: maptools, spsurvey, rgdal, knitr, gdistance, rgeos, readxl, rmarkdown
+# VignetteBuilder: knitr
+# Date: 2019-06-01
+# Author: Murray Efford
+# Maintainer: Murray Efford <murray.efford@otago.ac.nz>
+# Description: Functions to estimate the density and size of a spatially distributed animal population sampled with an array of passive detectors, such as traps, or by searching polygons or transects. Models incorporating distance-dependent detection are fitted by maximizing the likelihood. Tools are included for data manipulation and model selection.
+# License: GPL (>= 2)
+# LazyData: yes
+# LazyDataCompression: xz
+# URL: https://www.otago.ac.nz/density
+# NeedsCompilation: yes
+# Packaged: 2019-06-01 09:41:52 UTC; Murray
+# Repository: CRAN
+# Date/Publication: 2019-06-03 15:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

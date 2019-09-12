@@ -1,0 +1,87 @@
+{% set version = '0.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-phylometrics
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/phylometrics_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/phylometrics/phylometrics_{{ version }}.tar.gz
+  sha256: 340e10e33024b60c549d1f0b4fedb32bba03e830b5304d1b0fc9a9ca0735b9de
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('phylometrics')"           # [not win]
+    - "\"%R%\" -e \"library('phylometrics')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=phylometrics
+  license: GPL-2
+  summary: Provides functions to estimate statistical errors of phylogenetic metrics particularly
+    to detect binary trait influence on diversification, as well as a function to simulate
+    trees with fixed number of sampled taxa and trait prevalence.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: phylometrics
+# Title: Estimating Statistical Errors of Phylogenetic Metrics
+# Version: 0.0.1
+# Author: Xia Hua <xia.hua@anu.edu.au>, Lindell Bromham <lindell.bromham@anu.edu.au>
+# Maintainer: Xia Hua <xia.hua@anu.edu.au>
+# Description: Provides functions to estimate statistical errors of phylogenetic metrics particularly to detect binary trait influence on diversification, as well as a function to simulate trees with fixed number of sampled taxa and trait prevalence.
+# Depends: R (>= 2.1.1)
+# Imports: mvtnorm
+# License: GPL (>= 2)
+# Suggests: testthat
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2015-11-14 03:09:19 UTC; xhua
+# Repository: CRAN
+# Date/Publication: 2015-11-17 14:40:44
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

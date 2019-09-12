@@ -1,0 +1,97 @@
+{% set version = '0.15' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-servr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/servr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/servr/servr_{{ version }}.tar.gz
+  sha256: b13753018d3d06e95a81a908f559119c63a63a304f5e547370394d0e9f4a33a5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tools, later, rstudioapi, knitr (>= 1.9), rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httpuv >=1.4.0
+    - r-jsonlite
+    - r-mime >=0.2
+    - r-xfun
+
+  run:
+    - r-base
+    - r-httpuv >=1.4.0
+    - r-jsonlite
+    - r-mime >=0.2
+    - r-xfun
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('servr')"           # [not win]
+    - "\"%R%\" -e \"library('servr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/yihui/servr
+  license: GPL-3
+  summary: Start an HTTP server in R to serve static files, or dynamic documents that can be
+    converted to HTML files (e.g., R Markdown) under a given directory.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: servr
+# Type: Package
+# Title: A Simple HTTP Server to Serve Static Files or Dynamic Documents
+# Version: 0.15
+# Authors@R: c( person("Yihui", "Xie", role = c("aut", "cre"), email = "xie@yihui.name", comment = c(ORCID = "0000-0003-0645-5666")), person("Carson", "Sievert", role = "ctb"), person("Jesse", "Anderson", role = "ctb"), person("Ramnath", "Vaidyanathan", role = "ctb"), person() )
+# Maintainer: Yihui Xie <xie@yihui.name>
+# Description: Start an HTTP server in R to serve static files, or dynamic documents that can be converted to HTML files (e.g., R Markdown) under a given directory.
+# Depends: R (>= 3.0.0)
+# Imports: mime (>= 0.2), httpuv (>= 1.4.0), xfun, jsonlite
+# Suggests: tools, later, rstudioapi, knitr (>= 1.9), rmarkdown
+# License: GPL
+# URL: https://github.com/yihui/servr
+# BugReports: https://github.com/yihui/servr/issues
+# Encoding: UTF-8
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-08-07 04:37:15 UTC; yihui
+# Author: Yihui Xie [aut, cre] (<https://orcid.org/0000-0003-0645-5666>), Carson Sievert [ctb], Jesse Anderson [ctb], Ramnath Vaidyanathan [ctb]
+# Repository: CRAN
+# Date/Publication: 2019-08-07 05:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

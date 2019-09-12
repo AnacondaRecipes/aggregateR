@@ -1,0 +1,90 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-wmdb
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/WMDB_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/WMDB/WMDB_{{ version }}.tar.gz
+  sha256: 21671d51dcd8bd983afe0b7e1d0d1f3aa39578021eb6e07c39e961f186978d83
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('WMDB')"           # [not win]
+    - "\"%R%\" -e \"library('WMDB')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=WMDB
+  license: GPL-2
+  summary: Distance discriminant analysis method is one of classification methods according to
+    multiindex performance parameters.However,the traditional Mahalanobis distance discriminant
+    method treats with the importance of all parameters equally,and exaggerates the
+    role of parameters which changes a little.The weighted Mahalanobis distance is used
+    in discriminant analysis method to distinguish the importance of each parameter.In
+    the concrete application,firstly based on the principal component analysis scheme,a
+    new group of parameters and their corresponding percent contributions of the parameters
+    are calculated ,and the weighted matrix is regarded as the diagonal matrix of the
+    contributions rates.Setting data to standardization,then the weighted Mahalanobis
+    distance can be calculated.Besides the methods metioned above,bayes method is also
+    given.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: WMDB
+# Type: Package
+# Title: Discriminant Analysis Methods by Weight Mahalanobis Distance and bayes
+# Version: 1.0
+# Date: 2012-06-28
+# Author: Bingpei Wu
+# Maintainer: Bingpei Wu<jianpeizhon@126.com>
+# Description: Distance discriminant analysis method is one of classification methods according to multiindex performance parameters.However,the traditional Mahalanobis distance discriminant method treats with the importance of all parameters equally,and exaggerates the role of parameters which changes a little.The weighted Mahalanobis distance is used in discriminant analysis method to distinguish the importance of each parameter.In the concrete application,firstly based on the principal component analysis scheme,a new group of parameters and their corresponding percent contributions of the parameters are calculated ,and the weighted matrix is regarded as the diagonal matrix of the contributions rates.Setting data to standardization,then the weighted Mahalanobis distance can be calculated.Besides the methods metioned above,bayes method is also given.
+# License: GPL (>= 2)
+# Packaged: 2012-07-06 14:04:03 UTC; Administrator
+# Repository: CRAN
+# Date/Publication: 2012-07-06 15:58:00
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

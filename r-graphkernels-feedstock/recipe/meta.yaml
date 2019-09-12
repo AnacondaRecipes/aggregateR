@@ -1,0 +1,99 @@
+{% set version = '1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-graphkernels
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/graphkernels_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/graphkernels/graphkernels_{{ version }}.tar.gz
+  sha256: ac0dfd09603d21e78402409c6f59817ca0829f86e73ac1f66e19d4f3318cc3be
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.9
+    - r-rcppeigen
+    - r-igraph >=1.1.2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.9
+    - r-rcppeigen
+    - r-igraph >=1.1.2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('graphkernels')"           # [not win]
+    - "\"%R%\" -e \"library('graphkernels')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=graphkernels
+  license: GPL-2
+  summary: A fast C++ implementation for computing various graph kernels including (1) simple
+    kernels between vertex and/or edge label histograms, (2) graphlet kernels, (3) random
+    walk kernels (popular baselines), and (4) the Weisfeiler-Lehman graph kernel (state-of-the-art).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: graphkernels
+# Type: Package
+# Title: Graph Kernels
+# Version: 1.6
+# Date: 2018-05-30
+# Author: Mahito Sugiyama
+# Maintainer: Mahito Sugiyama <mahito@nii.ac.jp>
+# Description: A fast C++ implementation for computing various graph kernels including (1) simple kernels between vertex and/or edge label histograms, (2) graphlet kernels, (3) random walk kernels (popular baselines), and (4) the Weisfeiler-Lehman graph kernel (state-of-the-art).
+# License: GPL (>= 2)
+# Imports: Rcpp (>= 0.12.9)
+# Depends: igraph (>= 1.1.2)
+# LinkingTo: Rcpp, RcppEigen
+# NeedsCompilation: yes
+# Packaged: 2018-05-30 06:56:30 UTC; mahito
+# Repository: CRAN
+# Date/Publication: 2018-05-30 07:19:15 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,88 @@
+{% set version = '1.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lock5withr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Lock5withR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Lock5withR/Lock5withR_{{ version }}.tar.gz
+  sha256: 82810ee328aec6385566c607d2ce5bf21765094a8957f72e799191754388a383
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lubridate, lattice, mosaic
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Lock5withR')"           # [not win]
+    - "\"%R%\" -e \"library('Lock5withR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Lock5withR
+  license: GPL-2
+  summary: 'Data sets and other utilities for  ''Statistics: Unlocking the Power of Data'' by
+    Lock, Lock, Lock, Lock and Lock  (ISBN : 978-0-470-60187-7, http://lock5stat.com/).'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Lock5withR
+# Type: Package
+# Title: Datasets for 'Statistics: Unlocking the Power of Data'
+# Version: 1.2.2
+# Date: 2015-12-22
+# Author: Randall Pruim
+# Maintainer: Randall Pruim <rpruim@calvin.edu>
+# Description: Data sets and other utilities for  'Statistics: Unlocking the Power of Data' by Lock, Lock, Lock, Lock and Lock  (ISBN : 978-0-470-60187-7, http://lock5stat.com/).
+# License: GPL-2
+# Depends: R (>= 2.10)
+# Suggests: lubridate, lattice, mosaic
+# LazyLoad: yes
+# LazyData: yes
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2015-12-22 18:12:27 UTC; rpruim
+# Repository: CRAN
+# Date/Publication: 2015-12-22 20:50:46
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

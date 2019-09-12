@@ -1,0 +1,102 @@
+{% set version = '0.2-5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rmalschains
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Rmalschains_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Rmalschains/Rmalschains_{{ version }}.tar.gz
+  sha256: 211c8cb2943f26b2a4a844a7034894898d13d147f81a7de13b95c851b6d0989f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: inline
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.9.10
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.9.10
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Rmalschains')"           # [not win]
+    - "\"%R%\" -e \"library('Rmalschains')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Rmalschains
+  license: GPL-3
+  summary: An implementation of an algorithm family for continuous optimization called memetic
+    algorithms with local search chains (MA-LS-Chains). Memetic algorithms are hybridizations
+    of genetic algorithms with local search methods. They are especially suited for
+    continuous optimization.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Rmalschains
+# Maintainer: Christoph Bergmeir <c.bergmeir@decsai.ugr.es>
+# License: GPL-3 | file LICENSE
+# Title: Continuous Optimization using Memetic Algorithms with Local Search Chains (MA-LS-Chains) in R
+# LinkingTo: Rcpp
+# Type: Package
+# LazyLoad: yes
+# Authors@R: c( person("Christoph", "Bergmeir", email = "c.bergmeir@decsai.ugr.es", role = c("aut", "cre", "cph")), person("Jose M.", "Benitez", role = c("ths")), person("Daniel", "Molina", role = c("aut", "cph")), person("Robert", "Davies", role = c("ctb", "cph"), comment= "Developer of the matrix library newmat which partly ships with this package"), person("Dirk", "Eddelbuettel", role = c("ctb", "cph"), comment= "Developer of RcppDE from which code was used in evaluate.h"), person("Nikolaus", "Hansen", role = c("ctb", "cph"), comment= "Author of the original cmaes implementation that ships with the package"))
+# Description: An implementation of an algorithm family for continuous optimization called memetic algorithms with local search chains (MA-LS-Chains). Memetic algorithms are hybridizations of genetic algorithms with local search methods. They are especially suited for continuous optimization.
+# Version: 0.2-5
+# Depends: Rcpp (>= 0.9.10)
+# Suggests: inline
+# Encoding: UTF-8
+# Collate: 'malschains.R' 'Rmalschains-package.R'
+# RoxygenNote: 5.0.1
+# NeedsCompilation: yes
+# Packaged: 2019-03-15 00:31:14 UTC; bergmeir
+# Author: Christoph Bergmeir [aut, cre, cph], Jose M. Benitez [ths], Daniel Molina [aut, cph], Robert Davies [ctb, cph] (Developer of the matrix library newmat which partly ships with this package), Dirk Eddelbuettel [ctb, cph] (Developer of RcppDE from which code was used in evaluate.h), Nikolaus Hansen [ctb, cph] (Author of the original cmaes implementation that ships with the package)
+# Repository: CRAN
+# Date/Publication: 2019-03-15 09:23:35 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

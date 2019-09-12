@@ -1,0 +1,89 @@
+{% set version = '0.19' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gets
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gets_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gets/gets_{{ version }}.tar.gz
+  sha256: a57fbb931d6f88acb8c3c0b2bcb515bfd395a11a69fbe9153d6070446d060da3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lgarch, xtable
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-zoo
+
+  run:
+    - r-base
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gets')"           # [not win]
+    - "\"%R%\" -e \"library('gets')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=gets, http://www.sucarrat.net/R/gets
+  license: GPL-2
+  summary: Automated General-to-Specific (GETS) modelling of the mean and variance of a regression,
+    and indicator saturation methods for detecting and testing for structural breaks
+    in the mean.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gets
+# Type: Package
+# Title: General-to-Specific (GETS) Modelling and Indicator Saturation Methods
+# Version: 0.19
+# Date: 2019-07-10
+# Author: Genaro Sucarrat [aut, cre], Felix Pretis [aut], James Reade [aut]
+# Maintainer: Genaro Sucarrat <genaro.sucarrat@bi.no>
+# Description: Automated General-to-Specific (GETS) modelling of the mean and variance of a regression, and indicator saturation methods for detecting and testing for structural breaks in the mean.
+# License: GPL (>= 2)
+# Depends: R (>= 3.3.0), zoo, parallel
+# Suggests: lgarch, xtable
+# BugReports: https://github.com/gsucarrat/gets
+# URL: https://CRAN.R-project.org/package=gets, http://www.sucarrat.net/R/gets
+# NeedsCompilation: no
+# Packaged: 2019-07-10 14:45:25 UTC; sucarrat
+# Repository: CRAN
+# Date/Publication: 2019-07-10 15:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,90 @@
+{% set version = '0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-odata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/OData_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/OData/OData_{{ version }}.tar.gz
+  sha256: cef0cf449495217cb4f28be07cd85e382a4917a08eb037abac2a2fd5a09b2483
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rjsonio
+    - r-xml
+
+  run:
+    - r-base
+    - r-rjsonio
+    - r-xml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('OData')"           # [not win]
+    - "\"%R%\" -e \"library('OData')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=OData
+  license: GPL-2
+  summary: Helper methods for accessing data from web service based on OData Protocol. It provides
+    several helper methods to access the service metadata, the data from datasets and
+    to download some file resources (it only support CSV for now). For more information
+    about OData go to <http://www.odata.org/documentation/>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: OData
+# Type: Package
+# Title: R Helper for OData Web Services
+# Version: 0.6
+# Imports: XML, RJSONIO, utils
+# Date: 2016-12-16
+# Author: Patrick Beaucamp, Kevin Monnery, Sebastien Vigroux, BPM-Conseil
+# Maintainer: Sebastien Vigroux <sebastien.vigroux@bpm-conseil.com>
+# Description: Helper methods for accessing data from web service based on OData Protocol. It provides several helper methods to access the service metadata, the data from datasets and to download some file resources (it only support CSV for now). For more information about OData go to <http://www.odata.org/documentation/>.
+# License: GPL-2
+# LazyData: TRUE
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-12-20 16:33:25 UTC; svi
+# Repository: CRAN
+# Date/Publication: 2016-12-20 18:31:01
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

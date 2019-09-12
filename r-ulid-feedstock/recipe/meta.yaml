@@ -1,0 +1,114 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ulid
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ulid_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ulid/ulid_{{ version }}.tar.gz
+  sha256: 9bde255e9db9781cac0330230ed83b8993b215fe8ea917f458f38e4f6dc6b377
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, tinytest, knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ulid')"           # [not win]
+    - "\"%R%\" -e \"library('ulid')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://gitlab.com/hrbrmstr/ulid
+  license: MIT
+  summary: Universally unique identifiers ('UUIDs') can be suboptimal for many uses-cases because
+    they aren't the most character efficient way of encoding 128 bits of randomness;
+    v1/v2 versions are impractical in many environments, as they require access to a
+    unique, stable MAC address; v3/v5 versions require a unique seed and produce randomly
+    distributed IDs, which can cause fragmentation in many data structures; v4 provides
+    no other information than randomness which can cause fragmentation in many data
+    structures. 'ULIDs' (<https://github.com/ulid/spec>) have 128-bit compatibility
+    with 'UUID', 1.21e+24 unique 'ULIDs' per millisecond, are lexicographically sortable,
+    canonically encoded as a 26 character string, as opposed to the 36 character 'UUID',
+    use Crockford's 'base32' for better efficiency and readability (5 bits per character),
+    are case insensitive, have no special characters (i.e. are 'URL' safe) and have
+    a onotonic sort order (correctly detects and handles the same millisecond).
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ulid
+# Type: Package
+# Title: Generate Universally Unique Lexicographically Sortable Identifiers
+# Version: 0.3.0
+# Date: 2019-07-04
+# Authors@R: c( person("Bob", "Rudis", email = "bob@rud.is", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5670-2640")), person("suyash", role = c("aut"), comment = "ULID C++ Port <https://github.com/suyash/ulid/>") )
+# Maintainer: Bob Rudis <bob@rud.is>
+# Description: Universally unique identifiers ('UUIDs') can be suboptimal for many uses-cases because they aren't the most character efficient way of encoding 128 bits of randomness; v1/v2 versions are impractical in many environments, as they require access to a unique, stable MAC address; v3/v5 versions require a unique seed and produce randomly distributed IDs, which can cause fragmentation in many data structures; v4 provides no other information than randomness which can cause fragmentation in many data structures. 'ULIDs' (<https://github.com/ulid/spec>) have 128-bit compatibility with 'UUID', 1.21e+24 unique 'ULIDs' per millisecond, are lexicographically sortable, canonically encoded as a 26 character string, as opposed to the 36 character 'UUID', use Crockford's 'base32' for better efficiency and readability (5 bits per character), are case insensitive, have no special characters (i.e. are 'URL' safe) and have a onotonic sort order (correctly detects and handles the same millisecond).
+# URL: https://gitlab.com/hrbrmstr/ulid
+# BugReports: https://gitlab.com/hrbrmstr/ulid/issues
+# SystemRequirements: C++11
+# NeedsCompilation: yes
+# Encoding: UTF-8
+# License: MIT + file LICENSE
+# Suggests: covr, tinytest, knitr, rmarkdown
+# Depends: R (>= 3.2.0)
+# Imports: Rcpp
+# RoxygenNote: 6.1.1
+# LinkingTo: Rcpp
+# VignetteBuilder: knitr
+# Packaged: 2019-07-05 19:49:06 UTC; hrbrmstr
+# Author: Bob Rudis [aut, cre] (<https://orcid.org/0000-0001-5670-2640>), suyash [aut] (ULID C++ Port <https://github.com/suyash/ulid/>)
+# Repository: CRAN
+# Date/Publication: 2019-07-09 16:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,94 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pushoverr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pushoverr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pushoverr/pushoverr_{{ version }}.tar.gz
+  sha256: 6d8166e06ae702c9bc2dce5e4b9744598116e1c46ed27f6cf541f4af41cf5ffd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-assertthat
+    - r-httr
+
+  run:
+    - r-base
+    - r-assertthat
+    - r-httr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pushoverr')"           # [not win]
+    - "\"%R%\" -e \"library('pushoverr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/briandconnelly/pushoverr
+  license: BSD_2_clause
+  summary: Send push notifications to mobile devices or the desktop using Pushover. These notifications
+    can display job status, results, scraped web data, or any other text or numeric
+    data.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_2_clause'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pushoverr
+# Type: Package
+# Title: Send Push Notifications using Pushover
+# Version: 1.0.0
+# Date: 2016-11-22
+# Authors@R: c(person(family="Connelly", given="Brian", email="bdc@bconnelly.net", role=c("aut", "cre")))
+# Description: Send push notifications to mobile devices or the desktop using Pushover. These notifications can display job status, results, scraped web data, or any other text or numeric data.
+# License: BSD_2_clause + file LICENSE
+# URL: https://github.com/briandconnelly/pushoverr
+# BugReports: https://github.com/briandconnelly/pushoverr/issues
+# ByteCompile: no
+# NeedsCompilation: no
+# Depends: R (>= 3.0.0)
+# Imports: assertthat, httr
+# RoxygenNote: 5.0.1
+# Packaged: 2016-11-23 00:43:55 UTC; bdc
+# Author: Brian Connelly [aut, cre]
+# Maintainer: Brian Connelly <bdc@bconnelly.net>
+# Repository: CRAN
+# Date/Publication: 2016-11-23 09:38:52
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,104 @@
+{% set version = '0.9.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-varband
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/varband_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/varband/varband_{{ version }}.tar.gz
+  sha256: e906b18750518902594df13f48680ddceb92130320707b9155bfe07e7a36e69b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('varband')"           # [not win]
+    - "\"%R%\" -e \"library('varband')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/hugogogo/varband
+  license: GPL-3
+  summary: Implementation of the variable banding procedure for modeling local dependence and
+    estimating precision matrices that is introduced in Yu & Bien (2016) and is available
+    at <https://arxiv.org/abs/1604.07451>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: varband
+# Type: Package
+# Title: Variable Banding of Large Precision Matrices
+# Version: 0.9.0
+# Authors@R: person("Guo", "Yu", email = "gy63@cornell.edu", role = c("aut", "cre"))
+# Description: Implementation of the variable banding procedure for modeling local dependence and estimating precision matrices that is introduced in Yu & Bien (2016) and is available at <https://arxiv.org/abs/1604.07451>.
+# License: GPL-3
+# LazyData: TRUE
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# RoxygenNote: 5.0.1
+# URL: http://github.com/hugogogo/varband
+# BugReports: http://github.com/hugogogo/varband/issues
+# Collate: 'model_gen.R' 'refit.R' 'varband_cv.R' 'varband_path.R' 'RcppExports.R' 'misc.R' 'utils.R'
+# LinkingTo: Rcpp, RcppArmadillo
+# Imports: Rcpp, stats, graphics
+# NeedsCompilation: yes
+# Packaged: 2016-11-07 15:19:39 UTC; hugo
+# Author: Guo Yu [aut, cre]
+# Maintainer: Guo Yu <gy63@cornell.edu>
+# Repository: CRAN
+# Date/Publication: 2016-11-07 21:07:55
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '1.7.99' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sfinx
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sfinx_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sfinx/sfinx_{{ version }}.tar.gz
+  sha256: 6a9b1ca7b1f31b8ccb616914652992df1664394c81cbbf81166c730c803f6493
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sfinx')"           # [not win]
+    - "\"%R%\" -e \"library('sfinx')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://sfinx.ugent.be
+  license: Apache License 2.0
+  summary: The straightforward filtering index (SFINX) identifies true positive protein interactions
+    in a fast, user-friendly, and highly accurate way. It is not only useful for the
+    filtering of affinity purification - mass spectrometry (AP-MS) data, but also for
+    similar types of data resulting from other co-complex interactomics technologies,
+    such as TAP-MS, Virotrap and BioID. SFINX can also be used via the website interface
+    at <http://sfinx.ugent.be>.
+  license_family: APACHE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sfinx
+# Type: Package
+# Title: Straightforward Filtering Index for AP-MS Data Analysis (SFINX)
+# Version: 1.7.99
+# Date: 2017-07-19
+# Authors@R: c( person("Kevin", "Titeca", email = "sfinxinteractomics@gmail.com", role = c("aut", "cre")), person("Jan", "Tavernier", role = "ths"), person("Sven", "Eyckerman", role = "ths"))
+# Description: The straightforward filtering index (SFINX) identifies true positive protein interactions in a fast, user-friendly, and highly accurate way. It is not only useful for the filtering of affinity purification - mass spectrometry (AP-MS) data, but also for similar types of data resulting from other co-complex interactomics technologies, such as TAP-MS, Virotrap and BioID. SFINX can also be used via the website interface at <http://sfinx.ugent.be>.
+# License: Apache License 2.0
+# LazyData: TRUE
+# Depends: R (>= 3.2.3)
+# URL: http://sfinx.ugent.be
+# RoxygenNote: 5.0.1
+# Suggests: knitr, rmarkdown, testthat
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2017-07-19 19:57:40 UTC; Kevin
+# Author: Kevin Titeca [aut, cre], Jan Tavernier [ths], Sven Eyckerman [ths]
+# Maintainer: Kevin Titeca <sfinxinteractomics@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-07-19 20:55:19 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

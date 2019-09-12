@@ -1,0 +1,109 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-memnet
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/memnet_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/memnet/memnet_{{ version }}.tar.gz
+  sha256: ba949afb8ac358dd36cff3ca25510c08e1643973ac33e3b9d29093da868c17d2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh
+    - r-rcpp >=0.12.5
+    - r-igraph
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-rcpp >=0.12.5
+    - r-igraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('memnet')"           # [not win]
+    - "\"%R%\" -e \"library('memnet')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=memnet
+  license: GPL-3
+  summary: 'Efficient implementations of network science tools  to facilitate research into human
+    (semantic) memory. In its current version, the package  contains several methods
+    to infer networks from verbal fluency data, various network  growth models, diverse
+    (switcher-) random walk processes, and tools to analyze and  visualize networks.
+    To deliver maximum performance the majority of the code is written in C++. For an
+    application see: Wulff, D. U., Hills, T., & Mata, R. (2018)  <doi:10.31234/osf.io/s73dp>.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: memnet
+# Type: Package
+# Title: Network Tools for Memory Research
+# Description: Efficient implementations of network science tools  to facilitate research into human (semantic) memory. In its current version, the package  contains several methods to infer networks from verbal fluency data, various network  growth models, diverse (switcher-) random walk processes, and tools to analyze and  visualize networks. To deliver maximum performance the majority of the code is written in C++. For an application see: Wulff, D. U., Hills, T., & Mata, R. (2018)  <doi:10.31234/osf.io/s73dp>.
+# Version: 0.1.0
+# Maintainer: Dirk U. Wulff <dirk.wulff@gmail.com>
+# Authors@R: person(c("Dirk","U."), "Wulff", role = c("aut","cre"), email = "dirk.wulff@gmail.com")
+# License: GPL-3
+# Encoding: UTF-8
+# Depends: R (>= 3.1.0), Rcpp (>= 0.12.5)
+# Imports: igraph
+# LinkingTo: Rcpp, BH
+# RoxygenNote: 6.1.0
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# LazyData: true
+# NeedsCompilation: yes
+# Packaged: 2018-10-31 07:42:39 UTC; dwulff
+# Author: Dirk U. Wulff [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2018-11-03 16:20:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

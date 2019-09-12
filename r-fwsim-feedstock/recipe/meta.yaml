@@ -1,0 +1,98 @@
+{% set version = '0.3.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fwsim
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fwsim_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fwsim/fwsim_{{ version }}.tar.gz
+  sha256: 34ac179bd66fdef54ae980a879f1f386f20bd698fb867d2f7330c2d2033bc83b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fwsim')"           # [not win]
+    - "\"%R%\" -e \"library('fwsim')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=fwsim
+  license: GPL-2
+  summary: Simulates a population under the Fisher-Wright model (fixed or stochastic population
+    size) with a one-step neutral mutation process (stepwise mutation model, logistic
+    mutation model and exponential mutation model supported). The stochastic population
+    sizes are random Poisson distributed and different kinds of population growth are
+    supported. For the stepwise mutation model, it is possible to specify locus and
+    direction specific mutation rate (in terms of upwards and downwards mutation rate).
+    Intermediate generations can be saved in order to study e.g. drift.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fwsim
+# Version: 0.3.4
+# Title: Fisher-Wright Population Simulation
+# Author: Mikkel Meyer Andersen and Poul Svante Eriksen
+# Maintainer: Mikkel Meyer Andersen <mikl@math.aau.dk>
+# Description: Simulates a population under the Fisher-Wright model (fixed or stochastic population size) with a one-step neutral mutation process (stepwise mutation model, logistic mutation model and exponential mutation model supported). The stochastic population sizes are random Poisson distributed and different kinds of population growth are supported. For the stepwise mutation model, it is possible to specify locus and direction specific mutation rate (in terms of upwards and downwards mutation rate). Intermediate generations can be saved in order to study e.g. drift.
+# License: GPL-2
+# Depends: R (>= 3.1.0)
+# LinkingTo: Rcpp
+# Imports: Rcpp (>= 0.11), methods
+# SystemRequirements: C++11
+# NeedsCompilation: yes
+# Packaged: 2018-10-05 13:00:56 UTC; mikl
+# Repository: CRAN
+# Date/Publication: 2018-10-05 13:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

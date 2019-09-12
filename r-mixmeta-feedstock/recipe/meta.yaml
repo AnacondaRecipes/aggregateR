@@ -1,0 +1,90 @@
+{% set version = '1.0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mixmeta
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mixmeta_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mixmeta/mixmeta_{{ version }}.tar.gz
+  sha256: aba887967244c2a6417fa645a46b139bad11c6a80953aa280865f718f8c3e7ad
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: metafor, meta, rmeta, dosresmeta, nlme, MASS, dlnm
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mixmeta')"           # [not win]
+    - "\"%R%\" -e \"library('mixmeta')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/gasparrini/mixmeta, http://www.ag-myresearch.com/package-mixmeta
+  license: GPL-2
+  summary: A collection of functions to perform various meta-analytical models through a unified
+    mixed-effects framework, including standard univariate fixed and random-effects
+    meta-analysis and meta-regression, and non-standard extensions such as multivariate,
+    multilevel, longitudinal, and dose-response models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mixmeta
+# Type: Package
+# Version: 1.0.3
+# Date: 2019-08-21
+# Title: An Extended Mixed-Effects Framework for Meta-Analysis
+# Description: A collection of functions to perform various meta-analytical models through a unified mixed-effects framework, including standard univariate fixed and random-effects meta-analysis and meta-regression, and non-standard extensions such as multivariate, multilevel, longitudinal, and dose-response models.
+# Author: Antonio Gasparrini [aut, cre], Francesco Sera [aut]
+# Maintainer: Antonio Gasparrini <antonio.gasparrini@lshtm.ac.uk>
+# Authors@R: c( person("Antonio","Gasparrini",role=c("aut","cre"),email="antonio.gasparrini@lshtm.ac.uk"), person("Francesco","Sera",role="aut",email="francesco.sera@lshtm.ac.uk"))
+# Imports: stats, graphics, grDevices, utils
+# Depends: R (>= 3.5.0)
+# Suggests: metafor, meta, rmeta, dosresmeta, nlme, MASS, dlnm
+# URL: https://github.com/gasparrini/mixmeta, http://www.ag-myresearch.com/package-mixmeta
+# License: GPL (>= 2)
+# LazyData: yes
+# NeedsCompilation: no
+# Packaged: 2019-08-26 22:56:27 UTC; EMSUAGAS
+# Repository: CRAN
+# Date/Publication: 2019-08-27 04:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '1.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-scbmeanfd
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SCBmeanfd_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SCBmeanfd/SCBmeanfd_{{ version }}.tar.gz
+  sha256: 5fb1b0b831fc9b30903f4a031f845b1ea9941adfc59871d1630fff70304aa410
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-kernsmooth
+    - r-boot
+
+  run:
+    - r-base
+    - r-kernsmooth
+    - r-boot
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SCBmeanfd')"           # [not win]
+    - "\"%R%\" -e \"library('SCBmeanfd')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SCBmeanfd
+  license: GPL-3
+  summary: 'Statistical methods for estimating and inferring the mean of functional data. The
+    methods include simultaneous confidence bands, local polynomial fitting,  bandwidth
+    selection by plug-in and cross-validation, goodness-of-fit tests for parametric
+    models, equality tests for two-sample problems, and plotting functions.   '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SCBmeanfd
+# Type: Package
+# Title: Simultaneous Confidence Bands for the Mean of Functional Data
+# Version: 1.2.2
+# Date: 2016-12-22
+# Author: David Degras
+# Maintainer: David Degras <ddegrasv@gmail.com>
+# Description: Statistical methods for estimating and inferring the mean of functional data. The methods include simultaneous confidence bands, local polynomial fitting,  bandwidth selection by plug-in and cross-validation, goodness-of-fit tests for parametric models, equality tests for two-sample problems, and plotting functions.
+# License: GPL-3
+# Depends: R (>= 2.10), stats, graphics
+# Imports: boot, KernSmooth
+# URL: https://CRAN.R-project.org/package=SCBmeanfd
+# NeedsCompilation: no
+# Packaged: 2016-12-26 22:35:56 UTC; daviddegras
+# Repository: CRAN
+# Date/Publication: 2016-12-27 14:15:41
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,87 @@
+{% set version = '0.2.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-interpretr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/interpretR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/interpretR/interpretR_{{ version }}.tar.gz
+  sha256: 4c08a6dffd6fd5764f27812f3a085c53e6a21d59ae82d903c9c0da93fd1dd059
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-auc
+    - r-randomforest
+
+  run:
+    - r-base
+    - r-auc
+    - r-randomforest
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('interpretR')"           # [not win]
+    - "\"%R%\" -e \"library('interpretR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=interpretR
+  license: GPL-2
+  summary: Compute permutation- based performance measures and create partial dependence plots
+    for (cross-validated) 'randomForest' and 'ada' models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: interpretR
+# Type: Package
+# Title: Binary Classifier and Regression Model Interpretation Functions
+# Version: 0.2.4
+# Date: 2016-03-19
+# Depends: randomForest
+# Imports: AUC, stats, graphics
+# Author: Michel Ballings and Dirk Van den Poel
+# Maintainer: Michel Ballings <michel.ballings@GMail.com>
+# Description: Compute permutation- based performance measures and create partial dependence plots for (cross-validated) 'randomForest' and 'ada' models.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2016-03-19 20:36:41 UTC; michelballings
+# Repository: CRAN
+# Date/Publication: 2016-03-19 22:55:06
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

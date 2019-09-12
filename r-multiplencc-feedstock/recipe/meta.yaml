@@ -1,0 +1,87 @@
+{% set version = '1.2-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-multiplencc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/multipleNCC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/multipleNCC/multipleNCC_{{ version }}.tar.gz
+  sha256: 39d7833160c642f0fec742c345cff21f369906392a8a1ba5b981f0eba2bf1c20
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mgcv
+    - r-survival
+
+  run:
+    - r-base
+    - r-mgcv
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('multipleNCC')"           # [not win]
+    - "\"%R%\" -e \"library('multipleNCC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=multipleNCC
+  license: GPL-2
+  summary: Fit Cox proportional hazard models with a weighted  partial likelihood. It handles
+    one or multiple endpoints, additional matching  and makes it possible to reuse controls
+    for other endpoints.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: multipleNCC
+# Type: Package
+# Title: Weighted Cox-Regression for Nested Case-Control Data
+# Version: 1.2-1
+# Date: 2016-04-16
+# Author: Nathalie C. Stoer, Sven Ove Samuelsen
+# Maintainer: Nathalie C. Stoer <nathalcs@math.uio.no>
+# Description: Fit Cox proportional hazard models with a weighted  partial likelihood. It handles one or multiple endpoints, additional matching  and makes it possible to reuse controls for other endpoints.
+# Depends: survival, mgcv
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2016-04-19 14:50:45 UTC; Nathalie
+# Repository: CRAN
+# Date/Publication: 2016-04-19 17:34:59
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

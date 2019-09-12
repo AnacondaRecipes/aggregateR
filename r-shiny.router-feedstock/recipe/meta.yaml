@@ -1,0 +1,91 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-shiny.router
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/shiny.router_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/shiny.router/shiny.router_{{ version }}.tar.gz
+  sha256: 8c28e94417ea173e18b575f299327290d44733138323a8b753388db94cb43c2e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-magrittr
+    - r-shiny
+
+  run:
+    - r-base
+    - r-magrittr
+    - r-shiny
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('shiny.router')"           # [not win]
+    - "\"%R%\" -e \"library('shiny.router')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=shiny.router
+  license: MIT
+  summary: The minimal router for your Shiny apps. It allows you to create dynamic web applications
+    with real-time user interface and easily share URLs to pages within your Shiny apps.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: shiny.router
+# Type: Package
+# Title: Basic Routing for Shiny Web Applications
+# Version: 0.1.1
+# Author: Filip Stachura <filip@appsilon.com>
+# Maintainer: Dominik KrzemiAski <dominik@appsilon.com>
+# Description: The minimal router for your Shiny apps. It allows you to create dynamic web applications with real-time user interface and easily share URLs to pages within your Shiny apps.
+# Encoding: UTF-8
+# LazyData: true
+# License: MIT + file LICENSE
+# Imports: magrittr, shiny
+# RoxygenNote: 6.0.1
+# Suggests: testthat
+# NeedsCompilation: no
+# Packaged: 2018-09-17 08:17:25 UTC; dominik
+# Repository: CRAN
+# Date/Publication: 2018-09-18 08:50:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

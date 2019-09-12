@@ -1,0 +1,83 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-minirand
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Minirand_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Minirand/Minirand_{{ version }}.tar.gz
+  sha256: 21f640ac85b4fdeacfb7427fd5ff6822c79cdad9119205d9857dde8ea1865045
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Minirand')"           # [not win]
+    - "\"%R%\" -e \"library('Minirand')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Minirand
+  license: GPL-2
+  summary: Randomization schedules are generated in the schemes with k (k>=2) treatment groups
+    and any allocation ratios by minimization algorithms.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Minirand
+# Type: Package
+# Title: Minimization Randomization
+# Version: 0.1.0
+# Date: 2018-09-12
+# Author: Man Jin [aut, cre], Adam Polis [aut], Jonathan Hartzel [aut]
+# Maintainer: Man Jin <mj2149@gmail.com>
+# Description: Randomization schedules are generated in the schemes with k (k>=2) treatment groups and any allocation ratios by minimization algorithms.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-10-03 20:10:09 UTC; jinma
+# Repository: CRAN
+# Date/Publication: 2018-10-16 11:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

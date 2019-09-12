@@ -1,0 +1,85 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-exprep
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ExpRep_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ExpRep/ExpRep_{{ version }}.tar.gz
+  sha256: 6f7835a0859dd615a76d9a83431d48fa408f84cebfcd62d1185923961a1ffb6a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ExpRep')"           # [not win]
+    - "\"%R%\" -e \"library('ExpRep')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ExpRep
+  license: Unlimited
+  summary: 'Allows to calculate the probabilities  of occurrences of an event in a  great number
+    of repetitions of Bernoulli experiment, through the application of   the local and
+    the integral theorem of De Moivre Laplace, and the theorem of Poisson.  Gives the
+    possibility to show the results graphically and analytically, and to compare the
+    results obtained by the application of the above  theorems with those calculated
+    by the direct application of the Binomial formula. Is basically useful for educational
+    purposes. '
+
+  license_family: MIT
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ExpRep
+# Type: Package
+# Title: Experiment Repetitions
+# Version: 1.0
+# Date: 2017-06-22
+# Author: Larisa Zamora-Matamoros and Jorge Diaz-Silvera
+# Maintainer: Larisa Zamora-Matamoros <larisa@uo.edu.cu>
+# Description: Allows to calculate the probabilities  of occurrences of an event in a  great number of repetitions of Bernoulli experiment, through the application of   the local and the integral theorem of De Moivre Laplace, and the theorem of Poisson.  Gives the possibility to show the results graphically and analytically, and to compare the results obtained by the application of the above  theorems with those calculated by the direct application of the Binomial formula. Is basically useful for educational purposes.
+# License: Unlimited
+# NeedsCompilation: no
+# Packaged: 2017-06-27 20:09:59 UTC; Jorge
+# Repository: CRAN
+# Date/Publication: 2017-06-28 15:55:16 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

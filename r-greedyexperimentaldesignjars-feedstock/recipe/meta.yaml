@@ -1,0 +1,87 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-greedyexperimentaldesignjars
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GreedyExperimentalDesignJARs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GreedyExperimentalDesignJARs/GreedyExperimentalDesignJARs_{{ version }}.tar.gz
+  sha256: 875f953f2185ef878ed66904fab371738dc6220ca0c55f7b52cc054871a92692
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rjava >=0.9_8
+
+  run:
+    - r-base
+    - r-rjava >=0.9_8
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GreedyExperimentalDesignJARs')"           # [not win]
+    - "\"%R%\" -e \"library('GreedyExperimentalDesignJARs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=GreedyExperimentalDesignJARs
+  license: GPL-3
+  summary: 'These are GreedyExperimentalDesign Java dependency libraries. Note: this package
+    has no functionality of its own and should not be installed as a standalone package
+    without GreedyExperimentalDesign.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: GreedyExperimentalDesignJARs
+# Version: 1.0
+# Title: GreedyExperimentalDesign JARs
+# Type: Package
+# Date: 2018-07-15
+# Author: Adam Kapelner, David Azriel, Abba Krieger see COPYRIGHTS file for the authors of the java libraries
+# Maintainer: Adam Kapelner <kapelner@qc.cuny.edu>
+# Description: These are GreedyExperimentalDesign Java dependency libraries. Note: this package has no functionality of its own and should not be installed as a standalone package without GreedyExperimentalDesign.
+# License: GPL-3
+# Depends: R (>= 2.14.0), rJava (>= 0.9-8)
+# SystemRequirements: Java (>= 7.0)
+# NeedsCompilation: no
+# Packaged: 2018-07-15 08:29:01 UTC; AdamLenovo
+# Repository: CRAN
+# Date/Publication: 2018-07-15 14:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,92 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ramchoice
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ramchoice_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ramchoice/ramchoice_{{ version }}.tar.gz
+  sha256: 793dcff68ef2855f8e7754bccacb196ac08edb5626b2581d4c2125104acaa9c6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ramchoice')"           # [not win]
+    - "\"%R%\" -e \"library('ramchoice')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ramchoice
+  license: GPL-2
+  summary: 'It is widely documented in psychology, economics and other disciplines that socio-economic
+    agent may not pay full attention to all available alternatives, rendering standard
+    revealed preference theory invalid. This package implements the estimation and inference
+    procedures of Cattaneo, Ma, Masatlioglu and Suleymanov (2019) <arXiv:1712.03448>,
+    which utilizes standard choice data to partially identify and estimate a decision
+    maker''s preference. For inference, several simulation-based critical values are
+    provided. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ramchoice
+# Type: Package
+# Title: Estimation and Inference in Random Attention Models
+# Description: It is widely documented in psychology, economics and other disciplines that socio-economic agent may not pay full attention to all available alternatives, rendering standard revealed preference theory invalid. This package implements the estimation and inference procedures of Cattaneo, Ma, Masatlioglu and Suleymanov (2019) <arXiv:1712.03448>, which utilizes standard choice data to partially identify and estimate a decision maker's preference. For inference, several simulation-based critical values are provided.
+# Version: 1.1
+# Author: Matias D. Cattaneo, Xinwei Ma, Yusufcan Masatlioglu, Elchin Suleymanov
+# Maintainer: Xinwei Ma <x1ma@ucsd.edu>
+# Imports: MASS
+# Depends: R (>= 3.1.0)
+# License: GPL-2
+# Encoding: UTF-8
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-07-11 17:52:56 UTC; xinweima
+# Repository: CRAN
+# Date/Publication: 2019-07-11 21:57:28 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

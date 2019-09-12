@@ -1,0 +1,89 @@
+{% set version = '0.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-purge
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/purge_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/purge/purge_{{ version }}.tar.gz
+  sha256: 375da8f716fe486027fa6d7620d5df468e0641d1b9bc68f930d2eaae66454eb9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, survival, lme4 (>= 1.1-8), ranger, randomForest, rpart
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('purge')"           # [not win]
+    - "\"%R%\" -e \"library('purge')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=purge
+  license: MIT
+  summary: Enables the removal of training data from fitted R models while retaining predict
+    functionality. The purged models are more portable as their memory footprints do
+    not scale with the training sample size.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: purge
+# Type: Package
+# Title: Purge Training Data from Models
+# Version: 0.2.1
+# Date: 2015-10-29
+# Authors@R: c( person("Marc", "Maier", email="mmaier@massmutual.com", role="cre"), person("Chaoqun", "Jia", email="cjia@massmutual.com", role="ctb"), person("MassMutual Advanced Analytics", comment="http://datascience.massmutual.com", role="aut"))
+# Maintainer: Marc Maier <mmaier@massmutual.com>
+# Description: Enables the removal of training data from fitted R models while retaining predict functionality. The purged models are more portable as their memory footprints do not scale with the training sample size.
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Imports: methods
+# Suggests: testthat, survival, lme4 (>= 1.1-8), ranger, randomForest, rpart
+# NeedsCompilation: no
+# Packaged: 2017-02-12 02:08:55 UTC; mm90357
+# Author: Marc Maier [cre], Chaoqun Jia [ctb], MassMutual Advanced Analytics [aut] (http://datascience.massmutual.com)
+# RoxygenNote: 6.0.1
+# Repository: CRAN
+# Date/Publication: 2017-02-12 08:31:10
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,106 @@
+{% set version = '2.4.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fenmlm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/FENmlm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/FENmlm/FENmlm_{{ version }}.tar.gz
+  sha256: 137cc1195cdb535b69f6179568fdb6ecb6461b147ff7516f07f6cd22a3cc16db
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+    - r-mass
+    - r-rcpp
+    - r-numderiv
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-formula
+    - r-mass
+    - r-rcpp
+    - r-numderiv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('FENmlm')"           # [not win]
+    - "\"%R%\" -e \"library('FENmlm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=FENmlm
+  license: GPL-2
+  summary: Efficient estimation of maximum likelihood models with multiple fixed-effects. Standard-errors
+    can easily and flexibly be clustered and estimations exported.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: FENmlm
+# Type: Package
+# Title: Fixed Effects Nonlinear Maximum Likelihood Models
+# Version: 2.4.2
+# Date: 2019-05-16
+# Authors@R: person("Laurent", "Berge", email = "laurent.berge@uni.lu", role = c("aut", "cre"))
+# Imports: stats, graphics, utils, parallel, Formula, MASS, numDeriv, Rcpp
+# LinkingTo: Rcpp
+# Depends: R(>= 2.10)
+# Description: Efficient estimation of maximum likelihood models with multiple fixed-effects. Standard-errors can easily and flexibly be clustered and estimations exported.
+# License: GPL (>= 2)
+# LazyData: TRUE
+# RoxygenNote: 6.1.1
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2019-05-16 08:17:12 UTC; laurent.berge
+# Author: Laurent Berge [aut, cre]
+# Maintainer: Laurent Berge <laurent.berge@uni.lu>
+# Repository: CRAN
+# Date/Publication: 2019-05-16 09:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

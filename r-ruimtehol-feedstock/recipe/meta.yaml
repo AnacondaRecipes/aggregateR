@@ -1,0 +1,108 @@
+{% set version = '0.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ruimtehol
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ruimtehol_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ruimtehol/ruimtehol_{{ version }}.tar.gz
+  sha256: 3044ea2acd0039b7d41d98616b6495e69c354c91426f863cb849e8bbcdbcb8f5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: udpipe, data.table
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh
+    - r-rcpp >=0.11.5
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-rcpp >=0.11.5
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ruimtehol')"           # [not win]
+    - "\"%R%\" -e \"library('ruimtehol')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/bnosac/ruimtehol
+  license: MPL-2.0
+  summary: 'Wraps the ''StarSpace'' library <https://github.com/facebookresearch/StarSpace>  allowing
+    users to calculate word, sentence, article, document, webpage, link and entity ''embeddings''.  By
+    using the ''embeddings'', you can perform text based multi-label classification,  find
+    similarities between texts and categories, do collaborative-filtering based recommendation  as
+    well as content-based recommendation, find out relations between entities, calculate  graph
+    ''embeddings'' as well as perform semi-supervised learning and multi-task learning
+    on plain text.  The techniques are explained in detail in the paper: ''StarSpace:
+    Embed All The Things!'' by Wu et al. (2017), available at <arXiv:1709.03856>.'
+
+  license_family: OTHER
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ruimtehol
+# Type: Package
+# Title: Learn Text 'Embeddings' with 'Starspace'
+# Version: 0.2.1
+# Maintainer: Jan Wijffels <jwijffels@bnosac.be>
+# Authors@R: c( person('Jan', 'Wijffels', role = c('aut', 'cre', 'cph'), email = 'jwijffels@bnosac.be', comment = "R wrapper"),  person('BNOSAC', role = 'cph', comment = "R wrapper"),  person('Facebook, Inc.', role = 'cph', comment = "Starspace (BSD licensed)"))
+# Description: Wraps the 'StarSpace' library <https://github.com/facebookresearch/StarSpace>  allowing users to calculate word, sentence, article, document, webpage, link and entity 'embeddings'.  By using the 'embeddings', you can perform text based multi-label classification,  find similarities between texts and categories, do collaborative-filtering based recommendation  as well as content-based recommendation, find out relations between entities, calculate  graph 'embeddings' as well as perform semi-supervised learning and multi-task learning on plain text.  The techniques are explained in detail in the paper: 'StarSpace: Embed All The Things!' by Wu et al. (2017), available at <arXiv:1709.03856>.
+# License: MPL-2.0
+# URL: https://github.com/bnosac/ruimtehol
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 2.10)
+# Imports: Rcpp (>= 0.11.5), utils, graphics, stats
+# Suggests: udpipe, data.table
+# LinkingTo: Rcpp, BH
+# RoxygenNote: 6.0.1
+# SystemRequirements: C++11
+# NeedsCompilation: yes
+# Packaged: 2019-05-31 12:29:55 UTC; Jan
+# Author: Jan Wijffels [aut, cre, cph] (R wrapper), BNOSAC [cph] (R wrapper), Facebook, Inc. [cph] (Starspace (BSD licensed))
+# Repository: CRAN
+# Date/Publication: 2019-05-31 14:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

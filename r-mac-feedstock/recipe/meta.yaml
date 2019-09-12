@@ -1,0 +1,89 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mac
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MAc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MAc/MAc_{{ version }}.tar.gz
+  sha256: ce088608000525c5f3746a1361df52c5e0e6a2078c7fcc1e475f39177fc55cb5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggplot2, R2wd, metafor
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MAc')"           # [not win]
+    - "\"%R%\" -e \"library('MAc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://rwiki.sciviews.org/doku.php?id=packages:cran:ma_meta-analysis
+  license: GPL-2
+  summary: This is an integrated meta-analysis package for conducting a correlational research
+    synthesis. One of the unique features of this package is in its integration of user-friendly
+    functions to facilitate statistical analyses at each stage in a meta-analysis with
+    correlations. It uses recommended procedures as described in The Handbook of Research
+    Synthesis and Meta-Analysis (Cooper, Hedges, & Valentine, 2009).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MAc
+# Type: Package
+# Title: Meta-Analysis with Correlations
+# Version: 1.1.1
+# Date: 2010-07-06
+# Author: AC Del Re & William T. Hoyt
+# Maintainer: AC Del Re <acdelre@gmail.com>
+# Description: This is an integrated meta-analysis package for conducting a correlational research synthesis. One of the unique features of this package is in its integration of user-friendly functions to facilitate statistical analyses at each stage in a meta-analysis with correlations. It uses recommended procedures as described in The Handbook of Research Synthesis and Meta-Analysis (Cooper, Hedges, & Valentine, 2009).
+# Depends: R (>= 2.10.1)
+# Suggests: ggplot2, R2wd, metafor
+# Enhances: compute.es, irr
+# License: GPL-2
+# URL: http://rwiki.sciviews.org/doku.php?id=packages:cran:ma_meta-analysis
+# Packaged: 2018-08-31 16:20:09 UTC; hornik
+# Repository: CRAN
+# Date/Publication: 2018-08-31 17:39:52 UTC
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

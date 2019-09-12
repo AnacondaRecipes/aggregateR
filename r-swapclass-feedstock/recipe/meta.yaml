@@ -1,0 +1,84 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-swapclass
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/swapClass_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/swapClass/swapClass_{{ version }}.tar.gz
+  sha256: d5df2775aaaf822f84318ce013049f79e5cb39e18d98d8a7e2bef560449de671
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-inline
+
+  run:
+    - r-base
+    - r-inline
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('swapClass')"           # [not win]
+    - "\"%R%\" -e \"library('swapClass')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=swapClass
+  license: GPL-3
+  summary: A null model randomizing semi-quantitative multi-classes (or ordinal) data by swapping
+    sub-matrices while both the row and the column marginal sums are held constant.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: swapClass
+# Type: Package
+# Title: A Null Model Adapted to Abundance Class Data in Ecology
+# Version: 1.0.1
+# Date: 2017-06-22
+# Author: Benjamin Borgy, Remi Perronne, Xavier Reboud
+# Maintainer: Benjamin Borgy <benjamin.borgy@gmail.com>
+# Depends: R (>= 3.1.1), inline, utils, methods
+# Description: A null model randomizing semi-quantitative multi-classes (or ordinal) data by swapping sub-matrices while both the row and the column marginal sums are held constant.
+# License: GPL-3
+# NeedsCompilation: no
+# Packaged: 2017-06-22 07:31:37 UTC; jfb
+# Repository: CRAN
+# Date/Publication: 2017-06-22 09:24:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,95 @@
+{% set version = '0.9.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-timeordered
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/timeordered_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/timeordered/timeordered_{{ version }}.tar.gz
+  sha256: 734cb6ecab87ca45bb8e73ec733b1f893632ccbd61e1dfc4a775b2696251cf65
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-igraph
+    - r-plyr
+
+  run:
+    - r-base
+    - r-igraph
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('timeordered')"           # [not win]
+    - "\"%R%\" -e \"library('timeordered')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=timeordered
+  license: GPL-3
+  summary: 'Approaches for incorporating time into network analysis. Methods include: construction
+    of time-ordered networks (temporal graphs); shortest-time and shortest-path-length
+    analyses; resource spread calculations; data resampling and rarefaction for null
+    model construction; reduction to time-aggregated networks with variable window sizes;
+    application of common descriptive statistics to these networks; vector clock latencies;
+    and plotting functionalities. The package supports <doi:10.1371/journal.pone.0020298>. '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: timeordered
+# Type: Package
+# Title: Time-Ordered and Time-Aggregated Network Analyses
+# Version: 0.9.9
+# Date: 2018-07-04
+# Author: Benjamin Blonder
+# Maintainer: Benjamin Blonder <bblonder@gmail.com>
+# Description: Approaches for incorporating time into network analysis. Methods include: construction of time-ordered networks (temporal graphs); shortest-time and shortest-path-length analyses; resource spread calculations; data resampling and rarefaction for null model construction; reduction to time-aggregated networks with variable window sizes; application of common descriptive statistics to these networks; vector clock latencies; and plotting functionalities. The package supports <doi:10.1371/journal.pone.0020298>.
+# License: GPL-3
+# LazyLoad: yes
+# Depends: igraph, plyr
+# Enhances:
+# BuildManual: no
+# Imports: methods
+# NeedsCompilation: no
+# Packaged: 2018-07-04 22:31:02 UTC; benjaminblonder
+# Repository: CRAN
+# Date/Publication: 2018-07-04 22:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '1.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-streammetabolism
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/StreamMetabolism_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/StreamMetabolism/StreamMetabolism_{{ version }}.tar.gz
+  sha256: 0a51a5b20f70520513c2008a196c8f7d609c328034f5f23a9467d6ac4e0463eb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-chron
+    - r-maptools
+    - r-zoo
+
+  run:
+    - r-base
+    - r-chron
+    - r-maptools
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('StreamMetabolism')"           # [not win]
+    - "\"%R%\" -e \"library('StreamMetabolism')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ssefick/StreamMetabolism
+  license: GPL-3
+  summary: 'I provide functions to calculate Gross Primary Productivity, Net Ecosystem Production,
+    and Ecosystem Respiration from single station diurnal Oxygen curves.  '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: StreamMetabolism
+# Type: Package
+# Title: Calculate Single Station Metabolism from Diurnal Oxygen Curves
+# Version: 1.1.2
+# Date: 2016-08-24
+# Author: Stephen A Sefick Jr.
+# Maintainer: Stephen A Sefick Jr. <ssefick@gmail.com>
+# URL: https://github.com/ssefick/StreamMetabolism
+# Depends: zoo, chron, maptools
+# Description: I provide functions to calculate Gross Primary Productivity, Net Ecosystem Production, and Ecosystem Respiration from single station diurnal Oxygen curves.
+# License: GPL (>= 3)
+# LazyLoad: yes
+# Repository: CRAN
+# NeedsCompilation: no
+# Packaged: 2016-09-12 13:49:10 UTC; ssefick
+# Date/Publication: 2016-09-12 20:55:03
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

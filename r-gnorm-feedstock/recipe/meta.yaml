@@ -1,0 +1,91 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gnorm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gnorm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gnorm/gnorm_{{ version }}.tar.gz
+  sha256: 173399d6b810b6455799c34be11dd66d2d635f33332117232c931fb0381e049e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gnorm')"           # [not win]
+    - "\"%R%\" -e \"library('gnorm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/maryclare/gnorm
+  license: GPL-2
+  summary: Functions for obtaining generalized normal/exponential power distribution probabilities,
+    quantiles, densities and random deviates. The generalized normal/exponential power
+    distribution was introduced by Subbotin (1923) and rediscovered by Nadarajah (2005).
+    The parametrization given by Nadarajah (2005) <doi:10.1080/02664760500079464> is
+    used.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gnorm
+# Version: 1.0.0
+# Date: 2018-01-29
+# Title: Generalized Normal/Exponential Power Distribution
+# Author: Maryclare Griffin
+# Maintainer: Maryclare Griffin <maryclaregriffin@gmail.com>
+# Suggests: knitr, rmarkdown
+# Description: Functions for obtaining generalized normal/exponential power distribution probabilities, quantiles, densities and random deviates. The generalized normal/exponential power distribution was introduced by Subbotin (1923) and rediscovered by Nadarajah (2005). The parametrization given by Nadarajah (2005) <doi:10.1080/02664760500079464> is used.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# VignetteBuilder: knitr
+# Type: Package
+# URL: http://github.com/maryclare/gnorm
+# NeedsCompilation: no
+# Packaged: 2018-01-29 23:39:28 UTC; maryclaregriffin
+# Repository: CRAN
+# Date/Publication: 2018-01-30 10:46:25 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

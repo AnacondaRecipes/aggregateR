@@ -1,0 +1,90 @@
+{% set version = '0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nseval
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/nseval_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/nseval/nseval_{{ version }}.tar.gz
+  sha256: 2a0abb5df0dbb14932d4fd44b9ec86dda345db9926981497167553fa4b8e5ba1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.0.0), compiler (>= 3.4), roxygen2 (>= 2.2.2), knitr (>= 1.2), plyr (>= 1.8.1), ggplot2(>= 1.0.1), lazyeval(>= 0.2.0), stringr(>= 1.2.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('nseval')"           # [not win]
+    - "\"%R%\" -e \"library('nseval')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=nseval
+  license: GPL (>= 2.0)
+  summary: Facilities to capture, inspect, manipulate, and create lazy values (promises), "..."
+    lists, and active calls.
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: nseval
+# Type: Package
+# Title: A Clean API for Lazy and Non-Standard Evaluation
+# Version: 0.4
+# Date: 2018-08-01
+# Author: Peter Meilstrup <peter.meilstrup@gmail.com>
+# Maintainer: Peter Meilstrup <peter.meilstrup@gmail.com>
+# Description: Facilities to capture, inspect, manipulate, and create lazy values (promises), "..." lists, and active calls.
+# License: GPL (>= 2.0)
+# Depends:
+# Suggests: testthat (>= 2.0.0), compiler (>= 3.4), roxygen2 (>= 2.2.2), knitr (>= 1.2), plyr (>= 1.8.1), ggplot2(>= 1.0.1), lazyeval(>= 0.2.0), stringr(>= 1.2.0)
+# Collate: 'arg.R' 'caller.R' 'quo.R' 'dots.R' 'getpromise.R' 'conversions.R' 'format.R' 'force.R' 'shortcut.R' 'missing.R'
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2018-08-04 04:44:57 UTC; peter
+# Repository: CRAN
+# Date/Publication: 2018-08-06 17:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

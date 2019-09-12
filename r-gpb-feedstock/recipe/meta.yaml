@@ -1,0 +1,89 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gpb
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GPB_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GPB/GPB_{{ version }}.tar.gz
+  sha256: c8e5ba54c499d7edc7d405da1bd38e608d18f328820afb21cb410209c07f8da1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GPB')"           # [not win]
+    - "\"%R%\" -e \"library('GPB')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=GPB
+  license: GPL-2
+  summary: Functions that compute the distribution functions for the Generalized Poisson Binomial
+    distribution, which provides the cdf, pmf, quantile function, and random number
+    generation for the distribution.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: GPB
+# Type: Package
+# Title: Generalized Poisson Binomial Distribution
+# Version: 1.0
+# Date: 2017-02-01
+# Author: Yili Hong and Man Zhang
+# Maintainer: Yili Hong <yilihong@vt.edu>
+# Description: Functions that compute the distribution functions for the Generalized Poisson Binomial distribution, which provides the cdf, pmf, quantile function, and random number generation for the distribution.
+# License: GPL-2
+# Depends: stats
+# NeedsCompilation: yes
+# Packaged: 2017-02-07 01:31:55 UTC; yilihong
+# Repository: CRAN
+# Date/Publication: 2017-02-07 10:08:32
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

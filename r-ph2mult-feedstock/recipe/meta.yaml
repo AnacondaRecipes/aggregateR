@@ -1,0 +1,89 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ph2mult
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ph2mult_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ph2mult/ph2mult_{{ version }}.tar.gz
+  sha256: 67907be5ad30ef0fd995ef236da8d5ef8fd162f90c8075abd9bfa73c1d0a7c70
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: gsDesign, survival
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-clinfun
+
+  run:
+    - r-base
+    - r-clinfun
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ph2mult')"           # [not win]
+    - "\"%R%\" -e \"library('ph2mult')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ph2mult
+  license: GPL-2
+  summary: 'Provide multinomial design methods under intersection-union test (IUT) and union-intersection
+    test (UIT) scheme for Phase II trial. The design types include : Minimax (minimize
+    the maximum sample size), Optimal (minimize the expected sample size), Admissible
+    (minimize the Bayesian risk) and Maxpower (maximize the exact power level).'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ph2mult
+# Type: Package
+# Title: Phase II Clinical Trial Design for Multinomial Endpoints
+# Version: 0.1.1
+# Author: Yalin Zhu, Rui Qin
+# Maintainer: Yalin Zhu <yalin.zhu@outlook.com>
+# Description: Provide multinomial design methods under intersection-union test (IUT) and union-intersection test (UIT) scheme for Phase II trial. The design types include : Minimax (minimize the maximum sample size), Optimal (minimize the expected sample size), Admissible (minimize the Bayesian risk) and Maxpower (maximize the exact power level).
+# License: GPL (>= 2)
+# LazyData: TRUE
+# Imports: clinfun, graphics, stats
+# Suggests: gsDesign, survival
+# NeedsCompilation: no
+# Packaged: 2016-11-23 03:43:29 UTC; kaijingzhang
+# Repository: CRAN
+# Date/Publication: 2016-11-23 09:38:49
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

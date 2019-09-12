@@ -1,0 +1,90 @@
+{% set version = '1.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ratios
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ratios_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ratios/ratios_{{ version }}.tar.gz
+  sha256: ef5df99bc0e480f24405e896731ebfcefe469b53a3a708c76d9bce07a9d8099b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-stringr
+
+  run:
+    - r-base
+    - r-data.table
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ratios')"           # [not win]
+    - "\"%R%\" -e \"library('ratios')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ratios
+  license: GPL-3
+  summary: Calculation of ratios between two data sets containing environmental data like element
+    concentrations by different methods. Additionally plant element  concentrations
+    can be corrected for adhering particles (soil, airborne dust).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ratios
+# Type: Package
+# Title: Calculating Ratios Between Two Data Sets and Correction for Adhering Particles on Plants
+# Version: 1.2.0
+# Author: Solveig Pospiech [aut, cre],  Wiebke Fahlbusch [ctb]
+# Maintainer: Solveig Pospiech <s.pospiech@gmx.de>
+# Description: Calculation of ratios between two data sets containing environmental data like element concentrations by different methods. Additionally plant element  concentrations can be corrected for adhering particles (soil, airborne dust).
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# Depends: R (>= 2.10)
+# Imports: stringr, data.table
+# NeedsCompilation: no
+# Packaged: 2018-02-18 18:32:13 UTC; solveig
+# Repository: CRAN
+# Date/Publication: 2018-02-18 18:39:37 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

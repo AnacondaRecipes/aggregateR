@@ -1,0 +1,90 @@
+{% set version = '0.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lsdinterface
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LSDinterface_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LSDinterface/LSDinterface_{{ version }}.tar.gz
+  sha256: a0438a487189b9a39f9c645451b4515060e66bcede65aa6413fd484644aa445a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-abind
+
+  run:
+    - r-base
+    - r-abind
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LSDinterface')"           # [not win]
+    - "\"%R%\" -e \"library('LSDinterface')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=LSDinterface
+  license: GPL-3
+  summary: Interfaces R with LSD. Reads object-oriented data in results files (.res) produced
+    by LSD and creates appropriate multi-dimensional arrays in R. Supports multiple
+    core parallelization of multi-file data reading for increased performance. Also
+    provides functions to extract basic information and statistics from data files.
+    LSD (Laboratory for Simulation Development) is free software developed by Marco
+    Valente (documentation and downloads available at <http://labsimdev.org>).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LSDinterface
+# Type: Package
+# Title: Reading LSD Results (.res) Files
+# Version: 0.4.0
+# Date: 2018-2-7
+# Author: Marcelo C. Pereira
+# Maintainer: Marcelo C. Pereira <marcelocpereira@uol.com.br>
+# Description: Interfaces R with LSD. Reads object-oriented data in results files (.res) produced by LSD and creates appropriate multi-dimensional arrays in R. Supports multiple core parallelization of multi-file data reading for increased performance. Also provides functions to extract basic information and statistics from data files. LSD (Laboratory for Simulation Development) is free software developed by Marco Valente (documentation and downloads available at <http://labsimdev.org>).
+# Depends: R (>= 3.2.0)
+# Imports: stats, utils, abind, parallel
+# License: GPL-3
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2018-02-08 10:19:12 UTC; Marcelo
+# Repository: CRAN
+# Date/Publication: 2018-02-09 20:01:38 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

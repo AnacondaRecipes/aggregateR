@@ -1,0 +1,94 @@
+{% set version = '0.11.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-snakecase
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/snakecase_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/snakecase/snakecase_{{ version }}.tar.gz
+  sha256: 998420a58391ac85785e60bcdf6fd6927c82758ad2859a9a73a0e57299e8c1cf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr, tibble, purrrlyr, knitr, rmarkdown, magrittr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-stringi
+    - r-stringr
+
+  run:
+    - r-base
+    - r-stringi
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('snakecase')"           # [not win]
+    - "\"%R%\" -e \"library('snakecase')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/Tazinho/snakecase
+  license: GPL-3
+  summary: A consistent, flexible and easy to use tool to parse and convert strings into cases
+    like snake or camel among others.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: snakecase
+# Version: 0.11.0
+# Date: 2019-05-25
+# Title: Convert Strings into any Case
+# Description: A consistent, flexible and easy to use tool to parse and convert strings into cases like snake or camel among others.
+# Authors@R: c( person("Malte", "Grosser", , "malte.grosser@gmail.com", role = c("aut", "cre")))
+# Maintainer: Malte Grosser <malte.grosser@gmail.com>
+# Depends: R (>= 3.2)
+# Imports: stringr, stringi
+# Suggests: testthat, covr, tibble, purrrlyr, knitr, rmarkdown, magrittr
+# URL: https://github.com/Tazinho/snakecase
+# BugReports: https://github.com/Tazinho/snakecase/issues
+# Encoding: UTF-8
+# License: GPL-3
+# RoxygenNote: 6.1.1
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-05-25 21:16:42 UTC; MGO
+# Author: Malte Grosser [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2019-05-25 22:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

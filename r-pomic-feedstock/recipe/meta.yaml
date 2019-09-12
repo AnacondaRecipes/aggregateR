@@ -1,0 +1,90 @@
+{% set version = '1.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pomic
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Pomic_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Pomic/Pomic_{{ version }}.tar.gz
+  sha256: 87873a4147ace77e359916c1d4f775a9ed6cb7e770aa63075318bf55e373c577
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Pomic')"           # [not win]
+    - "\"%R%\" -e \"library('Pomic')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Pomic
+  license: GPL-2
+  summary: Calculations of an information criterion are proposed to check the quality of simulations
+    results of Agent-based models (ABM/IBM) or other non-linear rule-based models. The
+    POMDEV measure (Pattern Oriented Modelling DEViance) is based on the Kullback-Leibler
+    divergence and likelihood theory. It basically indicates the deviance of simulation
+    results from field observations. Once POMDEV scores and metropolis-hasting sampling
+    on different model versions are effectuated, POMIC scores (Pattern Oriented Modelling
+    Information Criterion) can be calculated. This method could be further developed
+    to incorporate multiple patterns assessment. Piou C, U Berger and V Grimm (2009)
+    <doi:10.1016/j.ecolmodel.2009.05.003>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Pomic
+# Type: Package
+# Title: Pattern Oriented Modelling Information Criterion
+# Version: 1.0.4
+# Date: 2018-02-09
+# Authors@R: c(person("Cyril", "Piou", role = c("aut", "cre"), email = "cyril.piou@cirad.fr"))
+# Author: Cyril Piou [aut, cre]
+# Maintainer: Cyril Piou <cyril.piou@cirad.fr>
+# Description: Calculations of an information criterion are proposed to check the quality of simulations results of Agent-based models (ABM/IBM) or other non-linear rule-based models. The POMDEV measure (Pattern Oriented Modelling DEViance) is based on the Kullback-Leibler divergence and likelihood theory. It basically indicates the deviance of simulation results from field observations. Once POMDEV scores and metropolis-hasting sampling on different model versions are effectuated, POMIC scores (Pattern Oriented Modelling Information Criterion) can be calculated. This method could be further developed to incorporate multiple patterns assessment. Piou C, U Berger and V Grimm (2009) <doi:10.1016/j.ecolmodel.2009.05.003>.
+# Depends: stats
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2018-02-09 12:49:12 UTC; piou
+# Repository: CRAN
+# Date/Publication: 2018-02-12 17:19:17 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

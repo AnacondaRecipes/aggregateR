@@ -1,0 +1,95 @@
+{% set version = '1.0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ordinalgmifs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ordinalgmifs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ordinalgmifs/ordinalgmifs_{{ version }}.tar.gz
+  sha256: e0630b2ae54f642f6938146d8658b4a9238ba8090e6117794dc468eb7db3b72b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ordinalgmifs')"           # [not win]
+    - "\"%R%\" -e \"library('ordinalgmifs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ordinalgmifs
+  license: GPL-2
+  summary: Provides a function for fitting cumulative link, adjacent category, forward and backward
+    continuation ratio, and stereotype ordinal response models when the number of parameters
+    exceeds the sample size, using the the generalized monotone incremental forward
+    stagewise method.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ordinalgmifs
+# Version: 1.0.6
+# Date: 2019-03-14
+# Title: Ordinal Regression for High-Dimensional Data
+# Author: Kellie J. Archer, Jiayi Hou, Qing Zhou, Kyle Ferber, John G. Layne, Amanda Gentry
+# Maintainer: Kellie J. Archer <archer.43@osu.edu>
+# Depends: R (>= 2.10), survival
+# Description: Provides a function for fitting cumulative link, adjacent category, forward and backward continuation ratio, and stereotype ordinal response models when the number of parameters exceeds the sample size, using the the generalized monotone incremental forward stagewise method.
+# License: GPL (>= 2)
+# BuildResaveData: best
+# SystemRequirements: C++11
+# NeedsCompilation: yes
+# BuildVignettes: TRUE
+# LazyData: true
+# Packaged: 2019-03-14 20:07:01 UTC; archer.43
+# Repository: CRAN
+# Date/Publication: 2019-03-15 08:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,89 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-qcafalsepositive
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/QCAfalsePositive_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/QCAfalsePositive/QCAfalsePositive_{{ version }}.tar.gz
+  sha256: 77f52cd77063ebfbce2f11d5b41bd7e2229448f88a8eee9e28312fdbb6591f0f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('QCAfalsePositive')"           # [not win]
+    - "\"%R%\" -e \"library('QCAfalsePositive')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=QCAfalsePositive
+  license: GPL-3
+  summary: 'Implements tests for Type I error in Qualitative Comparative Analysis (QCA) that
+    take into account the multiple hypothesis tests inherent in the procedure. Tests
+    can be carried out on three variants of QCA: crisp-set QCA (csQCA), multi-value
+    QCA (mvQCA) and fuzzy-set QCA (fsQCA). For fsQCA, the fsQCApermTest() command implements
+    a permutation test that provides 95% confidence intervals for the number of counterexamples
+    and degree of consistency, respectively. The distributions of permuted values can
+    be plotted against the observed values. For csQCA and mvQCA, simple binomial tests
+    are implemented in csQCAbinTest() and mvQCAbinTest(), respectively.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: QCAfalsePositive
+# Title: Tests for Type I Error in Qualitative Comparative Analysis (QCA)
+# Version: 1.1.1
+# Author: Bear Braumoeller <braumoeller.1@osu.edu>
+# Maintainer: Bear Braumoeller <braumoeller.1@osu.edu>
+# Description: Implements tests for Type I error in Qualitative Comparative Analysis (QCA) that take into account the multiple hypothesis tests inherent in the procedure. Tests can be carried out on three variants of QCA: crisp-set QCA (csQCA), multi-value QCA (mvQCA) and fuzzy-set QCA (fsQCA). For fsQCA, the fsQCApermTest() command implements a permutation test that provides 95% confidence intervals for the number of counterexamples and degree of consistency, respectively. The distributions of permuted values can be plotted against the observed values. For csQCA and mvQCA, simple binomial tests are implemented in csQCAbinTest() and mvQCAbinTest(), respectively.
+# Depends: R (>= 3.2.0)
+# License: GPL-3
+# LazyData: true
+# Note: For details and derivation, see Braumoeller, Bear F. "Guarding Against False Positives in Qualitative Comparative Analysis." Forthcoming, Political Analysis.
+# NeedsCompilation: no
+# Packaged: 2015-05-19 00:32:36 UTC; bfbraum
+# Repository: CRAN
+# Date/Publication: 2015-05-19 06:07:40
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

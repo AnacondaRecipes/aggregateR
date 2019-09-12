@@ -1,0 +1,95 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hazus
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hazus_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hazus/hazus_{{ version }}.tar.gz
+  sha256: b208e31b7e5910b4bd4d03783b443166c16c72cd649669073221b6e49b840ab0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggplot2, knitr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-reshape2
+
+  run:
+    - r-base
+    - r-reshape2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hazus')"           # [not win]
+    - "\"%R%\" -e \"library('hazus')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=hazus
+  license: GPL-2
+  summary: Damage Functions (DFs), also known as Vulnerability Functions, associate the physical
+    damage to a building or a structure (and also its contents and inventory) from natural
+    disasters to financial damage. The Federal Emergency Management Agency (FEMA) in
+    USA developed several thousand DFs and these serve as a benchmark in natural catastrophe
+    modeling, both in academia and industry. However, these DFs and their documentation
+    are buried within the HAZUS software are not easily accessible for analysis and
+    visualization. This package provides more than 1300 raw DFs used by FEMA's HAZUS
+    software and also functionality to extract and visualize DFs specific to the flood
+    hazard. The vignette included with this package demonstrates its use.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: hazus
+# Title: Damage functions from FEMA's HAZUS software for use in modeling financial losses from natural disasters
+# Description: Damage Functions (DFs), also known as Vulnerability Functions, associate the physical damage to a building or a structure (and also its contents and inventory) from natural disasters to financial damage. The Federal Emergency Management Agency (FEMA) in USA developed several thousand DFs and these serve as a benchmark in natural catastrophe modeling, both in academia and industry. However, these DFs and their documentation are buried within the HAZUS software are not easily accessible for analysis and visualization. This package provides more than 1300 raw DFs used by FEMA's HAZUS software and also functionality to extract and visualize DFs specific to the flood hazard. The vignette included with this package demonstrates its use.
+# Version: 0.1
+# Author: Gopi Goteti <my.ration.shop@gmail.com>
+# Maintainer: Gopi Goteti <my.ration.shop@gmail.com>
+# Depends: R (>= 3.0.2)
+# Imports: reshape2
+# VignetteBuilder: knitr
+# Suggests: ggplot2, knitr
+# License: GPL (>= 2)
+# LazyData: true
+# Collate: 'data.r' 'extract_hazus_functions.r'
+# Packaged: 2014-06-18 21:12:29 UTC; ggoteti
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-06-19 01:35:01
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

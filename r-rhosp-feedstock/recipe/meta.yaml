@@ -1,0 +1,83 @@
+{% set version = '1.10' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rhosp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rhosp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rhosp/rhosp_{{ version }}.tar.gz
+  sha256: 352d9efcd9a31e6d981f966365502a5dcb0ea6df4d7be3a78d9f4ac81c5919cc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rhosp')"           # [not win]
+    - "\"%R%\" -e \"library('rhosp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rhosp
+  license: GPL-2
+  summary: Evaluating risk (that a patient arises a side effect) during hospitalization is the
+    main purpose of this package. Several methods (Parametric, non parametric and De
+    Vielder estimation) to estimate the risk constant (R) are implemented in this package.
+    There are also functions to simulate the different models of this issue in order
+    to quantify the previous estimators. It is necessary to read at least the first
+    six pages of the report to understand the topic.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rhosp
+# Title: Side Effect Risks in Hospital : Simulation and Estimation
+# Version: 1.10
+# Author: Christophe Dutang and Julie Barthes
+# Description: Evaluating risk (that a patient arises a side effect) during hospitalization is the main purpose of this package. Several methods (Parametric, non parametric and De Vielder estimation) to estimate the risk constant (R) are implemented in this package. There are also functions to simulate the different models of this issue in order to quantify the previous estimators. It is necessary to read at least the first six pages of the report to understand the topic.
+# Maintainer: Christophe Dutang <christophe.dutang@ensimag.fr>
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2018-08-07 19:35:50 UTC; dutang
+# Repository: CRAN
+# Date/Publication: 2018-08-07 19:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

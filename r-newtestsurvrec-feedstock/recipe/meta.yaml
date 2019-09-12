@@ -1,0 +1,88 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-newtestsurvrec
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/newTestSurvRec_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/newTestSurvRec/newTestSurvRec_{{ version }}.tar.gz
+  sha256: ff1a4dc5388d258d212ef0d049ce15a40510cbf3659ca07881988fd1aa40e71a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('newTestSurvRec')"           # [not win]
+    - "\"%R%\" -e \"library('newTestSurvRec')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.r-project.org
+  license: GPL-2
+  summary: Implements the routines to compare the survival curves with recurrent events, including
+    the estimations of survival curves. The first model is a  model for recurrent event,
+    when the data are correlated or not  correlated. It was proposed by Wang and Chang
+    (1999) <doi:10.2307/2669690>. In the independent case, the survival function can
+    be  estimated by the generalization of the limit product model of Pena (2001) <doi:10.1198/016214501753381922>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: newTestSurvRec
+# Type: Package
+# Title: Statistical Tests to Compare Curves with Recurrent Events
+# Version: 1.0.2
+# Date: 2018-04-01
+# Depends: R (>= 3.4.0)
+# Author: Dr Carlos Miguel Martinez Manrique
+# Maintainer: Carlos Martinez <cmmm7031@gmail.com>
+# Description: Implements the routines to compare the survival curves with recurrent events, including the estimations of survival curves. The first model is a  model for recurrent event, when the data are correlated or not  correlated. It was proposed by Wang and Chang (1999) <doi:10.2307/2669690>. In the independent case, the survival function can be  estimated by the generalization of the limit product model of Pena (2001) <doi:10.1198/016214501753381922>.
+# License: GPL (>= 2)
+# URL: https://www.r-project.org
+# Encoding: UTF-8
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-04-13 11:14:56 UTC; Usuario 1
+# Repository: CRAN
+# Date/Publication: 2018-04-16 09:01:31 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

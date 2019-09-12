@@ -1,0 +1,91 @@
+{% set version = '1.0-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rnaseqwrapper
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rnaseqWrapper_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rnaseqWrapper/rnaseqWrapper_{{ version }}.tar.gz
+  sha256: 90ed9865a18e5aaf32ad405dddaf2ff27646c3a036be4b5b028eb19b798543b9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: topGO,seqinr,DESeq
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-ecodist
+    - r-gplots
+    - r-gtools
+
+  run:
+    - r-base
+    - r-ecodist
+    - r-gplots
+    - r-gtools
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rnaseqWrapper')"           # [not win]
+    - "\"%R%\" -e \"library('rnaseqWrapper')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rnaseqWrapper
+  license: GPL-3
+  summary: This package is designed to streamline several of the common steps for RNA-seq analysis,
+    including differential expression and variant discovery. For the development build,
+    or to contribute changes to this package, please see our repository at https://bitbucket.org/petersmp/rnaseqwrapper/
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rnaseqWrapper
+# Type: Package
+# Title: Wrapper for several R packages and scripts to automate RNA-seq analysis
+# Version: 1.0-1
+# Date: 2014-07-22
+# Author: Mark Peterson
+# Maintainer: Mark Peterson <mark.phillip.peterson@gmail.com>
+# Description: This package is designed to streamline several of the common steps for RNA-seq analysis, including differential expression and variant discovery. For the development build, or to contribute changes to this package, please see our repository at https://bitbucket.org/petersmp/rnaseqwrapper/
+# License: GPL
+# Depends: ecodist, gplots, gtools
+# Suggests: topGO,seqinr,DESeq
+# Packaged: 2014-07-22 23:29:27 UTC; markp
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-07-23 15:59:32
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

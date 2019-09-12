@@ -1,0 +1,92 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tnc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/TNC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/TNC/TNC_{{ version }}.tar.gz
+  sha256: 76ca4ab9f3c9a97749e46a20c3a81f1bdef08a91319d5ff75535cd4afde66918
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: igraph (>= 1.1.2), parallel (>= 3.4.1), testthat (>= 1.0.2)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('TNC')"           # [not win]
+    - "\"%R%\" -e \"library('TNC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=TNC
+  license: GPL-3
+  summary: Node centrality measures for temporal networks. Available measures are temporal degree
+    centrality, temporal closeness centrality and temporal betweenness centrality defined
+    by Kim and Anderson (2012) <doi:10.1103/PhysRevE.85.026107>. Applying the REN algorithm
+    by Hanke and Foraita (2017) <doi:10.1186/s12859-017-1677-x> when calculating the
+    centrality measures keeps the computational running time linear in the number of
+    graph snapshots. Further, all methods can run in parallel up to the number of nodes
+    in the network.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: TNC
+# Type: Package
+# Title: Temporal Network Centrality (TNC) Measures
+# Version: 0.1.0
+# Authors@R: person("Moritz", "Hanke", email = "hanke@leibniz-bips.de", role = c("aut", "cre"))
+# Description: Node centrality measures for temporal networks. Available measures are temporal degree centrality, temporal closeness centrality and temporal betweenness centrality defined by Kim and Anderson (2012) <doi:10.1103/PhysRevE.85.026107>. Applying the REN algorithm by Hanke and Foraita (2017) <doi:10.1186/s12859-017-1677-x> when calculating the centrality measures keeps the computational running time linear in the number of graph snapshots. Further, all methods can run in parallel up to the number of nodes in the network.
+# Depends: R (>= 3.4.1)
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: igraph (>= 1.1.2), parallel (>= 3.4.1), testthat (>= 1.0.2)
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-09-06 12:50:23 UTC; momo
+# Author: Moritz Hanke [aut, cre]
+# Maintainer: Moritz Hanke <hanke@leibniz-bips.de>
+# Repository: CRAN
+# Date/Publication: 2017-09-06 13:06:13 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

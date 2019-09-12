@@ -1,0 +1,103 @@
+{% set version = '0.1-12.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ggmselect
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GGMselect_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GGMselect/GGMselect_{{ version }}.tar.gz
+  sha256: fa95b62f292c8d73201fd87df81c0cef74eb50d0b43d7212a7c9fbd1cbb7a499
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: network, glasso
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-gtools
+    - r-lars
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-gtools
+    - r-lars
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GGMselect')"           # [not win]
+    - "\"%R%\" -e \"library('GGMselect')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://genome.jouy.inra.fr/logiciels/GGMselect/
+  license: GPL-3
+  summary: 'Graph estimation in Gaussian Graphical Models. The main functions return the adjacency
+    matrix of an undirected graph estimated from a data matrix. '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: GGMselect
+# Type: Package
+# Title: Gaussian Graphs Models Selection
+# Version: 0.1-12.2
+# Date: 2017-04-06
+# Author: Annie Bouvier, Christophe Giraud, Sylvie Huet, Verzelen N.
+# Maintainer: ORPHANED
+# Description: Graph estimation in Gaussian Graphical Models. The main functions return the adjacency matrix of an undirected graph estimated from a data matrix.
+# Imports: lars, gtools, stats
+# Depends: R (>= 3.6.0), mvtnorm
+# Suggests: network, glasso
+# License: GPL (>= 3)
+# URL: http://genome.jouy.inra.fr/logiciels/GGMselect/
+# NeedsCompilation: yes
+# Packaged: 2019-04-22 11:52:16 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2019-04-26 13:20:35 UTC
+# X-CRAN-Original-Maintainer: Annie Bouvier <Annie.Bouvier@inra.fr>
+# X-CRAN-Comment: Orphaned on 2018-02-01 as installation issues were not corrected despite reminders. . Attempted to use SAFE_FFLAGS as part of PKG_LIBS.
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

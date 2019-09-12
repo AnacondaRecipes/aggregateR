@@ -1,0 +1,96 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-metaheuristicfpa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MetaheuristicFPA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MetaheuristicFPA/MetaheuristicFPA_{{ version }}.tar.gz
+  sha256: 4f221eb36b58c977fe6dbe1e6380a41f02f40102b2ed9f4b91afe5578d41d324
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.6
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.6
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MetaheuristicFPA')"           # [not win]
+    - "\"%R%\" -e \"library('MetaheuristicFPA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MetaheuristicFPA
+  license: GPL-2
+  summary: A nature-inspired metaheuristics algorithm based on the pollination process of flowers.
+    This R package makes it easy to implement the standard flower pollination algorithm
+    for every user. The algorithm was first developed by Xin-She Yang in 2012 (<DOI:10.1007/978-3-642-32894-7_27>).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MetaheuristicFPA
+# Type: Package
+# Title: An Implementation of Flower Pollination Algorithm in R
+# Version: 1.0
+# Date: 2016-08-28
+# Author: Amanda Pratama Putra with contributions from Margaretha Ari Anggorowati
+# Maintainer: Amanda Pratama Putra <12.7012@stis.ac.id>
+# Description: A nature-inspired metaheuristics algorithm based on the pollination process of flowers. This R package makes it easy to implement the standard flower pollination algorithm for every user. The algorithm was first developed by Xin-She Yang in 2012 (<DOI:10.1007/978-3-642-32894-7_27>).
+# License: GPL-2
+# Imports: Rcpp (>= 0.12.6)
+# LinkingTo: Rcpp, RcppArmadillo
+# NeedsCompilation: yes
+# Packaged: 2016-08-29 02:24:44 UTC; Putra
+# Repository: CRAN
+# Date/Publication: 2016-08-29 08:18:35
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

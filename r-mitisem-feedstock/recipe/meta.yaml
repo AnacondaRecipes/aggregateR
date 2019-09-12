@@ -1,0 +1,89 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mitisem
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MitISEM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MitISEM/MitISEM_{{ version }}.tar.gz
+  sha256: 9275a9fd88d9b5727bf675c437165cecccd7000005c2777c7d26c09e374ac336
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: AdMit
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MitISEM')"           # [not win]
+    - "\"%R%\" -e \"library('MitISEM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.maastrichtuniversity.nl/n.basturk
+  license: GPL-3
+  summary: Flexible multivariate function approximation using adapted Mixture of Student t Distributions.
+    Mixture of t distribution is obtained using Importance Sampling weighted Expectation
+    Maximization algorithm.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MitISEM
+# Type: Package
+# Title: Mixture of Student t Distributions using Importance Sampling and Expectation Maximization
+# Version: 1.2
+# Date: 2017-07-10
+# Author: N. Basturk, L.F. Hoogerheide, A. Opschoor, H.K. van Dijk
+# Maintainer: N. Basturk <n.basturk@maastrichtuniversity.nl>
+# Description: Flexible multivariate function approximation using adapted Mixture of Student t Distributions. Mixture of t distribution is obtained using Importance Sampling weighted Expectation Maximization algorithm.
+# License: GPL (>= 3)
+# LazyLoad: yes
+# Imports: mvtnorm
+# Suggests: AdMit
+# URL: https://www.maastrichtuniversity.nl/n.basturk
+# NeedsCompilation: no
+# Packaged: 2017-07-10 14:21:19 UTC; nalan
+# Repository: CRAN
+# Date/Publication: 2017-07-10 18:36:41 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

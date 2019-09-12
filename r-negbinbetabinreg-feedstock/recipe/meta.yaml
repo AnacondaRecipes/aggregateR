@@ -1,0 +1,88 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-negbinbetabinreg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/NegBinBetaBinreg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/NegBinBetaBinreg/NegBinBetaBinreg_{{ version }}.tar.gz
+  sha256: 2dddb4f378d6644b8c3f4968d912b6614e570dcaa6760cd8393a6ae2da4bd167
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-boot
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-matrix
+    - r-boot
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('NegBinBetaBinreg')"           # [not win]
+    - "\"%R%\" -e \"library('NegBinBetaBinreg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=NegBinBetaBinreg
+  license: GPL-2
+  summary: The Negative Binomial regression with mean and shape modeling and mean and variance
+    modeling and Beta Binomial regression with mean and dispersion modeling.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: NegBinBetaBinreg
+# Type: Package
+# Title: Negative Binomial and Beta Binomial Bayesian Regression Models
+# License: GPL (>= 2)
+# Version: 1.0
+# Date: 2016-11-15
+# Author: Edilberto Cepeda-Cuervo, Maria Victoria Cifuentes-Amado and Margarita Marin
+# Maintainer: Edilberto Cepeda <ecepedac@unal.edu.co>
+# Depends: R (>= 3.1.1), mvtnorm, Matrix, boot
+# Description: The Negative Binomial regression with mean and shape modeling and mean and variance modeling and Beta Binomial regression with mean and dispersion modeling.
+# NeedsCompilation: no
+# Packaged: 2016-11-15 20:15:15 UTC; margarita
+# Repository: CRAN
+# Date/Publication: 2016-11-17 08:27:30
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

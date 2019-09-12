@@ -1,0 +1,95 @@
+{% set version = '1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-shiftr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/shiftR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/shiftR/shiftR_{{ version }}.tar.gz
+  sha256: 9dc49aa0e81be69e75272740ebbf6eec9a509f27585b1ee0f5a641d4f1c7c2a3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, pander
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('shiftR')"           # [not win]
+    - "\"%R%\" -e \"library('shiftR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/andreyshabalin/shiftR
+  license: LGPL-3
+  summary: Fast enrichment analysis for locally correlated statistics via circular permutations.
+    The analysis can be performed at multiple significance thresholds for both primary
+    and auxiliary data sets with efficient correction for multiple testing.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: shiftR
+# Type: Package
+# Title: Fast Enrichment Analysis via Circular Permutations
+# Version: 1.5
+# Date: 2019-03-21
+# Authors@R: c(person("Andrey A", "Shabalin", role = c("aut", "cre"), email = "andrey.shabalin@gmail.com", comment = c(ORCID = "0000-0003-0309-6821")), person("Edwin J C G", "van den Oord", email = "ejvandenoord@vcu.edu", role = "aut"))
+# Description: Fast enrichment analysis for locally correlated statistics via circular permutations. The analysis can be performed at multiple significance thresholds for both primary and auxiliary data sets with efficient correction for multiple testing.
+# BugReports: https://github.com/andreyshabalin/shiftR/issues
+# URL: https://github.com/andreyshabalin/shiftR
+# License: LGPL-3
+# Imports: parallel
+# Suggests: knitr, rmarkdown, pander
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2019-03-21 20:08:34 UTC; Andrey
+# Author: Andrey A Shabalin [aut, cre] (<https://orcid.org/0000-0003-0309-6821>), Edwin J C G van den Oord [aut]
+# Maintainer: Andrey A Shabalin <andrey.shabalin@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-03-22 09:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

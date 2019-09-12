@@ -1,0 +1,112 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-seqdesign
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/seqDesign_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/seqDesign/seqDesign_{{ version }}.tar.gz
+  sha256: d59ca51b8acfc27bd0b648d9318a5e1f415cb4ed442b1f3ebb70d78164a3e882
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, R.rsp
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-survival
+
+  run:
+    - r-base
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('seqDesign')"           # [not win]
+    - "\"%R%\" -e \"library('seqDesign')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mjuraska/seqDesign
+  license: GPL-2
+  summary: A modification of the preventive vaccine efficacy trial design of Gilbert, Grove et
+    al. (2011, Statistical Communications in Infectious Diseases) is implemented, with
+    application generally to individual-randomized clinical trials with multiple active
+    treatment groups and a shared control group, and a study endpoint that is a time-to-event
+    endpoint subject to right-censoring. The design accounts for the issues that the
+    efficacy of the treatment/vaccine groups may take time to accrue while the multiple
+    treatment administrations/vaccinations are given; there is interest in assessing
+    the durability of treatment efficacy over time; and group sequential monitoring
+    of each treatment group for potential harm, non-efficacy/efficacy futility, and
+    high efficacy is warranted. The design divides the trial into two stages of time
+    periods, where each treatment is first evaluated for efficacy in the first stage
+    of follow-up, and, if and only if it shows significant treatment efficacy in stage
+    one, it is evaluated for longer-term durability of efficacy in stage two. The package
+    produces plots and tables describing operating characteristics of a specified design
+    including an unconditional power for intention-to-treat and per-protocol/as-treated
+    analyses; trial duration; probabilities of the different possible trial monitoring
+    outcomes (e.g., stopping early for non-efficacy); unconditional power for comparing
+    treatment efficacies; and distributions of numbers of endpoint events occurring
+    after the treatments/vaccinations are given, useful as input parameters for the
+    design of studies of the association of biomarkers with a clinical outcome (surrogate
+    endpoint problem). The code can be used for a single active treatment versus control
+    design and for a single-stage design.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: seqDesign
+# Version: 1.2
+# Date: 2019-05-14
+# Title: Simulation and Group Sequential Monitoring of Randomized Two-Stage Treatment Efficacy Trials with Time-to-Event Endpoints
+# Authors@R: c(person("Michal", "Juraska", email = "mjuraska@fredhutch.org", role = c("aut", "cre")), person("Doug", "Grove", email = "dgrove@scharp.org", role = "aut"), person("Xuesong", "Yu", email = "xyu@scharp.org", role = "ctb"), person("Peter", "Gilbert", email = "pgilbert@scharp.org", role = "ctb"), person("Stephanie", "Wu", email = "swu18@uw.edu", role = "ctb"))
+# URL: https://github.com/mjuraska/seqDesign
+# Description: A modification of the preventive vaccine efficacy trial design of Gilbert, Grove et al. (2011, Statistical Communications in Infectious Diseases) is implemented, with application generally to individual-randomized clinical trials with multiple active treatment groups and a shared control group, and a study endpoint that is a time-to-event endpoint subject to right-censoring. The design accounts for the issues that the efficacy of the treatment/vaccine groups may take time to accrue while the multiple treatment administrations/vaccinations are given; there is interest in assessing the durability of treatment efficacy over time; and group sequential monitoring of each treatment group for potential harm, non-efficacy/efficacy futility, and high efficacy is warranted. The design divides the trial into two stages of time periods, where each treatment is first evaluated for efficacy in the first stage of follow-up, and, if and only if it shows significant treatment efficacy in stage one, it is evaluated for longer-term durability of efficacy in stage two. The package produces plots and tables describing operating characteristics of a specified design including an unconditional power for intention-to-treat and per-protocol/as-treated analyses; trial duration; probabilities of the different possible trial monitoring outcomes (e.g., stopping early for non-efficacy); unconditional power for comparing treatment efficacies; and distributions of numbers of endpoint events occurring after the treatments/vaccinations are given, useful as input parameters for the design of studies of the association of biomarkers with a clinical outcome (surrogate endpoint problem). The code can be used for a single active treatment versus control design and for a single-stage design.
+# BugReports: https://github.com/mjuraska/seqDesign/issues
+# Depends: R (>= 2.16), survival
+# License: GPL-2
+# Encoding: UTF-8
+# LazyLoad: yes
+# VignetteBuilder: knitr, R.rsp
+# Suggests: knitr, R.rsp
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-05-22 00:26:06 UTC; mjuraska
+# Author: Michal Juraska [aut, cre], Doug Grove [aut], Xuesong Yu [ctb], Peter Gilbert [ctb], Stephanie Wu [ctb]
+# Maintainer: Michal Juraska <mjuraska@fredhutch.org>
+# Repository: CRAN
+# Date/Publication: 2019-05-22 22:10:35 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,90 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-splitfeas
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/splitFeas_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/splitFeas/splitFeas_{{ version }}.tar.gz
+  sha256: 37a7db55c47c41393032f8ccdfb649fc25ad3b91b5d91a32ba731628868ed1b1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-corpcor
+    - r-matrixstats
+
+  run:
+    - r-base
+    - r-corpcor
+    - r-matrixstats
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('splitFeas')"           # [not win]
+    - "\"%R%\" -e \"library('splitFeas')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=splitFeas
+  license: MIT
+  summary: An implementation of the majorization-minimization (MM) algorithm introduced by Xu,
+    Chi, Yang, and Lange (2017) <arXiv:1612.05614> for solving multi-set split feasibility
+    problems. In the multi-set split feasibility problem, we seek to find a point x
+    in the intersection of multiple closed sets and whose image under a mapping also
+    must fall in the intersection of several closed sets.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: splitFeas
+# Title: Multi-Set Split Feasibility
+# Version: 0.1.0
+# Authors@R: c( person(given=c("Eric","C."), family="Chi", email="ecchi1105@gmail.com", role=c("aut","cre","cph")), person(given="Jason", family="Xu", email="jqxu@ucla.edu", role="ctb"), person(given="Meng", family="Yang", email="myang13@ncsu.edu", role="ctb"), person(given="Kenneth", family="Lange", email="klange@ucla.edu", role="ctb") )
+# Description: An implementation of the majorization-minimization (MM) algorithm introduced by Xu, Chi, Yang, and Lange (2017) <arXiv:1612.05614> for solving multi-set split feasibility problems. In the multi-set split feasibility problem, we seek to find a point x in the intersection of multiple closed sets and whose image under a mapping also must fall in the intersection of several closed sets.
+# Depends: compiler, corpcor, matrixStats
+# License: MIT + file LICENSE
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-04-10 17:18:01 UTC; ecchi
+# Author: Eric C. Chi [aut, cre, cph], Jason Xu [ctb], Meng Yang [ctb], Kenneth Lange [ctb]
+# Maintainer: Eric C. Chi <ecchi1105@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-04-11 08:15:34 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

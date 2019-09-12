@@ -1,0 +1,105 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-wrswor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/wrswoR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/wrswoR/wrswoR_{{ version }}.tar.gz
+  sha256: 9f92deb3106cbd8958b6e94d4d57bf9c75483c84630e10455f81a0df5140cb4a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: BatchExperiments, dplyr, ggplot2, import, kimisc (>= 0.2-4), knitcitations, knitr, metap, microbenchmark, rmarkdown, roxygen2, rticles (>= 0.1), sampling, testthat, tidyr, tikzDevice (>= 0.9-1)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-logging >=0.4_13
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-logging >=0.4_13
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('wrswoR')"           # [not win]
+    - "\"%R%\" -e \"library('wrswoR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://krlmlr.github.io/wrswoR
+  license: GPL-3
+  summary: A collection of implementations of classical and novel algorithms for weighted sampling
+    without replacement.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: wrswoR
+# Title: Weighted Random Sampling without Replacement
+# Version: 1.1
+# Date: 2018-02-02
+# Authors@R: person(given = "Kirill", family = "Muller", role = c("aut", "cre"), email = "krlmlr+r@mailbox.org")
+# Description: A collection of implementations of classical and novel algorithms for weighted sampling without replacement.
+# License: GPL-3
+# URL: http://krlmlr.github.io/wrswoR
+# BugReports: https://github.com/krlmlr/wrswoR/issues
+# Depends: R (>= 3.0.2)
+# Imports: logging (>= 0.4-13), Rcpp
+# Suggests: BatchExperiments, dplyr, ggplot2, import, kimisc (>= 0.2-4), knitcitations, knitr, metap, microbenchmark, rmarkdown, roxygen2, rticles (>= 0.1), sampling, testthat, tidyr, tikzDevice (>= 0.9-1)
+# LinkingTo: Rcpp (>= 0.11.5)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1.9000
+# URLNote: https://github.com/krlmlr/wrswoR
+# NeedsCompilation: yes
+# Packaged: 2018-02-02 07:58:28 UTC; muelleki
+# Author: Kirill Muller [aut, cre]
+# Maintainer: Kirill Muller <krlmlr+r@mailbox.org>
+# Repository: CRAN
+# Date/Publication: 2018-02-02 18:26:36 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

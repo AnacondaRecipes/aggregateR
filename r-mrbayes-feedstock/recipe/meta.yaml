@@ -1,0 +1,92 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mrbayes
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mrbayes_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mrbayes/mrbayes_{{ version }}.tar.gz
+  sha256: cf2aa3a069bba9c388759030e3132bbf2d1617511224612bd3e39dddcd0b0a5c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, rjags (>= 4-9), tidyverse, knitr, ggplot2, ggmcmc, foreign, DescTools, bayesmeta, utils, kableExtra, roxygen2, bookdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mrbayes')"           # [not win]
+    - "\"%R%\" -e \"library('mrbayes')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/okezie94/mrbayes
+  license: GPL-3
+  summary: Bayesian estimation of inverse variance weighted (IVW), Burgess  et al. (2013) <doi:10.1002/gepi.21758>,
+    and MR-Egger, Bowden et  al. (2015) <doi:10.1093/ije/dyv080>, summary data models
+    for Mendelian  randomization analyses.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mrbayes
+# Type: Package
+# Title: Bayesian Summary Data Models for Mendelian Randomization Studies
+# Version: 0.1.0
+# Authors@R: c(person("Okezie", "Uche-Ikonne",  email = "o.uche-ikonne@lancaster.ac.uk", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-8461-8099")), person("Frank", "Dondelinger", email = "f.dondelinger@lancaster.ac.uk", role = c("aut"), comment = c(ORCID = "0000-0003-1816-6300")), person("Tom", "Palmer",  email = "tom.palmer@lancaster.ac.uk", role = c("aut"), comment = c(ORCID = "0000-0003-4655-4511")))
+# Description: Bayesian estimation of inverse variance weighted (IVW), Burgess  et al. (2013) <doi:10.1002/gepi.21758>, and MR-Egger, Bowden et  al. (2015) <doi:10.1093/ije/dyv080>, summary data models for Mendelian  randomization analyses.
+# Depends: R (>= 3.5.0)
+# Imports: methods
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: testthat, rjags (>= 4-9), tidyverse, knitr, ggplot2, ggmcmc, foreign, DescTools, bayesmeta, utils, kableExtra, roxygen2, bookdown
+# URL: https://github.com/okezie94/mrbayes
+# BugReports: https://github.com/okezie94/mrbayes/issues
+# RoxygenNote: 6.1.1
+# SystemRequirements: JAGS 4.x.y
+# NeedsCompilation: no
+# Packaged: 2019-09-03 13:34:56 UTC; ucheikon
+# Author: Okezie Uche-Ikonne [aut, cre] (<https://orcid.org/0000-0002-8461-8099>), Frank Dondelinger [aut] (<https://orcid.org/0000-0003-1816-6300>), Tom Palmer [aut] (<https://orcid.org/0000-0003-4655-4511>)
+# Maintainer: Okezie Uche-Ikonne <o.uche-ikonne@lancaster.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2019-09-04 09:30:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

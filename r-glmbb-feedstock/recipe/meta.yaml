@@ -1,0 +1,89 @@
+{% set version = '0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-glmbb
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/glmbb_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/glmbb/glmbb_{{ version }}.tar.gz
+  sha256: 94d74cd5d6f55e02f8a8a901b6e50835f7e46d93695904f3ad0ee8cb355fca8b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-digest
+
+  run:
+    - r-base
+    - r-digest
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('glmbb')"           # [not win]
+    - "\"%R%\" -e \"library('glmbb')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/cjgeyer/glmbb
+  license: MIT
+  summary: Find all hierarchical models of specified generalized linear model with information
+    criterion (AIC, BIC, or AICc) within specified cutoff of minimum value.  Alternatively,
+    find all such graphical models. Use branch and bound algorithm so we do not have
+    to fit all models.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: glmbb
+# Version: 0.3
+# Date: 2017-06-02
+# Title: All Hierarchical or Graphical Models for Generalized Linear Model
+# Author: Charles J. Geyer <charlie@stat.umn.edu>.
+# Maintainer: Charles J. Geyer <charlie@stat.umn.edu>
+# Depends: R (>= 3.0.2)
+# Imports: digest, stats
+# ByteCompile: TRUE
+# Description: Find all hierarchical models of specified generalized linear model with information criterion (AIC, BIC, or AICc) within specified cutoff of minimum value.  Alternatively, find all such graphical models. Use branch and bound algorithm so we do not have to fit all models.
+# License: MIT + file LICENSE
+# URL: https://github.com/cjgeyer/glmbb
+# NeedsCompilation: no
+# Packaged: 2017-06-02 20:35:45 UTC; geyer
+# Repository: CRAN
+# Date/Publication: 2017-06-02 22:22:24 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

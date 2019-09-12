@@ -1,0 +1,105 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pgsc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pgsc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pgsc/pgsc_{{ version }}.tar.gz
+  sha256: 272a0c161f9c941055559fd5f5762113336ce1ba0d8d8391f5e342192cfe9af8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, plm
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.18
+    - r-rcpparmadillo
+    - r-nloptr
+    - r-reshape2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.18
+    - r-rcpparmadillo
+    - r-nloptr
+    - r-reshape2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pgsc')"           # [not win]
+    - "\"%R%\" -e \"library('pgsc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/philipbarrett/pgsc
+  license: GPL-2
+  summary: Computes the generalized synthetic control estimator described in Powell (2017) <doi:10.7249/WR1142>.  Provides
+    both point estimates, and hypothesis testing.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pgsc
+# Type: Package
+# Title: Computes Powell's Generalized Synthetic Control Estimator
+# Version: 1.0.0
+# Date: 2018-10-21
+# Author: Philip Barrett
+# Maintainer: Philip Barrett <pobarrett@gmail.com>
+# Description: Computes the generalized synthetic control estimator described in Powell (2017) <doi:10.7249/WR1142>.  Provides both point estimates, and hypothesis testing.
+# License: GPL-2
+# Depends: R (>= 2.10), Rcpp (>= 0.12.18), nloptr, reshape2
+# LinkingTo: Rcpp, RcppArmadillo
+# RoxygenNote: 6.1.0
+# Suggests: knitr, rmarkdown, plm
+# VignetteBuilder: knitr
+# URL: https://github.com/philipbarrett/pgsc
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2018-10-21 20:37:31 UTC; philip
+# Repository: CRAN
+# Date/Publication: 2018-10-28 22:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

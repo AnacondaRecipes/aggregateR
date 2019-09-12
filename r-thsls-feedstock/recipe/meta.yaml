@@ -1,0 +1,84 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-thsls
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/thsls_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/thsls/thsls_{{ version }}.tar.gz
+  sha256: 2736ad291a43a9f1c9469d8fd3fcd6189de2d7b70f0a9d713c6f363ff555e7a3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+
+  run:
+    - r-base
+    - r-formula
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('thsls')"           # [not win]
+    - "\"%R%\" -e \"library('thsls')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=thsls
+  license: GPL-3
+  summary: Fit the Simultaneous Systems of Linear Equations using Three-stage Least Squares.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: thsls
+# Type: Package
+# Title: Three-Stage Least Squares Estimation for Systems of Simultaneous Equations
+# Version: 0.1
+# Date: 2015-04-03
+# Author: Zaghdoudi Taha
+# Maintainer: Zaghdoudi Taha <zedtaha@gmail.com>
+# Description: Fit the Simultaneous Systems of Linear Equations using Three-stage Least Squares.
+# License: GPL-3
+# LazyData: TRUE
+# Imports: Formula
+# Packaged: 2015-04-03 14:49:32 UTC; Taha
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-04-03 20:04:55
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

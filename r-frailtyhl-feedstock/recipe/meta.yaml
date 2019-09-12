@@ -1,0 +1,86 @@
+{% set version = '2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-frailtyhl
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/frailtyHL_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/frailtyHL/frailtyHL_{{ version }}.tar.gz
+  sha256: 7eb26572d9ae38fec79cd3a683c7345fdf344876da599192e10738121342d944
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-cmprsk
+    - r-survival
+
+  run:
+    - r-base
+    - r-matrix
+    - r-cmprsk
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('frailtyHL')"           # [not win]
+    - "\"%R%\" -e \"library('frailtyHL')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=frailtyHL
+  license: Unlimited
+  summary: Implements the h-likelihood estimation procedures for general frailty models including
+    competing-risk models and joint models.
+  license_family: MIT
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: frailtyHL
+# Type: Package
+# Title: Frailty Models via Hierarchical Likelihood
+# Version: 2.2
+# Date: 2018-07-25
+# Author: Il Do Ha, Maengseok Noh, Jiwoong Kim, Youngjo Lee
+# Maintainer: Maengseok Noh <msnoh@pknu.ac.kr>
+# Description: Implements the h-likelihood estimation procedures for general frailty models including competing-risk models and joint models.
+# Depends: R (>= 3.4.0), methods, Matrix, survival, cmprsk
+# License: Unlimited
+# NeedsCompilation: no
+# Packaged: 2018-08-12 06:15:34 UTC; Noh
+# Repository: CRAN
+# Date/Publication: 2018-08-13 10:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

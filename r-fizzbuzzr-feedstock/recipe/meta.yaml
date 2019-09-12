@@ -1,0 +1,89 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fizzbuzzr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fizzbuzzR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fizzbuzzR/fizzbuzzR_{{ version }}.tar.gz
+  sha256: 9034fe3cb4cd9fc6a4a4cf5a7aa6ed69b7928efb47ee34a1281959e2535c2f85
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fizzbuzzR')"           # [not win]
+    - "\"%R%\" -e \"library('fizzbuzzR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=fizzbuzzR
+  license: GPL-3
+  summary: An implementation of the Fizz Buzz algorithm, as defined e.g. in <https://en.wikipedia.org/wiki/Fizz_buzz>.  It
+    provides the standard algorithm with 3 replaced by Fizz and 5 replaced by Buzz,
+    with the option of specifying start  and end numbers, step size and the numbers
+    being replaced by fizz and buzz, respectively. This package gives  interviewers
+    the optional answer of "I use fizzbuzzR::fizzbuzz()" when interviewing rather than
+    having to write an algorithm themselves.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fizzbuzzR
+# Type: Package
+# Title: Fizz Buzz Implementation
+# Version: 0.1.1
+# Date: 2016-10-26
+# Authors@R: person("Ansgar","Wenzel",email="ansgar.wenzel+fizzbuzzR@gmail.com",role=c("aut","cre"))
+# Description: An implementation of the Fizz Buzz algorithm, as defined e.g. in <https://en.wikipedia.org/wiki/Fizz_buzz>.  It provides the standard algorithm with 3 replaced by Fizz and 5 replaced by Buzz, with the option of specifying start  and end numbers, step size and the numbers being replaced by fizz and buzz, respectively. This package gives  interviewers the optional answer of "I use fizzbuzzR::fizzbuzz()" when interviewing rather than having to write an algorithm themselves.
+# License: GPL (>= 3)
+# LazyData: TRUE
+# Depends: R (>= 3.1.0)
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-10-27 09:27:05 UTC; ansgar
+# Author: Ansgar Wenzel [aut, cre]
+# Maintainer: Ansgar Wenzel <ansgar.wenzel+fizzbuzzR@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-10-27 17:40:26
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,87 @@
+{% set version = '0.14' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mod09nrt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mod09nrt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mod09nrt/mod09nrt_{{ version }}.tar.gz
+  sha256: 401d4afe5d99c1d81af0eeedfaa5554310ca5e91c30007a8082727b9c6f0c1f2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mod09nrt')"           # [not win]
+    - "\"%R%\" -e \"library('mod09nrt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mod09nrt
+  license: GPL-2
+  summary: Package for processing downloaded MODIS Surface reflectance Product HDF files. Specifically,
+    MOD09 surface reflectance product files, and the associated MOD03 geolocation files
+    (for MODIS-TERRA). The package will be most effective if the user installs MRTSwath
+    (MODIS Reprojection Tool for swath products; <https://lpdaac.usgs.gov/tools/modis_reprojection_tool_swath>,
+    and adds the directory with the MRTSwath executable to the default R PATH by editing
+    ~/.Rprofile.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mod09nrt
+# Type: Package
+# Title: Extraction of Bands from MODIS Surface Reflectance Product MOD09 NRT
+# Version: 0.14
+# Author: Rishabh Gupta <rishabh.uk@gmail.com>, Nicholas J. Matzke, Dept. of Integrative Biology, U.C. Berkeley
+# Maintainer: Rishabh Gupta <rishabh.uk@gmail.com>
+# Description: Package for processing downloaded MODIS Surface reflectance Product HDF files. Specifically, MOD09 surface reflectance product files, and the associated MOD03 geolocation files (for MODIS-TERRA). The package will be most effective if the user installs MRTSwath (MODIS Reprojection Tool for swath products; <https://lpdaac.usgs.gov/tools/modis_reprojection_tool_swath>, and adds the directory with the MRTSwath executable to the default R PATH by editing ~/.Rprofile.
+# SystemRequirements: MRTSwath
+# License: GPL (>= 2)
+# LazyData: TRUE
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-07-24 11:48:00 UTC; 500028930
+# Repository: CRAN
+# Date/Publication: 2016-07-24 13:55:50
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

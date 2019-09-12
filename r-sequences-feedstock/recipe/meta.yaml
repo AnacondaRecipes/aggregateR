@@ -1,0 +1,97 @@
+{% set version = '0.5.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sequences
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sequences_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sequences/sequences_{{ version }}.tar.gz
+  sha256: 6accda7ea30a3ab0493febbad05f402100821d372355e0c81ccaac224a0da79c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sequences')"           # [not win]
+    - "\"%R%\" -e \"library('sequences')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/lgatto/sequences/
+  license: GPL-3
+  summary: Educational package used in R courses to illustrate object-oriented programming and
+    package development. Using biological sequences (DNA and RNA) as a working example.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sequences
+# Title: Generic and Biological Sequences
+# Version: 0.5.9
+# Authors@R: c(person(given = "Laurent", family = "Gatto", email = "lg390@cam.ac.uk", role = c("aut", "cre")), person(given = "Robert", family ="Stojnic", email = "rs550@cam.ac.uk", role = "aut"))
+# Description: Educational package used in R courses to illustrate object-oriented programming and package development. Using biological sequences (DNA and RNA) as a working example.
+# Depends: methods, Rcpp
+# LinkingTo: Rcpp
+# Suggests: testthat, knitr
+# License: GPL-3
+# biocViews: Infrastructure, DataRepresentation, DataImport
+# VignetteBuilder: knitr
+# URL: https://github.com/lgatto/sequences/
+# Packaged: 2014-12-03 12:38:18 UTC; lg390
+# Author: Laurent Gatto [aut, cre], Robert Stojnic [aut]
+# Maintainer: Laurent Gatto <lg390@cam.ac.uk>
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2014-12-03 13:58:03
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

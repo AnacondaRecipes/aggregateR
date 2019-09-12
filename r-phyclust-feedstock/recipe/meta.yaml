@@ -1,0 +1,105 @@
+{% set version = '0.1-25' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-phyclust
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/phyclust_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/phyclust/phyclust_{{ version }}.tar.gz
+  sha256: 30a17173e8b4fc316f1ae4a9ea19ed5fbd1283d457a3d9123463f224760e288b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-ape
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-ape
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('phyclust')"           # [not win]
+    - "\"%R%\" -e \"library('phyclust')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://snoweye.github.io/phyclust/
+  license: GPL-2
+  summary: Phylogenetic clustering (phyloclustering) is an evolutionary Continuous Time Markov
+    Chain model-based approach to identify population structure from molecular data
+    without assuming linkage equilibrium. The package phyclust (Chen 2011) provides
+    a convenient implementation of phyloclustering for DNA and SNP data, capable of
+    clustering individuals into subpopulations and identifying molecular sequences representative
+    of those subpopulations. It is designed in C for performance, interfaced with R
+    for visualization, and incorporates other popular open source programs including
+    ms (Hudson 2002) <doi:10.1093/bioinformatics/18.2.337>, seq-gen (Rambaut and Grassly
+    1997) <doi:10.1093/bioinformatics/13.3.235>, Hap-Clustering (Tzeng 2005) <doi:10.1002/gepi.20063>
+    and PAML baseml (Yang 1997, 2007) <doi:10.1093/bioinformatics/13.5.555>, <doi:10.1093/molbev/msm088>,
+    for simulating data, additional analyses, and searching the best tree. See the phyclust
+    website for more information, documentations and examples.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: phyclust
+# Version: 0.1-25
+# Date: 2019-08-23
+# Title: Phylogenetic Clustering (Phyloclustering)
+# Authors@R: c(person("Wei-Chen", "Chen", role = c("aut", "cre"), email = "wccsnow@gmail.com"), person("Karin", "Dorman", role = "aut"))
+# Depends: R (>= 3.0.0), ape
+# LazyLoad: yes
+# LazyData: yes
+# Copyright: See phyclust/inst/Documents/ for files in src/msdir/, src/seq-gen/, src/paml_baseml, and R/ttzeng-*.r.
+# Description: Phylogenetic clustering (phyloclustering) is an evolutionary Continuous Time Markov Chain model-based approach to identify population structure from molecular data without assuming linkage equilibrium. The package phyclust (Chen 2011) provides a convenient implementation of phyloclustering for DNA and SNP data, capable of clustering individuals into subpopulations and identifying molecular sequences representative of those subpopulations. It is designed in C for performance, interfaced with R for visualization, and incorporates other popular open source programs including ms (Hudson 2002) <doi:10.1093/bioinformatics/18.2.337>, seq-gen (Rambaut and Grassly 1997) <doi:10.1093/bioinformatics/13.3.235>, Hap-Clustering (Tzeng 2005) <doi:10.1002/gepi.20063> and PAML baseml (Yang 1997, 2007) <doi:10.1093/bioinformatics/13.5.555>, <doi:10.1093/molbev/msm088>, for simulating data, additional analyses, and searching the best tree. See the phyclust website for more information, documentations and examples.
+# BugReports: https://github.com/snoweye/phyclust/issues
+# License: GPL (>= 2)
+# URL: http://snoweye.github.io/phyclust/
+# NeedsCompilation: yes
+# Maintainer: Wei-Chen Chen <wccsnow@gmail.com>
+# Packaged: 2019-08-24 00:44:03 UTC; snoweye
+# Author: Wei-Chen Chen [aut, cre], Karin Dorman [aut]
+# Repository: CRAN
+# Date/Publication: 2019-08-25 09:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

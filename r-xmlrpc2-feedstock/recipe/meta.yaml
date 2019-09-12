@@ -1,0 +1,89 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-xmlrpc2
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/xmlrpc2_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/xmlrpc2/xmlrpc2_{{ version }}.tar.gz
+  sha256: 3af74fcb68ba961f0623bd2432cec2a1c5485b0c3d0c0b49fc70dc1d19e02e8f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-base64enc
+    - r-curl
+    - r-xml2
+
+  run:
+    - r-base
+    - r-base64enc
+    - r-curl
+    - r-xml2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('xmlrpc2')"           # [not win]
+    - "\"%R%\" -e \"library('xmlrpc2')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=xmlrpc2
+  license: GPL-3
+  summary: The 'XML-RPC' is a remote procedure call protocol  based on 'XML'. The 'xmlrpc2' package
+    is inspired by the 'XMLRPC' package but uses the 'curl' and 'xml2' packages instead
+    'RCurl' and 'XML'.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: xmlrpc2
+# Type: Package
+# Title: Implementation of the Remote Procedure Call Protocol ('XML-RPC')
+# Version: 1.1
+# Author: Florian Schwendinger [aut, cre]
+# Maintainer: Florian Schwendinger <FlorianSchwendinger@gmx.at>
+# Description: The 'XML-RPC' is a remote procedure call protocol  based on 'XML'. The 'xmlrpc2' package is inspired by the 'XMLRPC' package but uses the 'curl' and 'xml2' packages instead 'RCurl' and 'XML'.
+# License: GPL-3
+# Imports: curl, xml2, base64enc
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-08-23 12:34:54 UTC; florian
+# Repository: CRAN
+# Date/Publication: 2018-08-23 13:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

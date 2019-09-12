@@ -1,0 +1,86 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ssize.fdr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ssize.fdr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ssize.fdr/ssize.fdr_{{ version }}.tar.gz
+  sha256: 7ec1301f31315723274efef952c42dea001f61f2366b0a57cf6356ab391de278
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ssize.fdr')"           # [not win]
+    - "\"%R%\" -e \"library('ssize.fdr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ssize.fdr
+  license: GPL-3
+  summary: This package contains a set of functions that calculates  appropriate sample sizes
+    for one-sample t-tests, two-sample t-tests,  and F-tests for microarray experiments
+    based on desired power while  controlling for false discovery rates. For all tests,
+    the standard deviations (variances) among genes can be assumed fixed or random.  This
+    is also true for effect sizes among genes in one-sample and two sample experiments.
+    Functions also output a chart of power versus sample size, a table of power at different
+    sample sizes, and a table of critical test values at different sample sizes.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ssize.fdr
+# Type: Package
+# Title: Sample Size Calculations for Microarray Experiments
+# Version: 1.2
+# Date: 2015-02-21
+# Author: Megan Orr, Peng Liu
+# Maintainer: Megan Orr <megan.orr@ndsu.edu>
+# Description: This package contains a set of functions that calculates  appropriate sample sizes for one-sample t-tests, two-sample t-tests,  and F-tests for microarray experiments based on desired power while  controlling for false discovery rates. For all tests, the standard deviations (variances) among genes can be assumed fixed or random.  This is also true for effect sizes among genes in one-sample and two sample experiments. Functions also output a chart of power versus sample size, a table of power at different sample sizes, and a table of critical test values at different sample sizes.
+# License: GPL-3
+# Packaged: 2015-02-22 00:01:01 UTC; megan.orr
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-02-22 07:59:58
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

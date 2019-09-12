@@ -1,0 +1,96 @@
+{% set version = '2.4.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sdnet
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sdnet_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sdnet/sdnet_{{ version }}.tar.gz
+  sha256: 08de1f1a89ee2e4d6b827eb1de104527bdd9864caafe24b75ab8570609c31c7c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests:
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sdnet')"           # [not win]
+    - "\"%R%\" -e \"library('sdnet')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.biomedcentral.com/1755-8794/6/S3/S1
+  license: GPL-2
+  summary: Fitting discrete Bayesian networks using soft-discretized data.  Soft-discretization
+    is based on mixture of normal distributions.  Also implemented is a supervised Bayesian
+    network learning employing Kullback-Leibler divergence. For more information see
+    Balov (2013) <DOI:10.1186/1755-8794-6-S3-S1>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sdnet
+# Title: Soft-Discretization-Based Bayesian Network Inference
+# Version: 2.4.1
+# Author: Nikolay Balov
+# Description: Fitting discrete Bayesian networks using soft-discretized data.  Soft-discretization is based on mixture of normal distributions.  Also implemented is a supervised Bayesian network learning employing Kullback-Leibler divergence. For more information see Balov (2013) <DOI:10.1186/1755-8794-6-S3-S1>.
+# Maintainer: Nikolay Balov <nhbalov@gmail.com>
+# License: GPL (>= 2)
+# Depends: R (>= 3.0.2)
+# Imports: methods, stats, utils, graphics
+# Suggests:
+# Collate: class.R def.R graph2catnet.R dags.R probs.R joint.prob.R marginal.prob.R samples.R loglik.R entropy.R categor.R dist.R plot.R find.R search.R eval.R predict.R chisq.R histo.R cluster.R bif.R xdsl.R quant.R expres.r zzz.R
+# LazyLoad: yes
+# Repository: CRAN
+# Date/Publication: 2019-04-30 07:10:09 UTC
+# URL: http://www.biomedcentral.com/1755-8794/6/S3/S1
+# Packaged: 2019-04-29 20:05:36 UTC; nbalov
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

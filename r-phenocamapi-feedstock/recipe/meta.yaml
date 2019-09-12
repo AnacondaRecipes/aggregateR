@@ -1,0 +1,98 @@
+{% set version = '0.1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-phenocamapi
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/phenocamapi_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/phenocamapi/phenocamapi_{{ version }}.tar.gz
+  sha256: 3151a82d34080cbaad583709bddc78ee67bb38883ae5d21ad602c21e353d6bcf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, jpeg,
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcurl
+    - r-data.table
+    - r-rjson
+
+  run:
+    - r-base
+    - r-rcurl
+    - r-data.table
+    - r-rjson
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('phenocamapi')"           # [not win]
+    - "\"%R%\" -e \"library('phenocamapi')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/bnasr/phenocamapi/
+  license: AGPL-3
+  summary: A bundle to facilitate working with PhenoCam timeseries and data.   The user would
+    be able to obtain phenological time-series and site metadata from the PhenoCam network
+    <https://phenocam.sr.unh.edu/webcam/>.
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: phenocamapi
+# Type: Package
+# Title: Interacting with the PhenoCam Data and API
+# Version: 0.1.5
+# Date: 2019-05-20
+# Author: Bijan Seyednasrollah
+# Maintainer: Bijan Seyednasrollah <bijan.s.nasr@gmail.com>
+# Description: A bundle to facilitate working with PhenoCam timeseries and data.   The user would be able to obtain phenological time-series and site metadata from the PhenoCam network <https://phenocam.sr.unh.edu/webcam/>.
+# License: AGPL-3 | file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 3.4.0), data.table, rjson, RCurl, utils,
+# Suggests: testthat, knitr, rmarkdown, jpeg,
+# RoxygenNote: 6.1.1
+# VignetteBuilder: knitr
+# URL: https://github.com/bnasr/phenocamapi/
+# BugReports: https://github.com/bnasr/phenocamapi/issues
+# NeedsCompilation: no
+# Packaged: 2019-05-20 21:24:59 UTC; bijan
+# Repository: CRAN
+# Date/Publication: 2019-05-20 22:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

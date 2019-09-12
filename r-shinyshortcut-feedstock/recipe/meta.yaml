@@ -1,0 +1,89 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-shinyshortcut
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/shinyShortcut_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/shinyShortcut/shinyShortcut_{{ version }}.tar.gz
+  sha256: 38765d4cbec59fdcd19f7013cc7bdb40a88ff6d82283fab05aeecc4c74fa3c80
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('shinyShortcut')"           # [not win]
+    - "\"%R%\" -e \"library('shinyShortcut')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=shinyShortcut
+  license: GPL-3
+  summary: Provides function shinyShortcut() that,  when given the base directory of a shiny
+    application, will produce an executable file that runs the shiny app directly in
+    the user's default browser. Tested on both windows and unix machines. Inspired by
+    and borrowing from  <http://www.mango-solutions.com/wp/2017/03/shiny-based-tablet-or-desktop-app/>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: shinyShortcut
+# Title: Creates an Executable Shortcut for Shiny Applications
+# Version: 0.1.0
+# Authors@R: person("Ewan", "Keith", email = "ewan.keith100@gmail.com", role = c("aut", "cre"))
+# Description: Provides function shinyShortcut() that,  when given the base directory of a shiny application, will produce an executable file that runs the shiny app directly in the user's default browser. Tested on both windows and unix machines. Inspired by and borrowing from  <http://www.mango-solutions.com/wp/2017/03/shiny-based-tablet-or-desktop-app/>.
+# Depends: R (>= 3.2.3)
+# License: GPL (>= 3) | file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: testthat, covr
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-03-19 13:53:46 UTC; ewan
+# Author: Ewan Keith [aut, cre]
+# Maintainer: Ewan Keith <ewan.keith100@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-03-19 18:13:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

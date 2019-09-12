@@ -1,0 +1,84 @@
+{% set version = '0.12' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-regsubseq
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/regsubseq_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/regsubseq/regsubseq_{{ version }}.tar.gz
+  sha256: 6fb45a8409d98915eaa42a7cf43fd660b3535d6449b9a14c9328df8932c9e920
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('regsubseq')"           # [not win]
+    - "\"%R%\" -e \"library('regsubseq')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=regsubseq
+  license: GPL-2
+  summary: For a sequence of event occurence times, we are interested in finding subsequences
+    in it that are too "regular". We define regular as being significantly different
+    from a homogeneous Poisson process. The departure from the Poisson process is measured
+    using a L1 distance. See Di and Perlman 2007 for more details.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: regsubseq
+# Type: Package
+# Title: Detect and Test Regular Sequences and Subsequences
+# Version: 0.12
+# Date: 2014-03-06
+# Author: Yanming Di
+# Maintainer: Yanming Di<diy@stat.oregonstate.edu>
+# Description: For a sequence of event occurence times, we are interested in finding subsequences in it that are too "regular". We define regular as being significantly different from a homogeneous Poisson process. The departure from the Poisson process is measured using a L1 distance. See Di and Perlman 2007 for more details.
+# License: GPL-2
+# Packaged: 2014-03-09 17:49:22 UTC; yanming
+# Depends: R (>= 2.10)
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-03-09 19:18:52
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

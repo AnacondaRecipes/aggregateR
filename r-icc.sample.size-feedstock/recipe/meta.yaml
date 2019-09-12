@@ -1,0 +1,86 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-icc.sample.size
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ICC.Sample.Size_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ICC.Sample.Size/ICC.Sample.Size_{{ version }}.tar.gz
+  sha256: e96aca6336b5be0b402f895bec59e9ed1d510a9b5ccf9808336ebb85ae0cdbf0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ICC.Sample.Size')"           # [not win]
+    - "\"%R%\" -e \"library('ICC.Sample.Size')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ICC.Sample.Size
+  license: GPL-3
+  summary: Provides functions to calculate the requisite sample size for studies where ICC is  the
+    primary outcome. Can also be used for calculation of power. In both cases it allows
+    the user to test the impact of changing input variables by calculating the outcome
+    for several different values of input variables. Based off the work of Zou. Zou,
+    G. Y. (2012). Sample size formulas for estimating intraclass correlation coefficients
+    with precision and assurance. Statistics in medicine, 31(29), 3972-3981.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ICC.Sample.Size
+# Type: Package
+# Version: 1.0
+# Date: 2015-08-01
+# Title: Calculation of Sample Size and Power for ICC
+# Author: Alasdair Rathbone [aut,cre], Saurabh Shaw [aut], Dinesh Kumbhare [aut]
+# Maintainer: Alasdair Rathbone <alasdair.rathbone@gmail.com>
+# Imports: stats
+# Description: Provides functions to calculate the requisite sample size for studies where ICC is  the primary outcome. Can also be used for calculation of power. In both cases it allows the user to test the impact of changing input variables by calculating the outcome for several different values of input variables. Based off the work of Zou. Zou, G. Y. (2012). Sample size formulas for estimating intraclass correlation coefficients with precision and assurance. Statistics in medicine, 31(29), 3972-3981.
+# License: GPL-3
+# Packaged: 2015-09-02 12:48:14 UTC; alasdairrathbone
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-09-04 01:03:54
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

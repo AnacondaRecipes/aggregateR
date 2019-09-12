@@ -1,0 +1,104 @@
+{% set version = '1.0.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mediana
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Mediana_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Mediana/Mediana_{{ version }}.tar.gz
+  sha256: c4147e33aad0a58c406019d9ed947c1d3c118594f1814d4600877615059b3148
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: flextable, knitr, officer, rmarkdown, pander
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-doparallel
+    - r-dorng
+    - r-foreach
+    - r-mvtnorm
+    - r-survival
+
+  run:
+    - r-base
+    - r-mass
+    - r-doparallel
+    - r-dorng
+    - r-foreach
+    - r-mvtnorm
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Mediana')"           # [not win]
+    - "\"%R%\" -e \"library('Mediana')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://gpaux.github.io/Mediana/
+  license: GPL-2
+  summary: Provides a general framework for clinical trial simulations based on the Clinical
+    Scenario Evaluation (CSE) approach. The package supports a broad class of data models
+    (including clinical trials with continuous, binary, survival-type and count-type
+    endpoints as well as multivariate outcomes that are based on combinations of different
+    endpoints), analysis strategies and commonly used evaluation criteria.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Mediana
+# Type: Package
+# Title: Clinical Trial Simulations
+# Version: 1.0.8
+# Date: 2019-05-08
+# Author: Gautier Paux, Alex Dmitrienko.
+# Maintainer: Gautier Paux <gautier@paux.fr>
+# BugReports: https://github.com/gpaux/Mediana/issues
+# Description: Provides a general framework for clinical trial simulations based on the Clinical Scenario Evaluation (CSE) approach. The package supports a broad class of data models (including clinical trials with continuous, binary, survival-type and count-type endpoints as well as multivariate outcomes that are based on combinations of different endpoints), analysis strategies and commonly used evaluation criteria.
+# Imports: doParallel, doRNG, foreach, MASS, mvtnorm, stats, survival, utils
+# License: GPL-2
+# URL: http://gpaux.github.io/Mediana/
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# Suggests: flextable, knitr, officer, rmarkdown, pander
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-05-08 12:18:21 UTC; gauti
+# Repository: CRAN
+# Date/Publication: 2019-05-08 13:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,102 @@
+{% set version = '3042.82' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fregression
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fRegression_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fRegression/fRegression_{{ version }}.tar.gz
+  sha256: acaa6acc305c5243520329c5a8c764db3a8c3b068d5d2c32780184e9fa39275e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, RUnit
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-fbasics
+    - r-lmtest
+    - r-mgcv
+    - r-nnet
+    - r-polspline
+    - r-timedate
+    - r-timeseries
+
+  run:
+    - r-base
+    - r-fbasics
+    - r-lmtest
+    - r-mgcv
+    - r-nnet
+    - r-polspline
+    - r-timedate
+    - r-timeseries
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fRegression')"           # [not win]
+    - "\"%R%\" -e \"library('fRegression')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.rmetrics.org
+  license: GPL-2
+  summary: 'A collection of functions for linear and non-linear regression modelling.  It implements
+    a wrapper for several regression models available in the base and contributed packages
+    of R. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fRegression
+# Title: Rmetrics - Regression Based Decision and Prediction
+# Date: 2017-11-12
+# Version: 3042.82
+# Author: Diethelm Wuertz [aut], Tobias Setz [cre], Yohan Chalabi [ctb]
+# Maintainer: Tobias Setz <tobias.setz@live.com>
+# Description: A collection of functions for linear and non-linear regression modelling.  It implements a wrapper for several regression models available in the base and contributed packages of R.
+# Depends: R (>= 2.15.1), timeDate, timeSeries, fBasics
+# Imports: lmtest, mgcv, nnet, polspline, methods, stats, utils
+# Suggests: MASS, RUnit
+# LazyData: yes
+# License: GPL (>= 2)
+# URL: https://www.rmetrics.org
+# NeedsCompilation: no
+# Packaged: 2017-11-15 19:17:36 UTC; Tobias Setz
+# Repository: CRAN
+# Date/Publication: 2017-11-15 22:31:49 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

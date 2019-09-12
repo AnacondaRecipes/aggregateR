@@ -1,0 +1,90 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nortestarma
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/nortestARMA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/nortestARMA/nortestARMA_{{ version }}.tar.gz
+  sha256: a03ca54e5c292f5660b5b6819e020f5a26e827d1df27597bb04b5b0d7e525485
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-astsa
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-astsa
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('nortestARMA')"           # [not win]
+    - "\"%R%\" -e \"library('nortestARMA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=nortestARMA
+  license: GPL (> 2)
+  summary: Tests the goodness-of-fit to the Normal distribution for the errors of an ARMA model.
+  license_family: GPL2
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: nortestARMA
+# Type: Package
+# Title: Neyman Smooth Tests of Normality for the Errors of ARMA Models
+# Version: 1.0.2
+# Date: 2017-04-14
+# License: GPL (> 2)
+# LazyLoad: yes
+# Author: Pierre Duchesne and Pierre Lafaye de Micheaux
+# Maintainer: Pierre Lafaye de Micheaux <lafaye@unsw.edu.au>
+# Description: Tests the goodness-of-fit to the Normal distribution for the errors of an ARMA model.
+# Depends: R (>= 2.10.0), astsa
+# Packaged: 2017-04-14 02:42:39 UTC; lafaye
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2017-04-14 14:37:35 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

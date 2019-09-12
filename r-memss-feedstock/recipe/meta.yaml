@@ -1,0 +1,87 @@
+{% set version = '0.9-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-memss
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MEMSS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MEMSS/MEMSS_{{ version }}.tar.gz
+  sha256: eda9bc1c9c04387012df82ff5104e3a7303b61ea82ebed04de8a3ba9b22c083b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lattice
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lme4 >=0.999375_36
+
+  run:
+    - r-base
+    - r-lme4 >=0.999375_36
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MEMSS')"           # [not win]
+    - "\"%R%\" -e \"library('MEMSS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MEMSS
+  license: GPL-2
+  summary: Data sets and sample analyses from Pinheiro and Bates, "Mixed-effects Models in S
+    and S-PLUS" (Springer, 2000).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MEMSS
+# Version: 0.9-3
+# Date: 2019-02-07
+# Title: Data Sets from Mixed-Effects Models in S
+# Author: Douglas Bates <bates@stat.wisc.edu>, Martin Maechler <maechler@R-project.org> and Ben Bolker <bbolker@gmail.com>
+# Contact: LME4 Authors <lme4-authors@lists.r-forge.r-project.org>
+# Maintainer: Steve Walker <steve.walker@utoronto.ca>
+# Description: Data sets and sample analyses from Pinheiro and Bates, "Mixed-effects Models in S and S-PLUS" (Springer, 2000).
+# Depends: R(>= 2.12.0), lme4 (>= 0.999375-36)
+# Suggests: lattice
+# LazyData: yes
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2019-02-08 02:04:21 UTC; Steve_Walker
+# Repository: CRAN
+# Date/Publication: 2019-02-08 05:13:31 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

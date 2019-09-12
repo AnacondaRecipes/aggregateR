@@ -1,0 +1,89 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-naturesounds
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/NatureSounds_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/NatureSounds/NatureSounds_{{ version }}.tar.gz
+  sha256: 90922fe7191bfe9214337c6db932a8e3a32697eeafac7dff6c94f63c9f9da9f1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tuneR
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('NatureSounds')"           # [not win]
+    - "\"%R%\" -e \"library('NatureSounds')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/maRce10/NatureSounds
+  license: GPL-2
+  summary: Collection of example animal sounds for bioacoustic analysis.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: NatureSounds
+# Type: Package
+# Title: Animal Sounds for Bioacustic Analysis
+# Version: 1.0.1
+# Date: 2019-01-07
+# Author: Marcelo Araya-Salas [aut, cre]
+# Maintainer: Marcelo Araya-Salas <marceloa27@gmail.com>
+# Description: Collection of example animal sounds for bioacoustic analysis.
+# License: GPL (>= 2)
+# Imports:
+# Depends: R (>= 3.2.1)
+# LazyData: TRUE
+# URL: https://github.com/maRce10/NatureSounds
+# BugReports: https://github.com/maRce10/NatureSounds/issues
+# NeedsCompilation: no
+# Suggests: tuneR
+# RoxygenNote: 6.1.0
+# Repository: CRAN
+# Authors@R: person("Marcelo", "Araya-Salas", role = c("aut", "cre"), email = "marceloa27@gmail.com")
+# Packaged: 2019-01-07 20:12:55 UTC; m
+# Date/Publication: 2019-01-07 23:00:14 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

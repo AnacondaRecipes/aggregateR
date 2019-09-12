@@ -1,0 +1,86 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rmio
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rmio_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rmio/rmio_{{ version }}.tar.gz
+  sha256: 7d4f4996f2629fdd88be33759d1bd7ace951190a19ac2c49d5fee812abe40e52
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rmio')"           # [not win]
+    - "\"%R%\" -e \"library('rmio')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/privefl/rmio
+  license: GPL-3
+  summary: Provides header files of 'mio', a cross-platform C++11 header-only  library for memory
+    mapped file IO <https://github.com/mandreyel/mio>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rmio
+# Title: Provides 'mio' C++11 Header Files
+# Version: 0.1.2
+# Authors@R:  person(given = "Florian", family = "Prive", role = c("aut", "cre"), email = "florian.prive.21@gmail.com")
+# Description: Provides header files of 'mio', a cross-platform C++11 header-only  library for memory mapped file IO <https://github.com/mandreyel/mio>.
+# License: GPL-3
+# Copyright: file COPYRIGHTS
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.0
+# URL: https://github.com/privefl/rmio
+# BugReports: https://github.com/privefl/rmio/issues
+# NeedsCompilation: no
+# Packaged: 2019-02-12 09:12:10 UTC; privef
+# Author: Florian Prive [aut, cre]
+# Maintainer: Florian Prive <florian.prive.21@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-02-22 10:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,88 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tseriesmma
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/TSeriesMMA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/TSeriesMMA/TSeriesMMA_{{ version }}.tar.gz
+  sha256: 6b987fbfd74b5f1769471f8a645d924192672e8084db84011307415aeaf87936
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('TSeriesMMA')"           # [not win]
+    - "\"%R%\" -e \"library('TSeriesMMA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=TSeriesMMA
+  license: GPL-2
+  summary: "Multiscale multifractal analysis (MMA) (Giera\xC5\u201Atowski et al., 2012)<DOI:10.1103/PhysRevE.85.021915>
+    is a time series analysis method, designed to describe scaling properties of fluctuations
+    within the signal analyzed. The main result of this procedure is the so called Hurst
+    surface h(q,s) , which is a dependence of the local Hurst exponent h (fluctuation
+    scaling exponent) on the multifractal parameter q and the scale of observation s
+    (data window width)."
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: TSeriesMMA
+# Title: Multiscale Multifractal Analysis of Time Series Data
+# Version: 0.1.1
+# Authors@R: c(person("Vishakh", "Padmakumar", email = "vishakhpadmakumar@gmail.com", role = c("aut", "cre")), person("Rishab", "Ranga", email = "rishab.ranga1996@gmail.com", role = c("aut")), person("Amogha", "Udupa", email = "amogha15@gmail.com", role = c("aut")), person("Param", "Hanji", email = "param.catchchaos@gmail.com", role = c("aut")))
+# Description: Multiscale multifractal analysis (MMA) (GieraAtowski et al., 2012)<DOI:10.1103/PhysRevE.85.021915> is a time series analysis method, designed to describe scaling properties of fluctuations within the signal analyzed. The main result of this procedure is the so called Hurst surface h(q,s) , which is a dependence of the local Hurst exponent h (fluctuation scaling exponent) on the multifractal parameter q and the scale of observation s (data window width).
+# Depends: R (>= 3.0.2)
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# Packaged: 2017-01-03 17:02:29 UTC; vishakh
+# Author: Vishakh Padmakumar [aut, cre], Rishab Ranga [aut], Amogha Udupa [aut], Param Hanji [aut]
+# Maintainer: Vishakh Padmakumar <vishakhpadmakumar@gmail.com>
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2017-01-04 10:56:05
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

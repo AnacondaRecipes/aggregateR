@@ -1,0 +1,90 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-multiplebubbles
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MultipleBubbles_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MultipleBubbles/MultipleBubbles_{{ version }}.tar.gz
+  sha256: ee6299e2f5b1504b04c54b1adc2ad6a0d7f38be6e62aca1f00c5c941f10dea10
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass >=7.3
+    - r-foreach >=1.4.4
+
+  run:
+    - r-base
+    - r-mass >=7.3
+    - r-foreach >=1.4.4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MultipleBubbles')"           # [not win]
+    - "\"%R%\" -e \"library('MultipleBubbles')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MultipleBubbles
+  license: GPL-2
+  summary: Provides the Augmented Dickey-Fuller test and its variations to check the existence
+    of bubbles (explosive behavior) for time series, based on the article by Peter C.
+    B. Phillips, Shuping Shi and Jun Yu (2015a) <doi:10.1111/iere.12131>. Some functions
+    may take a while depending on the size of the data used, or the number of Monte
+    Carlo replications applied.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MultipleBubbles
+# Version: 0.2.0
+# Date: 2018-07-30
+# Title: Test and Detection of Explosive Behaviors for Time Series
+# Author: Pedro Araujo <pharaujo1094@gmail.com> Gustavo Lacerda <gustavolacerdas@gmail.com> Peter C.B. Phillips <peter.phillips@yale.edu> Shu-Ping Shi <shuping.shi@mq.edu.au>
+# Maintainer: Pedro Araujo <pharaujo1094@gmail.com>
+# Description: Provides the Augmented Dickey-Fuller test and its variations to check the existence of bubbles (explosive behavior) for time series, based on the article by Peter C. B. Phillips, Shuping Shi and Jun Yu (2015a) <doi:10.1111/iere.12131>. Some functions may take a while depending on the size of the data used, or the number of Monte Carlo replications applied.
+# License: GPL (>= 2)
+# Imports: MASS (>= 7.3), foreach (>= 1.4.4), stats
+# LazyData: TRUE
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-07-30 20:12:17 UTC; pedro
+# Repository: CRAN
+# Date/Publication: 2018-07-30 20:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

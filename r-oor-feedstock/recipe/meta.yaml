@@ -1,0 +1,90 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-oor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/OOR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/OOR/OOR_{{ version }}.tar.gz
+  sha256: 151aab2b861b096d17fbed749624e7672025e84056638c04b2defe62067887ff
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('OOR')"           # [not win]
+    - "\"%R%\" -e \"library('OOR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=OOR
+  license: LGPL-3
+  summary: Implementation of optimistic optimization methods for global optimization of deterministic
+    or stochastic functions. The algorithms feature guarantees of the convergence to
+    a global optimum. They require minimal assumptions on the (only local) smoothness,
+    where the smoothness parameter does not need to be known. They are expected to be
+    useful for the most difficult functions when we have no information on smoothness
+    and the gradients are unknown or do not exist. Due to the weak assumptions, however,
+    they can be mostly effective only in small dimensions, for example, for hyperparameter
+    tuning.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: OOR
+# Type: Package
+# Title: Optimistic Optimization in R
+# Version: 0.1.2
+# Date: 2018-01-29
+# Authors@R: c( person("M.", "Binois", role = c("cre", "aut", "trl"), comment = "R port", email = "mbinois@mcs.anl.gov"), person("A.", "Carpentier", role = "aut", comment = "Matlab original"), person("J.-B.", "Grill", role = "aut", comment = "Python original"), person("R.", "Munos", role = "aut", comment = "Python and Matlab original"), person("M.", "Valko", role = c("aut", "ctb"), comment = "Python and Matlab original"))
+# Description: Implementation of optimistic optimization methods for global optimization of deterministic or stochastic functions. The algorithms feature guarantees of the convergence to a global optimum. They require minimal assumptions on the (only local) smoothness, where the smoothness parameter does not need to be known. They are expected to be useful for the most difficult functions when we have no information on smoothness and the gradients are unknown or do not exist. Due to the weak assumptions, however, they can be mostly effective only in small dimensions, for example, for hyperparameter tuning.
+# License: LGPL
+# Depends: methods
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-01-31 16:20:57 UTC; mickael
+# Author: M. Binois [cre, aut, trl] (R port), A. Carpentier [aut] (Matlab original), J.-B. Grill [aut] (Python original), R. Munos [aut] (Python and Matlab original), M. Valko [aut, ctb] (Python and Matlab original)
+# Maintainer: M. Binois <mbinois@mcs.anl.gov>
+# Repository: CRAN
+# Date/Publication: 2018-01-31 23:31:12 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

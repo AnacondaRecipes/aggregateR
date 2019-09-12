@@ -1,0 +1,89 @@
+{% set version = '4.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-yaletoolkit
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/YaleToolkit_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/YaleToolkit/YaleToolkit_{{ version }}.tar.gz
+  sha256: 0f6cdf1821340e4205fd8dbb441e2837f4e0fdf50b5d886daff671f07d7b8f8b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-foreach
+    - r-iterators
+
+  run:
+    - r-base
+    - r-foreach
+    - r-iterators
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('YaleToolkit')"           # [not win]
+    - "\"%R%\" -e \"library('YaleToolkit')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=YaleToolkit
+  license: LGPL-3
+  summary: This collection of data exploration tools was developed at Yale University for the
+    graphical exploration of complex multivariate data; barcode and gpairs now have
+    their own packages.  The new big.read.table() provided here may be useful for large
+    files when only a subset is needed.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: YaleToolkit
+# Version: 4.2.2
+# Date: 2014-12-31
+# Title: Data exploration tools from Yale University.
+# Author: John W. Emerson and Walton A. Green
+# Maintainer: John W. Emerson <john.emerson@yale.edu>
+# Depends: grid
+# Imports: foreach, iterators
+# Description: This collection of data exploration tools was developed at Yale University for the graphical exploration of complex multivariate data; barcode and gpairs now have their own packages.  The new big.read.table() provided here may be useful for large files when only a subset is needed.
+# License: LGPL-3
+# Copyright: (C) 2014 John W. Emerson and Walton Green
+# Packaged: 2014-12-31 13:56:01 UTC; jay
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-12-31 16:09:59
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

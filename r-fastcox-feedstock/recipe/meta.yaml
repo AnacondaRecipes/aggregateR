@@ -1,0 +1,95 @@
+{% set version = '1.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fastcox
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fastcox_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fastcox/fastcox_{{ version }}.tar.gz
+  sha256: 431dc248fead82643e9cb8643406cec20167df7c2ef7613afafef159cd4ec14a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fastcox')"           # [not win]
+    - "\"%R%\" -e \"library('fastcox')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/emeryyi/fastcox
+  license: GPL-2
+  summary: 'We implement a cocktail algorithm, a good mixture of coordinate decent, the majorization-minimization
+    principle and the strong rule, for computing the solution paths of the elastic net
+    penalized Cox''s proportional hazards model. The package is an implementation of
+    Yang, Y. and Zou, H. (2013) DOI: <doi:10.4310/SII.2013.v6.n2.a1>.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fastcox
+# Title: Lasso and Elastic-Net Penalized Cox's Regression in High Dimensions Models using the Cocktail Algorithm
+# Version: 1.1.3
+# Date: 2017-09-12
+# Author: Yi Yang <yi.yang6@mcgill.ca>, Hui Zou <hzou@stat.umn.edu>
+# Maintainer: Yi Yang <yi.yang6@mcgill.ca>
+# Imports: Matrix, methods
+# Description: We implement a cocktail algorithm, a good mixture of coordinate decent, the majorization-minimization principle and the strong rule, for computing the solution paths of the elastic net penalized Cox's proportional hazards model. The package is an implementation of Yang, Y. and Zou, H. (2013) DOI: <doi:10.4310/SII.2013.v6.n2.a1>.
+# License: GPL-2
+# URL: https://github.com/emeryyi/fastcox
+# Packaged: 2017-09-15 01:58:31 UTC; yiyang
+# Repository: CRAN
+# Date/Publication: 2017-09-15 07:43:20 UTC
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,109 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-quantilegrader
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/QuantileGradeR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/QuantileGradeR/QuantileGradeR_{{ version }}.tar.gz
+  sha256: e2813b82cab9809216babf3a21190cc1d07f47b3fff243e947f39961de328cff
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('QuantileGradeR')"           # [not win]
+    - "\"%R%\" -e \"library('QuantileGradeR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.kingcounty.gov/depts/health/environmental-health/food-safety/inspection-system/food-safety-rating.aspx
+  license: GPL-2
+  summary: 'Implementation of the food safety restaurant grading system adopted by Public Health
+    - Seattle & King County (see Ashwood, Z.C., Elias, B., and Ho. D.E. "Improving the
+    Reliability of Food Safety Disclosure: A Quantile Adjusted Restaurant Grading System
+    for Seattle-King County" (working paper)). As reported in the accompanying paper,
+    this package allows jurisdictions to easily implement refinements that address common
+    challenges with unadjusted grading systems. First, in contrast to unadjusted grading,
+    where the most recent single routine inspection is the primary determinant of a
+    grade, grading inputs are allowed to be flexible. For instance, it is straightforward
+    to base the grade on average inspection scores across multiple inspection cycles.
+    Second, the package can identify quantile cutoffs by inputting substantively meaningful
+    regulatory thresholds (e.g., the proportion of establishments receiving sufficient
+    violation points to warrant a return visit). Third, the quantile adjustment equalizes
+    the proportion of establishments in a flexible number of grading categories (e.g.,
+    A/B/C) across areas (e.g., ZIP codes, inspector areas) to account for inspector
+    differences. Fourth, the package implements a refined quantile adjustment that addresses
+    two limitations with the stats::quantile() function when applied to inspection score
+    datasets with large numbers of score ties. The quantile adjustment algorithm iterates
+    over quantiles until, over all restaurants in all areas, grading proportions are
+    within a tolerance of desired global proportions. In addition the package allows
+    a modified definition of "quantile" from "Nearest Rank". Instead of requiring that
+    at least p[1]% of restaurants receive the top grade and at least (p[1]+p[2])% of
+    restaurants receive the top or second best grade for quantiles p, the algorithm
+    searches for cutoffs so that as close as possible p[1]% of restaurants receive the
+    top grade, and as close as possible to p[2]% of restaurants receive the second top
+    grade.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: QuantileGradeR
+# Title: Quantile-Adjusted Restaurant Grading
+# Version: 0.1.1
+# Date: 2017-02-06
+# Author: Zoe Ashwood <zashwood@law.stanford.edu>, Becky Elias <Becky.Elias@kingcounty.gov>, Daniel E. Ho <dho@law.stanford.edu>
+# Maintainer: Zoe Ashwood <zashwood@law.stanford.edu>
+# Description: Implementation of the food safety restaurant grading system adopted by Public Health - Seattle & King County (see Ashwood, Z.C., Elias, B., and Ho. D.E. "Improving the Reliability of Food Safety Disclosure: A Quantile Adjusted Restaurant Grading System for Seattle-King County" (working paper)). As reported in the accompanying paper, this package allows jurisdictions to easily implement refinements that address common challenges with unadjusted grading systems. First, in contrast to unadjusted grading, where the most recent single routine inspection is the primary determinant of a grade, grading inputs are allowed to be flexible. For instance, it is straightforward to base the grade on average inspection scores across multiple inspection cycles. Second, the package can identify quantile cutoffs by inputting substantively meaningful regulatory thresholds (e.g., the proportion of establishments receiving sufficient violation points to warrant a return visit). Third, the quantile adjustment equalizes the proportion of establishments in a flexible number of grading categories (e.g., A/B/C) across areas (e.g., ZIP codes, inspector areas) to account for inspector differences. Fourth, the package implements a refined quantile adjustment that addresses two limitations with the stats::quantile() function when applied to inspection score datasets with large numbers of score ties. The quantile adjustment algorithm iterates over quantiles until, over all restaurants in all areas, grading proportions are within a tolerance of desired global proportions. In addition the package allows a modified definition of "quantile" from "Nearest Rank". Instead of requiring that at least p[1]% of restaurants receive the top grade and at least (p[1]+p[2])% of restaurants receive the top or second best grade for quantiles p, the algorithm searches for cutoffs so that as close as possible p[1]% of restaurants receive the top grade, and as close as possible to p[2]% of restaurants receive the second top grade.
+# URL: http://www.kingcounty.gov/depts/health/environmental-health/food-safety/inspection-system/food-safety-rating.aspx
+# Depends: R (>= 3.2.3)
+# License: GPL (>= 2)
+# LazyData: TRUE
+# RoxygenNote: 5.0.1
+# Imports: stats
+# NeedsCompilation: no
+# Packaged: 2017-02-06 18:47:12 UTC; zoeashwood
+# Repository: CRAN
+# Date/Publication: 2017-02-06 21:22:48
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

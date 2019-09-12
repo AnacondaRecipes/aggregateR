@@ -1,0 +1,97 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ropendota
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ROpenDota_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ROpenDota/ROpenDota_{{ version }}.tar.gz
+  sha256: 080c7aeedd7ec770d7e6c4bc4f607950a72634a903359580bf14162ea41f479f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcurl
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-rcurl
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ROpenDota')"           # [not win]
+    - "\"%R%\" -e \"library('ROpenDota')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/rosdyana/ROpenDota
+  license: MIT
+  summary: Provides a client for the API of OpenDota. OpenDota is a web service which is provide
+    DOTA2 real time data. Data is collected through the Steam WebAPI. With ROpenDota
+    you can easily grab the latest DOTA2 statistics in R programming such as latest
+    match on official international competition, analyzing your or enemy performance
+    to learn their strategies,etc. Please see <https://github.com/rosdyana/ROpenDota>
+    for more information.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ROpenDota
+# Type: Package
+# Title: Access OpenDota Services in R
+# Version: 0.1.2
+# Authors@R: person("Rosdyana", "Kusuma", email = "rosdyana.kusuma@gmail.com", role = c("aut", "cre"))
+# URL: https://github.com/rosdyana/ROpenDota
+# Depends: R (>= 3.2.0)
+# Imports: RCurl, jsonlite
+# Maintainer: Rosdyana Kusuma <rosdyana.kusuma@gmail.com>
+# Description: Provides a client for the API of OpenDota. OpenDota is a web service which is provide DOTA2 real time data. Data is collected through the Steam WebAPI. With ROpenDota you can easily grab the latest DOTA2 statistics in R programming such as latest match on official international competition, analyzing your or enemy performance to learn their strategies,etc. Please see <https://github.com/rosdyana/ROpenDota> for more information.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-06-13 20:50:21 UTC; ros
+# Author: Rosdyana Kusuma [aut, cre]
+# BugReports: https://github.com/rosdyana/ROpenDota/issues
+# Repository: CRAN
+# Date/Publication: 2018-06-13 20:59:17 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,95 @@
+{% set version = '1.0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rgnuplot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Rgnuplot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Rgnuplot/Rgnuplot_{{ version }}.tar.gz
+  sha256: 473a0147b634cd615dfc633d66d4fe5620ef91e3036ad79e23016cb7a2c19757
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Rgnuplot')"           # [not win]
+    - "\"%R%\" -e \"library('Rgnuplot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Rgnuplot
+  license: GPL-3
+  summary: Interface for gnuplot Based on gnuplot_i version 1.11, the GPL code from Nicolas Devillard.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Rgnuplot
+# Type: Package
+# Title: R Interface for Gnuplot
+# Version: 1.0.3
+# Encoding: UTF-8
+# Authors@R: c(person(given = "Jose", family = "Gama", role = c("aut","cre"),email = "rxprtgama@gmail.com"), person(given = "Nicolas", family = "Devillard", role = "aut"), person(given = "Mauricio", family = "Galo", role = "ctb"), person(given = "Patrick", family = "J. Bartlein", role = "ctb"), person(given = "Oscar", family = "Perpinan Lamigueiro", role = "ctb") )
+# SystemRequirements: gnuplot
+# Description: Interface for gnuplot Based on gnuplot_i version 1.11, the GPL code from Nicolas Devillard.
+# License: GPL (>= 3)
+# Depends: R (>= 2.7.0), methods
+# Enhances: colorspace, png, rgdal, sp
+# Packaged: 2015-07-28 21:09:05.378 UTC; poky
+# Author: Jose Gama [aut, cre], Nicolas Devillard [aut], Mauricio Galo [ctb], Patrick J. Bartlein [ctb], Oscar Perpinan Lamigueiro [ctb]
+# Maintainer: Jose Gama <rxprtgama@gmail.com>
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2015-07-29 00:20:58
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

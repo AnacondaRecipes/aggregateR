@@ -1,0 +1,94 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tubern
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tubern_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tubern/tubern_{{ version }}.tar.gz
+  sha256: 7b8b420de7f338242098e2927f70cb073890275119e79799bd3364f3a222f672
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr (>= 1.11), testthat, rmarkdown, xml2
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tubern')"           # [not win]
+    - "\"%R%\" -e \"library('tubern')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/soodoku/tubern
+  license: MIT
+  summary: Get statistics and reports from YouTube. To learn more about the YouTube Analytics
+    and Reporting API, see <https://developers.google.com/youtube/reporting/>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: tubern
+# Title: R Client for the YouTube Analytics and Reporting API
+# Version: 0.1.0
+# Authors@R: person("Gaurav", "Sood", email = "gsood07@gmail.com", role = c("aut", "cre"))
+# Maintainer: Gaurav Sood <gsood07@gmail.com>
+# Description: Get statistics and reports from YouTube. To learn more about the YouTube Analytics and Reporting API, see <https://developers.google.com/youtube/reporting/>.
+# URL: http://github.com/soodoku/tubern
+# BugReports: http://github.com/soodoku/tubern/issues
+# Depends: R (>= 3.2.0)
+# License: MIT + file LICENSE
+# LazyData: true
+# Imports: httr, jsonlite
+# VignetteBuilder: knitr
+# Suggests: knitr (>= 1.11), testthat, rmarkdown, xml2
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-04-13 22:33:45 UTC; gsood
+# Author: Gaurav Sood [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2017-04-13 22:44:46 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,120 @@
+{% set version = '4.0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-icd
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/icd_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/icd/icd_{{ version }}.tar.gz
+  sha256: 8b77230347a2f60218ca16f0def8875eb3b23c84dc649561f4c14bd10d33257e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: graphics, httr, jsonlite, knitr, magrittr, nhds, readxl, rmarkdown (>= 1.11), RODBC, roxygen2 (>= 5.0.0), stats, testthat (>= 0.11.1), utils, xml2
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.3
+    - r-rcppeigen
+    - r-rappdirs
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.3
+    - r-rcppeigen
+    - r-rappdirs
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('icd')"           # [not win]
+    - "\"%R%\" -e \"library('icd')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://jackwasey.github.io/icd/
+  license: GPL-3
+  summary: Calculate comorbidities, medical risk scores, and work very quickly and precisely
+    with ICD-9 and ICD-10 codes. This package enables a work flow from raw tables of
+    ICD codes in hospital databases to comorbidities. ICD-9 and ICD-10 comorbidity mappings
+    from Quan (Deyo and Elixhauser versions), Elixhauser and AHRQ included. Common ambiguities
+    and code formats are handled. Comorbidity computation includes Hierarchical Condition
+    Codes, and an implementation of AHRQ Clinical Classifications. Risk scores include
+    those of Charlson and van Walraven.  US Clinical Modification, Word Health Organization,
+    Belgian and French ICD-10 codes are supported, most of which are downloaded on demand.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: icd
+# Title: Comorbidity Calculations and Tools for ICD-9 and ICD-10 Codes
+# Version: 4.0.6
+# Authors@R:  c(person(given = "Jack O.", family = "Wasey", role = c("aut", "cre", "cph"), email = "jack@jackwasey.com", comment = c(ORCID = "0000-0003-3738-4637")), person(given = "William", family = "Murphy", role = "ctb", email = "WMurphy@eatright.org", comment = "Van Walraven scores"), person(given = "Anobel", family = "Odisho", role = "ctb", email = "anobel.odisho@ucsf.edu", comment = "CMS Hierarchical Condition Codes"), person(given = "Vitaly", family = "Druker", role = "ctb", email = "vdruker@gmail.com", comment = "AHRQ CCS"), person(given = "Ed", family = "Lee", role = "ctb", comment = "explain codes in table format"), person(given = "R Core Team", role = c("aut", "cph"), comment = "utils::askYesNo backport and m4 script for OpenMP detection."))
+# Maintainer: Jack O. Wasey <jack@jackwasey.com>
+# Description: Calculate comorbidities, medical risk scores, and work very quickly and precisely with ICD-9 and ICD-10 codes. This package enables a work flow from raw tables of ICD codes in hospital databases to comorbidities. ICD-9 and ICD-10 comorbidity mappings from Quan (Deyo and Elixhauser versions), Elixhauser and AHRQ included. Common ambiguities and code formats are handled. Comorbidity computation includes Hierarchical Condition Codes, and an implementation of AHRQ Clinical Classifications. Risk scores include those of Charlson and van Walraven.  US Clinical Modification, Word Health Organization, Belgian and French ICD-10 codes are supported, most of which are downloaded on demand.
+# License: GPL-3
+# URL: https://jackwasey.github.io/icd/
+# BugReports: https://github.com/jackwasey/icd/issues
+# Depends: R (>= 3.4)
+# Imports: methods, rappdirs, Rcpp (>= 0.12.3)
+# Suggests: graphics, httr, jsonlite, knitr, magrittr, nhds, readxl, rmarkdown (>= 1.11), RODBC, roxygen2 (>= 5.0.0), stats, testthat (>= 0.11.1), utils, xml2
+# LinkingTo: Rcpp (>= 0.12.3), RcppEigen
+# VignetteBuilder: knitr
+# Classification/ACM-2012: Social and professional topics~Medical records, Applied computing~Health care information systems, Applied computing~Health informatics, Applied computing~Bioinformatics
+# Copyright: See file (inst/)COPYRIGHTS
+# Encoding: UTF-8
+# Language: en-US
+# LazyData: true
+# LazyDataCompression: xz
+# RoxygenNote: 6.1.1.9000
+# NeedsCompilation: yes
+# Packaged: 2019-05-06 21:38:51 UTC; waseyj
+# Author: Jack O. Wasey [aut, cre, cph] (<https://orcid.org/0000-0003-3738-4637>), William Murphy [ctb] (Van Walraven scores), Anobel Odisho [ctb] (CMS Hierarchical Condition Codes), Vitaly Druker [ctb] (AHRQ CCS), Ed Lee [ctb] (explain codes in table format), R Core Team [aut, cph] (utils::askYesNo backport and m4 script for OpenMP detection.)
+# Repository: CRAN
+# Date/Publication: 2019-05-07 07:50:13 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

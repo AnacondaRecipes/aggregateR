@@ -1,0 +1,89 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-samplingdatacrt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/samplingDataCRT_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/samplingDataCRT/samplingDataCRT_{{ version }}.tar.gz
+  sha256: 733789d97b584980b916400697a1fe52371828947046162d628218ab4574032a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, lme4
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('samplingDataCRT')"           # [not win]
+    - "\"%R%\" -e \"library('samplingDataCRT')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=samplingDataCRT
+  license: GPL-3
+  summary: 'Package provides the possibility to sampling complete datasets  from a normal distribution
+    to simulate cluster randomized trails for different study designs. '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: samplingDataCRT
+# Version: 1.0
+# Type: Package
+# Title: Sampling Data Within Different Study Designs for Cluster Randomized Trials
+# Date: 2017-01-20
+# Author: Diana Trutschel, Hendrik Treutler
+# Maintainer: Diana Trutschel <Diana.Trutschel@dzne.de>
+# Description: Package provides the possibility to sampling complete datasets  from a normal distribution to simulate cluster randomized trails for different study designs.
+# License: GPL-3
+# RoxygenNote: 5.0.1
+# Imports: mvtnorm, stats
+# Suggests: knitr, rmarkdown, lme4
+# VignetteBuilder: knitr
+# Packaged: 2017-02-06 12:28:06 UTC; trutscheld
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2017-02-06 14:28:31
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

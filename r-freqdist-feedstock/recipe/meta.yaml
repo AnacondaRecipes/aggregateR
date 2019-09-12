@@ -1,0 +1,84 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-freqdist
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/freqdist_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/freqdist/freqdist_{{ version }}.tar.gz
+  sha256: db8906f4490375a5d8d528c08209b8e981952a2f4dc7b08fc243a7bd942c64dd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('freqdist')"           # [not win]
+    - "\"%R%\" -e \"library('freqdist')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=freqdist
+  license: GPL-2
+  summary: Generates a frequency distribution. The frequency distribution includes raw frequencies,
+    percentages in each category, and cumulative frequencies. The frequency distribution
+    can be stored as a data frame.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: freqdist
+# Type: Package
+# Title: Frequency Distribution
+# Version: 0.1
+# Author: Thomas Feldman <tfeldma@siue.edu> and Kenneth W. Moffett <kmoffet@siue.edu>
+# Maintainer: Kenneth W. Moffett <kmoffet@siue.edu>
+# Description: Generates a frequency distribution. The frequency distribution includes raw frequencies, percentages in each category, and cumulative frequencies. The frequency distribution can be stored as a data frame.
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-12-01 14:43:24 UTC; taxns
+# Repository: CRAN
+# Date/Publication: 2016-12-01 22:33:06
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

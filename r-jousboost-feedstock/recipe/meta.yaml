@@ -1,0 +1,105 @@
+{% set version = '2.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-jousboost
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/JOUSBoost_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/JOUSBoost/JOUSBoost_{{ version }}.tar.gz
+  sha256: 87b2fc8353fbe97a30bef0f231216e989692ebfb7ce08c2faddb02c1d5c97938
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-doparallel
+    - r-foreach
+    - r-rpart
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-doparallel
+    - r-foreach
+    - r-rpart
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('JOUSBoost')"           # [not win]
+    - "\"%R%\" -e \"library('JOUSBoost')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=JOUSBoost
+  license: MIT
+  summary: Implements under/oversampling for probability estimation.  To be used with machine
+    learning methods such as AdaBoost, random forests, etc.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: JOUSBoost
+# Type: Package
+# Title: Implements Under/Oversampling for Probability Estimation
+# Version: 2.1.0
+# Authors@R: person("Matthew", "Olson", , "maolson@wharton.upenn.edu", c("aut", "cre"))
+# Description: Implements under/oversampling for probability estimation.  To be used with machine learning methods such as AdaBoost, random forests, etc.
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Suggests: testthat, knitr, rmarkdown
+# LinkingTo: Rcpp
+# Depends: R (>= 2.10)
+# Imports: Rcpp, rpart, stats, doParallel, foreach
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2017-07-12 18:16:22 UTC; matthewolson
+# Author: Matthew Olson [aut, cre]
+# Maintainer: Matthew Olson <maolson@wharton.upenn.edu>
+# Repository: CRAN
+# Date/Publication: 2017-07-12 19:13:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

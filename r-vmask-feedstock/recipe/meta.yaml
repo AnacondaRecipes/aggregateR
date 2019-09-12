@@ -1,0 +1,93 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-vmask
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/vMask_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/vMask/vMask_{{ version }}.tar.gz
+  sha256: 1fe5bd4bbfe73a74409041ca83b527826546fee6e3336955aa956edae2abee93
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('vMask')"           # [not win]
+    - "\"%R%\" -e \"library('vMask')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=vMask
+  license: LGPL-3
+  summary: The cumulative sum (CUSUM) control chart is considered to be an alternative or complementary
+    to Shewhart control charts in statistical process control (SPC) applications, owing
+    to its higher sensitivity to small shifts in the process mean. It utilizes all the
+    available data rather than the last few ones used in Shewhart control charts for
+    quick decision making. V-mask is a traditional technique for separating meaningful
+    data from unusual circumstances in a Cumulative Sum (CUSUM) control chart; for see
+    details about v-mask see Montgomery (1985, ISBN:978-0471656319). The mask is a V-shaped
+    overlay placed on the CUSUM chart so that one arm of the V lines up with the slope
+    of data points, making it easy to see data points that lie outside the slope and
+    to determine whether these points should be discarded as random events, or treated
+    as a performance trend that should be addressed. But, complex computations is one
+    disadvantage V-mask method for detect small changes in mean using CUSUM control
+    chart. Package 'vMask' can help to the applied users to overcome this challenge
+    by considering six different methods which each of them are based on different information.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: vMask
+# Type: Package
+# Title: Detect Small Changes in Process Mean using CUSUM Control Chart by v-Mask
+# Version: 1.0
+# Date: 2018-04-22
+# Author: Abbas Parchami (Department of Statistics, Faculty of Mathematics and Computer, Shahid Bahonar University of Kerman, Kerman, Iran)
+# Maintainer: Abbas Parchami <parchami@uk.ac.ir>
+# Description: The cumulative sum (CUSUM) control chart is considered to be an alternative or complementary to Shewhart control charts in statistical process control (SPC) applications, owing to its higher sensitivity to small shifts in the process mean. It utilizes all the available data rather than the last few ones used in Shewhart control charts for quick decision making. V-mask is a traditional technique for separating meaningful data from unusual circumstances in a Cumulative Sum (CUSUM) control chart; for see details about v-mask see Montgomery (1985, ISBN:978-0471656319). The mask is a V-shaped overlay placed on the CUSUM chart so that one arm of the V lines up with the slope of data points, making it easy to see data points that lie outside the slope and to determine whether these points should be discarded as random events, or treated as a performance trend that should be addressed. But, complex computations is one disadvantage V-mask method for detect small changes in mean using CUSUM control chart. Package 'vMask' can help to the applied users to overcome this challenge by considering six different methods which each of them are based on different information.
+# License: LGPL (>= 3)
+# NeedsCompilation: no
+# Packaged: 2018-04-27 13:12:28 UTC; Parchami
+# Repository: CRAN
+# Date/Publication: 2018-04-30 08:07:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

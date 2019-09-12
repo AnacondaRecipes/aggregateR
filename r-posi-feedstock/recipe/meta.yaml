@@ -1,0 +1,86 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-posi
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PoSI_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PoSI/PoSI_{{ version }}.tar.gz
+  sha256: 5560434a25b36a6164e84c593adf54290bb185a0442b8ba7653581bae5670830
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PoSI')"           # [not win]
+    - "\"%R%\" -e \"library('PoSI')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PoSI
+  license: GPL-3
+  summary: ' In linear LS regression, calculate for a given design matrix the multiplier K of
+    coefficient standard errors such that the confidence intervals [b - K*SE(b), b +
+    K*SE(b)] have a guaranteed coverage probability for all coefficient estimates b
+    in any submodels after performing arbitrary model selection.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PoSI
+# Type: Package
+# Title: Valid Post-Selection Inference for Linear LS Regression
+# Version: 1.0
+# Date: 2016-11-11
+# Author: Andreas Buja, Kai Zhang
+# Maintainer: Kai Zhang <zhangk@email.unc.edu>
+# Description:  In linear LS regression, calculate for a given design matrix the multiplier K of coefficient standard errors such that the confidence intervals [b - K*SE(b), b + K*SE(b)] have a guaranteed coverage probability for all coefficient estimates b in any submodels after performing arbitrary model selection.
+# Suggests: MASS
+# License: GPL-3
+# Packaged: 2017-01-06 04:58:16 UTC; Kai
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2017-01-15 17:27:53
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

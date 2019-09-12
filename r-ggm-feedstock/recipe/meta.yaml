@@ -1,0 +1,83 @@
+{% set version = '2.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ggm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ggm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ggm/ggm_{{ version }}.tar.gz
+  sha256: 832ffe81ff87c6f1a6644e689ebbfb172924b4c4584ac8108d1244d153219ed8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-igraph
+
+  run:
+    - r-base
+    - r-igraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ggm')"           # [not win]
+    - "\"%R%\" -e \"library('ggm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ggm
+  license: GPL-2
+  summary: Functions and datasets for maximum likelihood fitting of some classes of graphical
+    Markov models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ggm
+# Version: 2.3
+# Date: 2015-01-21
+# Title: Functions for graphical Markov models
+# Author: Giovanni M. Marchetti, Mathias Drton, Kayvan Sadeghi
+# Maintainer: Giovanni M. Marchetti <giovanni.marchetti@disia.unifi.it>
+# Depends: igraph
+# Description: Functions and datasets for maximum likelihood fitting of some classes of graphical Markov models.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Repository: CRAN
+# Packaged: 2015-01-21 09:40:09 UTC; gmm
+# Date/Publication: 2015-01-21 12:47:19
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

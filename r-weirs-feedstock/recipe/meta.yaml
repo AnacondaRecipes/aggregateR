@@ -1,0 +1,81 @@
+{% set version = '0.25' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-weirs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/weirs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/weirs/weirs_{{ version }}.tar.gz
+  sha256: a735f56d8ab1982e84a4299f88011fd956b8997870ff342ccf33c277e2bd409d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('weirs')"           # [not win]
+    - "\"%R%\" -e \"library('weirs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=weirs
+  license: GPL-2
+  summary: Provides computational support for flow over weirs, such as sharp-crested, broad-crested,
+    and embankments. Initially, the package supports broad- and sharp-crested weirs.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: weirs
+# Title: A Hydraulics Package to Compute Open-Channel Flow over Weirs
+# Version: 0.25
+# Depends: R (>= 2.7.0), utils
+# Date: 2015-08-20
+# Author: William Asquith
+# Description: Provides computational support for flow over weirs, such as sharp-crested, broad-crested, and embankments. Initially, the package supports broad- and sharp-crested weirs.
+# Maintainer: William Asquith <william.asquith@ttu.edu>
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2015-08-20 14:56:25 UTC; williamasquith
+# Repository: CRAN
+# Date/Publication: 2015-08-20 19:24:10
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,94 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rstorm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RStorm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RStorm/RStorm_{{ version }}.tar.gz
+  sha256: c52c7cf2aaf94016b064c2350553306e459e9f1074fdfac5b6d970b4928f53d8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-plyr
+
+  run:
+    - r-base
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RStorm')"           # [not win]
+    - "\"%R%\" -e \"library('RStorm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RStorm
+  license: GPL-2
+  summary: 'While streaming processing provides opportunities to deal with extremely large and
+    ever growing data sets in (near) real time, the development of streaming algorithms
+    for complex models is often cumbersome: the software packages that facilitate streaming
+    processing in production environments do not provide statisticians with the simulation,
+    estimation, and plotting tools they are used to. Developers of streaming algorithms
+    would thus benefit from the flexibility of [R] to create, plot and compute data
+    while developing streaming algorithms. Package RStorm implements a streaming architecture
+    modeled on Storm for easy development and testing of streaming algorithms in [R].
+    RStorm is not intended as a production package, but rather a development tool for
+    streaming algorithms. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RStorm
+# Type: Package
+# Title: Simulate and Develop Streaming Processing
+# Version: 1.0
+# Date: 2018-11-29
+# Author: Maurits Kaptein
+# Maintainer: Maurits Kaptein <maurits@mauritskaptein.com>
+# Description: While streaming processing provides opportunities to deal with extremely large and ever growing data sets in (near) real time, the development of streaming algorithms for complex models is often cumbersome: the software packages that facilitate streaming processing in production environments do not provide statisticians with the simulation, estimation, and plotting tools they are used to. Developers of streaming algorithms would thus benefit from the flexibility of [R] to create, plot and compute data while developing streaming algorithms. Package RStorm implements a streaming architecture modeled on Storm for easy development and testing of streaming algorithms in [R]. RStorm is not intended as a production package, but rather a development tool for streaming algorithms.
+# License: GPL-2
+# Depends: plyr
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2018-11-29 15:23:16 UTC; mauritskate
+# Repository: CRAN
+# Date/Publication: 2018-11-29 15:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,93 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lmviz
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/lmviz_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/lmviz/lmviz_{{ version }}.tar.gz
+  sha256: ffe69a9b732ae2e8c93fad437c721d4bb43376164c5c5be8a166dea5ff03f41a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lmtest
+    - r-mgcv
+    - r-shiny
+    - r-shinyjs
+
+  run:
+    - r-base
+    - r-lmtest
+    - r-mgcv
+    - r-shiny
+    - r-shinyjs
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('lmviz')"           # [not win]
+    - "\"%R%\" -e \"library('lmviz')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=lmviz
+  license: GPL-3
+  summary: Contains three shiny applications. Two are meant to explore linear model inference
+    feature through simulation. The third is a game to learn interpreting diagnostic
+    plots.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: lmviz
+# Type: Package
+# Title: A Package to Visualize Linear Models Features and Play with Them
+# Version: 0.1.2
+# Author: Francesco Pauli (see file LICENSEMEDIA for credits on sounds and images)
+# Maintainer: Francesco Pauli <francesco.pauli@deams.units.it>
+# Description: Contains three shiny applications. Two are meant to explore linear model inference feature through simulation. The third is a game to learn interpreting diagnostic plots.
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Imports: shiny, shinyjs, lmtest, mgcv, methods
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-05-15 14:05:10 UTC; 8755
+# Repository: CRAN
+# Date/Publication: 2019-05-15 14:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

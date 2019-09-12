@@ -1,0 +1,85 @@
+{% set version = '1.3-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ormdr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ORMDR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ORMDR/ORMDR_{{ version }}.tar.gz
+  sha256: b5f231dfde56b936e5f713402eb209bb3bb6d44d54c953a9697affa1a412eb78
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ORMDR')"           # [not win]
+    - "\"%R%\" -e \"library('ORMDR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ORMDR
+  license: GPL-2
+  summary: Odds ratio based multifactor-dimensionality reduction method for detecting gene-gene
+    interactions
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ORMDR
+# Version: 1.3-2
+# Author: Eun-Kyung Lee, Sung Gon Yi, Yoojin Jung, Junghyun Namkung, Taesung Park
+# Maintainer: Junghyun Namkung <jh.namkung@gmail.com>
+# Title: ORMDR
+# Description: Odds ratio based multifactor-dimensionality reduction method for detecting gene-gene interactions
+# License: GPL (>= 2)
+# Packaged: 2012-12-21 02:55:51 UTC; nkjh
+# Repository: CRAN
+# Date/Publication: 2012-12-21 08:06:13
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

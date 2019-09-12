@@ -1,0 +1,88 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-isotonic.pen
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/isotonic.pen_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/isotonic.pen/isotonic.pen_{{ version }}.tar.gz
+  sha256: 714876e4e49d5d234abf425237456a8af7cd2696203b29336cc421e05a09fcd1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-coneproj
+
+  run:
+    - r-base
+    - r-matrix
+    - r-coneproj
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('isotonic.pen')"           # [not win]
+    - "\"%R%\" -e \"library('isotonic.pen')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=isotonic.pen
+  license: GPL-2 | GPL-3
+  summary: 'Given a response y and a one- or two-dimensional predictor, the isotonic regression
+    estimator is calculated with the usual orderings.  '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: isotonic.pen
+# Type: Package
+# Title: Penalized Isotonic Regression in one and two dimensions
+# Version: 1.0
+# Date: 2014-04-04
+# Author: Mary C Meyer, Jiwen Wu, and Jean D. Opsomer
+# Maintainer: Mary Meyer <meyer@stat.colostate.edu>
+# Description: Given a response y and a one- or two-dimensional predictor, the isotonic regression estimator is calculated with the usual orderings.
+# License: GPL-2 | GPL-3
+# Depends: graphics, grDevices, stats, utils, coneproj, Matrix
+# Packaged: 2014-04-04 22:31:54 UTC; marycmeyer
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-04-05 19:08:34
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,93 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-multicoll
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/multiColl_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/multiColl/multiColl_{{ version }}.tar.gz
+  sha256: a4efca136d41021554c08e7b14c6643db266e61b42860a9ad9998b295f719a05
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('multiColl')"           # [not win]
+    - "\"%R%\" -e \"library('multiColl')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://colldetreat.r-forge.r-project.org/
+  license: GPL-2
+  summary: 'The detection of worrying approximate collinearity in a multiple linear regression
+    model is a problem addressed in all existing statistical packages. However, we have
+    detected deficits regarding to the incorrect treatment of qualitative independent
+    variables and the role of the intercept of the model. The objective of this package
+    is to correct these deficits. In this package will be available detection and treatment
+    techniques traditionally used as the recently developed. D.A. Belsley (1982) <doi:10.1016/0304-4076(82)90020-3>.
+    D. A. Belsley (1991, ISBN: 978-0471528890). C. Garcia, R. Salmeron and C.B. Garcia
+    (2019) <doi:10.1080/00949655.2018.1543423>. R. Salmeron, C.B. Garcia and J. Garcia
+    (2018) <doi:10.1080/00949655.2018.1463376>. G.W. Stewart (1987) <doi:10.1214/ss/1177013444>.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: multiColl
+# Type: Package
+# Title: Collinearity Detection in a Multiple Linear Regression Model
+# Version: 1.0
+# Date: 2019-07-07
+# Author: R. Salmeron, C.B. Garcia and J. Garcia
+# Maintainer: R. Salmeron <romansg@ugr.es>
+# Description: The detection of worrying approximate collinearity in a multiple linear regression model is a problem addressed in all existing statistical packages. However, we have detected deficits regarding to the incorrect treatment of qualitative independent variables and the role of the intercept of the model. The objective of this package is to correct these deficits. In this package will be available detection and treatment techniques traditionally used as the recently developed. D.A. Belsley (1982) <doi:10.1016/0304-4076(82)90020-3>. D. A. Belsley (1991, ISBN: 978-0471528890). C. Garcia, R. Salmeron and C.B. Garcia (2019) <doi:10.1080/00949655.2018.1543423>. R. Salmeron, C.B. Garcia and J. Garcia (2018) <doi:10.1080/00949655.2018.1463376>. G.W. Stewart (1987) <doi:10.1214/ss/1177013444>.
+# License: GPL (>= 2)
+# URL: http://colldetreat.r-forge.r-project.org/
+# Repository: CRAN
+# Repository/R-Forge/Project: colldetreat
+# Repository/R-Forge/Revision: 26
+# Repository/R-Forge/DateTimeStamp: 2019-07-15 18:37:09
+# Date/Publication: 2019-07-18 11:14:05 UTC
+# NeedsCompilation: no
+# Packaged: 2019-07-15 18:50:27 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,102 @@
+{% set version = '2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-xllim
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/xLLiM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/xLLiM/xLLiM_{{ version }}.tar.gz
+  sha256: 94f9a39587b04709024e450325d843fe9b7149f8b91157765520f2f213f7d9e0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: shock
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-abind
+    - r-capushe
+    - r-corpcor
+    - r-igraph
+
+  run:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-abind
+    - r-capushe
+    - r-corpcor
+    - r-igraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('xLLiM')"           # [not win]
+    - "\"%R%\" -e \"library('xLLiM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=xLLiM
+  license: GPL-2
+  summary: Provides a tool for non linear mapping (non linear regression) using a mixture of
+    regression model and an inverse regression strategy. The methods include the GLLiM
+    model (see Deleforge et al (2015) <DOI:10.1007/s11222-014-9461-5>) based on Gaussian
+    mixtures and a robust version of GLLiM, named SLLiM (see Perthame et al (2016) <https://hal.archives-ouvertes.fr/hal-01347455>)
+    based on a mixture of Generalized Student distributions. The methods also include
+    BLLiM (see Devijver et al (2017) <https://arxiv.org/abs/1701.07899>) which is an
+    extension of GLLiM with a sparse block diagonal structure for large covariance matrices
+    (particularly interesting for transcriptomic data).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: xLLiM
+# Type: Package
+# Title: High Dimensional Locally-Linear Mapping
+# Version: 2.1
+# Author: Emeline Perthame (emeline.perthame@inria.fr), Florence Forbes (florence.forbes@inria.fr), Antoine Deleforge (antoine.deleforge@inria.fr), Emilie Devijver (emilie.devijver@kuleuven.be), Melina Gallopin (melina.gallopin@u-psud.fr)
+# Maintainer: Emeline Perthame <emeline.perthame@pasteur.fr>
+# Description: Provides a tool for non linear mapping (non linear regression) using a mixture of regression model and an inverse regression strategy. The methods include the GLLiM model (see Deleforge et al (2015) <DOI:10.1007/s11222-014-9461-5>) based on Gaussian mixtures and a robust version of GLLiM, named SLLiM (see Perthame et al (2016) <https://hal.archives-ouvertes.fr/hal-01347455>) based on a mixture of Generalized Student distributions. The methods also include BLLiM (see Devijver et al (2017) <https://arxiv.org/abs/1701.07899>) which is an extension of GLLiM with a sparse block diagonal structure for large covariance matrices (particularly interesting for transcriptomic data).
+# License: GPL (>= 2)
+# Depends:
+# Imports: MASS,abind,corpcor,Matrix,igraph,capushe
+# Suggests: shock
+# NeedsCompilation: no
+# Packaged: 2017-05-23 08:53:32 UTC; epertham
+# Repository: CRAN
+# Date/Publication: 2017-05-23 10:43:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

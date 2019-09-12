@@ -1,0 +1,93 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-qqvases
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/qqvases_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/qqvases/qqvases_{{ version }}.tar.gz
+  sha256: 74375e9f5e3a048416bd00871ac7fe7df44a942688bb5a7f65dc56aac32691ba
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-shiny
+    - r-shinythemes
+
+  run:
+    - r-base
+    - r-shiny
+    - r-shinythemes
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('qqvases')"           # [not win]
+    - "\"%R%\" -e \"library('qqvases')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=qqvases
+  license: GPL-2
+  summary: Presents an explanatory animation of normal quantile-quantile plots based on a water-filling
+    analogy.  The animation presents a normal QQ plot as the parametric plot of the
+    water levels in vases defined by two distributions.  The distributions decorate
+    the axes in the normal QQ plot and are optionally shown as vases adjacent to the
+    plot.  The package draws QQ plots for several distributions, either as samples or
+    continuous functions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: qqvases
+# Type: Package
+# Title: Animated Normal Quantile-Quantile Plots
+# Version: 1.0.0
+# Date: 2016-09-05
+# Author: Robert Stine
+# Maintainer: Robert Stine  <stine@upenn.edu>
+# Description: Presents an explanatory animation of normal quantile-quantile plots based on a water-filling analogy.  The animation presents a normal QQ plot as the parametric plot of the water levels in vases defined by two distributions.  The distributions decorate the axes in the normal QQ plot and are optionally shown as vases adjacent to the plot.  The package draws QQ plots for several distributions, either as samples or continuous functions.
+# Imports: shiny,shinythemes,stats,graphics
+# Suggests: MASS
+# License: GPL-2
+# RoxygenNote: 5.0.1.9000
+# NeedsCompilation: no
+# Packaged: 2016-09-14 18:01:37 UTC; bob
+# Repository: CRAN
+# Date/Publication: 2016-09-14 21:50:48
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

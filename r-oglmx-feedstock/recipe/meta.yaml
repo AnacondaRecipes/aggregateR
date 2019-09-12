@@ -1,0 +1,92 @@
+{% set version = '3.0.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-oglmx
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/oglmx_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/oglmx/oglmx_{{ version }}.tar.gz
+  sha256: 66a5f31d24abd33e17a5de3fac34c57e8206eec9e9d6a61b9b936c8817ac5d8d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: glmx, lmtest
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-maxlik
+
+  run:
+    - r-base
+    - r-maxlik
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('oglmx')"           # [not win]
+    - "\"%R%\" -e \"library('oglmx')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=oglmx
+  license: GPL-2
+  summary: Ordered models such as ordered probit and ordered logit presume that the error variance
+    is constant across observations. In the case that this assumption does not hold
+    estimates of marginal effects are typically biased (Weiss (1997)). This package
+    allows for generalization of ordered probit and ordered logit models by allowing
+    the user to specify a model for the variance. Furthermore, the package includes
+    functions to calculate the marginal effects. Wrapper functions to estimate the standard
+    limited dependent variable models are also included.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: oglmx
+# Type: Package
+# Title: Estimation of Ordered Generalized Linear Models
+# Version: 3.0.0.0
+# Date: 2018-05-05
+# Author: Nathan Carroll
+# Maintainer: Nathan Carroll <nathan.carroll@ur.de>
+# Description: Ordered models such as ordered probit and ordered logit presume that the error variance is constant across observations. In the case that this assumption does not hold estimates of marginal effects are typically biased (Weiss (1997)). This package allows for generalization of ordered probit and ordered logit models by allowing the user to specify a model for the variance. Furthermore, the package includes functions to calculate the marginal effects. Wrapper functions to estimate the standard limited dependent variable models are also included.
+# License: GPL-2
+# Depends: maxLik
+# Imports: stats
+# Suggests: glmx, lmtest
+# NeedsCompilation: no
+# Packaged: 2018-05-05 10:44:24 UTC; Nathan
+# Repository: CRAN
+# Date/Publication: 2018-05-05 11:24:43 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

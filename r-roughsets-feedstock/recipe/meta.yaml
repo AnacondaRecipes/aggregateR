@@ -1,0 +1,107 @@
+{% set version = '1.3-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-roughsets
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RoughSets_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RoughSets/RoughSets_{{ version }}.tar.gz
+  sha256: c22c358805d2cdd36abeb299e83917faa2b7acd37c475395fb17dff86c0adf23
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: class
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RoughSets')"           # [not win]
+    - "\"%R%\" -e \"library('RoughSets')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/janusza/RoughSets
+  license: GPL-2
+  summary: "Implementations of algorithms for data analysis based on the rough set theory (RST)
+    and the fuzzy rough set theory (FRST). We not only provide implementations for the
+    basic concepts of RST and FRST but also popular algorithms that derive from those
+    theories. The methods included in the package can be divided into several categories
+    based on their functionality: discretization, feature selection, instance selection,
+    rule induction and classification based on nearest neighbors. RST was introduced
+    by Zdzis\u0142aw Pawlak in 1982 as a sophisticated mathematical tool to model and
+    process imprecise or incomplete information. By using the indiscernibility relation
+    for objects/instances, RST does not require additional parameters to analyze the
+    data. FRST is an extension of RST. The FRST combines concepts of vagueness and indiscernibility
+    that are expressed with fuzzy sets (as proposed by Zadeh, in 1965) and RST."
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RoughSets
+# Maintainer: Christoph Bergmeir <c.bergmeir@decsai.ugr.es>
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# Title: Data Analysis Using Rough Set and Fuzzy Rough Set Theories
+# Authors@R: c(person("Lala Septem", "Riza", role = "aut", email = "lala_s_riza@yahoo.com"), person("Andrzej", "Janusz", role = "aut", email = "janusza@mimuw.edu.pl"), person("Dominik", "Slezak", role = "ctb"), person("Chris", "Cornelis", role = "ctb"), person("Francisco", "Herrera", role = "ctb"), person("Jose Manuel", "Benitez", role = "ctb"), person("Christoph", "Bergmeir", role = c("ctb", "cre"), email = "c.bergmeir@decsai.ugr.es"), person("Sebastian", "Stawicki", role = "ctb"))
+# Description: Implementations of algorithms for data analysis based on the rough set theory (RST) and the fuzzy rough set theory (FRST). We not only provide implementations for the basic concepts of RST and FRST but also popular algorithms that derive from those theories. The methods included in the package can be divided into several categories based on their functionality: discretization, feature selection, instance selection, rule induction and classification based on nearest neighbors. RST was introduced by Zdzisaw Pawlak in 1982 as a sophisticated mathematical tool to model and process imprecise or incomplete information. By using the indiscernibility relation for objects/instances, RST does not require additional parameters to analyze the data. FRST is an extension of RST. The FRST combines concepts of vagueness and indiscernibility that are expressed with fuzzy sets (as proposed by Zadeh, in 1965) and RST.
+# Version: 1.3-0
+# URL: https://github.com/janusza/RoughSets
+# Date: 2015-09-03
+# Suggests: class
+# LinkingTo: Rcpp
+# Depends: Rcpp
+# NeedsCompilation: yes
+# Packaged: 2015-09-04 13:22:54 UTC; Andrzej
+# Author: Lala Septem Riza [aut], Andrzej Janusz [aut], Dominik Slezak [ctb], Chris Cornelis [ctb], Francisco Herrera [ctb], Jose Manuel Benitez [ctb], Christoph Bergmeir [ctb, cre], Sebastian Stawicki [ctb]
+# Repository: CRAN
+# Date/Publication: 2015-09-05 09:37:46
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,96 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pgdraw
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pgdraw_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pgdraw/pgdraw_{{ version }}.tar.gz
+  sha256: 05b951b2ecc829d1e99f8dcf216fd4a4803342de7ec036a5c6d9e7777f0c2be8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.16
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.16
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pgdraw')"           # [not win]
+    - "\"%R%\" -e \"library('pgdraw')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=pgdraw
+  license: GPL-3
+  summary: Generates random samples from the Polya-Gamma distribution using an implementation
+    of the algorithm described in J. Windle's PhD thesis (2013) <https://repositories.lib.utexas.edu/bitstream/handle/2152/21842/WINDLE-DISSERTATION-2013.pdf>.
+    The underlying implementation is in C.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pgdraw
+# Type: Package
+# Title: Generate Random Samples from the Polya-Gamma Distribution
+# Version: 1.1
+# Date: 2019-02-19
+# Author: Daniel F. Schmidt [aut, cph, cre], Enes Makalic [aut, cph]
+# Maintainer: Daniel F. Schmidt <daniel.schmidt@monash.edu>
+# Description: Generates random samples from the Polya-Gamma distribution using an implementation of the algorithm described in J. Windle's PhD thesis (2013) <https://repositories.lib.utexas.edu/bitstream/handle/2152/21842/WINDLE-DISSERTATION-2013.pdf>. The underlying implementation is in C.
+# License: GPL (>= 3)
+# Imports: Rcpp (>= 0.12.16)
+# NeedsCompilation: yes
+# LinkingTo: Rcpp
+# Authors@R: c( person("Daniel F. Schmidt", email="daniel.schmidt@monash.edu", role = c("aut","cph","cre")),  person("Enes Makalic", email="emakalic@unimelb.edu.au", role=c("aut","cph")) )
+# RoxygenNote: 6.1.0
+# Packaged: 2019-02-19 01:26:45 UTC; dschmidt
+# Repository: CRAN
+# Date/Publication: 2019-02-19 13:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

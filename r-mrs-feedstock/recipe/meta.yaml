@@ -1,0 +1,103 @@
+{% set version = '1.2.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mrs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MRS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MRS/MRS_{{ version }}.tar.gz
+  sha256: 798d3f6ecc9b66ad32583950e13682ad668595ac0ac57d56d05e9cf5c1797aea
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: KernSmooth
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo
+    - r-igraph
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo
+    - r-igraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MRS')"           # [not win]
+    - "\"%R%\" -e \"library('MRS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MRS
+  license: GPL-3
+  summary: An implementation of the MRS algorithm for comparison across distributions, as described
+    in Jacopo Soriano, Li Ma (2016) <doi:10.1111/rssb.12180>.  The model is based on
+    a nonparametric process taking the form of a Markov model  that transitions between
+    a "null" and an "alternative" state  on a multi-resolution partition tree of the
+    sample space.  MRS effectively detects and characterizes a variety of underlying
+    differences.  These differences can be visualized using several plotting functions.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MRS
+# Type: Package
+# Title: Multi-Resolution Scanning for Cross-Sample Differences
+# Version: 1.2.4
+# Date: 2018-01-13
+# Author: Jacopo Soriano and Li Ma
+# Maintainer: Li Ma <li.ma@duke.edu>
+# Description: An implementation of the MRS algorithm for comparison across distributions, as described in Jacopo Soriano, Li Ma (2016) <doi:10.1111/rssb.12180>.  The model is based on a nonparametric process taking the form of a Markov model  that transitions between a "null" and an "alternative" state  on a multi-resolution partition tree of the sample space.  MRS effectively detects and characterizes a variety of underlying differences.  These differences can be visualized using several plotting functions.
+# License: GPL (>= 3)
+# Imports: Rcpp (>= 0.11.0), igraph
+# Suggests: KernSmooth
+# LinkingTo: Rcpp, RcppArmadillo
+# NeedsCompilation: yes
+# Packaged: 2018-01-13 22:43:32 UTC; uganaga
+# Repository: CRAN
+# Date/Publication: 2018-01-23 09:10:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

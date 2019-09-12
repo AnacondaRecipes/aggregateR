@@ -1,0 +1,94 @@
+{% set version = '1.3.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pmmltransformations
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pmmlTransformations_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pmmlTransformations/pmmlTransformations_{{ version }}.tar.gz
+  sha256: 08310f8b6e533e45f0d5739ffb6924bf826bbdefca1390ff6df112d0cb9a250c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, testthat, rmarkdown, pmml (<= 1.5.7)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pmmlTransformations')"           # [not win]
+    - "\"%R%\" -e \"library('pmmlTransformations')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.softwareag.com/zementis
+  license: GPL (>= 2.1)
+  summary: Allows for data to be transformed before using it to construct models. Builds structures
+    to allow functions in the PMML package to output transformation details in addition
+    to the model in the resulting PMML file. The Predictive Model Markup Language (PMML)
+    is an XML-based language which provides a way for applications to define machine
+    learning, statistical and data mining models and to share models between PMML compliant
+    applications. More information about the PMML industry standard and the Data Mining
+    Group can be found at <http://www.dmg.org>. The generated PMML can be imported into
+    any PMML consuming application, such as Zementis Predictive Analytics products,
+    which integrate with web services, relational database systems and deploy natively
+    on Hadoop in conjunction with Hive, Spark or Storm, as well as allow predictive
+    analytics to be executed for IBM z Systems mainframe applications and real-time,
+    streaming analytics platforms.
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pmmlTransformations
+# Type: Package
+# Title: Transforms Input Data from a PMML Perspective
+# Version: 1.3.3
+# Author: Tridivesh Jena, Wen Ching Lin, Dmitriy Bolotov
+# Maintainer: Dmitriy Bolotov <rpmmlsupport@softwareag.com>
+# Suggests: knitr, testthat, rmarkdown, pmml (<= 1.5.7)
+# Description: Allows for data to be transformed before using it to construct models. Builds structures to allow functions in the PMML package to output transformation details in addition to the model in the resulting PMML file. The Predictive Model Markup Language (PMML) is an XML-based language which provides a way for applications to define machine learning, statistical and data mining models and to share models between PMML compliant applications. More information about the PMML industry standard and the Data Mining Group can be found at <http://www.dmg.org>. The generated PMML can be imported into any PMML consuming application, such as Zementis Predictive Analytics products, which integrate with web services, relational database systems and deploy natively on Hadoop in conjunction with Hive, Spark or Storm, as well as allow predictive analytics to be executed for IBM z Systems mainframe applications and real-time, streaming analytics platforms.
+# URL: https://www.softwareag.com/zementis
+# License: GPL (>= 2.1)
+# NeedsCompilation: no
+# VignetteBuilder: knitr
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# Packaged: 2019-06-11 19:39:14 UTC; dmitriy
+# Repository: CRAN
+# Date/Publication: 2019-06-11 22:20:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

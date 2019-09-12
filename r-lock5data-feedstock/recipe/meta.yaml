@@ -1,0 +1,86 @@
+{% set version = '2.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lock5data
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Lock5Data_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Lock5Data/Lock5Data_{{ version }}.tar.gz
+  sha256: 3572effef62df67bd9c188b40b6fe9d34249e387a799e49bf8434074f0d45c9d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Lock5Data')"           # [not win]
+    - "\"%R%\" -e \"library('Lock5Data')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Lock5Data
+  license: GPL-2
+  summary: 'Datasets for "Statistics: Unlocking the Power of Data" by Lock^5 Datasets for the
+    first and second editions of the book.  Older editions of revised data often have
+    an extra 1e in the name.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Lock5Data
+# Type: Package
+# Title: Datasets for "Statistics: UnLocking the Power of Data"
+# Version: 2.8
+# Date: 2017-06-30
+# Author: Robin Lock
+# Maintainer: Robin Lock <rlock@stlawu.edu>
+# Description: Datasets for "Statistics: Unlocking the Power of Data" by Lock^5 Datasets for the first and second editions of the book.  Older editions of revised data often have an extra 1e in the name.
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-07-01 00:06:16 UTC; Robin
+# Repository: CRAN
+# Date/Publication: 2017-07-01 08:01:26 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,101 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-simml
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/simml_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/simml/simml_{{ version }}.tar.gz
+  sha256: 7edd20229c8d42f0a1be8080b4510130c5efb5b1ff6f908d55846674e7d87b48
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mgcv
+    - r-plyr
+
+  run:
+    - r-base
+    - r-mgcv
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('simml')"           # [not win]
+    - "\"%R%\" -e \"library('simml')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=simml
+  license: GPL-3
+  summary: 'A major challenge in estimating treatment decision rules from a randomized clinical
+    trial dataset with covariates measured at baseline lies in detecting relatively
+    small treatment effect modification-related variability (i.e., the treatment-by-covariates
+    interaction effects on treatment outcomes) against a relatively large non-treatment-related
+    variability (i.e., the main effects of covariates on treatment outcomes). The class
+    of Single-Index Models with Multiple-Links is a novel single-index model specifically
+    designed to estimate a single-index (a linear combination) of the covariates associated
+    with the treatment effect modification-related variability, while allowing a nonlinear
+    association with the treatment outcomes via flexible link functions. The models
+    provide a flexible regression approach to developing treatment decision rules based
+    on patients'' data measured at baseline. We refer to Petkova, Tarpey, Su, and Ogden
+    (2017) <doi: 10.1093/biostatistics/kxw035> and "A constrained single-index model
+    for estimating interactions between a treatment and covariates" (under review, 2019)
+    for detail. The main function of this package is simml(). '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: simml
+# Type: Package
+# Title: Single-Index Models with Multiple-Links
+# Version: 0.1.0
+# Author: Park, H., Petkova, E., Tarpey, T., Ogden, R.T.
+# Maintainer: Hyung Park <parkh15@nyu.edu>
+# Description: A major challenge in estimating treatment decision rules from a randomized clinical trial dataset with covariates measured at baseline lies in detecting relatively small treatment effect modification-related variability (i.e., the treatment-by-covariates interaction effects on treatment outcomes) against a relatively large non-treatment-related variability (i.e., the main effects of covariates on treatment outcomes). The class of Single-Index Models with Multiple-Links is a novel single-index model specifically designed to estimate a single-index (a linear combination) of the covariates associated with the treatment effect modification-related variability, while allowing a nonlinear association with the treatment outcomes via flexible link functions. The models provide a flexible regression approach to developing treatment decision rules based on patients' data measured at baseline. We refer to Petkova, Tarpey, Su, and Ogden (2017) <doi: 10.1093/biostatistics/kxw035> and "A constrained single-index model for estimating interactions between a treatment and covariates" (under review, 2019) for detail. The main function of this package is simml().
+# License: GPL-3
+# Imports: mgcv, plyr
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-05-21 17:39:18 UTC; parkh15
+# Repository: CRAN
+# Date/Publication: 2019-05-24 12:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

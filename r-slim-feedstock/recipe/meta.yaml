@@ -1,0 +1,95 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-slim
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/slim_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/slim/slim_{{ version }}.tar.gz
+  sha256: 416d39294d7d24ab95d73cf46af79ca72cca43432ff157902e81576ab8992b75
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lme4 (>= 1.1), jmcm (>= 0.1.6.0), gee (>= 4.13-19), ggplot2 (>= 2.1.0), testthat (>= 1.0.2), knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass >=7.3
+    - r-data.table >=1.9.6
+
+  run:
+    - r-base
+    - r-mass >=7.3
+    - r-data.table >=1.9.6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('slim')"           # [not win]
+    - "\"%R%\" -e \"library('slim')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=slim
+  license: GPL-3
+  summary: 'Fits singular linear models to longitudinal data. Singular linear models are useful
+    when the number, or timing, of longitudinal observations may be informative about
+    the observations themselves. They are described in Farewell (2010) <doi:10.1093/biomet/asp068>,
+    and are extensions of the linear increments model <doi:10.1111/j.1467-9876.2007.00590.x>
+    to general longitudinal data.   '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: slim
+# Title: Singular Linear Models for Longitudinal Data
+# Version: 0.1.1
+# Authors@R: person("Daniel", "Farewell", email = "farewelld@cf.ac.uk", role = c("aut", "cre"))
+# Description: Fits singular linear models to longitudinal data. Singular linear models are useful when the number, or timing, of longitudinal observations may be informative about the observations themselves. They are described in Farewell (2010) <doi:10.1093/biomet/asp068>, and are extensions of the linear increments model <doi:10.1111/j.1467-9876.2007.00590.x> to general longitudinal data.
+# Depends: R (>= 3.2.0), data.table (>= 1.9.6)
+# Imports: stats, MASS (>= 7.3)
+# Suggests: lme4 (>= 1.1), jmcm (>= 0.1.6.0), gee (>= 4.13-19), ggplot2 (>= 2.1.0), testthat (>= 1.0.2), knitr, rmarkdown
+# License: GPL-3
+# LazyData: true
+# RoxygenNote: 6.0.1
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2017-05-15 06:33:18 UTC; daniel
+# Author: Daniel Farewell [aut, cre]
+# Maintainer: Daniel Farewell <farewelld@cf.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2017-05-15 06:39:33 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

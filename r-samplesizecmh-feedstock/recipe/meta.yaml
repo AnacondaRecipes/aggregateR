@@ -1,0 +1,95 @@
+{% set version = '0.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-samplesizecmh
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/samplesizeCMH_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/samplesizeCMH/samplesizeCMH_{{ version }}.tar.gz
+  sha256: 2decbb3985055cf274a55ebe5421e4e158c51e0fee7b5dfe74a445ea2be6be3d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, DescTools, datasets, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('samplesizeCMH')"           # [not win]
+    - "\"%R%\" -e \"library('samplesizeCMH')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/pegeler/samplesizeCMH
+  license: GPL-2 | GPL-3
+  summary: ' Calculates the power and sample size for Cochran-Mantel-Haenszel tests.  There are
+    also several helper functions for working with probability, odds, relative risk,
+    and odds ratio values.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: samplesizeCMH
+# Title: Power and Sample Size Calculation for the Cochran-Mantel-Haenszel Test
+# Date: 2017-12-13
+# Version: 0.0.0
+# Authors@R: c( person("Paul", "Egeler", email = "paul.egeler@spectrumhealth.org", role = c("aut", "cre")), person("Spectrum Health, Grand Rapids, MI", role = "cph"))
+# Copyright: Spectrum Health, Grand Rapids, MI
+# Description:  Calculates the power and sample size for Cochran-Mantel-Haenszel tests.  There are also several helper functions for working with probability, odds, relative risk, and odds ratio values.
+# Depends: R (>= 3.4.0)
+# Imports: stats
+# License: GPL-2 | GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: knitr, rmarkdown, DescTools, datasets, testthat
+# VignetteBuilder: knitr
+# RoxygenNote: 6.0.1
+# URL: https://github.com/pegeler/samplesizeCMH
+# BugReports: https://github.com/pegeler/samplesizeCMH/issues
+# NeedsCompilation: no
+# Packaged: 2017-12-21 14:19:57 UTC; pau64307
+# Author: Paul Egeler [aut, cre], Spectrum Health, Grand Rapids, MI [cph]
+# Maintainer: Paul Egeler <paul.egeler@spectrumhealth.org>
+# Repository: CRAN
+# Date/Publication: 2017-12-21 15:15:57 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

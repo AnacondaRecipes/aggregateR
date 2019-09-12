@@ -1,0 +1,83 @@
+{% set version = '1.1-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-wpp2015
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/wpp2015_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/wpp2015/wpp2015_{{ version }}.tar.gz
+  sha256: dd3ba3e79696fb0355d877558e84f8555f9b59c157b6a2d8a51653a8735d761d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-plyr
+
+  run:
+    - r-base
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('wpp2015')"           # [not win]
+    - "\"%R%\" -e \"library('wpp2015')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://esa.un.org/wpp
+  license: GPL-2
+  summary: Provides data from the United Nation's World Population Prospects 2015.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: wpp2015
+# Version: 1.1-2
+# Date: 2018-12-21
+# Title: World Population Prospects 2015
+# Author: Population Division, Department of Economic and Social Affairs, United Nations.
+# Maintainer: Hana Sevcikova <hanas@uw.edu>
+# Depends: R (>= 2.14.2), plyr
+# Description: Provides data from the United Nation's World Population Prospects 2015.
+# License: GPL (>= 2)
+# URL: http://esa.un.org/wpp
+# NeedsCompilation: no
+# Packaged: 2018-12-21 17:36:14 UTC; hana
+# Repository: CRAN
+# Date/Publication: 2019-01-07 21:50:15 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

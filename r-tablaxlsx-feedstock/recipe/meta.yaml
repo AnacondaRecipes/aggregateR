@@ -1,0 +1,85 @@
+{% set version = '1.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tablaxlsx
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tablaxlsx_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tablaxlsx/tablaxlsx_{{ version }}.tar.gz
+  sha256: bf5eed1f9c77695a12fd8d711ef1b0f927eb24490718f48a54c3555f5bb8eae0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-openxlsx
+
+  run:
+    - r-base
+    - r-openxlsx
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tablaxlsx')"           # [not win]
+    - "\"%R%\" -e \"library('tablaxlsx')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=tablaxlsx
+  license: GPL-3
+  summary: Some functions are included in this package for writing tables in Excel format suitable
+    for distribution.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: tablaxlsx
+# Title: Write Formatted Tables in Excel Workbooks
+# Version: 1.2.2
+# Date: 2017-05-27
+# Author: Jesus Maria Rodriguez Rodriguez
+# Maintainer: Jesus Maria Rodriguez Rodriguez <jesusmro@ono.com>
+# Description: Some functions are included in this package for writing tables in Excel format suitable for distribution.
+# Depends: R (>= 3.2),openxlsx
+# License: GPL-3
+# LazyData: true
+# Encoding: latin1
+# NeedsCompilation: no
+# Packaged: 2017-05-27 16:14:38 UTC; Jesus
+# Repository: CRAN
+# Date/Publication: 2017-05-27 16:55:43 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

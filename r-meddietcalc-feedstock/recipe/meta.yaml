@@ -1,0 +1,88 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-meddietcalc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MedDietCalc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MedDietCalc/MedDietCalc_{{ version }}.tar.gz
+  sha256: be1f14184037bd7ce7ec3e8100ef35398d2869f26946ccc750f824438df50187
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: graphics, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MedDietCalc')"           # [not win]
+    - "\"%R%\" -e \"library('MedDietCalc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MedDietCalc
+  license: GPL-3
+  summary: Multi Calculator of different scores to measure adherence to Mediterranean Diet, to
+    compute them in nutriepidemiological data. Additionally, a sample dataset of this
+    kind of data is provided, and some other minor tools useful in epidemiological studies.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MedDietCalc
+# Type: Package
+# Title: Multi Calculator to Compute Scores of Adherence to Mediterranean Diet
+# Version: 0.1.1
+# Authors@R: c( person("Miguel", "Menendez", email = "miguelmo@gmail.com", role = c("aut", "cre")), person("David", "Lora", email = "david@h12o.es", role = "ctb"), person("Agustin", "Gomez-Camara", role = "dtc"))
+# Author: Miguel Menendez [aut, cre], David Lora [ctb], Agustin Gomez-Camara [dtc]
+# Maintainer: Miguel Menendez <miguelmo@gmail.com>
+# Description: Multi Calculator of different scores to measure adherence to Mediterranean Diet, to compute them in nutriepidemiological data. Additionally, a sample dataset of this kind of data is provided, and some other minor tools useful in epidemiological studies.
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Imports: stats
+# Suggests: graphics, knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-05-31 06:40:40 UTC; usuario
+# Repository: CRAN
+# Date/Publication: 2019-05-31 07:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

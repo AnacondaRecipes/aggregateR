@@ -1,0 +1,94 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-imfdata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/IMFData_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/IMFData/IMFData_{{ version }}.tar.gz
+  sha256: d7d8fc590829cd8e7ef95a2d3b2d75b06cf751698baeb6238a3fc0ed97be9dd6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+    - r-jsonlite
+    - r-plyr
+
+  run:
+    - r-base
+    - r-httr
+    - r-jsonlite
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('IMFData')"           # [not win]
+    - "\"%R%\" -e \"library('IMFData')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mingjerli/IMFData
+  license: MIT
+  summary: Search, extract and formulate IMF's datasets.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: IMFData
+# Type: Package
+# Title: R Interface for International Monetary Fund(IMF) Data API
+# Version: 0.2.0
+# Date: 2016-10-16
+# Authors@R: person("Ming-Jer", "Lee", email = "mingjerli@gmail.com", role = c("aut", "cre"))
+# Depends: R (>= 3.1.0)
+# Imports: httr, jsonlite, plyr
+# Description: Search, extract and formulate IMF's datasets.
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# KeepSource: TRUE
+# URL: https://github.com/mingjerli/IMFData
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-10-28 12:28:01 UTC; mingjerli
+# Author: Ming-Jer Lee [aut, cre]
+# Maintainer: Ming-Jer Lee <mingjerli@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-10-29 00:27:17
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

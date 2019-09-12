@@ -1,0 +1,81 @@
+{% set version = '1.0-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-solomon
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SOLOMON_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SOLOMON/SOLOMON_{{ version }}.tar.gz
+  sha256: 2ce3099bf1460ec2472d4300620f55cf06479efe39da46f42c22c7f6b2e6217d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SOLOMON')"           # [not win]
+    - "\"%R%\" -e \"library('SOLOMON')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SOLOMON
+  license: GPL-2
+  summary: Parentage analysis using Bayes' theorem
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SOLOMON
+# Type: Package
+# Title: Parentage analysis
+# Version: 1.0-1
+# Date: 2012-11-26
+# Author: Mark Christie
+# Maintainer: Mark Christie <redpath.christie@gmail.com>
+# Description: Parentage analysis using Bayes' theorem
+# Depends: tcltk
+# License: GPL-2
+# Packaged: 2013-08-21 12:14:45 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2013-08-21 14:15:28
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

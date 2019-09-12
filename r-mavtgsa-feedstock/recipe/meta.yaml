@@ -1,0 +1,104 @@
+{% set version = '1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mavtgsa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MAVTgsa_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MAVTgsa/MAVTgsa_{{ version }}.tar.gz
+  sha256: 1e683ad2432c68609931d2a5ec4326eddaeebf6f191ab7d838c8a3a86da2ea67
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-corpcor
+    - r-foreach
+    - r-multcomp
+    - r-randomforest
+
+  run:
+    - r-base
+    - r-mass
+    - r-corpcor
+    - r-foreach
+    - r-multcomp
+    - r-randomforest
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MAVTgsa')"           # [not win]
+    - "\"%R%\" -e \"library('MAVTgsa')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MAVTgsa
+  license: GPL-2
+  summary: 'This package is a gene set analysis function for one-sided test (OLS), two-sided
+    test (multivariate analysis of variance). If the experimental conditions are equal
+    to 2, the p-value for Hotelling''s t^2 test is calculated. If the experimental conditions
+    are great than 2, the p-value for Wilks'' Lambda is determined and post-hoc test
+    is reported too. Three multiple comparison procedures, Dunnett, Tukey, and sequential
+    pairwise comparison, are implemented. The program computes the p-values and FDR
+    (false discovery rate) q-values for all gene sets. The p-values for individual genes
+    in a significant gene set are also listed. MAVTgsa generates two visualization output:
+    a p-value plot of gene sets (GSA plot) and a GST-plot of the empirical distribution
+    function of the ranked test statistics of a given gene set. A Random Forests-based
+    procedure is to identify gene sets that can accurately predict samples from different
+    experimental conditions or are associated with the continuous phenotypes.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MAVTgsa
+# Type: Package
+# Title: Three methods to identify differentially expressed gene sets, ordinary least square test, Multivariate Analysis Of Variance test with n contrasts and Random forest.
+# Version: 1.3
+# Date: 2014-05-27
+# Author: Chih-Yi Chien, Chen-An Tsai, Ching-Wei Chang, and James J. Chen
+# Maintainer: Chih-Yi Chien <92354503@nccu.edu.tw>
+# Depends: R (>= 2.13.2), corpcor, foreach, multcomp, randomForest, MASS
+# Description: This package is a gene set analysis function for one-sided test (OLS), two-sided test (multivariate analysis of variance). If the experimental conditions are equal to 2, the p-value for Hotelling's t^2 test is calculated. If the experimental conditions are great than 2, the p-value for Wilks' Lambda is determined and post-hoc test is reported too. Three multiple comparison procedures, Dunnett, Tukey, and sequential pairwise comparison, are implemented. The program computes the p-values and FDR (false discovery rate) q-values for all gene sets. The p-values for individual genes in a significant gene set are also listed. MAVTgsa generates two visualization output: a p-value plot of gene sets (GSA plot) and a GST-plot of the empirical distribution function of the ranked test statistics of a given gene set. A Random Forests-based procedure is to identify gene sets that can accurately predict samples from different experimental conditions or are associated with the continuous phenotypes.
+# License: GPL-2
+# LazyData: Yes
+# Repository: CRAN
+# Packaged: 2014-06-30 03:41:28 UTC; pelly
+# NeedsCompilation: no
+# Date/Publication: 2014-07-02 13:48:35
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

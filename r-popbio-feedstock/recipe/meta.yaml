@@ -1,0 +1,84 @@
+{% set version = '2.4.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-popbio
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/popbio_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/popbio/popbio_{{ version }}.tar.gz
+  sha256: 90c39200b773bc593136f9d41ed1fb687fdb11c1fc10aec68d381c9838d2b998
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: quadprog
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('popbio')"           # [not win]
+    - "\"%R%\" -e \"library('popbio')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=popbio
+  license: GPL-3
+  summary: Construct and analyze projection matrix models from a demography study of marked individuals
+    classified by age or stage. The package covers methods described in Matrix Population
+    Models by Caswell (2001) and Quantitative Conservation Biology by Morris and Doak
+    (2002).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: popbio
+# Version: 2.4.4
+# Author: Chris Stubben, Brook Milligan, Patrick Nantel
+# Maintainer: Chris Stubben <chris.stubben@hci.utah.edu>
+# Date: 2018-05-03
+# Title: Construction and Analysis of Matrix Population Models
+# License: GPL-3
+# Suggests: quadprog
+# Description: Construct and analyze projection matrix models from a demography study of marked individuals classified by age or stage. The package covers methods described in Matrix Population Models by Caswell (2001) and Quantitative Conservation Biology by Morris and Doak (2002).
+# NeedsCompilation: no
+# Packaged: 2018-05-03 19:17:35 UTC; chrisstubben
+# Repository: CRAN
+# Date/Publication: 2018-05-03 22:32:53 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

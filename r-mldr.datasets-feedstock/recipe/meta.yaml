@@ -1,0 +1,90 @@
+{% set version = '0.4.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mldr.datasets
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mldr.datasets_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mldr.datasets/mldr.datasets_{{ version }}.tar.gz
+  sha256: 0314334d8d9b88e834393bacf6311245eedc07c9c94d20c70433fae23bdace7f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: mldr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mldr.datasets')"           # [not win]
+    - "\"%R%\" -e \"library('mldr.datasets')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/fcharte/mldr.datasets
+  license: LGPL-3
+  summary: Large collection of multilabel datasets along with the functions needed to export
+    them to several formats, to make partitions, and to obtain bibliographic information.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mldr.datasets
+# Title: R Ultimate Multilabel Dataset Repository
+# Version: 0.4.2
+# Date: 2019-01-16
+# Authors@R: c( person("David", "Charte", email = "fdavidcl@ugr.es", role = "cre", comment = c(ORCID = "0000-0002-4830-9512")), person("Francisco", "Charte", email = "francisco@fcharte.com", role = "aut", comment = c(ORCID = "0000-0002-3083-8942")),  person("Antonio J.", "Rivera", email = "arivera@ujaen.es", role = "aut"))
+# Description: Large collection of multilabel datasets along with the functions needed to export them to several formats, to make partitions, and to obtain bibliographic information.
+# URL: https://github.com/fcharte/mldr.datasets
+# Depends: R (>= 3.0.0)
+# Imports: utils
+# License: LGPL (>= 3) | file LICENSE
+# LazyData: true
+# RoxygenNote: 6.1.0
+# Suggests: mldr
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2019-01-17 09:51:35 UTC; fdavidcl
+# Author: David Charte [cre] (<https://orcid.org/0000-0002-4830-9512>), Francisco Charte [aut] (<https://orcid.org/0000-0002-3083-8942>), Antonio J. Rivera [aut]
+# Maintainer: David Charte <fdavidcl@ugr.es>
+# Repository: CRAN
+# Date/Publication: 2019-01-17 13:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

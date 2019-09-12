@@ -1,0 +1,94 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-parse
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PARSE_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PARSE/PARSE_{{ version }}.tar.gz
+  sha256: b590b8460be30fe148a12314e9bc59353d7ffd4413c4b01892c3ba1cd4468078
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-doparallel
+    - r-foreach
+    - r-gplots
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-doparallel
+    - r-foreach
+    - r-gplots
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PARSE')"           # [not win]
+    - "\"%R%\" -e \"library('PARSE')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PARSE
+  license: CC0
+  summary: Model-based clustering and identifying informative features based on regularization
+    methods. The package includes three regularization methods - PAirwise Reciprocal
+    fuSE (PARSE) penalty proposed by Wang, Zhou and Hoeting (2016), the adaptive L1
+    penalty (APL1) and the adaptive pairwise fusion penalty (APFP). Heatmaps are included
+    to shown the identification of informative features.
+  license_family: CC
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PARSE
+# Type: Package
+# Title: Model-Based Clustering with Regularization Methods for High-Dimensional Data
+# Version: 0.1.0
+# Date: 2016-06-10
+# Author: Lulu Wang, Wen Zhou, Jennifer Hoeting
+# Maintainer: Lulu Wang <wanglulu@stat.colostate.edu>
+# Description: Model-based clustering and identifying informative features based on regularization methods. The package includes three regularization methods - PAirwise Reciprocal fuSE (PARSE) penalty proposed by Wang, Zhou and Hoeting (2016), the adaptive L1 penalty (APL1) and the adaptive pairwise fusion penalty (APFP). Heatmaps are included to shown the identification of informative features.
+# License: CC0
+# LazyData: TRUE
+# Depends: R (>= 3.0.0)
+# Imports: stats, mvtnorm, gplots, foreach, doParallel, grDevices, utils
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-06-10 19:42:13 UTC; luluwang
+# Repository: CRAN
+# Date/Publication: 2016-06-11 09:42:05
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

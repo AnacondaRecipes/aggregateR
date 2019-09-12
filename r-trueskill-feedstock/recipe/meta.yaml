@@ -1,0 +1,90 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-trueskill
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/trueskill_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/trueskill/trueskill_{{ version }}.tar.gz
+  sha256: 0784c2405abddff5a8e4394a6920f4616024a8990dd3840ea4b26be688a91b57
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('trueskill')"           # [not win]
+    - "\"%R%\" -e \"library('trueskill')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=trueskill
+  license: GPL-3
+  summary: 'An implementation of the TrueSkill algorithm (Herbrich, R., Minka, T. and Grapel,
+    T) in R; a Bayesian skill rating system with inference by approximate message passing
+    on a factor graph. Used by Xbox to rank gamers and identify appropriate matches.
+    http://research.microsoft.com/en-us/projects/trueskill/default.aspx Current version
+    allows for one player per team. Will update as time permits.  Requires R version
+    3.0 as it is written with Reference Classes.  URL: https://github.com/bhoung/trueskill-in-r
+    Acknowledgements to Doug Zongker and Heungsub Lee for their python implementations
+    of the algorithm and for the liberal reuse of Doug''s code comments (@dougz and
+    @sublee on github).'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: trueskill
+# Title: Implementation the TrueSkill algorithm in R
+# Description: An implementation of the TrueSkill algorithm (Herbrich, R., Minka, T. and Grapel, T) in R; a Bayesian skill rating system with inference by approximate message passing on a factor graph. Used by Xbox to rank gamers and identify appropriate matches. http://research.microsoft.com/en-us/projects/trueskill/default.aspx Current version allows for one player per team. Will update as time permits.  Requires R version 3.0 as it is written with Reference Classes.  URL: https://github.com/bhoung/trueskill-in-r Acknowledgements to Doug Zongker and Heungsub Lee for their python implementations of the algorithm and for the liberal reuse of Doug's code comments (@dougz and @sublee on github).
+# Version: 0.1
+# Author: Brendan Houng <brendan.houng@gmail.com>
+# Maintainer: Brendan Houng <brendan.houng@gmail.com>
+# License: GPL-3
+# Depends: R (>= 3.0)
+# Imports: methods
+# Collate: 'factorgraph.r' 'init.r' 'competition.r' 'player.r'
+# Packaged: 2013-05-22 05:32:15 UTC; brendanhoung
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-05-22 08:00:08
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

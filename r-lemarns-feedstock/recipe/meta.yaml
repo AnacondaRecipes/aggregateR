@@ -1,0 +1,105 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lemarns
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LeMaRns_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LeMaRns/LeMaRns_{{ version }}.tar.gz
+  sha256: dabdc785671f511c30358adc584a3faf1b06db2642ae548da6100fd5e6fbebea
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-abind
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-abind
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LeMaRns')"           # [not win]
+    - "\"%R%\" -e \"library('LeMaRns')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=LeMaRns
+  license: GPL-3
+  summary: Set up, run and explore the outputs of the Length-based Multispecies model (LeMans;
+    Hall et al. 2006 <doi:10.1139/f06-039>), focused on the marine environment.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LeMaRns
+# Title: Length-Based Multispecies Analysis by Numerical Simulation
+# Version: 0.1.0
+# Date: 2019-06-01
+# Authors@R: c(person("Michael A.", "Spence", email = "michael.spence@cefas.co.uk", role = c("aut", "cre"),comment = c(ORCID = "0000-0002-3445-7979")), person("Hayley J.", "Bannister", email = "hayley.bannister@cefas.co.uk", role = c("aut"),comment = c(ORCID = "0000-0002-2546-5168")), person("Johnathan E.", "Ball", email = "johnathan.ball@cefas.co.uk", role = c("aut")), person("Paul J.", "Dolder", email = "paul.dolder@cefas.co.uk", role = c("aut"),comment = c(ORCID = "0000-0002-4179-712X")), person("Robert B.", "Thorpe", email = "robert.thorpe@cefas.co.uk", role = c("aut"),comment = c(ORCID = "0000-0001-8193-6932")),person("Christopher A.", "Griffiths", email = "chris.griffiths@cefas.co.uk", role = c("ctb")))
+# Description: Set up, run and explore the outputs of the Length-based Multispecies model (LeMans; Hall et al. 2006 <doi:10.1139/f06-039>), focused on the marine environment.
+# Depends: R (>= 3.5.0)
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# LinkingTo: Rcpp, RcppArmadillo
+# Imports: Rcpp, abind, methods
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# Collate: 'NS_par.R' 'RcppExports.R' 'calc_M1.R' 'calc_Q.R' 'calc_growth.R' 'calc_indicators.R' 'calc_mature.R' 'param_setup.R' 'run_LeMans.R' 'calc_output.R' 'calc_phi.R' 'calc_prefs.R' 'calc_ration_growthfac.R' 'calc_recruits.R' 'calc_suit_vect.R' 'get_Catch.R' 'get_SSB.R' 'get_indicators.R' 'other.R' 'plot_SSB.R' 'plot_indicators.R'
+# NeedsCompilation: yes
+# Packaged: 2019-05-31 13:11:50 UTC; HB04
+# Author: Michael A. Spence [aut, cre] (<https://orcid.org/0000-0002-3445-7979>), Hayley J. Bannister [aut] (<https://orcid.org/0000-0002-2546-5168>), Johnathan E. Ball [aut], Paul J. Dolder [aut] (<https://orcid.org/0000-0002-4179-712X>), Robert B. Thorpe [aut] (<https://orcid.org/0000-0001-8193-6932>), Christopher A. Griffiths [ctb]
+# Maintainer: Michael A. Spence <michael.spence@cefas.co.uk>
+# Repository: CRAN
+# Date/Publication: 2019-06-03 12:40:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

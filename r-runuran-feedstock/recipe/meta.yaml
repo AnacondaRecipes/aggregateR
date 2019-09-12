@@ -1,0 +1,104 @@
+{% set version = '0.27' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-runuran
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Runuran_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Runuran/Runuran_{{ version }}.tar.gz
+  sha256: a30cfccc30430ad0244fa995dd3315de59d63910151784cacc8372a0c6ee795b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.0.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Runuran')"           # [not win]
+    - "\"%R%\" -e \"library('Runuran')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://statmath.wu.ac.at/unuran/
+  license: GPL-2
+  summary: 'Interface to the ''UNU.RAN'' library for Universal Non-Uniform RANdom variate generators.  Thus
+    it allows to build non-uniform random number generators from quite arbitrary distributions.
+    In particular, it provides an algorithm for fast numerical inversion for distribution
+    with given density function. In addition, the package contains densities, distribution
+    functions and quantiles from a couple of distributions. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Runuran
+# Type: Package
+# Title: R Interface to the 'UNU.RAN' Random Variate Generators
+# Version: 0.27
+# Date: 2019-03-14
+# Authors@R: c(person("Josef", "Leydold", role = c("aut", "cre"), email = "josef.leydold@wu.ac.at"), person("Wolfgang", "H\"ormann", role = "aut"))
+# Depends: R (>= 3.0.0)
+# Imports: methods, stats
+# Suggests: testthat (>= 2.0.0)
+# Description: Interface to the 'UNU.RAN' library for Universal Non-Uniform RANdom variate generators.  Thus it allows to build non-uniform random number generators from quite arbitrary distributions. In particular, it provides an algorithm for fast numerical inversion for distribution with given density function. In addition, the package contains densities, distribution functions and quantiles from a couple of distributions.
+# Collate: unuran_distr.R unuran_cont.R unuran_discr.R unuran_cmv.R Runuran.R universal.R distributions.R deprecated.R options.R utils.R zzz.R
+# License: GPL (>= 2)
+# URL: http://statmath.wu.ac.at/unuran/
+# RoxygenNote: 6.1.1
+# NeedsCompilation: yes
+# Packaged: 2019-03-14 13:13:44 UTC; leydold
+# Author: Josef Leydold [aut, cre], Wolfgang H"ormann [aut]
+# Maintainer: Josef Leydold <josef.leydold@wu.ac.at>
+# Repository: CRAN
+# Date/Publication: 2019-03-14 14:33:34 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

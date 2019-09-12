@@ -1,0 +1,92 @@
+{% set version = '0.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mazeinda
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mazeinda_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mazeinda/mazeinda_{{ version }}.tar.gz
+  sha256: 8defe0c0caf8a60160b889dcdb8cc9b8122d0b50e0f1708f83cf113fce8a445b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: doMC, gamlss.dist, knitr, testthat, R.rsp, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-foreach
+
+  run:
+    - r-base
+    - r-foreach
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mazeinda')"           # [not win]
+    - "\"%R%\" -e \"library('mazeinda')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mazeinda
+  license: GPL-3
+  summary: Methods for calculating and testing the significance of pairwise monotonic association
+    from and based on the work of Pimentel (2009) <doi:10.4135/9781412985291.n2>. Computation
+    of association of vectors from one or multiple sets can be performed in parallel
+    thanks to the packages 'foreach' and 'doMC'.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mazeinda
+# Title: Monotonic Association on Zero-Inflated Data
+# Version: 0.0.1
+# Authors@R: person("Alice", "Albasi", email = "albasialice@gmail.com", role = c("aut", "cre"))
+# Author: Alice Albasi [aut, cre]
+# Maintainer: Alice Albasi <albasialice@gmail.com>
+# Description: Methods for calculating and testing the significance of pairwise monotonic association from and based on the work of Pimentel (2009) <doi:10.4135/9781412985291.n2>. Computation of association of vectors from one or multiple sets can be performed in parallel thanks to the packages 'foreach' and 'doMC'.
+# Depends: R (>= 3.3.0)
+# Imports: foreach
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# Suggests: doMC, gamlss.dist, knitr, testthat, R.rsp, rmarkdown
+# VignetteBuilder: R.rsp, knitr
+# NeedsCompilation: no
+# Packaged: 2018-01-15 19:39:32 UTC; alicealbasi
+# Repository: CRAN
+# Date/Publication: 2018-01-16 09:42:00 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

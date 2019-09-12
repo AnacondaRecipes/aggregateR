@@ -1,0 +1,90 @@
+{% set version = '1.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-powerupr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PowerUpR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PowerUpR/PowerUpR_{{ version }}.tar.gz
+  sha256: a9cc0506e14b6e1f992ebe02026b203f8a7197f533942d1c436b12fd4347e859
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PowerUpR')"           # [not win]
+    - "\"%R%\" -e \"library('PowerUpR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PowerUpR
+  license: GPL-3
+  summary: ' Includes tools to calculate statistical power, minimum detectable effect size (MDES),
+    MDES difference (MDESD), and minimum required sample size for various multilevel
+    randomized experiments with continuous outcomes. Some of the functions can assist
+    with planning two- and three-level cluster-randomized trials (CRTs) sensitive to
+    multilevel moderation and mediation (2-1-1, 2-2-1, and 3-2-1). See ''PowerUp!''
+    Excel series at <https://www.causalevaluation.org/>. '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PowerUpR
+# Type: Package
+# Title: Power Analysis Tools for Multilevel Randomized Experiments
+# Version: 1.0.4
+# Date: 2019-06-01
+# Authors@R: c( person("Metin", "Bulus", email = "bulusmetin@gmail.com", role = c("aut", "cre")), person("Nianbo", "Dong", role = "aut"), person("Benjamin", "Kelcey", role = "aut"), person("Jessaca", "Spybrook", role = "aut") )
+# Description:  Includes tools to calculate statistical power, minimum detectable effect size (MDES), MDES difference (MDESD), and minimum required sample size for various multilevel randomized experiments with continuous outcomes. Some of the functions can assist with planning two- and three-level cluster-randomized trials (CRTs) sensitive to multilevel moderation and mediation (2-1-1, 2-2-1, and 3-2-1). See 'PowerUp!' Excel series at <https://www.causalevaluation.org/>.
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# License: GPL (>= 3)
+# NeedsCompilation: no
+# Author: Metin Bulus [aut, cre], Nianbo Dong [aut], Benjamin Kelcey [aut], Jessaca Spybrook [aut]
+# Maintainer: Metin Bulus <bulusmetin@gmail.com>
+# Packaged: 2019-06-01 10:18:44 UTC; METIN
+# Repository: CRAN
+# Date/Publication: 2019-06-01 10:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

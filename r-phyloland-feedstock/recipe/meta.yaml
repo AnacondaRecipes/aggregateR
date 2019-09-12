@@ -1,0 +1,92 @@
+{% set version = '1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-phyloland
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/phyloland_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/phyloland/phyloland_{{ version }}.tar.gz
+  sha256: 57cf5c3d00172d109294061597ce6d7d1d09e6f097334cbfdd9868614d05e481
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-ape
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-ape
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('phyloland')"           # [not win]
+    - "\"%R%\" -e \"library('phyloland')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=phyloland
+  license: GPL-2
+  summary: Phyloland package models a space colonization process mapped onto a phylogeny, it
+    aims at estimating limited dispersal and ecological competitive exclusion in a Bayesian
+    MCMC statistical phylogeographic framework (please refer to phyloland-package help
+    for details.)
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: phyloland
+# Type: Package
+# Title: Modelling Competitive Exclusion and Limited Dispersal in a Statistical Phylogeographic Framework
+# Version: 1.3
+# Imports: ape
+# Date: 2014-09-05
+# Author: Louis Ranjard, Marie Paturel
+# Maintainer: Louis Ranjard <l.ranjard@auckland.ac.nz>
+# Description: Phyloland package models a space colonization process mapped onto a phylogeny, it aims at estimating limited dispersal and ecological competitive exclusion in a Bayesian MCMC statistical phylogeographic framework (please refer to phyloland-package help for details.)
+# License: GPL-2
+# Packaged: 2014-09-12 20:22:42 UTC; louis
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2014-09-13 07:55:48
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

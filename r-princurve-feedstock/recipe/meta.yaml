@@ -1,0 +1,100 @@
+{% set version = '2.1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-princurve
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/princurve_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/princurve/princurve_{{ version }}.tar.gz
+  sha256: f25e9b956152e4446f8918a0813d8f6dc1df381d97cf89ab7693233154ce6fac
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: devtools, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('princurve')"           # [not win]
+    - "\"%R%\" -e \"library('princurve')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/rcannood/princurve
+  license: GPL-2
+  summary: Fitting a principal curve to a data matrix in arbitrary dimensions.  Hastie and Stuetzle
+    (1989) <doi:10.2307/2289936>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: princurve
+# Version: 2.1.4
+# Title: Fits a Principal Curve in Arbitrary Dimension
+# Authors@R: c( person("Trevor", "Hastie", email = "trevor@research.att.com", role = "aut"), person("Andreas", "Weingessel", email = "Andreas.Weingessel@ci.tuwien.ac.at", role = "aut"), person( "Kurt", "Hornik",  email = "kurt.hornik@wu.ac.at",  role = "aut", comment = c(ORCID = "0000-0003-4198-9911") ), person( "Henrik", "Bengtsson",  email = "henrikb@braju.com",  role = "ctb", comment = c(github = "HenrikBengtsson") ), person( "Robrecht", "Cannoodt",  email = "rcannood@gmail.com",  role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3641-729X", github = "rcannood") ))
+# Description: Fitting a principal curve to a data matrix in arbitrary dimensions.  Hastie and Stuetzle (1989) <doi:10.2307/2289936>.
+# License: GPL-2
+# Encoding: UTF-8
+# Depends: R (>= 3.0)
+# Imports: stats, graphics, grDevices, Rcpp
+# Suggests: devtools, testthat
+# LinkingTo: Rcpp
+# NeedsCompilation: yes
+# RoxygenNote: 6.1.1
+# URL: https://github.com/rcannood/princurve
+# BugReports: https://github.com/rcannood/princurve/issues
+# Collate: 'RcppExports.R' 'bias_correct_curve.R' 'deprecated.R' 'package.R' 'periodic_lowess.R' 'smoother_functions.R' 'principal_curve.R' 'start_circle.R'
+# Packaged: 2019-05-29 12:26:55 UTC; rcannood
+# Author: Trevor Hastie [aut], Andreas Weingessel [aut], Kurt Hornik [aut] (<https://orcid.org/0000-0003-4198-9911>), Henrik Bengtsson [ctb] (HenrikBengtsson), Robrecht Cannoodt [aut, cre] (<https://orcid.org/0000-0003-3641-729X>, rcannood)
+# Maintainer: Robrecht Cannoodt <rcannood@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-05-29 14:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

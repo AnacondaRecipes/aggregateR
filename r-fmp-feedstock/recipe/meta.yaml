@@ -1,0 +1,82 @@
+{% set version = '1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fmp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/FMP_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/FMP/FMP_{{ version }}.tar.gz
+  sha256: 1523f050ca09ef652f3cea2e783b85c9eb7ccf9e1d009860fcc7926fd1512170
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('FMP')"           # [not win]
+    - "\"%R%\" -e \"library('FMP')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=FMP
+  license: GPL-2
+  summary: 'Estimates Filtered Monotonic Polynomial IRT Models as described by Liang and Browne
+    (2015) <DOI:10.3102/1076998614556816>. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: FMP
+# Version: 1.4
+# Date: 2016-02-08
+# Title: Filtered Monotonic Polynomial IRT Models
+# Author: Niels G. Waller <nwaller@umn.edu>
+# Maintainer: Niels G. Waller <nwaller@umn.edu>
+# Depends: R (>= 3.0)
+# Description: Estimates Filtered Monotonic Polynomial IRT Models as described by Liang and Browne (2015) <DOI:10.3102/1076998614556816>.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2016-02-09 02:34:38 UTC; nielswaller
+# Repository: CRAN
+# Date/Publication: 2016-02-09 15:38:39
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

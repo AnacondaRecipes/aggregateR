@@ -1,0 +1,91 @@
+{% set version = '0.11.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gim
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gim_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gim/gim_{{ version }}.tar.gz
+  sha256: fe3c08febb8be5159dae8796bb262ec23c02a328c16b62685b36cc0170fc55df
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-numderiv
+
+  run:
+    - r-base
+    - r-numderiv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gim')"           # [not win]
+    - "\"%R%\" -e \"library('gim')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/zhangh12/gim
+  license: MIT
+  summary: 'Implements the generalized integration model, which integrates individual-level data
+    and summary statistics under a generalized linear model framework. It supports continuous
+    and binary outcomes to be modeled by the linear and logistic regression models. '
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gim
+# Type: Package
+# Title: Generalized Integration Model
+# Version: 0.11.0
+# Date: 2018-03-12
+# Author: Han Zhang, Kai Yu
+# Maintainer: Han Zhang <han.zhang2@nih.gov>
+# Depends: R (>= 3.4.0)
+# Imports: numDeriv
+# Description: Implements the generalized integration model, which integrates individual-level data and summary statistics under a generalized linear model framework. It supports continuous and binary outcomes to be modeled by the linear and logistic regression models.
+# License: MIT + file LICENSE
+# URL: https://github.com/zhangh12/gim
+# BugReports: https://github.com/zhangh12/gim/issues
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2018-03-14 03:15:19 UTC; zhangh12
+# Repository: CRAN
+# Date/Publication: 2018-03-14 12:01:58 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

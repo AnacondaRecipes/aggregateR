@@ -1,0 +1,93 @@
+{% set version = '1.5.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-flsa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/flsa_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/flsa/flsa_{{ version }}.tar.gz
+  sha256: a96c36dd3c125ad60e171ce6a02ddf2d74aa5d4641dcc970208898a1af9e8e74
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('flsa')"           # [not win]
+    - "\"%R%\" -e \"library('flsa')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=flsa
+  license: GPL-2
+  summary: Implements a path algorithm for the Fused Lasso Signal Approximator.  For more details
+    see the help files or the article by Hoefling (2009) <arXiv:0910.0526>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: flsa
+# Type: Package
+# Title: Path Algorithm for the General Fused Lasso Signal Approximator
+# Version: 1.5.1
+# Date: 2019-03-11
+# Author: Holger Hoefling
+# Maintainer: Holger Hoefling <hhoeflin@gmail.com>
+# Description: Implements a path algorithm for the Fused Lasso Signal Approximator.  For more details see the help files or the article by Hoefling (2009) <arXiv:0910.0526>.
+# License: GPL-2
+# Depends: R (>= 2.0.0)
+# SystemRequirements: C++11
+# Suggests: testthat
+# NeedsCompilation: yes
+# Packaged: 2019-03-13 22:24:05 UTC; hhoeflin
+# Repository: CRAN
+# Date/Publication: 2019-03-13 22:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

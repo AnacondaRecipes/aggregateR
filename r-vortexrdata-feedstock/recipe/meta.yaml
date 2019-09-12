@@ -1,0 +1,90 @@
+{% set version = '1.0.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-vortexrdata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/vortexRdata_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/vortexRdata/vortexRdata_{{ version }}.tar.gz
+  sha256: 36b9b8ba696f60ad780e00cafc9f151e251007084ab9151408817caad5c0872c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('vortexRdata')"           # [not win]
+    - "\"%R%\" -e \"library('vortexRdata')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/carlopacioni/vortexRdata/
+  license: GPL-3
+  summary: Contains selected data from two publications, Campbell 'et' 'al'. (2016) <DOI:10.1080/14486563.2015.1028486>
+    and 'Pacioni' 'et' 'al'. (2017) <DOI:10.1071/PC17002>. The data is provided both
+    as raw outputs from the population viability analysis software 'Vortex' and packaged
+    as R objects. The R package 'vortexR' uses the raw data provided here to illustrate
+    its functionality of parsing raw 'Vortex' output into R objects.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: vortexRdata
+# Type: Package
+# Title: Example Data for R Package 'vortexR'
+# Version: 1.0.5
+# Authors@R: c( person("Carlo", "Pacioni", email="C.Pacioni@Murdoch.edu.au", role=c("aut", "cre")), person(c("Florian", "W."), "Mayer", email="Florian.Mayer@dpaw.wa.gov.au", role="aut"))
+# Author: Carlo Pacioni [aut, cre], Florian W. Mayer [aut]
+# Maintainer: Carlo Pacioni <C.Pacioni@Murdoch.edu.au>
+# Description: Contains selected data from two publications, Campbell 'et' 'al'. (2016) <DOI:10.1080/14486563.2015.1028486> and 'Pacioni' 'et' 'al'. (2017) <DOI:10.1071/PC17002>. The data is provided both as raw outputs from the population viability analysis software 'Vortex' and packaged as R objects. The R package 'vortexR' uses the raw data provided here to illustrate its functionality of parsing raw 'Vortex' output into R objects.
+# URL: https://github.com/carlopacioni/vortexRdata/
+# BugReports: https://github.com/carlopacioni/vortexR/issues
+# Depends: R (>= 3.1.0)
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-02-04 00:20:03 UTC; cp0d
+# Repository: CRAN
+# Date/Publication: 2019-02-04 11:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

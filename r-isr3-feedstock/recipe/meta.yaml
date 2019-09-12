@@ -1,0 +1,90 @@
+{% set version = '0.98' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-isr3
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ISR3_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ISR3/ISR3_{{ version }}.tar.gz
+  sha256: ba3f4faf19ea7c8b4ba34524fee231f5267f1e50f2d03f268849d266136db756
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ISR3')"           # [not win]
+    - "\"%R%\" -e \"library('ISR3')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ISR3
+  license: Unlimited
+  summary: Performs multivariate normal imputation through iterative sequential  regression.  Conditional
+    dependency structure between imputed variables can be  specified a priori to accelerate
+    imputation.
+  license_family: MIT
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ISR3
+# Type: Package
+# Title: Iterative Sequential Regression
+# Version: 0.98
+# Date: 2016-10-28
+# Authors@R: c( person("Jonathan", "Lisic", , "jonathan.lisic@nass.usda.gov", c("aut", "cre")) )
+# BugReports: https://github.com/jlisic/isr3/issues
+# Maintainer: Jonathan Lisic <jonathan.lisic@nass.usda.gov>
+# Description: Performs multivariate normal imputation through iterative sequential  regression.  Conditional dependency structure between imputed variables can be  specified a priori to accelerate imputation.
+# Depends: R (>= 3.0.2)
+# License: Unlimited
+# RoxygenNote: 5.0.1
+# NeedsCompilation: yes
+# Packaged: 2016-10-13 14:57:36 UTC; jonathanlisic
+# Author: Jonathan Lisic [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2016-10-14 00:21:04
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

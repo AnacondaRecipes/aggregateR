@@ -1,0 +1,89 @@
+{% set version = '0.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-worms
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/worms_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/worms/worms_{{ version }}.tar.gz
+  sha256: 39f2829408c0fde2f6fbb6409ecf50c99caf3a7b31b16d7fab7ae3129b846ca0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+    - r-plyr
+
+  run:
+    - r-base
+    - r-httr
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('worms')"           # [not win]
+    - "\"%R%\" -e \"library('worms')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=worms
+  license: AGPL-3
+  summary: Retrieves taxonomic information from  <http://www.marinespecies.org> using WoRMS'
+    RESTful Webservice. Utility functions aim at taxonomic consistency.
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: worms
+# Type: Package
+# Title: Retriving Aphia Information from World Register of Marine Species
+# Description: Retrieves taxonomic information from  <http://www.marinespecies.org> using WoRMS' RESTful Webservice. Utility functions aim at taxonomic consistency.
+# Version: 0.2.2
+# Author: Jan Holstein [aut, cre, cph]
+# Maintainer: Jan Holstein <janmholstein@gmail.com>
+# Authors@R: c( person("Jan", "Holstein" ,   email ="janmholstein@gmail.com",   role=c("aut","cre", "cph"))      )
+# Depends: httr, plyr
+# License: GNU Affero General Public License
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-04-25 13:34:18 UTC; holstein
+# Repository: CRAN
+# Date/Publication: 2018-04-25 13:58:37 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

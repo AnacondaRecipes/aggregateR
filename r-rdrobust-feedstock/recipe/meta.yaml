@@ -1,0 +1,89 @@
+{% set version = '0.99.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rdrobust
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rdrobust_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rdrobust/rdrobust_{{ version }}.tar.gz
+  sha256: 3cc11b78f219a141511232e5b77d240d1ab13d9868a6290f34b4a43c1f4d7f7a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rdrobust')"           # [not win]
+    - "\"%R%\" -e \"library('rdrobust')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rdrobust
+  license: GPL-2
+  summary: "Regression-discontinuity (RD) designs are quasi-experimental research designs popular
+    in social, behavioral and natural sciences. The RD design is usually employed to
+    study the (local) causal effect of a treatment, intervention or policy. This package
+    provides tools for data-driven graphical and analytical statistical inference in
+    RD\tdesigns: rdrobust() to construct local-polynomial point estimators and robust
+    confidence intervals for average treatment effects at the \tcutoff in Sharp, Fuzzy
+    and Kink RD settings, rdbwselect() to perform bandwidth selection for the different
+    procedures implemented, and rdplot() to conduct exploratory data analysis (RD plots)."
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rdrobust
+# Type: Package
+# Title: Robust Data-Driven Statistical Inference in Regression-Discontinuity Designs
+# Version: 0.99.4
+# Date: 2018-09-25
+# Author: Sebastian Calonico <scalonico@bus.miami.edu>, Matias D. Cattaneo <cattaneo@umich.edu>, Max H. Farrell <max.farrell@chicagobooth.edu>, Rocio Titiunik <titiunik@umich.edu>
+# Maintainer: Sebastian Calonico <scalonico@bus.miami.edu>
+# Description: Regression-discontinuity (RD) designs are quasi-experimental research designs popular in social, behavioral and natural sciences. The RD design is usually employed to study the (local) causal effect of a treatment, intervention or policy. This package provides tools for data-driven graphical and analytical statistical inference in RD	designs: rdrobust() to construct local-polynomial point estimators and robust confidence intervals for average treatment effects at the 	cutoff in Sharp, Fuzzy and Kink RD settings, rdbwselect() to perform bandwidth selection for the different procedures implemented, and rdplot() to conduct exploratory data analysis (RD plots).
+# Depends: R (>= 3.1.1)
+# License: GPL-2
+# Packaged: 2018-09-25 20:42:33 UTC; SCalonico
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2018-09-26 22:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

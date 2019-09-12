@@ -1,0 +1,99 @@
+{% set version = '0.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mergetrees
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mergeTrees_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mergeTrees/mergeTrees_{{ version }}.tar.gz
+  sha256: 5bb9f01974ffd61405e28d0147d7fc14b52671dbb2059da2c1bff8199a7b589d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mergeTrees')"           # [not win]
+    - "\"%R%\" -e \"library('mergeTrees')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mergeTrees
+  license: GPL-2
+  summary: Aggregates a set of trees with the same leaves to create a consensus tree. The trees
+    are typically  obtained via hierarchical clustering, hence the hclust format is
+    used to encode both the aggregated trees and the final  consensus tree. The method
+    is exact and proven to be O(nqlog(n)), n being the individuals and q being the number
+    of trees to aggregate.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mergeTrees
+# Type: Package
+# Title: Aggregating Trees
+# Version: 0.1.3
+# Authors@R: c( person("Audrey", "Hulot", role = c("aut", "cre"), email = "audrey.hulot@inra.fr"), person("Julien", "Chiquet", role = c("aut"), email = "julien.chiquet@inra.fr", comment = c(ORCID = "0000-0002-3629-3429")), person("Guillem", "Rigaill", role = c("aut"), email = "guillem.rigaill@inra.fr") )
+# Maintainer: Audrey Hulot <audrey.hulot@inra.fr>
+# Description: Aggregates a set of trees with the same leaves to create a consensus tree. The trees are typically  obtained via hierarchical clustering, hence the hclust format is used to encode both the aggregated trees and the final  consensus tree. The method is exact and proven to be O(nqlog(n)), n being the individuals and q being the number of trees to aggregate.
+# Encoding: UTF-8
+# LazyData: true
+# License: GPL (>= 2)
+# Imports: Rcpp
+# LinkingTo: Rcpp
+# RoxygenNote: 6.1.1
+# NeedsCompilation: yes
+# Packaged: 2019-07-10 11:07:50 UTC; hulot
+# Author: Audrey Hulot [aut, cre], Julien Chiquet [aut] (<https://orcid.org/0000-0002-3629-3429>), Guillem Rigaill [aut]
+# Repository: CRAN
+# Date/Publication: 2019-07-15 10:10:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

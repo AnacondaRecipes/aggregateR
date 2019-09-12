@@ -1,0 +1,90 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-midas
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/midas_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/midas/midas_{{ version }}.tar.gz
+  sha256: e258298f2e8963c1e7cb92033ffa86b9fc70e6be99d80edeb4321433c4ec98aa
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-shiny >=1.0.3
+    - r-xml2 >=1.1.1
+
+  run:
+    - r-base
+    - r-shiny >=1.0.3
+    - r-xml2 >=1.1.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('midas')"           # [not win]
+    - "\"%R%\" -e \"library('midas')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=midas
+  license: GPL-3
+  summary: Contains functions for converting existing HTML/JavaScript source into equivalent
+    'shiny' functions. Bootstraps the process of making new 'shiny' functions by allowing
+    us to turn HTML snippets directly into  R functions.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: midas
+# Type: Package
+# Title: Turn HTML 'Shiny'
+# Version: 1.0.1
+# Author: Nicholas Jhirad
+# Maintainer: Nicholas Jhirad <lostnfound@gmail.com>
+# Description: Contains functions for converting existing HTML/JavaScript source into equivalent 'shiny' functions. Bootstraps the process of making new 'shiny' functions by allowing us to turn HTML snippets directly into  R functions.
+# Imports: shiny (>= 1.0.3), xml2 (>= 1.1.1)
+# BugReports: https://github.com/shapenaji/midas/issues
+# License: GPL-3
+# LazyData: true
+# Encoding: UTF-8
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-07-05 12:36:33 UTC; hq-nb-nicholasj
+# Repository: CRAN
+# Date/Publication: 2017-07-05 22:53:56 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

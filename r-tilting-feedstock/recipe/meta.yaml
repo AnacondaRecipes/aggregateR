@@ -1,0 +1,88 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tilting
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tilting_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tilting/tilting_{{ version }}.tar.gz
+  sha256: f315474674431de360482dfd3c25e6bd851fbc2da4aa8bdcb1653c3db6ec3b6b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tilting')"           # [not win]
+    - "\"%R%\" -e \"library('tilting')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=tilting
+  license: GPL-2
+  summary: Implements an algorithm for variable selection in high-dimensional linear regression
+    using the "tilted correlation", a new way of measuring the contribution of each
+    variable to the response which takes into account high correlations among the variables
+    in a data-driven way.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: tilting
+# Type: Package
+# Title: Variable Selection via Tilted Correlation Screening Algorithm
+# Version: 1.1.1
+# Date: 2016-12-22
+# Authors@R: c(person("Haeran", "Cho", role = c("aut", "cre"), email = "haeran.cho@bristol.ac.uk"), person("Piotr", "Fryzlewicz", role = "aut"))
+# Author: Haeran Cho [aut, cre], Piotr Fryzlewicz [aut]
+# Maintainer: Haeran Cho <haeran.cho@bristol.ac.uk>
+# Description: Implements an algorithm for variable selection in high-dimensional linear regression using the "tilted correlation", a new way of measuring the contribution of each variable to the response which takes into account high correlations among the variables in a data-driven way.
+# Depends: R (>= 2.14.0), mvtnorm
+# License: GPL (>= 2)
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2016-12-26 10:05:59 UTC; h
+# Repository: CRAN
+# Date/Publication: 2016-12-26 12:25:13
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

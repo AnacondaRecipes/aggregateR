@@ -1,0 +1,97 @@
+{% set version = '2.2-6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stratification
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/stratification_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/stratification/stratification_{{ version }}.tar.gz
+  sha256: 1c2eeba3cb2c1676818c66563a635b2a3e35d2f63e836d22bb145f8eded093ca
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('stratification')"           # [not win]
+    - "\"%R%\" -e \"library('stratification')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=stratification
+  license: GPL-2
+  summary: 'Univariate stratification of survey populations with a generalization of the  Lavallee-Hidiroglou
+    method of stratum construction. The generalized method takes into account  a discrepancy
+    between the stratification variable and the survey variable. The determination  of
+    the optimal boundaries also incorporate, if desired, an anticipated non-response,
+    a take-all  stratum for large units, a take-none stratum for small units, and a
+    certainty stratum to ensure  that some specific units are in the sample. The well
+    known cumulative root frequency rule of  Dalenius and Hodges and the geometric rule
+    of Gunning and Horgan are also implemented. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: stratification
+# Type: Package
+# Title: Univariate Stratification of Survey Populations
+# Version: 2.2-6
+# Date: 2017-03-08
+# Authors@R: c( person("Louis-Paul", "Rivest",, "Louis-Paul.Rivest@mat.ulaval.ca", c("aut", "cre")), person("Sophie", "Baillargeon",, "Sophie.Baillargeon@mat.ulaval.ca", "aut") )
+# Author: Louis-Paul Rivest [aut, cre], Sophie Baillargeon [aut]
+# Maintainer: Louis-Paul Rivest <Louis-Paul.Rivest@mat.ulaval.ca>
+# Description: Univariate stratification of survey populations with a generalization of the  Lavallee-Hidiroglou method of stratum construction. The generalized method takes into account  a discrepancy between the stratification variable and the survey variable. The determination  of the optimal boundaries also incorporate, if desired, an anticipated non-response, a take-all  stratum for large units, a take-none stratum for small units, and a certainty stratum to ensure  that some specific units are in the sample. The well known cumulative root frequency rule of  Dalenius and Hodges and the geometric rule of Gunning and Horgan are also implemented.
+# Imports: graphics, grDevices, stats, utils
+# LazyData: true
+# License: GPL-2
+# NeedsCompilation: yes
+# Packaged: 2017-03-10 20:18:20 UTC; Sophie
+# Repository: CRAN
+# Date/Publication: 2017-03-11 09:18:46
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

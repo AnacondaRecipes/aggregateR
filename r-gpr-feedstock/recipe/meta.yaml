@@ -1,0 +1,83 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gpr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gpr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gpr/gpr_{{ version }}.tar.gz
+  sha256: 481c6ac940edacbb8533c2e951d1196db53c2549f1ff9fb1b2ccb019c28cdc0f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gpr')"           # [not win]
+    - "\"%R%\" -e \"library('gpr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=gpr
+  license: GPL-3
+  summary: This package provides a minimalistic functionality necessary to apply Gaussian Process
+    in R. They provide a selection of functionalities of GPML Matlab library.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gpr
+# Version: 1.1
+# Date: 2013-08-27
+# Title: A Minimalistic package to apply Gaussian Process in R
+# License: GPL-3
+# Author: Afshin Sadeghi
+# Maintainer: ORPHANED
+# Depends: R (>= 2.13)
+# Description: This package provides a minimalistic functionality necessary to apply Gaussian Process in R. They provide a selection of functionalities of GPML Matlab library.
+# Packaged: 2013-08-28 22:08:07 UTC; sadeghi
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-02-07 14:10:18
+# X-CRAN-Original-Maintainer: Afshin Sadeghi <sadeghi.afshin@gmail.com>
+# X-CRAN-Comment: Orphaned on 2014-02-07 as the maintainer could not maintain it officially any more.
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,86 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-oca
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/OCA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/OCA/OCA_{{ version }}.tar.gz
+  sha256: 8d98a664166d01197ce6d165b51f6751ad50dfc613198f9243f721169f214e4d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('OCA')"           # [not win]
+    - "\"%R%\" -e \"library('OCA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=OCA
+  license: GPL-2
+  summary: "Computes optimal capital allocations based on some standard principles such as Haircut,
+    Overbeck type II and the Covariance Allocation Principle. It also provides some
+    shortcuts for obtaining the Value at Risk and the Expectation Shortfall, using both
+    the normal and the t-student distribution, see Urbina and Guill\xC3\xA9n (2014)<doi:10.1016/j.eswa.2014.05.017>
+    and Urbina (2013)<http://hdl.handle.net/2099.1/19443>."
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: OCA
+# Type: Package
+# Title: Optimal Capital Allocations
+# Version: 0.1
+# Date: 2017-02-07
+# Author: Jilber Urbina
+# Maintainer: Jilber Urbina <jilberurbina@gmail.com>
+# Description: Computes optimal capital allocations based on some standard principles such as Haircut, Overbeck type II and the Covariance Allocation Principle. It also provides some shortcuts for obtaining the Value at Risk and the Expectation Shortfall, using both the normal and the t-student distribution, see Urbina and GuillAn (2014)<doi:10.1016/j.eswa.2014.05.017> and Urbina (2013)<http://hdl.handle.net/2099.1/19443>.
+# License: GPL-2
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2017-02-07 17:59:36 UTC; jilber
+# Repository: CRAN
+# Date/Publication: 2017-02-08 01:13:25
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

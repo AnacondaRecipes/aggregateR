@@ -1,0 +1,85 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-xrscc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/XRSCC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/XRSCC/XRSCC_{{ version }}.tar.gz
+  sha256: ece49c240beb9d1c38e9b076ed0d3d0d272e1f6a79fe74beda4a80a625e44243
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('XRSCC')"           # [not win]
+    - "\"%R%\" -e \"library('XRSCC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=XRSCC
+  license: GPL-2
+  summary: This is a set of statistical quality control functions,  that allows plotting control
+    charts and its iterations, process capability for variable and attribute control,
+    highlighting the xrs_gr() function, like a first iteration for variable chart, meanwhile
+    the we_rules() function detects non random patterns in sample.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: XRSCC
+# Type: Package
+# Title: Statistical Quality Control Simulation
+# Version: 0.1
+# Date: 2016-11-10
+# Author: Erick Marroquin
+# Maintainer: Erick Marroquin <ericksuhel@gmail.com>
+# Description: This is a set of statistical quality control functions,  that allows plotting control charts and its iterations, process capability for variable and attribute control, highlighting the xrs_gr() function, like a first iteration for variable chart, meanwhile the we_rules() function detects non random patterns in sample.
+# License: GPL (>= 2)
+# LazyData: TRUE
+# Imports: stats, graphics, utils, grDevices
+# NeedsCompilation: no
+# Packaged: 2016-11-11 17:09:13 UTC; Erick Marroquin
+# Repository: CRAN
+# Date/Publication: 2016-11-12 01:05:48
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

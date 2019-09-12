@@ -1,0 +1,86 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-globalopttests
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/globalOptTests_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/globalOptTests/globalOptTests_{{ version }}.tar.gz
+  sha256: 8ec05004d62724c8a863969aa38ba34b48eb463d7e65775b3303cadb04bac479
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('globalOptTests')"           # [not win]
+    - "\"%R%\" -e \"library('globalOptTests')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=globalOptTests
+  license: GPL-3
+  summary: 'This package makes available 50 objective functions for benchmarking the performance
+    of global optimization algorithms '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: globalOptTests
+# Version: 1.1
+# Title: Objective functions for benchmarking the performance of global optimization algorithms
+# Author: Katharine Mullen
+# Maintainer: Katharine Mullen <katharine.mullen@stat.ucla.edu>
+# Description: This package makes available 50 objective functions for benchmarking the performance of global optimization algorithms
+# License: GPL (>= 3)
+# Repository: CRAN
+# Packaged: 2014-09-09 09:42:59 UTC; kmm
+# NeedsCompilation: yes
+# Date/Publication: 2014-09-09 14:18:29
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

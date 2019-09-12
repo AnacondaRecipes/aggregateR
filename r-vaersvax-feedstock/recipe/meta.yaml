@@ -1,0 +1,97 @@
+{% set version = '1.0.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-vaersvax
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/vaersvax_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/vaersvax/vaersvax_{{ version }}.tar.gz
+  sha256: 2cc61ba38e375fda9ef14834cbb7245ecf8e33457f2171414e6b4f6f65bbcb2d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: vaersNDvax, vaers, vaersND, dplyr, data.table (>= 1.10.2), pivottabler, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('vaersvax')"           # [not win]
+    - "\"%R%\" -e \"library('vaersvax')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://gitlab.com/iembry/vaers
+  license: CC0
+  summary: 'US VAERS vaccine data for 01/01/2018 - 06/14/2018. If you want to explore the full
+    VAERS data for 1990 - Present (data, symptoms, and vaccines), then check out the
+    ''vaers'' package from the URL below. The URL and BugReports below correspond to
+    the ''vaers'' package, of which ''vaersvax'' is a small subset (2018 only). ''vaers''
+    is not hosted on CRAN due to the large size of the data set. To install the Suggested
+    ''vaers'' and ''vaersND'' packages, use the following R code: ''devtools::install_git("<https://gitlab.com/iembry/vaers.git>",
+    build_vignettes = TRUE)'' and ''devtools::install_git("<https://gitlab.com/iembry/vaersND.git>",
+    build_vignettes = TRUE)''. "The Vaccine Adverse Event Reporting System (VAERS) is
+    a national early warning system to detect possible safety problems in U.S.-licensed
+    vaccines. VAERS is co-managed by the Centers for Disease Control and Prevention
+    (CDC) and the U.S. Food and Drug Administration (FDA)." For more information about
+    the data, visit <https://vaers.hhs.gov/>. For information about vaccination/immunization
+    hazards, visit <http://www.questionuniverse.com/rethink.html#vaccine>.'
+
+  license_family: CC
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: vaersvax
+# Title: US Vaccine Adverse Event Reporting System (VAERS) Vaccine Data for Present
+# Version: 1.0.5
+# Depends: R (>= 3.1.0)
+# Suggests: vaersNDvax, vaers, vaersND, dplyr, data.table (>= 1.10.2), pivottabler, knitr, rmarkdown
+# Author: Irucka Embry [aut, cre]
+# Maintainer: Irucka Embry <iembry@ecoccs.com>
+# Description: US VAERS vaccine data for 01/01/2018 - 06/14/2018. If you want to explore the full VAERS data for 1990 - Present (data, symptoms, and vaccines), then check out the 'vaers' package from the URL below. The URL and BugReports below correspond to the 'vaers' package, of which 'vaersvax' is a small subset (2018 only). 'vaers' is not hosted on CRAN due to the large size of the data set. To install the Suggested 'vaers' and 'vaersND' packages, use the following R code: 'devtools::install_git("<https://gitlab.com/iembry/vaers.git>", build_vignettes = TRUE)' and 'devtools::install_git("<https://gitlab.com/iembry/vaersND.git>", build_vignettes = TRUE)'. "The Vaccine Adverse Event Reporting System (VAERS) is a national early warning system to detect possible safety problems in U.S.-licensed vaccines. VAERS is co-managed by the Centers for Disease Control and Prevention (CDC) and the U.S. Food and Drug Administration (FDA)." For more information about the data, visit <https://vaers.hhs.gov/>. For information about vaccination/immunization hazards, visit <http://www.questionuniverse.com/rethink.html#vaccine>.
+# URL: https://gitlab.com/iembry/vaers
+# BugReports: https://gitlab.com/iembry/vaers/issues
+# License: CC0
+# LazyData: true
+# Encoding: UTF-8
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-08-29 02:35:44 UTC; uoxyh
+# Repository: CRAN
+# Date/Publication: 2018-08-29 08:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

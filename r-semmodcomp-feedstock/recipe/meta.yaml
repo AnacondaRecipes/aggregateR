@@ -1,0 +1,86 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-semmodcomp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SEMModComp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SEMModComp/SEMModComp_{{ version }}.tar.gz
+  sha256: ad06a74d16d62a97365a19cb3dda48e9c7180f43a8fce1b5447f04070e3946fd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SEMModComp')"           # [not win]
+    - "\"%R%\" -e \"library('SEMModComp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.public.asu.edu/~rlevy2/papers&software.html
+  license: GPL-3
+  summary: Conduct tests of difference in fit for mean and covariance structure models as in
+    structural equation modeling (SEM)
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SEMModComp
+# Type: Package
+# Title: Model Comparisons for SEM
+# Version: 1.0
+# Date: 2009-02-23
+# Author: Roy Levy
+# Maintainer: Roy Levy <Roy.Levy@asu.edu>
+# Description: Conduct tests of difference in fit for mean and covariance structure models as in structural equation modeling (SEM)
+# URL: http://www.public.asu.edu/~rlevy2/papers&software.html
+# Depends: mvtnorm
+# License: GPL (>= 3)
+# LazyLoad: yes
+# Packaged: Mon May 4 12:30:18 2009; Roy Levy
+# Repository: CRAN
+# Date/Publication: 2009-05-05 07:28:48
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

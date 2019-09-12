@@ -1,0 +1,98 @@
+{% set version = '0.2-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nzilbb.labbcat
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/nzilbb.labbcat_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/nzilbb.labbcat/nzilbb.labbcat_{{ version }}.tar.gz
+  sha256: 0cee5f634f9bdabfab43e94f75cb3fdfcaac0d5e1f018d63c148673e8a9b4410
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+    - r-jsonlite
+    - r-rstudioapi
+    - r-stringr
+
+  run:
+    - r-base
+    - r-httr
+    - r-jsonlite
+    - r-rstudioapi
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('nzilbb.labbcat')"           # [not win]
+    - "\"%R%\" -e \"library('nzilbb.labbcat')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/nzilbb/labbcat-R, https://labbcat.canterbury.ac.nz
+  license: GPL-3
+  summary: '''LaBB-CAT'' is a web-based language corpus management system developed by the New
+    Zealand Institute of Language, Brain and Behaviour (NZILBB) - see <https://labbcat.canterbury.ac.nz>.
+    This package defines functions for accessing corpus data in a ''LaBB-CAT'' instance.
+    You must have at least version 20190425.1121 of ''LaBB-CAT'' to use this package.
+    For more information about ''LaBB-CAT'', see Robert Fromont and Jennifer Hay (2008)
+    <doi:10.3366/E1749503208000142> or  Robert Fromont (2017) <doi:10.1016/j.csl.2017.01.004>.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: nzilbb.labbcat
+# Version: 0.2-2
+# Date: 2019-04-25
+# Title: Accessing Data Stored in 'LaBB-CAT' Instances
+# Authors@R: c(person("Robert", "Fromont", role = c("aut", "cre"), email = "robert.fromont@canterbury.ac.nz"))
+# Imports: jsonlite, httr, stringr, utils, rstudioapi
+# Description: 'LaBB-CAT' is a web-based language corpus management system developed by the New Zealand Institute of Language, Brain and Behaviour (NZILBB) - see <https://labbcat.canterbury.ac.nz>. This package defines functions for accessing corpus data in a 'LaBB-CAT' instance. You must have at least version 20190425.1121 of 'LaBB-CAT' to use this package. For more information about 'LaBB-CAT', see Robert Fromont and Jennifer Hay (2008) <doi:10.3366/E1749503208000142> or  Robert Fromont (2017) <doi:10.1016/j.csl.2017.01.004>.
+# License: GPL (>= 3)
+# Copyright: New Zealand Institute of Language, Brain and Behaviour, University of Canterbury
+# URL: https://github.com/nzilbb/labbcat-R, https://labbcat.canterbury.ac.nz
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-04-25 14:35:18 UTC; robert
+# Author: Robert Fromont [aut, cre]
+# Maintainer: Robert Fromont <robert.fromont@canterbury.ac.nz>
+# Repository: CRAN
+# Date/Publication: 2019-04-26 15:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

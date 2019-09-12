@@ -1,0 +1,95 @@
+{% set version = '1.4.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-leanr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LEANR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LEANR/LEANR_{{ version }}.tar.gz
+  sha256: b924e86c72c55e779972d9916b156c87433366c37c2edb9c5a1116ed47f07d14
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, doMC, rmarkdown, ROCR, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-foreach >=1.4.2
+    - r-igraph >=0.7.1
+
+  run:
+    - r-base
+    - r-foreach >=1.4.2
+    - r-igraph >=0.7.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LEANR')"           # [not win]
+    - "\"%R%\" -e \"library('LEANR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=LEANR
+  license: GPL-3
+  summary: 'Implements the method described in "Network-based analysis of omics data: The LEAN
+    method" [Gwinner Boulday (2016) <DOI:10.1093/bioinformatics/btw676>] Given a protein
+    interaction network and a list of p-values describing a measure of interest (as
+    e.g. differential gene expression) this method computes an enrichment p-value for
+    the protein neighborhood of each gene and compares it to a background distribution
+    of randomly drawn p-values. The resulting scores are corrected for multiple testing
+    and significant hits are returned in tabular format.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LEANR
+# Type: Package
+# Title: Finds "Local Subnetworks" Within an Interaction Network which Show Enrichment for Differentially Expressed Genes
+# Version: 1.4.9
+# Date: 2016-11-11
+# Author: Frederik Gwinner
+# Maintainer: Frederik Gwinner <frederik.gwinner@gmail.com>
+# Description: Implements the method described in "Network-based analysis of omics data: The LEAN method" [Gwinner Boulday (2016) <DOI:10.1093/bioinformatics/btw676>] Given a protein interaction network and a list of p-values describing a measure of interest (as e.g. differential gene expression) this method computes an enrichment p-value for the protein neighborhood of each gene and compares it to a background distribution of randomly drawn p-values. The resulting scores are corrected for multiple testing and significant hits are returned in tabular format.
+# License: GPL-3
+# Packaged: 2016-11-11 23:37:29 UTC; fgwinner
+# Depends: R (>= 2.14), igraph(>= 0.7.1), foreach(>= 1.4.2)
+# Suggests: knitr, doMC, rmarkdown, ROCR, testthat
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2016-11-12 15:47:01
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

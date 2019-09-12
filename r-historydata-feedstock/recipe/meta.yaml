@@ -1,0 +1,88 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-historydata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/historydata_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/historydata/historydata_{{ version }}.tar.gz
+  sha256: 86cfbf53ea10db661d910618ae794404377207eaa8fe740769829417e3e8c9c0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggplot2 (>= 1.0.0)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('historydata')"           # [not win]
+    - "\"%R%\" -e \"library('historydata')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ropensci/historydata
+  license: MIT
+  summary: These sample data sets are intended for historians learning R. They include population,
+    institutional, religious, military, and prosopographical data suitable for mapping,
+    quantitative analysis, and network analysis.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: historydata
+# Title: Data Sets for Historians
+# Version: 0.1
+# Authors@R: c(person("Lincoln", "Mullen", role = c("aut", "cre"), email = "lincoln@lincolnmullen.com"))
+# Description: These sample data sets are intended for historians learning R. They include population, institutional, religious, military, and prosopographical data suitable for mapping, quantitative analysis, and network analysis.
+# Depends: R (>= 3.0.2)
+# Suggests: ggplot2 (>= 1.0.0)
+# License: MIT + file LICENSE
+# LazyData: true
+# URL: https://github.com/ropensci/historydata
+# BugReports: https://github.com/ropensci/historydata/issues
+# Packaged: 2014-12-24 00:51:11 UTC; lmullen
+# Author: Lincoln Mullen [aut, cre]
+# Maintainer: Lincoln Mullen <lincoln@lincolnmullen.com>
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-12-24 06:08:09
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

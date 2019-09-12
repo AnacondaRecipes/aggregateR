@@ -1,0 +1,97 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-modcmfitr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/modcmfitr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/modcmfitr/modcmfitr_{{ version }}.tar.gz
+  sha256: d04b6e15aac0e70fd2cf7c1516c295bdfecdca9b30df004f528283c0ee89ceb4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: cowplot, ggplot2, tidyr, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-gtools >=3.5.0
+    - r-nloptr >=1.0.4
+
+  run:
+    - r-base
+    - r-gtools >=3.5.0
+    - r-nloptr >=1.0.4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('modcmfitr')"           # [not win]
+    - "\"%R%\" -e \"library('modcmfitr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=modcmfitr
+  license: GPL-2
+  summary: Fits a modified version of the Connor-Mosimann distribution (Connor & Mosimann (1969)<doi:10.2307/2283728>),  a
+    Connor-Mosimann distribution or Dirichlet distribution (e.g. Gelman, Carlin, Stern
+    & Rubin Chapter 3.5 (2004, <ISBN:1-58488-388-X>) to elicited quantiles of a multinomial
+    distribution. Code is also provided to  sample from the distributions, generating
+    inputs suitable for a  probabilistic sensitivity analysis / Monte Carlo simulation
+    in a decision model.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: modcmfitr
+# Title: Fit a Modified Connor-Mosimann Distribution to Elicited Quantiles in Multinomial Problems
+# Version: 0.1.0
+# Date: 2017-10-20
+# Authors@R: person("Ed", "Wilson", email = "ed.wilson@medschl.cam.ac.uk",  role = c("aut", "cre"))
+# Description: Fits a modified version of the Connor-Mosimann distribution (Connor & Mosimann (1969)<doi:10.2307/2283728>),  a Connor-Mosimann distribution or Dirichlet distribution (e.g. Gelman, Carlin, Stern & Rubin Chapter 3.5 (2004, <ISBN:1-58488-388-X>) to elicited quantiles of a multinomial distribution. Code is also provided to  sample from the distributions, generating inputs suitable for a  probabilistic sensitivity analysis / Monte Carlo simulation in a decision model.
+# Depends: R (>= 3.4.2)
+# Imports: gtools (>= 3.5.0), nloptr (>= 1.0.4)
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# Suggests: cowplot, ggplot2, tidyr, knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2017-10-22 13:01:57 UTC; edwil
+# Author: Ed Wilson [aut, cre]
+# Maintainer: Ed Wilson <ed.wilson@medschl.cam.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2017-10-22 16:45:56 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

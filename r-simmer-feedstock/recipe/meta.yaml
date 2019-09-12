@@ -1,0 +1,115 @@
+{% set version = '4.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-simmer
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/simmer_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/simmer/simmer_{{ version }}.tar.gz
+  sha256: 9a06202908ed78e4f3d15bfada06f06d85622c2070a89ac7318c450de2bbf5c8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: simmer.plot, parallel, testthat, knitr, rmarkdown, rticles
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh >=1.62.0_1
+    - r-rcpp
+    - r-codetools
+    - r-magrittr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.62.0_1
+    - r-rcpp
+    - r-codetools
+    - r-magrittr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('simmer')"           # [not win]
+    - "\"%R%\" -e \"library('simmer')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://r-simmer.org, https://github.com/r-simmer/simmer
+  license: GPL-2
+  summary: "A process-oriented and trajectory-based Discrete-Event Simulation (DES) package for
+    R. It is designed as a generic yet powerful framework. The architecture encloses
+    a robust and fast simulation core written in 'C++' with automatic monitoring capabilities.
+    It provides a rich and flexible R API that revolves around the concept of trajectory,
+    a common path in the simulation model for entities of the same type. Documentation
+    about 'simmer' is provided by several vignettes included in this package, via the
+    paper by Ucar, Smeets & Azcorra (2019, <doi:10.18637/jss.v090.i02>), and the paper
+    by Ucar, Hern\xE1ndez, Serrano & Azcorra (2018, <doi:10.1109/MCOM.2018.1700960>);
+    see 'citation(\"simmer\")' for details."
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: simmer
+# Type: Package
+# Title: Discrete-Event Simulation for R
+# Version: 4.3.0
+# Authors@R: c( person("Inaki", "Ucar", email="iucar@fedoraproject.org", role=c("aut", "cph", "cre"), comment=c(ORCID="0000-0001-6403-5550")), person("Bart", "Smeets", email="bartsmeets86@gmail.com", role=c("aut", "cph")))
+# Description: A process-oriented and trajectory-based Discrete-Event Simulation (DES) package for R. It is designed as a generic yet powerful framework. The architecture encloses a robust and fast simulation core written in 'C++' with automatic monitoring capabilities. It provides a rich and flexible R API that revolves around the concept of trajectory, a common path in the simulation model for entities of the same type. Documentation about 'simmer' is provided by several vignettes included in this package, via the paper by Ucar, Smeets & Azcorra (2019, <doi:10.18637/jss.v090.i02>), and the paper by Ucar, Hernandez, Serrano & Azcorra (2018, <doi:10.1109/MCOM.2018.1700960>); see 'citation("simmer")' for details.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# URL: http://r-simmer.org, https://github.com/r-simmer/simmer
+# BugReports: https://github.com/r-simmer/simmer/issues
+# Depends: R (>= 3.1.2)
+# Imports: Rcpp, magrittr, codetools, utils
+# Suggests: simmer.plot, parallel, testthat, knitr, rmarkdown, rticles
+# LinkingTo: Rcpp (>= 0.12.9), BH (>= 1.62.0-1)
+# RoxygenNote: 6.1.1
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2019-07-30 19:03:50 UTC; iucar
+# Author: Inaki Ucar [aut, cph, cre] (<https://orcid.org/0000-0001-6403-5550>), Bart Smeets [aut, cph]
+# Maintainer: Inaki Ucar <iucar@fedoraproject.org>
+# Repository: CRAN
+# Date/Publication: 2019-07-30 21:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

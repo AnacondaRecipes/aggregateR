@@ -1,0 +1,90 @@
+{% set version = '0.6.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-params
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/params_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/params/params_{{ version }}.tar.gz
+  sha256: 5de9e8cb4c49501f24dd82cbe6be9b51756490d2da5dd800173e5cf4cf44f370
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: openxlsx, testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-whisker
+
+  run:
+    - r-base
+    - r-whisker
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('params')"           # [not win]
+    - "\"%R%\" -e \"library('params')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/sahilseth/params
+  license: GPL-2
+  summary: An interface to simplify organizing parameters used in a package, using external configuration
+    files. This attempts to provide a cleaner alternative to options().
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: params
+# Type: Package
+# Title: Simplify Parameters
+# Description: An interface to simplify organizing parameters used in a package, using external configuration files. This attempts to provide a cleaner alternative to options().
+# Version: 0.6.1
+# Depends: R (>= 3.0.2), whisker
+# Imports: utils
+# Suggests: openxlsx, testthat
+# License: GPL-2
+# Authors@R: c( person("Sahil", "Seth", role = c("aut", "cre"), email = "me@sahilseth.com"), person("Yihui", "Xie", role = c("ctb"), comment = "kable from knitr R/table.R") )
+# URL: https://github.com/sahilseth/params
+# BugReports: https://github.com/sahilseth/params/issues
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-04-18 21:27:11 UTC; root
+# Author: Sahil Seth [aut, cre], Yihui Xie [ctb] (kable from knitr R/table.R)
+# Maintainer: Sahil Seth <me@sahilseth.com>
+# Repository: CRAN
+# Date/Publication: 2016-04-19 01:00:58
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

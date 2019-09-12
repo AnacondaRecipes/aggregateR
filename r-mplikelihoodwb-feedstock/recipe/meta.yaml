@@ -1,0 +1,86 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mplikelihoodwb
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MPLikelihoodWB_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MPLikelihoodWB/MPLikelihoodWB_{{ version }}.tar.gz
+  sha256: 00a7be6588d5ce12f5f0d1efccb04a6966382d8fba52a262a349ec291319f275
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-survival
+
+  run:
+    - r-base
+    - r-mass
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MPLikelihoodWB')"           # [not win]
+    - "\"%R%\" -e \"library('MPLikelihoodWB')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MPLikelihoodWB
+  license: GPL-2
+  summary: Computing modified profile likelihood estimates for Weibull Shape and Regression Parameters.
+    Modified likelihood estimates are provided.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MPLikelihoodWB
+# Type: Package
+# Title: Modified Profile Likelihood Estimation for Weibull Shape and Regression Parameters
+# Version: 1.1
+# Date: 2017-08-14
+# Author: Mazharul Islam and Hasinur Rahaman Khan
+# Maintainer: Hasinur Rahaman Khan <hasinurkhan@gmail.com>
+# Description: Computing modified profile likelihood estimates for Weibull Shape and Regression Parameters. Modified likelihood estimates are provided.
+# Depends: survival, MASS, R (>= 3.0.2)
+# License: GPL-2
+# Packaged: 2017-08-14 08:19:18 UTC; hasinur
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2017-08-14 08:26:58 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,82 @@
+{% set version = '0.10.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-orientlib
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/orientlib_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/orientlib/orientlib_{{ version }}.tar.gz
+  sha256: 7bd7b975d00b3f8f5b6839d9eecf98b4f980f5e6860ff68538688df3273424e2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rgl, scatterplot3d
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('orientlib')"           # [not win]
+    - "\"%R%\" -e \"library('orientlib')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=orientlib
+  license: GPL-3
+  summary: Representations, conversions and display of orientation SO(3) data.  See the orientlib
+    help topic for details.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: orientlib
+# Title: Support for orientation data
+# Version: 0.10.3
+# Author: Duncan Murdoch
+# Description: Representations, conversions and display of orientation SO(3) data.  See the orientlib help topic for details.
+# Maintainer: Duncan Murdoch <murdoch@stats.uwo.ca>
+# License: GPL
+# Depends: R (>= 2.13.0), methods
+# Suggests: rgl, scatterplot3d
+# Packaged: 2013-03-22 18:15:25 UTC; murdoch
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-03-22 19:30:04
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

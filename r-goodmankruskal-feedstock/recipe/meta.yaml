@@ -1,0 +1,94 @@
+{% set version = '0.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-goodmankruskal
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GoodmanKruskal_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GoodmanKruskal/GoodmanKruskal_{{ version }}.tar.gz
+  sha256: 6b68b8ca60e357b4e3fe23b9b37a8936f5c0e45b8eb9eee5f682c10999ca8ae3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, MASS, testthat, car, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-classint
+    - r-corrplot
+
+  run:
+    - r-base
+    - r-classint
+    - r-corrplot
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GoodmanKruskal')"           # [not win]
+    - "\"%R%\" -e \"library('GoodmanKruskal')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=GoodmanKruskal
+  license: MIT
+  summary: Association analysis between categorical variables using the Goodman and Kruskal tau
+    measure. This asymmetric association measure allows the detection of asymmetric
+    relations between categorical variables (e.g., one variable obtained by re-grouping
+    another).
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: GoodmanKruskal
+# Title: Association Analysis for Categorical Variables
+# Version: 0.0.2
+# Authors@R: person("Ron", "Pearson", email = "ronald.k.pearson@gmail.com", role = c("aut", "cre"))
+# Description: Association analysis between categorical variables using the Goodman and Kruskal tau measure. This asymmetric association measure allows the detection of asymmetric relations between categorical variables (e.g., one variable obtained by re-grouping another).
+# Depends: R (>= 3.2.4)
+# Imports: classInt, corrplot
+# License: MIT + file LICENSE
+# LazyData: true
+# Suggests: knitr, MASS, testthat, car, rmarkdown
+# VignetteBuilder: knitr
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-04-12 15:27:25 UTC; Ron
+# Author: Ron Pearson [aut, cre]
+# Maintainer: Ron Pearson <ronald.k.pearson@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-04-18 15:31:38
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

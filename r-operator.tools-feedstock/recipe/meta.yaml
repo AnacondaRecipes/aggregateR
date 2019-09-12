@@ -1,0 +1,92 @@
+{% set version = '1.6.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-operator.tools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/operator.tools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/operator.tools/operator.tools_{{ version }}.tar.gz
+  sha256: e5b74018fb75bfa02820dec4b822312f1640422f01d9fec1b58d880ffb798dec
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: operators (>= 0.1.8), magrittr (>= 1.5), testthat (>= 1.0.2)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('operator.tools')"           # [not win]
+    - "\"%R%\" -e \"library('operator.tools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/decisionpatterns/operator.tools
+  license: GPL-2
+  summary: 'Provides a collection of utilities that allow programming with  R''s operators. Routines
+    allow classifying operators,  translating to and from an operator and its underlying
+    function, and inverting  some operators (e.g. comparison operators), etc. All methods
+    can be extended to custom infix operators. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: operator.tools
+# Type: Package
+# Title: Utilities for Working with R's Operators
+# Version: 1.6.3
+# Date: 2017-02-28
+# Authors@R: c( person("Christopher", "Brown", , "chris.brown@decisionpatterns.com", c("aut", "cre") ), person("Decision Patterns", role = "cph") )
+# Imports: utils (>= 3.3.2)
+# Suggests: operators (>= 0.1.8), magrittr (>= 1.5), testthat (>= 1.0.2)
+# Description: Provides a collection of utilities that allow programming with  R's operators. Routines allow classifying operators,  translating to and from an operator and its underlying function, and inverting  some operators (e.g. comparison operators), etc. All methods can be extended to custom infix operators.
+# License: GPL-2 | file LICENSE
+# URL: https://github.com/decisionpatterns/operator.tools
+# BugReports: https://github.com/decisionpatterns/operator.tools/issues
+# RoxygenNote: 6.0.1.9000
+# Repository: CRAN
+# NeedsCompilation: no
+# Packaged: 2017-02-28 14:38:49 UTC; cbrown
+# Author: Christopher Brown [aut, cre], Decision Patterns [cph]
+# Maintainer: Christopher Brown <chris.brown@decisionpatterns.com>
+# Date/Publication: 2017-02-28 23:13:22
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

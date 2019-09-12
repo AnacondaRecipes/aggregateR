@@ -1,0 +1,93 @@
+{% set version = '1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-msbp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/msBP_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/msBP/msBP_{{ version }}.tar.gz
+  sha256: eb360f8e58c1ea713262cbba7ffe56f914f655e9bfe7c416e4af9a75a3b31a9e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: R.rsp
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('msBP')"           # [not win]
+    - "\"%R%\" -e \"library('msBP')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=msBP
+  license: GPL-2
+  summary: Performs Bayesian nonparametric multiscale density estimation and multiscale testing
+    of group differences with multiscale Bernstein polynomials (msBP) mixtures as in
+    Canale and Dunson (2016).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: msBP
+# Type: Package
+# Title: Multiscale Bernstein Polynomials for Densities
+# Version: 1.4
+# Date: 2018-12-13
+# Author: Antonio Canale
+# Maintainer: Antonio Canale <canale@stat.unipd.it>
+# Description: Performs Bayesian nonparametric multiscale density estimation and multiscale testing of group differences with multiscale Bernstein polynomials (msBP) mixtures as in Canale and Dunson (2016).
+# License: GPL-2
+# Suggests: R.rsp
+# VignetteBuilder: R.rsp
+# NeedsCompilation: yes
+# Packaged: 2018-12-13 16:06:18 UTC; tony
+# Repository: CRAN
+# Date/Publication: 2018-12-13 20:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

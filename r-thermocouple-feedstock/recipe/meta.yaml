@@ -1,0 +1,88 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-thermocouple
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/thermocouple_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/thermocouple/thermocouple_{{ version }}.tar.gz
+  sha256: 44c6ba822635a8ad63bddca93edf861ca5768c7c0445bae20e380e1407879be6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('thermocouple')"           # [not win]
+    - "\"%R%\" -e \"library('thermocouple')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=thermocouple
+  license: GPL-3
+  summary: Temperature measurement data, equations and methods for thermocouples, wire RTD, thermistors,
+    IC thermometers, bimetallic strips and the ITS-90.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: thermocouple
+# Type: Package
+# Title: Temperature Measurement with Thermocouples, RTD and IC Sensors
+# Version: 1.0.2
+# Encoding: UTF-8
+# Authors@R: c(person(given = "Jose", family = "Gama", role = c("aut","cre"),email = "rxprtgama@gmail.com"))
+# Description: Temperature measurement data, equations and methods for thermocouples, wire RTD, thermistors, IC thermometers, bimetallic strips and the ITS-90.
+# License: GPL (>= 3)
+# LazyData: yes
+# LazyLoad: yes
+# Depends: R (>= 2.7.0)
+# Author: Jose Gama [aut, cre]
+# Maintainer: Jose Gama <rxprtgama@gmail.com>
+# Repository: CRAN
+# Repository/R-Forge/Project: thermocouple
+# Repository/R-Forge/Revision: 4
+# Repository/R-Forge/DateTimeStamp: 2015-07-18 23:20:17
+# Date/Publication: 2015-07-19 19:44:31
+# NeedsCompilation: no
+# Packaged: 2015-07-18 23:25:11 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,89 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-matmanlymix
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MatManlyMix_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MatManlyMix/MatManlyMix_{{ version }}.tar.gz
+  sha256: 4c281494bb255a5692b41b5122252606c35789b50076cae4f22d479a56695bb4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MatManlyMix')"           # [not win]
+    - "\"%R%\" -e \"library('MatManlyMix')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MatManlyMix
+  license: GPL-2
+  summary: Matrix clustering with finite mixture models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MatManlyMix
+# Version: 1.1.1
+# Date: 2017-12-25
+# Title: Matrix Clustering with Gaussian and Manly Mixture Models
+# Authors@R: c(person("Xuwen", "Zhu", role = c("aut", "cre"), email = "xuwen.zhu@louisville.edu"), person("Volodymyr", "Melnykov", role = "aut"), person("Michael", "Hutt", role = c("ctb", "cph"), comment = "NM optimization in c"), person("Stephen", "Moshier", role = c("ctb", "cph"), comment = "eigen calculations in c"), person("Rouben", "Rostamian", role = c("ctb", "cph"), comment = "memory allocation in c"))
+# Depends: R (>= 3.0.0)
+# LazyLoad: yes
+# LazyData: no
+# Description: Matrix clustering with finite mixture models.
+# License: GPL (>= 2)
+# Packaged: 2018-01-05 08:04:03 UTC; zhuxuwen
+# Author: Xuwen Zhu [aut, cre], Volodymyr Melnykov [aut], Michael Hutt [ctb, cph] (NM optimization in c), Stephen Moshier [ctb, cph] (eigen calculations in c), Rouben Rostamian [ctb, cph] (memory allocation in c)
+# Maintainer: Xuwen Zhu <xuwen.zhu@louisville.edu>
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2018-01-05 08:20:25 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

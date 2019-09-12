@@ -1,0 +1,99 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-soundexbr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SoundexBR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SoundexBR/SoundexBR_{{ version }}.tar.gz
+  sha256: 3721aabaeb2921fa00b06ca4201d71bb36c736ec6d7b7036189ff1b1c5180c32
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: SciencesPo, stringr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SoundexBR')"           # [not win]
+    - "\"%R%\" -e \"library('SoundexBR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SoundexBR
+  license: GPL-2
+  summary: 'The SoundexBR package provides an algorithm for decoding names into phonetic codes,
+    as pronounced in Portuguese. The goal is for homophones to be encoded to the same
+    representation so that they can be matched despite minor differences in spelling.
+    The algorithm mainly encodes consonants; a vowel will not be encoded unless it is
+    the first letter. The soundex code resultant consists of a four digits long string
+    composed by one letter followed by three numerical digits: the letter is the first
+    letter of the name, and the digits encode the remaining consonants.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SoundexBR
+# Type: Package
+# Title: Phonetic-Coding for Portuguese
+# Version: 1.2
+# Date/Publication: 2015-07-14 20:24:20
+# Author: Daniel Marcelino
+# Maintainer: Daniel Marcelino <dmarcelino@live.com>
+# Description: The SoundexBR package provides an algorithm for decoding names into phonetic codes, as pronounced in Portuguese. The goal is for homophones to be encoded to the same representation so that they can be matched despite minor differences in spelling. The algorithm mainly encodes consonants; a vowel will not be encoded unless it is the first letter. The soundex code resultant consists of a four digits long string composed by one letter followed by three numerical digits: the letter is the first letter of the name, and the digits encode the remaining consonants.
+# Suggests: SciencesPo, stringr
+# LazyData: yes
+# License: GPL (>= 2)
+# Depends: R (>= 3.0),stats,utils,graphics,grDevices
+# Enhances: RecordLinkage
+# BugReports: http://github.com/danielmarcelino/soundexBR
+# ByteCompile: TRUE
+# NeedsCompilation: yes
+# Packaged: 2015-07-14 00:29:32 UTC; daniel
+# Repository: CRAN
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

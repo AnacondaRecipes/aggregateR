@@ -1,0 +1,95 @@
+{% set version = '0.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gitlink
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gitlink_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gitlink/gitlink_{{ version }}.tar.gz
+  sha256: 6d33bb49cd00076be459cdb6b51fee1f81d393995e69aa04c197f232ba6764bc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr (>= 3.0.1), spelling (>= 2.0), testthat (>= 2.0.0.9000), rmarkdown, fs, rprojroot, shiny
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-htmltools >=0.3.6
+    - r-rlang >=0.3.1
+
+  run:
+    - r-base
+    - r-htmltools >=0.3.6
+    - r-rlang >=0.3.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gitlink')"           # [not win]
+    - "\"%R%\" -e \"library('gitlink')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/colearendt/gitlink
+  license: MIT
+  summary: Provides helpers to add 'Git' links to 'shiny' applications, 'rmarkdown' documents,
+    and other 'HTML' based resources. This is most commonly used for 'GitHub' ribbons.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gitlink
+# Title: Add 'Git' Links to Your Web Based Assets
+# Version: 0.1.3
+# Authors@R:  c(person(given = "Cole", family = "Arendt", role = c("aut", "cre"), email = "cole@rstudio.com"), person(given = "RStudio", role = c("cph", "fnd")))
+# Description: Provides helpers to add 'Git' links to 'shiny' applications, 'rmarkdown' documents, and other 'HTML' based resources. This is most commonly used for 'GitHub' ribbons.
+# License: MIT + file LICENSE
+# URL: https://github.com/colearendt/gitlink
+# BugReports: https://github.com/colearendt/gitlink/issues
+# Depends: R (>= 3.1)
+# Imports: htmltools (>= 0.3.6), rlang (>= 0.3.1)
+# Suggests: covr (>= 3.0.1), spelling (>= 2.0), testthat (>= 2.0.0.9000), rmarkdown, fs, rprojroot, shiny
+# Encoding: UTF-8
+# Language: en-US
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-07-19 12:44:55 UTC; carendt
+# Author: Cole Arendt [aut, cre], RStudio [cph, fnd]
+# Maintainer: Cole Arendt <cole@rstudio.com>
+# Repository: CRAN
+# Date/Publication: 2019-07-23 12:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

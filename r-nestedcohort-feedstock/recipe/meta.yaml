@@ -1,0 +1,88 @@
+{% set version = '1.1-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nestedcohort
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/NestedCohort_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/NestedCohort/NestedCohort_{{ version }}.tar.gz
+  sha256: f72a2e8025ea046ffb0dc14ebc69360ce035bec97dbc686e155fa319bf611a82
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-survival
+
+  run:
+    - r-base
+    - r-mass
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('NestedCohort')"           # [not win]
+    - "\"%R%\" -e \"library('NestedCohort')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://dceg.cancer.gov/about/staff-bios/katki-hormuzd
+  license: GPL-2
+  summary: Estimate hazard ratios, survival curves and attributable risks for cohorts with missing
+    covariates, using Cox models or Kaplan-Meier estimated for strata.  This handles
+    studies nested within cohorts, such as case-cohort studies with stratified sampling.  See
+    http://www.r-project.org/doc/Rnews/Rnews_2008-1.pdf
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: NestedCohort
+# Version: 1.1-3
+# Date: 2012-12-21
+# Title: Survival Analysis for Cohorts with Missing Covariate Information
+# Author: Hormuzd A. Katki <katkih@mail.nih.gov>
+# Maintainer: Hormuzd A. Katki <katkih@mail.nih.gov>
+# Depends: R (>= 2.15.2), survival, MASS
+# Description: Estimate hazard ratios, survival curves and attributable risks for cohorts with missing covariates, using Cox models or Kaplan-Meier estimated for strata.  This handles studies nested within cohorts, such as case-cohort studies with stratified sampling.  See http://www.r-project.org/doc/Rnews/Rnews_2008-1.pdf
+# License: GPL (>= 2)
+# URL: http://dceg.cancer.gov/about/staff-bios/katki-hormuzd
+# Packaged: 2013-02-07 18:19:36 UTC; katkih
+# Repository: CRAN
+# Date/Publication: 2013-02-07 20:16:59
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

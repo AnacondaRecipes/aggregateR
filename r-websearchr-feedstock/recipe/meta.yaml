@@ -1,0 +1,87 @@
+{% set version = '0.0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-websearchr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/websearchr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/websearchr/websearchr_{{ version }}.tar.gz
+  sha256: a9e2085beaa07e549f90640f042f5812989366899ce72fc20258e6f24ae5cdb0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('websearchr')"           # [not win]
+    - "\"%R%\" -e \"library('websearchr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/fschaff/websearchr
+  license: MIT
+  summary: Functions that allow for accessing domains and a number of search engines.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: websearchr
+# Title: Access Domains and Search Popular Websites
+# Version: 0.0.3
+# Authors@R: c( person("Florian S.", "Schaffner", email = "florian.schaffner@outlook.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3352-6191")), person("Charles", "Crabtree", email = "ccrabtr@umich.edu", role = c("ctb")))
+# Description: Functions that allow for accessing domains and a number of search engines.
+# Depends: R (>= 3.4.0)
+# Imports: utils
+# License: MIT + file LICENSE
+# LazyData: true
+# RoxygenNote: 6.1.0
+# Encoding: UTF-8
+# URL: https://github.com/fschaff/websearchr
+# BugReports: https://github.com/fschaff/websearchr/issues
+# NeedsCompilation: no
+# Packaged: 2018-10-23 11:42:32 UTC; florianschaffner
+# Author: Florian S. Schaffner [aut, cre] (<https://orcid.org/0000-0003-3352-6191>), Charles Crabtree [ctb]
+# Maintainer: Florian S. Schaffner <florian.schaffner@outlook.com>
+# Repository: CRAN
+# Date/Publication: 2018-10-23 12:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

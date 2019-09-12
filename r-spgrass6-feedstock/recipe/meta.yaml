@@ -1,0 +1,95 @@
+{% set version = '0.8-9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spgrass6
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/spgrass6_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/spgrass6/spgrass6_{{ version }}.tar.gz
+  sha256: 16e2c3e2f454dd8012191914789b5975bf7dcdfb50ed9a0c3b0d34a5236cbb17
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rgdal (>= 0.8-8)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-xml
+    - r-sp >=0.9
+
+  run:
+    - r-base
+    - r-xml
+    - r-sp >=0.9
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('spgrass6')"           # [not win]
+    - "\"%R%\" -e \"library('spgrass6')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://grass.osgeo.org/
+  license: GPL-2
+  summary: Interpreted interface between GRASS 6+ geographical  information system and R, based
+    on starting R from within the GRASS  environment, or running free-standing R in
+    a temporary GRASS location; the package provides facilities for using all GRASS
+    commands from the  R command line. This package may not be used for GRASS 7, for
+    which rgrass7 should be used.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: spgrass6
+# Version: 0.8-9
+# Date: 2016-02-08
+# Title: Interface Between GRASS 6+ Geographical Information System and R
+# Authors@R: c( person("Roger", "Bivand", role = c("cre", "aut"), email = "Roger.Bivand@nhh.no"), person("Rainer", "Krug", role = "ctb", email="Rainer@krugs.de"), person("Markus", "Neteler", role = "ctb"))
+# Description: Interpreted interface between GRASS 6+ geographical  information system and R, based on starting R from within the GRASS  environment, or running free-standing R in a temporary GRASS location; the package provides facilities for using all GRASS commands from the  R command line. This package may not be used for GRASS 7, for which rgrass7 should be used.
+# Depends: R (>= 2.12), sp (>= 0.9), XML
+# Imports: stats, utils, methods
+# Suggests: rgdal (>= 0.8-8)
+# SystemRequirements: GRASS (>= 6.3, < 7)
+# License: GPL (>= 2)
+# URL: http://grass.osgeo.org/
+# Collate: AAA.R options.R spgrass6.R bin_link.R vect_link.R initGRASS.R xml1.R
+# NeedsCompilation: no
+# Packaged: 2016-02-08 13:25:31 UTC; rsb
+# Author: Roger Bivand [cre, aut], Rainer Krug [ctb], Markus Neteler [ctb]
+# Maintainer: Roger Bivand <Roger.Bivand@nhh.no>
+# Repository: CRAN
+# Date/Publication: 2016-02-08 15:00:00
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

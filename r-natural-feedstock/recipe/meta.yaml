@@ -1,0 +1,100 @@
+{% set version = '0.9.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-natural
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/natural_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/natural/natural_{{ version }}.tar.gz
+  sha256: 9d11c6c618a72bc0e04161ec06ded3740b135a1ead022e285c008af7865bbc7f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-glmnet
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-glmnet
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('natural')"           # [not win]
+    - "\"%R%\" -e \"library('natural')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://arxiv.org/abs/1712.02412
+  license: GPL-3
+  summary: Implementation of the two error variance estimation methods in high-dimensional linear
+    models of Yu, Bien (2017) <arXiv:1712.02412>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: natural
+# Type: Package
+# Title: Estimating the Error Variance in a High-Dimensional Linear Model
+# Version: 0.9.0
+# Authors@R: person("Guo", "Yu", email = "gy63@cornell.edu", role = c("aut", "cre"))
+# Maintainer: Guo Yu <gy63@cornell.edu>
+# Description: Implementation of the two error variance estimation methods in high-dimensional linear models of Yu, Bien (2017) <arXiv:1712.02412>.
+# URL: https://arxiv.org/abs/1712.02412
+# BugReports: https://github.com/hugogogo/natural/issues
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# Imports: Matrix, glmnet
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2018-01-16 01:32:01 UTC; hugo
+# Author: Guo Yu [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2018-01-16 10:35:43 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

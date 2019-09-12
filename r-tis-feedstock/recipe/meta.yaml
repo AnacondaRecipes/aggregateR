@@ -1,0 +1,88 @@
+{% set version = '1.37.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tis
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tis_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tis/tis_{{ version }}.tar.gz
+  sha256: 96761f437c1b0b8a8a4940baeddebc8106b4e8660cee381882c4dbbd1573e075
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: reshape, scales
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tis')"           # [not win]
+    - "\"%R%\" -e \"library('tis')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=tis
+  license: Unlimited
+  summary: Functions and S3 classes for time indexes and time indexed series, which are compatible
+    with FAME frequencies.
+  license_family: MIT
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: tis
+# Title: Time Indexes and Time Indexed Series
+# Version: 1.37.1
+# Author: Jeff Hallman <jeffhallman@gmail.com>
+# Maintainer: Brian Salzer <brian.m.salzer@frb.gov>
+# Depends: R (>= 2.3)
+# Enhances: zoo, ggplot2, graphics
+# Suggests: reshape, scales
+# Description: Functions and S3 classes for time indexes and time indexed series, which are compatible with FAME frequencies.
+# License: Unlimited
+# RoxygenNote: 6.1.1
+# NeedsCompilation: yes
+# Packaged: 2019-03-04 10:41:11 UTC; hornik
+# Repository: CRAN
+# Date/Publication: 2019-03-04 10:45:31 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

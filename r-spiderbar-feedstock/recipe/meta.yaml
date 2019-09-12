@@ -1,0 +1,104 @@
+{% set version = '0.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spiderbar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/spiderbar_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/spiderbar/spiderbar_{{ version }}.tar.gz
+  sha256: 8b7a41c35fac2826d11a1d96168f201ce66d7b127b1fc8f445f3040de2712dab
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr, robotstxt
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('spiderbar')"           # [not win]
+    - "\"%R%\" -e \"library('spiderbar')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://gitlab.com/hrbrmstr/spiderbar
+  license: MIT
+  summary: The 'Robots Exclusion Protocol' <https://www.robotstxt.org/orig.html> documents a
+    set of standards for allowing or excluding robot/spider crawling of different areas
+    of site content. Tools are provided which wrap The 'rep-cpp' <https://github.com/seomoz/rep-cpp>
+    C++ library for processing these 'robots.txt' files.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: spiderbar
+# Type: Package
+# Title: Parse and Test Robots Exclusion Protocol Files and Rules
+# Version: 0.2.2
+# Date: 2019-08-18
+# Author: Bob Rudis (bob@rud.is) [aut, cre], SEOmoz, Inc [aut]
+# Maintainer: Bob Rudis <bob@rud.is>
+# Description: The 'Robots Exclusion Protocol' <https://www.robotstxt.org/orig.html> documents a set of standards for allowing or excluding robot/spider crawling of different areas of site content. Tools are provided which wrap The 'rep-cpp' <https://github.com/seomoz/rep-cpp> C++ library for processing these 'robots.txt' files.
+# SystemRequirements: C++11
+# NeedsCompilation: yes
+# URL: https://gitlab.com/hrbrmstr/spiderbar
+# BugReports: https://gitlab.com/hrbrmstr/spiderbar/issues
+# License: MIT + file LICENSE
+# Suggests: testthat, covr, robotstxt
+# Depends: R (>= 3.2.0)
+# Encoding: UTF-8
+# Imports: Rcpp
+# RoxygenNote: 6.1.1
+# LinkingTo: Rcpp
+# Packaged: 2019-08-19 15:38:01 UTC; hrbrmstr
+# Repository: CRAN
+# Date/Publication: 2019-08-19 16:50:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

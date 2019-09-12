@@ -1,0 +1,88 @@
+{% set version = '1.0-7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mangotraining
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mangoTraining_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mangoTraining/mangoTraining_{{ version }}.tar.gz
+  sha256: 77e4f7f80b8dc6b139b51132e53436ac6ccb7a95ffa87400f4ac414988348453
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mangoTraining')"           # [not win]
+    - "\"%R%\" -e \"library('mangoTraining')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.mango-solutions.com
+  license: GPL-2
+  summary: 'Datasets designed to be used in conjunction with Mango Solutions training materials
+    and the book SAMS Teach Yourself R in 24 Hours (ISBN: 978-0-672-33848-9).'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mangoTraining
+# Type: Package
+# Title: Mango Solutions Training Datasets
+# Version: 1.0-7
+# Date: 2017-01-17
+# Author: Mango Solutions <rin24hours@mango-solutions.com>
+# Maintainer: Aimee Gott <agott@mango-solutions.com>
+# Contact: Mango Solutions <rin24hours@mango-solutions.com>
+# Description: Datasets designed to be used in conjunction with Mango Solutions training materials and the book SAMS Teach Yourself R in 24 Hours (ISBN: 978-0-672-33848-9).
+# URL: http://www.mango-solutions.com
+# Depends: R (>= 2.10.0)
+# License: GPL-2
+# LazyLoad: yes
+# LazyData: yes
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2017-01-17 17:17:01 UTC; agott
+# Repository: CRAN
+# Date/Publication: 2017-01-17 18:25:21
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

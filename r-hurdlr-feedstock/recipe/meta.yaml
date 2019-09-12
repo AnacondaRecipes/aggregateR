@@ -1,0 +1,97 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hurdlr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hurdlr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hurdlr/hurdlr_{{ version }}.tar.gz
+  sha256: b8c258f3c127555c199668e578f9969e34332c5ba684fec5ee3a1ea0bac6d9e7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hurdlr')"           # [not win]
+    - "\"%R%\" -e \"library('hurdlr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=hurdlr
+  license: GPL-2
+  summary: When considering count data, it is often the case that many more zero counts than
+    would be expected of some given distribution are observed. It is well established
+    that data such as this can be reliably modelled using zero-inflated or hurdle distributions,
+    both of which may be applied using the functions in this package. Bayesian analysis
+    methods are used to best model problematic count data that cannot be fit to any
+    typical distribution. The package functions are flexible and versatile, and can
+    be applied to varying count distributions, parameter estimation with or without
+    explanatory variable information, and are able to allow for multiple hurdles as
+    it is also not uncommon that count data have an abundance of large-number observations
+    which would be considered outliers of the typical distribution. In lieu of throwing
+    out data or misspecifying the typical distribution, these extreme observations can
+    be applied to a second, extreme distribution. With the given functions of this package,
+    such a two-hurdle model may be easily specified in order to best manage data that
+    is both zero-inflated and over-dispersed.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: hurdlr
+# Version: 0.1
+# Title: Zero-Inflated and Hurdle Modelling Using Bayesian Inference
+# Description: When considering count data, it is often the case that many more zero counts than would be expected of some given distribution are observed. It is well established that data such as this can be reliably modelled using zero-inflated or hurdle distributions, both of which may be applied using the functions in this package. Bayesian analysis methods are used to best model problematic count data that cannot be fit to any typical distribution. The package functions are flexible and versatile, and can be applied to varying count distributions, parameter estimation with or without explanatory variable information, and are able to allow for multiple hurdles as it is also not uncommon that count data have an abundance of large-number observations which would be considered outliers of the typical distribution. In lieu of throwing out data or misspecifying the typical distribution, these extreme observations can be applied to a second, extreme distribution. With the given functions of this package, such a two-hurdle model may be easily specified in order to best manage data that is both zero-inflated and over-dispersed.
+# Date: 2017-07-01
+# Authors@R: c(person("Earvin", "Balderama", email = "ebalderama@luc.edu", role = c("aut", "cre")),person("Taylor", "Trippe", email = "taylortbertrand@gmail.com", role = "aut"))
+# Depends: R (>= 3.3.0)
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-07-01 19:29:37 UTC; Earvin
+# Author: Earvin Balderama [aut, cre], Taylor Trippe [aut]
+# Maintainer: Earvin Balderama <ebalderama@luc.edu>
+# Repository: CRAN
+# Date/Publication: 2017-07-02 00:04:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

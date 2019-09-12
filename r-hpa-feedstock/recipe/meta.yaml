@@ -1,0 +1,101 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hpa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hpa_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hpa/hpa_{{ version }}.tar.gz
+  sha256: f58d6cf4a704497420fc61a5b40a9fb8c52de82f89f7009d814d2b3be02b05a0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggplot2, mvtnorm, titanic, sampleSelection
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.1
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.1
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hpa')"           # [not win]
+    - "\"%R%\" -e \"library('hpa')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=hpa
+  license: GPL-3
+  summary: Multivariate conditional and marginal densities, moments, cumulative distribution
+    functions as well as binary choice and sample selection models based on hermite
+    polynomial approximation which was proposed and described by A. Gallant and D. W.
+    Nychka (1987) <doi:10.2307/1913241>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: hpa
+# Type: Package
+# Title: Distributions Hermite Polynomial Approximation
+# Version: 1.0.1
+# Date: 2019-08-20
+# Author: Potanin Bogdan
+# Maintainer: Potanin Bogdan <bogdanpotanin@gmail.com>
+# Description: Multivariate conditional and marginal densities, moments, cumulative distribution functions as well as binary choice and sample selection models based on hermite polynomial approximation which was proposed and described by A. Gallant and D. W. Nychka (1987) <doi:10.2307/1913241>.
+# License: GPL-3
+# Imports: Rcpp (>= 1.0.1)
+# LinkingTo: Rcpp, RcppArmadillo
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# Suggests: ggplot2, mvtnorm, titanic, sampleSelection
+# NeedsCompilation: yes
+# Packaged: 2019-08-25 09:07:22 UTC; Bogdan
+# Repository: CRAN
+# Date/Publication: 2019-08-25 13:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

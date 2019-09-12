@@ -1,0 +1,88 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stem
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Stem_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Stem/Stem_{{ version }}.tar.gz
+  sha256: 25874347d9c01b4806821bbca3f780d259c2df430f0ad8b6c2ab7b5c621520bb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mass
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Stem')"           # [not win]
+    - "\"%R%\" -e \"library('Stem')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Stem
+  license: GPL-2
+  summary: Estimation of the parameters of a spatio-temporal model using the EM algorithm, estimation
+    of the parameter standard errors using a spatio-temporal parametric bootstrap, spatial
+    mapping.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Stem
+# Type: Package
+# Title: Spatio-temporal models in R
+# Version: 1.0
+# Date: 2009-01-27
+# Author: Michela Cameletti
+# Maintainer: Michela Cameletti <michela.cameletti@unibg.it>
+# Depends: R (>= 2.7.0), mvtnorm, MASS
+# Description: Estimation of the parameters of a spatio-temporal model using the EM algorithm, estimation of the parameter standard errors using a spatio-temporal parametric bootstrap, spatial mapping.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# Packaged: 2012-10-29 08:57:42 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2012-10-29 08:57:42
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

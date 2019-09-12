@@ -1,0 +1,92 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lmfilter
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LMfilteR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LMfilteR/LMfilteR_{{ version }}.tar.gz
+  sha256: 8dd563a6945bcd1f73757fd0d3757d02ebb4208cc9a9646d4286632b69964f81
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass >=7.3_50
+
+  run:
+    - r-base
+    - r-mass >=7.3_50
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LMfilteR')"           # [not win]
+    - "\"%R%\" -e \"library('LMfilteR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=LMfilteR
+  license: GPL-2
+  summary: 'We present a method based on filtering algorithms to estimate the parameters of linear
+    regressions, i.e. the coefficients and the variance of the error term. The proposed
+    algorithms make use of Particle Filters following Ristic, B., Arulampalam, S., Gordon,
+    N. (2004, ISBN: 158053631X) resampling methods.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LMfilteR
+# Type: Package
+# Title: Filter Methods for Parameter Estimation in Linear Regression Models
+# Version: 0.1.2
+# Authors@R: c( person("Christian", "Llano Robayo", email = "cxl985@miami.edu", role = c("aut","cre")), person("Nazrul", "Shaikh", email = "n.shaikh@miami.edu", role = "aut") )
+# Description: We present a method based on filtering algorithms to estimate the parameters of linear regressions, i.e. the coefficients and the variance of the error term. The proposed algorithms make use of Particle Filters following Ristic, B., Arulampalam, S., Gordon, N. (2004, ISBN: 158053631X) resampling methods.
+# License: GPL (>= 2)
+# Imports: MASS (>= 7.3-50), stats (>= 3.5.1)
+# Depends: R (>= 3.5.0)
+# Encoding: UTF-8
+# LazyData: true
+# BugReports: https://github.com/ChrissCod/LMfilteR/issues
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-08-14 03:56:04 UTC; luiscastroabril
+# Author: Christian Llano Robayo [aut, cre], Nazrul Shaikh [aut]
+# Maintainer: Christian Llano Robayo <cxl985@miami.edu>
+# Repository: CRAN
+# Date/Publication: 2018-08-14 04:20:25 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,92 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fusionclust
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fusionclust_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fusionclust/fusionclust_{{ version }}.tar.gz
+  sha256: 676c6da6c46be30f5fa8f4d903074a180b35e7577d15286091e4db4726b503c0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bbmle
+
+  run:
+    - r-base
+    - r-bbmle
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fusionclust')"           # [not win]
+    - "\"%R%\" -e \"library('fusionclust')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/trambakbanerjee/fusionclust
+  license: GPL-2
+  summary: Provides the Big Merge Tracker and COSCI algorithms for convex clustering and  feature
+    screening using L1 fusion penalty. See Radchenko, P. and Mukherjee, G. (2017) <doi:10.1111/rssb.12226>
+    and  T.Banerjee et al. (2017) <doi:10.1016/j.jmva.2017.08.001> for more details.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fusionclust
+# Title: Clustering and Feature Screening using L1 Fusion Penalty
+# Version: 1.0.0
+# Authors@R: c(person("Trambak","Banerjee",role=c("aut","cre"), email="trambakb@usc.edu"), person("Gourab","Mukherjee",role="aut",email="gourab@usc.edu"), person("Peter","Radchenko",role="aut",email="peter.radchenko@sydney.edu.au"))
+# Description: Provides the Big Merge Tracker and COSCI algorithms for convex clustering and  feature screening using L1 fusion penalty. See Radchenko, P. and Mukherjee, G. (2017) <doi:10.1111/rssb.12226> and  T.Banerjee et al. (2017) <doi:10.1016/j.jmva.2017.08.001> for more details.
+# Depends: R (>= 3.4.1)
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# Imports: bbmle, stats, graphics
+# RoxygenNote: 6.0.1
+# URL: https://github.com/trambakbanerjee/fusionclust
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2017-09-19 01:43:57 UTC; Jolly
+# Author: Trambak Banerjee [aut, cre], Gourab Mukherjee [aut], Peter Radchenko [aut]
+# Maintainer: Trambak Banerjee <trambakb@usc.edu>
+# Repository: CRAN
+# Date/Publication: 2017-09-19 08:21:58 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

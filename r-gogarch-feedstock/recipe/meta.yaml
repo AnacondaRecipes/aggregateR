@@ -1,0 +1,89 @@
+{% set version = '0.7-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gogarch
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gogarch_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gogarch/gogarch_{{ version }}.tar.gz
+  sha256: 33c67d8a90a838432aa67b1e46ee69773634d679aba712ed237d1af6c7a1f70d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-fgarch
+    - r-fastica
+
+  run:
+    - r-base
+    - r-fgarch
+    - r-fastica
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gogarch')"           # [not win]
+    - "\"%R%\" -e \"library('gogarch')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=gogarch
+  license: GPL-2
+  summary: Implementation of the GO-GARCH model class
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gogarch
+# Version: 0.7-2
+# Date: 2012-07-15
+# Type: Package
+# Title: Generalized Orthogonal GARCH (GO-GARCH) models
+# Authors@R: person("Bernhard", "Pfaff", email = "bernhard@pfaffikus.de", role = c("aut", "cre"))
+# Depends: R (>= 2.10.0), methods, stats, graphics, fGarch, fastICA
+# Description: Implementation of the GO-GARCH model class
+# License: GPL (>= 2)
+# LazyLoad: yes
+# Author: Bernhard Pfaff [aut, cre]
+# Maintainer: Bernhard Pfaff <bernhard@pfaffikus.de>
+# Repository: CRAN
+# Repository/R-Forge/Project: gogarch
+# Repository/R-Forge/Revision: 48
+# Packaged: 2012-07-15 14:19:41 UTC; rforge
+# Date/Publication: 2012-07-28 13:54:24
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,86 @@
+{% set version = '9.1-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pwt9
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pwt9_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pwt9/pwt9_{{ version }}.tar.gz
+  sha256: 4d46b2a802db220cba1504b4b68f8d09b27e657b64b3ad0a4929524513724d54
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pwt9')"           # [not win]
+    - "\"%R%\" -e \"library('pwt9')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=pwt9
+  license: GPL-2 | GPL-3
+  summary: The Penn World Table 9.x (<http://www.ggdc.net/pwt/>) provides information on relative
+    levels of income, output, inputs, and productivity for 182 countries between 1950
+    and 2017.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pwt9
+# Version: 9.1-0
+# Date: 2019-06-12
+# Title: Penn World Table (Version 9.x)
+# Authors@R: person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org", comment = c(ORCID = "0000-0003-0918-3766"))
+# Description: The Penn World Table 9.x (<http://www.ggdc.net/pwt/>) provides information on relative levels of income, output, inputs, and productivity for 182 countries between 1950 and 2017.
+# LazyData: yes
+# LazyDataCompression: xz
+# Depends: R (>= 3.0.0)
+# License: GPL-2 | GPL-3
+# NeedsCompilation: no
+# Packaged: 2019-06-12 15:05:26 UTC; zeileis
+# Author: Achim Zeileis [aut, cre] (<https://orcid.org/0000-0003-0918-3766>)
+# Maintainer: Achim Zeileis <Achim.Zeileis@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2019-06-12 23:21:45 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

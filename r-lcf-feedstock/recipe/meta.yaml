@@ -1,0 +1,93 @@
+{% set version = '1.7.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lcf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LCF_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LCF/LCF_{{ version }}.tar.gz
+  sha256: ccc78798ec04f80d9c2de04676c2585891b61201aa5df597e1671921a7e5afd8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-quadprog
+
+  run:
+    - r-base
+    - r-quadprog
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LCF')"           # [not win]
+    - "\"%R%\" -e \"library('LCF')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=LCF
+  license: GPL-3
+  summary: 'Baseline correction, normalization and linear combination fitting (LCF)  of X-ray
+    absorption near edge structure (XANES) spectra. The package includes data loading
+    of .xmu files exported from ''ATHENA'' (Ravel and Newville, 2005) <doi:10.1107/S0909049505012719>.  Loaded
+    spectra can be background corrected and all standards can be fitted at once. Two
+    linear combination fitting functions can be used: (1) fit_athena(): Simply fitting
+    combinations of standards as in ATHENA,  (2) fit_float(): Fitting all standards
+    with changing baseline correction and edge-step normalization parameters. '
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LCF
+# Title: Linear Combination Fitting
+# Version: 1.7.0
+# Date: 2017-11-22
+# Authors@R: person("Florian", "Werner", email = "florian.werner@wzw.tum.de", role = c("aut", "cre"))
+# Author: Florian Werner [aut, cre]
+# Maintainer: Florian Werner <florian.werner@wzw.tum.de>
+# Description: Baseline correction, normalization and linear combination fitting (LCF)  of X-ray absorption near edge structure (XANES) spectra. The package includes data loading of .xmu files exported from 'ATHENA' (Ravel and Newville, 2005) <doi:10.1107/S0909049505012719>.  Loaded spectra can be background corrected and all standards can be fitted at once. Two linear combination fitting functions can be used: (1) fit_athena(): Simply fitting combinations of standards as in ATHENA,  (2) fit_float(): Fitting all standards with changing baseline correction and edge-step normalization parameters.
+# Depends: R (>= 3.2.1)
+# License: GPL-3
+# Imports: quadprog
+# Repository: CRAN
+# LazyData: true
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-11-22 13:46:13 UTC; Florian
+# Date/Publication: 2017-11-22 14:10:01 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,98 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-micompr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/micompr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/micompr/micompr_{{ version }}.tar.gz
+  sha256: c99ae3e296b216a7849019d30b2a801bc0cffa413f2cf6f585a8e35acbd05d63
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: biotools, MVN (>= 5.0), deseasonalize, testthat (>= 0.8), knitr, roxygen2, devtools
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('micompr')"           # [not win]
+    - "\"%R%\" -e \"library('micompr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/fakenmc/micompr
+  license: MIT
+  summary: A procedure for comparing multivariate samples associated with different groups. It
+    uses principal component analysis to convert multivariate observations into a set
+    of linearly uncorrelated statistical measures, which are then compared using a number
+    of statistical methods. The procedure is independent of the distributional properties
+    of samples and automatically selects features that best explain their differences,
+    avoiding manual selection of specific points or summary statistics. It is appropriate
+    for comparing samples of time series, images, spectrometric measures or similar
+    multivariate observations.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: micompr
+# Title: Multivariate Independent Comparison of Observations
+# Version: 1.1.0
+# Date: 2018-03-09
+# Authors@R: person("Nuno", "Fachada", email = "faken@fakenmc.com", role = c("aut", "cre"))
+# Maintainer: Nuno Fachada <faken@fakenmc.com>
+# Description: A procedure for comparing multivariate samples associated with different groups. It uses principal component analysis to convert multivariate observations into a set of linearly uncorrelated statistical measures, which are then compared using a number of statistical methods. The procedure is independent of the distributional properties of samples and automatically selects features that best explain their differences, avoiding manual selection of specific points or summary statistics. It is appropriate for comparing samples of time series, images, spectrometric measures or similar multivariate observations.
+# Depends: R (>= 3.3.0)
+# Imports: utils, graphics, methods, stats
+# Suggests: biotools, MVN (>= 5.0), deseasonalize, testthat (>= 0.8), knitr, roxygen2, devtools
+# License: MIT + file LICENSE
+# URL: https://github.com/fakenmc/micompr
+# BugReports: https://github.com/fakenmc/micompr/issues
+# LazyData: true
+# Encoding: UTF-8
+# VignetteBuilder: knitr
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-03-09 16:27:30 UTC; nfachada
+# Author: Nuno Fachada [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2018-03-09 16:36:22 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

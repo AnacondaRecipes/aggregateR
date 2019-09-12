@@ -1,0 +1,107 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pgee.mixed
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pgee.mixed_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pgee.mixed/pgee.mixed_{{ version }}.tar.gz
+  sha256: 6fedcc3e9743f2430d1e6487471c338774ef2af442f7110d22006152f6ddbb84
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.6
+    - r-rcpparmadillo
+    - r-copula >=0.999_15
+    - r-mvtnorm >=1.0_5
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.6
+    - r-rcpparmadillo
+    - r-copula >=0.999_15
+    - r-mvtnorm >=1.0_5
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pgee.mixed')"           # [not win]
+    - "\"%R%\" -e \"library('pgee.mixed')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/kaos42/pgee.mixed
+  license: GPL-2
+  summary: Perform simultaneous estimation and variable selection for correlated bivariate mixed
+    outcomes (one continuous outcome and one binary outcome per cluster) using penalized
+    generalized estimating equations. In addition, clustered Gaussian and binary outcomes
+    can also be modeled. The SCAD, MCP, and LASSO penalties are supported. Cross-validation
+    can be performed to find the optimal regularization parameter(s).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pgee.mixed
+# Type: Package
+# Title: Penalized Generalized Estimating Equations for Bivariate Mixed Outcomes
+# Version: 0.1.0
+# Authors@R: person("Ved", "Deshpande", email = "veddeshpande@gmail.com", role = c("aut", "cre"))
+# Description: Perform simultaneous estimation and variable selection for correlated bivariate mixed outcomes (one continuous outcome and one binary outcome per cluster) using penalized generalized estimating equations. In addition, clustered Gaussian and binary outcomes can also be modeled. The SCAD, MCP, and LASSO penalties are supported. Cross-validation can be performed to find the optimal regularization parameter(s).
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# Imports: mvtnorm (>= 1.0-5), copula (>= 0.999-15), Rcpp (>= 0.12.6), methods (>= 3.3.2)
+# LinkingTo: Rcpp, RcppArmadillo
+# RoxygenNote: 5.0.1
+# URL: http://github.com/kaos42/pgee.mixed
+# BugReports: http://github.com/kaos42/pgee.mixed/issues
+# NeedsCompilation: yes
+# Packaged: 2016-12-20 23:15:16 UTC; ved
+# Author: Ved Deshpande [aut, cre]
+# Maintainer: Ved Deshpande <veddeshpande@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-12-21 08:30:40
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

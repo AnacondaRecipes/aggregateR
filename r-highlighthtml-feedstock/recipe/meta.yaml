@@ -1,0 +1,90 @@
+{% set version = '0.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-highlighthtml
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/highlightHTML_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/highlightHTML/highlightHTML_{{ version }}.tar.gz
+  sha256: 61db70191788d2c437620bc07d1e87e1aa0365aa4d4d73bb69b229957a8b621a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: shiny, testthat, dplyr, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('highlightHTML')"           # [not win]
+    - "\"%R%\" -e \"library('highlightHTML')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/lebebr01/highlightHTML
+  license: MIT
+  summary: A tool to format R markdown with CSS ids for HTML output.  The tool may be most helpful
+    for those using markdown to create reproducible documents. The biggest limitations
+    in formatting is the knowledge of CSS by the document authors.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: highlightHTML
+# Type: Package
+# Title: Highlight HTML Text and Tables
+# Version: 0.2.1
+# Authors@R: person("Brandon", "LeBeau",  email = "lebebr01+highlightHTML@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1265-8761"))
+# Maintainer: Brandon LeBeau <lebebr01+highlightHTML@gmail.com>
+# Description: A tool to format R markdown with CSS ids for HTML output.  The tool may be most helpful for those using markdown to create reproducible documents. The biggest limitations in formatting is the knowledge of CSS by the document authors.
+# Depends: R (>= 3.0.0)
+# Suggests: shiny, testthat, dplyr, knitr, rmarkdown
+# License: MIT + file LICENSE
+# RoxygenNote: 6.0.1
+# VignetteBuilder: knitr
+# URL: https://github.com/lebebr01/highlightHTML
+# BugReports: https://github.com/lebebr01/highlightHTML/issues
+# NeedsCompilation: no
+# Packaged: 2018-01-24 19:45:14 UTC; bleb
+# Author: Brandon LeBeau [aut, cre] (<https://orcid.org/0000-0002-1265-8761>)
+# Repository: CRAN
+# Date/Publication: 2018-01-24 20:55:14
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

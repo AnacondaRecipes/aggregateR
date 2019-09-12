@@ -1,0 +1,94 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-roperators
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/roperators_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/roperators/roperators_{{ version }}.tar.gz
+  sha256: 869dc7e2cb973a902629424171c09f37d82a3d360a1732dcd33e06586598954e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: magrittr, knitr, prettydoc
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('roperators')"           # [not win]
+    - "\"%R%\" -e \"library('roperators')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=roperators
+  license: MIT
+  summary: Provides string arithmetic, reassignment operators, logical operators that handle
+    missing values, and extra logical operators such as floating point equality and
+    all or nothing. The intent is to allow R users to write code that is easier to read,
+    write, and maintain while providing a friendlier experience to new R users from
+    other language backgrounds (such as 'Python') who are used to concepts such as x
+    += 1 and 'foo' + 'bar'.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: roperators
+# Type: Package
+# Title: Additional Operators to Help you Write Cleaner R Code
+# Version: 1.1.0
+# Maintainer: Ben Wiseman <benjamin.wiseman@kornferry.com>
+# Authors@R: c(person('Ben', 'Wiseman', role = c('cre', 'aut', 'ccp'), email = 'benjamin.wiseman@kornferry.com'), person('Steven',  'Nydick', role = c('aut', 'ccp'), email = 'steven.nydick@kornferry.com'), person('Jeff', 'Jones', role = c('aut', 'led'), email = 'jeff.jones@kornferry.com'))
+# Description: Provides string arithmetic, reassignment operators, logical operators that handle missing values, and extra logical operators such as floating point equality and all or nothing. The intent is to allow R users to write code that is easier to read, write, and maintain while providing a friendlier experience to new R users from other language backgrounds (such as 'Python') who are used to concepts such as x += 1 and 'foo' + 'bar'.
+# Encoding: UTF-8
+# LazyData: true
+# Copyright: Korn Ferry International
+# License: MIT + file LICENSE
+# RoxygenNote: 6.1.0
+# Suggests: magrittr, knitr, prettydoc
+# VignetteBuilder: knitr
+# Collate: 'type_checks.R' 'operators.R' 'shorthand.R' 'write_pdf.R'
+# NeedsCompilation: no
+# Packaged: 2018-09-28 21:16:55 UTC; benwiseman
+# Author: Ben Wiseman [cre, aut, ccp], Steven Nydick [aut, ccp], Jeff Jones [aut, led]
+# Repository: CRAN
+# Date/Publication: 2018-09-28 21:40:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

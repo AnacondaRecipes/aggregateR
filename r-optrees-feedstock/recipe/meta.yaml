@@ -1,0 +1,86 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-optrees
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/optrees_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/optrees/optrees_{{ version }}.tar.gz
+  sha256: 1a7fbdc5ea29c4ff16855b0763409eddefc90272f162542c4adae986629417ff
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-igraph >=0.7.1
+
+  run:
+    - r-base
+    - r-igraph >=0.7.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('optrees')"           # [not win]
+    - "\"%R%\" -e \"library('optrees')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=optrees
+  license: GPL-3
+  summary: Finds optimal trees in weighted graphs. In particular, this package provides solving
+    tools for minimum cost spanning tree problems, minimum cost arborescence problems,
+    shortest path tree problems and minimum cut tree problem.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: optrees
+# Type: Package
+# Title: Optimal Trees in Weighted Graphs
+# Version: 1.0
+# Date: 2014-09-01
+# Authors@R: c(person("Manuel", "Fontenla", role = c("aut", "cre"), email = "manu.fontenla@gmail.com"))
+# Author: Manuel Fontenla [aut, cre]
+# Maintainer: Manuel Fontenla <manu.fontenla@gmail.com>
+# Depends: R (>= 2.7.0), igraph (>= 0.7.1)
+# Description: Finds optimal trees in weighted graphs. In particular, this package provides solving tools for minimum cost spanning tree problems, minimum cost arborescence problems, shortest path tree problems and minimum cut tree problem.
+# License: GPL-3
+# Packaged: 2014-09-01 23:16:39 UTC; Manuel
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-09-02 06:14:11
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

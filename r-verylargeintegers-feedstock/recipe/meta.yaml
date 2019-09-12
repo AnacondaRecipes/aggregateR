@@ -1,0 +1,99 @@
+{% set version = '0.1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-verylargeintegers
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/VeryLargeIntegers_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/VeryLargeIntegers/VeryLargeIntegers_{{ version }}.tar.gz
+  sha256: cc4e0e9a1ba7b6c8302cfad4cfa56a5435727c3b8646bc1c0e5c99b5872494b1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.9
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.9
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('VeryLargeIntegers')"           # [not win]
+    - "\"%R%\" -e \"library('VeryLargeIntegers')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=VeryLargeIntegers
+  license: GPL-3
+  summary: 'Multi-precission library that allows to store and operate with arbitrarily big integers
+    without loss of precision. It includes a large list of tools to work with them,
+    like: - Arithmetic and logic operators - Modular-arithmetic operators - Computer
+    Number Theory utilities - Probabilistic primality tests - Factorization algorithms
+    - Random generators of diferent types of integers.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: VeryLargeIntegers
+# Type: Package
+# Title: Store and Operate with Arbitrarily Large Integers
+# Version: 0.1.6
+# Author: Javier Leiva Cuadrado
+# Maintainer: Javier Leiva Cuadrado <jleivacuadrado@gmail.com>
+# Description: Multi-precission library that allows to store and operate with arbitrarily big integers without loss of precision. It includes a large list of tools to work with them, like: - Arithmetic and logic operators - Modular-arithmetic operators - Computer Number Theory utilities - Probabilistic primality tests - Factorization algorithms - Random generators of diferent types of integers.
+# License: GPL
+# Encoding: UTF-8
+# LazyData: true
+# Imports: Rcpp (>= 0.12.9)
+# LinkingTo: Rcpp
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2018-02-21 15:19:14 UTC; EXT31
+# Repository: CRAN
+# Date/Publication: 2018-02-21 16:01:56 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

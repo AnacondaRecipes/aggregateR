@@ -1,0 +1,106 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-intsurv
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/intsurv_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/intsurv/intsurv_{{ version }}.tar.gz
+  sha256: cd65378fe00a60b41425fc8627cfa19bd484bebc94537dfee001b8b2bc3cd8f8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.0
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.0
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('intsurv')"           # [not win]
+    - "\"%R%\" -e \"library('intsurv')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/wenjie2wang/intsurv
+  license: GPL-3
+  summary: Contains implementations of integrative survival analysis routines, including regular
+    Cox cure rate model proposed by Kuk and Chen (1992) <doi:10.1093/biomet/79.3.531>
+    via an EM algorithm proposed by Sy and Taylor (2000) <doi:10.1111/j.0006-341X.2000.00227.x>,
+    regularized Cox cure rate model with elastic net penalty following Masud et al.
+    (2018) <doi:10.1177/0962280216677748>, and Zou and Hastie (2005) <doi:10.1111/j.1467-9868.2005.00503.x>,
+    and weighted concordance index for cure models proposed by Asano and Hirakawa (2017)
+    <doi:10.1080/10543406.2017.1293082>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: intsurv
+# Title: Integrative Survival Modeling
+# Version: 0.2.0
+# Date: 2019-08-02
+# Authors@R: c( person(given = "Wenjie", family = "Wang", email = "wenjie.2.wang@uconn.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0363-3180")), person(given = "Kun", family = "Chen", role = "ctb", comment = c(ORCID = "0000-0003-3579-5467")), person(given = "Jun", family = "Yan", role = "ctb", comment = c(ORCID = "0000-0003-4401-7296")) )
+# Description: Contains implementations of integrative survival analysis routines, including regular Cox cure rate model proposed by Kuk and Chen (1992) <doi:10.1093/biomet/79.3.531> via an EM algorithm proposed by Sy and Taylor (2000) <doi:10.1111/j.0006-341X.2000.00227.x>, regularized Cox cure rate model with elastic net penalty following Masud et al. (2018) <doi:10.1177/0962280216677748>, and Zou and Hastie (2005) <doi:10.1111/j.1467-9868.2005.00503.x>, and weighted concordance index for cure models proposed by Asano and Hirakawa (2017) <doi:10.1080/10543406.2017.1293082>.
+# Depends: R (>= 3.2.3)
+# Imports: Rcpp (>= 0.12.0), methods, stats,
+# LinkingTo: Rcpp, RcppArmadillo
+# License: GPL (>= 3)
+# LazyData: true
+# Collate: 'RcppExports.R' 'class.R' 'Survi.R' 'assessment.R' 'bootSe.R' 'coef.R' 'cox_cure.R' 'cox_cure_net.R' 'iCoxph.R' 'intsurv.R' 'misc.R' 'prep_model.R' 'print.R' 'show.R' 'simData4cure.R' 'simData4iCoxph.R' 'summary.R'
+# URL: https://github.com/wenjie2wang/intsurv
+# BugReports: https://github.com/wenjie2wang/intsurv/issues
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2019-08-02 15:32:07 UTC; wenjie
+# Author: Wenjie Wang [aut, cre] (<https://orcid.org/0000-0003-0363-3180>), Kun Chen [ctb] (<https://orcid.org/0000-0003-3579-5467>), Jun Yan [ctb] (<https://orcid.org/0000-0003-4401-7296>)
+# Maintainer: Wenjie Wang <wenjie.2.wang@uconn.edu>
+# Repository: CRAN
+# Date/Publication: 2019-08-03 07:50:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

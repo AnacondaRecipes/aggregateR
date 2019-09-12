@@ -1,0 +1,95 @@
+{% set version = '0.1-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rpoppler
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Rpoppler_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Rpoppler/Rpoppler_{{ version }}.tar.gz
+  sha256: 95c1902214d1590cad0aae7069ccc359e18235c0f4f77003110c5ca80ad9dba6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  skip: True  # [not unix]
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}sed               # [win]
+    - {{posix}}grep              # [win]
+    - {{posix}}autoconf
+    - {{posix}}automake          # [not win]
+    - {{posix}}automake-wrapper  # [win]
+    - {{posix}}pkg-config
+    - {{posix}}make
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Rpoppler')"           # [not win]
+    - "\"%R%\" -e \"library('Rpoppler')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Rpoppler
+  license: GPL-2
+  summary: PDF tools based on the Poppler PDF rendering library. See <http://poppler.freedesktop.org/>
+    for more information on Poppler.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Rpoppler
+# Version: 0.1-0
+# Title: PDF Tools Based on Poppler
+# Description: PDF tools based on the Poppler PDF rendering library. See <http://poppler.freedesktop.org/> for more information on Poppler.
+# Authors@R: person("Kurt", "Hornik", role = c("aut", "cre"), email = "Kurt.Hornik@R-project.org")
+# License: GPL-2
+# SystemRequirements: Poppler Glib interface headers and libraries (<http://poppler.freedesktop.org/>) [Debian/Ubuntu: libpoppler-glib-dev, Fedora: poppler-glib-devel]
+# OS_type: unix
+# NeedsCompilation: yes
+# Packaged: 2017-04-18 13:14:19 UTC; hornik
+# Author: Kurt Hornik [aut, cre]
+# Maintainer: Kurt Hornik <Kurt.Hornik@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2017-04-18 13:15:47 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

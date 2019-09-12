@@ -1,0 +1,90 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lsrs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LSRS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LSRS/LSRS_{{ version }}.tar.gz
+  sha256: 86c731431fd6137342a4f0adba4691ca760a36bafae15a0a7039c4be76d9e05c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: raster, sp, rasterVis, lattice, latticeExtra,RColorBrewer
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LSRS')"           # [not win]
+    - "\"%R%\" -e \"library('LSRS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=LSRS
+  license: GPL-3
+  summary: Rapid satellite data streams in operational applications have clear benefits for monitoring
+    land cover,  especially when information can be delivered as fast as changing surface
+    conditions. Over the past decade, remote sensing has become a key tool for monitoring
+    and predicting environmental variables by using satellite data.  This package presents
+    the main applications in remote sensing for  land surface monitoring and land cover
+    mapping (soil, vegetation, water...). Tomlinson, C.J., Chapman, L., Thornes, E.,
+    Baker, C (2011) <doi:10.1002/met.287>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LSRS
+# Type: Package
+# Title: Land Surface Remote Sensing
+# Version: 0.2.0
+# Author: Mehdi Sarparast
+# Maintainer: Mehdi Sarparast <mehdisarparast@gmail.com>
+# Description: Rapid satellite data streams in operational applications have clear benefits for monitoring land cover,  especially when information can be delivered as fast as changing surface conditions. Over the past decade, remote sensing has become a key tool for monitoring and predicting environmental variables by using satellite data.  This package presents the main applications in remote sensing for  land surface monitoring and land cover mapping (soil, vegetation, water...). Tomlinson, C.J., Chapman, L., Thornes, E., Baker, C (2011) <doi:10.1002/met.287>.
+# Suggests: raster, sp, rasterVis, lattice, latticeExtra,RColorBrewer
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-03-07 22:13:01 UTC; mehdis
+# Repository: CRAN
+# Date/Publication: 2018-03-07 22:19:12 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

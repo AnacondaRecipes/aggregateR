@@ -1,0 +1,106 @@
+{% set version = '3042.79' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-funitroots
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fUnitRoots_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fUnitRoots/fUnitRoots_{{ version }}.tar.gz
+  sha256: 5e7f75a827e9e2a9a560ad77676174eba7135f930bc0f408d0a34350db215bc3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: RUnit
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-fbasics
+    - r-timedate
+    - r-timeseries
+    - r-urca
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-fbasics
+    - r-timedate
+    - r-timeseries
+    - r-urca
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fUnitRoots')"           # [not win]
+    - "\"%R%\" -e \"library('fUnitRoots')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.rmetrics.org
+  license: GPL-2
+  summary: 'Provides four addons for analyzing trends and unit roots in financial time series:
+    (i) functions for the density and probability of the augmented Dickey-Fuller Test,
+    (ii) functions  for the density and probability of MacKinnon''s unit root test  statistics,
+    (iii) reimplementations for the ADF and MacKinnon Test, and (iv) an ''urca'' Unit
+    Root Test Interface for Pfaff''s unit root test suite.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fUnitRoots
+# Title: Rmetrics - Modelling Trends and Unit Roots
+# Date: 2017-11-12
+# Version: 3042.79
+# Author: Diethelm Wuertz [aut], Tobias Setz [cre], Yohan Chalabi [ctb]
+# Maintainer: Tobias Setz <tobias.setz@live.com>
+# Description: Provides four addons for analyzing trends and unit roots in financial time series: (i) functions for the density and probability of the augmented Dickey-Fuller Test, (ii) functions  for the density and probability of MacKinnon's unit root test  statistics, (iii) reimplementations for the ADF and MacKinnon Test, and (iv) an 'urca' Unit Root Test Interface for Pfaff's unit root test suite.
+# Depends: R (>= 2.15.1), timeDate, timeSeries, fBasics
+# Imports: urca, graphics, methods, stats, utils
+# Suggests: RUnit
+# LazyData: yes
+# License: GPL (>= 2)
+# URL: http://www.rmetrics.org
+# NeedsCompilation: yes
+# Packaged: 2017-11-16 17:28:29 UTC; Tobias Setz
+# Repository: CRAN
+# Date/Publication: 2017-11-16 22:42:49 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

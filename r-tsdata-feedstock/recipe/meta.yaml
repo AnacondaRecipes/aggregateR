@@ -1,0 +1,86 @@
+{% set version = '2016.8-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tsdata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/TSdata_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/TSdata/TSdata_{{ version }}.tar.gz
+  sha256: 2b5a9ef3851d3d9df2f599cf46ba7e7db0144a297a4e72d79fe01b062ff12da5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tframe, tframePlus, tfplot, TSdbi (>= 2015.1-1), TSsql (>= 2015.1-1), TSPostgreSQL (>= 2015.1-1), TSMySQL (>= 2015.4-1), TSSQLite (>= 2015.1-1), TSodbc (>= 2015.1-1), TSsdmx, TSmisc, TScompare (>= 2015.1-1), zoo, xts, tseries, WriteXLS, DBI (>= 0.3.1), RPostgreSQL, RSQLite, RMySQL, RODBC, RJSDMX
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('TSdata')"           # [not win]
+    - "\"%R%\" -e \"library('TSdata')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://tsdbi.r-forge.r-project.org/
+  license: GPL-2
+  summary: Illustrates the various 'TSdbi' packages with a vignette using time series  data from
+    several sources. The vignette also illustrates some simple time series manipulation
+    and plotting using packages 'tframe' and 'tfplot'.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: TSdata
+# Version: 2016.8-1
+# Title: 'TSdbi' Illustration
+# Description: Illustrates the various 'TSdbi' packages with a vignette using time series  data from several sources. The vignette also illustrates some simple time series manipulation and plotting using packages 'tframe' and 'tfplot'.
+# Depends: R (>= 2.8.0)
+# Suggests: tframe, tframePlus, tfplot, TSdbi (>= 2015.1-1), TSsql (>= 2015.1-1), TSPostgreSQL (>= 2015.1-1), TSMySQL (>= 2015.4-1), TSSQLite (>= 2015.1-1), TSodbc (>= 2015.1-1), TSsdmx, TSmisc, TScompare (>= 2015.1-1), zoo, xts, tseries, WriteXLS, DBI (>= 0.3.1), RPostgreSQL, RSQLite, RMySQL, RODBC, RJSDMX
+# BuildVignettes: true
+# License: GPL-2
+# Copyright: 2012-2016 Paul Gilbert.
+# Author: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
+# Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
+# URL: http://tsdbi.r-forge.r-project.org/
+# NeedsCompilation: no
+# Packaged: 2016-08-25 14:40:48 UTC; paul
+# Repository: CRAN
+# Date/Publication: 2016-08-26 20:35:25
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,94 @@
+{% set version = '0.16-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-logconcens
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/logconcens_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/logconcens/logconcens_{{ version }}.tar.gz
+  sha256: fe6cfa96dce6c8a8d2e1cbaadd03794688ef9505ab7645ca3be42c2ae7007385
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: logcondens
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('logconcens')"           # [not win]
+    - "\"%R%\" -e \"library('logconcens')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.dominic.schuhmacher.name, http://www.kasparrufibach.ch, http://www.staff.unibe.ch/duembgen
+  license: GPL-2
+  summary: 'Based on right or interval censored data, compute the maximum likelihood estimator
+    of a (sub)probability density under the assumption that it is log-concave. For further
+    information see Duembgen, Rufibach, and Schuhmacher (2011, preprint).  '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: logconcens
+# Type: Package
+# Title: Maximum likelihood estimation of a log-concave density based on censored data
+# Version: 0.16-4
+# Date: 2013-12-13
+# Author: Dominic Schuhmacher <dominic.schuhmacher@mathematik.uni-goettingen.de>, Kaspar Rufibach <kaspar.rufibach@gmail.com>, Lutz Duembgen <duembgen@stat.unibe.ch>
+# Maintainer: Dominic Schuhmacher <dominic.schuhmacher@mathematik.uni-goettingen.de>
+# Depends: R (>= 2.15.0), base, methods, utils, grDevices, graphics, stats
+# Suggests: logcondens
+# Description: Based on right or interval censored data, compute the maximum likelihood estimator of a (sub)probability density under the assumption that it is log-concave. For further information see Duembgen, Rufibach, and Schuhmacher (2011, preprint).
+# License: GPL (>= 2)
+# URL: http://www.dominic.schuhmacher.name, http://www.kasparrufibach.ch, http://www.staff.unibe.ch/duembgen
+# LazyLoad: yes
+# Packaged: 2013-12-13 08:22:47 UTC; schumi
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2013-12-13 15:55:21
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

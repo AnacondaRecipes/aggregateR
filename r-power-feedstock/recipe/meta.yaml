@@ -1,0 +1,95 @@
+{% set version = '1.0.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-power
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PoweR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PoweR/PoweR_{{ version }}.tar.gz
+  sha256: eb5e57843a155dd91efedd2c3fbb9ebcd6dea616371e9d435dc623d5e1611c10
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PoweR')"           # [not win]
+    - "\"%R%\" -e \"library('PoweR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PoweR
+  license: GPL-2
+  summary: Functions for the computation of power and level tables for hypothesis tests, in Latex
+    format, functions to build explanatory graphs for studying power of test statistics.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PoweR
+# Version: 1.0.7
+# Date: 2018-08-23
+# Title: Computation of Power and Level Tables for Hypothesis Tests
+# Author: Pierre Lafaye De Micheaux [aut, cre], Viet Anh Tran [aut], Alain Desgagne [aut]
+# Authors@R: c(person("Pierre", "Lafaye De Micheaux", role = c("aut", "cre"), email = "lafaye@unsw.edu.au"), person("Viet Anh", "Tran", role = c("aut"), email = "vietanhtran184@yahoo.com"), person("Alain", "Desgagne", role = c("aut"), email = "desgagne.alain@uqam.ca"))
+# Maintainer: Pierre Lafaye De Micheaux <lafaye@unsw.edu.au>
+# Depends: R (>= 3.3.0), parallel, Rcpp
+# Description: Functions for the computation of power and level tables for hypothesis tests, in Latex format, functions to build explanatory graphs for studying power of test statistics.
+# License: GPL (>= 2)
+# Packaged: 2018-08-26 11:33:38 UTC; lafaye
+# LinkingTo: Rcpp, RcppArmadillo
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2018-08-28 09:34:26 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

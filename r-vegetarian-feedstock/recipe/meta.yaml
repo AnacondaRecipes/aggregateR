@@ -1,0 +1,93 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-vegetarian
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/vegetarian_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/vegetarian/vegetarian_{{ version }}.tar.gz
+  sha256: 85105bf188b4a3c337927e085f5368381b7b06d2cd7c2eb56bc78071510dda97
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('vegetarian')"           # [not win]
+    - "\"%R%\" -e \"library('vegetarian')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=vegetarian
+  license: GPL-2
+  summary: This package computes diversity for community data sets using the methods outlined
+    by Jost (2006, 2007). While there are differing opinions on the ideal way to calculate
+    diversity (e.g. Magurran 2004), this method offers the advantage of providing diversity
+    numbers equivalents, independent alpha and beta diversities, and the ability to
+    incorporate 'order' (q) as a continuous measure of the importance of rare species
+    in the metrics. The functions provided in this package largely correspond with the
+    equations offered by Jost in the cited papers. The package computes alpha diversities,
+    beta diversities, gamma diversities, and similarity indices. Confidence intervals
+    for diversity measures are calculated using a bootstrap method described by Chao
+    et al. (2008).  For datasets with many samples (sites, plots), sim.table creates
+    tables of all pairwise comparisons possible, and for grouped samples sim.groups
+    calculates pairwise combinations of within- and between-group comparisons.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: vegetarian
+# Type: Package
+# Title: Jost Diversity Measures for Community Data
+# Version: 1.2
+# Date: 2009-07-20
+# Author: Noah Charney, Sydne Record
+# Maintainer: Noah Charney <noah@alumni.amherst.edu>
+# Description: This package computes diversity for community data sets using the methods outlined by Jost (2006, 2007). While there are differing opinions on the ideal way to calculate diversity (e.g. Magurran 2004), this method offers the advantage of providing diversity numbers equivalents, independent alpha and beta diversities, and the ability to incorporate 'order' (q) as a continuous measure of the importance of rare species in the metrics. The functions provided in this package largely correspond with the equations offered by Jost in the cited papers. The package computes alpha diversities, beta diversities, gamma diversities, and similarity indices. Confidence intervals for diversity measures are calculated using a bootstrap method described by Chao et al. (2008).  For datasets with many samples (sites, plots), sim.table creates tables of all pairwise comparisons possible, and for grouped samples sim.groups calculates pairwise combinations of within- and between-group comparisons.
+# License: GPL-2
+# LazyLoad: yes
+# Depends: stats
+# Packaged: 2012-10-29 08:59:58 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2012-10-29 08:59:58
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

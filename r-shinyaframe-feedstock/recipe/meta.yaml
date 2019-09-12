@@ -1,0 +1,96 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-shinyaframe
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/shinyaframe_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/shinyaframe/shinyaframe_{{ version }}.tar.gz
+  sha256: 3adc011cef3a7cfa595ab2dfdb784b5ea46891bbe3ec401653e51e4caa7e90ba
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, scales, dplyr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-htmltools
+    - r-htmlwidgets
+    - r-shiny
+
+  run:
+    - r-base
+    - r-htmltools
+    - r-htmlwidgets
+    - r-shiny
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('shinyaframe')"           # [not win]
+    - "\"%R%\" -e \"library('shinyaframe')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=shinyaframe
+  license: AGPL-3
+  summary: Make R data available in Web-based virtual reality experiences for immersive, cross-platform
+    data visualizations. Includes the 'gg-aframe' JavaScript package for a Grammar of
+    Graphics declarative HTML syntax to create 3-dimensional data visualizations with
+    'Mozilla A-Frame' <https://aframe.io>.
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: shinyaframe
+# Type: Package
+# Title: 'WebVR' Data Visualizations with 'RStudio Shiny' and 'Mozilla A-Frame'
+# Version: 1.0.1
+# Authors@R: person("William", "Murphy", email = "william.murphy.rd@gmail.com", role = c("cre", "aut"))
+# Description: Make R data available in Web-based virtual reality experiences for immersive, cross-platform data visualizations. Includes the 'gg-aframe' JavaScript package for a Grammar of Graphics declarative HTML syntax to create 3-dimensional data visualizations with 'Mozilla A-Frame' <https://aframe.io>.
+# License: AGPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Imports: shiny, htmlwidgets, htmltools
+# RoxygenNote: 5.0.1
+# Suggests: knitr, rmarkdown, scales, dplyr
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2017-11-24 17:30:32 UTC; vrbox
+# Author: William Murphy [cre, aut]
+# Maintainer: William Murphy <william.murphy.rd@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-11-26 15:29:43 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

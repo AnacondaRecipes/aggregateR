@@ -1,0 +1,84 @@
+{% set version = '0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gpdtest
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gPdtest_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gPdtest/gPdtest_{{ version }}.tar.gz
+  sha256: b892d4de1786d2b95aaf01f70300136273edacc84ffa7321b95e3c47a785b401
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gPdtest')"           # [not win]
+    - "\"%R%\" -e \"library('gPdtest')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=gPdtest
+  license: GPL-2
+  summary: This package computes the bootstrap goodness-of-fit test for the generalized Pareto
+    distribution by Villasenor-Alva and Gonzalez-Estrada (2009). The null hypothesis
+    includes heavy and non-heavy tailed gPd's. A function for fitting the gPd to data
+    using the parameter estimation methods proposed in the same article is also provided.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gPdtest
+# Type: Package
+# Title: Bootstrap goodness-of-fit test for the generalized Pareto distribution
+# Version: 0.4
+# Date: 2011-08-12
+# Author: Elizabeth Gonzalez Estrada, Jose A. Villasenor Alva
+# Maintainer: Elizabeth Gonzalez Estrada <egonzalez@colpos.mx>
+# Description: This package computes the bootstrap goodness-of-fit test for the generalized Pareto distribution by Villasenor-Alva and Gonzalez-Estrada (2009). The null hypothesis includes heavy and non-heavy tailed gPd's. A function for fitting the gPd to data using the parameter estimation methods proposed in the same article is also provided.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# Packaged: 2012-10-29 08:58:48 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2012-10-29 08:58:48
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

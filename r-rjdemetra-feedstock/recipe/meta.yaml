@@ -1,0 +1,94 @@
+{% set version = '0.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rjdemetra
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RJDemetra_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RJDemetra/RJDemetra_{{ version }}.tar.gz
+  sha256: bb772adb2e2d6c3e45227aee6d47451a9765364dc00fc5663e04099954ecbcc8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rjava >=0.9_8
+
+  run:
+    - r-base
+    - r-rjava >=0.9_8
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RJDemetra')"           # [not win]
+    - "\"%R%\" -e \"library('RJDemetra')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jdemetra/rjdemetra
+  license: EUPL
+  summary: Interface around 'JDemetra+' (<https://github.com/jdemetra/jdemetra-app>), the seasonal
+    adjustment software officially recommended to the members of the European Statistical
+    System (ESS) and the European System of Central Banks. It offers full access to
+    all options and outputs of 'JDemetra+', including the two leading seasonal adjustment
+    methods TRAMO/SEATS+ and X-12ARIMA/X-13ARIMA-SEATS.
+  license_family: OTHER
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RJDemetra
+# Type: Package
+# Title: Interface to 'JDemetra+' Seasonal Adjustment Software
+# Version: 0.1.3
+# Authors@R: c( person("Alain", "Quartier-la-Tente", role = c("aut", "cre"), email = "alain.quartier@yahoo.fr"), person("Anna", "Michalek", role = "aut", email = "anna.michalek@ecb.int"), person("Jean", "Palate", role = "aut", email = "jean.palate@nbb.be"), person("Raf", "Baeyens", role = "aut", email = "raf.baeyens@nbb.be"))
+# Description: Interface around 'JDemetra+' (<https://github.com/jdemetra/jdemetra-app>), the seasonal adjustment software officially recommended to the members of the European Statistical System (ESS) and the European System of Central Banks. It offers full access to all options and outputs of 'JDemetra+', including the two leading seasonal adjustment methods TRAMO/SEATS+ and X-12ARIMA/X-13ARIMA-SEATS.
+# Depends: R (>= 3.1.1),
+# Imports: rJava (>= 0.9-8), graphics, grDevices, methods, stats, utils
+# SystemRequirements: Java SE 8 or higher
+# License: EUPL
+# URL: https://github.com/jdemetra/rjdemetra
+# LazyData: TRUE
+# Suggests: knitr, rmarkdown
+# RoxygenNote: 6.1.1
+# BugReports: https://github.com/jdemetra/rjdemetra/issues
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2019-06-26 07:40:33 UTC; ZW20hj
+# Author: Alain Quartier-la-Tente [aut, cre], Anna Michalek [aut], Jean Palate [aut], Raf Baeyens [aut]
+# Maintainer: Alain Quartier-la-Tente <alain.quartier@yahoo.fr>
+# Repository: CRAN
+# Date/Publication: 2019-06-26 10:30:17 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

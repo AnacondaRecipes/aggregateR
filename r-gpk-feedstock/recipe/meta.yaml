@@ -1,0 +1,85 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gpk
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gpk_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gpk/gpk_{{ version }}.tar.gz
+  sha256: eff96c57f8b9cc53ff88b64874e9ee7802fe86c7297e2117ac44aceb3d9ed0fd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gpk')"           # [not win]
+    - "\"%R%\" -e \"library('gpk')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=gpk
+  license: GPL-2
+  summary: 'Collection of datasets as prepared by Profs. A.P. Gore, S.A. Paranjape, and M.B.
+    Kulkarni of Department of Statistics, Poona University, India. With their permission,
+    first letter of their names forms the name of this package, the package has been
+    built by me and made available for the benefit of R users. This collection requires
+    a rich class of models and can be a very useful building block for a beginner. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gpk
+# Type: Package
+# Title: 100 Data Sets for Statistics Education
+# Version: 1.0
+# Date: 2013-07-12
+# Author: Prabhanjan Tattar
+# Maintainer: Prabhanjan Tattar <prabhanjannt@gmail.com>
+# Description: Collection of datasets as prepared by Profs. A.P. Gore, S.A. Paranjape, and M.B. Kulkarni of Department of Statistics, Poona University, India. With their permission, first letter of their names forms the name of this package, the package has been built by me and made available for the benefit of R users. This collection requires a rich class of models and can be a very useful building block for a beginner.
+# License: GPL-2
+# Packaged: 2013-07-14 02:59:31 UTC; prabhanjan
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-07-14 08:39:22
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

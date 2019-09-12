@@ -1,0 +1,96 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tsbox
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tsbox_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tsbox/tsbox_{{ version }}.tar.gz
+  sha256: ac9aa7a35c4c848125afc8ffefb5fd406fa2c30ca6cda16f00088888cd11dc4f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, dplyr, tibble, forecast, seasonal, dygraphs, xts, ggplot2, scales, knitr, rmarkdown, tsibble (>= 0.8.2), tsibbledata, tibbletime, tseries, zoo, tis, timeSeries, nycflights13
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-anytime
+    - r-data.table >=1.10.0
+
+  run:
+    - r-base
+    - r-anytime
+    - r-data.table >=1.10.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tsbox')"           # [not win]
+    - "\"%R%\" -e \"library('tsbox')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.tsbox.help
+  license: GPL-3
+  summary: 'Time series toolkit with identical behavior for all time series classes: ''ts'',''xts'',
+    ''data.frame'', ''data.table'', ''tibble'', ''zoo'', ''timeSeries'', ''tsibble'',
+    ''tis'' or ''irts''. Also converts reliably between these classes.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: tsbox
+# Type: Package
+# Title: Class-Agnostic Time Series
+# Version: 0.2.0
+# Date: 2019-08-06
+# Authors@R: person("Christoph", "Sax", email = "christoph.sax@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-7192-7044"))
+# Description: Time series toolkit with identical behavior for all time series classes: 'ts','xts', 'data.frame', 'data.table', 'tibble', 'zoo', 'timeSeries', 'tsibble', 'tis' or 'irts'. Also converts reliably between these classes.
+# Imports: data.table (>= 1.10.0), anytime
+# Suggests: testthat, dplyr, tibble, forecast, seasonal, dygraphs, xts, ggplot2, scales, knitr, rmarkdown, tsibble (>= 0.8.2), tsibbledata, tibbletime, tseries, zoo, tis, timeSeries, nycflights13
+# License: GPL-3
+# Encoding: UTF-8
+# URL: https://www.tsbox.help
+# BugReports: https://github.com/christophsax/tsbox/issues
+# RoxygenNote: 6.1.1
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-08-06 06:23:36 UTC; christoph
+# Author: Christoph Sax [aut, cre] (<https://orcid.org/0000-0002-7192-7044>)
+# Maintainer: Christoph Sax <christoph.sax@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-08-06 06:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

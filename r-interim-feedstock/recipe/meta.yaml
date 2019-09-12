@@ -1,0 +1,84 @@
+{% set version = '0.8.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-interim
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/interim_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/interim/interim_{{ version }}.tar.gz
+  sha256: ce0e28010e545afa1fcb0b633c10cfe689c0977e83f3d1fcde916c673a0b98c1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('interim')"           # [not win]
+    - "\"%R%\" -e \"library('interim')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=interim
+  license: GPL-3
+  summary: Allows the simulation of the recruitment and both the event and treatment phase of
+    a clinical trial. Based on these simulations, the timing of interim analyses can
+    be assessed.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: interim
+# Title: Scheduling Interim Analyses in Clinical Trials
+# Version: 0.8.0
+# Author: Bastian Becker, Katharina Mueller, Hermann Kulmann
+# Maintainer: Bastian Becker <bastian.becker@bayer.com>
+# Description: Allows the simulation of the recruitment and both the event and treatment phase of a clinical trial. Based on these simulations, the timing of interim analyses can be assessed.
+# Depends: R (>= 3.3)
+# License: GPL
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-06-21 13:56:52 UTC; Bastian.Becker
+# Repository: CRAN
+# Date/Publication: 2019-06-24 08:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,93 @@
+{% set version = '1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tcgaretriever
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/TCGAretriever_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/TCGAretriever/TCGAretriever_{{ version }}.tar.gz
+  sha256: 9708bc8ecace9c43e626ce37f439ba58a27971f3b77aa466395d8725e6912856
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: XML, stats, Hmisc
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+
+  run:
+    - r-base
+    - r-httr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('TCGAretriever')"           # [not win]
+    - "\"%R%\" -e \"library('TCGAretriever')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=TCGAretriever
+  license: GPL-2
+  summary: 'The Cancer Genome Atlas (TCGA) is a program aimed at improving our understanding
+    of Cancer Biology. Several TCGA Datasets are available online. ''TCGAretriever''
+    helps accessing and downloading TCGA data hosted on ''cBioPortal'' via its Web Interface
+    (see <http://www.cbioportal.org/web_api.jsp> for more information). Features of
+    ''TCGAretriever'' include: 1) it is very simple to use (get all the TCGA data you
+    need with a few lines of code); 2) performance (smooth and reliable data download
+    via ''httr''); 3) it is tailored for downloading large volumes of data. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: TCGAretriever
+# Type: Package
+# Title: Retrieve Genomic and Clinical Data from TCGA
+# Version: 1.3
+# Date: 2016-07-30
+# Author: Damiano Fantini
+# Maintainer: Damiano Fantini <damiano.fantini@gmail.com>
+# Depends: R (>= 3.0.0)
+# Imports: httr, graphics
+# Suggests: XML, stats, Hmisc
+# Description: The Cancer Genome Atlas (TCGA) is a program aimed at improving our understanding of Cancer Biology. Several TCGA Datasets are available online. 'TCGAretriever' helps accessing and downloading TCGA data hosted on 'cBioPortal' via its Web Interface (see <http://www.cbioportal.org/web_api.jsp> for more information). Features of 'TCGAretriever' include: 1) it is very simple to use (get all the TCGA data you need with a few lines of code); 2) performance (smooth and reliable data download via 'httr'); 3) it is tailored for downloading large volumes of data.
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2016-07-30 20:38:54 UTC; dami
+# Repository: CRAN
+# Date/Publication: 2016-07-30 23:15:43
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

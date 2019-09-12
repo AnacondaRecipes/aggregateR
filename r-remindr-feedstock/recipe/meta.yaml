@@ -1,0 +1,94 @@
+{% set version = '0.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-remindr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/remindR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/remindR/remindR_{{ version }}.tar.gz
+  sha256: 62188c7f9418a0d0a9d3fe04600b9fbd4509efccc0a167d94e14fd51b1d8472c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-assertthat
+
+  run:
+    - r-base
+    - r-assertthat
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('remindR')"           # [not win]
+    - "\"%R%\" -e \"library('remindR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=remindR
+  license: GPL-2 | GPL-3
+  summary: Insert/extract text "reminders" into/from function source code  comments or as the
+    "comment" attribute of any object.   The former can be handy in development as reminders
+    of e.g. argument requirements, expected objects in the calling environment, required
+    options settings, etc. The latter can be used to provide information of the object
+    and  as simple manual "tooltips" for users, among other things.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: remindR
+# Title: Insert and Extract "Reminders" from Function Comments
+# Version: 0.0.1
+# Authors@R: person("Bert", "Gunter", email = "bgunter.4567@gmail.com", role = c("aut", "cre"))
+# Description: Insert/extract text "reminders" into/from function source code  comments or as the "comment" attribute of any object.   The former can be handy in development as reminders of e.g. argument requirements, expected objects in the calling environment, required options settings, etc. The latter can be used to provide information of the object and  as simple manual "tooltips" for users, among other things.
+# Depends: R (>= 3.3.2)
+# Imports: assertthat
+# License: GPL-2 | GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2017-03-07 00:47:38 UTC; bgunter
+# Author: Bert Gunter [aut, cre]
+# Maintainer: Bert Gunter <bgunter.4567@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-03-07 13:41:43
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

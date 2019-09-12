@@ -1,0 +1,97 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gym
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gym_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gym/gym_{{ version }}.tar.gz
+  sha256: 1b61e9ae1cc1a6f1f49582d8e956d41ff53bfe94ab860c8b715a72ccd5fb9c6d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gym')"           # [not win]
+    - "\"%R%\" -e \"library('gym')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/paulhendricks/gym-R
+  license: MIT
+  summary: 'OpenAI Gym is a open-source Python toolkit for developing and comparing reinforcement
+    learning algorithms. This is a wrapper for the OpenAI Gym API, and enables access
+    to an ever-growing variety of environments. For more details on OpenAI Gym, please
+    see here: <https://github.com/openai/gym>. For more details on the OpenAI Gym API
+    specification, please see here: <https://github.com/openai/gym-http-api>.'
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gym
+# Version: 0.1.0
+# Title: Provides Access to the OpenAI Gym API
+# Description: OpenAI Gym is a open-source Python toolkit for developing and comparing reinforcement learning algorithms. This is a wrapper for the OpenAI Gym API, and enables access to an ever-growing variety of environments. For more details on OpenAI Gym, please see here: <https://github.com/openai/gym>. For more details on the OpenAI Gym API specification, please see here: <https://github.com/openai/gym-http-api>.
+# Authors@R: person("Paul", "Hendricks", email = "paul.hendricks.2013@owu.edu", role = c("aut", "cre"))
+# License: MIT + file LICENSE
+# LazyData: true
+# Depends: R (>= 3.3.1)
+# Imports: httr, jsonlite
+# URL: https://github.com/paulhendricks/gym-R
+# BugReports: https://github.com/paulhendricks/gym-R/issues
+# RoxygenNote: 5.0.1
+# Suggests: testthat
+# NeedsCompilation: no
+# Packaged: 2016-10-24 22:45:00 UTC; paulhendricks
+# Author: Paul Hendricks [aut, cre]
+# Maintainer: Paul Hendricks <paul.hendricks.2013@owu.edu>
+# Repository: CRAN
+# Date/Publication: 2016-10-25 00:57:54
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

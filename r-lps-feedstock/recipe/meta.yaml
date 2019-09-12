@@ -1,0 +1,88 @@
+{% set version = '1.0.10' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lps
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LPS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LPS/LPS_{{ version }}.tar.gz
+  sha256: 124db9f86ee9c76406523c8a0e42c3ffc1dd5f2abdf5521dfa01c4e96095c33d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: limma
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LPS')"           # [not win]
+    - "\"%R%\" -e \"library('LPS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://bioinformatics.ovsa.fr/LPS
+  license: GPL-3
+  summary: An implementation of the Linear Predictor Score approach, as initiated by Radmacher
+    et al. (J Comput Biol 2001) and enhanced by Wright et al. (PNAS 2003) for gene expression
+    signatures. Several tools for unsupervised clustering of gene expression data are
+    also provided.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LPS
+# Type: Package
+# Title: Linear Predictor Score, for Binary Inference from Multiple Continuous Variables
+# Version: 1.0.10
+# Date: 2015-02-15
+# Author: Sylvain Mareschal
+# Maintainer: Sylvain Mareschal <maressyl@gmail.com>
+# URL: http://bioinformatics.ovsa.fr/LPS
+# BugReports: https://github.com/maressyl/R.LPS/issues
+# Description: An implementation of the Linear Predictor Score approach, as initiated by Radmacher et al. (J Comput Biol 2001) and enhanced by Wright et al. (PNAS 2003) for gene expression signatures. Several tools for unsupervised clustering of gene expression data are also provided.
+# Depends: stats, R (>= 2.10)
+# Suggests: limma
+# License: GPL (>= 3)
+# Packaged: 2015-02-15 23:16:21 UTC; sylvain
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-02-16 06:49:28
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

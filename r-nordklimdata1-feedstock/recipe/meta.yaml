@@ -1,0 +1,89 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nordklimdata1
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/nordklimdata1_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/nordklimdata1/nordklimdata1_{{ version }}.tar.gz
+  sha256: 9d94ba3c73094869b75714ec496a40973fa7f173ff765a8ed0d9228f075c5030
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('nordklimdata1')"           # [not win]
+    - "\"%R%\" -e \"library('nordklimdata1')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=nordklimdata1
+  license: GPL-3
+  summary: The Nordklim dataset 1.0 is a unique and useful achievement for climate  analysis.
+    It includes observations of twelve different climate elements from  more than 100
+    stations in the Nordic region, in time span over 100 years. The project contractors
+    were NORDKLIM/NORDMET on behalf of the National  meteorological services in Denmark
+    (DMI), Finland (FMI), Iceland (VI),  Norway (DNMI) and Sweden (SMHI).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: nordklimdata1
+# Type: Package
+# Title: Dataset for Climate Analysis with Data from the Nordic Region
+# Version: 1.2
+# Encoding: UTF-8
+# Authors@R: c(person(given = "Heikki", family = "Tuomenvirta", role = "aut"), person(given = "Achim", family = "Drebs", role = "aut"), person(given = "Eirik", family = "Frland", role = "aut"), person(given = "Ole", family = "Einar Tveito", role = "aut"), person(given = "Hans", family = "Alexandersson", role = "aut"), person(given = "Ellen", family = "Vaarby Laursen", role = "aut"), person(given = "Trausti", family = "Jonsson", role = "aut"), person(given = "Jose", family = "Gama", role = "cre",email = "rxprtgama@gmail.com"))
+# Description: The Nordklim dataset 1.0 is a unique and useful achievement for climate  analysis. It includes observations of twelve different climate elements from  more than 100 stations in the Nordic region, in time span over 100 years. The project contractors were NORDKLIM/NORDMET on behalf of the National  meteorological services in Denmark (DMI), Finland (FMI), Iceland (VI),  Norway (DNMI) and Sweden (SMHI).
+# License: GPL (>= 3)
+# Depends: R (>= 2.10)
+# Author: Heikki Tuomenvirta [aut], Achim Drebs [aut], Eirik Frland [aut], Ole Einar Tveito [aut], Hans Alexandersson [aut], Ellen Vaarby Laursen [aut], Trausti Jonsson [aut], Jose Gama [cre]
+# Maintainer: Jose Gama <rxprtgama@gmail.com>
+# Repository: CRAN
+# Repository/R-Forge/Project: nordklimdata1
+# Repository/R-Forge/Revision: 16
+# Repository/R-Forge/DateTimeStamp: 2015-07-18 16:22:57
+# Date/Publication: 2015-07-19 09:38:58
+# NeedsCompilation: no
+# Packaged: 2015-07-18 16:45:18 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

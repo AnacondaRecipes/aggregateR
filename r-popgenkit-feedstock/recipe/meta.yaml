@@ -1,0 +1,90 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-popgenkit
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PopGenKit_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PopGenKit/PopGenKit_{{ version }}.tar.gz
+  sha256: 4443f7dc811ae55f24e38ea30980f4914595c4ce352e2638dbef5ecf405d9550
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PopGenKit')"           # [not win]
+    - "\"%R%\" -e \"library('PopGenKit')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PopGenKit
+  license: GPL-2
+  summary: There are two main purposes to this package. The first is to allow batch conversion
+    of Genepop (Rousset 2008) input files for use with Arlequin (Excoffier and Lischer
+    2010), which has a simple GUI to analyze batch files. Two commonly used simulation
+    software, BottleSim (Kuo & Janzen 2003) and Easypop (Balloux 2001) produce Genepop
+    output files that can be analyzed this way. There are also functions to convert
+    to and from BottleSim format, to quickly produce allele frequency tables or to convert
+    a file directly for use in ordination analyses (e.g. principal component analysis).
+    This package also includes functions to calculate allele rarefaction curves, confidence
+    intervals on heterozygosity and allelic richness with resampling strategies (bootstrap
+    and jackknife).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PopGenKit
+# Type: Package
+# Title: Useful functions for (batch) file conversion and data resampling in microsatellite datasets
+# Version: 1.0
+# Date: 2011-07-21
+# Author: Sebastien Rioux Paquette
+# Maintainer: Sebastien Rioux Paquette <sebastien.riouxpaquette@gmail.com>
+# Description: There are two main purposes to this package. The first is to allow batch conversion of Genepop (Rousset 2008) input files for use with Arlequin (Excoffier and Lischer 2010), which has a simple GUI to analyze batch files. Two commonly used simulation software, BottleSim (Kuo & Janzen 2003) and Easypop (Balloux 2001) produce Genepop output files that can be analyzed this way. There are also functions to convert to and from BottleSim format, to quickly produce allele frequency tables or to convert a file directly for use in ordination analyses (e.g. principal component analysis). This package also includes functions to calculate allele rarefaction curves, confidence intervals on heterozygosity and allelic richness with resampling strategies (bootstrap and jackknife).
+# License: GPL-2
+# LazyLoad: yes
+# Packaged: 2012-10-29 08:57:27 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2012-10-29 08:57:27
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,96 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-meto
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MeTo_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MeTo/MeTo_{{ version }}.tar.gz
+  sha256: f5d250ce120566dd3e2847586375f5569a32d84d5e442a785a1ee17107f40d92
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-lubridate
+
+  run:
+    - r-base
+    - r-lubridate
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MeTo')"           # [not win]
+    - "\"%R%\" -e \"library('MeTo')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MeTo
+  license: GPL-2
+  summary: 'Meteorological Tools following the FAO56 irrigation paper of Allen et al. (1998)
+    [1]. Functions for calculating: reference evapotranspiration (ETref), extraterrestrial
+    radiation (Ra), net radiation (Rn), saturation vapor pressure (satVP), global radiation
+    (Rs), soil heat flux (G), daylight hours, and more. [1] Allen, R. G., Pereira, L.
+    S., Raes, D., & Smith, M. (1998). Crop evapotranspiration-Guidelines for computing
+    crop water requirements-FAO Irrigation and drainage paper 56. FAO, Rome, 300(9).'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MeTo
+# Type: Package
+# Title: Meteorological Tools
+# Version: 0.1.0
+# Maintainer: Ullrich Dettmann <ullrich.dettmann@thuenen.de>
+# Authors@R: c(person('Ullrich', 'Dettmann', email = 'ullrich.dettmann@thuenen.de', role = c('aut', 'cre')), person('R.', 'Grimma', role = 'aut'))
+# Description: Meteorological Tools following the FAO56 irrigation paper of Allen et al. (1998) [1]. Functions for calculating: reference evapotranspiration (ETref), extraterrestrial radiation (Ra), net radiation (Rn), saturation vapor pressure (satVP), global radiation (Rs), soil heat flux (G), daylight hours, and more. [1] Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998). Crop evapotranspiration-Guidelines for computing crop water requirements-FAO Irrigation and drainage paper 56. FAO, Rome, 300(9).
+# BugReports: https://bitbucket.org/UlliD/meto/issues
+# Imports: lubridate
+# License: GPL (>= 2)
+# Depends: R (>= 3.3.0)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Suggests: testthat
+# NeedsCompilation: no
+# Packaged: 2019-01-08 16:42:05 UTC; ulli
+# Author: Ullrich Dettmann [aut, cre], R. Grimma [aut]
+# Repository: CRAN
+# Date/Publication: 2019-01-11 17:00:16 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

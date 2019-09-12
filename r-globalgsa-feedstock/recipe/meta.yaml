@@ -1,0 +1,84 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-globalgsa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/globalGSA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/globalGSA/globalGSA_{{ version }}.tar.gz
+  sha256: e849d49cf18d920810502b7bea4e3ed5b12eec86b203e78a38573c5307d87db8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('globalGSA')"           # [not win]
+    - "\"%R%\" -e \"library('globalGSA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=globalGSA
+  license: GPL-2
+  summary: Implementation of three different Gene set analysis (GSA) algorithms for combining
+    the individual pvalues of a set of genetic variats (SNPs) in a gene level pvalue.
+    The implementation includes the selection of the best inheritance model for each
+    SNP.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: globalGSA
+# Type: Package
+# Title: Global Gene-Set Analysis for Association Studies.
+# Version: 1.0
+# Date: 2013-10-22
+# Author: Natalia Vilor, M.Luz Calle
+# Maintainer: Natalia Vilor <natalia.vilor@uvic.cat>
+# Description: Implementation of three different Gene set analysis (GSA) algorithms for combining the individual pvalues of a set of genetic variats (SNPs) in a gene level pvalue. The implementation includes the selection of the best inheritance model for each SNP.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# Packaged: 2013-10-23 06:25:31 UTC; Natalia
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-10-23 23:52:23
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

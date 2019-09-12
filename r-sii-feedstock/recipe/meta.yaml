@@ -1,0 +1,94 @@
+{% set version = '1.0.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sii
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SII_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SII/SII_{{ version }}.tar.gz
+  sha256: 311f27ea34716d0bf8595756da8f366e59f54bbfe712789ad3b38873160173f7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: splines, gdata, xtable
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SII')"           # [not win]
+    - "\"%R%\" -e \"library('SII')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SII
+  license: GPL-2
+  summary: ' This package calculates ANSI S3.5-1997 Speech Intelligibility Index (SII), a standard
+    method for computing the intelligibility of speech from acoustical measurements
+    of speech, noise, and hearing thresholds. This package includes data frames corresponding
+    to Tables 1 - 4 in the ANSI standard as well as a function utilizing these tables
+    and user-provided hearing threshold and noise level measurements to compute the
+    SII score.  The methods implemented here extend the standard computations to allow
+    calculation of SII when the measured frequencies do not match those required by
+    the standard by applying interpolation to obtain values for the required frequencies
+    --  Development of this package was funded by the Center for Bioscience Education
+    and Technology (CBET) of the Rochester Institute of Technology (RIT).'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SII
+# Type: Package
+# Title: Calculate ANSI S3.5-1997 Speech Intelligibility Index
+# Version: 1.0.3.1
+# Date: 2013-12-06
+# Author: Gregory R. Warnes
+# Maintainer: Gregory R. Warnes <greg@warnes.net>
+# Description:  This package calculates ANSI S3.5-1997 Speech Intelligibility Index (SII), a standard method for computing the intelligibility of speech from acoustical measurements of speech, noise, and hearing thresholds. This package includes data frames corresponding to Tables 1 - 4 in the ANSI standard as well as a function utilizing these tables and user-provided hearing threshold and noise level measurements to compute the SII score.  The methods implemented here extend the standard computations to allow calculation of SII when the measured frequencies do not match those required by the standard by applying interpolation to obtain values for the required frequencies --  Development of this package was funded by the Center for Bioscience Education and Technology (CBET) of the Rochester Institute of Technology (RIT).
+# Depends:
+# Suggests: splines, gdata, xtable
+# License: GPL-2
+# LazyLoad: yes
+# Packaged: 2018-11-18 09:53:18 UTC; hornik
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2018-11-18 09:56:48 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

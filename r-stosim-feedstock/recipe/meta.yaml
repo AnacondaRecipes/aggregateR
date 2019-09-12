@@ -1,0 +1,100 @@
+{% set version = '0.0.14' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stosim
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/stosim_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/stosim/stosim_{{ version }}.tar.gz
+  sha256: b3425b05f94226338b66a34b3101c46109643cf484d0c064d6726aabea916882
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.1
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('stosim')"           # [not win]
+    - "\"%R%\" -e \"library('stosim')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=stosim
+  license: GPL-3
+  summary: A toolkit for Reliability Availability and Maintainability (RAM) modeling of industrial
+    process systems.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: stosim
+# Type: Package
+# Title: Stochastic Simulator for Reliability Modeling of Repairable Systems
+# Version: 0.0.14
+# Date: 2018-5-1
+# Authors@R: c(person("David", "Silkworth", email = "djsilk@openreliability.org", role = "aut"), person("Jacob", "Ormerod", email = "jake@openreliability.org", role = "cre"), person("OpenReliability.org", role = "cph"))
+# Description: A toolkit for Reliability Availability and Maintainability (RAM) modeling of industrial process systems.
+# License: GPL (>= 3)
+# Copyright: copyright (c) OpenReliability.org 2011-2018
+# LazyLoad: yes
+# Imports: Rcpp (>= 0.11.1)
+# Depends: tcltk
+# LinkingTo: Rcpp
+# Author: David Silkworth [aut], Jacob Ormerod [cre], OpenReliability.org [cph]
+# Maintainer: Jacob Ormerod <jake@openreliability.org>
+# Repository: CRAN
+# Repository/R-Forge/Project: stosim
+# Repository/R-Forge/Revision: 30
+# Repository/R-Forge/DateTimeStamp: 2018-05-01 11:51:11
+# Date/Publication: 2018-05-01 14:56:41 UTC
+# NeedsCompilation: yes
+# Packaged: 2018-05-01 11:55:08 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

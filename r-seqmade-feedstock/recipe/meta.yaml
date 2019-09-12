@@ -1,0 +1,85 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-seqmade
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SeqMADE_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SeqMADE/SeqMADE_{{ version }}.tar.gz
+  sha256: 0e8f9d7619fbcc539335b81f2c9b7f06f3dd191b8ff9cedeaff54e30a1ecc159
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SeqMADE')"           # [not win]
+    - "\"%R%\" -e \"library('SeqMADE')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SeqMADE
+  license: GPL-2
+  summary: A network module-based generalized linear model for differential expression analysis
+    with the count-based sequence data from RNA-Seq.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: SeqMADE
+# Type: Package
+# Title: Network Module-Based Model in the Differential Expression Analysis for RNA-Seq
+# Version: 1.0
+# Date: 2016-06-27
+# Author: Mingli Lei, Jia Xu, Li-Ching Huang, Lily Wang, Jing Li
+# Maintainer: Mingli Lei<leimingli2013@sjtu.edu.cn>
+# Description: A network module-based generalized linear model for differential expression analysis with the count-based sequence data from RNA-Seq.
+# License: GPL (>= 2)
+# Depends: R (>= 2.1.0),MASS
+# Repository: CRAN
+# LazyData: TRUE
+# NeedsCompilation: no
+# Packaged: 2016-06-27 03:06:53 UTC; Mingli Lei
+# Date/Publication: 2016-06-27 06:59:54
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

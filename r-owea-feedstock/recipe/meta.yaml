@@ -1,0 +1,96 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-owea
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/OWEA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/OWEA/OWEA_{{ version }}.tar.gz
+  sha256: e781b7c85243782632611b1584de39b22d61611f016aa360d73be6393649bd02
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-gtools >=3.8.1
+    - r-shiny >=1.1.0
+
+  run:
+    - r-base
+    - r-mass
+    - r-gtools >=3.8.1
+    - r-shiny >=1.1.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('OWEA')"           # [not win]
+    - "\"%R%\" -e \"library('OWEA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=OWEA
+  license: GPL-3
+  summary: An implementation of optimal weight exchange algorithm Yang(2013) <doi:10.1080/01621459.2013.806268>
+    for three models. They are Crossover model with subject dropout, crossover model
+    with proportional first order residual effects and interference model. You can use
+    it to find either A-opt or D-opt approximate designs. Exact designs can be automatically
+    rounded from approximate designs and relative efficiency is provided as well.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: OWEA
+# Type: Package
+# Title: Optimal Weight Exchange Algorithm for Optimal Designs for Three Models
+# Version: 0.1.1
+# Authors@R: c( person("Shuai", "Hao", email="shuaih0303@gmail.com", role = c("aut","cre")),  person("Min", "Yang", email="myang2@uic.edu", role = c("aut")), person("Wei", "Zheng", email= "wzheng9@utk.edu", role = c("aut")))
+# Maintainer: Shuai Hao <shuaih0303@gmail.com>
+# Description: An implementation of optimal weight exchange algorithm Yang(2013) <doi:10.1080/01621459.2013.806268> for three models. They are Crossover model with subject dropout, crossover model with proportional first order residual effects and interference model. You can use it to find either A-opt or D-opt approximate designs. Exact designs can be automatically rounded from approximate designs and relative efficiency is provided as well.
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: knitr, rmarkdown
+# Imports: gtools (>= 3.8.1), MASS, shiny (>= 1.1.0)
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-11-03 02:26:06 UTC; shuaihao
+# Author: Shuai Hao [aut, cre], Min Yang [aut], Wei Zheng [aut]
+# Repository: CRAN
+# Date/Publication: 2018-11-03 15:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

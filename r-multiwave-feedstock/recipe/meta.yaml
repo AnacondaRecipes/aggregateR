@@ -1,0 +1,86 @@
+{% set version = '1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-multiwave
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/multiwave_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/multiwave/multiwave_{{ version }}.tar.gz
+  sha256: 4c0273377a5db7b1a6446bd7f74240b5477752b217c20dbf650671cfe40ca8a4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('multiwave')"           # [not win]
+    - "\"%R%\" -e \"library('multiwave')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=multiwave
+  license: GPL-2
+  summary: 'Computation of an estimation of the long-memory parameters and the long-run covariance
+    matrix using a multivariate model (Lobato (1999) <doi:10.1016/S0304-4076(98)00038-4>;
+    Shimotsu (2007) <doi:10.1016/j.jeconom.2006.01.003>). Two semi-parametric methods
+    are implemented: a Fourier based approach (Shimotsu (2007) <doi:10.1016/j.jeconom.2006.01.003>)
+    and a wavelet based approach (Achard and Gannaz (2016) <doi:10.1111/jtsa.12170>).'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: multiwave
+# Version: 1.4
+# Date: 2019-05-06
+# Title: Estimation of Multivariate Long-Memory Models Parameters
+# Authors@R: c(person("Sophie", "Achard", role=c("aut","cre"), email="sophie.achard@gipsa-lab.fr"),person("Irene","Gannaz", role=c("aut"), email="irene.gannaz@insa-lyon.fr"))
+# Maintainer: Sophie Achard <sophie.achard@gipsa-lab.fr>
+# Description: Computation of an estimation of the long-memory parameters and the long-run covariance matrix using a multivariate model (Lobato (1999) <doi:10.1016/S0304-4076(98)00038-4>; Shimotsu (2007) <doi:10.1016/j.jeconom.2006.01.003>). Two semi-parametric methods are implemented: a Fourier based approach (Shimotsu (2007) <doi:10.1016/j.jeconom.2006.01.003>) and a wavelet based approach (Achard and Gannaz (2016) <doi:10.1111/jtsa.12170>).
+# License: GPL (>= 2)
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2019-05-06 06:41:53 UTC; achards
+# Author: Sophie Achard [aut, cre], Irene Gannaz [aut]
+# Repository: CRAN
+# Date/Publication: 2019-05-06 07:20:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

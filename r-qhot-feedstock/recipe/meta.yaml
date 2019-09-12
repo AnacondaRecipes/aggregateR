@@ -1,0 +1,84 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-qhot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/QHOT_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/QHOT/QHOT_{{ version }}.tar.gz
+  sha256: 8b2656b0c528a8dd4db1c23c3340fd80853b82049eddedf73ad534aea4b0e00b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('QHOT')"           # [not win]
+    - "\"%R%\" -e \"library('QHOT')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=QHOT
+  license: GPL-3
+  summary: This function produces both the numerical and graphical summaries of the QTL hotspot
+    detection in the genomes that are available on the worldwide web including the flanking
+    markers of QTLs.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: QHOT
+# Type: Package
+# Title: QTL Hotspot Detection
+# Version: 0.1.0
+# Author: ManHsia Yang
+# Maintainer: ManHsia Yang <ymh@tari.gov.tw>
+# Description: This function produces both the numerical and graphical summaries of the QTL hotspot detection in the genomes that are available on the worldwide web including the flanking markers of QTLs.
+# License: GPL (>= 3)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-01-04 06:23:23 UTC; ymh
+# Repository: CRAN
+# Date/Publication: 2019-01-08 17:40:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

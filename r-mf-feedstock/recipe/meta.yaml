@@ -1,0 +1,86 @@
+{% set version = '4.3.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MF_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MF/MF_{{ version }}.tar.gz
+  sha256: c0522cccdd99753fb55a945539614e2489d2c813135ff6fcb35bb2e0b08736ab
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MF')"           # [not win]
+    - "\"%R%\" -e \"library('MF')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MF
+  license: MIT
+  summary: Calculate MF (mitigated fraction) with clustering and bootstrap options. See http://goo.gl/pcXYVr
+    for definition of MF.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MF
+# Type: Package
+# Title: Mitigated Fraction
+# Version: 4.3.2
+# Date: 2014-01-10
+# Author: David Siev
+# Maintainer: Marie Vendettuoli <marie.c.vendettuoli@aphis.usda.gov>
+# Description: Calculate MF (mitigated fraction) with clustering and bootstrap options. See http://goo.gl/pcXYVr for definition of MF.
+# License: MIT + file LICENSE
+# LazyLoad: yes
+# LazyData: yes
+# Depends: R (>= 2.15.0), methods
+# Collate: 'aaa.r' 'classes.r' 'generic_methods.r' 'MF-package.r' 'HLBoot.r' 'MFBoot.r' 'MFClus.r' 'MFClusBoot.r' 'MFmp.r' 'MFr.r' 'MFSubj.r'
+# Packaged: 2014-01-13 14:29:41 UTC; mvendett
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-01-13 16:04:51
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

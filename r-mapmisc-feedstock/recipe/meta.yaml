@@ -1,0 +1,94 @@
+{% set version = '1.7.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mapmisc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mapmisc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mapmisc/mapmisc_{{ version }}.tar.gz
+  sha256: bd1ded4ce8f8ca95f1e15e0dab244c2ea94dccc1359a651063f299d96ddb1e70
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: RColorBrewer, classInt, rgdal, rgeos, geosphere, knitr, dismo
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-raster
+    - r-sp
+
+  run:
+    - r-base
+    - r-raster
+    - r-sp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mapmisc')"           # [not win]
+    - "\"%R%\" -e \"library('mapmisc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mapmisc
+  license: GPL-3
+  summary: A minimal, light-weight set of tools for producing nice looking maps in R, with support
+    for map projections.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mapmisc
+# Type: Package
+# Title: Utilities for Producing Maps
+# Version: 1.7.2
+# Date: 2018-04-06
+# Depends: sp, raster, R (>= 3.0.0)
+# Imports: methods, grDevices, stats, utils, graphics
+# Suggests: RColorBrewer, classInt, rgdal, rgeos, geosphere, knitr, dismo
+# Enhances: maptools, tools, geonames
+# Author: Patrick Brown <patrick.brown@utoronto.ca>
+# Maintainer: Patrick Brown <patrick.brown@utoronto.ca>
+# Description: A minimal, light-weight set of tools for producing nice looking maps in R, with support for map projections.
+# License: GPL
+# VignetteBuilder: knitr
+# Repository: CRAN
+# Repository/R-Forge/Project: diseasemapping
+# Repository/R-Forge/Revision: 1978
+# Repository/R-Forge/DateTimeStamp: 2018-04-09 17:51:32
+# Date/Publication: 2018-04-09 19:26:43 UTC
+# NeedsCompilation: no
+# Packaged: 2018-04-09 18:06:14 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

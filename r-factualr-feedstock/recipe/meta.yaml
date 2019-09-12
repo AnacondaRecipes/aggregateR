@@ -1,0 +1,88 @@
+{% set version = '0.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-factualr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/factualR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/factualR/factualR_{{ version }}.tar.gz
+  sha256: 54066e21950cd9f650d125a607aa3b4ed6764314cd26e1bd309dd158d98ae8f3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcurl
+    - r-rjsonio
+
+  run:
+    - r-base
+    - r-rcurl
+    - r-rjsonio
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('factualR')"           # [not win]
+    - "\"%R%\" -e \"library('factualR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.exmachinatech.net/factualR/
+  license: Apache License 2.0
+  summary: Per the Factual.com website, "Factual is a platform where anyone can share and mash
+    open, living data on any subject." The data is in the form of tables and is accessible
+    via REST API.  The factualR package is a thin wrapper around the Factual.com API,
+    to make it even easier for people working with R to explore Factual.com data sets.
+  license_family: APACHE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: factualR
+# Type: Package
+# Title: thin wrapper for the Factual.com server API
+# Version: 0.5
+# Date: 2010-12-31
+# Author: Ethan McCallum
+# Maintainer: Ethan McCallum <factualr-package@exmachinatech.net>
+# Description: Per the Factual.com website, "Factual is a platform where anyone can share and mash open, living data on any subject." The data is in the form of tables and is accessible via REST API.  The factualR package is a thin wrapper around the Factual.com API, to make it even easier for people working with R to explore Factual.com data sets.
+# License: Apache License 2.0
+# LazyLoad: yes
+# Depends: methods, RJSONIO, RCurl
+# URL: http://www.exmachinatech.net/factualR/
+# Packaged: 2010-12-31 15:25:24 UTC; root
+# Repository: CRAN
+# Date/Publication: 2011-01-03 12:35:05
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

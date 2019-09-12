@@ -1,0 +1,92 @@
+{% set version = '0.1.14' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-manlymix
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ManlyMix_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ManlyMix/ManlyMix_{{ version }}.tar.gz
+  sha256: 8f27638dc494d23d810e544e6888f572826f530e042a475a19c41693c861ec7e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ManlyMix')"           # [not win]
+    - "\"%R%\" -e \"library('ManlyMix')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ManlyMix
+  license: GPL-2
+  summary: 'The utility of this package includes finite mixture modeling and model-based clustering
+    through Manly mixture models by Zhu and Melnykov (2016) <DOI:10.1016/j.csda.2016.01.015>.
+    It also provides capabilities for forward and backward model selection procedures.  '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ManlyMix
+# Version: 0.1.14
+# Date: 2018-04-25
+# Title: Manly Mixture Modeling and Model-Based Clustering
+# Authors@R: c(person("Xuwen", "Zhu", role = c("aut", "cre"), email = "xuwen.zhu@louisville.edu"), person("Volodymyr", "Melnykov", role = "aut"), person("Michael", "Hutt", role = c("ctb", "cph"), comment = "NM optimization in c"), person("Stephen", "Moshier", role = c("ctb", "cph"), comment = "eigen calculations in c"), person("Rouben", "Rostamian", role = c("ctb", "cph"), comment = "memory allocation in c"))
+# Depends: R (>= 3.0.0)
+# LazyLoad: yes
+# LazyData: no
+# Description: The utility of this package includes finite mixture modeling and model-based clustering through Manly mixture models by Zhu and Melnykov (2016) <DOI:10.1016/j.csda.2016.01.015>. It also provides capabilities for forward and backward model selection procedures.
+# License: GPL (>= 2)
+# Packaged: 2018-04-25 13:40:01 UTC; zhu
+# Author: Xuwen Zhu [aut, cre], Volodymyr Melnykov [aut], Michael Hutt [ctb, cph] (NM optimization in c), Stephen Moshier [ctb, cph] (eigen calculations in c), Rouben Rostamian [ctb, cph] (memory allocation in c)
+# Maintainer: Xuwen Zhu <xuwen.zhu@louisville.edu>
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2018-04-25 20:09:41 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

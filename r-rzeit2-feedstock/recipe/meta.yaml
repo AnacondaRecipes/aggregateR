@@ -1,0 +1,106 @@
+{% set version = '0.2.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rzeit2
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rzeit2_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rzeit2/rzeit2_{{ version }}.tar.gz
+  sha256: 8e96980c7012a20e042c282c1654e7c55ee8f757dfa1fe4125469f420dbb733b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dplyr, ggplot2, ggthemes, knitr, rmarkdown, robotstxt, tidytext
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-anytime
+    - r-httr
+    - r-jsonlite
+    - r-openssl
+    - r-rvest
+    - r-stringr
+    - r-xml2
+
+  run:
+    - r-base
+    - r-anytime
+    - r-httr
+    - r-jsonlite
+    - r-openssl
+    - r-rvest
+    - r-stringr
+    - r-xml2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rzeit2')"           # [not win]
+    - "\"%R%\" -e \"library('rzeit2')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rzeit2
+  license: MIT
+  summary: Interface to gather newspaper articles from 'DIE ZEIT' and 'ZEIT ONLINE', based on
+    a multilevel query <http://developer.zeit.de/>. A personal API key is required for
+    usage.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: rzeit2
+# Type: Package
+# Title: Client for the ZEIT ONLINE Content API
+# Version: 0.2.3
+# Authors@R: person("Jan", "Dix", email = "jan.dix@uni-konstanz.de", role = c("aut", "cre"))
+# Description: Interface to gather newspaper articles from 'DIE ZEIT' and 'ZEIT ONLINE', based on a multilevel query <http://developer.zeit.de/>. A personal API key is required for usage.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Depends: R (>= 3.2.0)
+# BugReports: https://github.com/jandix/rzeit2/issues
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Imports: anytime, httr, jsonlite, openssl, rvest, stringr, xml2
+# Suggests: dplyr, ggplot2, ggthemes, knitr, rmarkdown, robotstxt, tidytext
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2019-01-07 13:32:21 UTC; jan
+# Author: Jan Dix [aut, cre]
+# Maintainer: Jan Dix <jan.dix@uni-konstanz.de>
+# Repository: CRAN
+# Date/Publication: 2019-01-07 18:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

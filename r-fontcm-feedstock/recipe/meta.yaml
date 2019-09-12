@@ -1,0 +1,82 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fontcm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fontcm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fontcm/fontcm_{{ version }}.tar.gz
+  sha256: 8a96d0cef27ff94e1db8e1e0fdfb0ed139072e0c558324b1dc7017f91a26cbfc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: extrafont
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fontcm')"           # [not win]
+    - "\"%R%\" -e \"library('fontcm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/wch/fontcm
+  license: GPL-2
+  summary: Computer Modern font for use with extrafont package
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fontcm
+# Title: Computer Modern font for use with extrafont package
+# Version: 1.1
+# Author: Winston Chang, Alexej Kryukov, Paul Murrell
+# Maintainer: Winston Chang <winston@stdout.org>
+# Description: Computer Modern font for use with extrafont package
+# Depends: R (>= 2.14)
+# Suggests: extrafont
+# License: GPL-2
+# URL: https://github.com/wch/fontcm
+# Packaged: 2014-03-19 18:09:45 UTC; winston
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-03-19 20:23:33
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

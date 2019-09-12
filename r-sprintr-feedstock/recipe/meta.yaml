@@ -1,0 +1,105 @@
+{% set version = '0.9.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sprintr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sprintr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sprintr/sprintr_{{ version }}.tar.gz
+  sha256: 92af87f22e7fedffc95ee7b0097eb1f967c9a42916029dc7acecb1fc8f95df5a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.16
+    - r-rcpparmadillo
+    - r-glmnet
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.16
+    - r-rcpparmadillo
+    - r-glmnet
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sprintr')"           # [not win]
+    - "\"%R%\" -e \"library('sprintr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=sprintr
+  license: GPL-3
+  summary: An implementation of a computationally efficient method to fit large-scale interaction
+    models based on the reluctant interaction selection principle. The method and its
+    properties are described in greater depth in Yu, G., Bien, J., and Tibshirani, R.J.
+    (2019) "Reluctant interaction modeling", which is available at <arXiv:1907.08414>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sprintr
+# Type: Package
+# Title: Sparse Reluctant Interaction Modeling
+# Version: 0.9.0
+# Date: 2019-08-08
+# Authors@R: person("Guo", "Yu", email = "gy63@uw.edu", role = c("aut", "cre"))
+# Description: An implementation of a computationally efficient method to fit large-scale interaction models based on the reluctant interaction selection principle. The method and its properties are described in greater depth in Yu, G., Bien, J., and Tibshirani, R.J. (2019) "Reluctant interaction modeling", which is available at <arXiv:1907.08414>.
+# BugReports: https://github.com/hugogogo/sprintr/issues
+# License: GPL-3
+# Imports: Rcpp (>= 0.12.16), glmnet
+# LinkingTo: Rcpp, RcppArmadillo
+# RoxygenNote: 6.0.1
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2019-08-23 01:16:15 UTC; hugo
+# Author: Guo Yu [aut, cre]
+# Maintainer: Guo Yu <gy63@uw.edu>
+# Repository: CRAN
+# Date/Publication: 2019-08-24 10:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

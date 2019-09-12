@@ -1,0 +1,98 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sesem
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sesem_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sesem/sesem_{{ version }}.tar.gz
+  sha256: 25d69c720aaa3fe4322c5991b7505c7aa25508a43bf7833085705e8ec6fe3d2c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-gplots
+    - r-lavaan
+    - r-mgcv
+
+  run:
+    - r-base
+    - r-gplots
+    - r-lavaan
+    - r-mgcv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sesem')"           # [not win]
+    - "\"%R%\" -e \"library('sesem')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.r-project.org, http://homepage.usask.ca/~egl388/index.html
+  license: GPL-2
+  summary: Structural equation modeling is a powerful statistical approach for the testing of
+    networks of direct and indirect theoretical causal relationships in complex data
+    sets with inter-correlated dependent and independent variables. Here we implement
+    a simple method for spatially explicit structural equation modeling based on the
+    analysis of variance co-variance matrices calculated across a range of lag distances.
+    This method provides readily interpreted plots of the change in path coefficients
+    across scale.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sesem
+# Type: Package
+# Title: Spatially Explicit Structural Equation Modeling
+# Version: 1.0.2
+# Date: 2016-06-09
+# Authors@R: c(person("Eric", "Lamb", role = c("aut", "cre"),email = "eric.lamb@usask.ca"),person("Kerrie", "Mengersen", role = "aut"),person("Katherine", "Stewart", role = "aut"),person("Udayanga", "Attanayake", role = "aut"),person("Steven", "Siciliano", role = "aut"))
+# Maintainer: Eric Lamb <eric.lamb@usask.ca>
+# Description: Structural equation modeling is a powerful statistical approach for the testing of networks of direct and indirect theoretical causal relationships in complex data sets with inter-correlated dependent and independent variables. Here we implement a simple method for spatially explicit structural equation modeling based on the analysis of variance co-variance matrices calculated across a range of lag distances. This method provides readily interpreted plots of the change in path coefficients across scale.
+# Depends: R (>= 1.8.0)
+# Imports: lavaan, mgcv, gplots
+# License: GPL (>= 2)
+# URL: http://www.r-project.org, http://homepage.usask.ca/~egl388/index.html
+# LazyData: yes
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-06-10 17:29:33 UTC; Eric Lamb
+# Author: Eric Lamb [aut, cre], Kerrie Mengersen [aut], Katherine Stewart [aut], Udayanga Attanayake [aut], Steven Siciliano [aut]
+# Repository: CRAN
+# Date/Publication: 2016-06-10 23:12:40
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

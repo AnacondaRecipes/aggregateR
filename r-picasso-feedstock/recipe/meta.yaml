@@ -1,0 +1,102 @@
+{% set version = '1.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-picasso
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/picasso_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/picasso/picasso_{{ version }}.tar.gz
+  sha256: 6c94e7a6d188c1a9d9658b2729736b5194e04a898792028e8aee5cc911aafffc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-matrix
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('picasso')"           # [not win]
+    - "\"%R%\" -e \"library('picasso')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=picasso
+  license: GPL-3
+  summary: Computationally efficient tools for fitting generalized linear model with convex or
+    non-convex penalty. Users can enjoy the superior statistical property of non-convex
+    penalty such as SCAD and MCP which has significantly less estimation error and overfitting
+    compared to convex penalty such as lasso and ridge. Computation is handled by multi-stage
+    convex relaxation and the PathwIse CAlibrated Sparse Shooting algOrithm (PICASSO)
+    which exploits warm start initialization, active set updating, and strong rule for
+    coordinate preselection to boost computation, and attains a linear convergence to
+    a unique sparse local optimum with optimal statistical properties. The computation
+    is memory-optimized using the sparse matrix output.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: picasso
+# Type: Package
+# Title: Pathwise Calibrated Sparse Shooting Algorithm
+# Version: 1.3.1
+# Date: 2019-02-10
+# Author: Jason Ge, Xingguo Li, Haoming Jiang, Mengdi Wang, Tong Zhang, Han Liu and Tuo Zhao
+# Maintainer: Jason Ge <jiange@princeton.edu>
+# Depends: R (>= 2.15.0), MASS, Matrix
+# Imports: methods
+# Description: Computationally efficient tools for fitting generalized linear model with convex or non-convex penalty. Users can enjoy the superior statistical property of non-convex penalty such as SCAD and MCP which has significantly less estimation error and overfitting compared to convex penalty such as lasso and ridge. Computation is handled by multi-stage convex relaxation and the PathwIse CAlibrated Sparse Shooting algOrithm (PICASSO) which exploits warm start initialization, active set updating, and strong rule for coordinate preselection to boost computation, and attains a linear convergence to a unique sparse local optimum with optimal statistical properties. The computation is memory-optimized using the sparse matrix output.
+# License: GPL-3
+# Repository: CRAN
+# Packaged: 2019-02-21 17:39:23 UTC; Jason
+# NeedsCompilation: yes
+# Date/Publication: 2019-02-21 21:20:18 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

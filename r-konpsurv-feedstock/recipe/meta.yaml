@@ -1,0 +1,103 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-konpsurv
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/KONPsurv_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/KONPsurv/KONPsurv_{{ version }}.tar.gz
+  sha256: f17e5068953a99c446965035668a24971c3ca1bbdc01136e2ab6788850fb8d79
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.16
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.16
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('KONPsurv')"           # [not win]
+    - "\"%R%\" -e \"library('KONPsurv')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=KONPsurv
+  license: GPL-2
+  summary: The K-sample omnibus non-proportional hazards (KONP) tests are powerful non-parametric
+    tests for comparing K (>=2) hazard functions based on right-censored data (Gorfine,
+    Schlesinger and Hsu, 2019, <arXiv:1901.05739v1>). These tests are consistent against
+    any differences between the hazard functions of the groups. The KONP tests are often
+    more powerful than other existing tests, especially under non-proportional hazard
+    functions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: KONPsurv
+# Type: Package
+# Title: KONP Tests: Powerful K-Sample Tests for Right-Censored Data
+# Version: 1.0.1
+# Date: 2019-03-16
+# Author: Matan Schlesinger [cre, aut], Malka Gorfine [aut]
+# Maintainer: Matan Schlesinger <matan.schles@gmail.com>
+# Description: The K-sample omnibus non-proportional hazards (KONP) tests are powerful non-parametric tests for comparing K (>=2) hazard functions based on right-censored data (Gorfine, Schlesinger and Hsu, 2019, <arXiv:1901.05739v1>). These tests are consistent against any differences between the hazard functions of the groups. The KONP tests are often more powerful than other existing tests, especially under non-proportional hazard functions.
+# Authors@R: c( person("Matan", "Schlesinger", email = "matan.schles@gmail.com", role = c("cre","aut")), person("Malka", "Gorfine", email = "gorfinem@tauex.tau.ac.il", role = "aut"))
+# License: GPL (>= 2)
+# Imports: survival,Rcpp (>= 0.12.16)
+# LinkingTo: Rcpp
+# RoxygenNote: 6.1.1
+# Suggests: testthat
+# NeedsCompilation: yes
+# Packaged: 2019-03-19 20:34:47 UTC; Matan
+# Repository: CRAN
+# Date/Publication: 2019-03-19 22:53:34 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

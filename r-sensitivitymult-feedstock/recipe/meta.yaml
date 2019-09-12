@@ -1,0 +1,87 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sensitivitymult
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sensitivitymult_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sensitivitymult/sensitivitymult_{{ version }}.tar.gz
+  sha256: a549671d9ec4c607a1275cf1056a04956fe62014b7fc36fefc23ef7b98c1fea6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sensitivitymult')"           # [not win]
+    - "\"%R%\" -e \"library('sensitivitymult')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=sensitivitymult
+  license: GPL-2
+  summary: Sensitivity analysis for multiple outcomes in observational studies.  For instance,
+    all linear combinations of several outcomes may be explored using Scheffe projections
+    in the comparison() function; see Rosenbaum (2016, Annals of Applied Statistics)
+    <doi:10.1214/16-AOAS942>.  Alternatively, attention may focus on a few principal
+    components in the principal() function.  The package includes parallel methods for
+    individual outcomes, including tests in the senm() function and confidence intervals
+    in the senmCI() function.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sensitivitymult
+# Type: Package
+# Title: Sensitivity Analysis for Observational Studies with Multiple Outcomes
+# Version: 1.0.2
+# Author: Paul R. Rosenbaum
+# Maintainer: Paul R. Rosenbaum <rosenbaum@wharton.upenn.edu>
+# Description: Sensitivity analysis for multiple outcomes in observational studies.  For instance, all linear combinations of several outcomes may be explored using Scheffe projections in the comparison() function; see Rosenbaum (2016, Annals of Applied Statistics) <doi:10.1214/16-AOAS942>.  Alternatively, attention may focus on a few principal components in the principal() function.  The package includes parallel methods for individual outcomes, including tests in the senm() function and confidence intervals in the senmCI() function.
+# Imports: stats
+# License: GPL-2
+# LazyData: TRUE
+# NeedsCompilation: no
+# Packaged: 2017-08-29 20:56:40 UTC; rosenbap
+# Repository: CRAN
+# Date/Publication: 2017-08-29 21:49:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,92 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-wvtool
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/wvtool_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/wvtool/wvtool_{{ version }}.tar.gz
+  sha256: bb63f417741833c577e05be6af38f4bfb92acf8a093e0ea9b8f8d3f28ce42a75
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tiff
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('wvtool')"           # [not win]
+    - "\"%R%\" -e \"library('wvtool')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=wvtool
+  license: GPL-2
+  summary: This tool, wood vision tool, is intended to facilitate preprocessing and analyzing
+    2-dimensional wood images toward automated recognition. The former includes some
+    basics such as functions to RGB to grayscale, gray to binary, cropping, rotation(bilinear),
+    median/mean/Gaussian filter, and Canny/Sobel edge detection. The latter includes
+    gray level co-occurrence matrix (GLCM), Haralick parameters, local binary pattern
+    (LBP), higher order local autocorrelation (HLAC), Fourier transform (radial and
+    azimuthal integration), and Gabor filtering. The functions are intended to read
+    data using  'readTIFF(x,info=T)' from 'tiff' package. The functions in this packages
+    basically assumes the grayscale images as input data, thus the color images should
+    be subjected to the function rgb2gray() before used for some other functions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: wvtool
+# Type: Package
+# Title: Image Tools for Automated Wood Identification
+# Version: 1.0
+# Date: 2016-11-07
+# Author: Junji Sugiyama, Kayoko Kobayashi
+# Maintainer: Kayoko Kobayashi <kayoko_kobayashi@rish.kyoto-u.ac.jp>
+# Description: This tool, wood vision tool, is intended to facilitate preprocessing and analyzing 2-dimensional wood images toward automated recognition. The former includes some basics such as functions to RGB to grayscale, gray to binary, cropping, rotation(bilinear), median/mean/Gaussian filter, and Canny/Sobel edge detection. The latter includes gray level co-occurrence matrix (GLCM), Haralick parameters, local binary pattern (LBP), higher order local autocorrelation (HLAC), Fourier transform (radial and azimuthal integration), and Gabor filtering. The functions are intended to read data using  'readTIFF(x,info=T)' from 'tiff' package. The functions in this packages basically assumes the grayscale images as input data, thus the color images should be subjected to the function rgb2gray() before used for some other functions.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Suggests: tiff
+# Depends: R (>= 2.10)
+# Packaged: 2016-11-08 11:17:41 UTC; kayoko
+# Repository: CRAN
+# Date/Publication: 2016-11-08 16:50:40
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,99 @@
+{% set version = '0.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-scatterd3
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/scatterD3_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/scatterD3/scatterD3_{{ version }}.tar.gz
+  sha256: 5b16f5c47cf8e444a5383bba0c99da1bd0b0faa0ee08a603ff386e03886d2a56
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-digest
+    - r-ellipse
+    - r-htmlwidgets
+
+  run:
+    - r-base
+    - r-digest
+    - r-ellipse
+    - r-htmlwidgets
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('scatterD3')"           # [not win]
+    - "\"%R%\" -e \"library('scatterD3')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/juba/scatterD3
+  license: GPL-3
+  summary: 'Creates ''D3'' ''JavaScript'' scatterplots from ''R'' with interactive features :
+    panning, zooming, tooltips, etc.'
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: scatterD3
+# Type: Package
+# Title: D3 JavaScript Scatterplot from R
+# Version: 0.9
+# Date: 2019-03-27
+# Authors@R: c( person( "Julien", "Barnier", email = "julien.barnier@ens-lyon.fr", role = c("aut", "cre") ), person( "Kent", "Russell" , role = c("aut", "ctb") , email = "kent.russell@timelyportfolio.com" ), person( "Mike", "Bostock" , role = c("aut", "cph") , comment = "d3.js library, http://d3js.org" ), person( "Susie", "Lu" , role = c("aut", "cph") , comment = "d3-legend library, http://d3-legend.susielu.com/" ), person( "Speros", "Kokenes" , role = c("aut", "cph") , comment = "d3-lasso-plugin library, https://github.com/skokenes/D3-Lasso-Plugin" ), person( "Evan", "Wang" , role = c("aut", "cph") , comment = "d3-labeler plugin, https://github.com/tinker10/D3-Labeler" ) )
+# Maintainer: Julien Barnier <julien.barnier@ens-lyon.fr>
+# Description: Creates 'D3' 'JavaScript' scatterplots from 'R' with interactive features : panning, zooming, tooltips, etc.
+# License: GPL (>= 3)
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# URL: https://github.com/juba/scatterD3
+# BugReports: https://github.com/juba/scatterD3/issues
+# LazyData: TRUE
+# Enhances: shiny
+# Imports: htmlwidgets, digest, ellipse
+# Suggests: knitr, rmarkdown
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-04-16 09:08:35 UTC; julien
+# Author: Julien Barnier [aut, cre], Kent Russell [aut, ctb], Mike Bostock [aut, cph] (d3.js library, http://d3js.org), Susie Lu [aut, cph] (d3-legend library, http://d3-legend.susielu.com/), Speros Kokenes [aut, cph] (d3-lasso-plugin library, https://github.com/skokenes/D3-Lasso-Plugin), Evan Wang [aut, cph] (d3-labeler plugin, https://github.com/tinker10/D3-Labeler)
+# Repository: CRAN
+# Date/Publication: 2019-04-16 09:42:37 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

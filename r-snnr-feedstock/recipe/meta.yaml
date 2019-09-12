@@ -1,0 +1,89 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-snnr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/snnR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/snnR/snnR_{{ version }}.tar.gz
+  sha256: aac6ffd2f9645f85160c52ae5f59fb5f18f250db2e4dd4bf5ef1c67a772c3463
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('snnR')"           # [not win]
+    - "\"%R%\" -e \"library('snnR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=snnR
+  license: GPL-2
+  summary: Solve the problem of over-parameterization in neural networks for genomic selection.
+    Daniel Gianola, Hayrettin OkutEmail, Kent A Weigel and Guilherme JM Rosa (2011)
+    <doi:10.1186/1471-2156-12-87>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: snnR
+# Type: Package
+# Title: Sparse Neural Networks for Genomic Selection in Animal Breeding
+# Version: 1.0
+# Date: 2017-11-01
+# Author: Yangfan Wang, Ping Lin, Zhihui Chen, Zhenmin Bao, Guilherme J. M. Rosa
+# Maintainer: Yangfan Wang<yfwang@ouc.edu.cn>
+# Depends: R (>= 3.2.5)
+# Description: Solve the problem of over-parameterization in neural networks for genomic selection. Daniel Gianola, Hayrettin OkutEmail, Kent A Weigel and Guilherme JM Rosa (2011) <doi:10.1186/1471-2156-12-87>.
+# License: GPL-2
+# Repository: CRAN
+# NeedsCompilation: yes
+# Packaged: 2017-11-09 22:51:51 UTC; yfwang
+# Date/Publication: 2017-11-12 13:07:16 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

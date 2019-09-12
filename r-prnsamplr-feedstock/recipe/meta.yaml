@@ -1,0 +1,94 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-prnsamplr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/prnsamplr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/prnsamplr/prnsamplr_{{ version }}.tar.gz
+  sha256: ecddfeb814f55d355fbf5cb28f11d80cfdbe56928e30874357a3b95e675bbd41
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('prnsamplr')"           # [not win]
+    - "\"%R%\" -e \"library('prnsamplr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=prnsamplr
+  license: MIT
+  summary: Survey sampling using permanent random numbers (PRN's). A solution to the problem
+    of unknown overlap between survey samples, which leads to a low precision in estimates
+    when the survey is repeated or combined with other surveys. The PRN solution is
+    to supply the U(0, 1) random numbers to the  sampling procedure, instead of having
+    the sampling procedure generate them. In Lindblom (2014) <doi:10.2478/jos-2014-0047>,
+    and therein cited articles, it is shown how this is carried out and how it improves
+    the estimates. This package supports two common fixed-size sampling procedures (simple
+    random  sampling and probability-proportional-to-size sampling) and includes a  function
+    for transforming the PRN's in order to control the sample overlap.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: prnsamplr
+# Type: Package
+# Title: Permanent Random Number Sampling
+# Version: 0.1.0
+# Date: 2019-02-21
+# Author: Kira Coder Gylling
+# Maintainer: Kira Coder Gylling <kira.gylling@gmail.com>
+# Description: Survey sampling using permanent random numbers (PRN's). A solution to the problem of unknown overlap between survey samples, which leads to a low precision in estimates when the survey is repeated or combined with other surveys. The PRN solution is to supply the U(0, 1) random numbers to the  sampling procedure, instead of having the sampling procedure generate them. In Lindblom (2014) <doi:10.2478/jos-2014-0047>, and therein cited articles, it is shown how this is carried out and how it improves the estimates. This package supports two common fixed-size sampling procedures (simple random  sampling and probability-proportional-to-size sampling) and includes a  function for transforming the PRN's in order to control the sample overlap.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# RoxygenNote: 6.1.0
+# Imports: stats
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2019-02-22 11:43:07 UTC; kirag
+# Depends: R (>= 2.10)
+# Repository: CRAN
+# Date/Publication: 2019-03-02 17:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

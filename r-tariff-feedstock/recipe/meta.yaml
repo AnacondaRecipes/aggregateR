@@ -1,0 +1,86 @@
+{% set version = '1.0.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tariff
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Tariff_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Tariff/Tariff_{{ version }}.tar.gz
+  sha256: 9c28c23c5f9553c2b1441ced610094f19d71441ba9cf138cf4b335e5bd61abd5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Tariff')"           # [not win]
+    - "\"%R%\" -e \"library('Tariff')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Tariff
+  license: GPL-2
+  summary: Implement the Tariff algorithm for coding cause-of-death from verbal autopsies. The
+    Tariff method was originally proposed in James et al (2011) <DOI:10.1186/1478-7954-9-31>
+    and later refined as Tariff 2.0 in Serina, et al. (2015) <DOI:10.1186/s12916-015-0527-9>.
+    Note that this package was not developed by authors affiliated with the Institute
+    for Health Metrics and Evaluation and thus unintentional discrepancies may exist
+    between the this implementation and the implementation available from IHME.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Tariff
+# Type: Package
+# Title: Replicate Tariff Method for Verbal Autopsy
+# Version: 1.0.5
+# Date: 2018-10-23
+# Author: Zehang Li, Tyler McCormick, Sam Clark
+# Maintainer: Zehang Li <lizehang@uw.edu>
+# Description: Implement the Tariff algorithm for coding cause-of-death from verbal autopsies. The Tariff method was originally proposed in James et al (2011) <DOI:10.1186/1478-7954-9-31> and later refined as Tariff 2.0 in Serina, et al. (2015) <DOI:10.1186/s12916-015-0527-9>. Note that this package was not developed by authors affiliated with the Institute for Health Metrics and Evaluation and thus unintentional discrepancies may exist between the this implementation and the implementation available from IHME.
+# License: GPL-2
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-10-23 21:47:24 UTC; zehangli
+# Repository: CRAN
+# Date/Publication: 2018-10-29 05:40:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

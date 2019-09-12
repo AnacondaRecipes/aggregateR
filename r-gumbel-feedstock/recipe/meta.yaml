@@ -1,0 +1,83 @@
+{% set version = '1.10-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gumbel
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gumbel_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gumbel/gumbel_{{ version }}.tar.gz
+  sha256: 3292051658a82eb1b6f365a41fca023e32eaf1fec94fbed440865aad336b3169
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gumbel')"           # [not win]
+    - "\"%R%\" -e \"library('gumbel')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=gumbel
+  license: GPL-2
+  summary: Provides probability functions (cumulative distribution and density functions), simulation
+    function (Gumbel copula multivariate simulation) and estimation functions (Maximum
+    Likelihood Estimation, Inference For Margins, Moment Based Estimation and Canonical
+    Maximum Likelihood).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: gumbel
+# Type: Package
+# Title: The Gumbel-Hougaard Copula
+# Version: 1.10-2
+# Author: Anne-Lise Caillat [ctb], Christophe Dutang [aut,cre], Veronique Larrieu [ctb] and Triet Nguyen [ctb]
+# Maintainer: Christophe Dutang <christophe.dutang@ensimag.fr>
+# Description: Provides probability functions (cumulative distribution and density functions), simulation function (Gumbel copula multivariate simulation) and estimation functions (Maximum Likelihood Estimation, Inference For Margins, Moment Based Estimation and Canonical Maximum Likelihood).
+# Depends: R (>= 2.10.0)
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2018-08-07 19:12:16 UTC; dutang
+# Repository: CRAN
+# Date/Publication: 2018-08-07 19:40:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

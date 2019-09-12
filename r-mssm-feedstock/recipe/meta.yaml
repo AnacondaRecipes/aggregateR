@@ -1,0 +1,111 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mssm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mssm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mssm/mssm_{{ version }}.tar.gz
+  sha256: 5c757df65687d8a2a9aa9b736ce6db270bf85aceb85259bcb621cb90a944e8f4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, microbenchmark, Ecdat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-nloptr >=1.2.0
+    - r-testthat
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-nloptr >=1.2.0
+    - r-testthat
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mssm')"           # [not win]
+    - "\"%R%\" -e \"library('mssm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mssm
+  license: GPL-2
+  summary: Provides methods to perform parameter estimation and  make analysis of multivariate
+    observed outcomes through time which depends  on a latent state variable. All methods
+    scale well in the dimension  of the observed outcomes at each time point. The package
+    contains an  implementation of a Laplace approximation, particle filters like  suggested
+    by Lin, Zhang, Cheng, & Chen (2005) <doi:10.1198/016214505000000349>, and the gradient
+    and observed information matrix approximation suggested by Poyiadjis, Doucet, &
+    Singh (2011)  <doi:10.1093/biomet/asq062>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: mssm
+# Type: Package
+# Title: Multivariate State Space Models
+# Version: 0.1.2
+# Authors@R: c( person("Benjamin", "Christoffersen",  email = "boennecd@gmail.com",  role = c("cre", "aut")),  person("Anthony", "Williams",  role = c("cph")))
+# Description: Provides methods to perform parameter estimation and  make analysis of multivariate observed outcomes through time which depends  on a latent state variable. All methods scale well in the dimension  of the observed outcomes at each time point. The package contains an  implementation of a Laplace approximation, particle filters like  suggested by Lin, Zhang, Cheng, & Chen (2005) <doi:10.1198/016214505000000349>, and the gradient and observed information matrix approximation suggested by Poyiadjis, Doucet, & Singh (2011)  <doi:10.1093/biomet/asq062>.
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 3.5.0), stats, graphics
+# LinkingTo: Rcpp, RcppArmadillo, testthat, nloptr (>= 1.2.0)
+# Imports: Rcpp, nloptr (>= 1.2.0)
+# RoxygenNote: 6.1.1
+# SystemRequirements: C++11
+# Suggests: testthat, microbenchmark, Ecdat
+# NeedsCompilation: yes
+# Packaged: 2019-08-08 19:51:19 UTC; boennecd
+# Author: Benjamin Christoffersen [cre, aut], Anthony Williams [cph]
+# Maintainer: Benjamin Christoffersen <boennecd@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-08-08 22:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

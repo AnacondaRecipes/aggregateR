@@ -1,0 +1,86 @@
+{% set version = '0.1-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rcassandra
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RCassandra_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RCassandra/RCassandra_{{ version }}.tar.gz
+  sha256: 68c49cdebbedc2b4942c7f7c9fb67aa0654fab704294251d35dcb38074204275
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RCassandra')"           # [not win]
+    - "\"%R%\" -e \"library('RCassandra')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.rforge.net/RCassandra
+  license: GPL-2
+  summary: This packages provides a direct interface (without the use of Java) to the most basic
+    functionality of Apache Cassanda such as login, updates and queries.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RCassandra
+# Version: 0.1-3
+# Title: R/Cassandra interface
+# Author: Simon Urbanek <simon.urbanek@r-project.org>
+# Maintainer: Simon Urbanek <simon.urbanek@r-project.org>
+# Description: This packages provides a direct interface (without the use of Java) to the most basic functionality of Apache Cassanda such as login, updates and queries.
+# License: GPL-2
+# URL: http://www.rforge.net/RCassandra
+# Packaged: 2013-12-03 20:12:17 UTC; svnuser
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2013-12-03 22:24:59
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

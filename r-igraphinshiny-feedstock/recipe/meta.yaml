@@ -1,0 +1,89 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-igraphinshiny
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/igraphinshiny_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/igraphinshiny/igraphinshiny_{{ version }}.tar.gz
+  sha256: 06a5737a367510343f55e58a756007e27c529cfe70d13226e9ecc3e824d185f3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-igraph
+    - r-shiny
+
+  run:
+    - r-base
+    - r-igraph
+    - r-shiny
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('igraphinshiny')"           # [not win]
+    - "\"%R%\" -e \"library('igraphinshiny')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=igraphinshiny
+  license: GPL-2
+  summary: Using 'shiny' to demo 'igraph' package makes learning graph theory easy and fun.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: igraphinshiny
+# Type: Package
+# Title: Use 'shiny' to Demo 'igraph'
+# Version: 0.1
+# Date: 2016-01-12
+# Authors@R: person("Ming-Jer", "Lee", email = "mingjerli@gmail.com", role = c("aut", "cre"))
+# Depends: R (>= 3.2.0)
+# Imports: shiny, igraph
+# Description: Using 'shiny' to demo 'igraph' package makes learning graph theory easy and fun.
+# License: GPL (>= 2)
+# LazyData: TRUE
+# KeepSource: TRUE
+# NeedsCompilation: no
+# Packaged: 2016-01-19 01:34:31 UTC; mingjerli
+# Author: Ming-Jer Lee [aut, cre]
+# Maintainer: Ming-Jer Lee <mingjerli@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-01-19 08:18:05
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

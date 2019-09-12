@@ -1,0 +1,106 @@
+{% set version = '1.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fasterelasticnet
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fasterElasticNet_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fasterElasticNet/fasterElasticNet_{{ version }}.tar.gz
+  sha256: 0f0933b220d7c46a095814ad950812faac2e71030eeae7260cf87ea30de320c3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.16
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.16
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fasterElasticNet')"           # [not win]
+    - "\"%R%\" -e \"library('fasterElasticNet')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/CUFESAM/Elastic-Net
+  license: GPL-2
+  summary: Fit Elastic Net, Lasso, and Ridge regression and do cross-validation in a fast way.
+    We build the algorithm based on Least Angle Regression by Bradley Efron, Trevor
+    Hastie, Iain Johnstone, etc. (2004)(<doi:10.1214/009053604000000067 >) and some
+    algorithms like Givens rotation and Forward/Back Substitution. In this way, many
+    matrices to be computed are retained as triangular matrices which can eventually
+    speed up the computation. The fitting algorithm for Elastic Net is written in C++
+    using Armadillo linear algebra library.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fasterElasticNet
+# Type: Package
+# Title: An Amazing Fast Way to Fit Elastic Net
+# Version: 1.1.2
+# Date: 2018-08-01
+# Authors@R: c(person("Jingyi","Ma",email = "jingyima@163.com", role = c("aut")), person("Qiuhong","Lai",email = "lailaqiuhong@gmail.com", role = "ctb"), person("Linyu","Zuo",email = "zuozhe5959@gmail.com", role = c("ctb","cre")), person("Yi","Yang",email = "lucious.stat.y@gmail.com", role = "ctb"), person("Meng","Su",email = "SUmeng97@126.com", role = "ctb"), person("Zhen","Yu", email = "amy.yuzhen@foxmail.com", role = 'ctb'), person("Gege","Gao", email = "gaogege1995@163.com", role = 'ctb'), person("Xiao","Liu", email = "lucinecoco@163.com", role = 'ctb'), person("Xueni","Ruan", email = "ruanxueni96@163.com", role = 'ctb'), person("Xinyuan","Yang", email = "yangxinyuan100@126.com", role = 'ctb'), person("Yu","Bai", email = "yukisunflower@sina.com", role = 'ctb'), person("Zhijun","Liao", email = "econzhijun@163.com", role = 'ctb') )
+# Description: Fit Elastic Net, Lasso, and Ridge regression and do cross-validation in a fast way. We build the algorithm based on Least Angle Regression by Bradley Efron, Trevor Hastie, Iain Johnstone, etc. (2004)(<doi:10.1214/009053604000000067 >) and some algorithms like Givens rotation and Forward/Back Substitution. In this way, many matrices to be computed are retained as triangular matrices which can eventually speed up the computation. The fitting algorithm for Elastic Net is written in C++ using Armadillo linear algebra library.
+# Depends: R (>= 3.1.0)
+# License: GPL (>= 2)
+# Imports: Rcpp (>= 0.12.16)
+# LinkingTo: Rcpp, RcppArmadillo
+# Suggests: knitr, rmarkdown
+# URL: https://github.com/CUFESAM/Elastic-Net
+# BugReports: https://github.com/CUFESAM/Elastic-Net/issues
+# NeedsCompilation: yes
+# Packaged: 2018-08-08 13:22:50 UTC; <e8><8b><8f><e8><90><8c>
+# Author: Jingyi Ma [aut], Qiuhong Lai [ctb], Linyu Zuo [ctb, cre], Yi Yang [ctb], Meng Su [ctb], Zhen Yu [ctb], Gege Gao [ctb], Xiao Liu [ctb], Xueni Ruan [ctb], Xinyuan Yang [ctb], Yu Bai [ctb], Zhijun Liao [ctb]
+# Maintainer: Linyu Zuo <zuozhe5959@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-08-11 16:30:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

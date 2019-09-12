@@ -1,0 +1,96 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-misreport
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/misreport_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/misreport/misreport_{{ version }}.tar.gz
+  sha256: d0b45521ea63fb413881b086675347f2891b21318d43eab6aca13c4638fbe8b8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-vgam >=1.0_2
+    - r-mvtnorm >=1.0_5
+    - r-numderiv >=2014.2_1
+
+  run:
+    - r-base
+    - r-vgam >=1.0_2
+    - r-mvtnorm >=1.0_5
+    - r-numderiv >=2014.2_1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('misreport')"           # [not win]
+    - "\"%R%\" -e \"library('misreport')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=misreport
+  license: GPL-3
+  summary: Enables investigation of the predictors of misreporting on sensitive survey questions
+    through a multivariate list experiment regression method. The method permits researchers
+    to model whether a survey respondent's answer to the sensitive item in a list experiment
+    is different from his or her answer to an analogous direct question.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: misreport
+# Title: Statistical Analysis of Misreporting on Sensitive Survey Questions
+# Description: Enables investigation of the predictors of misreporting on sensitive survey questions through a multivariate list experiment regression method. The method permits researchers to model whether a survey respondent's answer to the sensitive item in a list experiment is different from his or her answer to an analogous direct question.
+# Authors@R: person("Gregory", "Eady", email = "gregory.eady@gmail.com", role = c("aut", "cre"))
+# Version: 0.1.1
+# Depends: R (>= 3.2.0)
+# Imports: numDeriv (>= 2014.2-1), VGAM (>= 1.0-2), mvtnorm (>= 1.0-5)
+# Suggests: knitr, rmarkdown
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 5.0.1
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2017-02-27 04:20:39 UTC; gregoryeady
+# Author: Gregory Eady [aut, cre]
+# Maintainer: Gregory Eady <gregory.eady@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2017-02-27 08:15:34
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

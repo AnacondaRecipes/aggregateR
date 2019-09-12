@@ -1,0 +1,103 @@
+{% set version = '1.3.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-localcontrolstrategy
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LocalControlStrategy_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LocalControlStrategy/LocalControlStrategy_{{ version }}.tar.gz
+  sha256: 342f1b008b70f66f2890eca2272e119b4359fc87899d200a4f6e70d0ca7c6f17
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-cluster
+    - r-lattice
+
+  run:
+    - r-base
+    - r-cluster
+    - r-lattice
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LocalControlStrategy')"           # [not win]
+    - "\"%R%\" -e \"library('LocalControlStrategy')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.R-project.org, http://localcontrolstatistics.org
+  license: GPL-2
+  summary: 'Especially when cross-sectional data are observational, effects of treatment selection
+    bias and confounding are revealed by using the Nonparametric and Unsupervised  "preprocessing"
+    methods central to Local Control (LC) Strategy. The LC objective is to estimate
+    the "effect-size distribution" that best quantifies a potentially causal relationship
+    between a numeric y-Outcome variable and a t-Treatment variable. This t-variable
+    may be either binary {1 = "new" vs 0 = "control"} or a numeric measure of Exposure
+    level. LC Strategy starts by CLUSTERING experimental units (patients) on their pre-exposure
+    X-Covariates, forming mutually exclusive and exhaustive BLOCKS of relatively well-matched
+    units. The implicit statistical model for LC is thus simple one-way ANOVA. The Within-Block
+    measures of effect-size are Local Rank Correlations (LRCs) when Exposure is numeric
+    with more than two levels. Otherwise, Treatment choice is Nested within BLOCKS,
+    and effect-sizes are LOCAL Treatment Differences (LTDs) between within-cluster y-Outcome
+    Means ["new" minus "control"]. An Instrumental Variable (IV) method is also provided
+    so that Local Average y-Outcomes (LAOs) within BLOCKS may also contribute information
+    for effect-size inferences ...assuming that X-Covariates influence only Treatment
+    choice or Exposure level and otherwise have no direct effects on y-Outcome. Finally,
+    a "Most-Like-Me" function provides histograms of effect-size distributions to aid
+    Doctor-Patient communications about Personalized Medicine.  '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: LocalControlStrategy
+# Title: Local Control Strategy for Robust Analysis of Cross-Sectional Data
+# Version: 1.3.3
+# Date: 2019-09-01
+# Author: Bob Obenchain
+# Maintainer: Bob Obenchain <wizbob@att.net>
+# Depends: cluster, lattice
+# Description: Especially when cross-sectional data are observational, effects of treatment selection bias and confounding are revealed by using the Nonparametric and Unsupervised  "preprocessing" methods central to Local Control (LC) Strategy. The LC objective is to estimate the "effect-size distribution" that best quantifies a potentially causal relationship between a numeric y-Outcome variable and a t-Treatment variable. This t-variable may be either binary {1 = "new" vs 0 = "control"} or a numeric measure of Exposure level. LC Strategy starts by CLUSTERING experimental units (patients) on their pre-exposure X-Covariates, forming mutually exclusive and exhaustive BLOCKS of relatively well-matched units. The implicit statistical model for LC is thus simple one-way ANOVA. The Within-Block measures of effect-size are Local Rank Correlations (LRCs) when Exposure is numeric with more than two levels. Otherwise, Treatment choice is Nested within BLOCKS, and effect-sizes are LOCAL Treatment Differences (LTDs) between within-cluster y-Outcome Means ["new" minus "control"]. An Instrumental Variable (IV) method is also provided so that Local Average y-Outcomes (LAOs) within BLOCKS may also contribute information for effect-size inferences ...assuming that X-Covariates influence only Treatment choice or Exposure level and otherwise have no direct effects on y-Outcome. Finally, a "Most-Like-Me" function provides histograms of effect-size distributions to aid Doctor-Patient communications about Personalized Medicine.
+# License: GPL-2
+# URL: https://www.R-project.org, http://localcontrolstatistics.org
+# NeedsCompilation: no
+# Packaged: 2019-08-29 18:24:27 UTC; bobo
+# Repository: CRAN
+# Date/Publication: 2019-08-29 23:10:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

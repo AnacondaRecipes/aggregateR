@@ -1,0 +1,96 @@
+{% set version = '0.7-6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-signal
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/signal_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/signal/signal_{{ version }}.tar.gz
+  sha256: 6b60277b07cf0167f8272059b128cc82f27a9bab1fd33d74c2a9e1f2abca5def
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: pracma
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('signal')"           # [not win]
+    - "\"%R%\" -e \"library('signal')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=signal
+  license: GPL-2
+  summary: A set of signal processing functions originally written for 'Matlab' and 'Octave'.
+    Includes filter generation utilities, filtering functions, resampling routines,
+    and visualization of filter models. It also includes interpolation functions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: signal
+# Title: Signal Processing
+# Version: 0.7-6
+# Date: 2015-07-29
+# Authors@R: c(person("Uwe", "Ligges", role = c("aut", "cre"), email="ligges@statistik.tu-dortmund.de", comment = "new maintainer"), person("Tom", "Short", role = "aut", email = "tshort@eprisolutions.com", comment="port to R"), person("Paul", "Kienzle", role = "aut", comment="majority of the original sources"), person("Sarah", "Schnackenberg", role = "ctb", comment="various test cases and bug fixes"), person("David", "Billinghurst", role = "ctb"), person("Hans-Werner", "Borchers", role = "ctb"), person("Andre", "Carezia", role = "ctb"), person("Pascal", "Dupuis", role = "ctb"), person("John W.", "Eaton", role = "ctb"), person("E.", "Farhi", role = "ctb"), person("Kai", "Habel", role = "ctb"), person("Kurt", "Hornik", role = "ctb"), person("Sebastian", "Krey", role = "ctb"), person("Bill", "Lash", role = "ctb"), person("Friedrich", "Leisch", role = "ctb"), person("Olaf", "Mersmann", role = "ctb"), person("Paulo", "Neis", role = "ctb"), person("Jaakko", "Ruohio", role = "ctb"), person("Julius O.", "Smith III", role = "ctb"),                   	    person("Doug", "Stewart", role = "ctb"), person("Andreas", "Weingessel", role = "ctb"))
+# Depends: R (>= 2.14.0)
+# Imports: MASS, graphics, grDevices, stats, utils
+# Suggests: pracma
+# Description: A set of signal processing functions originally written for 'Matlab' and 'Octave'. Includes filter generation utilities, filtering functions, resampling routines, and visualization of filter models. It also includes interpolation functions.
+# License: GPL-2
+# NeedsCompilation: yes
+# Packaged: 2015-07-29 17:06:27 UTC; ligges
+# Author: Uwe Ligges [aut, cre] (new maintainer), Tom Short [aut] (port to R), Paul Kienzle [aut] (majority of the original sources), Sarah Schnackenberg [ctb] (various test cases and bug fixes), David Billinghurst [ctb], Hans-Werner Borchers [ctb], Andre Carezia [ctb], Pascal Dupuis [ctb], John W. Eaton [ctb], E. Farhi [ctb], Kai Habel [ctb], Kurt Hornik [ctb], Sebastian Krey [ctb], Bill Lash [ctb], Friedrich Leisch [ctb], Olaf Mersmann [ctb], Paulo Neis [ctb], Jaakko Ruohio [ctb], Julius O. Smith III [ctb], Doug Stewart [ctb], Andreas Weingessel [ctb]
+# Maintainer: Uwe Ligges <ligges@statistik.tu-dortmund.de>
+# Repository: CRAN
+# Date/Publication: 2015-07-30 00:17:37
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,95 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-metricsweighted
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MetricsWeighted_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MetricsWeighted/MetricsWeighted_{{ version }}.tar.gz
+  sha256: 951c6839006ec8fcb9a7796ce4a038366c8f2ed37c3767324ce94d77b89253a5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dplyr, knitr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MetricsWeighted')"           # [not win]
+    - "\"%R%\" -e \"library('MetricsWeighted')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MetricsWeighted
+  license: GPL-2
+  summary: 'Provides weighted versions of several metrics, scoring functions and performance
+    measures used in machine learning, including average unit deviances of the Bernoulli,
+    Tweedie, Poisson, and Gamma distributions, see Jorgensen B. (1997, ISBN: 978-0412997112).
+    The package also contains a weighted version of generalized R-squared, see e.g.
+    Cohen, J. et al. (2002, ISBN: 978-0805822236). Furthermore, ''dplyr'' chains are
+    supported.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: MetricsWeighted
+# Title: Weighted Metrics, Scoring Functions and Performance Measures for Machine Learning
+# Version: 0.2.0
+# Date: 2019-08-16
+# Authors@R:  c(person(given = "Michael", family = "Mayer", role = c("aut", "cre", "cph"), email = "mayermichael79@gmail.com"), person(given = "Christian", family = "Lorentzen", role = "rev", email = "lorentzen.ch@googlemail.com"))
+# Maintainer: Michael Mayer <mayermichael79@gmail.com>
+# Description: Provides weighted versions of several metrics, scoring functions and performance measures used in machine learning, including average unit deviances of the Bernoulli, Tweedie, Poisson, and Gamma distributions, see Jorgensen B. (1997, ISBN: 978-0412997112). The package also contains a weighted version of generalized R-squared, see e.g. Cohen, J. et al. (2002, ISBN: 978-0805822236). Furthermore, 'dplyr' chains are supported.
+# License: GPL (>= 2)
+# Depends: R (>= 3.5.0)
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# LazyData: true
+# Imports: stats
+# Suggests: dplyr, knitr
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-08-19 16:30:22 UTC; Michael
+# Author: Michael Mayer [aut, cre, cph], Christian Lorentzen [rev]
+# Repository: CRAN
+# Date/Publication: 2019-08-19 18:00:14 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

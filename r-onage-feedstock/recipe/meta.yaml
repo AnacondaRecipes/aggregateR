@@ -1,0 +1,91 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-onage
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/OnAge_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/OnAge/OnAge_{{ version }}.tar.gz
+  sha256: 40b0fbafcf322ed382fd87307b40f8d5ecf59a255ba650cb2a2830919c2e7efd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lme4
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('OnAge')"           # [not win]
+    - "\"%R%\" -e \"library('OnAge')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://lbbe.univ-lyon1.fr/OnAge.html
+  license: GPL-3
+  summary: Implementation of a likelihood ratio test of differential onset of senescence between
+    two groups. Given two groups with measures of age and of an individual trait likely
+    to be subjected to senescence (e.g. body mass), 'OnAge' provides an asymptotic p-value
+    for the null hypothesis that senescence starts at the same age in both groups. The
+    package implements the procedure used in  Douhard et al. (2017) <doi:10.1111/oik.04421>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: OnAge
+# Title: Test of Between-Group Differences in the Onset of Senescence
+# Version: 1.0.1
+# Date: 2017-10-20
+# Author: Laurent Jacob, Frederic Douhard, Jean-Francois Lemaitre, Jean-Michel Gaillard, Aurelie Siberchicot
+# Maintainer: Aurelie Siberchicot <aurelie.siberchicot@univ-lyon1.fr>
+# Description: Implementation of a likelihood ratio test of differential onset of senescence between two groups. Given two groups with measures of age and of an individual trait likely to be subjected to senescence (e.g. body mass), 'OnAge' provides an asymptotic p-value for the null hypothesis that senescence starts at the same age in both groups. The package implements the procedure used in  Douhard et al. (2017) <doi:10.1111/oik.04421>.
+# URL: https://lbbe.univ-lyon1.fr/OnAge.html
+# License: GPL-3
+# LazyLoad: yes
+# Imports: stats
+# Suggests: lme4
+# Depends: R (>= 3.0.0)
+# NeedsCompilation: no
+# BuildVignettes: true
+# Encoding: UTF-8
+# Packaged: 2017-10-20 09:35:34 UTC; aurelie
+# Repository: CRAN
+# Date/Publication: 2017-10-20 10:21:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

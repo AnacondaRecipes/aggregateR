@@ -1,0 +1,93 @@
+{% set version = '2014.02.17' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-genesignaturefinder
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/geneSignatureFinder_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/geneSignatureFinder/geneSignatureFinder_{{ version }}.tar.gz
+  sha256: 90ecabf3bf1bc1baede7ad8d680a9766d1d633f409686e61aaef7fcb0f9232e9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests:
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-class
+    - r-cluster
+    - r-survival
+
+  run:
+    - r-base
+    - r-class
+    - r-cluster
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('geneSignatureFinder')"           # [not win]
+    - "\"%R%\" -e \"library('geneSignatureFinder')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.bioinformatics.unisannio.it/gsf
+  license: GPL-2
+  summary: 'A tool for finding an ensemble gene-signature by a steepest ascending algorithm partially
+    supervised by survival time data. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: geneSignatureFinder
+# Type: Package
+# Title: A Gene-signatures finder tools
+# Version: 2014.02.17
+# Date: 2012-08-20
+# Author: Stefano M. Pagnotta, Michele Ceccarelli
+# Maintainer: Stefano M. Pagnotta <pagnotta@unisannio.it>
+# Description: A tool for finding an ensemble gene-signature by a steepest ascending algorithm partially supervised by survival time data.
+# License: GPL-2
+# Depends: R (>= 3.0.0), survival, cluster, class, parallel
+# Suggests:
+# URL: http://www.bioinformatics.unisannio.it/gsf
+# BugReports: http://www.bioinformatics.unisannio.it/gsf
+# Packaged: 2014-03-07 09:41:13 UTC; stefano
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-03-07 11:58:47
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

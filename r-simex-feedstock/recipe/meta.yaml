@@ -1,0 +1,92 @@
+{% set version = '1.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-simex
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/simex_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/simex/simex_{{ version }}.tar.gz
+  sha256: 80c7841196b9377a9367eb6960ad80ca0bf8de511b8b18a0031bfbe7bde289a0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: mgcv, nlme, MASS, survival
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('simex')"           # [not win]
+    - "\"%R%\" -e \"library('simex')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://wolfganglederer.github.io/simex/
+  license: GPL-3
+  summary: "Implementation of the SIMEX-Algorithm by Cook & Stefanski (1994) <doi:10.1080/01621459.1994.10476871>
+    and MCSIMEX by K\xFCchenhoff, Mwalili & Lesaffre (2006) <doi:10.1111/j.1541-0420.2005.00396.x>."
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: simex
+# Type: Package
+# Version: 1.8
+# Date: 2019-07-28
+# Imports: stats, graphics
+# Suggests: mgcv, nlme, MASS, survival
+# Title: SIMEX- And MCSIMEX-Algorithm for Measurement Error Models
+# Authors@R: c( person("Wolfgang", "Lederer", email = "Wolfgang.Lederer@gmail.com", role = c("cre", "aut")), person("Heidi", "Seibold", email = "heidi.bold@gmail.com", role = "aut"), person("Helmut", "K\u00fcchenhoff", email = "Kuechenhoff@stat.uni-muenchen.de", role = "ctb"), person("Chris", "Lawrence", email = "", role = "ctb"), person("Rasmus Froberg", "Brndum", email = "", role = "ctb"))
+# Description: Implementation of the SIMEX-Algorithm by Cook & Stefanski (1994) <doi:10.1080/01621459.1994.10476871> and MCSIMEX by Kuchenhoff, Mwalili & Lesaffre (2006) <doi:10.1111/j.1541-0420.2005.00396.x>.
+# URL: http://wolfganglederer.github.io/simex/
+# BugReports: https://github.com/wolfganglederer/simex/issues
+# License: GPL-3
+# Encoding: UTF-8
+# LazyLoad: yes
+# ZipData: yes
+# Packaged: 2019-07-30 23:54:30 UTC; Wolfgang
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Author: Wolfgang Lederer [cre, aut], Heidi Seibold [aut], Helmut Kuchenhoff [ctb], Chris Lawrence [ctb], Rasmus Froberg Brndum [ctb]
+# Maintainer: Wolfgang Lederer <Wolfgang.Lederer@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-07-31 05:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

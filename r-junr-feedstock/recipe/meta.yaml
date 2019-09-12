@@ -1,0 +1,100 @@
+{% set version = '0.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-junr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/junr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/junr/junr_{{ version }}.tar.gz
+  sha256: 6e51b50f23e79839c9efabe378c49a72a82569fc5983c38f25df441fffa58f71
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat (>= 0.8.0)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('junr')"           # [not win]
+    - "\"%R%\" -e \"library('junr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/fvd/junr
+  license: MIT
+  summary: ' The ''Junar'' API is a commercial platform to organize and publish data <http://www.junar.com>.
+    It has been used in a number of national and local government Open Data initiatives
+    in Latin America and the USA. This package is a wrapper to make it easier to access
+    data made public through the ''Junar'' API.'
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENCE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Encoding: UTF-8
+# Package: junr
+# Type: Package
+# Title: Access Open Data Through the 'Junar' API
+# Description:  The 'Junar' API is a commercial platform to organize and publish data <http://www.junar.com>. It has been used in a number of national and local government Open Data initiatives in Latin America and the USA. This package is a wrapper to make it easier to access data made public through the 'Junar' API.
+# Version: 0.1.3
+# Date: 2017-08-08
+# Authors@R: c(person("Frans", "van Dunne", , "frans@ixpantia.com", c("aut", "cre")) )
+# BugReports: https://github.com/fvd/junr/issues
+# LazyData: TRUE
+# Depends: R (>= 3.0.0)
+# Imports: httr, jsonlite
+# Suggests: knitr, rmarkdown, testthat (>= 0.8.0)
+# VignetteBuilder: knitr
+# License: MIT + file LICENCE
+# URL: https://github.com/fvd/junr
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-12-11 22:29:39 UTC; frans
+# Author: Frans van Dunne [aut, cre]
+# Maintainer: Frans van Dunne <frans@ixpantia.com>
+# Repository: CRAN
+# Date/Publication: 2017-12-11 22:55:22 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,82 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pcfam
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PCFAM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PCFAM/PCFAM_{{ version }}.tar.gz
+  sha256: bbfe54ab71e88f021ec183c20a7345f6c634064a36d5a7fcfcc048e3c0fed2a4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PCFAM')"           # [not win]
+    - "\"%R%\" -e \"library('PCFAM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PCFAM
+  license: GPL-2
+  summary: We provide several algorithms to compute the genotype ancestry scores (such as eigenvector
+    projections) in the case where highly correlated individuals are involved.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PCFAM
+# Type: Package
+# Title: Computation of Ancestry Scores with Mixed Families and Unrelated Individuals
+# Version: 1.0
+# Date: 2017-03-20
+# Author: Yi-Hui Zhou
+# Maintainer: Yi-Hui Zhou <yihui_zhou@ncsu.edu>
+# Description: We provide several algorithms to compute the genotype ancestry scores (such as eigenvector projections) in the case where highly correlated individuals are involved.
+# License: GPL-2
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2017-03-24 18:30:41 UTC; yzhou19
+# Repository: CRAN
+# Date/Publication: 2017-03-24 19:10:36 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

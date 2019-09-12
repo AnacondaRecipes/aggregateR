@@ -1,0 +1,113 @@
+{% set version = '2.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-multivariance
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/multivariance_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/multivariance/multivariance_{{ version }}.tar.gz
+  sha256: f0324f570675021f8a4607cbada93b1c84ef5996ed42e69a84d24277aaf7e7a0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-igraph
+    - r-microbenchmark
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-igraph
+    - r-microbenchmark
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('multivariance')"           # [not win]
+    - "\"%R%\" -e \"library('multivariance')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=multivariance
+  license: GPL-3
+  summary: "Distance multivariance is a measure of dependence which can be used to detect  and
+    quantify dependence. The necessary functions are implemented in this packages,  and
+    examples are given. For the theoretic background we refer to the papers: B. B\xF6ttcher,
+    Dependence and Dependence Structures: Estimation and Visualization Using Distance
+    Multivariance. <arXiv:1712.06532>. B. B\xF6ttcher, M. Keller-Ressel, R.L. Schilling,
+    Detecting independence of random vectors: generalized distance covariance and Gaussian
+    covariance. VMSTA, 2018, Vol. 5, No. 3, 353-383. <arXiv:1711.07778>. B. B\xF6ttcher,
+    M. Keller-Ressel, R.L. Schilling, Distance multivariance: New dependence measures
+    for random vectors. <arXiv:1711.07775>. G. Berschneider, B. B\xF6ttcher, On complex
+    Gaussian random fields, Gaussian quadratic forms and sample distance multivariance.
+    <arXiv:1808.07280>."
+
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: multivariance
+# Title: Measuring Multivariate Dependence Using Distance Multivariance
+# Version: 2.2.0
+# Date: 2019-06-18
+# Authors@R: c( person("Bjorn", "Bottcher", email = "bjoern.boettcher@tu-dresden.de",role = c("aut", "cre")), person("Martin", "Keller-Ressel", email = "martin.keller-ressel@tu-dresden.de", role = "ctb") )
+# Description: Distance multivariance is a measure of dependence which can be used to detect  and quantify dependence. The necessary functions are implemented in this packages,  and examples are given. For the theoretic background we refer to the papers: B. Bottcher, Dependence and Dependence Structures: Estimation and Visualization Using Distance Multivariance. <arXiv:1712.06532>. B. Bottcher, M. Keller-Ressel, R.L. Schilling, Detecting independence of random vectors: generalized distance covariance and Gaussian covariance. VMSTA, 2018, Vol. 5, No. 3, 353-383. <arXiv:1711.07778>. B. Bottcher, M. Keller-Ressel, R.L. Schilling, Distance multivariance: New dependence measures for random vectors. <arXiv:1711.07775>. G. Berschneider, B. Bottcher, On complex Gaussian random fields, Gaussian quadratic forms and sample distance multivariance. <arXiv:1808.07280>.
+# Depends: R (>= 3.3.0)
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Imports: igraph, graphics, stats, Rcpp, microbenchmark
+# RoxygenNote: 6.1.1
+# Suggests: testthat
+# LinkingTo: Rcpp
+# NeedsCompilation: yes
+# Packaged: 2019-06-18 11:18:18 UTC; BB
+# Author: Bjorn Bottcher [aut, cre], Martin Keller-Ressel [ctb]
+# Maintainer: Bjorn Bottcher <bjoern.boettcher@tu-dresden.de>
+# Repository: CRAN
+# Date/Publication: 2019-06-18 12:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

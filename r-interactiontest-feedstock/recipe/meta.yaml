@@ -1,0 +1,86 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-interactiontest
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/interactionTest_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/interactionTest/interactionTest_{{ version }}.tar.gz
+  sha256: 62b241f9148c08e8ed53e88d8849759d39d02add526492a782aa1f40d3409979
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('interactionTest')"           # [not win]
+    - "\"%R%\" -e \"library('interactionTest')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=interactionTest
+  license: GPL-3
+  summary: Implements the procedures suggested in Esarey and Sumner (2017) <http://justinesarey.com/interaction-overconfidence.pdf>
+    for controlling the false discovery rate when constructing marginal effects plots
+    for models with interaction terms.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: interactionTest
+# Type: Package
+# Title: Calculates Critical Test Statistics to Control False Discovery Rates in Marginal Effects Plots
+# Version: 1.2
+# Date: 2019-6-6
+# Author: Justin Esarey and Jane Lawrence Sumner
+# Maintainer: Justin Esarey <justin@justinesarey.com>
+# Description: Implements the procedures suggested in Esarey and Sumner (2017) <http://justinesarey.com/interaction-overconfidence.pdf> for controlling the false discovery rate when constructing marginal effects plots for models with interaction terms.
+# Depends: stats, R (>= 3.4)
+# License: GPL
+# LazyData: true
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2019-06-06 19:47:51 UTC; justi
+# Repository: CRAN
+# Date/Publication: 2019-06-06 21:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

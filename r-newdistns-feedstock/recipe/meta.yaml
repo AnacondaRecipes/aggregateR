@@ -1,0 +1,94 @@
+{% set version = '2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-newdistns
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Newdistns_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Newdistns/Newdistns_{{ version }}.tar.gz
+  sha256: 31c045c66dff1afa4b75b5a907c468698e91406c04a4edf6ce1c2c24ff94b6ac
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-adequacymodel
+
+  run:
+    - r-base
+    - r-adequacymodel
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Newdistns')"           # [not win]
+    - "\"%R%\" -e \"library('Newdistns')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Newdistns
+  license: GPL-2
+  summary: 'Computes the probability density function, cumulative distribution function, quantile
+    function, random numbers and measures of inference for the following general families
+    of  distributions (each family defined in terms of an arbitrary cdf G): Marshall
+    Olkin G distributions, exponentiated G distributions, beta G distributions, gamma
+    G distributions, Kumaraswamy G distributions, generalized beta G distributions,
+    beta extended G distributions, gamma G distributions, gamma uniform G distributions,
+    beta exponential G distributions, Weibull G distributions, log gamma G I distributions,
+    log gamma G II distributions, exponentiated generalized G distributions, exponentiated
+    Kumaraswamy G distributions, geometric exponential Poisson G distributions, truncated-exponential
+    skew-symmetric G distributions, modified beta G distributions, and exponentiated
+    exponential Poisson G distributions.'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Newdistns
+# Type: Package
+# Title: Computes Pdf, Cdf, Quantile and Random Numbers, Measures of Inference for 19 General Families of Distributions
+# Version: 2.1
+# Date: 2016-03-24
+# Author: Saralees Nadarajah, Ricardo Rocha
+# Maintainer: Saralees Nadarajah <Saralees.Nadarajah@manchester.ac.uk>
+# Depends: AdequacyModel
+# Description: Computes the probability density function, cumulative distribution function, quantile function, random numbers and measures of inference for the following general families of  distributions (each family defined in terms of an arbitrary cdf G): Marshall Olkin G distributions, exponentiated G distributions, beta G distributions, gamma G distributions, Kumaraswamy G distributions, generalized beta G distributions, beta extended G distributions, gamma G distributions, gamma uniform G distributions, beta exponential G distributions, Weibull G distributions, log gamma G I distributions, log gamma G II distributions, exponentiated generalized G distributions, exponentiated Kumaraswamy G distributions, geometric exponential Poisson G distributions, truncated-exponential skew-symmetric G distributions, modified beta G distributions, and exponentiated exponential Poisson G distributions.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2016-03-24 13:17:56 UTC; Ricardo
+# Repository: CRAN
+# Date/Publication: 2016-03-25 00:10:07
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

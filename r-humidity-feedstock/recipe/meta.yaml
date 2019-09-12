@@ -1,0 +1,95 @@
+{% set version = '0.1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-humidity
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/humidity_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/humidity/humidity_{{ version }}.tar.gz
+  sha256: 534b8a23dc63ea41957142e6f3e6d0926c6e29e5a9f5128c46e26ec9d394d9da
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, bookdown, tidyverse
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('humidity')"           # [not win]
+    - "\"%R%\" -e \"library('humidity')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/caijun/humidity
+  license: GPL-3
+  summary: Vapor pressure, relative humidity, absolute humidity, specific humidity, and mixing
+    ratio are commonly used water vapor measures in meteorology. This R package provides
+    functions for calculating saturation vapor pressure (hPa), partial water vapor pressure
+    (Pa), relative humidity (%), absolute humidity (kg/m^3), specific humidity (kg/kg),
+    and mixing ratio (kg/kg) from temperature (K) and dew point (K). Conversion functions
+    between humidity measures are also provided.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: humidity
+# Type: Package
+# Title: Calculate Water Vapor Measures from Temperature and Dew Point
+# Version: 0.1.4
+# Date: 2018-06-02
+# Authors@R: c( person("Jun", "Cai", email = "cai-j12@mails.tsinghua.edu.cn", role = c("aut", "cre")) )
+# Maintainer: Jun Cai <cai-j12@mails.tsinghua.edu.cn>
+# Description: Vapor pressure, relative humidity, absolute humidity, specific humidity, and mixing ratio are commonly used water vapor measures in meteorology. This R package provides functions for calculating saturation vapor pressure (hPa), partial water vapor pressure (Pa), relative humidity (%), absolute humidity (kg/m^3), specific humidity (kg/kg), and mixing ratio (kg/kg) from temperature (K) and dew point (K). Conversion functions between humidity measures are also provided.
+# Depends: R (>= 2.10)
+# License: GPL-3
+# URL: https://github.com/caijun/humidity
+# BugReports: https://github.com/caijun/humidity/issues
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# Suggests: knitr, rmarkdown, bookdown, tidyverse
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2018-06-10 16:58:38 UTC; tonytsai
+# Author: Jun Cai [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2018-06-10 17:23:15 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

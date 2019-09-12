@@ -1,0 +1,95 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-yummlyr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/yummlyr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/yummlyr/yummlyr_{{ version }}.tar.gz
+  sha256: a6eff466b9920f11669ff9eb529e48924c3d449aac57d444fa7a2a8aca333377
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-httr
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('yummlyr')"           # [not win]
+    - "\"%R%\" -e \"library('yummlyr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/RomanTsegelskyi/yummlyr
+  license: GPL-2
+  summary: ' Yummly.com is one of the world''s largest and most powerful recipe search sites
+    and this package aims to provide R bindings for publicly available Yummly.com Recipe
+    API (https://developer.yummly.com/).'
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: yummlyr
+# Type: Package
+# Title: R Bindings for Yummly API
+# Version: 0.1.1
+# Author: Roman Tsegelskyi
+# Maintainer: Roman Tsegelskyi <roman.tsegelskyi@gmail.com>
+# Description:  Yummly.com is one of the world's largest and most powerful recipe search sites and this package aims to provide R bindings for publicly available Yummly.com Recipe API (https://developer.yummly.com/).
+# URL: https://github.com/RomanTsegelskyi/yummlyr
+# BugReports: https://github.com/RomanTsegelskyi/yummlyr/issues
+# License: GPL (>= 2)
+# LazyData: TRUE
+# Depends: R (>= 2.10)
+# Suggests: testthat, knitr
+# Imports: httr, jsonlite
+# VignetteBuilder: knitr
+# RoxygenNote: 5.0.0
+# NeedsCompilation: no
+# Packaged: 2015-11-24 01:18:38 UTC; romantsegelskyi
+# Repository: CRAN
+# Date/Publication: 2015-11-24 07:46:55
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

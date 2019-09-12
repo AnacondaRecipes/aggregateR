@@ -1,0 +1,98 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-r.blip
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/r.blip_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/r.blip/r.blip_{{ version }}.tar.gz
+  sha256: a0762c75200071dae822a387e4322411a49d2f6a36f558da112c6167a27963dc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bnlearn >=4.0
+    - r-foreign
+
+  run:
+    - r-base
+    - r-bnlearn >=4.0
+    - r-foreign
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('r.blip')"           # [not win]
+    - "\"%R%\" -e \"library('r.blip')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=r.blip
+  license: LGPL-3
+  summary: 'Allows the user to learn Bayesian networks from datasets containing thousands of
+    variables. It focuses on score-based learning, mainly the ''BIC'' and the ''BDeu''
+    score functions. It provides state-of-the-art algorithms for the following tasks:
+    (1) parent set identification - Mauro Scanagatta (2015) <http://papers.nips.cc/paper/5803-learning-bayesian-networks-with-thousands-of-variables>;
+    (2) general structure optimization - Mauro Scanagatta (2018) <doi:10.1007/s10994-018-5701-9>,
+    Mauro Scanagatta (2018) <http://proceedings.mlr.press/v73/scanagatta17a.html>; (3)
+    bounded treewidth structure optimization - Mauro Scanagatta (2016) <http://papers.nips.cc/paper/6232-learning-treewidth-bounded-bayesian-networks-with-thousands-of-variables>;
+    (4) structure learning on incomplete data sets - Mauro Scanagatta (2018) <doi:10.1016/j.ijar.2018.02.004>.
+    Distributed under the LGPL-3 by IDSIA.'
+
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: r.blip
+# Title: Bayesian Network Learning Improved Project
+# Version: 1.1
+# Authors@R: person("Mauro", "Scanagatta", email = "mauro@idsia.ch", role = c("aut", "cre"))
+# Description: Allows the user to learn Bayesian networks from datasets containing thousands of variables. It focuses on score-based learning, mainly the 'BIC' and the 'BDeu' score functions. It provides state-of-the-art algorithms for the following tasks: (1) parent set identification - Mauro Scanagatta (2015) <http://papers.nips.cc/paper/5803-learning-bayesian-networks-with-thousands-of-variables>; (2) general structure optimization - Mauro Scanagatta (2018) <doi:10.1007/s10994-018-5701-9>, Mauro Scanagatta (2018) <http://proceedings.mlr.press/v73/scanagatta17a.html>; (3) bounded treewidth structure optimization - Mauro Scanagatta (2016) <http://papers.nips.cc/paper/6232-learning-treewidth-bounded-bayesian-networks-with-thousands-of-variables>; (4) structure learning on incomplete data sets - Mauro Scanagatta (2018) <doi:10.1016/j.ijar.2018.02.004>. Distributed under the LGPL-3 by IDSIA.
+# Depends: R (>= 3.0.0)
+# Imports: foreign, bnlearn (>= 4.0)
+# SystemRequirements: Java (>= 1.5)
+# License: LGPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-02-19 13:03:35 UTC; loskana
+# Author: Mauro Scanagatta [aut, cre]
+# Maintainer: Mauro Scanagatta <mauro@idsia.ch>
+# Repository: CRAN
+# Date/Publication: 2019-02-27 19:20:21 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,105 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-quantregranger
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/quantregRanger_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/quantregRanger/quantregRanger_{{ version }}.tar.gz
+  sha256: 7ddf64a61eb648c6bdb9d8920db29c788f766f89b678a00dbf0ba493f31538a9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.2
+    - r-ranger
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.2
+    - r-ranger
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('quantregRanger')"           # [not win]
+    - "\"%R%\" -e \"library('quantregRanger')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/PhilippPro/quantregRanger
+  license: GPL-3
+  summary: This is the implementation of quantile regression forests for the fast random forest
+    package 'ranger'.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: quantregRanger
+# Type: Package
+# Title: Quantile Regression Forests for 'ranger'
+# Description: This is the implementation of quantile regression forests for the fast random forest package 'ranger'.
+# Authors@R: person("Philipp", "Probst", email = "philipp_probst@gmx.de", role = c("aut", "cre"))
+# URL: https://github.com/PhilippPro/quantregRanger
+# BugReports: https://github.com/PhilippPro/quantregRanger/issues
+# License: GPL-3
+# Encoding: UTF-8
+# Depends: R (>= 3.0.2), stats
+# Imports: Rcpp (>= 0.12.2), ranger
+# LinkingTo: Rcpp
+# LazyData: yes
+# ByteCompile: yes
+# Version: 1.0
+# Date: 2017-12-15
+# RoxygenNote: 6.0.1
+# Suggests: testthat
+# NeedsCompilation: yes
+# Packaged: 2017-12-15 10:13:39 UTC; philipp
+# Author: Philipp Probst [aut, cre]
+# Maintainer: Philipp Probst <philipp_probst@gmx.de>
+# Repository: CRAN
+# Date/Publication: 2017-12-15 11:43:17 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

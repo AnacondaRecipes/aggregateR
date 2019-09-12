@@ -1,0 +1,86 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fittetra
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fitTetra_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fitTetra/fitTetra_{{ version }}.tar.gz
+  sha256: 6f80b0a51ddcf1df19f8f129bac476fcdab0cf45a269caa6b1f5b2f8c8e44645
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: doMC, foreach, RSvgDevice, devEMF
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fitTetra')"           # [not win]
+    - "\"%R%\" -e \"library('fitTetra')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=fitTetra
+  license: GPL (>= 2.2)
+  summary: Package fitTetra contains three functions that can be used to assign genotypes to
+    a collection of tetraploid samples based on bialleleic marker assays. Functions
+    fitTetra (to fit several models for one marker from the data and select the best
+    fitting) or saveMarkerModels (calls fitTetra for multiple markers and saves the
+    results to files) will probably be the most convenient to use. Function CodomMarker
+    offers more control and fits one specified model for a given marker.
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: fitTetra
+# Type: Package
+# Title: fitTetra is an R package for assigning tetraploid genotype scores
+# Version: 1.0
+# Date: 2013-04-23
+# Author: Roeland Voorrips and Gerrit Gort
+# Maintainer: Gerrit Gort <gerrit.gort@wur.nl>
+# Suggests: doMC, foreach, RSvgDevice, devEMF
+# Description: Package fitTetra contains three functions that can be used to assign genotypes to a collection of tetraploid samples based on bialleleic marker assays. Functions fitTetra (to fit several models for one marker from the data and select the best fitting) or saveMarkerModels (calls fitTetra for multiple markers and saves the results to files) will probably be the most convenient to use. Function CodomMarker offers more control and fits one specified model for a given marker.
+# License: GPL (>= 2.2)
+# Packaged: 2013-05-28 16:10:03 UTC; gort001
+# Depends: R (>= 2.10)
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-05-28 22:43:11
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

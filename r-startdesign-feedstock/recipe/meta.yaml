@@ -1,0 +1,95 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-startdesign
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/STARTdesign_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/STARTdesign/STARTdesign_{{ version }}.tar.gz
+  sha256: 4efe3063009421a5a984664843c5218650e227f917f87b47571fea88f6a0c1e0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.7
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.7
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('STARTdesign')"           # [not win]
+    - "\"%R%\" -e \"library('STARTdesign')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=STARTdesign
+  license: GPL-2
+  summary: The package is used for calibrating the design parameters for single-to-double arm
+    transition design proposed by Shi and Yin (2017). The calibration is performed via
+    numerical enumeration to find the optimal design that satisfies the constraints
+    on the type I and II error rates.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: STARTdesign
+# Type: Package
+# Title: Single to Double Arm Transition Design for Phase II Clinical Trials
+# Version: 1.0
+# Date: 2017-08-21
+# Author: Haolun Shi and Guosheng Yin
+# Maintainer: Haolun Shi <shl2003@connect.hku.hk>
+# Description: The package is used for calibrating the design parameters for single-to-double arm transition design proposed by Shi and Yin (2017). The calibration is performed via numerical enumeration to find the optimal design that satisfies the constraints on the type I and II error rates.
+# License: GPL (>= 2)
+# Imports: Rcpp (>= 0.12.7)
+# LinkingTo: Rcpp
+# NeedsCompilation: yes
+# Packaged: 2017-08-22 02:16:17 UTC; ra3
+# Repository: CRAN
+# Date/Publication: 2017-08-22 07:09:44 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

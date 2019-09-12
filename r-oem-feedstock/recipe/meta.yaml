@@ -1,0 +1,117 @@
+{% set version = '2.0.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-oem
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/oem_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/oem/oem_{{ version }}.tar.gz
+  sha256: 8aa5987cb2aebc8868d7fdd550c81f1250370721d7c33fd4ca1c15c75938dbb9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh
+    - r-matrix
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo
+    - r-rcppeigen
+    - r-bigmemory
+    - r-foreach
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-matrix
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo
+    - r-rcppeigen
+    - r-bigmemory
+    - r-foreach
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('oem')"           # [not win]
+    - "\"%R%\" -e \"library('oem')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://arxiv.org/abs/1801.09661, https://github.com/jaredhuling/oem, https://jaredhuling.github.io/oem
+  license: GPL-2
+  summary: Solves penalized least squares problems for big tall data using the orthogonalizing
+    EM algorithm of Xiong et al. (2016)  <doi:10.1080/00401706.2015.1054436>. The main
+    fitting function is oem() and the functions cv.oem() and xval.oem() are for cross
+    validation, the latter being an accelerated cross validation function for linear
+    models. The big.oem() function allows for out of memory fitting.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: oem
+# Type: Package
+# Title: Orthogonalizing EM: Penalized Regression for Big Tall Data
+# Version: 2.0.9
+# Authors@R: c( person("Bin", "Dai", , "bdai@uwalumni.com", role = c("aut")), person("Jared", "Huling", , "jaredhuling@gmail.com", c("aut", "cre"), comment = c(ORCID = "0000-0003-0670-4845")), person("Yixuan", "Qiu", , , c("ctb")), person("Gael", "Guennebaud", , , c("cph")), person("Jitse", "Niesen", , , c("cph")) )
+# Maintainer: Jared Huling <jaredhuling@gmail.com>
+# Description: Solves penalized least squares problems for big tall data using the orthogonalizing EM algorithm of Xiong et al. (2016)  <doi:10.1080/00401706.2015.1054436>. The main fitting function is oem() and the functions cv.oem() and xval.oem() are for cross validation, the latter being an accelerated cross validation function for linear models. The big.oem() function allows for out of memory fitting.
+# URL: https://arxiv.org/abs/1801.09661, https://github.com/jaredhuling/oem, https://jaredhuling.github.io/oem
+# BugReports: https://github.com/jaredhuling/oem/issues
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: TRUE
+# Depends: R (>= 3.2.0), bigmemory
+# Imports: Rcpp (>= 0.11.0), Matrix, foreach, methods
+# LinkingTo: Rcpp, RcppEigen, BH, bigmemory, RcppArmadillo
+# RoxygenNote: 6.1.0
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2018-10-30 02:14:22 UTC; Jared
+# Author: Bin Dai [aut], Jared Huling [aut, cre] (<https://orcid.org/0000-0003-0670-4845>), Yixuan Qiu [ctb], Gael Guennebaud [cph], Jitse Niesen [cph]
+# Repository: CRAN
+# Date/Publication: 2018-10-30 10:40:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

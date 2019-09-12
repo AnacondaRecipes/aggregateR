@@ -1,0 +1,88 @@
+{% set version = '0.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-quadprogxt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/quadprogXT_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/quadprogXT/quadprogXT_{{ version }}.tar.gz
+  sha256: af80ca93f51104d22052d13a433527d62c72484f4100a3db7be18c0523a612af
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-quadprog
+
+  run:
+    - r-base
+    - r-quadprog
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('quadprogXT')"           # [not win]
+    - "\"%R%\" -e \"library('quadprogXT')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=quadprogXT
+  license: GPL-2
+  summary: Extends the quadprog package to solve quadratic programs with absolute value constraints
+    and absolute values in the objective function.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: quadprogXT
+# Title: Quadratic Programming with Absolute Value Constraints
+# Version: 0.0.4
+# Authors@R: person("Bob", "Harlow", email = "rharlow86@gmail.com",role = c("aut", "cre"))
+# Description: Extends the quadprog package to solve quadratic programs with absolute value constraints and absolute values in the objective function.
+# Imports: quadprog
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: testthat
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2019-02-17 14:45:23 UTC; bob
+# Author: Bob Harlow [aut, cre]
+# Maintainer: Bob Harlow <rharlow86@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-02-17 15:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

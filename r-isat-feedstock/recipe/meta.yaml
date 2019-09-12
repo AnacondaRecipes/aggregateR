@@ -1,0 +1,93 @@
+{% set version = '1.0.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-isat
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ISAT_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ISAT/ISAT_{{ version }}.tar.gz
+  sha256: af7ec334acf029e6a5674bdc099e56161e2483cd55e1d5e511e5bbab91299876
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown,dplyr
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-gtools
+    - r-stringr
+
+  run:
+    - r-base
+    - r-gtools
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ISAT')"           # [not win]
+    - "\"%R%\" -e \"library('ISAT')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ISAT
+  license: GPL-2
+  summary: Reads the output of the 'PerkinElmer InForm' software <http://www.perkinelmer.com/product/inform-cell-analysis-one-seat-cls135781>.
+    In addition to cell-density count, it can derive statistics of intercellular spatial
+    distance for each cell-type.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ISAT
+# Title: Extract Cell Density and Nearest Distance Based on 'PerkinElmer InForm' Software Output
+# Version: 1.0.5
+# Date: 2018-07-31
+# Author: Minyu Wang,Yu Sun,Yu-Kuan Huang
+# Maintainer: Minyu Wang <minyu.wang@petermac.org>
+# Description: Reads the output of the 'PerkinElmer InForm' software <http://www.perkinelmer.com/product/inform-cell-analysis-one-seat-cls135781>. In addition to cell-density count, it can derive statistics of intercellular spatial distance for each cell-type.
+# Depends: R (>= 3.4)
+# Suggests: knitr, rmarkdown,dplyr
+# VignetteBuilder: knitr
+# Imports: gtools,stats,stringr,utils
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2018-08-20 03:39:33 UTC; wangminyu
+# Repository: CRAN
+# Date/Publication: 2018-08-20 11:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

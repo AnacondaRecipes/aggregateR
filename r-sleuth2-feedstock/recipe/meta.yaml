@@ -1,0 +1,90 @@
+{% set version = '2.0-5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sleuth2
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Sleuth2_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Sleuth2/Sleuth2_{{ version }}.tar.gz
+  sha256: 115a5fac5ff57d8d7b46e80a068f07ab0889e2332816893bfee29692db1037a3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lattice, knitr, MASS, agricolae, car, gmodels, leaps, mosaic
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Sleuth2')"           # [not win]
+    - "\"%R%\" -e \"library('Sleuth2')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://r-forge.r-project.org/projects/sleuth2/
+  license: GPL-2
+  summary: 'Data sets from Ramsey, F.L. and Schafer, D.W. (2002), "The Statistical Sleuth: A
+    Course in Methods of Data Analysis (2nd ed)", Duxbury. '
+
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Sleuth2
+# Title: Data Sets from Ramsey and Schafer's "Statistical Sleuth (2nd Ed)"
+# Version: 2.0-5
+# Date: 2019-01-24
+# Author: Original by F.L. Ramsey and D.W. Schafer; modifications by Daniel W. Schafer, Jeannie Sifneos and Berwin A. Turlach; vignettes contributed by Nicholas Horton, Kate Aloisio and Ruobing Zhang, with corrections by Randall Pruim
+# Description: Data sets from Ramsey, F.L. and Schafer, D.W. (2002), "The Statistical Sleuth: A Course in Methods of Data Analysis (2nd ed)", Duxbury.
+# Maintainer: Berwin A Turlach <Berwin.Turlach@gmail.com>
+# LazyData: yes
+# Depends: R (>= 3.5.0)
+# Suggests: lattice, knitr, MASS, agricolae, car, gmodels, leaps, mosaic
+# VignetteBuilder: knitr
+# License: GPL (>= 2)
+# URL: http://r-forge.r-project.org/projects/sleuth2/
+# Repository: CRAN
+# Repository/R-Forge/Project: sleuth2
+# Repository/R-Forge/Revision: 77
+# Repository/R-Forge/DateTimeStamp: 2019-01-24 05:54:13
+# Date/Publication: 2019-01-24 08:30:11 UTC
+# NeedsCompilation: no
+# Packaged: 2019-01-24 06:48:57 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

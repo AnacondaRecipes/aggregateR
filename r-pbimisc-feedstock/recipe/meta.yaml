@@ -1,0 +1,93 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pbimisc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PBImisc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PBImisc/PBImisc_{{ version }}.tar.gz
+  sha256: 94556757787e174c5171de5cef5ff80624759fd4a599faf4361c50838db9f2a1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggplot2, ca, lattice
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-lme4
+
+  run:
+    - r-base
+    - r-matrix
+    - r-lme4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PBImisc')"           # [not win]
+    - "\"%R%\" -e \"library('PBImisc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.biecek.pl/R/
+  license: GPL-2
+  summary: A set of datasets and functions used in the book 'Modele liniowe i mieszane w R, wraz
+    z przykladami w analizie danych'. Datasets either come from real studies or are
+    created to be as similar  as possible to real studies.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PBImisc
+# Version: 1.0
+# Type: Package
+# Title: A Set of Datasets Used in My Classes or in the Book 'Modele Liniowe i Mieszane w R, Wraz z Przykladami w Analizie Danych'
+# Author: Przemyslaw Biecek <przemyslaw.biecek@gmail.com>
+# Maintainer: Przemyslaw Biecek <przemyslaw.biecek@gmail.com>
+# Description: A set of datasets and functions used in the book 'Modele liniowe i mieszane w R, wraz z przykladami w analizie danych'. Datasets either come from real studies or are created to be as similar  as possible to real studies.
+# Repository: CRAN
+# License: GPL (>= 2)
+# LazyLoad: yes
+# LazyData: yes
+# URL: http://www.biecek.pl/R/
+# Depends: R (>= 2.8.0)
+# LinkingTo:
+# Imports: lme4, Matrix
+# Suggests: ggplot2, ca, lattice
+# NeedsCompilation: no
+# Packaged: 2016-02-25 21:00:34 UTC; pbiecek
+# Date/Publication: 2016-02-25 22:46:59
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

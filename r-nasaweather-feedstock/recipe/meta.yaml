@@ -1,0 +1,83 @@
+{% set version = '0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nasaweather
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/nasaweather_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/nasaweather/nasaweather_{{ version }}.tar.gz
+  sha256: aba7ba0bd2c23c45e313781c4f0a32c425c7515c786f49e8617fd62d9ccef816
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('nasaweather')"           # [not win]
+    - "\"%R%\" -e \"library('nasaweather')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/hadley/nasaweather, http://stat-computing.org/dataexpo/2006/
+  license: GPL-3
+  summary: This package contains tidied data from the ASA 2006 data expo, as well as a number
+    of useful other related data sets.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: nasaweather
+# Title: Collection of datasets from the ASA 2006 data expo
+# Version: 0.1
+# Authors@R: 'Hadley Wickham <h.wickham@gmail.com> [aut,cre]'
+# Description: This package contains tidied data from the ASA 2006 data expo, as well as a number of useful other related data sets.
+# Depends: R (>= 3.1.0)
+# License: GPL-3
+# LazyData: true
+# URL: http://github.com/hadley/nasaweather, http://stat-computing.org/dataexpo/2006/
+# Packaged: 2014-07-21 19:30:24 UTC; hadley
+# Author: 'Hadley Wickham' [aut, cre]
+# Maintainer: 'Hadley Wickham' <h.wickham@gmail.com>
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2014-07-22 11:08:36
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

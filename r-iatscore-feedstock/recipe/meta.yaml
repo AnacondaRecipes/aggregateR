@@ -1,0 +1,102 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-iatscore
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/IATScore_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/IATScore/IATScore_{{ version }}.tar.gz
+  sha256: ffc1096d15c6e874b8ec203728779781cfb421757b2e16c2601d5c1de455e469
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('IATScore')"           # [not win]
+    - "\"%R%\" -e \"library('IATScore')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=IATScore
+  license: MIT
+  summary: "This minimalist package is designed to quickly score raw data outputted from an Implicit
+    Association Test (IAT; Greenwald, McGhee, & Schwartz, 1998) <doi:10.1037/0022-3514.74.6.1464>.
+    IAT scores are calculated as specified by Greenwald, Nosek, and Banaji (2003) <doi:10.1037/0022-3514.85.2.197>.
+    Outputted values can be interpreted as effect sizes. The input function consists
+    of three arguments. First, indicate the name of the dataset to be analyzed. This
+    is the only required input. Second, indicate the number of trials in your entire
+    IAT (the default is set to 219, which is typical for most IATs). Last, indicate
+    whether congruent trials (e.g., flowers and pleasant) or incongruent trials (e.g.,
+    guns and pleasant) were presented first for this participant (the default is set
+    to congruent). The script will tell you how long it took to run the code, the effect
+    size for the participant, and whether that participant should be excluded based
+    on the criteria outlined by Greenwald et al. (2003). Data files should consist of
+    six columns organized in order as follows: Block (0-6), trial (0-19 for training
+    blocks, 0-39 for test blocks), category (dependent on your IAT), the type of item
+    within that category (dependent on your IAT), a dummy variable indicating whether
+    the participant was correct or incorrect on that trial (0=correct, 1=incorrect),
+    and the participant\xE2\u20AC\u2122s reaction time (in milliseconds). Three sample
+    datasets are included in this package (labeled 'IAT', 'TooFastIAT', and 'BriefIAT')
+    to practice with."
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: IATScore
+# Type: Package
+# Title: Scoring Algorithm for the Implicit Association Test (IAT)
+# Version: 0.1.1
+# Author: Daniel Storage [aut, cre]
+# Maintainer: Daniel Storage <sabbystorage@gmail.com>
+# Description: This minimalist package is designed to quickly score raw data outputted from an Implicit Association Test (IAT; Greenwald, McGhee, & Schwartz, 1998) <doi:10.1037/0022-3514.74.6.1464>. IAT scores are calculated as specified by Greenwald, Nosek, and Banaji (2003) <doi:10.1037/0022-3514.85.2.197>. Outputted values can be interpreted as effect sizes. The input function consists of three arguments. First, indicate the name of the dataset to be analyzed. This is the only required input. Second, indicate the number of trials in your entire IAT (the default is set to 219, which is typical for most IATs). Last, indicate whether congruent trials (e.g., flowers and pleasant) or incongruent trials (e.g., guns and pleasant) were presented first for this participant (the default is set to congruent). The script will tell you how long it took to run the code, the effect size for the participant, and whether that participant should be excluded based on the criteria outlined by Greenwald et al. (2003). Data files should consist of six columns organized in order as follows: Block (0-6), trial (0-19 for training blocks, 0-39 for test blocks), category (dependent on your IAT), the type of item within that category (dependent on your IAT), a dummy variable indicating whether the participant was correct or incorrect on that trial (0=correct, 1=incorrect), and the participantaTMs reaction time (in milliseconds). Three sample datasets are included in this package (labeled 'IAT', 'TooFastIAT', and 'BriefIAT') to practice with.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-01-10 20:41:56 UTC; Sabby
+# Repository: CRAN
+# Date/Publication: 2018-01-10 20:57:45 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

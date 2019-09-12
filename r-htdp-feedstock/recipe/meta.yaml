@@ -1,0 +1,103 @@
+{% set version = '0.1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-htdp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/htdp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/htdp/htdp_{{ version }}.tar.gz
+  sha256: bca8090e15662be2abe99e029cf6abf9380c6da808e4b27cee84940b2e4ea770
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.5
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.5
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('htdp')"           # [not win]
+    - "\"%R%\" -e \"library('htdp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jbuonagurio/RHTDP
+  license: MIT
+  summary: Provides bindings to the National Geodetic Survey (NGS) Horizontal Time Dependent
+    Positioning (HTDP) utility, v3.2.5, written by Richard Snay, Chris Pearson, and
+    Jarir Saleh of NGS. HTDP is a utility that allows users to transform positional
+    coordinates across time and between spatial reference frames. See <https://www.ngs.noaa.gov/TOOLS/Htdp/Htdp.shtml>
+    for more information.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: htdp
+# Type: Package
+# Title: Horizontal Time Dependent Positioning
+# Version: 0.1.4
+# Date: 2016-09-19
+# Authors@R: c( person("John", "Buonagurio", , "jbuonagurio@exponent.com", role = c("aut", "cre")), person("National Geodetic Survey", , , "ngs.cors.htdp@noaa.gov", role = "cph", comment = "Author of included HTDP code") )
+# Maintainer: John Buonagurio <jbuonagurio@exponent.com>
+# Description: Provides bindings to the National Geodetic Survey (NGS) Horizontal Time Dependent Positioning (HTDP) utility, v3.2.5, written by Richard Snay, Chris Pearson, and Jarir Saleh of NGS. HTDP is a utility that allows users to transform positional coordinates across time and between spatial reference frames. See <https://www.ngs.noaa.gov/TOOLS/Htdp/Htdp.shtml> for more information.
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Imports: Rcpp (>= 0.12.5)
+# LinkingTo: Rcpp
+# URL: https://github.com/jbuonagurio/RHTDP
+# BugReports: https://github.com/jbuonagurio/RHTDP/issues
+# NeedsCompilation: yes
+# Packaged: 2016-09-19 06:32:29 UTC; jbuonagurio
+# Author: John Buonagurio [aut, cre], National Geodetic Survey [cph] (Author of included HTDP code)
+# Repository: CRAN
+# Date/Publication: 2016-09-19 11:06:08
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

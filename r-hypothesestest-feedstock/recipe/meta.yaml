@@ -1,0 +1,88 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hypothesestest
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hypothesestest_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hypothesestest/hypothesestest_{{ version }}.tar.gz
+  sha256: 550bf47a7e8c9bbe366d6762883c03c02c3e5017260390464cf5876ad0a81a3d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hypothesestest')"           # [not win]
+    - "\"%R%\" -e \"library('hypothesestest')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=hypothesestest
+  license: GPL-2
+  summary: Compute the confidence interval of the population mean with one sample or of the difference
+    of population means of two samples from normal distributions or t-distributions.Compute
+    the confidence interval of population variance with one sample or of the difference
+    of population variances of two samples by chi-square tests.Test for population mean
+    or the differences of two normal samples under normality with the given null hypothesis
+    H0,which depends on the user,so that he can know if he can reject H0 or not at the
+    significance level alpha.Do the chi-square tests with one or two samples which have
+    multinomial distributions by using an approximate chi-square distribution when n
+    is large enough.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: hypothesestest
+# Type: Package
+# Title: Confidence Intervals and Tests of Statistical Hypotheses
+# Version: 1.0
+# Date: 2012-05-14
+# Author: Chengfeng Liu,Huiqing Liu,Yingyan Liang,Ruibin Feng
+# Maintainer: Chengfeng Liu <478996606@qq.com>
+# Description: Compute the confidence interval of the population mean with one sample or of the difference of population means of two samples from normal distributions or t-distributions.Compute the confidence interval of population variance with one sample or of the difference of population variances of two samples by chi-square tests.Test for population mean or the differences of two normal samples under normality with the given null hypothesis H0,which depends on the user,so that he can know if he can reject H0 or not at the significance level alpha.Do the chi-square tests with one or two samples which have multinomial distributions by using an approximate chi-square distribution when n is large enough.
+# License: GPL (>= 2)
+# Packaged: 2012-07-11 10:25:37 UTC; Administrator
+# Repository: CRAN
+# Date/Publication: 2012-07-11 11:35:50
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

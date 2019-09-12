@@ -1,0 +1,99 @@
+{% set version = '0.1.35' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-osrmr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/osrmr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/osrmr/osrmr_{{ version }}.tar.gz
+  sha256: 48831e1a6b065e542b669fd6347fa7acbeaa85d29957073df8f8be89fdf2bade
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, microbenchmark
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-r.utils
+    - r-assertthat
+    - r-bitops
+    - r-rjson
+    - r-stringr
+
+  run:
+    - r-base
+    - r-r.utils
+    - r-assertthat
+    - r-bitops
+    - r-rjson
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('osrmr')"           # [not win]
+    - "\"%R%\" -e \"library('osrmr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=osrmr
+  license: GPL-3
+  summary: Wrapper around the 'Open Source Routing Machine (OSRM)' API <http://project-osrm.org/>.
+    'osrmr' works with API versions 4 and 5 and can handle servers that run locally
+    as well as the 'OSRM' webserver.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: osrmr
+# Type: Package
+# Title: Wrapper for the 'OSRM' API
+# Version: 0.1.35
+# Date: 2019-01-14
+# Author: Adrian Staempfli, Christoph Strauss
+# Maintainer: Adrian Staempfli <adrian.staempfli@fhsg.ch>
+# Description: Wrapper around the 'Open Source Routing Machine (OSRM)' API <http://project-osrm.org/>. 'osrmr' works with API versions 4 and 5 and can handle servers that run locally as well as the 'OSRM' webserver.
+# License: GPL-3
+# LazyData: TRUE
+# Imports: assertthat, bitops, rjson, R.utils, stringr
+# Suggests: testthat, knitr, rmarkdown, microbenchmark
+# RoxygenNote: 6.0.1
+# VignetteBuilder: knitr
+# SystemRequirements: To use the Localhost of OSRM, you need to build OSRM <https://github.com/Project-OSRM/osrm-backend/wiki/Building-OSRM> locally
+# NeedsCompilation: no
+# Packaged: 2019-01-14 15:01:12 UTC; SCN
+# Repository: CRAN
+# Date/Publication: 2019-01-14 15:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

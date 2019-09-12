@@ -1,0 +1,91 @@
+{% set version = '1.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-grex
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/grex_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/grex/grex_{{ version }}.tar.gz
+  sha256: ebc2ca93af6a9115a34f9b7885fa4d5cf49f1bbe67fdfda01fb0e66c8e55d668
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('grex')"           # [not win]
+    - "\"%R%\" -e \"library('grex')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://nanx.me/grex/, https://github.com/nanxstats/grex
+  license: GPL-3
+  summary: Convert 'Ensembl' gene identifiers from Genotype-Tissue Expression (GTEx) data to
+    identifiers in other annotation systems, including 'Entrez', 'HGNC', and 'UniProt'.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: grex
+# Type: Package
+# Title: Gene ID Mapping for Genotype-Tissue Expression (GTEx) Data
+# Version: 1.9
+# Authors@R: c( person("Nan", "Xiao", email = "me@nanx.me", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0250-5673")), person("Gao", "Wang", email = "gaow@uchicago.edu", role = "aut"), person("Lei", "Sun", email = "sunl@uchicago.edu", role = "aut") )
+# Maintainer: Nan Xiao <me@nanx.me>
+# Description: Convert 'Ensembl' gene identifiers from Genotype-Tissue Expression (GTEx) data to identifiers in other annotation systems, including 'Entrez', 'HGNC', and 'UniProt'.
+# License: GPL-3 | file LICENSE
+# LazyData: TRUE
+# VignetteBuilder: knitr
+# URL: https://nanx.me/grex/, https://github.com/nanxstats/grex
+# BugReports: https://github.com/nanxstats/grex/issues
+# Depends: R (>= 3.5.0)
+# Suggests: knitr, rmarkdown
+# Encoding: UTF-8
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-05-17 22:22:43 UTC; nanx
+# Author: Nan Xiao [aut, cre] (<https://orcid.org/0000-0002-0250-5673>), Gao Wang [aut], Lei Sun [aut]
+# Repository: CRAN
+# Date/Publication: 2019-05-17 22:40:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

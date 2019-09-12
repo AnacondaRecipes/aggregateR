@@ -1,0 +1,99 @@
+{% set version = '1.0.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-selectmeta
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/selectMeta_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/selectMeta/selectMeta_{{ version }}.tar.gz
+  sha256: c0374642972de879af11408c932885ea08882c9998584b8df0c0b4f74aff1c44
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-deoptim >=2.0_6
+
+  run:
+    - r-base
+    - r-deoptim >=2.0_6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('selectMeta')"           # [not win]
+    - "\"%R%\" -e \"library('selectMeta')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.kasparrufibach.ch
+  license: GPL-2
+  summary: Publication bias, the fact that studies identified for inclusion in a meta analysis
+    do not represent all studies on the topic of interest, is commonly recognized as
+    a threat to the validity of the results of a meta analysis. One way to explicitly
+    model publication bias is via selection models or weighted probability distributions.
+    In this package we provide implementations of several parametric and nonparametric
+    weight functions. The novelty in Rufibach (2011) is the proposal of a non-increasing
+    variant of the nonparametric weight function of Dear & Begg (1992). The new approach
+    potentially offers more insight in the selection process than other methods, but
+    is more flexible than parametric approaches. To maximize the log-likelihood function
+    proposed by Dear & Begg (1992) under a monotonicity constraint we use a differential
+    evolution algorithm proposed by Ardia et al (2010a, b) and implemented in Mullen
+    et al (2009). In addition, we offer a method to compute a confidence interval for
+    the overall effect size theta, adjusted for selection bias as well as a function
+    that computes the simulation-based p-value to assess the null hypothesis of no selection
+    as described in Rufibach (2011, Section 6).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: selectMeta
+# Type: Package
+# Title: Estimation of Weight Functions in Meta Analysis
+# Version: 1.0.8
+# Date: 2015-07-03
+# Author: Kaspar Rufibach <kaspar.rufibach@gmail.com>
+# Maintainer: Kaspar Rufibach <kaspar.rufibach@gmail.com>
+# Depends: DEoptim (>= 2.0-6)
+# Imports: graphics, stats
+# Description: Publication bias, the fact that studies identified for inclusion in a meta analysis do not represent all studies on the topic of interest, is commonly recognized as a threat to the validity of the results of a meta analysis. One way to explicitly model publication bias is via selection models or weighted probability distributions. In this package we provide implementations of several parametric and nonparametric weight functions. The novelty in Rufibach (2011) is the proposal of a non-increasing variant of the nonparametric weight function of Dear & Begg (1992). The new approach potentially offers more insight in the selection process than other methods, but is more flexible than parametric approaches. To maximize the log-likelihood function proposed by Dear & Begg (1992) under a monotonicity constraint we use a differential evolution algorithm proposed by Ardia et al (2010a, b) and implemented in Mullen et al (2009). In addition, we offer a method to compute a confidence interval for the overall effect size theta, adjusted for selection bias as well as a function that computes the simulation-based p-value to assess the null hypothesis of no selection as described in Rufibach (2011, Section 6).
+# License: GPL (>= 2)
+# URL: http://www.kasparrufibach.ch
+# Packaged: 2015-07-03 09:52:15 UTC; rufibach
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2015-07-03 12:51:10
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

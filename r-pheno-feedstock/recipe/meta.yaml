@@ -1,0 +1,97 @@
+{% set version = '1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pheno
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pheno_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pheno/pheno_{{ version }}.tar.gz
+  sha256: 0cf19d3cf9dcb23d216beb91cba0cc459cdce7ba6ad86f9808f05c155e50be75
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-sparsem
+    - r-nlme
+    - r-quantreg
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-sparsem
+    - r-nlme
+    - r-quantreg
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pheno')"           # [not win]
+    - "\"%R%\" -e \"library('pheno')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=pheno
+  license: GPL-2
+  summary: Provides some easy-to-use functions for time series analyses of (plant-) phenological
+    data sets. These functions mainly deal with the estimation of combined phenological
+    time series and are usually wrappers for functions that are already implemented
+    in other R packages adapted to the special structure of phenological data and the
+    needs of phenologists. Some date conversion functions to handle Julian dates are
+    also provided.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: pheno
+# Title: Auxiliary functions for phenological data analysis
+# Version: 1.6
+# Date: 22.10.2012
+# Author: Joerg Schaber
+# Description: Provides some easy-to-use functions for time series analyses of (plant-) phenological data sets. These functions mainly deal with the estimation of combined phenological time series and are usually wrappers for functions that are already implemented in other R packages adapted to the special structure of phenological data and the needs of phenologists. Some date conversion functions to handle Julian dates are also provided.
+# Maintainer: Joerg Schaber <j.schaber@web.de>
+# Depends: R (>= 2.14), nlme, SparseM, quantreg
+# License: GPL (>= 2)
+# Packaged: 2012-10-23 07:24:30 UTC; schaber
+# Repository: CRAN
+# Date/Publication: 2012-10-23 09:37:11
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

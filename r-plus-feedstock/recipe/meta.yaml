@@ -1,0 +1,82 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-plus
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/plus_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/plus/plus_{{ version }}.tar.gz
+  sha256: 9a22233d0670098b9b5085c884703c590120f9c024573b4f4512aa7db0ddf4d0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('plus')"           # [not win]
+    - "\"%R%\" -e \"library('plus')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=plus
+  license: GPL-2
+  summary: Efficient procedures for fitting an entire regression sequences with different model
+    types.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: plus
+# Type: Package
+# Version: 1.0
+# Date: 2012-05-28
+# Title: Penalized Linear Unbiased Selection
+# Author: Cun-Hui Zhang and Ofer Melnik, with contributions from Yi Yu and Stephanie Zhang
+# Maintainer: Cun-Hui Zhang <czhang@stat.rutgers.edu>
+# Depends: R (>= 2.10), grDevices, graphics, stats, utils
+# Description: Efficient procedures for fitting an entire regression sequences with different model types.
+# License: GPL (>= 2)
+# Packaged: 2012-05-28 08:53:26 UTC; stephaniezhang
+# Repository: CRAN
+# Date/Publication: 2012-05-28 18:23:56
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

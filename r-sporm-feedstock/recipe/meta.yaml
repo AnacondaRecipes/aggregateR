@@ -1,0 +1,84 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sporm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sporm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sporm/sporm_{{ version }}.tar.gz
+  sha256: 179255313563edd66d352914339d4c3688d02f275223f030ed67490285f95d1f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sporm')"           # [not win]
+    - "\"%R%\" -e \"library('sporm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=sporm
+  license: GPL-2
+  summary: R implementation of the methods described in "A rank-based empirical likelihood approach
+    to two-sample proportional odds model and its goodness-of-fit" by Zhong Guan and
+    Cheng Peng, Journal of Nonparametric Statistics, to appear.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: sporm
+# Type: Package
+# Title: Semiparametric proportional odds rate model
+# Version: 1.1
+# Date: 2011-01-18
+# Author: Zhong Guan <zguan@iusb.edu>; Cheng Peng <cpeng@usm.maine.edu>
+# Maintainer: Zhong Guan <zguan@iusb.edu>
+# Description: R implementation of the methods described in "A rank-based empirical likelihood approach to two-sample proportional odds model and its goodness-of-fit" by Zhong Guan and Cheng Peng, Journal of Nonparametric Statistics, to appear.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# LazyData: yes
+# Packaged: 2012-10-29 08:59:49 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2012-10-29 08:59:49
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

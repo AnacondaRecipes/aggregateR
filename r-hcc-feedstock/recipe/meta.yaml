@@ -1,0 +1,83 @@
+{% set version = '0.54' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hcc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hcc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hcc/hcc_{{ version }}.tar.gz
+  sha256: 78b53b57f8cf1a57b348f3edea5d2d0be8c6a8bb1cd475a5e660713fabba6391
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hcc')"           # [not win]
+    - "\"%R%\" -e \"library('hcc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.stats.uwo.ca/faculty/aim
+  license: GPL-2
+  summary: A new diagnostic check for model adequacy in regression and generalized linear models
+    is implemented.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: hcc
+# Version: 0.54
+# Date: 2013-03-23
+# Title: Hidden correlation check
+# Author: Yun Shi and A. I. McLeod
+# Maintainer: A. I. McLeod <aimcleod@uwo.ca>
+# Depends: R (>= 2.1.0)
+# Description: A new diagnostic check for model adequacy in regression and generalized linear models is implemented.
+# LazyLoad: yes
+# License: GPL (>= 2)
+# URL: http://www.stats.uwo.ca/faculty/aim
+# Packaged: 2013-03-23 15:28:32 UTC; Aim
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-03-23 17:01:19
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

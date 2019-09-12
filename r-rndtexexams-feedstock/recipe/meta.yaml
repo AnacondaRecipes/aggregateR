@@ -1,0 +1,94 @@
+{% set version = '1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rndtexexams
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RndTexExams_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RndTexExams/RndTexExams_{{ version }}.tar.gz
+  sha256: 7d60bef4595d886eef80fd447f2d52d417b906b064c4c057731b63ae58ff5f9d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, ggplot2, irtoys
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-stringi
+    - r-stringr
+
+  run:
+    - r-base
+    - r-data.table
+    - r-stringi
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RndTexExams')"           # [not win]
+    - "\"%R%\" -e \"library('RndTexExams')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RndTexExams
+  license: GPL-2
+  summary: Using as input a 'LaTeX' file with a multiple choice exam, this package will produce
+    several versions with randomized contents of the same exam. Functions for grading
+    are also available.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RndTexExams
+# Title: Build and Grade Multiple Choice Exams with Randomized Content
+# Version: 1.5
+# Authors@R: person("Marcelo", "Perlin", email = "marceloperlin@gmail.com", role = c("aut", "cre"))
+# Description: Using as input a 'LaTeX' file with a multiple choice exam, this package will produce several versions with randomized contents of the same exam. Functions for grading are also available.
+# Depends: R (>= 3.2.3)
+# Imports: tools, stringr, stringi, data.table
+# License: GPL-2
+# LazyData: true
+# RoxygenNote: 6.1.0
+# Suggests: knitr, rmarkdown, testthat, ggplot2, irtoys
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2018-10-09 20:37:42 UTC; msperlin
+# Author: Marcelo Perlin [aut, cre]
+# Maintainer: Marcelo Perlin <marceloperlin@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-10-09 21:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

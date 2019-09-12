@@ -1,0 +1,112 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tatoo
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tatoo_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tatoo/tatoo_{{ version }}.tar.gz
+  sha256: 0109d4ecb9cd61893375b17f1ba345830978b9fcd2a245a777b7066699a93971
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, rprojroot, kableExtra, knitr, rmarkdown
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-assertthat
+    - r-colt
+    - r-crayon
+    - r-data.table
+    - r-magrittr
+    - r-openxlsx >=4.0.0
+    - r-stringi
+    - r-withr
+
+  run:
+    - r-base
+    - r-assertthat
+    - r-colt
+    - r-crayon
+    - r-data.table
+    - r-magrittr
+    - r-openxlsx >=4.0.0
+    - r-stringi
+    - r-withr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tatoo')"           # [not win]
+    - "\"%R%\" -e \"library('tatoo')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/statistikat/tatoo
+  license: MIT
+  summary: ' Functions to combine data.frames in ways that require additional effort in  base
+    R, and to add metadata (id, title, ...) that can be used for printing and  xlsx
+    export. The ''Tatoo_report'' class is provided as a  convenient helper to write
+    several such tables to a workbook, one table per  worksheet. Tatoo is built on top
+    of ''openxlsx'', but intimate knowledge of  that package is not required to use
+    tatoo.'
+
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: tatoo
+# Type: Package
+# Title: Combine and Export Data Frames
+# Version: 1.1.1
+# Authors@R: person("Stefan", "Fleck", email = "stefan.b.fleck@gmail.com", role = c("aut", "cre"))
+# Maintainer: Stefan Fleck <stefan.b.fleck@gmail.com>
+# Description:  Functions to combine data.frames in ways that require additional effort in  base R, and to add metadata (id, title, ...) that can be used for printing and  xlsx export. The 'Tatoo_report' class is provided as a  convenient helper to write several such tables to a workbook, one table per  worksheet. Tatoo is built on top of 'openxlsx', but intimate knowledge of  that package is not required to use tatoo.
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Imports: assertthat, magrittr, data.table, openxlsx (>= 4.0.0), stringi, colt, crayon, withr
+# Suggests: testthat, rprojroot, kableExtra, knitr, rmarkdown
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# VignetteBuilder: knitr
+# BugReports: https://github.com/statistikat/tatoo/issues
+# URL: https://github.com/statistikat/tatoo
+# NeedsCompilation: no
+# Packaged: 2019-03-29 07:25:25 UTC; fleck
+# Author: Stefan Fleck [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2019-03-29 07:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

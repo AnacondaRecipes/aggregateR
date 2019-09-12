@@ -1,0 +1,87 @@
+{% set version = '2.0-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-icesadvice
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/icesAdvice_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/icesAdvice/icesAdvice_{{ version }}.tar.gz
+  sha256: d9ed9052cbec008567858fa68cc1e145a55a4459720dbdadf5356bd1b51ba96b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('icesAdvice')"           # [not win]
+    - "\"%R%\" -e \"library('icesAdvice')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://ices.dk/community/advisory-process/
+  license: GPL-2
+  summary: A collection of functions that facilitate computational steps related to advice for
+    fisheries management, according to ICES guidelines. These include methods for calculating
+    reference points and model diagnostics.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: icesAdvice
+# Version: 2.0-0
+# Date: 2018-12-07
+# Title: Functions Related to ICES Advice
+# Authors@R: c(person("Arni", "Magnusson", role=c("aut","cre"), email="arni.magnusson@ices.dk"), person("Colin", "Millar", role="aut"), person("Anne", "Cooper", role="aut"))
+# Imports: graphics, stats
+# LazyData: yes
+# Description: A collection of functions that facilitate computational steps related to advice for fisheries management, according to ICES guidelines. These include methods for calculating reference points and model diagnostics.
+# License: GPL (>= 2)
+# URL: http://ices.dk/community/advisory-process/
+# Encoding: UTF-8
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2018-12-07 11:30:56 UTC; arnima
+# Author: Arni Magnusson [aut, cre], Colin Millar [aut], Anne Cooper [aut]
+# Maintainer: Arni Magnusson <arni.magnusson@ices.dk>
+# Repository: CRAN
+# Date/Publication: 2018-12-07 12:00:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

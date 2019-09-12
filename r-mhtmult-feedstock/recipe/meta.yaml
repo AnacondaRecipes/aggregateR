@@ -1,0 +1,87 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mhtmult
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MHTmult_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MHTmult/MHTmult_{{ version }}.tar.gz
+  sha256: 8d7aa1d24fc08f7ca1305034b76298b91998fccdb07d4b7e9cce9aa5a6807bf8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: structSSI, MHTdiscrete, FixSeqMTP
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MHTmult')"           # [not win]
+    - "\"%R%\" -e \"library('MHTmult')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MHTmult
+  license: GPL-2
+  summary: A Comprehensive tool for almost all existing multiple testing methods for multiple
+    families. The package summarizes the existing methods for multiple families multiple
+    testing procedures (MTPs) such as double FDR, group Benjamini-Hochberg (GBH) procedure
+    and average FDR controlling procedure. The package also provides some novel multiple
+    testing procedures using selective inference idea.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: MHTmult
+# Type: Package
+# Title: Multiple Hypotheses Testing for Multiple Families/Groups Structure
+# Version: 0.1.0
+# Author: Yalin Zhu, Wenge Guo
+# Maintainer: Yalin Zhu <yalin.zhu@outlook.com>
+# BugReports: https://github.com/allenzhuaz/MHTmult/issues
+# Description: A Comprehensive tool for almost all existing multiple testing methods for multiple families. The package summarizes the existing methods for multiple families multiple testing procedures (MTPs) such as double FDR, group Benjamini-Hochberg (GBH) procedure and average FDR controlling procedure. The package also provides some novel multiple testing procedures using selective inference idea.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: TRUE
+# Suggests: structSSI, MHTdiscrete, FixSeqMTP
+# NeedsCompilation: yes
+# Packaged: 2017-05-01 15:51:11 UTC; yalinzhu
+# Repository: CRAN
+# Date/Publication: 2017-05-01 16:21:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

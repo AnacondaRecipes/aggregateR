@@ -1,0 +1,84 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-periodictable
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PeriodicTable_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PeriodicTable/PeriodicTable_{{ version }}.tar.gz
+  sha256: 32f3f725c2ad8ecc2b834591077c95f0b480943e17c53d606d29cdabf6e2798c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PeriodicTable')"           # [not win]
+    - "\"%R%\" -e \"library('PeriodicTable')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PeriodicTable
+  license: GPL-3
+  summary: Provides a dataset containing properties for chemical elements. Helper functions are
+    also provided to access some atomic properties.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: PeriodicTable
+# Type: Package
+# Title: Periodic Table of the Elements
+# Version: 0.1.2
+# Encoding: UTF-8
+# Author: Julien Ide
+# Maintainer: Julien Ide <julien.ide.fr@gmail.com>
+# Description: Provides a dataset containing properties for chemical elements. Helper functions are also provided to access some atomic properties.
+# License: GPL
+# LazyData: FALSE
+# RoxygenNote: 5.0.1
+# Depends: R (>= 3.3.1)
+# NeedsCompilation: no
+# Packaged: 2017-08-29 07:24:13 UTC; jide
+# Repository: CRAN
+# Date/Publication: 2017-08-29 08:13:52 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

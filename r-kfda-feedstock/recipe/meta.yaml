@@ -1,0 +1,95 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-kfda
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/kfda_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/kfda/kfda_{{ version }}.tar.gz
+  sha256: f1f580dffbf5ba444ed8e4de58e725439cc5038d9ca1d6a647f295e2f387c120
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-kernlab
+
+  run:
+    - r-base
+    - r-mass
+    - r-kernlab
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('kfda')"           # [not win]
+    - "\"%R%\" -e \"library('kfda')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ainsuotain/kfda
+  license: GPL-3
+  summary: Kernel Fisher Discriminant Analysis (KFDA) is performed using Kernel Principal Component
+    Analysis (KPCA) and Fisher Discriminant Analysis (FDA). There are some similar packages.
+    First, 'lfda' is a package that performs Local Fisher Discriminant Analysis (LFDA)
+    and performs other functions. In particular, 'lfda' seems to be impossible to test
+    because it needs the label information of the data in the function argument. Also,
+    the 'ks' package has a limited dimension, which makes it difficult to analyze properly.
+    This package is a simple and practical package for KFDA based on the paper of Yang,
+    J., Jin, Z., Yang, J. Y., Zhang, D., and Frangi, A. F. (2004) <DOI:10.1016/j.patcog.2003.10.015>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: kfda
+# Type: Package
+# Title: Kernel Fisher Discriminant Analysis
+# Version: 1.0.0
+# Date: 2017-09-27
+# Author: Donghwan Kim
+# Maintainer: Donghwan Kim <donhkim9714@korea.ac.kr>
+# Description: Kernel Fisher Discriminant Analysis (KFDA) is performed using Kernel Principal Component Analysis (KPCA) and Fisher Discriminant Analysis (FDA). There are some similar packages. First, 'lfda' is a package that performs Local Fisher Discriminant Analysis (LFDA) and performs other functions. In particular, 'lfda' seems to be impossible to test because it needs the label information of the data in the function argument. Also, the 'ks' package has a limited dimension, which makes it difficult to analyze properly. This package is a simple and practical package for KFDA based on the paper of Yang, J., Jin, Z., Yang, J. Y., Zhang, D., and Frangi, A. F. (2004) <DOI:10.1016/j.patcog.2003.10.015>.
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: yes
+# Repository: CRAN
+# URL: https://github.com/ainsuotain/kfda
+# Depends: R (>= 3.0.0), kernlab, MASS
+# NeedsCompilation: no
+# Packaged: 2017-09-27 00:52:55 UTC; David
+# Date/Publication: 2017-09-27 11:06:54 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

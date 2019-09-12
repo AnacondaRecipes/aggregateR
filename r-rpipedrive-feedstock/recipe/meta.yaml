@@ -1,0 +1,91 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rpipedrive
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Rpipedrive_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Rpipedrive/Rpipedrive_{{ version }}.tar.gz
+  sha256: 0887ae8c07f22f430b752f7926a63f02ebc3196cf5e2d862b2a355c70136c1e5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr >=1.3.1
+    - r-jsonlite >=1.5
+
+  run:
+    - r-base
+    - r-httr >=1.3.1
+    - r-jsonlite >=1.5
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Rpipedrive')"           # [not win]
+    - "\"%R%\" -e \"library('Rpipedrive')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Rpipedrive
+  license: GPL-2
+  summary: R interaction with 'pipedrive.com API'.  All functions were created and documented
+    according to <https://developers.pipedrive.com/docs/api/v1/>.  Created with the
+    objective of offering integration and even the development of 'APIs'.  Making possible
+    to create workflows and easily downloading databases for analysis.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: Rpipedrive
+# Type: Package
+# Title: 'Pipedrive API's' Functions to Improvement and Integration's Systems
+# Version: 0.1.1
+# Author: Ney Moresco
+# Maintainer: Ney Moresco <neymoresco@hotmail.com>
+# Description: R interaction with 'pipedrive.com API'.  All functions were created and documented according to <https://developers.pipedrive.com/docs/api/v1/>.  Created with the objective of offering integration and even the development of 'APIs'.  Making possible to create workflows and easily downloading databases for analysis.
+# License: GPL-2
+# Imports: httr (>= 1.3.1), jsonlite (>= 1.5), utils (>= 3.0.0)
+# Depends: R (>= 3.0.0)
+# Encoding: UTF-8
+# LazyData: false
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-05-14 11:27:17 UTC; ney.moresco
+# Repository: CRAN
+# Date/Publication: 2019-05-14 22:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

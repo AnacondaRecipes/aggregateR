@@ -1,0 +1,111 @@
+{% set version = '4.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rmixtcompio
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RMixtCompIO_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RMixtCompIO/RMixtCompIO_{{ version }}.tar.gz
+  sha256: d2ddc766fd1555549e564ca00b4641e0093ee0d94a9c77869df22b09f38f7f71
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Rmixmod, blockcluster, testthat, RInside, xml2
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh
+    - r-rcpp
+    - r-rcppeigen
+    - r-doparallel
+    - r-foreach
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-rcpp
+    - r-rcppeigen
+    - r-doparallel
+    - r-foreach
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RMixtCompIO')"           # [not win]
+    - "\"%R%\" -e \"library('RMixtCompIO')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/modal-inria/MixtComp, https://massiccc.lille.inria.fr/
+  license: AGPL-3
+  summary: Mixture Composer <https://github.com/modal-inria/MixtComp> is a project to build mixture
+    models with heterogeneous data sets and partially missing data management.  It includes
+    models for real, categorical, counting, functional and ranking data. This package
+    contains the minimal R interface of the C++ 'MixtComp' library.
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: RMixtCompIO
+# Type: Package
+# Title: Mixture Models with Heterogeneous and (Partially) Missing Data
+# Version: 4.0.1
+# Date: 2019-08-29
+# Authors@R: c(person("Vincent", "Kubicki", role = "aut"), person("Christophe", "Biernacki", role = "aut"), person("Quentin", "Grimonprez", role = c("aut", "cre"), email = "quentin.grimonprez@inria.fr"), person("Serge", "Iovleff", role = "ctb"), person("Matthieu", "Marbac-Lourdelle", role = "ctb"), person("Etienne", "Goffinet", role = "ctb"),  person("Patrick", "Patrick Wieschollek", role = "ctb", comment = "for CppOptimizationLibrary"), person("Tobias", "Wood", role = "ctb", comment = "for CppOptimizationLibrary"))
+# Copyright: Inria - Universite de Lille - CNRS; Patrick Wieschollek, Tobias Wood & the respective contributors for CppOptimizationLibrary
+# License: AGPL-3
+# Description: Mixture Composer <https://github.com/modal-inria/MixtComp> is a project to build mixture models with heterogeneous data sets and partially missing data management.  It includes models for real, categorical, counting, functional and ranking data. This package contains the minimal R interface of the C++ 'MixtComp' library.
+# URL: https://github.com/modal-inria/MixtComp, https://massiccc.lille.inria.fr/
+# BugReports: https://github.com/modal-inria/MixtComp/issues
+# Imports: Rcpp, doParallel, foreach
+# Suggests: Rmixmod, blockcluster, testthat, RInside, xml2
+# LinkingTo: Rcpp, RcppEigen, BH
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2019-08-30 15:10:37 UTC; grimonprez
+# Author: Vincent Kubicki [aut], Christophe Biernacki [aut], Quentin Grimonprez [aut, cre], Serge Iovleff [ctb], Matthieu Marbac-Lourdelle [ctb], Etienne Goffinet [ctb], Patrick Patrick Wieschollek [ctb] (for CppOptimizationLibrary), Tobias Wood [ctb] (for CppOptimizationLibrary)
+# Maintainer: Quentin Grimonprez <quentin.grimonprez@inria.fr>
+# Repository: CRAN
+# Date/Publication: 2019-09-02 15:00:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
