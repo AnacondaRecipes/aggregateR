@@ -1,0 +1,93 @@
+{% set version = '2.3-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-exams
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/exams_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/exams/exams_{{ version }}.tar.gz
+  sha256: a759cb3a777405970ad609fbcd7878143b6291163410d64f92941ef72d3647e9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: base64enc, knitr, magick, parallel, png, RCurl, RJSONIO, rmarkdown, tth
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('exams')"           # [not win]
+    - "\"%R%\" -e \"library('exams')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.R-exams.org/
+  license: GPL-2 | GPL-3
+  summary: Automatic generation of exams based on exercises in Markdown or LaTeX format, possibly
+    including R code for dynamic generation of exercise elements. Exercise types include
+    single-choice and multiple-choice questions, arithmetic problems, string questions,
+    and combinations thereof (cloze). Output formats include standalone files (PDF,
+    HTML, Docx, ODT, ...), Moodle XML, QTI 1.2, QTI 2.1, Blackboard, Canvas, OpenOLAT,
+    ARSnova, and TCExam. In addition to fully customizable PDF exams, a standardized
+    PDF format (NOPS) is provided that can be printed, scanned, and automatically evaluated.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: exams
+# Version: 2.3-4
+# Date: 2019-07-05
+# Title: Automatic Generation of Exams in R
+# Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org", comment = c(ORCID = "0000-0003-0918-3766")), person(given = "Bettina", family = "Gruen", role = "aut", email = "Bettina.Gruen@jku.at", comment = c(ORCID = "0000-0001-7265-4773")), person(given = "Friedrich", family = "Leisch", role = "aut", email = "Friedrich.Leisch@R-project.org", comment = c(ORCID = "0000-0001-7278-1983")), person(given = "Nikolaus", family = "Umlauf", role = "aut", email = "Nikolaus.Umlauf@uibk.ac.at"),	      person(given = "Mirko", family = "Birbaumer", role = "ctb", email = "Mirko.Birbaumer@hslu.ch"), person(given = "Dominik", family = "Ernst", role = "ctb", email = "Dominik.Ernst@boku.ac.at"), person(given = "Patrik", family = "Keller", role = "ctb", email = "Patrik.Keller@uibk.ac.at"), person(given = "Niels", family = "Smits", role = "ctb", email = "N.Smits@uva.nl"), person(given = "Reto", family = "Stauffer", role = "ctb", email = "Reto.Stauffer@uibk.ac.at"))
+# Description: Automatic generation of exams based on exercises in Markdown or LaTeX format, possibly including R code for dynamic generation of exercise elements. Exercise types include single-choice and multiple-choice questions, arithmetic problems, string questions, and combinations thereof (cloze). Output formats include standalone files (PDF, HTML, Docx, ODT, ...), Moodle XML, QTI 1.2, QTI 2.1, Blackboard, Canvas, OpenOLAT, ARSnova, and TCExam. In addition to fully customizable PDF exams, a standardized PDF format (NOPS) is provided that can be printed, scanned, and automatically evaluated.
+# Depends: R (>= 3.0.0)
+# Imports: stats, graphics, grDevices, tools, utils
+# Suggests: base64enc, knitr, magick, parallel, png, RCurl, RJSONIO, rmarkdown, tth
+# License: GPL-2 | GPL-3
+# URL: http://www.R-exams.org/
+# BugReports: http://www.R-exams.org/contact/
+# NeedsCompilation: no
+# Packaged: 2019-07-05 10:01:35 UTC; zeileis
+# Author: Achim Zeileis [aut, cre] (<https://orcid.org/0000-0003-0918-3766>), Bettina Gruen [aut] (<https://orcid.org/0000-0001-7265-4773>), Friedrich Leisch [aut] (<https://orcid.org/0000-0001-7278-1983>), Nikolaus Umlauf [aut], Mirko Birbaumer [ctb], Dominik Ernst [ctb], Patrik Keller [ctb], Niels Smits [ctb], Reto Stauffer [ctb]
+# Maintainer: Achim Zeileis <Achim.Zeileis@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2019-07-06 07:21:14 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

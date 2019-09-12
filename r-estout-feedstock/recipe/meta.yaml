@@ -1,0 +1,87 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-estout
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/estout_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/estout/estout_{{ version }}.tar.gz
+  sha256: 258ed5ea88f02ccd4a341ade7d29cd76e95789912e7ea20bb9d1ff4920e51972
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('estout')"           # [not win]
+    - "\"%R%\" -e \"library('estout')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.toolswitch.net
+  license: GPL-2
+  summary: This package is intended to speedup the process of creating model-comparing tables
+    common in Macroeconomics. The function collection stores the estimates of several
+    models and formats it to a table of the form estimate starred and std.err. below.
+    The default output is LaTeX but output to CSV for later editing in a spreadsheet
+    tool is possible as well. It works for linear models (lm) and panel models from
+    the "plm"-package (plm). Two further implemented functions "descsto" and "desctab"
+    enable you to export descriptive statistics of data-frames and single variables
+    to LaTeX and CSV.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: estout
+# Version: 1.2
+# Date: 2013-02-24
+# Title: Estimates Output
+# Author: Felix Kaminsky <fkamins@uni-goettingen.de>, inspired by the estout package for Stata.
+# Maintainer: Felix Kaminsky <fkamins@uni-goettingen.de>
+# Description: This package is intended to speedup the process of creating model-comparing tables common in Macroeconomics. The function collection stores the estimates of several models and formats it to a table of the form estimate starred and std.err. below. The default output is LaTeX but output to CSV for later editing in a spreadsheet tool is possible as well. It works for linear models (lm) and panel models from the "plm"-package (plm). Two further implemented functions "descsto" and "desctab" enable you to export descriptive statistics of data-frames and single variables to LaTeX and CSV.
+# License: GPL-2
+# URL: http://www.toolswitch.net
+# Packaged: 2013-02-25 12:17:19 UTC; thunderboy
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-02-26 16:24:42
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,86 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-es.dif
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/es.dif_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/es.dif/es.dif_{{ version }}.tar.gz
+  sha256: 9c92be8e6039bbafa351d4f08be131076782da100c4b77f8650ec3868c64f632
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('es.dif')"           # [not win]
+    - "\"%R%\" -e \"library('es.dif')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=es.dif
+  license: MIT
+  summary: Computes various effect sizes of the difference, their variance, and confidence interval.
+    This package treats Cohen's d, Hedges' d, biased/unbiased c (an effect size between
+    a mean and a constant) and e (an effect size between means without assuming the
+    variance equality).
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: es.dif
+# Type: Package
+# Title: Compute Effect Sizes of the Difference
+# Version: 1.0.1
+# Author: Satoshi Aoki
+# Maintainer: Satoshi Aoki <aokis1ll1@gmail.com>
+# Date: 2019-06-07
+# Description: Computes various effect sizes of the difference, their variance, and confidence interval. This package treats Cohen's d, Hedges' d, biased/unbiased c (an effect size between a mean and a constant) and e (an effect size between means without assuming the variance equality).
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2019-06-07 04:42:30 UTC; akaka
+# Repository: CRAN
+# Date/Publication: 2019-06-07 05:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

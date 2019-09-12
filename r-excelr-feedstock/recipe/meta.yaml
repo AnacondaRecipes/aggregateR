@@ -1,0 +1,94 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-excelr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/excelR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/excelR/excelR_{{ version }}.tar.gz
+  sha256: 244aa15e9bbed7d41a864e942a33601ce32d1d92f602548ca25b9df41acf55bf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: shiny (>= 1.3.1), testthat (>= 2.0.0), covr (>= 3.2.1)
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-htmlwidgets >=1.3
+    - r-jsonlite >=1.6
+
+  run:
+    - r-base
+    - r-htmlwidgets >=1.3
+    - r-jsonlite >=1.6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('excelR')"           # [not win]
+    - "\"%R%\" -e \"library('excelR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/Swechhya/excelR
+  license: MIT
+  summary: An R interface to 'jExcel' library to create web-based interactive tables and spreadsheets
+    compatible with 'Excel' or any other spreadsheet software.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: excelR
+# Type: Package
+# Title: A Wrapper of the 'JavaScript' Library 'jExcel'
+# Version: 0.3.0
+# Authors@R: c(person("Swechhya", "Bista", email = "swechhyabista@gmail.com", role = c("aut", "cre")), person("Kent", "Russell", role = c("ctb")), person("Marcis", "Bratka", role = c("ctb")))
+# Maintainer: Swechhya Bista <swechhyabista@gmail.com>
+# Description: An R interface to 'jExcel' library to create web-based interactive tables and spreadsheets compatible with 'Excel' or any other spreadsheet software.
+# License: MIT + file LICENSE
+# Imports: htmlwidgets (>= 1.3), jsonlite (>= 1.6)
+# Suggests: shiny (>= 1.3.1), testthat (>= 2.0.0), covr (>= 3.2.1)
+# URL: https://github.com/Swechhya/excelR
+# BugReports: https://github.com/Swechhya/excelR/issues
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-09-06 10:33:04 UTC; leapfrog
+# Author: Swechhya Bista [aut, cre], Kent Russell [ctb], Marcis Bratka [ctb]
+# Repository: CRAN
+# Date/Publication: 2019-09-07 09:30:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

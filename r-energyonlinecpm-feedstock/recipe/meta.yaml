@@ -1,0 +1,95 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-energyonlinecpm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/EnergyOnlineCPM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/EnergyOnlineCPM/EnergyOnlineCPM_{{ version }}.tar.gz
+  sha256: a8da638b3658428a8d671641a4ff960bff7e9a953c526863c19bf18629db7ca8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-energy
+
+  run:
+    - r-base
+    - r-mass
+    - r-energy
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('EnergyOnlineCPM')"           # [not win]
+    - "\"%R%\" -e \"library('EnergyOnlineCPM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://sites.google.com/site/EnergyOnlineCPM/
+  license: GPL-3
+  summary: Provides a function for distribution free control chart based on the change point
+    model, for multivariate statistical process control. The main constituent of the
+    chart is the energy test that focuses on the discrepancy between empirical characteristic
+    functions of two random vectors. This new control chart highlights in three aspects.
+    Firstly, it is distribution free, requiring no knowledge of the random processes.
+    Secondly, this control chart can monitor mean and variance simultaneously. Thirdly
+    it is devised for multivariate time series which is more practical in real data
+    application. Fourthly, it is designed for online detection (Phase II), which is
+    central for real time surveillance of stream data. For more information please refer
+    to O. Okhrin and Y.F. Xu (2017) <https://github.com/YafeiXu/working_paper/raw/master/CPM102.pdf>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: EnergyOnlineCPM
+# Type: Package
+# Title: Distribution Free Multivariate Control Chart Based on Energy Test
+# Version: 1.0
+# Date: 2017-09-30
+# Author: Yafei Xu
+# Maintainer: Yafei Xu <yafei.xu@hotmail.de>
+# Depends: parallel, energy, MASS
+# Description: Provides a function for distribution free control chart based on the change point model, for multivariate statistical process control. The main constituent of the chart is the energy test that focuses on the discrepancy between empirical characteristic functions of two random vectors. This new control chart highlights in three aspects. Firstly, it is distribution free, requiring no knowledge of the random processes. Secondly, this control chart can monitor mean and variance simultaneously. Thirdly it is devised for multivariate time series which is more practical in real data application. Fourthly, it is designed for online detection (Phase II), which is central for real time surveillance of stream data. For more information please refer to O. Okhrin and Y.F. Xu (2017) <https://github.com/YafeiXu/working_paper/raw/master/CPM102.pdf>.
+# URL: https://sites.google.com/site/EnergyOnlineCPM/
+# License: GPL (>= 3)
+# NeedsCompilation: no
+# Packaged: 2017-10-02 09:12:49 UTC; up2mike
+# Repository: CRAN
+# Date/Publication: 2017-10-02 11:37:01 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

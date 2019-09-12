@@ -1,0 +1,84 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-evaluationmeasures
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/EvaluationMeasures_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/EvaluationMeasures/EvaluationMeasures_{{ version }}.tar.gz
+  sha256: efa0feb26ce7209a67a2ed7f353157395bd540d5e0a3c01e851014b332f1c52c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('EvaluationMeasures')"           # [not win]
+    - "\"%R%\" -e \"library('EvaluationMeasures')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=EvaluationMeasures
+  license: GPL-3
+  summary: Provides Some of the most important evaluation measures for evaluating a model. Just
+    by giving the real and predicted class, measures such as accuracy, sensitivity,
+    specificity, ppv, npv, fmeasure, mcc and ... will be returned.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: EvaluationMeasures
+# Type: Package
+# Title: Collection of Model Evaluation Measure Functions
+# Version: 1.1.0
+# Authors@R: c(person(given = "Babak", family = "Khorsand", role = c("aut", "cre"), email = "khorsand@yahoo.com"), person(given = "Javad", family = "Zahiri", role = "ths", email = "zahiri@modares.ac.ir"), person(given = "Abdorreza", family = "Savadi", role = "ths", email = "savadi@um.ac.ir"))
+# Maintainer: Babak Khorsand <khorsand@yahoo.com>
+# Description: Provides Some of the most important evaluation measures for evaluating a model. Just by giving the real and predicted class, measures such as accuracy, sensitivity, specificity, ppv, npv, fmeasure, mcc and ... will be returned.
+# License: GPL
+# LazyData: TRUE
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-07-27 09:48:27 UTC; Challenger1980
+# Author: Babak Khorsand [aut, cre], Javad Zahiri [ths], Abdorreza Savadi [ths]
+# Repository: CRAN
+# Date/Publication: 2016-07-27 12:03:25
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,89 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-equivump
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/equivUMP_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/equivUMP/equivUMP_{{ version }}.tar.gz
+  sha256: 3c0026520f6e18e56433c954800b17be8f361e99d6834469421ba7d64c5e3016
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('equivUMP')"           # [not win]
+    - "\"%R%\" -e \"library('equivUMP')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/thmild/equivUMP
+  license: GPL-2
+  summary: Implementation of uniformly most powerful invariant equivalence tests for one- and
+    two-sample problems (paired and unpaired) as described  in Wellek (2010, ISBN:978-1-4398-0818-4).
+    Also one-sided alternatives  (non-inferiority and non-superiority tests) are supported.
+    Basically a variant  of a t-test with (relaxed) null and alternative hypotheses
+    exchanged.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: equivUMP
+# Type: Package
+# Title: Uniformly Most Powerful Invariant Tests of Equivalence
+# Version: 0.1.1
+# Authors@R: person("Thoralf", "Mildenberger", email = "mild@zhaw.ch", role = c("aut", "cre"))
+# Description: Implementation of uniformly most powerful invariant equivalence tests for one- and two-sample problems (paired and unpaired) as described  in Wellek (2010, ISBN:978-1-4398-0818-4). Also one-sided alternatives  (non-inferiority and non-superiority tests) are supported. Basically a variant  of a t-test with (relaxed) null and alternative hypotheses exchanged.
+# License: GPL (>= 2)
+# URL: https://github.com/thmild/equivUMP
+# BugReports: https://github.com/thmild/equivUMP/issues
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-04-12 09:45:27 UTC; thoralf
+# Author: Thoralf Mildenberger [aut, cre]
+# Maintainer: Thoralf Mildenberger <mild@zhaw.ch>
+# Repository: CRAN
+# Date/Publication: 2019-04-13 08:22:52 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,95 @@
+{% set version = '2.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ewgof
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/EWGoF_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/EWGoF/EWGoF_{{ version }}.tar.gz
+  sha256: d5ebd27c70c095bbdee394218401510fd4f3212e2f10896984663729f34beda5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{posix}}filesystem        # [win]
+    - {{posix}}make
+    - {{posix}}sed               # [win]
+    - {{posix}}coreutils         # [win]
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.10.3
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.10.3
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('EWGoF')"           # [not win]
+    - "\"%R%\" -e \"library('EWGoF')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=EWGoF
+  license: GPL (>= 2.0)
+  summary: 'Contains a large number of the goodness-of-fit tests for the Exponential and Weibull
+    distributions classified into families: the tests based on the empirical distribution
+    function, the tests based on the probability plot, the tests based on the normalized
+    spacings, the tests based on the Laplace transform and the likelihood based tests.'
+
+  license_family: GPL3
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: EWGoF
+# Type: Package
+# Title: Goodness-of-Fit Tests for the Exponential and Two-Parameter Weibull Distributions
+# Version: 2.2.2
+# Author: Meryam Krit
+# Maintainer: Meryam Krit <meryam.krit@gmail.com>
+# Description: Contains a large number of the goodness-of-fit tests for the Exponential and Weibull distributions classified into families: the tests based on the empirical distribution function, the tests based on the probability plot, the tests based on the normalized spacings, the tests based on the Laplace transform and the likelihood based tests.
+# License: GPL (>= 2.0)
+# Encoding: UTF-8
+# Imports: Rcpp (>= 0.10.3)
+# LinkingTo: Rcpp
+# LazyData: true
+# NeedsCompilation: yes
+# Packaged: 2019-03-01 07:10:33 UTC; mkrit
+# Repository: CRAN
+# Date/Publication: 2019-03-01 07:50:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

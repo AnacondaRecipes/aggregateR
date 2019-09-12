@@ -1,0 +1,82 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ergmharris
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ergmharris_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ergmharris/ergmharris_{{ version }}.tar.gz
+  sha256: b8dd248b5d7fcb871266bdfe572f7e75fe32f65db488c8495ad353493594d1ad
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ergmharris')"           # [not win]
+    - "\"%R%\" -e \"library('ergmharris')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ergmharris
+  license: GPL-3
+  summary: Data for use with the Sage Introduction to Exponential Random Graph Modeling text
+    by Jenine K. Harris.  Network data set consists of 1283 local health departments
+    and the communication links among them along with several attributes.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: ergmharris
+# Type: Package
+# Title: Local Health Department network data set
+# Version: 1.0
+# Date: 2013-05-10
+# Author: Jenine K. Harris
+# Maintainer: Jenine K. Harris <harrisj@wustl.edu>
+# Description: Data for use with the Sage Introduction to Exponential Random Graph Modeling text by Jenine K. Harris.  Network data set consists of 1283 local health departments and the communication links among them along with several attributes.
+# License: GPL-3
+# Packaged: 2013-05-10 18:15:21 UTC; jharris
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2013-05-11 15:16:28
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

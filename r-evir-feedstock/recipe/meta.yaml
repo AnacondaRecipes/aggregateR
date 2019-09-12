@@ -1,0 +1,86 @@
+{% set version = '1.7-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-evir
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/evir_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/evir/evir_{{ version }}.tar.gz
+  sha256: 715ef77208506c3b95261b7ef5dcd57cdd3d62d69fb9a661f163ccb2cf3feac0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('evir')"           # [not win]
+    - "\"%R%\" -e \"library('evir')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=evir
+  license: GPL-2
+  summary: Functions for extreme value theory, which may be  divided into the following groups;
+    exploratory data analysis,  block maxima, peaks over thresholds (univariate and
+    bivariate),  point processes, gev/gpd distributions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: evir
+# Version: 1.7-4
+# Date: 2018-03-19
+# Title: Extreme Values in R
+# Authors@R: c(person("Bernhard", "Pfaff", email = "bernhard@pfaffikus.de", role = c("aut", "cre")), person("Eric", "Zivot", email = "ezivot@u.washington.edu", role = "ctb"), person("Alexander", "McNeil", email = "mcneil@math.ethz.ch", role = "aut", comment = "S original (EVIS)"), person("Alec", "Stephenson", email = "alec_stephenson@hotmail.com", role = "trl", comment = "R port of EVIS"))
+# Depends: stats
+# Description: Functions for extreme value theory, which may be  divided into the following groups; exploratory data analysis,  block maxima, peaks over thresholds (univariate and bivariate),  point processes, gev/gpd distributions.
+# License: GPL (>= 2)
+# Author: Bernhard Pfaff [aut, cre], Eric Zivot [ctb], Alexander McNeil [aut] (S original (EVIS)), Alec Stephenson [trl] (R port of EVIS)
+# Maintainer: Bernhard Pfaff <bernhard@pfaffikus.de>
+# Repository: CRAN
+# Repository/R-Forge/Project: evir
+# Repository/R-Forge/Revision: 13
+# Repository/R-Forge/DateTimeStamp: 2018-03-19 20:00:59
+# Date/Publication: 2018-03-20 12:00:27 UTC
+# NeedsCompilation: no
+# Packaged: 2018-03-19 20:06:44 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

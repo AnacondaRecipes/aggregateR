@@ -1,0 +1,84 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-equivnoninf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/EQUIVNONINF_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/EQUIVNONINF/EQUIVNONINF_{{ version }}.tar.gz
+  sha256: 388b3cbb006993c047e03de87c7494cbde3027f1a8bf0a63be3356067cce7c80
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{posix}}zip               # [win]
+
+  host:
+    - r-base
+    - r-biasedurn
+
+  run:
+    - r-base
+    - r-biasedurn
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('EQUIVNONINF')"           # [not win]
+    - "\"%R%\" -e \"library('EQUIVNONINF')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=EQUIVNONINF
+  license: CC0
+  summary: 'Making available in R the complete set of programs accompanying S. Wellek''s (2010)
+    monograph ''''Testing Statistical Hypotheses of Equivalence and Noninferiority.
+    Second Edition'''' (Chapman&Hall/CRC). '
+
+  license_family: CC
+
+extra:
+  recipe-maintainers:
+    - katietz
+
+# The original CRAN metadata for this package was:
+
+# Package: EQUIVNONINF
+# Type: Package
+# Title: Testing for Equivalence and Noninferiority
+# Version: 1.0
+# Date: 2017-09-12
+# Author: Stefan Wellek, Peter Ziegler
+# Maintainer: Stefan Wellek <stefan.wellek@zi-mannheim.de>
+# Description: Making available in R the complete set of programs accompanying S. Wellek's (2010) monograph ''Testing Statistical Hypotheses of Equivalence and Noninferiority. Second Edition'' (Chapman&Hall/CRC).
+# License: CC0
+# Depends: R (>= 3.0.0), stats, BiasedUrn
+# NeedsCompilation: no
+# Packaged: 2017-09-18 13:56:16 UTC; ziegler
+# Repository: CRAN
+# Date/Publication: 2017-09-19 10:23:41 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
