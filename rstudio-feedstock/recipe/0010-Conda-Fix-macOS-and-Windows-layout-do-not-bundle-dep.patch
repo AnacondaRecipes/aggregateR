@@ -1,0 +1,203 @@
+From 7df6a4a9408bc76e574b27a16989b7e6d1036114 Mon Sep 17 00:00:00 2001
+From: Ray Donnelly <mingw.android@gmail.com>
+Date: Sat, 29 Oct 2016 17:39:52 +0100
+Subject: [PATCH 10/38] Conda: Fix macOS and Windows layout, do not bundle deps
+
+---
+ CMakeGlobals.txt                              |  2 +-
+ dependencies/windows/install-dependencies.cmd | 46 ++++++++------
+ src/cpp/desktop/CMakeLists.txt                | 60 ++++++++++++-------
+ 3 files changed, 66 insertions(+), 42 deletions(-)
+
+diff --git a/CMakeGlobals.txt b/CMakeGlobals.txt
+index 485eebd720..604ef6e633 100644
+--- a/CMakeGlobals.txt
++++ b/CMakeGlobals.txt
+@@ -164,7 +164,7 @@ if(NOT EXISTS "${RSTUDIO_DEPENDENCIES_DIR}")
+ endif()
+ 
+ # special install directories for apple desktop
+-if (APPLE AND RSTUDIO_DESKTOP)
++if (APPLE AND RSTUDIO_DESKTOP AND NOT DEFINED ENV{CONDA_BUILD})
+    set(RSTUDIO_INSTALL_BIN RStudio.app/Contents/MacOS)
+    set(RSTUDIO_INSTALL_SUPPORTING RStudio.app/Contents/Resources)
+ else()
+diff --git a/dependencies/windows/install-dependencies.cmd b/dependencies/windows/install-dependencies.cmd
+index ba0e7d1249..eb73196011 100644
+--- a/dependencies/windows/install-dependencies.cmd
++++ b/dependencies/windows/install-dependencies.cmd
+@@ -27,28 +27,34 @@ set LIBCLANG_VERSION=5.0.2
+ set LIBCLANG_NAME=libclang-windows-%LIBCLANG_VERSION%
+ set LIBCLANG_FILE=%LIBCLANG_NAME%.zip
+ 
+-if not exist gnudiff (
+-  wget %WGET_ARGS% "%BASEURL%%GNUDIFF_FILE%"
+-  mkdir gnudiff
+-  echo Unzipping %GNUDIFF_FILE%
+-  unzip %UNZIP_ARGS% "%GNUDIFF_FILE%" -d gnudiff
+-  del "%GNUDIFF_FILE%"
++if not "%CONDA_BUILD%" == "1" (
++  if not exist gnudiff (
++    wget %WGET_ARGS% "%BASEURL%%GNUDIFF_FILE%"
++    mkdir gnudiff
++    echo Unzipping %GNUDIFF_FILE%
++    unzip %UNZIP_ARGS% "%GNUDIFF_FILE%" -d gnudiff
++    del "%GNUDIFF_FILE%"
++  )
+ )
+ 
+-if not exist gnugrep (
+-  wget %WGET_ARGS% "%BASEURL%%GNUGREP_FILE%"
+-  mkdir gnugrep
+-  echo Unzipping %GNUGREP_FILE%
+-  unzip %UNZIP_ARGS% "%GNUGREP_FILE%" -d gnugrep
+-  del "%GNUGREP_FILE%"
++if not "%CONDA_BUILD%" == "1" (
++  if not exist gnugrep (
++    wget %WGET_ARGS% "%BASEURL%%GNUGREP_FILE%"
++    mkdir gnugrep
++    echo Unzipping %GNUGREP_FILE%
++    unzip %UNZIP_ARGS% "%GNUGREP_FILE%" -d gnugrep
++    del "%GNUGREP_FILE%"
++  )
+ )
+ 
+-if not exist msys-ssh-1000-18 (
+-  wget %WGET_ARGS% "%BASEURL%%MSYS_SSH_FILE%"
+-  mkdir msys-ssh-1000-18
+-  echo Unzipping %MSYS_SSH_FILE%
+-  unzip %UNZIP_ARGS% "%MSYS_SSH_FILE%" -d msys-ssh-1000-18
+-  del "%MSYS_SSH_FILE%"
++if not "%CONDA_BUILD%" == "1" (
++  if not exist msys-ssh-1000-18 (
++    wget %WGET_ARGS% "%BASEURL%%MSYS_SSH_FILE%"
++    mkdir msys-ssh-1000-18
++    echo Unzipping %MSYS_SSH_FILE%
++    unzip %UNZIP_ARGS% "%MSYS_SSH_FILE%" -d msys-ssh-1000-18
++    del "%MSYS_SSH_FILE%"
++  )
+ )
+ 
+ if not exist sumatra\3.1.1 (
+@@ -141,7 +147,9 @@ if not exist libclang\%LIBCLANG_VERSION% (
+   del %LIBCLANG_FILE%
+ )
+ 
+-call install-packages.cmd
++if not "%CONDA_BUILD%" == "1" (
++  call install-packages.cmd
++)
+ 
+ popd
+ 
+diff --git a/src/cpp/desktop/CMakeLists.txt b/src/cpp/desktop/CMakeLists.txt
+index a75da0e7cf..fd4e388e23 100644
+--- a/src/cpp/desktop/CMakeLists.txt
++++ b/src/cpp/desktop/CMakeLists.txt
+@@ -325,10 +325,11 @@ endif(WIN32)
+ # bundle it unless we are building on linux and NOT linking against the
+ # qtsdk -- in that case we are linking against system versions of the
+ # qt libraries which should therefore not be bundled
+-if(APPLE OR WIN32 OR
+-   RSTUDIO_PACKAGE_BUILD OR
+-   (${QT_LIBRARY_DIR} MATCHES ".*QtSDK.*"))
+-  set(RSTUDIO_BUNDLE_QT TRUE)
++if(NOT DEFINED ENV{CONDA_BUILD} AND
++   (APPLE OR WIN32 OR
++    RSTUDIO_PACKAGE_BUILD OR
++    (${QT_LIBRARY_DIR} MATCHES ".*QtSDK.*")))
++      set(RSTUDIO_BUNDLE_QT TRUE)
+ endif()
+ 
+ set(RSTUDIO_QTMODULES
+@@ -374,12 +375,12 @@ if(NOT APPLE)
+    # add rpath for linux so we can find qt libraries in our bin dir
+    if(UNIX AND RSTUDIO_BUNDLE_QT)
+       set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+-      set_target_properties(rstudio PROPERTIES
++      set_target_properties(${RSTUDIO_EXE_NAME} PROPERTIES
+                             INSTALL_RPATH \$ORIGIN)
+    endif()
+ 
+    # set link dependencies
+-   target_link_libraries(rstudio
++   target_link_libraries(${RSTUDIO_EXE_NAME}
+       ${RSTUDIO_QTMODULES}
+       ${QT_LIBRARIES}
+       ${Boost_LIBRARIES}
+@@ -411,18 +412,28 @@ else()
+    set_source_files_properties(${PNG_FILES}
+       PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+ 
+-   # define bundle name and executable
+-   set(MACOSX_BUNDLE_BUNDLE_NAME "RStudio")
+-
+-   add_stripped_executable(RStudio MACOSX_BUNDLE
+-      ${DESKTOP_SOURCE_FILES}
+-      ${MOC_DESKTOP_SOURCE_FILES}
+-      ${DESKTOP_RESOURCES_SOURCES}
+-      ${DESKTOP_UI_SOURCES}
+-      ${ICNS_FILES}
+-      ${PNG_FILES})
++   if(NOT DEFINED ENV{CONDA_BUILD})
++      # define bundle name and executable
++      set(MACOSX_BUNDLE_BUNDLE_NAME "RStudio")
++
++      add_stripped_executable(RStudio MACOSX_BUNDLE
++         ${DESKTOP_SOURCE_FILES}
++         ${MOC_DESKTOP_SOURCE_FILES}
++         ${DESKTOP_RESOURCES_SOURCES}
++         ${DESKTOP_UI_SOURCES}
++         ${ICNS_FILES}
++         ${PNG_FILES})
++   else()
++      add_stripped_executable(${RSTUDIO_EXE_NAME}
++         ${DESKTOP_SOURCE_FILES}
++         ${MOC_DESKTOP_SOURCE_FILES}
++         ${DESKTOP_RESOURCES_SOURCES}
++         ${DESKTOP_UI_SOURCES}
++         ${ICNS_FILES}
++         ${PNG_FILES})
++   endif()
+ 
+-   target_link_libraries(RStudio
++   target_link_libraries(${RSTUDIO_EXE_NAME}
+       ${RSTUDIO_QTMODULES}
+       ${QT_LIBRARIES}
+       rstudio-core
+@@ -434,14 +445,19 @@ else()
+ endif()
+ 
+ # install target (OSX install goes into the bundle)
+-if(APPLE)
+-  set_target_properties(RStudio PROPERTIES
++if(APPLE AND NOT DEFINED{CONDA_BUILD})
++  set_target_properties(${RSTUDIO_EXE_NAME} PROPERTIES
+      MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist)
+-  install(TARGETS RStudio BUNDLE DESTINATION .)
+-
++  install(TARGETS ${RSTUDIO_EXE_NAME} BUNDLE DESTINATION .
++                                      RUNTIME DESTINATION ${RSTUDIO_INSTALL_BIN})
+   install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/RStudio.sdef
+                    DESTINATION ${RSTUDIO_INSTALL_SUPPORTING})
+ else()
++  if(APPLE)
++      install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/RStudio.sdef
++                       DESTINATION ${RSTUDIO_INSTALL_SUPPORTING})
++  endif()
++
+   install(TARGETS rstudio DESTINATION ${RSTUDIO_INSTALL_BIN})
+ endif()
+ 
+@@ -534,7 +550,7 @@ if(RSTUDIO_BUNDLE_QT)
+          add_library(${ICU_LIBRARY} SHARED IMPORTED)
+          set_property(TARGET ${ICU_LIBRARY} PROPERTY IMPORTED_LOCATION "${QT_LIBRARY_DIR}/${ICU_LIBRARY}.so")
+       endforeach()
+-      target_link_libraries(rstudio ${ICU_LIBRARIES})
++      target_link_libraries(${RSTUDIO_EXE_NAME} ${ICU_LIBRARIES})
+ 
+       # configure and install qt
+       configure_file(
+-- 
+2.23.0
+

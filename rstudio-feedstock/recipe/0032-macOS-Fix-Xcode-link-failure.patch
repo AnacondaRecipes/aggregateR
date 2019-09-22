@@ -1,0 +1,42 @@
+From b50e33f306bc87072d1ce643f5e1cd087f5e5712 Mon Sep 17 00:00:00 2001
+From: Ray Donnelly <mingw.android@gmail.com>
+Date: Sat, 31 Mar 2018 11:19:43 +0100
+Subject: [PATCH 32/38] macOS: Fix Xcode link failure
+
+Undefined symbols for architecture x86_64:
+  _objc_readClassPair, referenced from:
+      __ARCLite__load() in libarclite_macosx.a(arclite.o)
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+
+Note, this needs to be done for every executable (rsession, rpostback etc) so instead
+we set LDFLAGS in build.sh when doing an Xcode build. Keeping this around as reference
+meterial though.
+---
+ src/cpp/desktop/CMakeLists.txt | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/src/cpp/desktop/CMakeLists.txt b/src/cpp/desktop/CMakeLists.txt
+index 5edfce81d6..2349f50048 100644
+--- a/src/cpp/desktop/CMakeLists.txt
++++ b/src/cpp/desktop/CMakeLists.txt
+@@ -465,6 +465,16 @@ else()
+   install(TARGETS rstudio DESTINATION ${RSTUDIO_INSTALL_BIN})
+ endif()
+ 
++# https://stackoverflow.com/q/15761583
++# https://forums.developer.apple.com/thread/17757
++# If this does not work then we may be able to add "-Xlinker -U -Xlinker _objc_readClassPair" to the
++# linker flags.
++if(APPLE)
++   if(CMAKE_GENERATOR STREQUAL Xcode)
++      set_target_properties(${RSTUDIO_EXE_NAME} PROPERTIES XCODE_ATTRIBUTE_CLANG_LINK_OBJC_RUNTIME "NO")
++   endif()
++endif()
++
+ # bundle qt dependencies if this is a package build
+ if(RSTUDIO_BUNDLE_QT)
+    # set lib suffix for windows
+-- 
+2.23.0
+

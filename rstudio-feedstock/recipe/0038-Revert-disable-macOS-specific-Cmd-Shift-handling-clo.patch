@@ -1,0 +1,116 @@
+From 2ad2af16c05f73ae562b54b79d269dc0fe643919 Mon Sep 17 00:00:00 2001
+From: Ray Donnelly <mingw.android@gmail.com>
+Date: Tue, 17 Jul 2018 09:08:10 -0700
+Subject: [PATCH 38/38] Revert "disable macOS-specific Cmd+Shift+/ handling
+ (closes #2443)"
+
+This reverts commit d026ae8b360f993726a27c33ccf9c05be8cf70d2.
+---
+ src/cpp/desktop/DesktopGwtCallback.cpp   | 12 ------------
+ src/cpp/desktop/DesktopGwtCallback.hpp   |  3 ++-
+ src/cpp/desktop/DesktopGwtCallbackMac.mm | 23 -----------------------
+ src/cpp/desktop/DesktopMainWindow.cpp    |  2 +-
+ 4 files changed, 3 insertions(+), 37 deletions(-)
+
+diff --git a/src/cpp/desktop/DesktopGwtCallback.cpp b/src/cpp/desktop/DesktopGwtCallback.cpp
+index a6166909ea..330456d39e 100644
+--- a/src/cpp/desktop/DesktopGwtCallback.cpp
++++ b/src/cpp/desktop/DesktopGwtCallback.cpp
+@@ -90,7 +90,6 @@ GwtCallback::GwtCallback(MainWindow* pMainWindow, GwtWindow* pOwner, bool isRemo
+                 QString());
+       ::_exit(EXIT_FAILURE);
+    }
+-   
+ #ifdef Q_OS_LINUX
+    // assume light theme on startup (theme will be dynamically updated
+    // based on editor theme chosen by user)
+@@ -119,17 +118,6 @@ GwtCallback::GwtCallback(MainWindow* pMainWindow, GwtWindow* pOwner, bool isRemo
+ #endif
+ }
+ 
+-#ifndef Q_OS_MAC
+-void GwtCallback::initialize()
+-{
+-}
+-#endif
+-
+-void GwtCallback::invokeReflowComment()
+-{
+-   pMainWindow_->invokeCommand(QStringLiteral("reflowComment"));
+-}
+-
+ Synctex& GwtCallback::synctex()
+ {
+    if (pSynctex_ == nullptr)
+diff --git a/src/cpp/desktop/DesktopGwtCallback.hpp b/src/cpp/desktop/DesktopGwtCallback.hpp
+index 6c3293318c..0867d053fe 100644
+--- a/src/cpp/desktop/DesktopGwtCallback.hpp
++++ b/src/cpp/desktop/DesktopGwtCallback.hpp
+@@ -61,6 +61,7 @@ class GwtCallback : public QObject
+ public:
+    GwtCallback(MainWindow* pMainWindow, GwtWindow* pOwner, bool isRemoteDesktop);
+    void initialize();
++   GwtCallback(MainWindow* pMainWindow, GwtWindow* pOwner);
+    int collectPendingQuitRequest();
+ 
+ Q_SIGNALS:
+@@ -275,8 +276,8 @@ public Q_SLOTS:
+    int getProxyPortNumber();
+ 
+ private:
+-   void invokeReflowComment();
+    Synctex& synctex();
++
+    void activateAndFocusOwner();
+ 
+ private:
+diff --git a/src/cpp/desktop/DesktopGwtCallbackMac.mm b/src/cpp/desktop/DesktopGwtCallbackMac.mm
+index ad27468735..654552f07e 100644
+--- a/src/cpp/desktop/DesktopGwtCallbackMac.mm
++++ b/src/cpp/desktop/DesktopGwtCallbackMac.mm
+@@ -165,29 +165,6 @@ NSArray* parseFileNameFilters(NSString* fileNameFilters)
+ 
+ RS_END_NAMESPACE()
+ 
+-void GwtCallback::initialize()
+-{
+-   [NSEvent addLocalMonitorForEventsMatchingMask: NSKeyDownMask
+-                                         handler: ^(NSEvent* event)
+-    {
+-       // detect attempts to run Command + Shift + /, and let our own
+-       // reflow comment code run instead
+-       if (event.keyCode == 44 &&
+-           (event.modifierFlags & NSEventModifierFlagShift) != 0 &&
+-           (event.modifierFlags & NSEventModifierFlagCommand) != 0 &&
+-           (event.modifierFlags & NSEventModifierFlagControl) == 0 &&
+-           (event.modifierFlags & NSEventModifierFlagOption) == 0 &&
+-           (event.modifierFlags & NSEventModifierFlagFunction) == 0)
+-       {
+-          invokeReflowComment();
+-          return (NSEvent*) nil;
+-       }
+-       
+-       return event;
+-    }];
+-
+-}
+-
+ int GwtCallback::showMessageBox(int type,
+                                 QString qCaption,
+                                 QString qMessage,
+diff --git a/src/cpp/desktop/DesktopMainWindow.cpp b/src/cpp/desktop/DesktopMainWindow.cpp
+index 29b000a6ed..c7d27113d0 100644
+--- a/src/cpp/desktop/DesktopMainWindow.cpp
++++ b/src/cpp/desktop/DesktopMainWindow.cpp
+@@ -105,7 +105,7 @@ MainWindow::MainWindow(QUrl url,
+    pMainMenuStub->addMenu(QString::fromUtf8("Help"));
+    setMenuBar(pMainMenuStub);
+ #endif
+-   
++
+    connect(&menuCallback_, SIGNAL(menuBarCompleted(QMenuBar*)),
+            this, SLOT(setMenuBar(QMenuBar*)));
+    connect(&menuCallback_, SIGNAL(commandInvoked(QString)),
+-- 
+2.23.0
+
