@@ -4,6 +4,10 @@ if [[ $target_platform =~ linux.* ]] || [[ $target_platform == win-32 ]] || [[ $
   export DISABLE_AUTOBREW=1
   mv DESCRIPTION DESCRIPTION.old
   grep -v '^Priority: ' DESCRIPTION.old > DESCRIPTION
+  if [[ $target_platform == osx-64 ]]; then
+    export CXXFLAGS="${CXXFLAGS} -DMAP_ANONYMOUS=MAP_ANON "
+    export CFLAGS="${CFLAGS} -DMAP_ANONYMOUS=MAP_ANON "
+  fi
   $R CMD INSTALL --build .
 else
   mkdir -p $PREFIX/lib/R/library/IsoSpecR
@@ -11,7 +15,7 @@ else
 
   if [[ $target_platform == osx-64 ]]; then
     export CXXFLAGS="${CXXFLAGS} -DMAP_ANONYMOUS=MAP_ANON "
-    export CFLAGS="{CFLAGS} -DMAP_ANONYMOUS=MAP_ANON "
+    export CFLAGS="${CFLAGS} -DMAP_ANONYMOUS=MAP_ANON "
     pushd $PREFIX
       for libdir in lib/R/lib lib/R/modules lib/R/library lib/R/bin/exec sysroot/usr/lib; do
         pushd $libdir || exit 1
