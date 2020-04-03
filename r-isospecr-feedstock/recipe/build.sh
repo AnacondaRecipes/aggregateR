@@ -11,6 +11,7 @@ else
 
   if [[ $target_platform == osx-64 ]]; then
     export CXXFLAGS="${CXXFLAGS} -DMAP_ANONYMOUS=MAP_ANON "
+    export CFLAGS="{CFLAGS} -DMAP_ANONYMOUS=MAP_ANON "
     pushd $PREFIX
       for libdir in lib/R/lib lib/R/modules lib/R/library lib/R/bin/exec sysroot/usr/lib; do
         pushd $libdir || exit 1
