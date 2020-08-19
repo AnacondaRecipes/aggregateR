@@ -1,7 +1,7 @@
-From c6d0d150f590c61595384335f0ba947f46021952 Mon Sep 17 00:00:00 2001
+From 525b8550b45a85c014b89b7ef52d2d32e4cd800b Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Mon, 31 Oct 2016 12:01:00 +0000
-Subject: [PATCH 16/16] Conda: Put resources in share/rstudio
+Subject: [PATCH 16/42] Conda: Put resources in share/rstudio
 
 ..on all platforms.
 
@@ -11,7 +11,7 @@ Add FilePath::lexically_normalized (requires Boost>=1.60)
 Add resolveIDEPath for Xcode and/or QtCreator debugging
 ---
  CMakeGlobals.txt                              |   2 +-
- src/cpp/core/system/Win32System.cpp           |   2 +-
+ src/cpp/core/system/Win32System.cpp           |   5 +-
  src/cpp/desktop/DesktopMain.cpp               |  45 ++++++++
  src/cpp/desktop/DesktopOptions.cpp            |   6 ++
  src/cpp/r/R/Diagnostics.R                     |  15 +--
@@ -20,7 +20,7 @@ Add resolveIDEPath for Xcode and/or QtCreator debugging
  .../include/session/SessionConstants.hpp      |  21 ++++
  .../include/session/SessionOptions.gen.hpp    |  11 +-
  .../include/session/SessionOptions.hpp        |  17 +++
- 10 files changed, 210 insertions(+), 20 deletions(-)
+ 10 files changed, 213 insertions(+), 20 deletions(-)
 
 diff --git a/CMakeGlobals.txt b/CMakeGlobals.txt
 index 04a8d68f29..cbd44639ea 100644
@@ -36,15 +36,18 @@ index 04a8d68f29..cbd44639ea 100644
  
  # if the install prefix is /usr/local then tweak as appropriate
 diff --git a/src/cpp/core/system/Win32System.cpp b/src/cpp/core/system/Win32System.cpp
-index 74ca314aa1..a4ffb0b5b3 100644
+index 74ca314aa1..4b25bb883f 100644
 --- a/src/cpp/core/system/Win32System.cpp
 +++ b/src/cpp/core/system/Win32System.cpp
-@@ -522,7 +522,7 @@ Error installPath(const std::string& relativeToExecutable,
+@@ -522,7 +522,10 @@ Error installPath(const std::string& relativeToExecutable,
     if (relativeToExecutable == "..") // common case
       *pInstallationPath = exePath.getParent().getParent();
     else
 -     *pInstallationPath = exePath.getParent().completePath(relativeToExecutable);
-+     *pInstallationPath = exePath.getParent().completePath(relativeToExecutable).getLexicallyNormalPath();
++   {
++     FilePath fp(exePath.getParent().completePath(relativeToExecutable).getLexicallyNormalPath());
++     *pInstallationPath = fp;
++   }
  
     return Success();
  }
@@ -187,7 +190,7 @@ index 03076e22f3..cd1a766fea 100644
        if (!options.verifyInstallation())
        {
 diff --git a/src/cpp/session/SessionOptions.cpp b/src/cpp/session/SessionOptions.cpp
-index da33662da9..cec7deb7bd 100644
+index da33662da9..9fc6f04677 100644
 --- a/src/cpp/session/SessionOptions.cpp
 +++ b/src/cpp/session/SessionOptions.cpp
 @@ -13,6 +13,11 @@
