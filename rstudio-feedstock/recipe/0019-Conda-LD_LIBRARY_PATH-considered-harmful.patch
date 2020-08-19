@@ -1,19 +1,19 @@
-From 1c3aba5cf39e9037005cda8384c024131b80bdc1 Mon Sep 17 00:00:00 2001
+From 0fcc8617fdf5250502006f5bbcfc69a777fe7d88 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Mon, 31 Oct 2016 18:25:35 -0400
 Subject: [PATCH 19/41] Conda: LD_LIBRARY_PATH considered harmful
 
 (and DYLD_FALLBACK_LIBRARY_PATH useless due to SIP)
 ---
- src/cpp/core/r_util/REnvironmentPosix.cpp |  2 ++
- src/cpp/session/CMakeLists.txt            | 15 +++++++++++++++
- 2 files changed, 17 insertions(+)
+ src/cpp/core/r_util/REnvironmentPosix.cpp | 2 ++
+ src/cpp/session/CMakeLists.txt            | 1 +
+ 2 files changed, 3 insertions(+)
 
 diff --git a/src/cpp/core/r_util/REnvironmentPosix.cpp b/src/cpp/core/r_util/REnvironmentPosix.cpp
-index 6c9f3c4164..cdb91601d9 100644
+index b836aa4ae1..6e009e601a 100644
 --- a/src/cpp/core/r_util/REnvironmentPosix.cpp
 +++ b/src/cpp/core/r_util/REnvironmentPosix.cpp
-@@ -681,6 +681,7 @@ bool detectREnvironment(const FilePath& whichRScript,
+@@ -738,6 +738,7 @@ bool detectREnvironment(const FilePath& whichRScript,
                                     resolveRPath(rHomePath,
                                                  scriptVars["R_DOC_DIR"])));
  
@@ -21,7 +21,7 @@ index 6c9f3c4164..cdb91601d9 100644
     // determine library path (existing + r lib dir + r extra lib dirs)
     std::string libraryPath = rLibraryPath(rHomePath,
                                            rLibPath,
-@@ -688,6 +689,7 @@ bool detectREnvironment(const FilePath& whichRScript,
+@@ -745,6 +746,7 @@ bool detectREnvironment(const FilePath& whichRScript,
                                            ldLibraryPath);
     
     pVars->push_back(std::make_pair(kLibraryPathEnvVariable, libraryPath));
@@ -30,31 +30,17 @@ index 6c9f3c4164..cdb91601d9 100644
     // set R_ARCH on the mac if we are running against CRAN R
  #ifdef __APPLE__
 diff --git a/src/cpp/session/CMakeLists.txt b/src/cpp/session/CMakeLists.txt
-index eb5e9aa640..b0d3277aef 100644
+index 3605786a3e..101f03efce 100644
 --- a/src/cpp/session/CMakeLists.txt
 +++ b/src/cpp/session/CMakeLists.txt
-@@ -361,6 +361,21 @@ if(WIN32)
-    add_subdirectory(consoleio)
+@@ -421,6 +421,7 @@ if(DEFINED ENV{CONDA_BUILD})
+    # which point to directories outside the build tree to the install RPATH
+    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
  endif()
- 
-+if(DEFINED ENV{CONDA_BUILD})
-+   # use, i.e. don't skip the full RPATH for the build tree
-+   set(CMAKE_SKIP_BUILD_RPATH FALSE)
-+
-+   # when building, don't use the install RPATH already
-+   # (but later on when installing)
-+   set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-+
-+   set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-+
-+   # add the automatically determined parts of the RPATH
-+   # which point to directories outside the build tree to the install RPATH
-+   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-+endif()
 +
  # define executable
- add_executable(rsession ${SESSION_SOURCE_FILES} ${SESSION_HEADER_FILES})
+ add_stripped_executable(rsession ${SESSION_SOURCE_FILES} ${SESSION_HEADER_FILES})
  
 -- 
-2.20.1
+2.28.0.windows.1
 

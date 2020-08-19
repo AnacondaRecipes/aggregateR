@@ -1,4 +1,4 @@
-From d1f4f1fe5d64cf38a5093ed1ba85d267fb7f26bc Mon Sep 17 00:00:00 2001
+From 2d390dca336b68e7a1c514382bfb0c1a5a8052bb Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Tue, 17 Jul 2018 09:08:10 -0700
 Subject: [PATCH 41/41] Revert "disable macOS-specific Cmd+Shift+/ handling
@@ -6,17 +6,16 @@ Subject: [PATCH 41/41] Revert "disable macOS-specific Cmd+Shift+/ handling
 
 This reverts commit d026ae8b360f993726a27c33ccf9c05be8cf70d2.
 ---
- src/cpp/desktop/DesktopGwtCallback.cpp   | 13 -------------
- src/cpp/desktop/DesktopGwtCallback.hpp   |  4 ++--
- src/cpp/desktop/DesktopGwtCallbackMac.mm | 23 -----------------------
- src/cpp/desktop/DesktopMainWindow.cpp    |  2 +-
- 4 files changed, 3 insertions(+), 39 deletions(-)
+ src/cpp/desktop/DesktopGwtCallback.cpp   | 10 ----------
+ src/cpp/desktop/DesktopGwtCallback.hpp   |  1 +
+ src/cpp/desktop/DesktopGwtCallbackMac.mm |  4 ----
+ 2 files changed, 1 insertions(+), 14 deletions(-)
 
 diff --git a/src/cpp/desktop/DesktopGwtCallback.cpp b/src/cpp/desktop/DesktopGwtCallback.cpp
-index 0060cacbbe..9eca9cdcfc 100644
+index 283db367a7..7924c6a61b 100644
 --- a/src/cpp/desktop/DesktopGwtCallback.cpp
 +++ b/src/cpp/desktop/DesktopGwtCallback.cpp
-@@ -74,8 +74,6 @@ GwtCallback::GwtCallback(MainWindow* pMainWindow, GwtWindow* pOwner)
+@@ -77,8 +77,6 @@ GwtCallback::GwtCallback(MainWindow* pMainWindow, GwtWindow* pOwner, bool isRemo
       pSynctex_(nullptr),
       pendingQuit_(PendingQuitNone)
  {
@@ -25,94 +24,36 @@ index 0060cacbbe..9eca9cdcfc 100644
  #ifdef Q_OS_LINUX
     // assume light theme on startup (theme will be dynamically updated
     // based on editor theme chosen by user)
-@@ -104,17 +102,6 @@ GwtCallback::GwtCallback(MainWindow* pMainWindow, GwtWindow* pOwner)
+@@ -105,14 +103,6 @@ GwtCallback::GwtCallback(MainWindow* pMainWindow, GwtWindow* pOwner, bool isRemo
+       }
+    }
  #endif
- }
- 
+-}
+-
 -#ifndef Q_OS_MAC
 -void GwtCallback::initialize()
 -{
 -}
 -#endif
 -
--void GwtCallback::invokeReflowComment()
--{
--   pMainWindow_->invokeCommand(QStringLiteral("reflowComment"));
--}
--
  Synctex& GwtCallback::synctex()
  {
     if (pSynctex_ == nullptr)
-diff --git a/src/cpp/desktop/DesktopGwtCallback.hpp b/src/cpp/desktop/DesktopGwtCallback.hpp
-index 7d29d3c4d3..6bc073623a 100644
---- a/src/cpp/desktop/DesktopGwtCallback.hpp
-+++ b/src/cpp/desktop/DesktopGwtCallback.hpp
-@@ -57,7 +57,7 @@ class GwtCallback : public QObject
- 
- public:
-    GwtCallback(MainWindow* pMainWindow, GwtWindow* pOwner);
--   void initialize();
-+
-    int collectPendingQuitRequest();
- 
- Q_SIGNALS:
-@@ -250,8 +250,8 @@ public Q_SLOTS:
-    QString getDisplayDpi();
- 
- private:
--   void invokeReflowComment();
-    Synctex& synctex();
-+
-    void activateAndFocusOwner();
- 
- private:
 diff --git a/src/cpp/desktop/DesktopGwtCallbackMac.mm b/src/cpp/desktop/DesktopGwtCallbackMac.mm
-index ce0249d476..12853312aa 100644
+index 4da5aa6e04..b97a8824e1 100644
 --- a/src/cpp/desktop/DesktopGwtCallbackMac.mm
 +++ b/src/cpp/desktop/DesktopGwtCallbackMac.mm
-@@ -213,29 +213,6 @@ NSArray* parseFileNameFilters(NSString* fileNameFilters)
+@@ -165,10 +165,6 @@ NSArray* parseFileNameFilters(NSString* fileNameFilters)
  
  RS_END_NAMESPACE()
  
 -void GwtCallback::initialize()
 -{
--   [NSEvent addLocalMonitorForEventsMatchingMask: NSKeyDownMask
--                                         handler: ^(NSEvent* event)
--    {
--       // detect attempts to run Command + Shift + /, and let our own
--       // reflow comment code run instead
--       if (event.keyCode == 44 &&
--           (event.modifierFlags & NSEventModifierFlagShift) != 0 &&
--           (event.modifierFlags & NSEventModifierFlagCommand) != 0 &&
--           (event.modifierFlags & NSEventModifierFlagControl) == 0 &&
--           (event.modifierFlags & NSEventModifierFlagOption) == 0 &&
--           (event.modifierFlags & NSEventModifierFlagFunction) == 0)
--       {
--          invokeReflowComment();
--          return (NSEvent*) nil;
--       }
--       
--       return event;
--    }];
--
 -}
 -
  int GwtCallback::showMessageBox(int type,
                                  QString qCaption,
                                  QString qMessage,
-diff --git a/src/cpp/desktop/DesktopMainWindow.cpp b/src/cpp/desktop/DesktopMainWindow.cpp
-index 53fe75fd4d..377d8fd12c 100644
---- a/src/cpp/desktop/DesktopMainWindow.cpp
-+++ b/src/cpp/desktop/DesktopMainWindow.cpp
-@@ -87,7 +87,7 @@ MainWindow::MainWindow(QUrl url) :
-    pMainMenuStub->addMenu(QString::fromUtf8("Help"));
-    setMenuBar(pMainMenuStub);
- #endif
--   
-+
-    connect(&menuCallback_, SIGNAL(menuBarCompleted(QMenuBar*)),
-            this, SLOT(setMenuBar(QMenuBar*)));
-    connect(&menuCallback_, SIGNAL(commandInvoked(QString)),
 -- 
-2.20.1
+2.28.0.windows.1
 

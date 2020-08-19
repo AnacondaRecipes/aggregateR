@@ -1,20 +1,19 @@
-From 10d8a2608fdbb01c78f23233507d9ea367bcb702 Mon Sep 17 00:00:00 2001
+From 125e3ee137f1612c32409b42c702177197d8d86d Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Wed, 28 Mar 2018 21:29:26 +0100
-Subject: [PATCH 12/41] Conda: Define CONDA_BUILD when ENV{CONDA_BUILD} for
+Subject: [PATCH 12/12] Conda: Define CONDA_BUILD when ENV{CONDA_BUILD} for
  rstudio and rsession
 
 ---
- src/cpp/core/CMakeLists.txt        | 4 ++++
- src/cpp/desktop-mac/CMakeLists.txt | 2 ++
- src/cpp/session/CMakeLists.txt     | 4 ++++
- 3 files changed, 10 insertions(+)
+ src/cpp/core/CMakeLists.txt    |  4 ++++
+ src/cpp/session/CMakeLists.txt | 20 +++++++++++++++++++-
+ 2 files changed, 23 insertions(+), 1 deletion(-)
 
 diff --git a/src/cpp/core/CMakeLists.txt b/src/cpp/core/CMakeLists.txt
-index f667f6a567..b458381fc3 100644
+index 05f5ad67b4..57a2dbde1e 100644
 --- a/src/cpp/core/CMakeLists.txt
 +++ b/src/cpp/core/CMakeLists.txt
-@@ -340,6 +340,10 @@ target_link_libraries(
+@@ -343,6 +343,10 @@ target_link_libraries(
     ${CORE_SYSTEM_LIBRARIES}
  )
  
@@ -25,34 +24,47 @@ index f667f6a567..b458381fc3 100644
  # define executable (for running unit tests)
  if (RSTUDIO_UNIT_TESTS_ENABLED)
  
-diff --git a/src/cpp/desktop-mac/CMakeLists.txt b/src/cpp/desktop-mac/CMakeLists.txt
-index 58fbfb49bc..d59ddfa779 100644
---- a/src/cpp/desktop-mac/CMakeLists.txt
-+++ b/src/cpp/desktop-mac/CMakeLists.txt
-@@ -106,6 +106,8 @@ else()
-       ${OPENGL_LIBRARY}
-       ${WEBKIT_LIBRARY})
- 
-+   target_compile_definitions(rstudio PRIVATE "-DCONDA_BUILD")
-+
-    # install target
-    install(TARGETS rstudio DESTINATION ${RSTUDIO_INSTALL_BIN})
- 
 diff --git a/src/cpp/session/CMakeLists.txt b/src/cpp/session/CMakeLists.txt
-index d1690539c9..eb5e9aa640 100644
+index a5547b75da..926f31d820 100644
 --- a/src/cpp/session/CMakeLists.txt
 +++ b/src/cpp/session/CMakeLists.txt
-@@ -369,6 +369,10 @@ if(RSTUDIO_DEVELOPMENT OR RSTUDIO_RUN_IN_PLACE)
-    set_target_properties(rsession PROPERTIES SKIP_BUILD_RPATH TRUE)
+@@ -25,7 +25,7 @@ endif()
+ if(NOT EXISTS "${RSTUDIO_DEPENDENCIES_DIR}/common/mathjax-27")
+   message(FATAL_ERROR "Mathjax 2.7 not found (re-run install-dependencies script to install)")
  endif()
+-if(NOT EXISTS "${RSTUDIO_DEPENDENCIES_DIR}/common/pandoc")
++if(NOT DEFINED ENV{CONDA_BUILD} AND NOT EXISTS "${RSTUDIO_DEPENDENCIES_DIR}/common/pandoc")
+   message(FATAL_ERROR "pandoc not found (re-run install-dependencies script to install)")
+ endif()
+ 
+@@ -388,9 +388,27 @@ if(WIN32)
+    endif()
+ endif()
+ 
++if(DEFINED ENV{CONDA_BUILD})
++   # use, i.e. don't skip the full RPATH for the build tree
++   set(CMAKE_SKIP_BUILD_RPATH FALSE)
++
++   # when building, don't use the install RPATH already
++   # (but later on when installing)
++   set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
++
++   set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
++
++   # add the automatically determined parts of the RPATH
++   # which point to directories outside the build tree to the install RPATH
++   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
++endif()
+ # define executable
+ add_stripped_executable(rsession ${SESSION_SOURCE_FILES} ${SESSION_HEADER_FILES})
  
 +if(DEFINED ENV{CONDA_BUILD})
 +   target_compile_definitions(rsession PRIVATE "-DCONDA_BUILD")
 +endif()
 +
- # add origin rpath for suse/sles
- if(RSTUDIO_PACKAGE_VARIANT STREQUAL "SLES")
-    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+ # skip libR RPATH at development time
+ if(RSTUDIO_DEVELOPMENT OR RSTUDIO_RUN_IN_PLACE)
+    set_target_properties(rsession PROPERTIES SKIP_BUILD_RPATH TRUE)
 -- 
-2.20.1
+2.28.0.windows.1
 

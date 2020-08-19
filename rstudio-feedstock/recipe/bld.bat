@@ -12,9 +12,9 @@ FOR /f "usebackqeol=; tokens=1 delims=." %%A IN ('%PKG_VERSION%') DO set RSTUDIO
 FOR /f "usebackqeol=; tokens=2 delims=." %%A IN ('%PKG_VERSION%') DO set RSTUDIO_VERSION_MINOR=%%A
 FOR /f "usebackqeol=; tokens=3 delims=." %%A IN ('%PKG_VERSION%') DO set RSTUDIO_VERSION_PATCH=%%A
 
-pushd dependencies\windows
-  call install-dependencies.cmd
-popd
+:: pushd dependencies\windows
+::   call install-dependencies.cmd
+:: popd
 
 pushd dependencies\common
   mkdir rmarkdown
@@ -44,17 +44,21 @@ set R_ROOT=%PREFIX%\lib\R
 :: echo EXPORTS >> %PREFIX%\R\bin\!R_ARCH!\R.def
 :: for /f "skip=19 tokens=4" %%A in (%PREFIX%\R\bin\!R_ARCH!\R.dll.exports.txt) do echo %%A >> %PREFIX%\R\bin\!R_ARCH!\R.def
 gendef %R_ROOT%\bin\!R_ARCH!\R.dll - > %R_ROOT%\bin\!R_ARCH!\R.def
+if %errorlevel% neq 0 exit /b %errorlevel%
 lib /def:%R_ROOT%\bin\!R_ARCH!\R.def /out:%R_ROOT%\bin\!R_ARCH!\R.lib /machine:!MS_MACH!
+if %errorlevel% neq 0 exit /b %errorlevel%
 
 :: .. and one for Rgraphapp.dll. Unfortunately, the first export from this is bad:
 :: ".refptr.GAI_active_windows.refptr.GAI_app_control_proc..." so this horrible loop
 :: is used to create a new header then copy everything after line 8 from the defs file.
 :: Yes, I know this is awful.
 gendef %R_ROOT%\bin\!R_ARCH!\Rgraphapp.dll - > %R_ROOT%\bin\!R_ARCH!\Rgraphapp.dll.exports.txt
+if %errorlevel% neq 0 exit /b %errorlevel%
 echo LIBRARY Rgraphapp > %R_ROOT%\bin\!R_ARCH!\Rgraphapp.def
 echo EXPORTS >> %R_ROOT%\bin\!R_ARCH!\Rgraphapp.def
 for /f "delims= skip=8" %%A in (%R_ROOT%\bin\!R_ARCH!\Rgraphapp.dll.exports.txt) do echo %%A >> %R_ROOT%\bin\!R_ARCH!\Rgraphapp.def
 lib /def:%R_ROOT%\bin\!R_ARCH!\Rgraphapp.def /out:%R_ROOT%\bin\!R_ARCH!\Rgraphapp.lib /machine:!MS_MACH!
+if %errorlevel% neq 0 exit /b %errorlevel%
 
 set BOOST_ROOT=%PREFIX%
 
@@ -75,8 +79,8 @@ if "%USE_JOM%" == "0" goto skip_jom
         -DLIBR_GRAPHAPP_LIBRARY=%R_ROOT%\bin\!R_ARCH!\Rgraphapp.lib ^
         -DQT_QMAKE_EXECUTABLE=%PREFIX%\Library\bin\qmake.exe ^
         -DCMAKE_MAKE_PROGRAM=jom ^
-        -Wdev --debug-output --trace ^
         ..
+::        -Wdev --debug-output --trace ^
 ::  if "%PROCESSOR_ARCHITECTURE%"=="x86" (
 ::     echo Early test for OpenJDK heap allocation problem
 ::     pushd %CONDA_PREFIX%\conda-bld\work\src\gwt
@@ -105,7 +109,7 @@ if "%USE_JOM%" == "0" goto skip_jom
         -DCMAKE_C_FLAGS="/MP /DWIN32 /D_WINDOWS /EHsc" ^
         ..
   cmake --build . --config %BUILD_TYPE% --target INSTALL
-  if %errorlevel% neq 0 exit /b %errorlevel%
+  :: if %errorlevel% neq 0 exit /b %errorlevel%
 :skip_msvs
 
 IF NOT EXIST %PREFIX%\Menu mkdir %PREFIX%\Menu

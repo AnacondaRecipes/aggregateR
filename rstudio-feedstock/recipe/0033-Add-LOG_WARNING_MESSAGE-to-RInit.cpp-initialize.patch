@@ -1,4 +1,4 @@
-From 916338c94b77a3af964ea11d3772bbff6648aac0 Mon Sep 17 00:00:00 2001
+From c1a159301fe741b529e40c2fd8de0f936a4bff80 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Wed, 28 Mar 2018 04:37:20 -0700
 Subject: [PATCH 33/41] Add LOG_WARNING_MESSAGE to RInit.cpp initialize
@@ -13,10 +13,10 @@ The messages will appear in %AppLocalData%\RStudio-Desktop\log\rsession-builder.
  1 file changed, 16 insertions(+)
 
 diff --git a/src/cpp/r/session/RInit.cpp b/src/cpp/r/session/RInit.cpp
-index ef7e2f30c1..4f03752439 100644
+index 3564ca1aea..970cf72db6 100644
 --- a/src/cpp/r/session/RInit.cpp
 +++ b/src/cpp/r/session/RInit.cpp
-@@ -200,14 +200,19 @@ Error initialize()
+@@ -202,14 +202,19 @@ Error initialize()
     // ensure that the utils package is loaded (it might not be loaded
     // if R is attempting to recover from a library loading error which
     // occurs during .Rprofile)
@@ -36,7 +36,7 @@ index ef7e2f30c1..4f03752439 100644
  
     if (s_isR3_3)
     {
-@@ -221,6 +226,7 @@ Error initialize()
+@@ -223,6 +228,7 @@ Error initialize()
           LOG_ERROR(r3Error);
     }
  
@@ -44,10 +44,10 @@ index ef7e2f30c1..4f03752439 100644
     // initialize console history capacity
     r::session::consoleHistory().setCapacityFromRHistsize();
  
-@@ -232,9 +238,11 @@ Error initialize()
+@@ -234,9 +240,11 @@ Error initialize()
  
     // install RStudio API
-    FilePath apiFilePath = utils::rSourcePath().complete("Api.R");
+    FilePath apiFilePath = utils::rSourcePath().completePath("Api.R");
 +   LOG_WARNING_MESSAGE("initialize 7");
     error = r::sourceManager().sourceTools(apiFilePath);
     if (error)
@@ -56,15 +56,15 @@ index ef7e2f30c1..4f03752439 100644
  
     // initialize graphics device -- use a stable directory for server mode
     // and temp directory for desktop mode (so that we can support multiple
-@@ -252,6 +260,7 @@ Error initialize()
-       graphicsPath = r::session::utils::tempDir().complete(
-                               "rs-graphics-" + core::system::generateUuid());
+@@ -254,6 +262,7 @@ Error initialize()
+       graphicsPath = r::session::utils::tempDir().completePath(
+          "rs-graphics-" + core::system::generateUuid());
     }
 +   LOG_WARNING_MESSAGE("initialize 9");
  
     error = graphics::device::initialize(graphicsPath,
                                          rCallbacks().locator);
-@@ -262,12 +271,14 @@ Error initialize()
+@@ -264,12 +273,14 @@ Error initialize()
     session::clientState().restore(utils::clientStatePath(),
                                    utils::projectClientStatePath());
        
@@ -77,17 +77,17 @@ index ef7e2f30c1..4f03752439 100644
     {
 +      LOG_WARNING_MESSAGE("initialize 11");
        // restore session
-       std::string errorMessages ;
+       std::string errorMessages;
        restoreSession(restartContext().sessionStatePath(), &errorMessages);
-@@ -282,6 +293,7 @@ Error initialize()
+@@ -284,6 +295,7 @@ Error initialize()
     else if (suspendedSessionPath().exists())
     {  
        // restore session
 +      LOG_WARNING_MESSAGE("initialize 12");
-       std::string errorMessages ;
+       std::string errorMessages;
        restoreSession(suspendedSessionPath(), &errorMessages);
        
-@@ -295,6 +307,7 @@ Error initialize()
+@@ -297,6 +309,7 @@ Error initialize()
     // new session
     else
     {  
@@ -95,7 +95,7 @@ index ef7e2f30c1..4f03752439 100644
        // restore console history
        FilePath historyPath = rHistoryFilePath();
        error = consoleHistory().loadFromFile(historyPath, false);
-@@ -306,6 +319,7 @@ Error initialize()
+@@ -308,6 +321,7 @@ Error initialize()
     }
     
     // initialize client
@@ -103,7 +103,7 @@ index ef7e2f30c1..4f03752439 100644
     RInitInfo rInitInfo(wasResumed);
     error = rCallbacks().init(rInitInfo);
     if (error)
-@@ -329,6 +343,7 @@ Error initialize()
+@@ -331,6 +345,7 @@ Error initialize()
        if (error)
           return error;
     }
@@ -111,7 +111,7 @@ index ef7e2f30c1..4f03752439 100644
  
     // initialize profile resources
     error = r::exec::RFunction(".rs.profileResources").call();
-@@ -346,6 +361,7 @@ Error initialize()
+@@ -348,6 +363,7 @@ Error initialize()
     if (error)
        return error;
  
@@ -120,5 +120,5 @@ index ef7e2f30c1..4f03752439 100644
     if (utils::isServerMode())
     {
 -- 
-2.20.1
+2.28.0.windows.1
 
