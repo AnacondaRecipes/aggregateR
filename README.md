@@ -2,7 +2,11 @@
 
 ## 1. Figure out or decide upon the latest R version and the appropriate MRAN snapshot date to use, you should check:
 https://mran.microsoft.com/documents/rro/reproducibility#reproducibility
-```
+
+
+ --- This needs some additional clarification.
+
+ ```
 # For example:
 export CRAN_URL=https://mran.microsoft.com/snapshot/2018-08-01
 export CRAN_URL=https://cran.r-project.org
@@ -25,12 +29,21 @@ git submodule foreach git clean -dxf .
 git clean -dxf .
 ```
 
+### 2b?
+Probably each submodule should be updates to latest master/main before running conda skeleton as well, to reduce conflict issues.
+
+Maybe something like this:
+```
+git submodule foreach git checkout master
+git submodule foreach git checkout main     # Just in case there's a name change!
+git submodule foreach pull
+```
+
 ## 3. Update all of the recipes that are sourced from MRAN
 ```
 conda skeleton cran \
   --cran-url ${CRAN_URL} \
   --output-suffix=-feedstock/recipe --recursive \
-  --add-maintainer=mingwandroid \
   --update-policy=merge-keep-build-num \
   --r-interp=r-base \
   --use-noarch-generic \
@@ -43,7 +56,6 @@ conda skeleton cran \
         -e 's|^./r-rmr2-feedstock$||' \
         -e 's|^./rpy2-feedstock$||' \
         -e 's|^./rpy2-2.8-feedstock$||' \
-        -e 's|^./r-base-feedstock$||' \
         -e 's|^./r-irkernel-feedstock$||' \
         -e 's|^./r-rhive-feedstock$||' \
         -e 's|^./r-feedstock$||' \
