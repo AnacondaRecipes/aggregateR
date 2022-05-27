@@ -18,9 +18,9 @@ echo $DATE > $SKEL_FULL
 
 skelly_one () {
 
-    echo "================================================================================"
-    echo ${@}
-    echo "================================================================================"
+    echo "================================================================================" >> $SKEL_FULL
+    echo "Skeleton for ${@}" >> $SKEL_FULL
+    echo "================================================================================" >> $SKEL_FULL
     conda skeleton cran \
           --cran-url ${CRAN_URL} \
           --output-suffix=-feedstock/recipe \
@@ -28,7 +28,7 @@ skelly_one () {
           --update-policy=merge-keep-build-num \
           --r-interp=r-base \
           --use-noarch-generic \
-          ${@} || return 1
+          ${@}  >> $SKEL_FULL 2>> $SKEL_FULL || return 1
 
     return 0
 
@@ -56,7 +56,7 @@ skelly_all () {
 
 
 
-skelly \
+skelly_all \
     \
     ./r-abc.data-feedstock \
     ./r-abc.rap-feedstock \
