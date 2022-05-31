@@ -3,12 +3,14 @@
 export CRAN_URL=https://cran.r-project.org
 export CONDA_R=4.2.0
 
+mkdir -p logs
 
 DATE=`date -Iseconds`
-SKEL_LIST="skel_list.log"
-SKEL_GOOD="skel_good.log"
-SKEL_FAIL="skel_fail.log"
-SKEL_FULL="skel_full.log"
+SKEL_LIST="logs/skel_list.log"
+SKEL_GOOD="logs/skel_good.log"
+SKEL_FAIL="logs/skel_fail.log"
+SKEL_FULL="logs/skel_full.log"
+
 
 echo $DATE > $SKEL_LIST
 echo $DATE > $SKEL_GOOD

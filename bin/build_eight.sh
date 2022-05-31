@@ -3,11 +3,13 @@
 export EXTRA_BUILD_ARGS=
 #export EXTRA_BUILD_ARGS=' --skip-existing'
 
+mkdir -p logs
+
 DATE=`date -Iseconds`
-BUILD_LIST="build_list.log"
-BUILD_GOOD="build_good.log"
-BUILD_FAIL="build_fail.log"
-BUILD_FULL="build_full.log"
+BUILD_LIST="logs/build_list.log"
+BUILD_GOOD="logs/build_good.log"
+BUILD_FAIL="logs/build_fail.log"
+BUILD_FULL="logs/build_full.log"
 
 echo $DATE > $BUILD_LIST
 echo $DATE > $BUILD_GOOD
