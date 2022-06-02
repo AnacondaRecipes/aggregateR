@@ -1,9 +1,11 @@
 #!/bin/bash
 
 
+echo "Please run this from inside a tmux session in case your network connection becomes disconnected!"
 
-export EXTRA_BUILD_ARGS=
-#export EXTRA_BUILD_ARGS=' --skip-existing'
+
+#export EXTRA_BUILD_ARGS=
+export EXTRA_BUILD_ARGS=' --skip-existing'
 
 mkdir -p logs
 
