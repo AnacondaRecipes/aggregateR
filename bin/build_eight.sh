@@ -6,10 +6,10 @@ export EXTRA_BUILD_ARGS=
 mkdir -p logs
 
 DATE=`date -Iseconds`
-BUILD_LIST="logs/build_list.log"
-BUILD_GOOD="logs/build_good.log"
-BUILD_FAIL="logs/build_fail.log"
-BUILD_FULL="logs/build_full.log"
+BUILD_LIST="logs/build_eight_list.log"
+BUILD_GOOD="logs/build_eight_good.log"
+BUILD_FAIL="logs/build_eight_fail.log"
+BUILD_FULL="logs/build_eight_full.log"
 
 echo $DATE > $BUILD_LIST
 echo $DATE > $BUILD_GOOD
