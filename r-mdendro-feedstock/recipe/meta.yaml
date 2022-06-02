@@ -1,4 +1,4 @@
-{% set version = '1.0.1' %}
+{% set version = '2.1.0' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,31 +11,40 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/mdendro_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/mdendro/mdendro_{{ version }}.tar.gz
-  sha256: 1c2ab9ab95fdc6eca43be051454dc0afa046140e7266750f49cca964ff59675e
+  sha256: aec3d524abafc09e1b8c3eed99d9f6f518aef81426556473b6808ce7b03af5c2
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
+# Suggests: ape, cluster, dendextend, knitr, rmarkdown
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
-    - r-rjava >=0.9.8
+    - r-rcpp
 
   run:
     - r-base
-    - r-rjava >=0.9.8
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
 
 test:
   commands:
@@ -50,19 +59,17 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://CRAN.R-project.org/package=mdendro
-  license: LGPL-2.1
-  summary: A collection of methods for agglomerative hierarchical clustering strategies on a
-    matrix of distances, implemented using the variable-group approach introduced in
-    Fernandez and Gomez (2008) <doi:10.1007/s00357-008-9004-x>. Descriptive measures
-    to analyze the resulting hierarchical trees are also provided. In addition to the
-    usual clustering methods, two parameterized methods are provided to explore an infinite
-    family of hierarchical clustering strategies. When there are ties in proximity values,
-    the hierarchical trees obtained are unique and independent of the order of the elements
-    in the input matrix.
-  license_family: LGPL
+  home: https://deim.urv.cat/~sergio.gomez/mdendro.php
+  license: AGPL-3
+  summary: A comprehensive collection of linkage methods for agglomerative hierarchical clustering
+    on a matrix of proximity data (distances or similarities), returning a multifurcated
+    dendrogram or multidendrogram. Multidendrograms can group more than two clusters
+    when ties in proximity data occur, and therefore they do not depend on the order
+    of the input data. Descriptive measures to analyze the resulting dendrogram are
+    additionally provided.
+  license_family: AGPL
   license_file:
-    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-2.1'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
 
 extra:
   recipe-maintainers:
@@ -71,23 +78,25 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: mdendro
-# Version: 1.0.1
-# Date: 2018-12-06
-# Title: Variable-Group Methods for Agglomerative Hierarchical Clustering
-# Authors@R: c(person("Alberto", "Fernandez", role = c("aut", "cre"), email = "alberto.fernandez@urv.cat", comment = c(ORCID = "0000-0002-1241-1646")), person("Sergio", "Gomez", role = "aut", email = "sergio.gomez@urv.cat", comment = c(ORCID = "0000-0003-1820-0062")))
-# Description: A collection of methods for agglomerative hierarchical clustering strategies on a matrix of distances, implemented using the variable-group approach introduced in Fernandez and Gomez (2008) <doi:10.1007/s00357-008-9004-x>. Descriptive measures to analyze the resulting hierarchical trees are also provided. In addition to the usual clustering methods, two parameterized methods are provided to explore an infinite family of hierarchical clustering strategies. When there are ties in proximity values, the hierarchical trees obtained are unique and independent of the order of the elements in the input matrix.
-# Depends: R (>= 3.5.0)
-# Imports: rJava (>= 0.9.8)
-# SystemRequirements: Java (>= 6)
-# License: LGPL-2.1
-# Encoding: UTF-8
-# RoxygenNote: 6.1.1
-# NeedsCompilation: no
-# Packaged: 2018-12-06 14:50:17 UTC; Alberto
-# Author: Alberto Fernandez [aut, cre] (<https://orcid.org/0000-0002-1241-1646>), Sergio Gomez [aut] (<https://orcid.org/0000-0003-1820-0062>)
-# Maintainer: Alberto Fernandez <alberto.fernandez@urv.cat>
+# Version: 2.1.0
+# Date: 2021-09-12
+# Title: Extended Agglomerative Hierarchical Clustering
+# Description: A comprehensive collection of linkage methods for agglomerative hierarchical clustering on a matrix of proximity data (distances or similarities), returning a multifurcated dendrogram or multidendrogram. Multidendrograms can group more than two clusters when ties in proximity data occur, and therefore they do not depend on the order of the input data. Descriptive measures to analyze the resulting dendrogram are additionally provided.
+# Encoding: latin1
+# Authors@R: c(person(given = "Alberto", family = "Fernndez", email = "alberto.fernandez@urv.cat", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1241-1646")), person(given = "Sergio", family = "Gmez", email = "sergio.gomez@urv.cat", role = c("aut"), comment = c(ORCID = "0000-0003-1820-0062")))
+# URL: https://deim.urv.cat/~sergio.gomez/mdendro.php
+# License: AGPL-3
+# Imports: graphics, grDevices, Rcpp, stats, utils
+# LinkingTo: Rcpp
+# Suggests: ape, cluster, dendextend, knitr, rmarkdown
+# VignetteBuilder: knitr, rmarkdown
+# NeedsCompilation: yes
+# SystemRequirements: C++11
+# Packaged: 2021-09-12 13:54:41 UTC; Alberto
+# Author: Alberto Fernndez [aut, cre] (<https://orcid.org/0000-0002-1241-1646>), Sergio Gmez [aut] (<https://orcid.org/0000-0003-1820-0062>)
+# Maintainer: Alberto Fernndez <alberto.fernandez@urv.cat>
 # Repository: CRAN
-# Date/Publication: 2018-12-06 15:20:08 UTC
+# Date/Publication: 2021-09-12 21:40:07 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

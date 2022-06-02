@@ -1,0 +1,103 @@
+{% set version = '1.26.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-future
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/future_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/future/future_{{ version }}.tar.gz
+  sha256: a35c0bdae86265ebe86119231802b6fbf7b1d533b57cb423d8483fbe779390d5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: methods, RhpcBLASctl, R.rsp, markdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-digest
+    - r-globals >=0.15.0
+    - r-listenv >=0.8.0
+    - r-parallelly >=1.30.0
+
+  run:
+    - r-base
+    - r-digest
+    - r-globals >=0.15.0
+    - r-listenv >=0.8.0
+    - r-parallelly >=1.30.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('future')"           # [not win]
+    - "\"%R%\" -e \"library('future')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://future.futureverse.org, https://github.com/HenrikBengtsson/future
+  license: LGPL-2.1
+  summary: The purpose of this package is to provide a lightweight and unified Future API for
+    sequential and parallel processing of R expression via futures.  The simplest way
+    to evaluate an expression in parallel is to use `x %<-% { expression }` with `plan(multisession)`.
+    This package implements sequential, multicore, multisession, and cluster futures.  With
+    these, R expressions can be evaluated on the local machine, in parallel a set of
+    local machines, or distributed on a mix of local and remote machines. Extensions
+    to this package implement additional backends for processing futures via compute
+    cluster schedulers, etc. Because of its unified API, there is no need to modify
+    any code in order switch from sequential on the local machine to, say, distributed
+    processing on a remote compute cluster. Another strength of this package is that
+    global variables and functions are automatically identified and exported as needed,
+    making it straightforward to tweak existing code to make use of futures.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-2.1'
+
+# The original CRAN metadata for this package was:
+
+# Package: future
+# Version: 1.26.1
+# Title: Unified Parallel and Distributed Processing in R for Everyone
+# Imports: digest, globals (>= 0.15.0), listenv (>= 0.8.0), parallel, parallelly (>= 1.30.0), tools, utils
+# Suggests: methods, RhpcBLASctl, R.rsp, markdown
+# VignetteBuilder: R.rsp
+# Authors@R: c(person("Henrik", "Bengtsson", role=c("aut", "cre", "cph"), email = "henrikb@braju.com"))
+# Description: The purpose of this package is to provide a lightweight and unified Future API for sequential and parallel processing of R expression via futures.  The simplest way to evaluate an expression in parallel is to use `x %<-% { expression }` with `plan(multisession)`. This package implements sequential, multicore, multisession, and cluster futures.  With these, R expressions can be evaluated on the local machine, in parallel a set of local machines, or distributed on a mix of local and remote machines. Extensions to this package implement additional backends for processing futures via compute cluster schedulers, etc. Because of its unified API, there is no need to modify any code in order switch from sequential on the local machine to, say, distributed processing on a remote compute cluster. Another strength of this package is that global variables and functions are automatically identified and exported as needed, making it straightforward to tweak existing code to make use of futures.
+# License: LGPL (>= 2.1)
+# LazyLoad: TRUE
+# ByteCompile: TRUE
+# URL: https://future.futureverse.org, https://github.com/HenrikBengtsson/future
+# BugReports: https://github.com/HenrikBengtsson/future/issues
+# RoxygenNote: 7.2.0
+# NeedsCompilation: no
+# Packaged: 2022-05-27 17:43:10 UTC; hb
+# Author: Henrik Bengtsson [aut, cre, cph]
+# Maintainer: Henrik Bengtsson <henrikb@braju.com>
+# Repository: CRAN
+# Date/Publication: 2022-05-27 19:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

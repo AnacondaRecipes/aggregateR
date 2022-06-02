@@ -1,0 +1,106 @@
+{% set version = '0.7-10' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cplm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cplm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cplm/cplm_{{ version }}.tar.gz
+  sha256: b3533e031f79579ce31d7dd3765ff0ea3b44435fafc258d84a18162340981257
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-biglm
+    - r-coda
+    - r-ggplot2
+    - r-minqa
+    - r-nlme
+    - r-reshape2
+    - r-statmod
+    - r-tweedie
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-biglm
+    - r-coda
+    - r-ggplot2
+    - r-minqa
+    - r-nlme
+    - r-reshape2
+    - r-statmod
+    - r-tweedie
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cplm')"           # [not win]
+    - "\"%R%\" -e \"library('cplm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/actuaryzhang/cplm
+  license: GPL-2
+  summary: Likelihood-based and Bayesian methods for various compound Poisson linear models based
+    on Zhang, Yanwei (2013) <https://link.springer.com/article/10.1007/s11222-012-9343-7>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: cplm
+# Type: Package
+# Title: Compound Poisson Linear Models
+# Version: 0.7-10
+# Author: Yanwei (Wayne) Zhang
+# Maintainer: Yanwei (Wayne) Zhang <actuary_zhang@hotmail.com>
+# Description: Likelihood-based and Bayesian methods for various compound Poisson linear models based on Zhang, Yanwei (2013) <https://link.springer.com/article/10.1007/s11222-012-9343-7>.
+# Imports: biglm, ggplot2, minqa, nlme, reshape2, statmod, stats, stats4, tweedie
+# Depends: R (>= 3.2.0), coda, Matrix, splines, methods
+# LinkingTo: Matrix
+# License: GPL (>= 2)
+# URL: https://github.com/actuaryzhang/cplm
+# LazyLoad: yes
+# LazyData: yes
+# NeedsCompilation: yes
+# Packaged: 2022-04-25 22:34:11 UTC; waynezhang
+# Repository: CRAN
+# Date/Publication: 2022-04-26 00:00:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

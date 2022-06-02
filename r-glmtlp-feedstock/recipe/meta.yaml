@@ -1,4 +1,4 @@
-{% set version = '1.1' %}
+{% set version = '2.0.1' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,31 +11,44 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/glmtlp_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/glmtlp/glmtlp_{{ version }}.tar.gz
-  sha256: 1750fb5b7e6fb4dd9c232366a451c3ff6585f3f93c909ffaf929fb1b3be07e06
+  sha256: 4a76f430b1ecf13aad5e48e55c8cad98688d01929678a1cafdaf9c151794a32b
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
+# Suggests: rmarkdown, knitr, testthat (>= 3.0.0)
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
-    - r-glmnet
+    - r-doparallel
+    - r-foreach
+    - r-ggplot2
 
   run:
     - r-base
-    - r-glmnet
+    - {{native}}gcc-libs         # [win]
+    - r-doparallel
+    - r-foreach
+    - r-ggplot2
 
 test:
   commands:
@@ -50,18 +63,16 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://CRAN.R-project.org/package=glmtlp
-  license: GPL-2
-  summary: It provides an extremely efficient procedure for fitting the entire truncated lasso
-    regularization path for linear regression, logistic and multinomial regression models,
-    Poisson regression and the Cox model. The algorithm uses the difference of convex
-    technique. The detail of the algorithm is described in Shen, Pan and Zhu (2012)
-    <doi:10.1080/01621459.2011.645783>. The package is inherited from a popular R package
-    'glmnet' and many functions in 'glmnet' can be directly used in 'glmtlp'. You can
-    learn more details by the online manual (<http://wuchong.org/glmtlp.html>).
-  license_family: GPL2
+  home: https://yuyangyy.com/glmtlp/
+  license: GPL-3
+  summary: Extremely efficient procedures for fitting regularization path with l0, l1, and truncated
+    lasso penalty for linear regression and logistic regression models. This version
+    is a completely new version compared with our previous version, which was mainly
+    based on R. New core algorithms are developed and are now written in C++ and highly
+    optimized.
+  license_family: GPL3
   license_file:
-    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
 
 extra:
   recipe-maintainers:
@@ -71,18 +82,27 @@ extra:
 
 # Package: glmtlp
 # Type: Package
-# Title: Truncated Lasso Regularized Generalized Linear Models
-# Version: 1.1
-# Date: 2018-02-05
-# Author: Chong Wu and Wei Pan
-# Maintainer: Chong Wu <wuxx0845@umn.edu>
-# Description: It provides an extremely efficient procedure for fitting the entire truncated lasso regularization path for linear regression, logistic and multinomial regression models, Poisson regression and the Cox model. The algorithm uses the difference of convex technique. The detail of the algorithm is described in Shen, Pan and Zhu (2012) <doi:10.1080/01621459.2011.645783>. The package is inherited from a popular R package 'glmnet' and many functions in 'glmnet' can be directly used in 'glmtlp'. You can learn more details by the online manual (<http://wuchong.org/glmtlp.html>).
-# License: GPL-2
-# Depends: R (>= 3.1.1), glmnet
-# NeedsCompilation: no
-# Packaged: 2018-02-07 03:25:58 UTC; uniquechong
+# Title: Generalized Linear Models with Truncated Lasso Penalty
+# Version: 2.0.1
+# Date: 2021-12-17
+# Authors@R: c( person("Chunlin", "Li", role = "aut"), person("Yu", "Yang", email = "yang6367@umn.edu", role = c("aut", "cre")), person("Chong", "Wu", role = "aut"))
+# URL: https://yuyangyy.com/glmtlp/
+# Depends: R (>= 3.5.0)
+# Imports: foreach, doParallel, ggplot2
+# Suggests: rmarkdown, knitr, testthat (>= 3.0.0)
+# Description: Extremely efficient procedures for fitting regularization path with l0, l1, and truncated lasso penalty for linear regression and logistic regression models. This version is a completely new version compared with our previous version, which was mainly based on R. New core algorithms are developed and are now written in C++ and highly optimized.
+# Encoding: UTF-8
+# License: GPL-3
+# LazyData: true
+# Author: Chunlin Li [aut], Yu Yang [aut, cre], Chong Wu [aut]
+# Maintainer: Yu Yang <yang6367@umn.edu>
+# RoxygenNote: 7.1.2
+# VignetteBuilder: knitr
+# Config/testthat/edition: 3
+# NeedsCompilation: yes
+# Packaged: 2021-12-17 22:42:26 UTC; yuyang
 # Repository: CRAN
-# Date/Publication: 2018-02-07 13:50:51 UTC
+# Date/Publication: 2021-12-17 23:00:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

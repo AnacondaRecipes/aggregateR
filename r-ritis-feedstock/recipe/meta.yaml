@@ -1,0 +1,100 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ritis
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ritis_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ritis/ritis_{{ version }}.tar.gz
+  sha256: 327b221872408b1f0fe0cce953685535b66d2fa5d6cac628e1142a26e4856136
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, webmockr, vcr (>= 0.5.4)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-crul >=0.9.0
+    - r-data.table
+    - r-jsonlite
+    - r-solrium >=1.1.4
+    - r-tibble
+
+  run:
+    - r-base
+    - r-crul >=0.9.0
+    - r-data.table
+    - r-jsonlite
+    - r-solrium >=1.1.4
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ritis')"           # [not win]
+    - "\"%R%\" -e \"library('ritis')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ropensci/ritis (devel) https://docs.ropensci.org/ritis/ (docs)
+  license: MIT
+  summary: An interface to the Integrated Taxonomic Information System ('ITIS') (<https://www.itis.gov>).
+    Includes functions to work with the 'ITIS' REST API methods (<https://www.itis.gov/ws_description.html>),
+    as well as the 'Solr' web service (<https://www.itis.gov/solr_documentation.html>).
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: ritis
+# Title: Integrated Taxonomic Information System Client
+# Description: An interface to the Integrated Taxonomic Information System ('ITIS') (<https://www.itis.gov>). Includes functions to work with the 'ITIS' REST API methods (<https://www.itis.gov/ws_description.html>), as well as the 'Solr' web service (<https://www.itis.gov/solr_documentation.html>).
+# Version: 1.0.0
+# License: MIT + file LICENSE
+# URL: https://github.com/ropensci/ritis (devel) https://docs.ropensci.org/ritis/ (docs)
+# BugReports: https://github.com/ropensci/ritis/issues
+# Authors@R: c( person("Scott", "Chamberlain", role = c("aut", "cre"), email = "myrmecocystus@gmail.com", comment = c(ORCID = "0000-0003-1444-9135")), person(given = "rOpenSci", role = "fnd", comment = "https://ropensci.org/"))
+# LazyData: true
+# Encoding: UTF-8
+# Language: en-US
+# Imports: solrium (>= 1.1.4), crul (>= 0.9.0), jsonlite, data.table, tibble
+# Suggests: testthat, webmockr, vcr (>= 0.5.4)
+# RoxygenNote: 7.1.1
+# X-schema.org-applicationCategory: Taxonomy
+# X-schema.org-keywords: taxonomy, biology, nomenclature, JSON, API, web, api-client, identifiers, species, names
+# X-schema.org-isPartOf: https://ropensci.org
+# NeedsCompilation: no
+# Packaged: 2021-02-02 06:21:27 UTC; sckott
+# Author: Scott Chamberlain [aut, cre] (<https://orcid.org/0000-0003-1444-9135>), rOpenSci [fnd] (https://ropensci.org/)
+# Maintainer: Scott Chamberlain <myrmecocystus@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-02-02 07:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

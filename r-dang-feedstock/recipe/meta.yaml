@@ -1,4 +1,4 @@
-{% set version = '0.0.10' %}
+{% set version = '0.0.15' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,30 +11,40 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/dang_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/dang/dang_{{ version }}.tar.gz
-  sha256: e2885bc282f25a700a5c1dfe3eab810d605d7a8a1a2cfc46ddd501bb393a83e0
+  sha256: 9cc4650e1ab80f7b7082a7c939461560f2487fc24ec8edf55852c7b86916c77f
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: anytime, data.table, zoo, xts, TTR, quantmod
+# Suggests: anytime, data.table, zoo, xts, TTR, quantmod, rtweet
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-tidycpp
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-tidycpp
 
 test:
   commands:
@@ -49,7 +59,7 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://CRAN.R-project.org/package=dang
+  home: https://github.com/eddelbuettel/dang, https://dirk.eddelbuettel.com/code/dang.html
   license: GPL-2
   summary: A collection of utility functions.
   license_family: GPL2
@@ -65,18 +75,21 @@ extra:
 # Package: dang
 # Type: Package
 # Title: 'Dang' Associated New Goodies
-# Version: 0.0.10
-# Date: 2019-02-11
-# Author: Dirk Eddelbuettel with contributions by Brodie Gaslam, Kevin Denny, Kabira Namit, and others
+# Version: 0.0.15
+# Date: 2021-10-26
+# Author: Dirk Eddelbuettel with contributions by Brodie Gaslam, Kevin Denny, Kabira Namit, Colin Gillespie, R Core, Josh Ulrich, Jordan Mark Barbone, and others.
 # Maintainer: Dirk Eddelbuettel <edd@debian.org>
 # Description: A collection of utility functions.
-# Suggests: anytime, data.table, zoo, xts, TTR, quantmod
+# URL: https://github.com/eddelbuettel/dang, https://dirk.eddelbuettel.com/code/dang.html
+# BugReports: https://github.com/eddelbuettel/dang/issues
+# Suggests: anytime, data.table, zoo, xts, TTR, quantmod, rtweet
+# LinkingTo: tidyCpp
 # License: GPL (>= 2)
 # RoxygenNote: 6.0.1
-# NeedsCompilation: no
-# Packaged: 2019-02-11 14:06:31.042782 UTC; edd
+# NeedsCompilation: yes
+# Packaged: 2021-10-26 13:02:17 UTC; edd
 # Repository: CRAN
-# Date/Publication: 2019-02-21 15:20:03 UTC
+# Date/Publication: 2021-10-29 23:10:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

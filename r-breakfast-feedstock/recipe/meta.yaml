@@ -1,4 +1,4 @@
-{% set version = '1.0.0' %}
+{% set version = '2.2' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,29 +11,43 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/breakfast_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/breakfast/breakfast_{{ version }}.tar.gz
-  sha256: 8e9a4eea38b9277d155257d18050ab88f61ea6aab2b0e26e4abc3478b1de1a5c
+  sha256: 93a6a34882bfaf043fb71dcae27528c0639e2e082bfc6e5ac4914bf81988bfad
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
-  noarch: generic
+  # no skip
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
+# Suggests: testthat, knitr, rmarkdown
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-rcpp
+    - r-ggplot2
     - r-plyr
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-ggplot2
     - r-plyr
 
 test:
@@ -50,15 +64,12 @@ test:
 
 about:
   home: https://CRAN.R-project.org/package=breakfast
-  license: GPL-3
-  summary: The breakfast package performs multiple change-point detection in data sequences,
-    or sequence segmentation, using computationally efficient multiscale methods. This
-    version of the package implements the "Tail-Greedy Unbalanced Haar", "Wild Binary
-    Segmentation" and "Adaptive Wild Binary Segmentation" change-point detection and
-    segmentation methodologies. To start with, see the function segment.mean.
-  license_family: GPL3
+  license: GPL-2
+  summary: A developing software suite for multiple change-point detection/estimation (data segmentation)
+    in data sequences.
+  license_family: GPL2
   license_file:
-    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
 
 extra:
   recipe-maintainers:
@@ -67,22 +78,24 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: breakfast
-# Title: Multiple Change-Point Detection and Segmentation
-# Version: 1.0.0
-# Authors@R: person("Piotr", "Fryzlewicz", email = "p.fryzlewicz@lse.ac.uk", role = c("aut", "cre"))
-# Description: The breakfast package performs multiple change-point detection in data sequences, or sequence segmentation, using computationally efficient multiscale methods. This version of the package implements the "Tail-Greedy Unbalanced Haar", "Wild Binary Segmentation" and "Adaptive Wild Binary Segmentation" change-point detection and segmentation methodologies. To start with, see the function segment.mean.
-# Depends: R (>= 3.4.0)
-# License: GPL
+# Title: Methods for Fast Multiple Change-Point Detection and Estimation
+# Version: 2.2
+# Authors@R: c( person("Andreas", "Anastasiou", email = "anastasiou.andreas@ucy.ac.cy", role = "aut"), person("Yining", "Chen", email = "y.chen101@lse.ac.uk", role = c("aut", "cre")), person("Haeran", "Cho", email = "haeran.cho@bristol.ac.uk", role = "aut"), person("Piotr", "Fryzlewicz", email = "p.fryzlewicz@lse.ac.uk", role = "aut"))
+# Description: A developing software suite for multiple change-point detection/estimation (data segmentation) in data sequences.
+# Depends: R (>= 3.0.0)
+# License: GPL-2
+# Imports: plyr, Rcpp, ggplot2
+# LinkingTo: Rcpp
 # Encoding: UTF-8
-# LazyData: true
-# RoxygenNote: 6.0.1
-# Imports: plyr
-# NeedsCompilation: no
-# Packaged: 2017-09-28 15:36:56 UTC; piotr
-# Author: Piotr Fryzlewicz [aut, cre]
-# Maintainer: Piotr Fryzlewicz <p.fryzlewicz@lse.ac.uk>
+# Suggests: testthat, knitr, rmarkdown
+# VignetteBuilder: knitr
+# RoxygenNote: 7.1.1
+# NeedsCompilation: yes
+# Packaged: 2021-06-11 18:49:37 UTC; chen
+# Author: Andreas Anastasiou [aut], Yining Chen [aut, cre], Haeran Cho [aut], Piotr Fryzlewicz [aut]
+# Maintainer: Yining Chen <y.chen101@lse.ac.uk>
 # Repository: CRAN
-# Date/Publication: 2017-09-28 15:49:36 UTC
+# Date/Publication: 2021-06-11 19:20:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

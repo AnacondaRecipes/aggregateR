@@ -1,0 +1,106 @@
+{% set version = '0.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-downlit
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/downlit_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/downlit/downlit_{{ version }}.tar.gz
+  sha256: 740f6821dab66eabf94e9c00565d307f9839205e46e0014ff26d2b7e1bcefb83
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, htmltools, jsonlite, leaflet, MASS, pkgload, rmarkdown, testthat (>= 3.0.0), xml2
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-brio
+    - r-desc
+    - r-digest
+    - r-evaluate
+    - r-fansi
+    - r-memoise
+    - r-rlang
+    - r-vctrs
+    - r-yaml
+
+  run:
+    - r-base
+    - r-brio
+    - r-desc
+    - r-digest
+    - r-evaluate
+    - r-fansi
+    - r-memoise
+    - r-rlang
+    - r-vctrs
+    - r-yaml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('downlit')"           # [not win]
+    - "\"%R%\" -e \"library('downlit')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://downlit.r-lib.org/, https://github.com/r-lib/downlit
+  license: MIT
+  summary: Syntax highlighting of R code, specifically designed for the needs of 'RMarkdown'
+    packages like 'pkgdown', 'hugodown', and 'bookdown'. It includes linking of function
+    calls to their documentation on the web, and automatic translation of ANSI escapes
+    in output to the equivalent HTML.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: downlit
+# Title: Syntax Highlighting and Automatic Linking
+# Version: 0.4.0
+# Authors@R: c( person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut", "cre")), person("RStudio", role = "cph") )
+# Description: Syntax highlighting of R code, specifically designed for the needs of 'RMarkdown' packages like 'pkgdown', 'hugodown', and 'bookdown'. It includes linking of function calls to their documentation on the web, and automatic translation of ANSI escapes in output to the equivalent HTML.
+# License: MIT + file LICENSE
+# URL: https://downlit.r-lib.org/, https://github.com/r-lib/downlit
+# BugReports: https://github.com/r-lib/downlit/issues
+# Depends: R (>= 3.4.0)
+# Imports: brio, desc, digest, evaluate, fansi, memoise, rlang, vctrs, yaml
+# Suggests: covr, htmltools, jsonlite, leaflet, MASS, pkgload, rmarkdown, testthat (>= 3.0.0), xml2
+# Config/testthat/edition: 3
+# Encoding: UTF-8
+# RoxygenNote: 7.1.2
+# NeedsCompilation: no
+# Packaged: 2021-10-29 18:02:03 UTC; hadley
+# Author: Hadley Wickham [aut, cre], RStudio [cph]
+# Maintainer: Hadley Wickham <hadley@rstudio.com>
+# Repository: CRAN
+# Date/Publication: 2021-10-29 19:40:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

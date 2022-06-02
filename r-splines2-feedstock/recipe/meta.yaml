@@ -1,4 +1,4 @@
-{% set version = '0.2.8' %}
+{% set version = '0.4.5' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,30 +11,42 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/splines2_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/splines2/splines2_{{ version }}.tar.gz
-  sha256: 3bd450de42cd6d4bf85df32fbb56e4e3eeeb507af8d88576d19a41ae01c6ff79
+  sha256: 384990e5f3c3feaf8dbccd269b64c351018347a5fea194d93552d099677efc6d
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: knitr, rmarkdown, testthat
+# Suggests: knitr, rmarkdown, tinytest
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-rcpp
+    - r-rcpparmadillo
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
 
 test:
   commands:
@@ -49,13 +61,13 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://github.com/wenjie2wang/splines2
+  home: https://wwenjie.org/splines2, https://github.com/wenjie2wang/splines2
   license: GPL-3
-  summary: Constructs B-splines and its integral, monotone splines (M-splines) and its integral
-    (I-splines), convex splines (C-splines), and their derivatives of given order. Piecewise
-    constant basis is allowed for B-splines and M-splines. See De Boor (1978) <doi:10.1002/zamm.19800600129>,
-    Ramsay (1988) <doi:10.1214/ss/1177012761>, and Meyer (2008) <doi:10.1214/08-AOAS167>
-    for more information.
+  summary: Constructs basis matrix of B-splines, M-splines, I-splines, convex splines (C-splines),
+    periodic M-splines, natural cubic splines, generalized Bernstein polynomials, and
+    their integrals (except C-splines) and derivatives of given order by close-form
+    recursive formulas. It also contains a C++ head-only library integrated with Rcpp.
+    See Wang and Yan (2021) <doi:10.6339/21-JDS1020> for details.
   license_family: GPL3
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
@@ -68,24 +80,25 @@ extra:
 
 # Package: splines2
 # Title: Regression Spline Functions and Classes
-# Version: 0.2.8
-# Date: 2018-06-14
-# Authors@R: c( person(given = "Wenjie", family = "Wang", email = "wenjie.2.wang@uconn.edu", role = c("aut", "cre")), person(given = "Jun", family = "Yan", role = "aut") )
-# Description: Constructs B-splines and its integral, monotone splines (M-splines) and its integral (I-splines), convex splines (C-splines), and their derivatives of given order. Piecewise constant basis is allowed for B-splines and M-splines. See De Boor (1978) <doi:10.1002/zamm.19800600129>, Ramsay (1988) <doi:10.1214/ss/1177012761>, and Meyer (2008) <doi:10.1214/08-AOAS167> for more information.
-# Imports: splines, stats
-# Suggests: knitr, rmarkdown, testthat
+# Version: 0.4.5
+# Authors@R: c( person(given = "Wenjie", family = "Wang", email = "wang@wwenjie.org", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0363-3180")), person(given = "Jun", family = "Yan", role = "aut", comment = c(ORCID = "0000-0003-4401-7296")) )
+# Description: Constructs basis matrix of B-splines, M-splines, I-splines, convex splines (C-splines), periodic M-splines, natural cubic splines, generalized Bernstein polynomials, and their integrals (except C-splines) and derivatives of given order by close-form recursive formulas. It also contains a C++ head-only library integrated with Rcpp. See Wang and Yan (2021) <doi:10.6339/21-JDS1020> for details.
+# Imports: Rcpp, stats
+# LinkingTo: Rcpp, RcppArmadillo
+# Suggests: knitr, rmarkdown, tinytest
 # Depends: R (>= 3.2.3)
 # VignetteBuilder: knitr
 # License: GPL (>= 3)
-# URL: https://github.com/wenjie2wang/splines2
+# URL: https://wwenjie.org/splines2, https://github.com/wenjie2wang/splines2
 # BugReports: https://github.com/wenjie2wang/splines2/issues
-# RoxygenNote: 6.0.1
-# NeedsCompilation: no
-# Packaged: 2018-06-14 18:34:43 UTC; wenjie
-# Author: Wenjie Wang [aut, cre], Jun Yan [aut]
-# Maintainer: Wenjie Wang <wenjie.2.wang@uconn.edu>
+# Encoding: UTF-8
+# RoxygenNote: 7.1.1
+# NeedsCompilation: yes
+# Packaged: 2021-09-19 00:33:10 UTC; wenjie
+# Author: Wenjie Wang [aut, cre] (<https://orcid.org/0000-0003-0363-3180>), Jun Yan [aut] (<https://orcid.org/0000-0003-4401-7296>)
+# Maintainer: Wenjie Wang <wang@wwenjie.org>
 # Repository: CRAN
-# Date/Publication: 2018-06-14 19:00:03 UTC
+# Date/Publication: 2021-09-19 13:20:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

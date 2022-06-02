@@ -1,0 +1,110 @@
+{% set version = '2.8.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-phangorn
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/phangorn_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/phangorn/phangorn_{{ version }}.tar.gz
+  sha256: 6d471410ae29775104a94746936e8c1c54c7273dd289333973ec06dad489dc75
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Biostrings, knitr, magick, prettydoc, rgl, rmarkdown, seqinr, seqLogo, tinytest, xtable
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-rcpp
+    - r-ape >=5.5
+    - r-fastmatch
+    - r-igraph >=1.0
+    - r-quadprog
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-rcpp
+    - r-ape >=5.5
+    - r-fastmatch
+    - r-igraph >=1.0
+    - r-quadprog
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('phangorn')"           # [not win]
+    - "\"%R%\" -e \"library('phangorn')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/KlausVigo/phangorn
+  license: GPL-2
+  summary: Allows for estimation of phylogenetic trees and networks using Maximum Likelihood,
+    Maximum Parsimony, distance methods and Hadamard conjugation. Offers methods for
+    tree comparison, model selection and visualization of phylogenetic networks as described
+    in Schliep et al. (2017) <doi:10.1111/2041-210X.12760>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: phangorn
+# Title: Phylogenetic Reconstruction and Analysis
+# Version: 2.8.1
+# Authors@R: c(person(given = "Klaus", family = "Schliep", role = c("aut", "cre"), email = "klaus.schliep@gmail.com", comment = c(ORCID = "0000-0003-2941-0161")), person(given = "Emmanuel", family = "Paradis", role = "aut", comment = c(ORCID = "0000-0003-3092-2199")), person(given = "Leonardo", family = "de Oliveira Martins", role = "aut", comment = c(ORCID = "0000-0001-5247-1320")), person(given = "Alastair", family = "Potts", role = "aut"), person(given = "Tim W.", family = "White", role = "aut"), person(given = "Cyrill", family = "Stachniss", role = "ctb"), person(given = "Michelle", family = "Kendall", role = "ctb", email = "m.kendall@imperial.ac.uk"), person(given = "Keren", family = "Halabi", role = "ctb"), person(given = "Richel", family = "Bilderbeek", role = "ctb"), person(given = "Kristin", family = "Winchell", role = "ctb"), person(given = "Liam", family = "Revell", role = "ctb"), person(given = "Mike", family = "Gilchrist", role = "ctb"), person(given = "Jeremy", family = "Beaulieu", role = "ctb"), person(given = "Brian", family = "O'Meara", role = "ctb"), person(given = "Long", family = "Qu", role = "ctb"))
+# Description: Allows for estimation of phylogenetic trees and networks using Maximum Likelihood, Maximum Parsimony, distance methods and Hadamard conjugation. Offers methods for tree comparison, model selection and visualization of phylogenetic networks as described in Schliep et al. (2017) <doi:10.1111/2041-210X.12760>.
+# License: GPL (>= 2)
+# URL: https://github.com/KlausVigo/phangorn
+# BugReports: https://github.com/KlausVigo/phangorn/issues
+# Depends: ape (>= 5.5), R (>= 4.1.0)
+# Imports: fastmatch, graphics, grDevices, igraph (>= 1.0), Matrix, methods, parallel, quadprog, Rcpp, stats, utils
+# Suggests: Biostrings, knitr, magick, prettydoc, rgl, rmarkdown, seqinr, seqLogo, tinytest, xtable
+# LinkingTo: Rcpp
+# VignetteBuilder: knitr, utils
+# biocViews: Software, Technology, QualityControl
+# Encoding: UTF-8
+# Repository: CRAN
+# RoxygenNote: 7.1.2
+# Language: en-US
+# NeedsCompilation: yes
+# Packaged: 2021-12-13 14:03:14 UTC; klaus
+# Author: Klaus Schliep [aut, cre] (<https://orcid.org/0000-0003-2941-0161>), Emmanuel Paradis [aut] (<https://orcid.org/0000-0003-3092-2199>), Leonardo de Oliveira Martins [aut] (<https://orcid.org/0000-0001-5247-1320>), Alastair Potts [aut], Tim W. White [aut], Cyrill Stachniss [ctb], Michelle Kendall [ctb], Keren Halabi [ctb], Richel Bilderbeek [ctb], Kristin Winchell [ctb], Liam Revell [ctb], Mike Gilchrist [ctb], Jeremy Beaulieu [ctb], Brian O'Meara [ctb], Long Qu [ctb]
+# Maintainer: Klaus Schliep <klaus.schliep@gmail.com>
+# Date/Publication: 2021-12-15 00:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

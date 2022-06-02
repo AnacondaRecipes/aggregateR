@@ -1,4 +1,4 @@
-{% set version = '0.2.3' %}
+{% set version = '0.4.0' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,13 +11,13 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/beeswarm_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/beeswarm/beeswarm_{{ version }}.tar.gz
-  sha256: 0115425e210dced05da8e162c8455526a47314f72e441ad2a33dcab3f94ac843
+  sha256: 51f4339bf4080a2be84bb49a844c636625657fbed994abeaa42aead916c3d504
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
-  noarch: generic
+  # no skip
 
   # This is required to make R link correctly on Linux.
   rpaths:
@@ -26,13 +26,20 @@ build:
 
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
 
 test:
   commands:
@@ -47,13 +54,13 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: http://www.cbs.dtu.dk/~eklund/beeswarm/
+  home: https://github.com/aroneklund/beeswarm
   license: Artistic-2.0
-  summary: 'The bee swarm plot is a one-dimensional scatter plot like "stripchart", but with
-    closely-packed, non-overlapping points. '
-
+  summary: The bee swarm plot is a one-dimensional scatter plot like "stripchart", but with closely-packed,
+    non-overlapping points.
   license_family: OTHER
-  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/Artistic-2.0'
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/Artistic-2.0'
 
 extra:
   recipe-maintainers:
@@ -62,19 +69,21 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: beeswarm
-# Version: 0.2.3
-# Date: 2016-04-25
 # Title: The Bee Swarm Plot, an Alternative to Stripchart
-# Author: Aron Eklund
-# Maintainer: Aron Eklund <eklund@cbs.dtu.dk>
-# Imports: stats, graphics, grDevices, utils
 # Description: The bee swarm plot is a one-dimensional scatter plot like "stripchart", but with closely-packed, non-overlapping points.
+# Version: 0.4.0
+# Date: 2021-05-07
+# Authors@R: c( person("Aron", "Eklund", , "aroneklund@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0861-1001")), person("James", "Trimble", role = "aut", comment = c(ORCID = "0000-0001-7282-8745")) )
+# Imports: stats, graphics, grDevices, utils
+# NeedsCompilation: yes
 # License: Artistic-2.0
-# URL: http://www.cbs.dtu.dk/~eklund/beeswarm/
-# NeedsCompilation: no
-# Packaged: 2016-04-25 13:59:08 UTC; aron
+# URL: https://github.com/aroneklund/beeswarm
+# BugReports: https://github.com/aroneklund/beeswarm/issues
+# Packaged: 2021-05-07 08:52:45 UTC; aron
+# Author: Aron Eklund [aut, cre] (<https://orcid.org/0000-0003-0861-1001>), James Trimble [aut] (<https://orcid.org/0000-0001-7282-8745>)
+# Maintainer: Aron Eklund <aroneklund@gmail.com>
 # Repository: CRAN
-# Date/Publication: 2016-04-25 17:02:42
+# Date/Publication: 2021-06-01 21:40:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

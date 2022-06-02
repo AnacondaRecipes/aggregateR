@@ -1,0 +1,95 @@
+{% set version = '1.7.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-formula.tools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/formula.tools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/formula.tools/formula.tools_{{ version }}.tar.gz
+  sha256: 4fe0e72d9d96f2398e86cbd8536d0c84de38e5583d4ff7dcd73f415ddd8ca395
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: magrittr, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-operator.tools >=1.4.0
+
+  run:
+    - r-base
+    - r-operator.tools >=1.4.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('formula.tools')"           # [not win]
+    - "\"%R%\" -e \"library('formula.tools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/decisionpatterns/formula.tools
+  license: GPL-2
+  summary: 'These utilities facilitate the programmatic manipulations of formulas, expressions,
+    calls, assignments and other R language objects. These objects all share the same
+    structure: a left-hand side, operator and right-hand side. This packages provides
+    methods for accessing and modifying this structures as well as extracting and replacing
+    names and symbols from these objects.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: formula.tools
+# Type: Package
+# Title: Programmatic Utilities for Manipulating Formulas, Expressions, Calls, Assignments and Other R Objects
+# Version: 1.7.1
+# Date: 2018-02-22
+# Authors@R: c( person("Christopher", "Brown", , "chris.brown@decisionpatterns.com", c("aut", "cre") ), person("Decision Patterns", role = "cph") )
+# Description: These utilities facilitate the programmatic manipulations of formulas, expressions, calls, assignments and other R language objects. These objects all share the same structure: a left-hand side, operator and right-hand side. This packages provides methods for accessing and modifying this structures as well as extracting and replacing names and symbols from these objects.
+# Depends: R (>= 3.0.0)
+# Imports: operator.tools(>= 1.4.0), utils, methods
+# Suggests: magrittr, testthat
+# License: GPL-2 | file LICENSE
+# URL: https://github.com/decisionpatterns/formula.tools
+# BugReports: https://github.com/decisionpatterns/formula.tools/issues
+# LazyLoad: yes
+# LazyData: yes
+# Collate: 'as.character.formula.R' 'env.R' 'get.vars.R' 'invert.R' 'is.one.sided.R' 'is.two.sided.R' 'lhs.vars.R' 'op.type.R' 'parts.R' 'parts.lhs.get.R' 'parts.lhs.set.R' 'parts.op.get.R' 'parts.op.set.R' 'parts.rhs.get.R' 'parts.rhs.set.R' 'rhs.vars.R' 'split.terms.R' 'terms.R' 'toggle.sign.R' 'zzz.R'
+# RoxygenNote: 6.0.1.9000
+# Repository: CRAN
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2018-03-01 07:53:43 UTC; cbrown
+# Author: Christopher Brown [aut, cre], Decision Patterns [cph]
+# Maintainer: Christopher Brown <chris.brown@decisionpatterns.com>
+# Date/Publication: 2018-03-01 12:56:01 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

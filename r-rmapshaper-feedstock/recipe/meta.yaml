@@ -1,0 +1,105 @@
+{% set version = '0.4.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rmapshaper
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rmapshaper_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rmapshaper/rmapshaper_{{ version }}.tar.gz
+  sha256: 125464dd112c2f56a6bb1d5b81eccc148750fdad9b71a181aa22093f79b7ee0d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, magrittr, rgdal, rgeos, rmarkdown, testthat (>= 2.1.0), covr, units
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-v8 >=3.4.2
+    - r-geojsonio >=0.9.4
+    - r-geojsonlint >=0.4.0
+    - r-jsonlite >=1.7.0
+    - r-readr >=1.4.0
+    - r-sf >=0.9_0
+    - r-sp >=1.4_0
+
+  run:
+    - r-base
+    - r-v8 >=3.4.2
+    - r-geojsonio >=0.9.4
+    - r-geojsonlint >=0.4.0
+    - r-jsonlite >=1.7.0
+    - r-readr >=1.4.0
+    - r-sf >=0.9_0
+    - r-sp >=1.4_0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rmapshaper')"           # [not win]
+    - "\"%R%\" -e \"library('rmapshaper')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ateucher/rmapshaper
+  license: MIT
+  summary: Edit and simplify 'geojson', 'Spatial', and 'sf' objects.  This is wrapper around
+    the 'mapshaper' 'JavaScript' library by Matthew Bloch <https://github.com/mbloch/mapshaper/>
+    to perform topologically-aware polygon simplification, as well as other operations
+    such as clipping, erasing, dissolving, and converting 'multi-part' to 'single-part'
+    geometries.  It relies on the 'geojsonio' package for working with 'geojson' objects,
+    the 'sf' package for working with 'sf' objects, and the 'sp' and 'rgdal' packages
+    for working with 'Spatial' objects.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: rmapshaper
+# Title: Client for 'mapshaper' for 'Geospatial' Operations
+# Version: 0.4.6
+# Authors@R: c(person(given = "Andy", family = "Teucher", role = c("aut", "cre"), email = "andy.teucher@gmail.com"), person(given = "Kenton", family = "Russell", role = "aut", email = "kent.russell@timelyportfolio.com", comment = "JavaScript support"), person(given = "Matthew", family = "Bloch", role = "cph", comment = "mapshaper Javascript library"))
+# Description: Edit and simplify 'geojson', 'Spatial', and 'sf' objects.  This is wrapper around the 'mapshaper' 'JavaScript' library by Matthew Bloch <https://github.com/mbloch/mapshaper/> to perform topologically-aware polygon simplification, as well as other operations such as clipping, erasing, dissolving, and converting 'multi-part' to 'single-part' geometries.  It relies on the 'geojsonio' package for working with 'geojson' objects, the 'sf' package for working with 'sf' objects, and the 'sp' and 'rgdal' packages for working with 'Spatial' objects.
+# License: MIT + file LICENSE
+# URL: https://github.com/ateucher/rmapshaper
+# BugReports: https://github.com/ateucher/rmapshaper/issues
+# Imports: geojsonio (>= 0.9.4), geojsonlint (>= 0.4.0), jsonlite (>= 1.7.0), methods, readr (>= 1.4.0), sf (>= 0.9-0), sp (>= 1.4-0), V8 (>= 3.4.2)
+# Suggests: knitr, magrittr, rgdal, rgeos, rmarkdown, testthat (>= 2.1.0), covr, units
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# RoxygenNote: 7.1.2
+# NeedsCompilation: no
+# Packaged: 2022-05-10 22:34:35 UTC; ateucher
+# Author: Andy Teucher [aut, cre], Kenton Russell [aut] (JavaScript support), Matthew Bloch [cph] (mapshaper Javascript library)
+# Maintainer: Andy Teucher <andy.teucher@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-05-10 23:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

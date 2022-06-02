@@ -1,4 +1,4 @@
-{% set version = '1.5' %}
+{% set version = '2.0.4' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,7 +11,7 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/mixture_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/mixture/mixture_{{ version }}.tar.gz
-  sha256: c4b2873f3b81dd456faccedabdf8acef509c80c89ac0e12b2ccdf691b84419aa
+  sha256: 50b981bfe2964bc7d7d6cfbf43404a80eee5d61a92ff5cb922c6c557ecf9bbce
 
 build:
   merge_build_host: True  # [win]
@@ -28,18 +28,35 @@ requirements:
   build:
     - {{ compiler('c') }}              # [not win]
     - {{ compiler('m2w64_c') }}        # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}make
-    - {{posix}}sed               # [win]
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-bh
+    - r-rcpp >=1.0.2
+    - r-rcpparmadillo
+    - r-rcppgsl
+    - r-lattice >=0.20
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-rcpp >=1.0.2
+    - r-rcpparmadillo
+    - r-rcppgsl
+    - r-lattice >=0.20
 
 test:
   commands:
@@ -56,8 +73,11 @@ test:
 about:
   home: https://CRAN.R-project.org/package=mixture
   license: GPL-2
-  summary: An implementation of all 14 Gaussian parsimonious clustering models (GPCMs) for model-based
-    clustering and model-based classification.
+  summary: An implementation of 14 parsimonious mixture models for model-based clustering or
+    model-based classification. Gaussian, Student's t, generalized hyperbolic, variance-gamma
+    or skew-t mixtures are available. All approaches work with missing data. Celeux
+    and Govaert (1995) <doi:10.1016/0031-3203(94)00125-6>, Browne and McNicholas (2014)
+    <doi:10.1007/s11634-013-0139-1>, Browne and McNicholas (2015) <doi:10.1002/cjs.11246>.
   license_family: GPL2
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
@@ -70,19 +90,23 @@ extra:
 
 # Package: mixture
 # Type: Package
-# Title: Finite Gaussian Mixture Models for Clustering and Classification
-# Version: 1.5
-# Date: 2018-02-13
-# Author: Ryan P. Browne, Aisha ElSherbiny and Paul D. McNicholas
-# Maintainer: Ryan Browne <rbrowne@math.mcmaster.ca>
-# Description: An implementation of all 14 Gaussian parsimonious clustering models (GPCMs) for model-based clustering and model-based classification.
-# License: GPL (>= 2)
+# Title: Mixture Models for Clustering and Classification
+# Version: 2.0.4
+# Date: 2021-04-14
+# Authors@R: c(person("Nik", "Pocuca", role=c("aut")), person("Ryan P.", "Browne", role = c("aut")), person("Paul D.", "McNicholas", role = c("aut", "cre"), email = "mcnicholas@math.mcmaster.ca"))
+# Author: Nik Pocuca [aut], Ryan P. Browne [aut], Paul D. McNicholas [aut, cre]
+# Maintainer: Paul D. McNicholas <mcnicholas@math.mcmaster.ca>
+# Description: An implementation of 14 parsimonious mixture models for model-based clustering or model-based classification. Gaussian, Student's t, generalized hyperbolic, variance-gamma or skew-t mixtures are available. All approaches work with missing data. Celeux and Govaert (1995) <doi:10.1016/0031-3203(94)00125-6>, Browne and McNicholas (2014) <doi:10.1007/s11634-013-0139-1>, Browne and McNicholas (2015) <doi:10.1002/cjs.11246>.
+# Repository: CRAN
 # LazyLoad: yes
 # NeedsCompilation: yes
-# Repository: CRAN
-# Packaged: 2018-02-13 18:42:39 UTC; ryanbrowne
-# SystemRequirements: GNU make
-# Date/Publication: 2018-02-13 22:07:56 UTC
+# License: GPL (>= 2)
+# Imports: Rcpp (>= 1.0.2)
+# LinkingTo: Rcpp, RcppArmadillo, BH, RcppGSL
+# Depends: R (>= 3.5.0), lattice (>= 0.20)
+# SystemRequirements: GNU GSL
+# Packaged: 2021-04-16 13:08:54 UTC; nik
+# Date/Publication: 2021-04-19 14:50:13 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

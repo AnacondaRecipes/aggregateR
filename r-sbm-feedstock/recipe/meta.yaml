@@ -1,0 +1,131 @@
+{% set version = '0.4.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sbm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sbm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sbm/sbm_{{ version }}.tar.gz
+  sha256: 8e214da7745801958320ba0f4f2a8f6d9ed2ff8a7bc79e1229c0ea091b487a17
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, spelling, knitr, rmarkdown, aricode, covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-gremlins
+    - r-r6
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-alluvial
+    - r-blockmodels
+    - r-dplyr
+    - r-ggplot2
+    - r-igraph
+    - r-magrittr
+    - r-prodlim
+    - r-purrr
+    - r-reshape2
+    - r-rlang
+    - r-stringr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-gremlins
+    - r-r6
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-alluvial
+    - r-blockmodels
+    - r-dplyr
+    - r-ggplot2
+    - r-igraph
+    - r-magrittr
+    - r-prodlim
+    - r-purrr
+    - r-reshape2
+    - r-rlang
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sbm')"           # [not win]
+    - "\"%R%\" -e \"library('sbm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://grosssbm.github.io/sbm/
+  license: GPL-3
+  summary: "A collection of tools and functions to adjust a variety of stochastic blockmodels
+    (SBM). Supports at the moment Simple, Bipartite, 'Multipartite' and Multiplex SBM
+    (undirected or directed with Bernoulli, Poisson or Gaussian emission laws on the
+    edges, and possibly covariate for Simple and Bipartite SBM). See L\xE9ger (2016)
+    <arxiv:1602.07587>, 'Barbillon et al.' (2020) <doi:10.1111/rssa.12193> and 'Bar-Hen
+    et al.' (2020) <arxiv:1807.10138>."
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: sbm
+# Title: Stochastic Blockmodels
+# Version: 0.4.3
+# Authors@R: c(person(given = "Julien", family = "Chiquet", role = c("aut", "cre"), email = "julien.chiquet@inrae.fr", comment = c(ORCID = "0000-0002-3629-3429")), person(given = "Sophie", family = "Donnet", role = c("aut"), email = "sophie.donnet@inrae.fr", comment = c(ORCID = "0000-0003-4370-7316")), person("groBM team", role = c("ctb")), person(given = "Pierre", family = "Barbillon", role = c("aut"), email = "pierre.barbillon@agroparistech.fr", comment = c(ORCID = "0000-0002-7766-7693")))
+# Description: A collection of tools and functions to adjust a variety of stochastic blockmodels (SBM). Supports at the moment Simple, Bipartite, 'Multipartite' and Multiplex SBM (undirected or directed with Bernoulli, Poisson or Gaussian emission laws on the edges, and possibly covariate for Simple and Bipartite SBM). See Leger (2016) <arxiv:1602.07587>, 'Barbillon et al.' (2020) <doi:10.1111/rssa.12193> and 'Bar-Hen et al.' (2020) <arxiv:1807.10138>.
+# URL: https://grosssbm.github.io/sbm/
+# BugReports: https://github.com/GrossSBM/sbm/issues
+# License: GPL (>= 3)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.1.1
+# Suggests: testthat, spelling, knitr, rmarkdown, aricode, covr
+# Language: en-US
+# Imports: alluvial, magrittr, dplyr, purrr, blockmodels, R6, Rcpp, igraph, ggplot2, GREMLINS, stringr, rlang, reshape2, prodlim
+# Collate: 'R6Class-SBM.R' 'R6Class-BipartiteSBM.R' 'R6Class-BipartiteSBM_fit.R' 'R6Class-MultipartiteSBM.R' 'R6Class-MultipartiteSBM_fit.R' 'R6Class-MultiplexSBM_fit.R' 'R6Class-SimpleSBM.R' 'R6Class-SimpleSBM_fit.R' 'RcppExports.R' 'defineSBM.R' 'estimate.R' 'fungusTreeNetwork.R' 'multipartiteEcologicalNetwork.R' 'plotAlluvial.R' 'plotMyMatrix.R' 'plotMyMultipartiteMatrix.R' 'plotMyMultiplexMatrix.R' 'sample.R' 'sbm-package.R' 'utils-pipe.R' 'utils.R' 'utils_plot.R' 'war.R'
+# LinkingTo: Rcpp, RcppArmadillo
+# VignetteBuilder: knitr
+# Depends: R (>= 3.5.0)
+# NeedsCompilation: yes
+# Packaged: 2021-06-09 16:42:06 UTC; jchiquet
+# Author: Julien Chiquet [aut, cre] (<https://orcid.org/0000-0002-3629-3429>), Sophie Donnet [aut] (<https://orcid.org/0000-0003-4370-7316>), groBM team [ctb], Pierre Barbillon [aut] (<https://orcid.org/0000-0002-7766-7693>)
+# Maintainer: Julien Chiquet <julien.chiquet@inrae.fr>
+# Repository: CRAN
+# Date/Publication: 2021-06-09 17:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

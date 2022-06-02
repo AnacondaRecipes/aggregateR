@@ -1,4 +1,4 @@
-{% set version = '1.2.1.1' %}
+{% set version = '1.3.0.3' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,30 +11,42 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/rhoR_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/rhoR/rhoR_{{ version }}.tar.gz
-  sha256: 342e8fd6060795a03ffe0f6c551cea14c405beea7efed8caf4c4ada83c53364a
+  sha256: 91ab9dab72616d9517fe521b00bcada2968112a9e4a94883956d74414d3d6850
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: testthat
+# Suggests: testthat (>= 2.1.0), knitr, rmarkdown, microbenchmark
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-rcpp
+    - r-rcpparmadillo
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
 
 test:
   commands:
@@ -49,7 +61,7 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://CRAN.R-project.org/package=rhoR
+  home: https://rhor.qe-libs.org
   license: GPL-3
   summary: 'Rho is used to test the generalization of inter rater reliability (IRR) statistics.
     Calculating rho starts by generating a large number of simulated, fully-coded data
@@ -61,7 +73,6 @@ about:
     observed kappa, the null hypothesis is rejected and one can conclude that if the
     two raters had coded the rest of the data, we would have acceptable agreement (kappa
     above the threshold).'
-
   license_family: GPL3
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
@@ -75,21 +86,25 @@ extra:
 
 # Package: rhoR
 # Title: Rho for Inter Rater Reliability
-# Authors@R: c(person("Brendan", "Eagan", email="beagan@wisc.edu", role = c("aut")),person("Brad", "Rogers", email = "bjrogers2@wisc.edu", role = c("aut")), person("Rebecca","Pozen", email = "rpozen@wisc.edu", role = c("aut")),person("Cody L", "Marquart", email="cody.marquart@wisc.edu", role = c("cre", "aut")),person("David", "Williamson Shaffer", email = "dws@education.wisc.edu", role = c("aut")))
+# Authors@R: c(person("Brendan", "Eagan", email="beagan@wisc.edu", role = c("aut")),person("Brad", "Rogers", email = "bjrogers2@wisc.edu", role = c("aut")), person("Rebecca","Pozen", email = "rpozen@wisc.edu", role = c("aut")),person("Cody L", "Marquart", email="cody.marquart@wisc.edu", role = c("cre", "aut"), comment = c(ORCID = "0000-0002-3387-6792")),person("David", "Williamson Shaffer", email = "dws@education.wisc.edu", role = c("aut")))
 # Maintainer: Cody L Marquart <cody.marquart@wisc.edu>
-# Version: 1.2.1.1
+# Version: 1.3.0.3
 # Description: Rho is used to test the generalization of inter rater reliability (IRR) statistics. Calculating rho starts by generating a large number of simulated, fully-coded data sets: a sizable collection of hypothetical populations, all of which have a kappa value below a given threshold -- which indicates unacceptable agreement. Then kappa is calculated on a sample from each of those sets in the collection to see if it is equal to or higher than the kappa in then real sample. If less than five percent of the distribution of samples from the simulated data sets is greater than actual observed kappa, the null hypothesis is rejected and one can conclude that if the two raters had coded the rest of the data, we would have acceptable agreement (kappa above the threshold).
 # Depends: R (>= 3.0.0)
 # License: GPL-3 | file LICENSE
+# URL: https://rhor.qe-libs.org
+# BugReports: https://gitlab.com/epistemic-analytics/qe-packages/rhoR/-/issues
 # LazyData: true
-# RoxygenNote: 6.1.0
-# Suggests: testthat
-# Collate: 'rhoR.R' 'rho.R' 'rhoK.R' 'rhoSet.R' 'rhoCT.R' 'kappa.R' 'kappaSet.R' 'kappaCT.R' 'rhoMin.R' 'baserate.R' 'baserateSet.R' 'baserateCT.R' 'calcKappa.R' 'calcRho.R' 'checkBRPKcombo.R' 'contingencyTable.R' 'codeSet.R' 'contingencyToSet.R' 'createRandomSet.R' 'createSimulatedCodeSet.R' 'genPKcombo.R' 'genPcombo.R' 'generateKPs.R' 'getBootPvalue.R' 'getHandSet.R' 'getHandSetIndices.R' 'getR.R' 'getTestSet.R' 'prset.R'
-# NeedsCompilation: no
-# Packaged: 2019-04-01 02:58:05 UTC; root
-# Author: Brendan Eagan [aut], Brad Rogers [aut], Rebecca Pozen [aut], Cody L Marquart [cre, aut], David Williamson Shaffer [aut]
+# RoxygenNote: 7.1.0
+# LinkingTo: Rcpp, RcppArmadillo
+# Imports: Rcpp, stats, utils, methods
+# Suggests: testthat (>= 2.1.0), knitr, rmarkdown, microbenchmark
+# Collate: 'RcppExports.R' 'baserate.R' 'baserateCT.R' 'baserateSet.R' 'calcKappa.R' 'calcRho.R' 'calculations.R' 'checkBRPKcombo.R' 'codeSet.R' 'contingencyTable.R' 'contingencyToSet.R' 'createRandomSet.R' 'createSimulatedCodeSet.R' 'genPKcombo.R' 'genPcombo.R' 'generateKPs.R' 'getBootPvalue.R' 'getHandSet.R' 'getHandSetIndices.R' 'getR.R' 'getTestSet.R' 'kappa.R' 'kappaCT.R' 'kappaSet.R' 'prset.R' 'rho.R' 'rho.file.R' 'rhoCT.R' 'rhoK.R' 'rhoMin.R' 'rhoR.R' 'rhoSet.R' 'utils.R' 'zzz.R'
+# NeedsCompilation: yes
+# Packaged: 2020-09-08 21:11:01 UTC; root
+# Author: Brendan Eagan [aut], Brad Rogers [aut], Rebecca Pozen [aut], Cody L Marquart [cre, aut] (<https://orcid.org/0000-0002-3387-6792>), David Williamson Shaffer [aut]
 # Repository: CRAN
-# Date/Publication: 2019-04-01 04:40:09 UTC
+# Date/Publication: 2020-09-13 14:20:03 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

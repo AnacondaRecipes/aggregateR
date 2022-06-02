@@ -1,4 +1,4 @@
-{% set version = '1.1' %}
+{% set version = '2.0.6' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,7 +11,7 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/marqLevAlg_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/marqLevAlg/marqLevAlg_{{ version }}.tar.gz
-  sha256: 12553e139744faeb0f8f110b6281d6b182abbadf8fef8364a5993af09089b8f2
+  sha256: a8a98e0621c434865ddb24243e8afbbf4f743e3461176297792da38094cf5b8a
 
 build:
   merge_build_host: True  # [win]
@@ -24,24 +24,29 @@ build:
     - lib/R/lib/
     - lib/
 
+# Suggests: microbenchmark,knitr,rmarkdown,rticles,ggplot2,viridis,patchwork,xtable
 requirements:
   build:
     - {{ compiler('c') }}              # [not win]
     - {{ compiler('m2w64_c') }}        # [win]
     - {{ compiler('fortran') }}        # [not win]
     - {{ compiler('m2w64_fortran') }}  # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}make
-    - {{posix}}sed               # [win]
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-doparallel
+    - r-foreach
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
+    - r-doparallel
+    - r-foreach
 
 test:
   commands:
@@ -56,14 +61,14 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: http://www.r-project.org
+  home: https://CRAN.R-project.org/package=marqLevAlg
   license: GPL (>= 2.0)
-  summary: 'This algorithm provides a numerical solution to the problem of minimizing a function.
-    This is more efficient than the Gauss-Newton-like algorithm when starting from points
-    very far from the final minimum. A new convergence test is implemented (RDM) in
-    addition to the usual stopping criterion : stopping rule is when the gradients are
-    small enough in the parameters metric (GH-1G).'
-
+  summary: This algorithm provides a numerical solution to the problem of unconstrained local
+    minimization (or maximization). It is particularly suited for complex problems and
+    more efficient than the Gauss-Newton-like algorithm when starting from points very
+    far from the final minimum (or maximum). Each iteration is parallelized and convergence
+    relies on a stringent stopping criterion based on the first and second derivatives.
+    See Philipps et al, 2021 <doi:10.32614/RJ-2021-089>.
   license_family: GPL3
 
 extra:
@@ -74,21 +79,25 @@ extra:
 
 # Package: marqLevAlg
 # Type: Package
-# Title: An algorithm for least-squares curve fitting
-# Version: 1.1
-# Date: 2013-03-01
-# Author: D. Commenges <Daniel.Commenges@isped.u-bordeaux2.fr>, M. Prague <Melanie.Prague@isped.u-bordeaux2.fr> and A. Diakite
-# Maintainer: Melanie Prague <Melanie.Prague@isped.u-bordeaux2.fr>
-# Depends: R (>= 2.0.0)
+# Title: A Parallelized General-Purpose Optimization Based on Marquardt-Levenberg Algorithm
+# Version: 2.0.6
+# Date: 2022-03-08
+# Author: Viviane Philipps, Cecile Proust-Lima, Melanie Prague, Boris Hejblum, Daniel Commenges, Amadou Diakite
+# Maintainer: Viviane Philipps <viviane.philipps@u-bordeaux.fr>
+# Depends: R (>= 3.5.0)
+# Suggests: microbenchmark,knitr,rmarkdown,rticles,ggplot2,viridis,patchwork,xtable
 # LazyLoad: yes
-# Description: This algorithm provides a numerical solution to the problem of minimizing a function. This is more efficient than the Gauss-Newton-like algorithm when starting from points very far from the final minimum. A new convergence test is implemented (RDM) in addition to the usual stopping criterion : stopping rule is when the gradients are small enough in the parameters metric (GH-1G).
+# LazyData: true
+# Description: This algorithm provides a numerical solution to the problem of unconstrained local minimization (or maximization). It is particularly suited for complex problems and more efficient than the Gauss-Newton-like algorithm when starting from points very far from the final minimum (or maximum). Each iteration is parallelized and convergence relies on a stringent stopping criterion based on the first and second derivatives. See Philipps et al, 2021 <doi:10.32614/RJ-2021-089>.
 # License: GPL (>= 2.0)
-# URL: http://www.r-project.org
-# Encoding: latin1
-# Repository: CRAN
-# Packaged: 2013-03-18 09:50:39 UTC; mp8
+# BugReports: https://github.com/VivianePhilipps/marqLevAlgParallel/issues
+# Imports: doParallel, foreach
+# VignetteBuilder: knitr
 # NeedsCompilation: yes
-# Date/Publication: 2013-03-18 23:14:20
+# RoxygenNote: 7.1.1
+# Packaged: 2022-03-09 11:56:55 UTC; vp3
+# Repository: CRAN
+# Date/Publication: 2022-03-09 15:20:07 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

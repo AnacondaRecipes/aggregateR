@@ -1,0 +1,100 @@
+{% set version = '0.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sofa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sofa_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sofa/sofa_{{ version }}.tar.gz
+  sha256: db1f174f5609ec06a38915a1bd4894bfa423c94c9e717eed3770936e2f72e8f0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6 >=2.2.2
+    - r-crul >=0.4.0
+    - r-jsonlite >=1.5
+    - r-mime
+
+  run:
+    - r-base
+    - r-r6 >=2.2.2
+    - r-crul >=0.4.0
+    - r-jsonlite >=1.5
+    - r-mime
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sofa')"           # [not win]
+    - "\"%R%\" -e \"library('sofa')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ropensci/sofa (devel) https://docs.ropensci.org/sofa (docs)
+  license: MIT
+  summary: Provides an interface to the 'NoSQL' database 'CouchDB' (<http://couchdb.apache.org>).
+    Methods are provided for managing databases within 'CouchDB', including creating/deleting/updating/transferring,
+    and managing documents within databases. One can connect with a local 'CouchDB'
+    instance, or a remote 'CouchDB' databases such as 'Cloudant'. Documents can be inserted
+    directly from vectors, lists, data.frames, and 'JSON'. Targeted at 'CouchDB' v2
+    or greater.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: sofa
+# Title: Connector to 'CouchDB'
+# Description: Provides an interface to the 'NoSQL' database 'CouchDB' (<http://couchdb.apache.org>). Methods are provided for managing databases within 'CouchDB', including creating/deleting/updating/transferring, and managing documents within databases. One can connect with a local 'CouchDB' instance, or a remote 'CouchDB' databases such as 'Cloudant'. Documents can be inserted directly from vectors, lists, data.frames, and 'JSON'. Targeted at 'CouchDB' v2 or greater.
+# Version: 0.4.0
+# Authors@R: c( person("Scott", "Chamberlain", role = c("aut", "cre"), email = "myrmecocystus@gmail.com", comment = c(ORCID="0000-0003-1444-9135")), person(given = "rOpenSci", role = "fnd", comment = "https://ropensci.org/") )
+# License: MIT + file LICENSE
+# URL: https://github.com/ropensci/sofa (devel) https://docs.ropensci.org/sofa (docs)
+# BugReports: https://github.com/ropensci/sofa/issues
+# Encoding: UTF-8
+# VignetteBuilder: knitr
+# Imports: crul (>= 0.4.0), jsonlite (>= 1.5), R6 (>= 2.2.2), mime
+# Suggests: testthat, knitr, rmarkdown
+# RoxygenNote: 7.1.0
+# X-schema.org-applicationCategory: Databases
+# X-schema.org-keywords: CouchDB, database, NoSQL, documents
+# X-schema.org-isPartOf: https://ropensci.org
+# NeedsCompilation: no
+# Packaged: 2020-06-26 14:29:31 UTC; sckott
+# Author: Scott Chamberlain [aut, cre] (<https://orcid.org/0000-0003-1444-9135>), rOpenSci [fnd] (https://ropensci.org/)
+# Maintainer: Scott Chamberlain <myrmecocystus@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2020-06-26 15:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

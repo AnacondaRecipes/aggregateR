@@ -1,0 +1,91 @@
+{% set version = '1.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tuner
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tuneR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tuneR/tuneR_{{ version }}.tar.gz
+  sha256: 561eeae1bfe10ac4a950d2a60afc6db05d28557a8cb932e00ac7b7f57b6ea0e9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: pastecs
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-signal
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-signal
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tuneR')"           # [not win]
+    - "\"%R%\" -e \"library('tuneR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=tuneR
+  license: GPL-2 | GPL-3
+  summary: Analyze music and speech, extract features like MFCCs, handle wave files and their
+    representation in various ways, read mp3, read midi, perform steps of a transcription,
+    ... Also contains functions ported from the 'rastamat' 'Matlab' package.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: tuneR
+# Version: 1.4.0
+# Date: 2022-03-29
+# Title: Analysis of Music and Speech
+# Authors@R: c(person("Uwe", "Ligges", email="ligges@statistik.tu-dortmund.de", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0001-5875-6167")), person("Sebastian", "Krey", role = c("aut", "cph")), person("Olaf", "Mersmann", role = c("aut", "cph")), person("Sarah", "Schnackenberg", role = c("aut", "cph")), person("Guillaume", "Guenard", role = c("aut", "cph"), comment = "for the pulse functionality"), person("Daniel P. W.", "Ellis", role = c("aut", "cph"), comment = "functions ported from 'rastamat'"), person("", "Underbit Technologies", role = c("aut", "cph"), comment = "for the included libmad MPEG audio decoder library"), person("Andrea", "Preusser", role = c("ctb")), person("Anita", "Thieler", role = c("ctb")), person("Johanna", "Mielke", role = c("ctb")), person("Claus", "Weihs", role = c("ctb")), person("Brian D.", "Ripley", role = c("ctb")), person("Matthias", "Heymann", role = c("ctb"), comment = "for ideas from the former sound package"))
+# Depends: R (>= 3.0.0)
+# Suggests: pastecs
+# Imports: signal, methods
+# Description: Analyze music and speech, extract features like MFCCs, handle wave files and their representation in various ways, read mp3, read midi, perform steps of a transcription, ... Also contains functions ported from the 'rastamat' 'Matlab' package.
+# License: GPL-2 | GPL-3
+# NeedsCompilation: yes
+# Packaged: 2022-03-29 08:35:49 UTC; ligges
+# Author: Uwe Ligges [aut, cre, cph] (<https://orcid.org/0000-0001-5875-6167>), Sebastian Krey [aut, cph], Olaf Mersmann [aut, cph], Sarah Schnackenberg [aut, cph], Guillaume Guenard [aut, cph] (for the pulse functionality), Daniel P. W. Ellis [aut, cph] (functions ported from 'rastamat'), Underbit Technologies [aut, cph] (for the included libmad MPEG audio decoder library), Andrea Preusser [ctb], Anita Thieler [ctb], Johanna Mielke [ctb], Claus Weihs [ctb], Brian D. Ripley [ctb], Matthias Heymann [ctb] (for ideas from the former sound package)
+# Maintainer: Uwe Ligges <ligges@statistik.tu-dortmund.de>
+# Repository: CRAN
+# Date/Publication: 2022-03-29 12:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

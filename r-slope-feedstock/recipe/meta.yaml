@@ -1,4 +1,4 @@
-{% set version = '0.1.3' %}
+{% set version = '0.4.1' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,7 +11,7 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/SLOPE_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/SLOPE/SLOPE_{{ version }}.tar.gz
-  sha256: 7d78487df2d8569ef43cbdbf7b6b59647e71e0098ee3190335f64a8cc054ca8a
+  sha256: 930f64a8776cb0c298b9c2e4c54feaa2a976de8f329cdd8a36441bbf09941f6d
 
 build:
   merge_build_host: True  # [win]
@@ -24,27 +24,35 @@ build:
     - lib/R/lib/
     - lib/
 
-# Suggests: knitr, testthat, isotone, R.matlab
+# Suggests: caret, covr, glmnet, ggplot2, stringr, scales, tidyr, dplyr, bench, knitr, rmarkdown, spelling, testthat (>= 2.1.0)
 requirements:
   build:
     - {{ compiler('c') }}              # [not win]
     - {{ compiler('m2w64_c') }}        # [win]
     - {{ compiler('cxx') }}            # [not win]
     - {{ compiler('m2w64_cxx') }}      # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}make
-    - {{posix}}sed               # [win]
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-matrix
     - r-rcpp
+    - r-rcpparmadillo >=0.9.850.1.0
+    - r-foreach
+    - r-lattice
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
+    - r-matrix
     - r-rcpp
+    - r-rcpparmadillo >=0.9.850.1.0
+    - r-foreach
+    - r-lattice
 
 test:
   commands:
@@ -59,11 +67,14 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://CRAN.R-project.org/package=SLOPE
+  home: https://jolars.github.io/SLOPE/, https://github.com/jolars/SLOPE
   license: GPL-3
-  summary: Efficient procedures for Sorted L1 Penalized Estimation (SLOPE). The sorted L1 norm
-    is useful for statistical estimation and testing, particularly for variable selection
-    in the linear model.
+  summary: 'Efficient implementations for Sorted L-One Penalized Estimation (SLOPE): generalized
+    linear models regularized with the sorted L1-norm (Bogdan et al. (2015) <doi:10/gfgwzt>).
+    Supported models include ordinary least-squares regression, binomial regression,
+    multinomial regression, and Poisson regression. Both dense and sparse  predictor
+    matrices are supported. In addition, the package features predictor screening rules
+    that enable fast and efficient solutions to high-dimensional problems.'
   license_family: GPL3
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
@@ -75,23 +86,28 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: SLOPE
-# Type: Package
-# Title: Sorted L1 Penalized Estimation (SLOPE)
-# Version: 0.1.3
-# Date: 2015-04-27
-# Author: Malgorzata Bogdan, Ewout van den Berg, Chiara Sabatti, Weijie Su, Emmanuel Candes, Evan Patterson
-# Maintainer: Evan Patterson <epatters@stanford.edu>
-# Description: Efficient procedures for Sorted L1 Penalized Estimation (SLOPE). The sorted L1 norm is useful for statistical estimation and testing, particularly for variable selection in the linear model.
+# Title: Sorted L1 Penalized Estimation
+# Version: 0.4.1
+# Authors@R: c( person( "Johan", "Larsson", role = c("aut", "cre"), email = "johan.larsson@stat.lu.se", comment = c(ORCID = "0000-0002-4029-5945") ), person( "Jonas", "Wallin", role = "aut", email = "jonas.wallin@stat.lu.se", comment = c(ORCID = "0000-0003-0381-6593") ), person("Malgorzata", "Bogdan", role = "aut"), person("Ewout", "van den Berg", role = "aut"), person("Chiara", "Sabatti", role = "aut"), person("Emmanuel", "Candes", role = "aut"), person("Evan", "Patterson", role = "aut"), person("Weijie", "Su", role = "aut"), person( "Jerome", "Friedman", role = "ctb", comment = "code adapted from 'glmnet'" ), person( "Trevor", "Hastie", role = "ctb", comment = "code adapted from 'glmnet'" ), person( "Rob", "Tibshirani", role = "ctb", comment = "code adapted from 'glmnet'" ), person( "Balasubramanian", "Narasimhan", role = "ctb", comment = "code adapted from 'glmnet'" ), person( "Noah", "Simon", role = "ctb", comment = "code adapted from 'glmnet'" ), person( "Junyang", "Qian", role = "ctb", comment = "code adapted from 'glmnet'" ), person("Akarsh", "Goyal", role = "ctb"), person("Jakub", "Kaa", role = "ctb"), person("Krystyna", "Grzesiak", role = "ctb") )
+# Description: Efficient implementations for Sorted L-One Penalized Estimation (SLOPE): generalized linear models regularized with the sorted L1-norm (Bogdan et al. (2015) <doi:10/gfgwzt>). Supported models include ordinary least-squares regression, binomial regression, multinomial regression, and Poisson regression. Both dense and sparse  predictor matrices are supported. In addition, the package features predictor screening rules that enable fast and efficient solutions to high-dimensional problems.
 # License: GPL-3
-# LinkingTo: Rcpp
-# Imports: Rcpp
-# Suggests: knitr, testthat, isotone, R.matlab
+# LazyData: true
+# Depends: R (>= 3.3.0)
+# Imports: foreach, lattice, Matrix, methods, Rcpp
+# LinkingTo: Rcpp, RcppArmadillo (>= 0.9.850.1.0)
+# Suggests: caret, covr, glmnet, ggplot2, stringr, scales, tidyr, dplyr, bench, knitr, rmarkdown, spelling, testthat (>= 2.1.0)
+# RoxygenNote: 7.1.2
+# Language: en-US
+# Encoding: UTF-8
+# URL: https://jolars.github.io/SLOPE/, https://github.com/jolars/SLOPE
+# BugReports: https://github.com/jolars/SLOPE/issues
 # VignetteBuilder: knitr
-# RoxygenNote: 5.0.0
 # NeedsCompilation: yes
-# Packaged: 2015-11-02 22:55:16 UTC; epatters
+# Packaged: 2022-03-14 14:23:52 UTC; gerd-jln
+# Author: Johan Larsson [aut, cre] (<https://orcid.org/0000-0002-4029-5945>), Jonas Wallin [aut] (<https://orcid.org/0000-0003-0381-6593>), Malgorzata Bogdan [aut], Ewout van den Berg [aut], Chiara Sabatti [aut], Emmanuel Candes [aut], Evan Patterson [aut], Weijie Su [aut], Jerome Friedman [ctb] (code adapted from 'glmnet'), Trevor Hastie [ctb] (code adapted from 'glmnet'), Rob Tibshirani [ctb] (code adapted from 'glmnet'), Balasubramanian Narasimhan [ctb] (code adapted from 'glmnet'), Noah Simon [ctb] (code adapted from 'glmnet'), Junyang Qian [ctb] (code adapted from 'glmnet'), Akarsh Goyal [ctb], Jakub Kaa [ctb], Krystyna Grzesiak [ctb]
+# Maintainer: Johan Larsson <johan.larsson@stat.lu.se>
 # Repository: CRAN
-# Date/Publication: 2015-11-03 10:54:06
+# Date/Publication: 2022-03-14 18:00:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

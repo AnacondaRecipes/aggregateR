@@ -1,4 +1,4 @@
-{% set version = '1.0.0' %}
+{% set version = '1.1.0' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,14 +11,13 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/lest_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/lest/lest_{{ version }}.tar.gz
-  sha256: bcbf369175420f3852c244de267daa276916859e9746321887709d216f03cf1a
+  sha256: e94a61897983109e0e4ba41326f39f9ab8a107a69e2f3423d9998541db9ec9b4
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
@@ -28,13 +27,20 @@ build:
 # Suggests: testthat
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
 
 test:
   commands:
@@ -51,12 +57,11 @@ test:
 about:
   home: https://CRAN.R-project.org/package=lest
   license: MIT
-  summary: ' Functions for vectorised conditional recoding of variables. case_when() enables
-    you to vectorise multiple if and else statements (like ''CASE WHEN'' in ''SQL'').
-    if_else() is a stricter and more predictable version of ifelse() in ''base'' that
-    preserves attributes. These functions are  forked from ''dplyr'' with all package
-    dependencies removed and behave identically to the originals.'
-
+  summary: Functions for vectorised conditional recoding of variables. case_when() enables you
+    to vectorise multiple if and else statements (like 'CASE WHEN' in 'SQL'). if_else()
+    is a stricter and more predictable version of ifelse() in 'base' that preserves
+    attributes. These functions are forked from 'dplyr' with all package dependencies
+    removed and behave identically to the originals.
   license_family: MIT
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
@@ -71,20 +76,20 @@ extra:
 # Type: Package
 # Package: lest
 # Title: Vectorised Nested if-else Statements Similar to CASE WHEN in 'SQL'
-# Version: 1.0.0
-# Authors@R: person("Stefan", "Fleck", email = "stefan.b.fleck@gmail.com", role = c("aut", "cre"))
+# Version: 1.1.0
+# Authors@R: c(person(given = "Stefan", family = "Fleck", role = c("aut", "cre"), email = "stefan.b.fleck@gmail.com", comment = c(ORCID = "0000-0003-3344-9851")), person(given = "Hadley", family = "Wickham", role = "aut", email = "hadley@rstudio.com", comment = c(ORCID = "0000-0003-4757-117X")), person(given = "Romain", family = "Francois", role = "aut", comment = c(ORCID = "0000-0002-2444-4226")), person(given = "Lionel", family = "Henry", role = "aut"), person(given = "Kirill", family = "Muller", role = "aut", comment = c(ORCID = "0000-0002-1416-3412")))
 # Maintainer: Stefan Fleck <stefan.b.fleck@gmail.com>
-# Description:  Functions for vectorised conditional recoding of variables. case_when() enables you to vectorise multiple if and else statements (like 'CASE WHEN' in 'SQL'). if_else() is a stricter and more predictable version of ifelse() in 'base' that preserves attributes. These functions are  forked from 'dplyr' with all package dependencies removed and behave identically to the originals.
+# Description: Functions for vectorised conditional recoding of variables. case_when() enables you to vectorise multiple if and else statements (like 'CASE WHEN' in 'SQL'). if_else() is a stricter and more predictable version of ifelse() in 'base' that preserves attributes. These functions are forked from 'dplyr' with all package dependencies removed and behave identically to the originals.
 # License: MIT + file LICENSE
+# Suggests: testthat
 # Encoding: UTF-8
 # LazyData: true
-# Suggests: testthat
-# RoxygenNote: 6.1.0
-# NeedsCompilation: no
-# Packaged: 2018-08-14 13:39:36 UTC; fleck
-# Author: Stefan Fleck [aut, cre]
+# RoxygenNote: 7.0.1.9000
+# NeedsCompilation: yes
+# Packaged: 2019-11-29 07:23:52 UTC; fleck
+# Author: Stefan Fleck [aut, cre] (<https://orcid.org/0000-0003-3344-9851>), Hadley Wickham [aut] (<https://orcid.org/0000-0003-4757-117X>), Romain Francois [aut] (<https://orcid.org/0000-0002-2444-4226>), Lionel Henry [aut], Kirill Muller [aut] (<https://orcid.org/0000-0002-1416-3412>)
 # Repository: CRAN
-# Date/Publication: 2018-08-16 09:20:06 UTC
+# Date/Publication: 2019-11-29 07:30:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

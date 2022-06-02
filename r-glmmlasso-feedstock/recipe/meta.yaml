@@ -1,4 +1,4 @@
-{% set version = '1.5.1' %}
+{% set version = '1.6.1' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,14 +11,13 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/glmmLasso_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/glmmLasso/glmmLasso_{{ version }}.tar.gz
-  sha256: 69e878f95c1eac337a21d1b262de06eb9cce3de9c6e67f70b02e7bec6ddbe9ab
+  sha256: 8000a23ede847398b1a81352c83142469b34ae57a5a1af18897bdbea98c6435b
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
@@ -27,16 +26,31 @@ build:
 
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-gmmboost
     - r-matrix
+    - r-rcpp >=0.12.12
+    - r-rcppeigen
     - r-minqa
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-gmmboost
     - r-matrix
+    - r-rcpp >=0.12.12
+    - r-rcppeigen
     - r-minqa
 
 test:
@@ -69,17 +83,18 @@ extra:
 # Package: glmmLasso
 # Type: Package
 # Title: Variable Selection for Generalized Linear Mixed Models by L1-Penalized Estimation
-# Version: 1.5.1
-# Date: 2017-05-05
+# Version: 1.6.1
+# Date: 2022-10-05
 # Author: Andreas Groll
-# Maintainer: Andreas Groll <groll@mathematik.uni-muenchen.de>
+# Maintainer: Andreas Groll <groll@statistik.tu-dortmund.de>
 # Description: A variable selection approach for generalized linear mixed models by L1-penalized estimation is provided.
-# Imports: minqa, Matrix
+# Imports: stats, minqa, Matrix, Rcpp (>= 0.12.12), methods, GMMBoost
+# LinkingTo: Rcpp, RcppEigen
 # License: GPL-2
 # Repository: CRAN
-# NeedsCompilation: no
-# Packaged: 2017-05-05 14:47:00 UTC; user
-# Date/Publication: 2017-05-06 09:05:52 UTC
+# NeedsCompilation: yes
+# Packaged: 2022-05-10 15:47:06 UTC; user
+# Date/Publication: 2022-05-11 08:50:06 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

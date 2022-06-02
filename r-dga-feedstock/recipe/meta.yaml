@@ -1,4 +1,4 @@
-{% set version = '1.2' %}
+{% set version = '2.0.1' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,30 +11,43 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/dga_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/dga/dga_{{ version }}.tar.gz
-  sha256: b9ee525779ba79b0de90a4d81b4ce1105344125fc9e04f6f2f9ac1676f55ae8e
+  sha256: 535ac661fa8a751abc96fd708d2895dc901526275dfb06afad77aedc3f0406e1
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
+# Suggests: testthat
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-rcpp
+    - r-rcpparmadillo
     - r-chron
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
     - r-chron
 
 test:
@@ -52,10 +65,9 @@ test:
 about:
   home: https://CRAN.R-project.org/package=dga
   license: GPL-2
-  summary: 'Performs Bayesian model averaging for capture-recapture. This includes code to stratify
+  summary: Performs Bayesian model averaging for capture-recapture. This includes code to stratify
     records, check the strata for suitable overlap to be used for capture-recapture,
-    and some functions to plot the estimated population size. '
-
+    and some functions to plot the estimated population size.
   license_family: GPL2
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
@@ -69,18 +81,23 @@ extra:
 # Package: dga
 # Type: Package
 # Title: Capture-Recapture Estimation using Bayesian Model Averaging
-# Version: 1.2
-# Date: 2015-04-16
-# Author: James Johndrow, Kristian Lum, and Patrick Ball
-# Maintainer: Kristian Lum <kl@hrdag.org>
+# Version: 2.0.1
+# Date: 2021-05-04
+# Authors@R: c(person(given="James", family="Johndrow", role=c("aut")), person(given="Kristian", family="Lum", email="kl@hrdag.org", role=c("aut")), person(given="Patrick", family="Ball", role=c("aut")), person(given="Olivier", family="Binette", email="olivier.binette@gmail.com", role=c("ctb",  "cre")))
 # Description: Performs Bayesian model averaging for capture-recapture. This includes code to stratify records, check the strata for suitable overlap to be used for capture-recapture, and some functions to plot the estimated population size.
 # License: GPL (>= 2)
 # LazyLoad: yes
-# Imports: chron
-# Packaged: 2015-04-16 14:42:17 UTC; kristianlum
-# NeedsCompilation: no
+# NeedsCompilation: yes
+# ByteCompile: yes
+# Imports: chron, Rcpp
+# RoxygenNote: 7.1.1
+# LinkingTo: Rcpp, RcppArmadillo
+# Suggests: testthat
+# Packaged: 2021-05-04 20:21:44 UTC; ob37
+# Author: James Johndrow [aut], Kristian Lum [aut], Patrick Ball [aut], Olivier Binette [ctb, cre]
+# Maintainer: Olivier Binette <olivier.binette@gmail.com>
 # Repository: CRAN
-# Date/Publication: 2015-04-16 19:53:41
+# Date/Publication: 2021-05-10 16:22:11 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

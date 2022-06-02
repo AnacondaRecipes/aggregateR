@@ -1,0 +1,83 @@
+{% set version = '0.0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tidycpp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tidyCpp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tidyCpp/tidyCpp_{{ version }}.tar.gz
+  sha256: fc915846b1769de134c05c066152514fd3eaea95a123754a31599d1130c9cef0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Rcpp, RcppSpdlog, simplermarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tidyCpp')"           # [not win]
+    - "\"%R%\" -e \"library('tidyCpp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/eddelbuettel/tidycpp, https://dirk.eddelbuettel.com/code/tidycpp.html
+  license: GPL-2
+  summary: Core parts of the C API of R are wrapped in a C++ namespace via a set of inline functions
+    giving a tidier representation of the underlying data structures and functionality
+    using a header-only implementation without additional dependencies.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: tidyCpp
+# Type: Package
+# Title: Tidy C++ Header-Only Definitions for Parts of the C API of R
+# Version: 0.0.6
+# Date: 2021-12-06
+# Author: Dirk Eddelbuettel
+# Maintainer: Dirk Eddelbuettel <edd@debian.org>
+# Description: Core parts of the C API of R are wrapped in a C++ namespace via a set of inline functions giving a tidier representation of the underlying data structures and functionality using a header-only implementation without additional dependencies.
+# Suggests: Rcpp, RcppSpdlog, simplermarkdown
+# VignetteBuilder: simplermarkdown
+# License: GPL (>= 2)
+# URL: https://github.com/eddelbuettel/tidycpp, https://dirk.eddelbuettel.com/code/tidycpp.html
+# BugReports: https://github.com/eddelbuettel/tidycpp/issues
+# NeedsCompilation: no
+# Packaged: 2021-12-06 13:56:42 UTC; edd
+# Repository: CRAN
+# Date/Publication: 2021-12-06 14:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

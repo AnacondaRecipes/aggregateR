@@ -1,0 +1,107 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-genieclust
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/genieclust_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/genieclust/genieclust_{{ version }}.tar.gz
+  sha256: c37e65b84aea87f24ba3df4e3c8a3f856dc46492ac40e62935c86c5f325d6bbd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: datasets, mlpack
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.4
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('genieclust')"           # [not win]
+    - "\"%R%\" -e \"library('genieclust')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://genieclust.gagolewski.com/
+  license: AGPL-3
+  summary: A retake on the Genie algorithm - a robust hierarchical clustering method (Gagolewski,
+    Bartoszuk, Cena, 2016 <DOI:10.1016/j.ins.2016.05.003>). Now faster and more memory
+    efficient; determining the whole hierarchy for datasets of 10M points in low dimensional
+    Euclidean spaces or 100K points in high-dimensional ones takes only 1-2 minutes.
+    Allows clustering with respect to mutual reachability distances so that it can act
+    as a noise point detector or a robustified version of 'HDBSCAN*' (that is able to
+    detect a predefined number of clusters and hence it does not dependent on the somewhat
+    fragile 'eps' parameter). The package also features an implementation of economic
+    inequity indices (the Gini, Bonferroni index) and external cluster validity measures
+    (partition similarity scores; e.g., the adjusted Rand, Fowlkes-Mallows, adjusted
+    mutual information, pair sets index). See also the 'Python' version of 'genieclust'
+    available on 'PyPI', which supports sparse data, more metrics, and even larger datasets.
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: genieclust
+# Type: Package
+# Title: The Genie++ Hierarchical Clustering Algorithm with Noise Points Detection
+# Version: 1.0.0
+# Date: 2021-04-22
+# Authors@R: c( person("Marek", "Gagolewski", role = c("aut", "cre", "cph"), email = "marek@gagolewski.com", comment = c(ORCID = "0000-0003-0637-6028")), person("Maciej", "Bartoszuk", role = c("ctb")), person("Anna", "Cena", role = c("ctb")), person("Peter M.", "Larsen", role = c("ctb")) )
+# Description: A retake on the Genie algorithm - a robust hierarchical clustering method (Gagolewski, Bartoszuk, Cena, 2016 <DOI:10.1016/j.ins.2016.05.003>). Now faster and more memory efficient; determining the whole hierarchy for datasets of 10M points in low dimensional Euclidean spaces or 100K points in high-dimensional ones takes only 1-2 minutes. Allows clustering with respect to mutual reachability distances so that it can act as a noise point detector or a robustified version of 'HDBSCAN*' (that is able to detect a predefined number of clusters and hence it does not dependent on the somewhat fragile 'eps' parameter). The package also features an implementation of economic inequity indices (the Gini, Bonferroni index) and external cluster validity measures (partition similarity scores; e.g., the adjusted Rand, Fowlkes-Mallows, adjusted mutual information, pair sets index). See also the 'Python' version of 'genieclust' available on 'PyPI', which supports sparse data, more metrics, and even larger datasets.
+# BugReports: https://github.com/gagolews/genieclust/issues
+# URL: https://genieclust.gagolewski.com/
+# License: AGPL-3
+# Imports: Rcpp (>= 1.0.4), stats, utils
+# Suggests: datasets, mlpack
+# LinkingTo: Rcpp
+# Encoding: UTF-8
+# SystemRequirements: OpenMP, C++11
+# RoxygenNote: 7.1.1
+# NeedsCompilation: yes
+# Packaged: 2021-04-22 05:43:20 UTC; gagolews
+# Author: Marek Gagolewski [aut, cre, cph] (<https://orcid.org/0000-0003-0637-6028>), Maciej Bartoszuk [ctb], Anna Cena [ctb], Peter M. Larsen [ctb]
+# Maintainer: Marek Gagolewski <marek@gagolewski.com>
+# Repository: CRAN
+# Date/Publication: 2021-04-22 07:20:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,97 @@
+{% set version = '0.1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dlstats
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dlstats_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dlstats/dlstats_{{ version }}.tar.gz
+  sha256: 2ff330457fa673ac02a129b356ca698a72afdff26dcbc2e0f858c5efad339302
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, tidyr, DT, rmarkdown, prettydoc
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcolorbrewer
+    - r-ggplot2
+    - r-jsonlite
+    - r-magrittr
+    - r-scales
+
+  run:
+    - r-base
+    - r-rcolorbrewer
+    - r-ggplot2
+    - r-jsonlite
+    - r-magrittr
+    - r-scales
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dlstats')"           # [not win]
+    - "\"%R%\" -e \"library('dlstats')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/GuangchuangYu/dlstats
+  license: Artistic-2.0
+  summary: Monthly download stats of 'CRAN' and 'Bioconductor' packages. Download stats of 'CRAN'
+    packages is from the 'RStudio' 'CRAN mirror', see <https://cranlogs.r-pkg.org:443>.
+    'Bioconductor' package download stats is at <https://bioconductor.org/packages/stats/>.
+  license_family: OTHER
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/Artistic-2.0'
+
+# The original CRAN metadata for this package was:
+
+# Package: dlstats
+# Title: Download Stats of R Packages
+# Version: 0.1.5
+# Authors@R: c(person(given = "Guangchuang", family = "Yu", email = "guangchuangyu@gmail.com", role  = c("aut", "cre")) )
+# Maintainer: Guangchuang Yu <guangchuangyu@gmail.com>
+# Description: Monthly download stats of 'CRAN' and 'Bioconductor' packages. Download stats of 'CRAN' packages is from the 'RStudio' 'CRAN mirror', see <https://cranlogs.r-pkg.org:443>. 'Bioconductor' package download stats is at <https://bioconductor.org/packages/stats/>.
+# Depends: R (>= 3.3.0)
+# Imports: ggplot2, jsonlite, magrittr, RColorBrewer, scales, utils
+# Suggests: knitr, tidyr, DT, rmarkdown, prettydoc
+# License: Artistic-2.0
+# VignetteBuilder: knitr
+# ByteCompile: true
+# Encoding: UTF-8
+# URL: https://github.com/GuangchuangYu/dlstats
+# BugReports: https://github.com/GuangchuangYu/dlstats/issues
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2022-04-13 07:57:14 UTC; ygc
+# Author: Guangchuang Yu [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2022-04-13 10:12:33 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

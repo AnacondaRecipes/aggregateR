@@ -1,4 +1,4 @@
-{% set version = '0.2.4' %}
+{% set version = '0.3.6' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,7 +11,7 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/robcp_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/robcp/robcp_{{ version }}.tar.gz
-  sha256: b29ba3bdeea2727b623245d5c1c4b59c8d8a83f22a2ba72ccf9dbf0978436ddf
+  sha256: 781cb4a6529d867de930cb8b8fd08bd6ad94cdb93cd9659ff04f921f4a723a8e
 
 build:
   merge_build_host: True  # [win]
@@ -24,22 +24,27 @@ build:
     - lib/R/lib/
     - lib/
 
+# Suggests: testthat, MASS, pracma, mvtnorm, cumstats
 requirements:
   build:
     - {{ compiler('c') }}              # [not win]
     - {{ compiler('m2w64_c') }}        # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}make
-    - {{posix}}sed               # [win]
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-rcpp
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
+    - r-rcpp
 
 test:
   commands:
@@ -57,10 +62,17 @@ about:
   home: https://CRAN.R-project.org/package=robcp
   license: GPL-3
   summary: Provides robust methods to detect change-points in uni- or multivariate time series.
-    They can cope with corrupted data and heavy tails. One can detect changes in location,
-    scale and dependence structure of a possibly multivariate time series. Procedures
-    are based on Huberized versions of CUSUM tests proposed in Duerre and Fried (2019)
-    <arXiv:1905.06201>.
+    They can cope with corrupted data and heavy tails. Focus is on the detection of
+    abrupt changes in location, but changes scale or dependence structure can be detected
+    as well. This package provides tests for change detection in uni- and multivariate
+    time series based on Huberized versions of CUSUM tests proposed in Duerre and Fried
+    (2019) <arXiv:1905.06201>, and tests for change detection in univariate time series
+    based on 2-sample U-statistics or 2-sample U-quantiles as proposed by Dehling et
+    al. (2015) <DOI:10.1007/978-1-4939-3076-0_12> and Dehling, Fried and Wendler (2020)
+    <DOI:10.1093/biomet/asaa004>. Furthermore, the packages provides tests on changes
+    in the scale or the correlation as proposed in Gerstenberger, Vogel and Wendler
+    (2020) <DOI:10.1080/01621459.2019.1629938>, Dehling et al. (2017) <DOI:10.1017/S026646661600044X>,
+    and Wied et al. (2014) <DOI:10.1016/j.csda.2013.03.005>.
   license_family: GPL3
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
@@ -73,19 +85,23 @@ extra:
 
 # Package: robcp
 # Title: Robust Change-Point Tests
-# Version: 0.2.4
-# Authors@R: c(person("Sheila", "Goerz", email = "sheila.goerz@tu-dortmund.de", role = c("aut", "cre")), person("Alexander", "Duerre", email = "alexander.duerre@udo.edu", role = "ctb"))
-# Description: Provides robust methods to detect change-points in uni- or multivariate time series. They can cope with corrupted data and heavy tails. One can detect changes in location, scale and dependence structure of a possibly multivariate time series. Procedures are based on Huberized versions of CUSUM tests proposed in Duerre and Fried (2019) <arXiv:1905.06201>.
+# Version: 0.3.6
+# Authors@R: c(person("Sheila", "Goerz", email = "sheila.goerz@tu-dortmund.de", role = c("aut", "cre")), person("Alexander", "Duerre", email = "alexander.duerre@udo.edu", role = "aut"))
+# Description: Provides robust methods to detect change-points in uni- or multivariate time series. They can cope with corrupted data and heavy tails. Focus is on the detection of abrupt changes in location, but changes scale or dependence structure can be detected as well. This package provides tests for change detection in uni- and multivariate time series based on Huberized versions of CUSUM tests proposed in Duerre and Fried (2019) <arXiv:1905.06201>, and tests for change detection in univariate time series based on 2-sample U-statistics or 2-sample U-quantiles as proposed by Dehling et al. (2015) <DOI:10.1007/978-1-4939-3076-0_12> and Dehling, Fried and Wendler (2020) <DOI:10.1093/biomet/asaa004>. Furthermore, the packages provides tests on changes in the scale or the correlation as proposed in Gerstenberger, Vogel and Wendler (2020) <DOI:10.1080/01621459.2019.1629938>, Dehling et al. (2017) <DOI:10.1017/S026646661600044X>, and Wied et al. (2014) <DOI:10.1016/j.csda.2013.03.005>.
 # Depends: R (>= 3.3.1)
 # License: GPL-3
 # Encoding: UTF-8
 # LazyData: true
 # NeedsCompilation: yes
-# Packaged: 2019-06-03 18:02:21 UTC; Sheila
-# Author: Sheila Goerz [aut, cre], Alexander Duerre [ctb]
+# Packaged: 2022-05-03 12:59:00 UTC; goerz
+# Author: Sheila Goerz [aut, cre], Alexander Duerre [aut]
 # Maintainer: Sheila Goerz <sheila.goerz@tu-dortmund.de>
+# Imports: methods, Rcpp
+# LinkingTo: Rcpp
+# RoxygenNote: 7.1.2
+# Suggests: testthat, MASS, pracma, mvtnorm, cumstats
 # Repository: CRAN
-# Date/Publication: 2019-06-03 23:50:14 UTC
+# Date/Publication: 2022-05-03 13:20:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

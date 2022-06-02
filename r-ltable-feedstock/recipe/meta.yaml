@@ -1,4 +1,4 @@
-{% set version = '1.0' %}
+{% set version = '2.0.1' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,30 +11,49 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/ltable_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/ltable/ltable_{{ version }}.tar.gz
-  sha256: 99de72d46927467e627a89abaa4f39ffc7c3f6c5fc609f12d25e4db7ec5ca6eb
+  sha256: bd9df48963f595f5964d42b8f7bada280e6f5eb85d044ba9023f817a1e2a3496
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
-  # no skip
-  noarch: generic
+  skip: True  # [not unix]
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: utils, stats
+# Suggests: MCMCglmm, knitr, datasets
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-rcpp >=1.0.5
+    - r-rcppgsl >=0.3.9
+    - r-clipr
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.5
+    - r-rcppgsl >=0.3.9
+    - r-clipr
 
 test:
   commands:
@@ -51,12 +70,13 @@ test:
 about:
   home: https://CRAN.R-project.org/package=ltable
   license: GPL-2
-  summary: 'Constructs tables of counts and proportions out of data sets. It has simplified syntax
+  summary: Constructs tables of counts and proportions out of data sets. It has simplified syntax
     appealing for novice and even for advanced user under time pressure. It is particularly
     suitable for exploratory data analysis or presentation to single out most appropriate
     pieces of tabulated information. The other important feature is possibility to insert
-    tables to Excel and Word documents.  '
-
+    tables to Excel and Word documents. This version also features capacity of log-linear
+    and power analyses (original by Oleksandr Ocheredko <doi:10.35566/isdsa2019c5>)
+    for tabulated data with GSL.
   license_family: GPL2
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
@@ -70,18 +90,23 @@ extra:
 # Package: ltable
 # Type: Package
 # Title: Easy to Make (Lazy) Tables
-# Version: 1.0
-# Date: 2018-08-10
+# Version: 2.0.1
+# Date: 2021-11-12
 # Author: Ocheredko Oleksandr
-# Description: Constructs tables of counts and proportions out of data sets. It has simplified syntax appealing for novice and even for advanced user under time pressure. It is particularly suitable for exploratory data analysis or presentation to single out most appropriate pieces of tabulated information. The other important feature is possibility to insert tables to Excel and Word documents.
+# Description: Constructs tables of counts and proportions out of data sets. It has simplified syntax appealing for novice and even for advanced user under time pressure. It is particularly suitable for exploratory data analysis or presentation to single out most appropriate pieces of tabulated information. The other important feature is possibility to insert tables to Excel and Word documents. This version also features capacity of log-linear and power analyses (original by Oleksandr Ocheredko <doi:10.35566/isdsa2019c5>) for tabulated data with GSL.
 # Maintainer: Ocheredko Oleksandr <Ocheredko@yahoo.com>
 # License: GPL (>= 2)
-# Depends: R (>= 3.4.0)
-# Suggests: utils, stats
-# NeedsCompilation: no
-# Packaged: 2018-08-10 11:39:37 UTC; user
+# Depends: R (>= 4.1.0), methods, clipr
+# Imports: Rcpp (>= 1.0.5), RcppGSL (>= 0.3.9), graphics, stats
+# Suggests: MCMCglmm, knitr, datasets
+# Collate: PowerPoisson.R RcppExports.R Plot.R Print.R table_f.R tableToData.R
+# SystemRequirements: 'GSL'
+# NeedsCompilation: yes
+# OS_type: unix
+# LinkingTo: Rcpp, RcppGSL
+# Packaged: 2021-11-22 09:45:50 UTC; macbook
 # Repository: CRAN
-# Date/Publication: 2018-08-13 14:00:03 UTC
+# Date/Publication: 2021-11-22 11:40:05 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

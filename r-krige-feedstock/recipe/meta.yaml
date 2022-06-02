@@ -1,4 +1,4 @@
-{% set version = '0.2-1' %}
+{% set version = '0.6.2' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,14 +11,13 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/krige_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/krige/krige_{{ version }}.tar.gz
-  sha256: da8d4284b43aaef81fc09246df0d2af6ae90bb6d8af751acfb5d49693b4a02bd
+  sha256: 049b736e944d8dc751497f94d4973060a6f37bcfc4d0dc54bfbd778a1592b80f
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
@@ -27,17 +26,31 @@ build:
 
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
-    - r-mass
-    - r-mvtnorm
+    - r-rcpp
+    - r-coda
 
   run:
     - r-base
-    - r-mass
-    - r-mvtnorm
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-coda
 
 test:
   commands:
@@ -52,10 +65,10 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://www.r-project.org
+  home: https://CRAN.R-project.org/package=krige
   license: GPL-2
   summary: Estimates kriging models for geographical point-referenced data. Method is described
-    in Monogan and Gill (2016) <doi:10.1017/psrm.2015.5>.
+    in Gill (2020) <doi:10.1177/1532440020930197>.
   license_family: GPL2
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
@@ -67,21 +80,24 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: krige
-# Version: 0.2-1
-# Date: 2019-06-18
+# Type: Package
 # Title: Geospatial Kriging with Metropolis Sampling
-# Author: Jason S. Byers [aut, cre], Jeff Gill [aut], James E. Monogan III [aut]
+# Version: 0.6.2
+# Date: 2022-04-28
+# Author: Jason S. Byers [aut, cre], Le Bao [aut], Jamie Carson [aut], Jeff Gill [aut]
 # Maintainer: Jason S. Byers <jaybyers55@gmail.com>
-# Depends: R (>= 2.10), mvtnorm, MASS
-# Description: Estimates kriging models for geographical point-referenced data. Method is described in Monogan and Gill (2016) <doi:10.1017/psrm.2015.5>.
+# Description: Estimates kriging models for geographical point-referenced data. Method is described in Gill (2020) <doi:10.1177/1532440020930197>.
 # License: GPL (>= 2)
+# Depends: R (>= 4.0)
+# Imports: Rcpp, stats, graphics, coda
+# LinkingTo: Rcpp
+# Encoding: UTF-8
 # LazyData: true
-# URL: https://www.r-project.org
-# Packaged: 2019-06-19 06:01:50 UTC; monogan
-# NeedsCompilation: no
+# RoxygenNote: 7.1.1
+# NeedsCompilation: yes
+# Packaged: 2022-04-30 14:08:06 UTC; jasonbyers
 # Repository: CRAN
-# Date/Publication: 2019-06-19 07:30:02 UTC
-# RoxygenNote: 6.1.0
+# Date/Publication: 2022-05-01 14:20:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

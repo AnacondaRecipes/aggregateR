@@ -1,4 +1,4 @@
-{% set version = '1.0.6' %}
+{% set version = '1.2.1' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,55 +11,59 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/RMariaDB_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/RMariaDB/RMariaDB_{{ version }}.tar.gz
-  sha256: 51cc0b2cdf3aaf0cfc290d0b54eb533a7cffedaa4641a372426b0d98feebf2a6
+  sha256: c9176a096854ce33a98ce0faef0065c50b5d356174f90cea742c70e130cf5f0c
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
+  # no skip
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: DBItest, rprojroot, testthat
+# Suggests: DBItest (>= 1.7.0), readr, rprojroot, testthat, withr
 requirements:
   build:
-    - {{ compiler('c') }}        # [not win]
-    - {{ compiler('cxx') }}      # [not win]
-    - {{native}}toolchain        # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}sed               # [win]
-    - {{posix}}grep              # [win]
-    - {{posix}}autoconf
-    - {{posix}}automake          # [not win]
-    - {{posix}}automake-wrapper  # [win]
-    - {{posix}}pkg-config
-    - {{posix}}make
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
-    - r-bh
-    - r-dbi >=1.0.0
+    - r-dbi >=1.1.0
     - r-rcpp >=0.12.4
     - r-bit64
-    - r-hms
+    - r-blob
+    - r-hms >=0.5.0
+    - r-lubridate
     - r-plogr
-    - {{native}}mysql            # [not win]
+    - r-rlang
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
-    - r-bh
-    - r-dbi >=1.0.0
+    - r-dbi >=1.1.0
     - r-rcpp >=0.12.4
     - r-bit64
-    - r-hms
+    - r-blob
+    - r-hms >=0.5.0
+    - r-lubridate
     - r-plogr
-    - {{native}}mysql            # [not win]
+    - r-rlang
 
 test:
   commands:
@@ -74,12 +78,14 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://github.com/r-dbi/RMariaDB, https://downloads.mariadb.org/connector-c/
-  license: GPL-2
-  summary: Implements a 'DBI'-compliant interface to 'MariaDB' (<https://mariadb.org/>) and 'MySQL'
+  home: https://rmariadb.r-dbi.org, https://github.com/r-dbi/RMariaDB, https://downloads.mariadb.org/connector-c/
+  license: MIT
+  summary: Implements a DBI-compliant interface to MariaDB (<https://mariadb.org/>) and MySQL
     (<https://www.mysql.com/>) databases.
-  license_family: GPL2
-  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
 
 extra:
   recipe-maintainers:
@@ -88,28 +94,30 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: RMariaDB
-# Title: Database Interface and 'MariaDB' Driver
-# Version: 1.0.6
-# Authors@R: c( person("Kirill", "M\u00fcller", role = c("aut", "cre"), email = "krlmlr+r@mailbox.org", comment = c(ORCID = "0000-0002-1416-3412")), person("Jeroen", "Ooms", role = "aut", comment = c(ORCID = "0000-0002-4035-0289")), person("David", "James", role = "aut"), person("Saikat", "DebRoy", role = "aut"), person("Hadley", "Wickham", role = "aut"), person("Jeffrey", "Horner", role = "aut"), person("R Consortium", role = "fnd"), person("RStudio", role = "cph"))
-# Description: Implements a 'DBI'-compliant interface to 'MariaDB' (<https://mariadb.org/>) and 'MySQL' (<https://www.mysql.com/>) databases.
-# License: GPL-2
-# URL: https://github.com/r-dbi/RMariaDB, https://downloads.mariadb.org/connector-c/
+# Title: Database Interface and MariaDB Driver
+# Version: 1.2.1
+# Authors@R: c(person(given = "Kirill", family = "M\u00fcller", role = c("aut", "cre"), email = "krlmlr+r@mailbox.org", comment = c(ORCID = "0000-0002-1416-3412")), person(given = "Jeroen", family = "Ooms", role = "aut", comment = c(ORCID = "0000-0002-4035-0289")), person(given = "David", family = "James", role = "aut"), person(given = "Saikat", family = "DebRoy", role = "aut"), person(given = "Hadley", family = "Wickham", role = "aut"), person(given = "Jeffrey", family = "Horner", role = "aut"), person(given = "R Consortium", role = "fnd"), person(given = "RStudio", role = "cph"))
+# Description: Implements a DBI-compliant interface to MariaDB (<https://mariadb.org/>) and MySQL (<https://www.mysql.com/>) databases.
+# License: MIT + file LICENSE
+# URL: https://rmariadb.r-dbi.org, https://github.com/r-dbi/RMariaDB, https://downloads.mariadb.org/connector-c/
 # BugReports: https://github.com/r-dbi/RMariaDB/issues
 # Depends: R (>= 2.8.0)
-# Imports: bit64, DBI (>= 1.0.0), hms, methods, Rcpp (>= 0.12.4)
-# Suggests: DBItest, rprojroot, testthat
-# LinkingTo: BH, plogr, Rcpp
+# Imports: bit64, blob, DBI (>= 1.1.0), hms (>= 0.5.0), lubridate, methods, Rcpp (>= 0.12.4), rlang
+# Suggests: DBItest (>= 1.7.0), readr, rprojroot, testthat, withr
+# LinkingTo: plogr, Rcpp
 # Encoding: UTF-8
 # NeedsCompilation: yes
-# RoxygenNote: 6.0.1.9000
-# SystemRequirements: libmariadb-client-lgpl-dev or libmysqlclient-dev (deb), mariadb-connector-c-devel or mariadb-devel (rpm), mariadb-connector-c or mysql-connector-c (brew)
-# Collate: 'MariaDBConnection.R' 'MariaDBDriver.R' 'MariaDBResult.R' 'RMariaDB.R' 'RcppExports.R' 'coerce.R' 'connect.R' 'default.R' 'export.R' 'names.R' 'query.R' 'quote.R' 'rownames.R' 'table.R' 'transaction.R' 'utils.R' 'zzz.R'
-# Packaged: 2018-05-06 17:03:59 UTC; kirill
+# RoxygenNote: 7.1.2
+# SystemRequirements: libmariadb-client-lgpl-dev or libmariadb-dev or libmysqlclient-dev, with libssl-dev (deb), mariadb-connector-c-devel or mariadb-devel (rpm), mariadb-connector-c or mysql-connector-c (brew)
+# Collate: 'MariaDBConnection.R' 'MariaDBDriver.R' 'MariaDBResult.R' 'RMariaDB-package.R' 'RcppExports.R' 'coerce.R' 'compatRowNames.R' 'connect.R' 'dbAppendTable_MariaDBConnection.R' 'dbBegin_MariaDBConnection.R' 'dbBind_MariaDBResult.R' 'dbClearResult_MariaDBResult.R' 'dbColumnInfo_MariaDBResult.R' 'dbCommit_MariaDBConnection.R' 'dbConnect_MariaDBDriver.R' 'dbDataType_MariaDBConnection.R' 'dbDataType_MariaDBDriver.R' 'dbDisconnect_MariaDBConnection.R' 'dbExistsTable_MariaDBConnection_character.R' 'dbFetch_MariaDBResult.R' 'dbGetInfo_MariaDBConnection.R' 'dbGetInfo_MariaDBDriver.R' 'dbGetRowCount_MariaDBResult.R' 'dbGetRowsAffected_MariaDBResult.R' 'dbGetStatement_MariaDBResult.R' 'dbHasCompleted_MariaDBResult.R' 'dbIsValid_MariaDBConnection.R' 'dbIsValid_MariaDBDriver.R' 'dbIsValid_MariaDBResult.R' 'dbListObjects_MariaDBConnection_ANY.R' 'dbListTables_MariaDBConnection.R' 'dbQuoteIdentifier_MariaDBConnection_Id.R' 'dbQuoteIdentifier_MariaDBConnection_SQL.R' 'dbQuoteIdentifier_MariaDBConnection_character.R' 'dbQuoteLiteral_MariaDBConnection.R' 'dbQuoteString_MariaDBConnection_SQL.R' 'dbQuoteString_MariaDBConnection_character.R' 'dbReadTable_MariaDBConnection_character.R' 'dbRemoveTable_MariaDBConnection_character.R' 'dbRollback_MariaDBConnection.R' 'dbSendQuery_MariaDBConnection_character.R' 'dbSendStatement_MariaDBConnection_character.R' 'dbUnloadDriver_MariaDBDriver.R' 'dbUnquoteIdentifier_MariaDBConnection_SQL.R' 'dbWriteTable_MariaDBConnection_character_character.R' 'dbWriteTable_MariaDBConnection_character_data.frame.R' 'default.R' 'export.R' 'names.R' 'query.R' 'quote.R' 'show_MariaDBConnection.R' 'sqlData_MariaDBConnection.R' 'table.R' 'transaction.R' 'utils.R' 'zzz.R'
+# Config/autostyle/scope: line_breaks
+# Config/autostyle/strict: false
+# Packaged: 2021-12-20 04:51:59 UTC; kirill
 # Author: Kirill Muller [aut, cre] (<https://orcid.org/0000-0002-1416-3412>), Jeroen Ooms [aut] (<https://orcid.org/0000-0002-4035-0289>), David James [aut], Saikat DebRoy [aut], Hadley Wickham [aut], Jeffrey Horner [aut], R Consortium [fnd], RStudio [cph]
 # Maintainer: Kirill Muller <krlmlr+r@mailbox.org>
 # Repository: CRAN
-# Date/Publication: 2018-05-06 20:21:29 UTC
+# Date/Publication: 2021-12-20 05:10:02 UTC
 
 # See
-# http://docs.continuum.io/conda/build.html for
+# https://docs.conda.io/projects/conda-build for
 # more information about meta.yaml

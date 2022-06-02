@@ -1,0 +1,95 @@
+{% set version = '1.0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cachem
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cachem_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cachem/cachem_{{ version }}.tar.gz
+  sha256: 9a9452f7bcf3f79436c418b3c3290449fb8fd338714d9b992153754d112f1864
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-fastmap
+    - r-rlang
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-fastmap
+    - r-rlang
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cachem')"           # [not win]
+    - "\"%R%\" -e \"library('cachem')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://cachem.r-lib.org/, https://github.com/r-lib/cachem
+  license: MIT
+  summary: Key-value stores with automatic pruning. Caches can limit either their total size
+    or the age of the oldest object (or both), automatically pruning objects to maintain
+    the constraints.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: cachem
+# Version: 1.0.6
+# Title: Cache R Objects with Automatic Pruning
+# Description: Key-value stores with automatic pruning. Caches can limit either their total size or the age of the oldest object (or both), automatically pruning objects to maintain the constraints.
+# Authors@R: c( person("Winston", "Chang", , "winston@rstudio.com", c("aut", "cre")), person(family = "RStudio", role = c("cph", "fnd")))
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# ByteCompile: true
+# URL: https://cachem.r-lib.org/, https://github.com/r-lib/cachem
+# Imports: rlang, fastmap
+# Suggests: testthat
+# RoxygenNote: 7.1.1
+# NeedsCompilation: yes
+# Packaged: 2021-08-19 21:07:46 UTC; barret
+# Author: Winston Chang [aut, cre], RStudio [cph, fnd]
+# Maintainer: Winston Chang <winston@rstudio.com>
+# Repository: CRAN
+# Date/Publication: 2021-08-19 21:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

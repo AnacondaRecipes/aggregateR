@@ -1,0 +1,101 @@
+{% set version = '0.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-geojsonlint
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/geojsonlint_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/geojsonlint/geojsonlint_{{ version }}.tar.gz
+  sha256: 5fa55c1bea418ad4f6fa53f5ebae62bede3ed76370c2275adb1eea448da3dd50
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-v8
+    - r-crul >=0.7.0
+    - r-jsonlite >=0.9.19
+    - r-jsonvalidate >=1.0.0
+
+  run:
+    - r-base
+    - r-v8
+    - r-crul >=0.7.0
+    - r-jsonlite >=0.9.19
+    - r-jsonvalidate >=1.0.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('geojsonlint')"           # [not win]
+    - "\"%R%\" -e \"library('geojsonlint')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ropensci/geojsonlint (devel) https://docs.ropensci.org/geojsonlint
+    (docs)
+  license: MIT
+  summary: Tools for linting 'GeoJSON'. Includes tools for interacting with the online tool <http://geojsonlint.com>,
+    the 'Javascript' library 'geojsonhint' (<https://www.npmjs.com/package/geojsonhint>),
+    and validating against a 'GeoJSON' schema via the 'Javascript' library (<https://www.npmjs.com/package/is-my-json-valid>).
+    Some tools work locally while others require an internet connection.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: geojsonlint
+# Title: Tools for Validating 'GeoJSON'
+# Description: Tools for linting 'GeoJSON'. Includes tools for interacting with the online tool <http://geojsonlint.com>, the 'Javascript' library 'geojsonhint' (<https://www.npmjs.com/package/geojsonhint>), and validating against a 'GeoJSON' schema via the 'Javascript' library (<https://www.npmjs.com/package/is-my-json-valid>). Some tools work locally while others require an internet connection.
+# Version: 0.4.0
+# License: MIT + file LICENSE
+# Authors@R: c( person("Scott", "Chamberlain", role = c("aut", "cre"), email = "myrmecocystus@gmail.com", comment = c(ORCID="0000-0003-1444-9135")), person("Andy", "Teucher", role = "aut", email = "andy.teucher@gmail.com"), person("Tom", "MacWright", role = "cph", comment = "geojsonhint Javascript library"), person("Mads", "Kristensen", role = "cph", comment = "geojson schema") )
+# URL: https://github.com/ropensci/geojsonlint (devel) https://docs.ropensci.org/geojsonlint (docs)
+# BugReports: https://github.com/ropensci/geojsonlint/issues
+# LazyData: true
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# Depends: R (>= 2.10)
+# Imports: crul (>= 0.7.0), jsonlite (>= 0.9.19), jsonvalidate (>= 1.0.0), V8
+# Suggests: testthat, knitr, rmarkdown
+# RoxygenNote: 7.0.2
+# X-schema.org-applicationCategory: Geospatial
+# X-schema.org-keywords: geojson, geospatial, lint, hint, data, schema
+# X-schema.org-isPartOf: https://ropensci.org
+# NeedsCompilation: no
+# Packaged: 2020-02-13 01:16:25 UTC; sckott
+# Author: Scott Chamberlain [aut, cre] (<https://orcid.org/0000-0003-1444-9135>), Andy Teucher [aut], Tom MacWright [cph] (geojsonhint Javascript library), Mads Kristensen [cph] (geojson schema)
+# Maintainer: Scott Chamberlain <myrmecocystus@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2020-02-13 06:20:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

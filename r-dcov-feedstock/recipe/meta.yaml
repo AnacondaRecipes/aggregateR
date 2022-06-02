@@ -1,0 +1,95 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dcov
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dcov_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dcov/dcov_{{ version }}.tar.gz
+  sha256: 03d6344c0f6cdca92b747997e11373af027b1a68ec0e71a0a65dff787f2b6a30
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dcov')"           # [not win]
+    - "\"%R%\" -e \"library('dcov')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=dcov
+  license: GPL-2
+  summary: "Efficient methods for computing distance covariance and relevant statistics. See
+    Sz\xE9kely et al.(2007) <doi:10.1214/009053607000000505>; Sz\xE9kely and Rizzo (2013)
+    <doi:10.1016/j.jmva.2013.02.012>; Sz\xE9kely and Rizzo (2014) <doi:10.1214/14-AOS1255>;
+    Huo and Sz\xE9kely (2016) <doi:10.1080/00401706.2015.1054435>."
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: dcov
+# Type: Package
+# Title: A Fast Implementation of Distance Covariance
+# Version: 0.1.1
+# Author: Hang Weiqiang <e0010758@u.nus.edu>
+# Maintainer: Hang Weiqiang <e0010758@u.nus.edu>
+# Description: Efficient methods for computing distance covariance and relevant statistics. See Szekely et al.(2007) <doi:10.1214/009053607000000505>; Szekely and Rizzo (2013) <doi:10.1016/j.jmva.2013.02.012>; Szekely and Rizzo (2014) <doi:10.1214/14-AOS1255>; Huo and Szekely (2016) <doi:10.1080/00401706.2015.1054435>.
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# Imports: Rcpp
+# LinkingTo: Rcpp, RcppArmadillo
+# RoxygenNote: 6.1.1
+# NeedsCompilation: yes
+# Packaged: 2020-06-25 19:00:18 UTC; weiqianghang
+# Repository: CRAN
+# Date/Publication: 2020-06-25 21:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

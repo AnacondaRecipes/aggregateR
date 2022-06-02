@@ -1,4 +1,4 @@
-{% set version = '1.0' %}
+{% set version = '1.2.0' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,36 +11,54 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/opera_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/opera/opera_{{ version }}.tar.gz
-  sha256: d8e18a8054b5cde3cae02d8f72a8b935c0bf3107384f0f04a1088197f5785c5c
+  sha256: d066d7f03ea6bacf39471165cb2656ae168a9747cae770932bc20e4f0e03f025
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: testthat, splines, caret, mgcv, survival, knitr, gbm
+# Suggests: quantreg, quadprog, RColorBrewer, testthat, splines, caret, mgcv, survival, knitr, gbm, rmarkdown, magrittr
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
-    - r-rcolorbrewer
-    - r-quadprog
-    - r-quantreg
+    - r-rcpp
+    - r-rcppeigen
+    - r-rdpack
+    - r-alabama
+    - r-htmltools
+    - r-htmlwidgets
+    - r-piper
+    - r-ramcharts
 
   run:
     - r-base
-    - r-rcolorbrewer
-    - r-quadprog
-    - r-quantreg
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcppeigen
+    - r-rdpack
+    - r-alabama
+    - r-htmltools
+    - r-htmlwidgets
+    - r-piper
+    - r-ramcharts
 
 test:
   commands:
@@ -58,7 +76,8 @@ about:
   home: http://pierre.gaillard.me/opera.html
   license: LGPL-3
   summary: Misc methods to form online predictions, for regression-oriented time-series, by combining
-    a finite set of forecasts provided by the user.
+    a finite set of forecasts provided by the user. See Cesa-Bianchi and Lugosi (2006)
+    <doi:10.1017/CBO9780511546921> for an overview.
   license_family: LGPL
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
@@ -72,25 +91,27 @@ extra:
 # Package: opera
 # Type: Package
 # Title: Online Prediction by Expert Aggregation
-# Version: 1.0
-# Date: 2016-08-11
-# Author: Pierre Gaillard [cre, aut], Yannig Goude [aut]
+# Version: 1.2.0
+# Author: Pierre Gaillard [cre, aut], Yannig Goude [aut], Laurent Plagne [ctb], Thibaut Dubois [ctb], Benoit Thieurmel [ctb]
 # Maintainer: Pierre Gaillard <pierre@gaillard.me>
 # Copyright: EDF R&D 2012-2015
-# Description: Misc methods to form online predictions, for regression-oriented time-series, by combining a finite set of forecasts provided by the user.
+# Description: Misc methods to form online predictions, for regression-oriented time-series, by combining a finite set of forecasts provided by the user. See Cesa-Bianchi and Lugosi (2006) <doi:10.1017/CBO9780511546921> for an overview.
 # License: LGPL
 # URL: http://pierre.gaillard.me/opera.html
 # BugReports: https://github.com/dralliag/opera/issues
-# Depends: R (>= 3.1.0)
-# Imports: quadprog, quantreg, RColorBrewer
-# Suggests: testthat, splines, caret, mgcv, survival, knitr, gbm
+# Depends: R (>= 3.5.0)
+# LinkingTo: Rcpp, RcppEigen
+# Imports: Rcpp, htmltools, rAmCharts, htmlwidgets, pipeR, alabama, methods, Rdpack
+# Suggests: quantreg, quadprog, RColorBrewer, testthat, splines, caret, mgcv, survival, knitr, gbm, rmarkdown, magrittr
+# RdMacros: Rdpack
 # LazyData: true
 # VignetteBuilder: knitr
-# RoxygenNote: 5.0.1
-# NeedsCompilation: no
-# Packaged: 2016-08-17 09:16:55 UTC; Pierre
+# RoxygenNote: 7.1.2
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2021-12-06 17:07:44 UTC; BenoitThieurmel
 # Repository: CRAN
-# Date/Publication: 2016-08-17 12:26:24
+# Date/Publication: 2021-12-06 18:00:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

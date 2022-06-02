@@ -1,0 +1,86 @@
+{% set version = '1.0.20' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dosnow
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/doSNOW_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/doSNOW/doSNOW_{{ version }}.tar.gz
+  sha256: 917cabed166aa2d1ec291691c17e1e3d344e858543e1682e3a442cc0c504bbb8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: compiler, RUnit, caret, mlbench, rpart, parallel
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-foreach >=1.2.0
+    - r-iterators >=1.0.0
+    - r-snow >=0.3.0
+
+  run:
+    - r-base
+    - r-foreach >=1.2.0
+    - r-iterators >=1.0.0
+    - r-snow >=0.3.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('doSNOW')"           # [not win]
+    - "\"%R%\" -e \"library('doSNOW')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=doSNOW
+  license: GPL-2
+  summary: Provides a parallel backend for the %dopar% function using the snow package of Tierney,
+    Rossini, Li, and Sevcikova.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: doSNOW
+# Type: Package
+# Title: Foreach Parallel Adaptor for the 'snow' Package
+# Version: 1.0.20
+# Authors@R: c(person("Folashade", "Daniel", role="cre", email = "fdaniel@microsoft.com"), person("Microsoft", "Corporation", role=c("aut","cph")), person("Stephen", "Weston", role="aut"))
+# Description: Provides a parallel backend for the %dopar% function using the snow package of Tierney, Rossini, Li, and Sevcikova.
+# Depends: R (>= 2.5.0), foreach(>= 1.2.0), iterators(>= 1.0.0), snow(>= 0.3.0), utils
+# Suggests: compiler, RUnit, caret, mlbench, rpart, parallel
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2022-01-16 18:34:00 UTC; folashade
+# Author: Folashade Daniel [cre], Microsoft Corporation [aut, cph], Stephen Weston [aut]
+# Maintainer: Folashade Daniel <fdaniel@microsoft.com>
+# Repository: CRAN
+# Date/Publication: 2022-02-04 16:20:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

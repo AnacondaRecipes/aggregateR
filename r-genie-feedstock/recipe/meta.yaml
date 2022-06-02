@@ -1,4 +1,4 @@
-{% set version = '1.0.4' %}
+{% set version = '1.0.5' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,7 +11,7 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/genie_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/genie/genie_{{ version }}.tar.gz
-  sha256: 0ac3a25107189a856d32fd49dd806ad2c6d3f4039f605f1b8d2e831905b1b97a
+  sha256: 985aa0de4bec0478bb1cbaa7b24b63616af1a0eeeca7cfdb9164b4a188cb861f
 
 build:
   merge_build_host: True  # [win]
@@ -31,23 +31,22 @@ requirements:
     - {{ compiler('m2w64_c') }}        # [win]
     - {{ compiler('cxx') }}            # [not win]
     - {{ compiler('m2w64_cxx') }}      # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}make
-    - {{posix}}sed               # [win]
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
-    - llvm-openmp >=4.0.1        # [osx]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
-    - r-rcpp >=0.12.10
-    - llvm-openmp >=4.0.1        # [osx]
+    - r-rcpp >=1.0.0
+    - r-genieclust
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
-    - r-rcpp >=0.12.10
-    - llvm-openmp >=4.0.1        # [osx]
+    - r-rcpp >=1.0.0
+    - r-genieclust
 
 test:
   commands:
@@ -62,16 +61,18 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: http://www.gagolewski.com/software/genie/
+  home: http://genieclust.gagolewski.com/
   license: GPL-3
-  summary: 'A new hierarchical clustering linkage criterion: the Genie algorithm links two clusters
-    in such a way that a chosen economic inequity measure (e.g., the Gini index) of
-    the cluster sizes does not increase drastically above a given threshold. Benchmarks
-    indicate a high practical usefulness of the introduced method: it most often outperforms
-    the Ward or average linkage in terms of the clustering quality while retaining the
-    single linkage speed, see (Gagolewski et al. 2016a <DOI:10.1016/j.ins.2016.05.003>,
-    2016b <DOI:10.1007/978-3-319-45656-0_16>) for more details.'
-
+  summary: Includes the reference implementation of Genie - a hierarchical clustering algorithm
+    that links two point groups in such a way that an inequity measure (namely, the
+    Gini index) of the cluster sizes does not significantly increase above a given threshold.
+    This method most often outperforms many other data segmentation approaches in terms
+    of clustering quality as tested on a wide range of benchmark datasets. At the same
+    time, Genie retains the high speed of the single linkage approach, therefore it
+    is also suitable for analysing larger data sets. For more details see (Gagolewski
+    et al. 2016 <DOI:10.1016/j.ins.2016.05.003>). For an even faster and more feature-rich
+    implementation, including, amongst others, noise point detection, see the 'genieclust'
+    package.
   license_family: GPL3
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
@@ -84,26 +85,26 @@ extra:
 
 # Package: genie
 # Type: Package
-# Title: A New, Fast, and Outlier Resistant Hierarchical Clustering Algorithm
-# Version: 1.0.4
-# Date: 2017-04-27
-# Authors@R: c( person("Marek", "Gagolewski", role = c("aut", "cre"), email = "gagolews@rexamine.com"), person("Maciej", "Bartoszuk", role = "aut", email = "bartoszuk@rexamine.com"), person("Anna", "Cena", role = "aut", email = "cena@rexamine.com") )
-# Description: A new hierarchical clustering linkage criterion: the Genie algorithm links two clusters in such a way that a chosen economic inequity measure (e.g., the Gini index) of the cluster sizes does not increase drastically above a given threshold. Benchmarks indicate a high practical usefulness of the introduced method: it most often outperforms the Ward or average linkage in terms of the clustering quality while retaining the single linkage speed, see (Gagolewski et al. 2016a <DOI:10.1016/j.ins.2016.05.003>, 2016b <DOI:10.1007/978-3-319-45656-0_16>) for more details.
+# Title: Fast, Robust, and Outlier Resistant Hierarchical Clustering
+# Version: 1.0.5
+# Date: 2020-08-02
+# Authors@R: c( person("Marek", "Gagolewski", role = c("aut", "cre", "cph"), email = "marek@gagolewski.com", comment = c(ORCID = "0000-0003-0637-6028")), person("Maciej", "Bartoszuk", role = "aut", email = "bartoszuk@rexamine.com", comment = c(ORCID = "0000-0001-6088-8273")), person("Anna", "Cena", role = "aut", email = "cena@rexamine.com", comment = c(ORCID = "0000-0001-8697-5383")) )
+# Description: Includes the reference implementation of Genie - a hierarchical clustering algorithm that links two point groups in such a way that an inequity measure (namely, the Gini index) of the cluster sizes does not significantly increase above a given threshold. This method most often outperforms many other data segmentation approaches in terms of clustering quality as tested on a wide range of benchmark datasets. At the same time, Genie retains the high speed of the single linkage approach, therefore it is also suitable for analysing larger data sets. For more details see (Gagolewski et al. 2016 <DOI:10.1016/j.ins.2016.05.003>). For an even faster and more feature-rich implementation, including, amongst others, noise point detection, see the 'genieclust' package.
 # License: GPL (>= 3)
 # BugReports: http://github.com/gagolews/genie/issues
-# URL: http://www.gagolewski.com/software/genie/
-# Depends: R (>= 3.3.0), stats
-# Imports: Rcpp (>= 0.12.10)
+# URL: http://genieclust.gagolewski.com/
+# Depends: R (>= 3.3.0), stats, genieclust
+# Imports: Rcpp (>= 1.0.0)
 # Suggests: datasets, testthat, stringi
-# LinkingTo: Rcpp (>= 0.12.10)
+# LinkingTo: Rcpp (>= 1.0.0)
 # SystemRequirements: OpenMP, C++11
-# RoxygenNote: 6.0.1
+# RoxygenNote: 7.1.1
 # NeedsCompilation: yes
-# Packaged: 2017-04-27 15:29:11 UTC; gagolews
-# Author: Marek Gagolewski [aut, cre], Maciej Bartoszuk [aut], Anna Cena [aut]
-# Maintainer: Marek Gagolewski <gagolews@rexamine.com>
+# Packaged: 2020-08-02 09:13:53 UTC; gagolews
+# Author: Marek Gagolewski [aut, cre, cph] (<https://orcid.org/0000-0003-0637-6028>), Maciej Bartoszuk [aut] (<https://orcid.org/0000-0001-6088-8273>), Anna Cena [aut] (<https://orcid.org/0000-0001-8697-5383>)
+# Maintainer: Marek Gagolewski <marek@gagolewski.com>
 # Repository: CRAN
-# Date/Publication: 2017-04-27 15:44:40 UTC
+# Date/Publication: 2020-08-02 22:00:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

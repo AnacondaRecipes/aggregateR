@@ -1,0 +1,105 @@
+{% set version = '1.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ragg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ragg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ragg/ragg_{{ version }}.tar.gz
+  sha256: 3b6151c93a79093f9e638448db8abf88a57fd7b1e1093867cc0f6b492bbf83e0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, testthat, grid, graphics
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-systemfonts >=1.0.3
+    - r-textshaping >=0.3.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-systemfonts >=1.0.3
+    - r-textshaping >=0.3.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ragg')"           # [not win]
+    - "\"%R%\" -e \"library('ragg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://ragg.r-lib.org, https://github.com/r-lib/ragg
+  license: MIT
+  summary: Anti-Grain Geometry (AGG) is a high-quality and high-performance 2D drawing library.
+    The 'ragg' package provides a set of graphic devices based on AGG to use as alternative
+    to the raster devices provided through the 'grDevices' package.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: ragg
+# Type: Package
+# Title: Graphic Devices Based on AGG
+# Version: 1.2.2
+# Authors@R: c(person(given = "Thomas Lin", family = "Pedersen", role = c("cre", "aut"), email = "thomas.pedersen@rstudio.com", comment = c(ORCID = "0000-0002-5147-4711")), person(given = "Maxim", family = "Shemanarev", role = c("aut", "cph"), comment = "Author of AGG"), person(given = "Tony", family = "Juricic", role = c("ctb", "cph"), email = "tonygeek@yahoo.com", comment = "Contributor to AGG"), person(given = "Milan", family = "Marusinec", role = c("ctb", "cph"), email = "milan@marusinec.sk", comment = "Contributor to AGG"), person(given = "Spencer", family = "Garrett", role = "ctb", comment = "Contributor to AGG"), person(given = "RStudio", role = "cph"))
+# Maintainer: Thomas Lin Pedersen <thomas.pedersen@rstudio.com>
+# Description: Anti-Grain Geometry (AGG) is a high-quality and high-performance 2D drawing library. The 'ragg' package provides a set of graphic devices based on AGG to use as alternative to the raster devices provided through the 'grDevices' package.
+# License: MIT + file LICENSE
+# URL: https://ragg.r-lib.org, https://github.com/r-lib/ragg
+# BugReports: https://github.com/r-lib/ragg/issues
+# Encoding: UTF-8
+# RoxygenNote: 7.1.1
+# SystemRequirements: C++11, freetype2, libpng, libtiff, libjpeg
+# Suggests: covr, testthat, grid, graphics
+# Imports: systemfonts (>= 1.0.3), textshaping (>= 0.3.0)
+# LinkingTo: systemfonts, textshaping
+# NeedsCompilation: yes
+# Packaged: 2022-02-21 08:12:00 UTC; thomas
+# Author: Thomas Lin Pedersen [cre, aut] (<https://orcid.org/0000-0002-5147-4711>), Maxim Shemanarev [aut, cph] (Author of AGG), Tony Juricic [ctb, cph] (Contributor to AGG), Milan Marusinec [ctb, cph] (Contributor to AGG), Spencer Garrett [ctb] (Contributor to AGG), RStudio [cph]
+# Repository: CRAN
+# Date/Publication: 2022-02-21 08:30:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

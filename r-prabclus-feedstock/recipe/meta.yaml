@@ -1,0 +1,87 @@
+{% set version = '2.3-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-prabclus
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/prabclus_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/prabclus/prabclus_{{ version }}.tar.gz
+  sha256: f421bcbcb557281e0de4a06b15f9a496adb5c640e883c0f7bb12051efc69e441
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: spdep, spatialreg, bootstrap, maptools, foreign, mvtnorm
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-mclust
+
+  run:
+    - r-base
+    - r-mass
+    - r-mclust
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('prabclus')"           # [not win]
+    - "\"%R%\" -e \"library('prabclus')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.unibo.it/sitoweb/christian.hennig/en/
+  license: GPL-3
+  summary: Distance-based parametric bootstrap tests for clustering with spatial neighborhood
+    information. Some distance measures, Clustering of presence-absence, abundance and
+    multilocus genetic data for species delimitation, nearest neighbor based noise detection.
+    Genetic distances between communities. Tests whether various distance-based regressions
+    are equal. Try package?prabclus for on overview.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: prabclus
+# Title: Functions for Clustering and Testing of Presence-Absence, Abundance and Multilocus Genetic Data
+# Version: 2.3-2
+# Date: 2020-01-06
+# Author: Christian Hennig <christian.hennig@unibo.it>, Bernhard Hausdorf <Hausdorf@zoologie.uni-hamburg.de>
+# Depends: R (>= 2.10), MASS, mclust
+# Suggests: spdep, spatialreg, bootstrap, maptools, foreign, mvtnorm
+# Description: Distance-based parametric bootstrap tests for clustering with spatial neighborhood information. Some distance measures, Clustering of presence-absence, abundance and multilocus genetic data for species delimitation, nearest neighbor based noise detection. Genetic distances between communities. Tests whether various distance-based regressions are equal. Try package?prabclus for on overview.
+# Maintainer: Christian Hennig <christian.hennig@unibo.it>
+# License: GPL
+# URL: https://www.unibo.it/sitoweb/christian.hennig/en/
+# NeedsCompilation: no
+# Packaged: 2020-01-06 18:43:57 UTC; root
+# Repository: CRAN
+# Date/Publication: 2020-01-08 23:00:39 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

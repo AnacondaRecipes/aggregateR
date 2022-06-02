@@ -1,0 +1,108 @@
+{% set version = '2.0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-geojsonsf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/geojsonsf_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/geojsonsf/geojsonsf_{{ version }}.tar.gz
+  sha256: 275ca14672d982e6a95884515f49d8a0aad14f3be62ea01b675a91b0bffb46d1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, jsonify, knitr, rmarkdown, tinytest
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-geometries
+    - r-jsonify >=1.1.1
+    - r-rapidjsonr >=1.2.0
+    - r-sfheaders >=0.2.2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-geometries
+    - r-jsonify >=1.1.1
+    - r-rapidjsonr >=1.2.0
+    - r-sfheaders >=0.2.2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('geojsonsf')"           # [not win]
+    - "\"%R%\" -e \"library('geojsonsf')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/SymbolixAU/geojsonsf
+  license: MIT
+  summary: Converts Between GeoJSON and simple feature objects.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: geojsonsf
+# Type: Package
+# Title: GeoJSON to Simple Feature Converter
+# Version: 2.0.3
+# Date: 2022-05-31
+# Authors@R: c( person("David", "Cooley", ,"dcooley@symbolix.com.au", role = c("aut", "cre")) )
+# Description: Converts Between GeoJSON and simple feature objects.
+# License: MIT + file LICENSE
+# URL: https://github.com/SymbolixAU/geojsonsf
+# BugReports: https://github.com/SymbolixAU/geojsonsf/issues
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 3.3.0)
+# SystemRequirements: C++11
+# LinkingTo: geometries, jsonify (>= 1.1.1), rapidjsonr (>= 1.2.0), Rcpp, sfheaders (>= 0.2.2)
+# Imports: Rcpp
+# RoxygenNote: 7.1.0
+# Suggests: covr, jsonify, knitr, rmarkdown, tinytest
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2022-05-30 22:52:38 UTC; david
+# Author: David Cooley [aut, cre]
+# Maintainer: David Cooley <dcooley@symbolix.com.au>
+# Repository: CRAN
+# Date/Publication: 2022-05-30 23:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

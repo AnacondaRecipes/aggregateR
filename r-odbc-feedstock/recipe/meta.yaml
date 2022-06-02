@@ -1,4 +1,4 @@
-{% set version = '1.1.5' %}
+{% set version = '1.3.3' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -10,12 +10,13 @@ package:
 source:
 
   git_url: https://github.com/rstats-db/odbc
-  git_tag: v1.1.6
+  git_tag: v1.3.3
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
+  # no skip
   noarch: generic
 
   # This is required to make R link correctly on Linux.
@@ -23,36 +24,35 @@ build:
     - lib/R/lib/
     - lib/
 
-# Suggests: tibble, DBItest, testthat, covr, magrittr
+# Suggests: covr, DBItest, magrittr, RSQLite, testthat, tibble
 requirements:
   build:
-    - {{ compiler('c') }}        # [not win]
-    - {{ compiler('cxx') }}      # [not win]
-    - {{native}}toolchain        # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}git
-    - {{posix}}zip               # [win]
-    - {{posix}}make
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}git
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
-    - r-bh
     - r-dbi >=1.0.0
     - r-rcpp >=0.12.11
     - r-bit64
-    - r-blob >=1.1.0
+    - r-blob >=1.2.0
     - r-hms
-    - unixodbc                   # [unix]
+    - r-rlang
+
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
-    - r-bh
     - r-dbi >=1.0.0
     - r-rcpp >=0.12.11
     - r-bit64
-    - r-blob >=1.1.0
+    - r-blob >=1.2.0
     - r-hms
-    - unixodbc                   # [unix]
+    - r-rlang
 
 test:
   commands:
@@ -67,10 +67,13 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://github.com/r-dbi/odbc
-  license: MIT + file LICENSE
+  home: https://github.com/r-dbi/odbc, https://db.rstudio.com
+  license: MIT
   summary: A DBI-compatible interface to ODBC databases.
   license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
 
 extra:
   recipe-maintainers:
@@ -80,23 +83,23 @@ extra:
 
 # Package: odbc
 # Title: Connect to ODBC Compatible Databases (using the DBI Interface)
-# Version: 1.1.5
-# Authors@R: c( person("Jim", "Hester", , "james.hester@rstudio.com", role = c("aut", "cre")), person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut")), person("lexicalunit", role = c("cph"), comment = "nanodbc library"), person("Google Inc.", role = c("cph"), comment = "cctz library"), person("RStudio", role = c("cph", "fnd")) )
+# Version: 1.3.3
+# Authors@R: c(person(given = "Jim", family = "Hester", role = "aut"), person(given = "Hadley", family = "Wickham", role = c("aut", "cre"), email = "hadley@rstudio.com"), person(given = "Oliver", "Gjoneski", role = "ctb", comment = "detule"), person(given = "lexicalunit", role = "cph", comment = "nanodbc library"), person(given = "Google Inc.", role = "cph", comment = "cctz library"), person(given = "RStudio", role = c("cph", "fnd")))
 # Description: A DBI-compatible interface to ODBC databases.
 # License: MIT + file LICENSE
-# URL: https://github.com/r-dbi/odbc
+# URL: https://github.com/r-dbi/odbc, https://db.rstudio.com
 # BugReports: https://github.com/r-dbi/odbc/issues
-# SystemRequirements: C++11, GNU make, An ODBC3 driver manager and drivers.
-# Roxygen: list(markdown = TRUE)
-# RoxygenNote: 6.0.1
-# LazyData: true
-# ByteCompile: true
 # Depends: R (>= 3.2.0)
-# Imports: DBI (>= 1.0.0), methods, Rcpp (>= 0.12.11), blob (>= 1.1.0), bit64, hms
-# Suggests: tibble, DBItest, testthat, covr, magrittr
-# LinkingTo: Rcpp, BH
+# Imports: bit64, blob (>= 1.2.0), DBI (>= 1.0.0), hms, methods, rlang, Rcpp (>= 0.12.11)
+# Suggests: covr, DBItest, magrittr, RSQLite, testthat, tibble
+# LinkingTo: Rcpp
+# ByteCompile: true
+# Encoding: UTF-8
+# Roxygen: list(markdown = TRUE)
+# RoxygenNote: 7.1.2
+# SystemRequirements: C++11, GNU make, An ODBC3 driver manager and drivers.
 # Collate: 'odbc.R' 'Driver.R' 'Connection.R' 'DataTypes.R' 'RcppExports.R' 'Result.R' 'Table.R' 'Viewer.R' 'db.R' 'hidden.R' 'utils.R' 'zzz.R'
 
 # See
-# http://docs.continuum.io/conda/build.html for
+# https://docs.conda.io/projects/conda-build for
 # more information about meta.yaml

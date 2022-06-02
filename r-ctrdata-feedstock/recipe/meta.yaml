@@ -1,4 +1,4 @@
-{% set version = '0.18.2' %}
+{% set version = '1.9.1' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,12 +11,13 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/ctrdata_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/ctrdata/ctrdata_{{ version }}.tar.gz
-  sha256: 8724e04b3d96ad485ad8dc3baef9b2af4b8a961365f54ed6a70573d3cf73d8da
+  sha256: 727eb1d4fcf9c9c6613c8c9ae2982f9e732bb9ec60855d7afe7e58f520c010fa
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
+  # no skip
   noarch: generic
 
   # This is required to make R link correctly on Linux.
@@ -24,29 +25,35 @@ build:
     - lib/R/lib/
     - lib/
 
-# Suggests: testthat, devtools, knitr, rmarkdown
+# Suggests: devtools, knitr, rmarkdown, RSQLite (>= 2.2.4), mongolite, tinytest (>= 1.2.1), R.rsp
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
     - r-clipr
     - r-curl
+    - r-dplyr
     - r-httr
     - r-jsonlite
-    - r-mongolite >=2.0
+    - r-lubridate
+    - r-nodbi >=0.7.0
     - r-rvest
+    - r-stringi
     - r-xml2
 
   run:
     - r-base
     - r-clipr
     - r-curl
+    - r-dplyr
     - r-httr
     - r-jsonlite
-    - r-mongolite >=2.0
+    - r-lubridate
+    - r-nodbi >=0.7.0
     - r-rvest
+    - r-stringi
     - r-xml2
 
 test:
@@ -62,16 +69,18 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://github.com/rfhb/ctrdata
+  home: https://cran.r-project.org/package=ctrdata
   license: MIT
-  summary: Provides functions for querying, retrieving and analysing protocol- and results-related
-    information on clinical trials from two public registers, the European Union Clinical
-    Trials Register (EUCTR, <https://www.clinicaltrialsregister.eu/>) and ClinicalTrials.gov
-    (CTGOV, <https://clinicaltrials.gov/>). The information is transformed and then
-    stored in a database (mongo). Functions are provided for accessing and analysing
-    the locally stored information on the clinical trials, as well as for identifying
-    duplicate records. The package is motivated by the need for aggregating and trend-analysing
-    the design, conduct and outcomes across clinical trials.
+  summary: A system for querying, retrieving and analyzing protocol- and results-related information
+    on clinical trials from three public registers, the 'European Union Clinical Trials
+    Register' ('EUCTR', <https://www.clinicaltrialsregister.eu/>), 'ClinicalTrials.gov'
+    ('CTGOV', <https://clinicaltrials.gov/>) and the 'ISRCTN' (<http://www.isrctn.com/>).
+    Trial information is downloaded, converted and stored in a database ('PostgreSQL',
+    'SQLite' or 'MongoDB'; via package 'nodbi'). Functions are included to identify
+    de-duplicated records, to easily find and extract variables (fields) of interest
+    even from complex nesting as used by the registers, and to update previous queries.
+    The package can be used for meta-analysis and trend-analysis of the design and conduct
+    as well as for results of clinical trials.
   license_family: MIT
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
@@ -85,27 +94,25 @@ extra:
 
 # Package: ctrdata
 # Type: Package
-# Title: Retrieve and Analyze Information on Clinical Trials from Public Registers
-# Version: 0.18.2
-# Date: 2019-04-30
-# Imports: mongolite (>= 2.0), jsonlite, httr, curl, clipr, xml2, rvest
-# SystemRequirements: mongo database, sed, php, cat, perl
-# URL: https://github.com/rfhb/ctrdata
+# Title: Retrieve and Analyze Clinical Trials in Public Registers
+# Version: 1.9.1
+# Imports: jsonlite, httr, curl, clipr, xml2, rvest, nodbi (>= 0.7.0), stringi, dplyr, lubridate
+# SystemRequirements: sed, php, cat, perl
+# URL: https://cran.r-project.org/package=ctrdata
 # BugReports: https://github.com/rfhb/ctrdata/issues
-# Description: Provides functions for querying, retrieving and analysing protocol- and results-related information on clinical trials from two public registers, the European Union Clinical Trials Register (EUCTR, <https://www.clinicaltrialsregister.eu/>) and ClinicalTrials.gov (CTGOV, <https://clinicaltrials.gov/>). The information is transformed and then stored in a database (mongo). Functions are provided for accessing and analysing the locally stored information on the clinical trials, as well as for identifying duplicate records. The package is motivated by the need for aggregating and trend-analysing the design, conduct and outcomes across clinical trials.
+# Description: A system for querying, retrieving and analyzing protocol- and results-related information on clinical trials from three public registers, the 'European Union Clinical Trials Register' ('EUCTR', <https://www.clinicaltrialsregister.eu/>), 'ClinicalTrials.gov' ('CTGOV', <https://clinicaltrials.gov/>) and the 'ISRCTN' (<http://www.isrctn.com/>). Trial information is downloaded, converted and stored in a database ('PostgreSQL', 'SQLite' or 'MongoDB'; via package 'nodbi'). Functions are included to identify de-duplicated records, to easily find and extract variables (fields) of interest even from complex nesting as used by the registers, and to update previous queries. The package can be used for meta-analysis and trend-analysis of the design and conduct as well as for results of clinical trials.
 # License: MIT + file LICENSE
-# RoxygenNote: 6.1.1
-# LazyData: true
-# Suggests: testthat, devtools, knitr, rmarkdown
-# VignetteBuilder: knitr
+# RoxygenNote: 7.1.2
+# Suggests: devtools, knitr, rmarkdown, RSQLite (>= 2.2.4), mongolite, tinytest (>= 1.2.1), R.rsp
+# VignetteBuilder: R.rsp
 # NeedsCompilation: no
 # Encoding: UTF-8
-# Authors@R:  person(given = "Ralf", family = "Herold", role = c("aut", "cre"), email = "ralf.herold@mailbox.org", comment = c(ORCID = "0000-0002-8148-6748"))
-# Packaged: 2019-04-30 09:07:55 UTC; ralfherold
+# Authors@R: person(given = "Ralf", family = "Herold", role = c("aut", "cre"), email = "ralf.herold@mailbox.org", comment = c(ORCID = "0000-0002-8148-6748"))
+# Packaged: 2022-04-24 14:11:43 UTC; ralfherold
 # Author: Ralf Herold [aut, cre] (<https://orcid.org/0000-0002-8148-6748>)
 # Maintainer: Ralf Herold <ralf.herold@mailbox.org>
 # Repository: CRAN
-# Date/Publication: 2019-05-01 17:30:02 UTC
+# Date/Publication: 2022-04-24 14:30:09 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

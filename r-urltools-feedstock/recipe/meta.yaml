@@ -1,0 +1,104 @@
+{% set version = '1.7.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-urltools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/urltools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/urltools/urltools_{{ version }}.tar.gz
+  sha256: 6020355c1b16a9e3956674e5dea9ac5c035c8eb3eb6bbdd841a2b5528cafa313
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-triebeard
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-triebeard
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('urltools')"           # [not win]
+    - "\"%R%\" -e \"library('urltools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/Ironholds/urltools/
+  license: MIT
+  summary: A toolkit for all URL-handling needs, including encoding and decoding, parsing, parameter
+    extraction and modification. All functions are designed to be both fast and entirely
+    vectorised. It is intended to be useful for people dealing with web-related datasets,
+    such as server-side logs, although may be useful for other situations involving
+    large sets of URLs.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: urltools
+# Type: Package
+# Title: Vectorised Tools for URL Handling and Parsing
+# Version: 1.7.3
+# Date: 2019-04-14
+# Author: Os Keyes [aut, cre], Jay Jacobs [aut, cre], Drew Schmidt [aut], Mark Greenaway [ctb], Bob Rudis [ctb], Alex Pinto [ctb], Maryam Khezrzadeh [ctb], Peter Meilstrup [ctb], Adam M. Costello [cph], Jeff Bezanson [cph], Peter Meilstrup [ctb], Xueyuan Jiang [ctb]
+# Maintainer: Os Keyes <ironholds@gmail.com>
+# Description: A toolkit for all URL-handling needs, including encoding and decoding, parsing, parameter extraction and modification. All functions are designed to be both fast and entirely vectorised. It is intended to be useful for people dealing with web-related datasets, such as server-side logs, although may be useful for other situations involving large sets of URLs.
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# LinkingTo: Rcpp
+# Imports: Rcpp, methods, triebeard
+# Suggests: testthat, knitr
+# URL: https://github.com/Ironholds/urltools/
+# BugReports: https://github.com/Ironholds/urltools/issues
+# VignetteBuilder: knitr
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# Depends: R (>= 2.10)
+# NeedsCompilation: yes
+# Packaged: 2019-04-14 22:25:08 UTC; ironholds
+# Repository: CRAN
+# Date/Publication: 2019-04-14 23:02:47 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,100 @@
+{% set version = '0.8.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rncl
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rncl_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rncl/rncl_{{ version }}.tar.gz
+  sha256: fcc972c04fb43ace0876eb640a6433caddf6ec8304f7ceee37107d812ce68ffb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, ape
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.0
+    - r-progress >=1.1.2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.0
+    - r-progress >=1.1.2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rncl')"           # [not win]
+    - "\"%R%\" -e \"library('rncl')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/fmichonneau/rncl
+  license: BSD_2_clause
+  summary: An interface to the Nexus Class Library which allows parsing of NEXUS, Newick and
+    other phylogenetic tree file formats. It provides elements of the file that can
+    be used to build phylogenetic objects such as ape's 'phylo' or phylobase's 'phylo4(d)'.
+    This functionality is demonstrated with 'read_newick_phylo()' and 'read_nexus_phylo()'.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_2_clause'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: rncl
+# Title: An Interface to the Nexus Class Library
+# Version: 0.8.6
+# Authors@R: c(person("Francois", "Michonneau", role=c("aut", "cre"), email="francois.michonneau@gmail.com",    comment = c("ORCID" = "0000-0002-9092-966X")), person("Ben", "Bolker", role=c("aut"),    comment = c("ORCID" = "0000-0002-2127-0443")), person("Mark", "Holder", role=c("aut"),   comment = c("ORCID" = "0000-0001-5575-0536")), person("Paul", "Lewis", role=c("aut"),    comment = c("ORCID" = "0000-0001-9852-8759")), person("Brian", "O'Meara", role=c("aut"), comment = c("ORCID" = "0000-0002-0337-5997")))
+# Maintainer: Francois Michonneau <francois.michonneau@gmail.com>
+# Description: An interface to the Nexus Class Library which allows parsing of NEXUS, Newick and other phylogenetic tree file formats. It provides elements of the file that can be used to build phylogenetic objects such as ape's 'phylo' or phylobase's 'phylo4(d)'. This functionality is demonstrated with 'read_newick_phylo()' and 'read_nexus_phylo()'.
+# Imports: Rcpp (>= 0.11.0), progress (>= 1.1.2), stats
+# Suggests: testthat, ape
+# LinkingTo: Rcpp, progress
+# Depends: R (>= 3.1.1)
+# License: BSD_2_clause + file LICENSE
+# URL: https://github.com/fmichonneau/rncl
+# BugReports: https://github.com/fmichonneau/rncl/issues
+# RoxygenNote: 7.1.2
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2022-03-18 06:20:53 UTC; francoism
+# Author: Francois Michonneau [aut, cre] (<https://orcid.org/0000-0002-9092-966X>), Ben Bolker [aut] (<https://orcid.org/0000-0002-2127-0443>), Mark Holder [aut] (<https://orcid.org/0000-0001-5575-0536>), Paul Lewis [aut] (<https://orcid.org/0000-0001-9852-8759>), Brian O'Meara [aut] (<https://orcid.org/0000-0002-0337-5997>)
+# Repository: CRAN
+# Date/Publication: 2022-03-18 06:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

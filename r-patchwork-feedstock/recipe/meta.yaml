@@ -1,0 +1,95 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-patchwork
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/patchwork_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/patchwork/patchwork_{{ version }}.tar.gz
+  sha256: cf0d7d9f92945729b499d6e343441c55007d5b371206d5389b9e5154dc7cf481
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, gridGraphics, gridExtra, ragg, testthat (>= 2.1.0), vdiffr, covr, png
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggplot2 >=3.0.0
+    - r-gtable
+
+  run:
+    - r-base
+    - r-ggplot2 >=3.0.0
+    - r-gtable
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('patchwork')"           # [not win]
+    - "\"%R%\" -e \"library('patchwork')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://patchwork.data-imaginist.com, https://github.com/thomasp85/patchwork
+  license: MIT
+  summary: The 'ggplot2' package provides a strong API for sequentially building up a plot, but
+    does not concern itself with composition of multiple plots. 'patchwork' is a package
+    that expands the API to allow for arbitrarily complex composition of plots by, among
+    others, providing mathematical operators for combining multiple plots. Other packages
+    that try to address this need (but with a different approach) are 'gridExtra' and
+    'cowplot'.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: patchwork
+# Type: Package
+# Title: The Composer of Plots
+# Version: 1.1.1
+# Authors@R: person(given = "Thomas Lin", family = "Pedersen", role = c("cre", "aut"), email = "thomasp85@gmail.com", comment = c(ORCID = "0000-0002-5147-4711"))
+# Maintainer: Thomas Lin Pedersen <thomasp85@gmail.com>
+# Description: The 'ggplot2' package provides a strong API for sequentially building up a plot, but does not concern itself with composition of multiple plots. 'patchwork' is a package that expands the API to allow for arbitrarily complex composition of plots by, among others, providing mathematical operators for combining multiple plots. Other packages that try to address this need (but with a different approach) are 'gridExtra' and 'cowplot'.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# Imports: ggplot2 (>= 3.0.0), gtable, grid, stats, grDevices, utils, graphics
+# RoxygenNote: 7.1.1
+# URL: https://patchwork.data-imaginist.com, https://github.com/thomasp85/patchwork
+# BugReports: https://github.com/thomasp85/patchwork/issues
+# Suggests: knitr, rmarkdown, gridGraphics, gridExtra, ragg, testthat (>= 2.1.0), vdiffr, covr, png
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2020-12-15 10:14:48 UTC; thomas
+# Author: Thomas Lin Pedersen [cre, aut] (<https://orcid.org/0000-0002-5147-4711>)
+# Repository: CRAN
+# Date/Publication: 2020-12-17 09:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,4 +1,4 @@
-{% set version = '0.2.0' %}
+{% set version = '1.0.2' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,7 +11,7 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/missSBM_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/missSBM/missSBM_{{ version }}.tar.gz
-  sha256: 269f023089d73086fbea848b111553a4ccfaa57a23267ab80cb761f0fff55f53
+  sha256: 1634b6f557c161680f95486646d6f8a7b2cf3cd1bdd2929906566b6d49652726
 
 build:
   merge_build_host: True  # [win]
@@ -24,46 +24,49 @@ build:
     - lib/R/lib/
     - lib/
 
-# Suggests: aricode, blockmodels, testthat, covr, knitr, rmarkdown, ggplot2
+# Suggests: aricode, blockmodels, corrplot, future, testthat (>= 2.1.0), covr, knitr, rmarkdown, spelling
 requirements:
   build:
     - {{ compiler('c') }}              # [not win]
     - {{ compiler('m2w64_c') }}        # [win]
     - {{ compiler('cxx') }}            # [not win]
     - {{ compiler('m2w64_cxx') }}      # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}sed               # [win]
-    - {{posix}}grep              # [win]
-    - {{posix}}autoconf
-    - {{posix}}automake          # [not win]
-    - {{posix}}automake-wrapper  # [win]
-    - {{posix}}pkg-config
-    - {{posix}}make
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-matrix
     - r-r6
+    - r-rspectra
     - r-rcpp
     - r-rcpparmadillo
-    - r-ape
-    - r-corrplot
+    - r-future.apply
+    - r-ggplot2
     - r-igraph
     - r-magrittr
     - r-nloptr
+    - r-rlang
+    - r-sbm
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
+    - r-matrix
     - r-r6
+    - r-rspectra
     - r-rcpp
     - r-rcpparmadillo
-    - r-ape
-    - r-corrplot
+    - r-future.apply
+    - r-ggplot2
     - r-igraph
     - r-magrittr
     - r-nloptr
+    - r-rlang
+    - r-sbm
 
 test:
   commands:
@@ -78,13 +81,14 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://jchiquet.github.io/missSBM
+  home: https://grosssbm.github.io/missSBM/
   license: GPL-3
   summary: When a network is partially observed (here, NAs in the adjacency matrix rather than
-    1 or 0  due to missing information between node pairs), it is possible to account
-    for the underlying process that generates those NAs. 'missSBM' adjusts the popular
-    stochastic block model from network data  sampled under various missing data conditions,
-    as described in Tabouy, Barbillon and Chiquet (2019) <doi:10.1080/01621459.2018.1562934>.
+    1 or 0 due to missing information between node pairs), it is possible to account
+    for the underlying process that generates those NAs. 'missSBM', presented in 'Barbillon,
+    Chiquet and Tabouy' (2021) <doi:10.18637/jss.v101.i12>, adjusts the popular stochastic
+    block model from network data sampled under various missing data conditions, as
+    described in 'Tabouy, Barbillon and Chiquet' (2019) <doi:10.1080/01621459.2018.1562934>.
   license_family: GPL3
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
@@ -98,27 +102,28 @@ extra:
 # Package: missSBM
 # Type: Package
 # Title: Handling Missing Data in Stochastic Block Models
-# Version: 0.2.0
-# Authors@R: c( person("Julien", "Chiquet", role = c("aut", "cre"), email = "julien.chiquet@inra.fr", comment = c(ORCID = "0000-0002-3629-3429")), person("Pierre", "Barbillon", role = c("aut"), email = "pierre.barbillon@agroparistech.fr", comment = c(ORCID = "0000-0002-7766-7693")), person("Timothee", "Tabouy", role = c("aut"), email = "timothee.tabouy@agroparistech.fr") )
-# Maintainer: Julien Chiquet <julien.chiquet@inra.fr>
-# Description: When a network is partially observed (here, NAs in the adjacency matrix rather than 1 or 0  due to missing information between node pairs), it is possible to account for the underlying process that generates those NAs. 'missSBM' adjusts the popular stochastic block model from network data  sampled under various missing data conditions, as described in Tabouy, Barbillon and Chiquet (2019) <doi:10.1080/01621459.2018.1562934>.
-# URL: https://jchiquet.github.io/missSBM
-# BugReports: https://github.com/jchiquet/missSBM/issues
+# Version: 1.0.2
+# Authors@R: c( person("Julien", "Chiquet", role = c("aut", "cre"), email = "julien.chiquet@inrae.fr", comment = c(ORCID = "0000-0002-3629-3429")), person("Pierre", "Barbillon", role = "aut", email = "pierre.barbillon@agroparistech.fr", comment = c(ORCID = "0000-0002-7766-7693")), person("Timothee", "Tabouy", role = "aut", email = "timothee.tabouy@agroparistech.fr"), person("Jean-Benoist", "Leger", role = "ctb", email = "jbleger@hds.utc.fr", comment = "provided C++ implementaion of K-means"), person("Francois", "Gindraud", role = "ctb", email = "francois.gindraud@gmail.com", comment = "provided C++ interface to NLopt"), person("groBM team", role = c("ctb")) )
+# Maintainer: Julien Chiquet <julien.chiquet@inrae.fr>
+# Description: When a network is partially observed (here, NAs in the adjacency matrix rather than 1 or 0 due to missing information between node pairs), it is possible to account for the underlying process that generates those NAs. 'missSBM', presented in 'Barbillon, Chiquet and Tabouy' (2021) <doi:10.18637/jss.v101.i12>, adjusts the popular stochastic block model from network data sampled under various missing data conditions, as described in 'Tabouy, Barbillon and Chiquet' (2019) <doi:10.1080/01621459.2018.1562934>.
+# URL: https://grosssbm.github.io/missSBM/
+# BugReports: https://github.com/grossSBM/missSBM/issues
 # License: GPL-3
 # Encoding: UTF-8
 # LazyData: true
-# RoxygenNote: 6.1.1
+# RoxygenNote: 7.1.2
 # Depends: R (>= 3.4.0)
-# Imports: Rcpp, methods, ape, igraph, nloptr, corrplot, R6, magrittr
-# LinkingTo: Rcpp, RcppArmadillo
-# Collate: 'RcppExports.R' 'SBM-Class.R' 'SBM_fit-Class.R' 'SBM_fit_covariates-Class.R' 'SBM_fit_nocovariate-Class.R' 'SBM_sampler-Class.R' 'er_network.R' 'estimate.R' 'frenchblog2007.R' 'missSBM-package.R' 'utils_missSBM.R' 'networkSampling-Class.R' 'networkSampling_fit-Class.R' 'missSBM_fit-Class.R' 'missSBM_collection-Class.R' 'networkSampler-Class.R' 'prepare_data.R' 'sample.R' 'sampledNetwork-Class.R' 'simulate.R' 'utils-pipe.R' 'utils_initialization.R' 'war.R'
-# Suggests: aricode, blockmodels, testthat, covr, knitr, rmarkdown, ggplot2
+# Imports: Rcpp, methods, igraph, nloptr, ggplot2, future.apply, R6, rlang, sbm, magrittr, Matrix, RSpectra
+# LinkingTo: Rcpp, RcppArmadillo, nloptr
+# Collate: 'utils_missSBM.R' 'R6Class-networkSampling.R' 'R6Class-networkSampling_fit.R' 'R6Class-simpleSBM_fit.R' 'R6Class-missSBM_fit.R' 'R6Class-missSBM_collection.R' 'R6Class-networkSampler.R' 'R6Class-partlyObservedNetwork.R' 'RcppExports.R' 'er_network.R' 'estimateMissSBM.R' 'frenchblog2007.R' 'kmeans.R' 'missSBM-package.R' 'observeNetwork.R' 'war.R'
+# Suggests: aricode, blockmodels, corrplot, future, testthat (>= 2.1.0), covr, knitr, rmarkdown, spelling
 # VignetteBuilder: knitr
+# Language: en-US
 # NeedsCompilation: yes
-# Packaged: 2019-06-07 12:08:02 UTC; jchiquet
-# Author: Julien Chiquet [aut, cre] (<https://orcid.org/0000-0002-3629-3429>), Pierre Barbillon [aut] (<https://orcid.org/0000-0002-7766-7693>), Timothee Tabouy [aut]
+# Packaged: 2022-01-31 12:37:10 UTC; jchiquet
+# Author: Julien Chiquet [aut, cre] (<https://orcid.org/0000-0002-3629-3429>), Pierre Barbillon [aut] (<https://orcid.org/0000-0002-7766-7693>), Timothee Tabouy [aut], Jean-Benoist Leger [ctb] (provided C++ implementaion of K-means), Francois Gindraud [ctb] (provided C++ interface to NLopt), groBM team [ctb]
 # Repository: CRAN
-# Date/Publication: 2019-06-08 08:10:03 UTC
+# Date/Publication: 2022-02-01 16:00:20 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

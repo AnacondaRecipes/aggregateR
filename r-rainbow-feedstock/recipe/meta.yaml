@@ -1,0 +1,96 @@
+{% set version = '3.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rainbow
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rainbow_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rainbow/rainbow_{{ version }}.tar.gz
+  sha256: 63d1246f88a498f3db0321b46a552163631b288a25b24400935db41326636e87
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: forecast
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-cluster
+    - r-colorspace
+    - r-hdrcde
+    - r-ks
+    - r-pcapp
+
+  run:
+    - r-base
+    - r-mass
+    - r-cluster
+    - r-colorspace
+    - r-hdrcde
+    - r-ks
+    - r-pcapp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rainbow')"           # [not win]
+    - "\"%R%\" -e \"library('rainbow')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rainbow
+  license: GPL-3
+  summary: Visualizing functional data and identifying functional outliers.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: rainbow
+# Type: Package
+# Title: Bagplots, Boxplots and Rainbow Plots for Functional Data
+# Version: 3.6
+# Date: 2019-1-29
+# Depends: R (>= 3.4.0), MASS, pcaPP
+# Suggests: forecast
+# Imports: hdrcde, cluster, colorspace, ks
+# LazyLoad: yes
+# LazyData: yes
+# ByteCompile: TRUE
+# Authors@R: c( person("Han Lin", "Shang", email="hanlin.shang@anu.edu.au", role=c("aut", "cre", "cph"), comment = c(ORCID = "0000-0003-1769-6430")), person("Rob", "Hyndman", role="aut", comment = c(ORCID = "0000-0002-2140-5352")) )
+# Maintainer: Han Lin Shang <hanlin.shang@anu.edu.au>
+# Description: Visualizing functional data and identifying functional outliers.
+# License: GPL-3
+# NeedsCompilation: no
+# Packaged: 2019-01-29 07:24:55 UTC; hanlinshang
+# Author: Han Lin Shang [aut, cre, cph] (<https://orcid.org/0000-0003-1769-6430>), Rob Hyndman [aut] (<https://orcid.org/0000-0002-2140-5352>)
+# Repository: CRAN
+# Date/Publication: 2019-01-29 16:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

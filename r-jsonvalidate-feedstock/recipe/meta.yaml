@@ -1,0 +1,89 @@
+{% set version = '1.3.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-jsonvalidate
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/jsonvalidate_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/jsonvalidate/jsonvalidate_{{ version }}.tar.gz
+  sha256: 2b6c08bfa9ba043151a41d914b24b776583a140ee93a448191d5d0af46aadb57
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, jsonlite, rmarkdown, testthat, withr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-v8
+
+  run:
+    - r-base
+    - r-v8
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('jsonvalidate')"           # [not win]
+    - "\"%R%\" -e \"library('jsonvalidate')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://docs.ropensci.org/jsonvalidate/, https://github.com/ropensci/jsonvalidate
+  license: MIT
+  summary: Uses the node library 'is-my-json-valid' or 'ajv' to validate 'JSON' against a 'JSON'
+    schema.  Drafts 04, 06 and 07 of 'JSON' schema are supported.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: jsonvalidate
+# Title: Validate 'JSON' Schema
+# Version: 1.3.2
+# Authors@R: c(person("Rich", "FitzJohn", role = c("aut", "cre"), email = "rich.fitzjohn@gmail.com"), person("Rob", "Ashton", role = "aut"), person("Alex", "Hill", role = "ctb"), person("Alicia", "Schep", role = "ctb"), person("Ian", "Lyttle", role = "ctb"), person("Kara", "Woo", role = "ctb"), person("Mathias", "Buus", role = c("aut", "cph"), comment = "Author of bundled imjv library"), person("Evgeny", "Poberezkin", role = c("aut", "cph"), comment = "Author of bundled Ajv library"))
+# Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
+# Description: Uses the node library 'is-my-json-valid' or 'ajv' to validate 'JSON' against a 'JSON' schema.  Drafts 04, 06 and 07 of 'JSON' schema are supported.
+# License: MIT + file LICENSE
+# URL: https://docs.ropensci.org/jsonvalidate/, https://github.com/ropensci/jsonvalidate
+# BugReports: https://github.com/ropensci/jsonvalidate/issues
+# Imports: V8
+# Suggests: knitr, jsonlite, rmarkdown, testthat, withr
+# RoxygenNote: 7.1.2
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# Language: en-GB
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2021-11-03 14:55:48 UTC; rfitzjoh
+# Author: Rich FitzJohn [aut, cre], Rob Ashton [aut], Alex Hill [ctb], Alicia Schep [ctb], Ian Lyttle [ctb], Kara Woo [ctb], Mathias Buus [aut, cph] (Author of bundled imjv library), Evgeny Poberezkin [aut, cph] (Author of bundled Ajv library)
+# Repository: CRAN
+# Date/Publication: 2021-11-03 15:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,101 @@
+{% set version = '0.4-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fastmatrix
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fastmatrix_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fastmatrix/fastmatrix_{{ version }}.tar.gz
+  sha256: 494a1aad38dcec28956eba8d095c964b20c5388dfb6dc2a23848ae37ea61cde5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fastmatrix')"           # [not win]
+    - "\"%R%\" -e \"library('fastmatrix')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://faosorios.github.io/fastmatrix/
+  license: GPL-3
+  summary: Small set of functions to fast computation of some matrices and operations useful
+    in statistics and econometrics. Currently, there are functions for efficient computation
+    of duplication, commutation and symmetrizer matrices with minimal storage requirements.
+    Some commonly used matrix decompositions (LU and LDL), basic matrix operations (for
+    instance, Hadamard, Kronecker products and the Sherman-Morrison formula) and iterative
+    solvers for linear systems are also available. In addition, the package includes
+    a number of common statistical procedures such as the sweep operator, weighted mean
+    and covariance matrix using an online algorithm, linear regression (using Cholesky,
+    QR, SVD, sweep operator and conjugate gradients methods), ridge regression (with
+    optimal selection of the ridge parameter considering several procedures), functions
+    to compute the multivariate skewness, kurtosis, Mahalanobis distance (checking the
+    positive defineteness) and the Wilson-Hilferty transformation of chi squared variables.
+    Furthermore, the package provides interfaces to C code callable by another C code
+    from other R packages.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: fastmatrix
+# Type: Package
+# Title: Fast Computation of some Matrices Useful in Statistics
+# Version: 0.4-1
+# Date: 2022-04-20
+# Authors@R: c(person(given = "Felipe", family = "Osorio", role = c("aut", "cre"), email = "felipe.osorios@usm.cl", comment = c(ORCID = "0000-0002-4675-5201")), person(given = "Alonso", family = "Ogueda", role = "aut", email = "alonso.ogueda@gmail.com"))
+# Author: Felipe Osorio [aut, cre] (<https://orcid.org/0000-0002-4675-5201>), Alonso Ogueda [aut]
+# Maintainer: Felipe Osorio <felipe.osorios@usm.cl>
+# Description: Small set of functions to fast computation of some matrices and operations useful in statistics and econometrics. Currently, there are functions for efficient computation of duplication, commutation and symmetrizer matrices with minimal storage requirements. Some commonly used matrix decompositions (LU and LDL), basic matrix operations (for instance, Hadamard, Kronecker products and the Sherman-Morrison formula) and iterative solvers for linear systems are also available. In addition, the package includes a number of common statistical procedures such as the sweep operator, weighted mean and covariance matrix using an online algorithm, linear regression (using Cholesky, QR, SVD, sweep operator and conjugate gradients methods), ridge regression (with optimal selection of the ridge parameter considering several procedures), functions to compute the multivariate skewness, kurtosis, Mahalanobis distance (checking the positive defineteness) and the Wilson-Hilferty transformation of chi squared variables. Furthermore, the package provides interfaces to C code callable by another C code from other R packages.
+# Depends: R(>= 3.5.0)
+# License: GPL-3
+# URL: https://faosorios.github.io/fastmatrix/
+# NeedsCompilation: yes
+# LazyLoad: yes
+# Packaged: 2022-04-20 18:14:14 UTC; felipe
+# Repository: CRAN
+# Date/Publication: 2022-04-21 13:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

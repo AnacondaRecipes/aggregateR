@@ -1,0 +1,82 @@
+{% set version = '1.0-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-eql
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/EQL_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/EQL/EQL_{{ version }}.tar.gz
+  sha256: 15f12166a5a0ffe47913dd18b3a26a1d6f5a0a3549f468aa288382e1001c435d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-lattice >=0.17_17
+    - r-ttutils >=0.1_0
+
+  run:
+    - r-base
+    - r-lattice >=0.17_17
+    - r-ttutils >=0.1_0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('EQL')"           # [not win]
+    - "\"%R%\" -e \"library('EQL')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=EQL
+  license: GPL-2
+  summary: Computation of the EQL for a given family of variance functions, Saddlepoint-approximations
+    and related auxiliary functions (e.g. Hermite polynomials).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: EQL
+# Version: 1.0-1
+# Date: 2009-06-18
+# Title: Extended-Quasi-Likelihood-Function (EQL)
+# Depends: ttutils(>= 0.1-0)
+# Imports: lattice(>= 0.17-17)
+# Author: Thorn Thaler <thorn.thaler@thothal.com>
+# Maintainer: Thorn Thaler <thorn.thaler@thothal.com>
+# Description: Computation of the EQL for a given family of variance functions, Saddlepoint-approximations and related auxiliary functions (e.g. Hermite polynomials).
+# License: GPL-2
+# Packaged: 2019-08-30 13:02:46 UTC; hornik
+# Repository: CRAN
+# Date/Publication: 2019-08-30 13:04:27 UTC
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

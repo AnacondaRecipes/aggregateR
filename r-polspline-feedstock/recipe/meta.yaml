@@ -1,4 +1,4 @@
-{% set version = '1.1.14' %}
+{% set version = '1.1.20' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,12 +11,13 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/polspline_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/polspline/polspline_{{ version }}.tar.gz
-  sha256: 40ed803ea25975b6fcd96292009897db22a2f346dc271396d1ce8f10b92d9a3c
+  sha256: 6992484e9e41036debef1e705e26959f8f5c7a68d3e1fda58273d2a72297a1b5
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
+  # no skip
 
   # This is required to make R link correctly on Linux.
   rpaths:
@@ -25,23 +26,22 @@ build:
 
 requirements:
   build:
-    - {{ compiler('c') }}        # [not win]
-    - {{ compiler('fortran') }}  # [not win]
-    - {{native}}toolchain        # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}make
-    - {{posix}}sed               # [win]
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
-    - libopenblas                # [osx]
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
-    - libopenblas                # [osx]
 
 test:
   commands:
@@ -57,12 +57,13 @@ test:
 
 about:
   home: https://CRAN.R-project.org/package=polspline
-  license: GPL (>= 2)
+  license: GPL-2
   summary: Routines for the polynomial spline fitting routines hazard regression, hazard estimation
     with flexible tails, logspline, lspec, polyclass, and polymars, by C. Kooperberg
     and co-authors.
-  license_family: GPL3
-  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
 
 extra:
   recipe-maintainers:
@@ -71,19 +72,20 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: polspline
-# Version: 1.1.14
-# Date: 2019-02-27
-# Title: Polynomial Spline Routines
-# Author: Charles Kooperberg <clk@fredhutch.org>
+# Version: 1.1.20
+# Date: 2022-04-24
 # Maintainer: Charles Kooperberg <clk@fredhutch.org>
+# Title: Polynomial Spline Routines
+# Authors@R: c(person("Charles", "Kooperberg", role = c("aut", "cre"), email = "clk@fredhutch.org"), person("Cleve", "Moler", role = "ctb", comment = "LINPACK routines in src"), person("Jack", "Dongarra", role = "ctb", comment = "LINPACK routines in src"))
 # Description: Routines for the polynomial spline fitting routines hazard regression, hazard estimation with flexible tails, logspline, lspec, polyclass, and polymars, by C. Kooperberg and co-authors.
 # Imports: stats, graphics
 # License: GPL (>= 2)
 # NeedsCompilation: yes
-# Packaged: 2019-02-27 21:29:57 UTC; clk
+# Packaged: 2022-04-24 23:27:30 UTC; clk
+# Author: Charles Kooperberg [aut, cre], Cleve Moler [ctb] (LINPACK routines in src), Jack Dongarra [ctb] (LINPACK routines in src)
 # Repository: CRAN
-# Date/Publication: 2019-02-28 06:30:03 UTC
+# Date/Publication: 2022-04-25 06:40:02 UTC
 
 # See
-# http://docs.continuum.io/conda/build.html for
+# https://docs.conda.io/projects/conda-build for
 # more information about meta.yaml

@@ -1,4 +1,4 @@
-{% set version = '0.2' %}
+{% set version = '1.6.0' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,48 +11,53 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/gert_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/gert/gert_{{ version }}.tar.gz
-  sha256: 32fba2a89ae361f0621216fc1bd433e4107ac4c2970a95fb1bf576e6140144e3
+  sha256: 8c440aeebabf1cb3b57124ec9280e0f46b2ab56f2bca07d72b5c7a7f4edc2964
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
-  # TODO: skip due r-openssl >=1.4.1 is not present
-  skip: True
+  # no skip
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: testthat
+# Suggests: spelling, knitr, rmarkdown, testthat
 requirements:
   build:
     - {{ compiler('c') }}              # [not win]
     - {{ compiler('m2w64_c') }}        # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}sed               # [win]
-    - {{posix}}grep              # [win]
-    - {{posix}}autoconf
-    - {{posix}}automake          # [not win]
-    - {{posix}}automake-wrapper  # [win]
-    - {{posix}}pkg-config
-    - {{posix}}make
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
     - r-askpass
-    - r-credentials >=1.0
+    - r-credentials >=1.2.1
     - r-openssl >=1.4.1
+    - r-rstudioapi >=0.11
+    - r-sys
+    - r-zip >=2.1.0
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
     - r-askpass
-    - r-credentials >=1.0
+    - r-credentials >=1.2.1
     - r-openssl >=1.4.1
+    - r-rstudioapi >=0.11
+    - r-sys
+    - r-zip >=2.1.0
 
 test:
   commands:
@@ -67,12 +72,13 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: http://github.com/r-lib/gert (devel), https://libgit2.org (upstream)
+  home: https://docs.ropensci.org/gert/, https://github.com/r-lib/gert
   license: MIT
-  summary: Simple git client based on 'libgit2' with user-friendly authentication and support
-    for both SSH and HTTPS remotes on all platforms. User credentials are shared with
-    command line 'git' through the git-credential store and ssh keys stored on disk
-    or ssh-agent. On Linux, a somewhat recent  version of 'libgit2' is required.
+  summary: Simple git client for R based on 'libgit2' <https://libgit2.org> with support for
+    SSH and HTTPS remotes. All functions in 'gert' use basic R data types (such as vectors
+    and data-frames) for their arguments and return values. User credentials are shared
+    with command line 'git' through the git-credential store and ssh keys stored on
+    disk or ssh-agent.
   license_family: MIT
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
@@ -84,25 +90,28 @@ extra:
 
 # The original CRAN metadata for this package was:
 
-# Package: gert
 # Type: Package
+# Package: gert
 # Title: Simple Git Client for R
-# Version: 0.2
-# Author: Jeroen Ooms
-# Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
-# Description: Simple git client based on 'libgit2' with user-friendly authentication and support for both SSH and HTTPS remotes on all platforms. User credentials are shared with command line 'git' through the git-credential store and ssh keys stored on disk or ssh-agent. On Linux, a somewhat recent  version of 'libgit2' is required.
+# Version: 1.6.0
+# Authors@R: c( person("Jeroen", "Ooms", role = c("aut", "cre"), email = "jeroen@berkeley.edu", comment = c(ORCID = "0000-0002-4035-0289")), person("Jennifer", "Bryan", role = "ctb", email = "jenny@rstudio.com", comment = c(ORCID = "0000-0002-6983-2759")))
+# Description: Simple git client for R based on 'libgit2' <https://libgit2.org> with support for SSH and HTTPS remotes. All functions in 'gert' use basic R data types (such as vectors and data-frames) for their arguments and return values. User credentials are shared with command line 'git' through the git-credential store and ssh keys stored on disk or ssh-agent.
 # License: MIT + file LICENSE
-# SystemRequirements: libgit2 (>= 0.26): libgit2-devel (rpm) or libgit2-dev (deb)
-# URL: http://github.com/r-lib/gert (devel), https://libgit2.org (upstream)
-# BugReports: http://github.com/r-lib/gert/issues
+# URL: https://docs.ropensci.org/gert/, https://github.com/r-lib/gert
+# BugReports: https://github.com/r-lib/gert/issues
+# Imports: askpass, credentials (>= 1.2.1), openssl (>= 1.4.1), rstudioapi (>= 0.11), sys, zip (>= 2.1.0)
+# Suggests: spelling, knitr, rmarkdown, testthat
+# VignetteBuilder: knitr
 # Encoding: UTF-8
-# RoxygenNote: 6.1.1
-# Imports: openssl (>= 1.4.1), credentials (>= 1.0), askpass
-# Suggests: testthat
+# RoxygenNote: 7.1.2
+# SystemRequirements: libgit2 (>= 1.0): libgit2-devel (rpm) or libgit2-dev (deb)
+# Language: en-US
 # NeedsCompilation: yes
-# Packaged: 2019-07-22 12:02:22 UTC; jeroen
+# Packaged: 2022-03-29 20:42:24 UTC; jeroen
+# Author: Jeroen Ooms [aut, cre] (<https://orcid.org/0000-0002-4035-0289>), Jennifer Bryan [ctb] (<https://orcid.org/0000-0002-6983-2759>)
+# Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
 # Repository: CRAN
-# Date/Publication: 2019-07-22 21:30:02 UTC
+# Date/Publication: 2022-03-29 21:10:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

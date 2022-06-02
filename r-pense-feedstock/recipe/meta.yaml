@@ -1,4 +1,4 @@
-{% set version = '1.2.5' %}
+{% set version = '2.1.0' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,7 +11,7 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/pense_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/pense/pense_{{ version }}.tar.gz
-  sha256: 530de9f73f03e7c227e8c7346c30efdb37518317f0208ee37f37c65c5d1f6617
+  sha256: 9234f92cf5b1540a74535768b25aab788cdc7afb240cae5225dbec0ae7b8e9bf
 
 build:
   merge_build_host: True  # [win]
@@ -24,38 +24,40 @@ build:
     - lib/R/lib/
     - lib/
 
-# Suggests: testthat, lars
+# Suggests: testthat (>= 2.1.0), knitr, rmarkdown, jsonlite
 requirements:
   build:
     - {{ compiler('c') }}              # [not win]
     - {{ compiler('m2w64_c') }}        # [win]
     - {{ compiler('cxx') }}            # [not win]
     - {{ compiler('m2w64_cxx') }}      # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}sed               # [win]
-    - {{posix}}grep              # [win]
-    - {{posix}}autoconf
-    - {{posix}}automake          # [not win]
-    - {{posix}}automake-wrapper  # [win]
-    - {{posix}}pkg-config
-    - {{posix}}make
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
     - r-matrix
     - r-rcpp
-    - r-rcpparmadillo
-    - r-robustbase
+    - r-rcpparmadillo >=0.9.600
+    - r-lifecycle >=0.2.0
+    - r-rlang >=0.4.0
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
     - r-matrix
     - r-rcpp
-    - r-rcpparmadillo
-    - r-robustbase
+    - r-rcpparmadillo >=0.9.600
+    - r-lifecycle >=0.2.0
+    - r-rlang >=0.4.0
 
 test:
   commands:
@@ -70,14 +72,17 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://github.com/dakep/pense-rpkg
-  license: GPL-2
-  summary: Robust penalized elastic net S and MM estimator for linear regression. The method
-    is described in detail in Cohen Freue, G. V., Kepplinger, D., Salibian-Barrera,
-    M., and Smucler, E. (2017) <https://gcohenfr.github.io/pdfs/PENSE_manuscript.pdf>.
-  license_family: GPL2
+  home: https://dakep.github.io/pense-rpkg/, https://github.com/dakep/pense-rpkg
+  license: MIT
+  summary: "Robust penalized (adaptive) elastic net S and M estimators for linear regression.
+    The methods are proposed in Cohen Freue, G. V., Kepplinger, D., Salibi\xE1n-Barrera,
+    M., and Smucler, E. (2019) <https://projecteuclid.org/euclid.aoas/1574910036>. The
+    package implements the extensions and algorithms described in Kepplinger, D. (2020)
+    <doi:10.14288/1.0392915>."
+  license_family: MIT
   license_file:
-    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
 
 extra:
   recipe-maintainers:
@@ -88,27 +93,29 @@ extra:
 # Package: pense
 # Type: Package
 # Title: Penalized Elastic Net S/MM-Estimator of Regression
-# Version: 1.2.5
-# Date: 2019-06-07
-# Authors@R: c( person("David", "Kepplinger", , "david.kepplinger@gmail.com", role = c("aut", "cre")), person("Matias", "Salibian-Barrera", role = c("aut")), person("Gabriela", "Cohen Freue", role = "aut"), person("Derek", "Cho", role = "ctb") )
-# Copyright: See the file COPYRIGHTS for copyright details on some of the functions and algorithms used.
+# Version: 2.1.0
+# Date: 2021-07-06
+# Authors@R: c( person("David", "Kepplinger", , "david.kepplinger@gmail.com", role = c("aut", "cre")), person("Matias", "Salibian-Barrera", role = c("aut")), person("Gabriela", "Cohen Freue", role = "aut") )
+# Copyright: See the file COPYRIGHT for copyright details on some of the functions and algorithms used.
 # Encoding: UTF-8
 # Biarch: true
-# URL: https://github.com/dakep/pense-rpkg
+# URL: https://dakep.github.io/pense-rpkg/, https://github.com/dakep/pense-rpkg
 # BugReports: https://github.com/dakep/pense-rpkg/issues
-# Description: Robust penalized elastic net S and MM estimator for linear regression. The method is described in detail in Cohen Freue, G. V., Kepplinger, D., Salibian-Barrera, M., and Smucler, E. (2017) <https://gcohenfr.github.io/pdfs/PENSE_manuscript.pdf>.
-# Depends: R (>= 3.1.0), Matrix
-# Imports: Rcpp, robustbase, parallel, methods
-# LinkingTo: Rcpp, RcppArmadillo
-# Suggests: testthat, lars
-# License: GPL (>= 2)
+# Description: Robust penalized (adaptive) elastic net S and M estimators for linear regression. The methods are proposed in Cohen Freue, G. V., Kepplinger, D., Salibian-Barrera, M., and Smucler, E. (2019) <https://projecteuclid.org/euclid.aoas/1574910036>. The package implements the extensions and algorithms described in Kepplinger, D. (2020) <doi:10.14288/1.0392915>.
+# Depends: R (>= 3.5.0), Matrix
+# Imports: Rcpp, methods, parallel, lifecycle (>= 0.2.0), rlang (>= 0.4.0)
+# LinkingTo: Rcpp, RcppArmadillo (>= 0.9.600)
+# Suggests: testthat (>= 2.1.0), knitr, rmarkdown, jsonlite
+# License: MIT + file LICENSE
 # NeedsCompilation: yes
-# RoxygenNote: 6.1.1
-# Packaged: 2019-06-07 22:49:11 UTC; david
-# Author: David Kepplinger [aut, cre], Matias Salibian-Barrera [aut], Gabriela Cohen Freue [aut], Derek Cho [ctb]
+# RoxygenNote: 7.1.1
+# RdMacros: lifecycle
+# VignetteBuilder: knitr
+# Packaged: 2021-07-07 13:09:51 UTC; david
+# Author: David Kepplinger [aut, cre], Matias Salibian-Barrera [aut], Gabriela Cohen Freue [aut]
 # Maintainer: David Kepplinger <david.kepplinger@gmail.com>
 # Repository: CRAN
-# Date/Publication: 2019-06-08 14:30:06 UTC
+# Date/Publication: 2021-07-07 13:40:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

@@ -1,4 +1,4 @@
-{% set version = '0.2.2' %}
+{% set version = '1.2.2' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,37 +11,34 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/BASS_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/BASS/BASS_{{ version }}.tar.gz
-  sha256: c277f903048d200bf8568afe1cc65fe8fb2ae01e53b4f7df9b31ec282e8c7ae0
+  sha256: a94100ed56c59fac4ba693627cdc2c4ad6aa53bc8d921fac1034ea3b9babf193
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
+  # no skip
+  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: knitr
+# Suggests: knitr, testthat (>= 2.1.0), parallel, MASS, formatR
 requirements:
   build:
-    - {{ compiler('c') }}              # [not win]
-    - {{ compiler('m2w64_c') }}        # [win]
-    - {{ compiler('cxx') }}            # [not win]
-    - {{ compiler('m2w64_cxx') }}      # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}make
-    - {{posix}}sed               # [win]
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-hypergeo
+    - r-truncdist
 
   run:
     - r-base
-    - {{native}}gcc-libs         # [win]
+    - r-hypergeo
+    - r-truncdist
 
 test:
   commands:
@@ -58,11 +55,13 @@ test:
 about:
   home: https://CRAN.R-project.org/package=BASS
   license: GPL-3
-  summary: Bayesian fitting and sensitivity analysis methods for adaptive spline surfaces. Built
-    to handle continuous and categorical inputs as well as functional or scalar output.
-    An extension of the methodology in Denison, Mallick and Smith (1998) <doi:10.1023/A:1008824606259>.
+  summary: Bayesian fitting and sensitivity analysis methods for adaptive spline surfaces described
+    in <doi:10.18637/jss.v094.i08>. Built to handle continuous and categorical inputs
+    as well as functional or scalar output. An extension of the methodology in Denison,
+    Mallick and Smith (1998) <doi:10.1023/A:1008824606259>.
   license_family: GPL3
-  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
 
 extra:
   recipe-maintainers:
@@ -71,21 +70,23 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: BASS
-# Version: 0.2.2
-# Date: 2017-3-15
+# Version: 1.2.2
+# Date: 2020-08-31
 # Title: Bayesian Adaptive Spline Surfaces
-# Description: Bayesian fitting and sensitivity analysis methods for adaptive spline surfaces. Built to handle continuous and categorical inputs as well as functional or scalar output. An extension of the methodology in Denison, Mallick and Smith (1998) <doi:10.1023/A:1008824606259>.
-# Authors@R: c(person("Devin", "Francom", role = c("aut", "cre"), email = "devinfrancom@gmail.com"), person("Bruno", "Sanso", role = "ths"), person("Agner", "Fog", role = c("ctb","cph")))
+# Description: Bayesian fitting and sensitivity analysis methods for adaptive spline surfaces described in <doi:10.18637/jss.v094.i08>. Built to handle continuous and categorical inputs as well as functional or scalar output. An extension of the methodology in Denison, Mallick and Smith (1998) <doi:10.1023/A:1008824606259>.
+# Authors@R: c(person("Devin", "Francom", role = c("aut", "cre"), email = "devinfrancom@gmail.com"), person("Bruno", "Sanso", role = "ths"))
 # License: GPL-3
-# Suggests: knitr
+# Suggests: knitr, testthat (>= 2.1.0), parallel, MASS, formatR
 # VignetteBuilder: knitr
-# RoxygenNote: 6.0.1
-# NeedsCompilation: yes
-# Packaged: 2017-03-16 21:56:04 UTC; francom1
-# Author: Devin Francom [aut, cre], Bruno Sanso [ths], Agner Fog [ctb, cph]
+# Imports: truncdist, hypergeo
+# RoxygenNote: 7.1.0
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2020-08-31 15:03:13 UTC; dfrancom
+# Author: Devin Francom [aut, cre], Bruno Sanso [ths]
 # Maintainer: Devin Francom <devinfrancom@gmail.com>
 # Repository: CRAN
-# Date/Publication: 2017-03-17 07:24:00 UTC
+# Date/Publication: 2020-09-07 13:20:03 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

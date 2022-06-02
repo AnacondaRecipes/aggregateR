@@ -1,0 +1,87 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nakagami
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/nakagami_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/nakagami/nakagami_{{ version }}.tar.gz
+  sha256: 826a55366fa55bf54b4bf6fdfd666e2288c9d251cd044a06cff8f4506679ba2f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, covr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-assertthat
+
+  run:
+    - r-base
+    - r-assertthat
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('nakagami')"           # [not win]
+    - "\"%R%\" -e \"library('nakagami')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/JonasMoss/nakagami
+  license: MIT
+  summary: Density, distribution function, quantile function and random generation for the Nakagami
+    distribution of Nakagami (1960) <doi:10.1016/B978-0-08-009306-2.50005-4>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: nakagami
+# Type: Package
+# Title: Functions for the Nakagami Distribution
+# Version: 1.1.0
+# Authors@R: c( person("Jonas", "Moss", , "jonas.gjertsen@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-6876-6964") ))
+# Description: Density, distribution function, quantile function and random generation for the Nakagami distribution of Nakagami (1960) <doi:10.1016/B978-0-08-009306-2.50005-4>.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Imports: assertthat
+# Suggests: testthat, knitr, covr, rmarkdown
+# RoxygenNote: 7.1.1
+# URL: https://github.com/JonasMoss/nakagami
+# BugReports: https://github.com/JonasMoss/nakagami/issues
+# NeedsCompilation: no
+# Packaged: 2021-09-14 07:55:53 UTC; A2010578
+# Author: Jonas Moss [aut, cre] (<https://orcid.org/0000-0002-6876-6964>)
+# Maintainer: Jonas Moss <jonas.gjertsen@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-09-14 08:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

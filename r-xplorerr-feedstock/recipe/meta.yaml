@@ -1,4 +1,4 @@
-{% set version = '0.1.1' %}
+{% set version = '0.1.2' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,33 +11,41 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/xplorerr_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/xplorerr/xplorerr_{{ version }}.tar.gz
-  sha256: 1641cd693a9957914a2862cad54bfbb7ff93eb18eac6972a35b54e5c73fa089e
+  sha256: 197c5764365b6fb5e39b20eb0ab4faab9c8b0ceaff35125b28ce68f9ac358a69
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: blorr, descriptr, DT, grid, haven, highcharter, inferr, jsonlite, kableExtra, olsrr, plotly, rbokeh, readr, readxl, rfm, shinyBS, shinycssloaders, shinythemes, tools, vistributions
+# Suggests: blorr, data.table, descriptr, DT, grid, haven, highcharter, jsonlite, kableExtra, magrittr, olsrr, plotly, rbokeh, readr, readxl, rfm, shinyBS, shinycssloaders, shinythemes, tools, vistributions
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
-    - r-magrittr
+    - r-rcpp
     - r-shiny
 
   run:
     - r-base
-    - r-magrittr
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
     - r-shiny
 
 test:
@@ -55,9 +63,9 @@ test:
 about:
   home: https://github.com/rsquaredacademy/xplorerr, https://xplorerr.rsquaredacademy.com/
   license: MIT
-  summary: Tools for interactive data exploration built using 'shiny'. Includes apps for descriptive  statistics,
-    visualizing probability distributions, inferential statistics, linear regression,  logistic
-    regression and RFM analysis.
+  summary: Tools for interactive data exploration built using 'shiny'. Includes apps for descriptive
+    statistics, visualizing probability distributions, inferential statistics, linear
+    regression, logistic regression and RFM analysis.
   license_family: MIT
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
@@ -72,24 +80,25 @@ extra:
 # Package: xplorerr
 # Type: Package
 # Title: Tools for Interactive Data Exploration
-# Version: 0.1.1
+# Version: 0.1.2
 # Authors@R: person("Aravind", "Hebbali", email = "hebbali.aravind@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9220-9669"))
-# Description: Tools for interactive data exploration built using 'shiny'. Includes apps for descriptive  statistics, visualizing probability distributions, inferential statistics, linear regression,  logistic regression and RFM analysis.
+# Description: Tools for interactive data exploration built using 'shiny'. Includes apps for descriptive statistics, visualizing probability distributions, inferential statistics, linear regression, logistic regression and RFM analysis.
 # Depends: R(>= 3.2.4)
-# Imports: magrittr, shiny, utils
-# Suggests: blorr, descriptr, DT, grid, haven, highcharter, inferr, jsonlite, kableExtra, olsrr, plotly, rbokeh, readr, readxl, rfm, shinyBS, shinycssloaders, shinythemes, tools, vistributions
+# Imports: Rcpp, shiny, utils
+# Suggests: blorr, data.table, descriptr, DT, grid, haven, highcharter, jsonlite, kableExtra, magrittr, olsrr, plotly, rbokeh, readr, readxl, rfm, shinyBS, shinycssloaders, shinythemes, tools, vistributions
 # URL: https://github.com/rsquaredacademy/xplorerr, https://xplorerr.rsquaredacademy.com/
 # BugReports: https://github.com/rsquaredacademy/xplorerr/issues
 # License: MIT + file LICENSE
 # Encoding: UTF-8
 # LazyData: true
-# RoxygenNote: 6.1.1
-# NeedsCompilation: no
-# Packaged: 2019-02-28 09:31:08 UTC; HP
+# RoxygenNote: 7.1.1
+# LinkingTo: Rcpp
+# NeedsCompilation: yes
+# Packaged: 2021-05-21 02:41:55 UTC; HP
 # Author: Aravind Hebbali [aut, cre] (<https://orcid.org/0000-0001-9220-9669>)
 # Maintainer: Aravind Hebbali <hebbali.aravind@gmail.com>
 # Repository: CRAN
-# Date/Publication: 2019-02-28 10:30:03 UTC
+# Date/Publication: 2021-05-21 04:50:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

@@ -1,4 +1,4 @@
-{% set version = '1.6-2' %}
+{% set version = '1.6-6' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,24 +11,31 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/gmm_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/gmm/gmm_{{ version }}.tar.gz
-  sha256: b12f888276c2d480f17ae2711e4915bb253574e3fc36531349f1c2f2c8ad715d
+  sha256: b1b321ad1b4a4a14a2825a2c3eb939ce2f2bcef995247a1d638eca250e59739b
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: mvtnorm, car, stabledist, MASS, timeDate, timeSeries
+# Suggests: knitr, mvtnorm, car, stabledist, MASS, timeDate, timeSeries
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
@@ -36,6 +43,7 @@ requirements:
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
     - r-sandwich
 
 test:
@@ -71,23 +79,24 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: gmm
-# Version: 1.6-2
-# Date: 2017-09-26
+# Version: 1.6-6
+# Date: 2021-02-07
 # Title: Generalized Method of Moments and Generalized Empirical Likelihood
 # Author: Pierre Chausse <pchausse@uwaterloo.ca>
 # Maintainer: Pierre Chausse <pchausse@uwaterloo.ca>
 # Description: It is a complete suite to estimate models based on moment conditions. It includes the two step Generalized method of moments (Hansen 1982; <doi:10.2307/1912775>), the iterated GMM and continuous updated estimator (Hansen, Eaton and Yaron 1996; <doi:10.2307/1392442>) and several methods that belong to the Generalized Empirical Likelihood family of estimators (Smith 1997; <doi:10.1111/j.0013-0133.1997.174.x>, Kitamura 1997; <doi:10.1214/aos/1069362388>, Newey and Smith 2004; <doi:10.1111/j.1468-0262.2004.00482.x>, and Anatolyev 2005 <doi:10.1111/j.1468-0262.2005.00601.x>).
 # Depends: R (>= 2.10.0), sandwich
-# Suggests: mvtnorm, car, stabledist, MASS, timeDate, timeSeries
+# NeedsCompilation: yes
+# Suggests: knitr, mvtnorm, car, stabledist, MASS, timeDate, timeSeries
 # Imports: stats, methods, grDevices, graphics
 # License: GPL (>= 2)
+# VignetteBuilder: knitr
 # Repository: CRAN
 # Repository/R-Forge/Project: gmm
-# Repository/R-Forge/Revision: 119
-# Repository/R-Forge/DateTimeStamp: 2018-03-12 14:25:26
-# Date/Publication: 2018-03-15 22:51:20 UTC
-# NeedsCompilation: no
-# Packaged: 2018-03-12 14:47:02 UTC; rforge
+# Repository/R-Forge/Revision: 184
+# Repository/R-Forge/DateTimeStamp: 2021-03-02 21:28:59
+# Date/Publication: 2021-03-05 06:40:17 UTC
+# Packaged: 2021-03-02 21:47:29 UTC; rforge
 
 # See
 # https://docs.conda.io/projects/conda-build for

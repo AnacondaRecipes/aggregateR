@@ -1,4 +1,4 @@
-{% set version = '1.0' %}
+{% set version = '2.0.1' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,12 +11,13 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/Buddle_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/Buddle/Buddle_{{ version }}.tar.gz
-  sha256: eb24d4483b74aceb79d3c085d24e5873e6b41b48be639ee646e754c25bed80ab
+  sha256: 8e058d68809f3b77a132b718bb492aae830f8b1cd7bf7625007f24ba98092542
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
+  # no skip
 
   # This is required to make R link correctly on Linux.
   rpaths:
@@ -29,25 +30,24 @@ requirements:
     - {{ compiler('m2w64_c') }}        # [win]
     - {{ compiler('cxx') }}            # [not win]
     - {{ compiler('m2w64_cxx') }}      # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}make
-    - {{posix}}sed               # [win]
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
-    - llvm-openmp >=4.0.1        # [osx]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
     - r-rcpp >=0.12.17
     - r-rcpparmadillo
-    - llvm-openmp >=4.0.1        # [osx]
+    - r-plyr
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
     - r-rcpp >=0.12.17
     - r-rcpparmadillo
-    - llvm-openmp >=4.0.1        # [osx]
+    - r-plyr
 
 test:
   commands:
@@ -64,24 +64,27 @@ test:
 about:
   home: https://CRAN.R-project.org/package=Buddle
   license: GPL-2
-  summary: 'Statistical classification has been popular among various fields and stayed in the
-    limelight of scientists of those fields. Examples of the fields include clinical
-    trials where the statistical classification of patients is indispensable to predict
-    the clinical courses of diseases. Considering the negative impact of diseases on
-    performing daily tasks, correctly classifying patients based on the clinical information
-    is vital in that we need to identify patients of the high-risk group to develop
-    a severe state and arrange medical treatment for them at an opportune moment. Deep
-    learning - a part of artificial intelligence - has gained much attention, and research
-    on it burgeons during past decades. It is a veritable technique which was originally
-    designed for the classification, and hence, the EzDL package can provide sublime
-    solutions to various challenging classification problems encountered in the clinical
-    trials. The EzDL package is based on the back-propagation algorithm which performs
-    a multi-layer feed-forward neural network. This package contains two functions:
-    Buddle_Main() and Buddle_Predict(). Buddle_Main() builds a feed-forward neural network
-    model and trains the model. Buddle_Predict() provokes the trained model which is
-    the output of Buddle_Main(), classifies given data, and make a final prediction
-    for the data.  '
-
+  summary: 'Statistical classification and regression have been popular among various fields
+    and stayed in the limelight of scientists of those fields. Examples of the fields
+    include clinical trials where the statistical classification of patients is indispensable
+    to predict the clinical courses of diseases. Considering the negative impact of
+    diseases on performing daily tasks, correctly classifying patients based on the
+    clinical information is vital in that we need to identify patients of the high-risk
+    group to develop a severe state and arrange medical treatment for them at an opportune
+    moment. Deep learning - a part of artificial intelligence - has gained much attention,
+    and research on it burgeons during past decades: see, e.g, Kazemi and Mirroshandel
+    (2018) <DOI:10.1016/j.artmed.2017.12.001>. It is a veritable technique which was
+    originally designed for the classification, and hence, the Buddle package can provide
+    sublime solutions to various challenging classification and regression problems
+    encountered in the clinical trials. The Buddle package is based on the back-propagation
+    algorithm - together with various powerful techniques such as batch normalization
+    and dropout - which performs a multi-layer feed-forward neural network: see Krizhevsky
+    et. al (2017) <DOI:10.1145/3065386>, Schmidhuber (2015) <DOI:10.1016/j.neunet.2014.09.003>
+    and LeCun et al. (1998) <DOI:10.1109/5.726791> for more details. This package contains
+    two main functions: TrainBuddle() and FetchBuddle(). TrainBuddle() builds a feed-forward
+    neural network model and trains the model. FetchBuddle() recalls the trained model
+    which is the output of TrainBuddle(), classifies or regresses given data, and make
+    a final prediction for the data.'
   license_family: GPL2
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
@@ -94,23 +97,22 @@ extra:
 
 # Package: Buddle
 # Type: Package
-# Title: A Deep Learning Package for Statistical Classification Analysis
-# Version: 1.0
-# Date: 2018-12-11
-# Author: Jiwoong Kim <ji_woong_kim@hotmail.com>
+# Title: A Deep Learning for Statistical Classification and Regression Analysis with Random Effects
+# Version: 2.0.1
+# Date: 2020-02-04
+# Author: Jiwoong Kim <jwboys26 at gmail.com>
 # Maintainer: Jiwoong Kim <jwboys26@gmail.com>
-# Description: Statistical classification has been popular among various fields and stayed in the limelight of scientists of those fields. Examples of the fields include clinical trials where the statistical classification of patients is indispensable to predict the clinical courses of diseases. Considering the negative impact of diseases on performing daily tasks, correctly classifying patients based on the clinical information is vital in that we need to identify patients of the high-risk group to develop a severe state and arrange medical treatment for them at an opportune moment. Deep learning - a part of artificial intelligence - has gained much attention, and research on it burgeons during past decades. It is a veritable technique which was originally designed for the classification, and hence, the EzDL package can provide sublime solutions to various challenging classification problems encountered in the clinical trials. The EzDL package is based on the back-propagation algorithm which performs a multi-layer feed-forward neural network. This package contains two functions: Buddle_Main() and Buddle_Predict(). Buddle_Main() builds a feed-forward neural network model and trains the model. Buddle_Predict() provokes the trained model which is the output of Buddle_Main(), classifies given data, and make a final prediction for the data.
-# Encoding: UTF-8
-# Depends: R (>= 3.2.2)
+# Description: Statistical classification and regression have been popular among various fields and stayed in the limelight of scientists of those fields. Examples of the fields include clinical trials where the statistical classification of patients is indispensable to predict the clinical courses of diseases. Considering the negative impact of diseases on performing daily tasks, correctly classifying patients based on the clinical information is vital in that we need to identify patients of the high-risk group to develop a severe state and arrange medical treatment for them at an opportune moment. Deep learning - a part of artificial intelligence - has gained much attention, and research on it burgeons during past decades: see, e.g, Kazemi and Mirroshandel (2018) <DOI:10.1016/j.artmed.2017.12.001>. It is a veritable technique which was originally designed for the classification, and hence, the Buddle package can provide sublime solutions to various challenging classification and regression problems encountered in the clinical trials. The Buddle package is based on the back-propagation algorithm - together with various powerful techniques such as batch normalization and dropout - which performs a multi-layer feed-forward neural network: see Krizhevsky et. al (2017) <DOI:10.1145/3065386>, Schmidhuber (2015) <DOI:10.1016/j.neunet.2014.09.003> and LeCun et al. (1998) <DOI:10.1109/5.726791> for more details. This package contains two main functions: TrainBuddle() and FetchBuddle(). TrainBuddle() builds a feed-forward neural network model and trains the model. FetchBuddle() recalls the trained model which is the output of TrainBuddle(), classifies or regresses given data, and make a final prediction for the data.
+# Depends: R (>= 3.5.0)
 # License: GPL-2
 # LazyData: TRUE
-# Imports: Rcpp (>= 0.12.17)
+# Imports: Rcpp (>= 0.12.17), plyr, stats, graphics
 # LinkingTo: Rcpp, RcppArmadillo
-# RoxygenNote: 6.1.1
+# RoxygenNote: 7.0.2
 # NeedsCompilation: yes
-# Packaged: 2018-12-10 23:34:21 UTC; NEW0830
+# Packaged: 2020-02-11 13:27:23 UTC; Jason
 # Repository: CRAN
-# Date/Publication: 2018-12-21 15:50:03 UTC
+# Date/Publication: 2020-02-13 09:30:10 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

@@ -1,0 +1,110 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dqrng
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dqrng_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dqrng/dqrng_{{ version }}.tar.gz
+  sha256: 4beeabfe245ce7196b07369f2a7d277cb08869ad8b45a22c6354c4cc70a39abb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh >=1.64.0_1
+    - r-rcpp >=0.12.16
+    - r-sitmo >=2.0.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.64.0_1
+    - r-rcpp >=0.12.16
+    - r-sitmo >=2.0.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dqrng')"           # [not win]
+    - "\"%R%\" -e \"library('dqrng')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://daqana.github.io/dqrng/, https://github.com/daqana/dqrng
+  license: AGPL-3
+  summary: 'Several fast random number generators are provided as C++ header only libraries:
+    The PCG family by O''Neill (2014 <https://www.cs.hmc.edu/tr/hmc-cs-2014-0905.pdf>)
+    as well as Xoroshiro128+ and Xoshiro256+ by Blackman and Vigna (2018 <arXiv:1805.01407>).
+    In addition fast functions for generating random numbers according to a uniform,
+    normal and exponential distribution are included. The latter two use the Ziggurat
+    algorithm originally proposed by Marsaglia and Tsang (2000, <doi:10.18637/jss.v005.i08>).
+    These functions are exported to R and as a C++ interface and are enabled for use
+    with the default 64 bit generator from the PCG family, Xoroshiro128+ and Xoshiro256+
+    as well as the 64 bit version of the 20 rounds Threefry engine (Salmon et al., 2011
+    <doi:10.1145/2063384.2063405>) as provided by the package ''sitmo''.'
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: dqrng
+# Type: Package
+# Title: Fast Pseudo Random Number Generators
+# Version: 0.3.0
+# Authors@R: c( person("Ralf", "Stubner", email = "ralf.stubner@gmail.com", role = c("aut", "cre")), person("daqana GmbH", role = "cph"), person("David Blackman", role = "ctb"), person("Melissa O'Neill", email = "oneill@pcg-random.org", role = "ctb"), person("Sebastiano Vigna", email = "vigna@acm.org", role = "ctb"), person("Aaron", "Lun", role="ctb") )
+# Description: Several fast random number generators are provided as C++ header only libraries: The PCG family by O'Neill (2014 <https://www.cs.hmc.edu/tr/hmc-cs-2014-0905.pdf>) as well as Xoroshiro128+ and Xoshiro256+ by Blackman and Vigna (2018 <arXiv:1805.01407>). In addition fast functions for generating random numbers according to a uniform, normal and exponential distribution are included. The latter two use the Ziggurat algorithm originally proposed by Marsaglia and Tsang (2000, <doi:10.18637/jss.v005.i08>). These functions are exported to R and as a C++ interface and are enabled for use with the default 64 bit generator from the PCG family, Xoroshiro128+ and Xoshiro256+ as well as the 64 bit version of the 20 rounds Threefry engine (Salmon et al., 2011 <doi:10.1145/2063384.2063405>) as provided by the package 'sitmo'.
+# License: AGPL-3 | file LICENSE
+# Depends: R (>= 3.1.0)
+# Imports: Rcpp (>= 0.12.16)
+# LinkingTo: Rcpp, BH (>= 1.64.0-1), sitmo (>= 2.0.0)
+# RoxygenNote: 7.1.1
+# Suggests: testthat, knitr, rmarkdown
+# VignetteBuilder: knitr
+# URL: https://daqana.github.io/dqrng/, https://github.com/daqana/dqrng
+# BugReports: https://github.com/daqana/dqrng/issues
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2021-05-01 09:51:11 UTC; ralf
+# Author: Ralf Stubner [aut, cre], daqana GmbH [cph], David Blackman [ctb], Melissa O'Neill [ctb], Sebastiano Vigna [ctb], Aaron Lun [ctb]
+# Maintainer: Ralf Stubner <ralf.stubner@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-05-01 10:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

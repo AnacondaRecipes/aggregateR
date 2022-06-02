@@ -1,0 +1,107 @@
+{% set version = '0.7.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-flextable
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/flextable_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/flextable/flextable_{{ version }}.tar.gz
+  sha256: 75e5d54078651e52ba507af959ba2665b9a0d39f01ecadabaf229c83162d7997
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.1.0), xtable, webshot, magick, ggplot2, scales, broom, mgcv, bookdown, equatags, commonmark,pdftools
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-base64enc
+    - r-data.table >=1.13.0
+    - r-gdtools >=0.1.6
+    - r-htmltools
+    - r-knitr
+    - r-officer >=0.4.1
+    - r-rlang
+    - r-rmarkdown
+    - r-uuid >=0.1_4
+    - r-xml2
+
+  run:
+    - r-base
+    - r-base64enc
+    - r-data.table >=1.13.0
+    - r-gdtools >=0.1.6
+    - r-htmltools
+    - r-knitr
+    - r-officer >=0.4.1
+    - r-rlang
+    - r-rmarkdown
+    - r-uuid >=0.1_4
+    - r-xml2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('flextable')"           # [not win]
+    - "\"%R%\" -e \"library('flextable')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://ardata-fr.github.io/flextable-book/, https://davidgohel.github.io/flextable/
+  license: GPL-3
+  summary: Create pretty tables for 'HTML', 'PDF', 'Microsoft Word' and 'Microsoft PowerPoint'
+    documents from 'R Markdown'. Functions are provided to let users create tables,
+    modify and format their content. It also extends package 'officer' that does not
+    contain any feature for customized tabular reporting.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: flextable
+# Type: Package
+# Title: Functions for Tabular Reporting
+# Version: 0.7.0
+# Authors@R: c( person("David", "Gohel", role = c("aut", "cre"), email = "david.gohel@ardata.fr"), person("Clementine", "Jager", role = c("ctb")), person("Quentin", "Fazilleau", role = c("ctb")), person("Maxim", "Nazarov", role = c("ctb"), comment = "rmarkdown for docx output"), person(given = "Titouan", family = "Robert", role = c("ctb")), person(given = "Michael", family = "Barrowman", role = c("ctb"), comment = "inline footnotes"), person(given = "Atsushi", family = "Yasumoto", role = c("ctb"), comment = "support for bookdown cross reference"), person(given = "Paul", family = "Julian", role = c("ctb"), comment = "support for gam objects") )
+# Description: Create pretty tables for 'HTML', 'PDF', 'Microsoft Word' and 'Microsoft PowerPoint' documents from 'R Markdown'. Functions are provided to let users create tables, modify and format their content. It also extends package 'officer' that does not contain any feature for customized tabular reporting.
+# License: GPL-3
+# Imports: stats, utils, grDevices, graphics, officer (>= 0.4.1), rmarkdown, knitr, htmltools, xml2, data.table (>= 1.13.0), uuid (>= 0.1-4), gdtools (>= 0.1.6), rlang, base64enc
+# RoxygenNote: 7.1.2
+# Suggests: testthat (>= 2.1.0), xtable, webshot, magick, ggplot2, scales, broom, mgcv, bookdown, equatags, commonmark,pdftools
+# Encoding: UTF-8
+# URL: https://ardata-fr.github.io/flextable-book/, https://davidgohel.github.io/flextable/
+# BugReports: https://github.com/davidgohel/flextable/issues
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2022-03-06 22:42:13 UTC; davidgohel
+# Author: David Gohel [aut, cre], Clementine Jager [ctb], Quentin Fazilleau [ctb], Maxim Nazarov [ctb] (rmarkdown for docx output), Titouan Robert [ctb], Michael Barrowman [ctb] (inline footnotes), Atsushi Yasumoto [ctb] (support for bookdown cross reference), Paul Julian [ctb] (support for gam objects)
+# Maintainer: David Gohel <david.gohel@ardata.fr>
+# Repository: CRAN
+# Date/Publication: 2022-03-06 23:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

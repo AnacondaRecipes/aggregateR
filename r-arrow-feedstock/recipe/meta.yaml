@@ -1,5 +1,4 @@
-{% set version = '0.14.1.1' %}
-{% set arrow_ver = '0.14.1' %}
+{% set version = '8.0.0' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -12,62 +11,59 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/arrow_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/arrow/arrow_{{ version }}.tar.gz
-  sha256: 2da7962b7c32ec1f108b27ca614764c3bde6fd88519520a5ba6eff0327ce59d4
+  sha256: 6c9aa08c68b7b39cb7d6b9394c0b94a566c0fe9a85cea61f5ed19e460bdb05ad
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
-  number: 1
-  # TODO: for windows and osx we lack std:thread
-  skip: True  # [win]
+  number: 0
+  # no skip
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: covr, hms, lubridate, pkgdown, rmarkdown, roxygen2, testthat, tibble, vctrs
+# Suggests: DBI, dbplyr, decor, distro, dplyr, duckdb (>= 0.2.8), hms, knitr, lubridate, pkgload, reticulate, rmarkdown, stringi, stringr, testthat (>= 3.1.0), tibble, tzdb, withr
 requirements:
   build:
     - {{ compiler('c') }}              # [not win]
     - {{ compiler('m2w64_c') }}        # [win]
     - {{ compiler('cxx') }}            # [not win]
     - {{ compiler('m2w64_cxx') }}      # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}sed               # [win]
-    - {{posix}}grep              # [win]
-    - {{posix}}autoconf
-    - {{posix}}automake          # [not win]
-    - {{posix}}automake-wrapper  # [win]
-    - {{posix}}pkg-config
-    - {{posix}}make
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
-    - arrow-cpp {{ arrow_ver }}
     - r-r6
-    - r-rcpp >=1.0.1
     - r-assertthat
-    - r-bit64
-    - r-fs
+    - r-bit64 >=0.9_7
+    - r-cpp11 >=0.4.2
     - r-purrr
     - r-rlang
-    - r-tidyselect
+    - r-tidyselect >=1.0.0
+    - r-vctrs
 
   run:
     - r-base
-    - {{ pin_compatible('arrow-cpp') }}
     - {{native}}gcc-libs         # [win]
     - r-r6
-    - r-rcpp >=1.0.1
     - r-assertthat
-    - r-bit64
-    - r-fs
+    - r-bit64 >=0.9_7
+    - r-cpp11 >=0.4.2
     - r-purrr
     - r-rlang
-    - r-tidyselect
+    - r-tidyselect >=1.0.0
+    - r-vctrs
 
 test:
   commands:
@@ -82,13 +78,12 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://github.com/apache/arrow/
+  home: https://github.com/apache/arrow/, https://arrow.apache.org/docs/r/
   license: Apache License (>= 2.0)
   summary: '''Apache'' ''Arrow'' <https://arrow.apache.org/> is a cross-language development
     platform for in-memory data. It specifies a standardized language-independent columnar
     memory format for flat and hierarchical data, organized for efficient analytic operations
     on modern hardware. This package provides an interface to the ''Arrow C++'' library.'
-
   license_family: APACHE
 
 extra:
@@ -99,29 +94,30 @@ extra:
 
 # Package: arrow
 # Title: Integration to 'Apache' 'Arrow'
-# Version: 0.14.1.1
-# Authors@R: c( person("Romain", "Fran\u00e7ois", email = "romain@rstudio.com", role = c("aut"), comment = c(ORCID = "0000-0002-2444-4226")), person("Jeroen", "Ooms", email = "jeroen@berkeley.edu", role = c("aut")), person("Neal", "Richardson", email = "neal@ursalabs.org", role = c("aut", "cre")), person("Javier", "Luraschi", email = "javier@rstudio.com", role = c("ctb")), person("Jeffrey", "Wong", email = "jeffreyw@netflix.com", role = c("ctb")), person("Apache Arrow", email = "dev@arrow.apache.org", role = c("aut", "cph")) )
+# Version: 8.0.0
+# Authors@R: c( person("Neal", "Richardson", email = "neal@ursalabs.org", role = c("aut", "cre")), person("Ian", "Cook", email = "ianmcook@gmail.com", role = c("aut")), person("Nic", "Crane", email = "thisisnic@gmail.com", role = c("aut")), person("Dewey", "Dunnington", role = c("aut"), email = "dewey@fishandwhistle.net", comment = c(ORCID = "0000-0002-9415-4582")), person("Romain", "Fran\u00e7ois", email = "romain@rstudio.com", role = c("aut"), comment = c(ORCID = "0000-0002-2444-4226")), person("Jonathan", "Keane", email = "jkeane@gmail.com", role = c("aut")), person("Drago\u0219", "Moldovan-Gr\u00fcnfeld", email = "dragos.mold@gmail.com", role = c("aut")), person("Jeroen", "Ooms", email = "jeroen@berkeley.edu", role = c("aut")), person("Javier", "Luraschi", email = "javier@rstudio.com", role = c("ctb")), person("Karl", "Dunkle Werner", email = "karldw@users.noreply.github.com", role = c("ctb"), comment = c(ORCID = "0000-0003-0523-7309")), person("Jeffrey", "Wong", email = "jeffreyw@netflix.com", role = c("ctb")), person("Apache Arrow", email = "dev@arrow.apache.org", role = c("aut", "cph")) )
 # Description: 'Apache' 'Arrow' <https://arrow.apache.org/> is a cross-language development platform for in-memory data. It specifies a standardized language-independent columnar memory format for flat and hierarchical data, organized for efficient analytic operations on modern hardware. This package provides an interface to the 'Arrow C++' library.
-# Depends: R (>= 3.1)
+# Depends: R (>= 3.4)
 # License: Apache License (>= 2.0)
-# URL: https://github.com/apache/arrow/
+# URL: https://github.com/apache/arrow/, https://arrow.apache.org/docs/r/
 # BugReports: https://issues.apache.org/jira/projects/ARROW/issues
 # Encoding: UTF-8
 # Language: en-US
-# LazyData: true
-# SystemRequirements: C++11
+# SystemRequirements: C++11; for AWS S3 support on Linux, libcurl and openssl (optional)
 # Biarch: true
-# LinkingTo: Rcpp (>= 1.0.1)
-# Imports: assertthat, bit64, fs, purrr, R6, Rcpp (>= 1.0.1), rlang, tidyselect, utils
-# RoxygenNote: 6.1.1
-# Suggests: covr, hms, lubridate, pkgdown, rmarkdown, roxygen2, testthat, tibble, vctrs
-# Collate: 'enums.R' 'R6.R' 'ArrayData.R' 'ChunkedArray.R' 'Column.R' 'Field.R' 'List.R' 'RecordBatch.R' 'RecordBatchReader.R' 'RecordBatchWriter.R' 'Schema.R' 'Struct.R' 'Table.R' 'array.R' 'arrow-package.R' 'arrowExports.R' 'buffer.R' 'io.R' 'compression.R' 'compute.R' 'csv.R' 'dictionary.R' 'feather.R' 'install-arrow.R' 'json.R' 'memory_pool.R' 'message.R' 'parquet.R' 'read_record_batch.R' 'read_table.R' 'reexports-bit64.R' 'reexports-tidyselect.R' 'write_arrow.R'
+# Imports: assertthat, bit64 (>= 0.9-7), methods, purrr, R6, rlang, stats, tidyselect (>= 1.0.0), utils, vctrs
+# RoxygenNote: 7.1.2
+# Config/testthat/edition: 3
+# VignetteBuilder: knitr
+# Suggests: DBI, dbplyr, decor, distro, dplyr, duckdb (>= 0.2.8), hms, knitr, lubridate, pkgload, reticulate, rmarkdown, stringi, stringr, testthat (>= 3.1.0), tibble, tzdb, withr
+# LinkingTo: cpp11 (>= 0.4.2)
+# Collate: 'arrowExports.R' 'enums.R' 'arrow-package.R' 'type.R' 'array-data.R' 'arrow-datum.R' 'array.R' 'arrow-tabular.R' 'buffer.R' 'chunked-array.R' 'io.R' 'compression.R' 'scalar.R' 'compute.R' 'config.R' 'csv.R' 'dataset.R' 'dataset-factory.R' 'dataset-format.R' 'dataset-partition.R' 'dataset-scan.R' 'dataset-write.R' 'deprecated.R' 'dictionary.R' 'dplyr-arrange.R' 'dplyr-collect.R' 'dplyr-count.R' 'dplyr-distinct.R' 'dplyr-eval.R' 'dplyr-filter.R' 'dplyr-funcs-conditional.R' 'dplyr-funcs-datetime.R' 'dplyr-funcs-math.R' 'dplyr-funcs-string.R' 'dplyr-funcs-type.R' 'expression.R' 'dplyr-funcs.R' 'dplyr-group-by.R' 'dplyr-join.R' 'dplyr-mutate.R' 'dplyr-select.R' 'dplyr-summarize.R' 'record-batch.R' 'table.R' 'dplyr.R' 'duckdb.R' 'extension.R' 'feather.R' 'field.R' 'filesystem.R' 'flight.R' 'install-arrow.R' 'ipc-stream.R' 'json.R' 'memory-pool.R' 'message.R' 'metadata.R' 'parquet.R' 'python.R' 'query-engine.R' 'record-batch-reader.R' 'record-batch-writer.R' 'reexports-bit64.R' 'reexports-tidyselect.R' 'schema.R' 'util.R'
 # NeedsCompilation: yes
-# Packaged: 2019-08-08 20:20:55 UTC; enpiar
-# Author: Romain FranAois [aut] (<https://orcid.org/0000-0002-2444-4226>), Jeroen Ooms [aut], Neal Richardson [aut, cre], Javier Luraschi [ctb], Jeffrey Wong [ctb], Apache Arrow [aut, cph]
+# Packaged: 2022-05-09 19:51:23 UTC; enpiar
+# Author: Neal Richardson [aut, cre], Ian Cook [aut], Nic Crane [aut], Dewey Dunnington [aut] (<https://orcid.org/0000-0002-9415-4582>), Romain Francois [aut] (<https://orcid.org/0000-0002-2444-4226>), Jonathan Keane [aut], Dragos Moldovan-Grunfeld [aut], Jeroen Ooms [aut], Javier Luraschi [ctb], Karl Dunkle Werner [ctb] (<https://orcid.org/0000-0003-0523-7309>), Jeffrey Wong [ctb], Apache Arrow [aut, cph]
 # Maintainer: Neal Richardson <neal@ursalabs.org>
 # Repository: CRAN
-# Date/Publication: 2019-08-08 22:40:08 UTC
+# Date/Publication: 2022-05-09 22:50:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

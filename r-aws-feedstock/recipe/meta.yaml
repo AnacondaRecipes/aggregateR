@@ -1,4 +1,4 @@
-{% set version = '2.2-1' %}
+{% set version = '2.5-1' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,12 +11,13 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/aws_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/aws/aws_{{ version }}.tar.gz
-  sha256: 21fd72d46d7c5a836cd86311c955aa636f7ca01a939934cc6c921db387541abc
+  sha256: e8abadc5614f132edc3fb9cb1c82ce4dacc1315b727fbd49db7399aee24115ba
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
+  # no skip
 
   # This is required to make R link correctly on Linux.
   rpaths:
@@ -29,30 +30,22 @@ requirements:
     - {{ compiler('m2w64_c') }}        # [win]
     - {{ compiler('fortran') }}        # [not win]
     - {{ compiler('m2w64_fortran') }}  # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}sed               # [win]
-    - {{posix}}grep              # [win]
-    - {{posix}}autoconf
-    - {{posix}}automake          # [not win]
-    - {{posix}}automake-wrapper  # [win]
-    - {{posix}}pkg-config
-    - {{posix}}make
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
-    - llvm-openmp >=4.0.1        # [osx]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
-    - r-awsmethods >=1.0_1
+    - r-awsmethods >=1.1_1
     - r-gsl
-    - llvm-openmp >=4.0.1        # [osx]
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
-    - r-awsmethods >=1.0_1
+    - r-awsmethods >=1.1_1
     - r-gsl
-    - llvm-openmp >=4.0.1        # [osx]
 
 test:
   commands:
@@ -68,15 +61,18 @@ test:
 
 about:
   home: http://www.wias-berlin.de/people/polzehl/
-  license: GPL (>= 2)
+  license: GPL-2
   summary: We provide a collection of R-functions implementing adaptive smoothing procedures
     in 1D, 2D and 3D. This includes the Propagation-Separation Approach to adaptive
-    smoothing as described in "J. Polzehl and V. Spokoiny (2006) <DOI:10.1007/s00440-005-0464-1>",
-    "J. Polzehl and V. Spokoiny (2004) <DOI:10.20347/WIAS.PREPRINT.998>" and "J. Polzehl,
-    K. Papafitsoros, K. Tabelow (2018) <DOI:10.20347/WIAS.PREPRINT.2520>", the Intersecting
-    Confidence Intervals (ICI), variational approaches and a non-local means filter.
-  license_family: GPL3
-  license_file: '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    smoothing, the Intersecting Confidence Intervals (ICI), variational approaches and
+    a non-local means filter. The package is described in detail in Polzehl J, Papafitsoros
+    K, Tabelow K (2020). Patch-Wise Adaptive Weights Smoothing in R. Journal of Statistical
+    Software, 95(6), 1-27. <doi:10.18637/jss.v095.i06>, Usage of the package in neuroimaging
+    is illustrated in Polzehl and Tabelow (2019), Magnetic Resonance Brain Imaging,
+    Appendix A, Springer, Use R! Series. <doi:10.1007/978-3-030-29184-6_6>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
 
 extra:
   recipe-maintainers:
@@ -85,22 +81,23 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: aws
-# Version: 2.2-1
-# Date: 2019-04-23
+# Version: 2.5-1
+# Date: 2021-01-11
 # Title: Adaptive Weights Smoothing
 # Authors@R: c(person("Joerg","Polzehl",role=c("aut","cre"),email="joerg.polzehl@wias-berlin.de"),person("Felix","Anker",role=c("ctb")))
 # Author: Joerg Polzehl [aut, cre], Felix Anker [ctb]
 # Maintainer: Joerg Polzehl <joerg.polzehl@wias-berlin.de>
-# Depends: R (>= 3.4.0), methods, awsMethods (>= 1.0-1), gsl
-# Description: We provide a collection of R-functions implementing adaptive smoothing procedures in 1D, 2D and 3D. This includes the Propagation-Separation Approach to adaptive smoothing as described in "J. Polzehl and V. Spokoiny (2006) <DOI:10.1007/s00440-005-0464-1>", "J. Polzehl and V. Spokoiny (2004) <DOI:10.20347/WIAS.PREPRINT.998>" and "J. Polzehl, K. Papafitsoros, K. Tabelow (2018) <DOI:10.20347/WIAS.PREPRINT.2520>", the Intersecting Confidence Intervals (ICI), variational approaches and a non-local means filter.
+# Depends: R (>= 3.4.0), awsMethods (>= 1.1-1)
+# Imports: methods, gsl
+# Description: We provide a collection of R-functions implementing adaptive smoothing procedures in 1D, 2D and 3D. This includes the Propagation-Separation Approach to adaptive smoothing, the Intersecting Confidence Intervals (ICI), variational approaches and a non-local means filter. The package is described in detail in Polzehl J, Papafitsoros K, Tabelow K (2020). Patch-Wise Adaptive Weights Smoothing in R. Journal of Statistical Software, 95(6), 1-27. <doi:10.18637/jss.v095.i06>, Usage of the package in neuroimaging is illustrated in Polzehl and Tabelow (2019), Magnetic Resonance Brain Imaging, Appendix A, Springer, Use R! Series. <doi:10.1007/978-3-030-29184-6_6>.
 # License: GPL (>= 2)
-# Copyright: This package is Copyright (C) 2005-2018 Weierstrass Institute for Applied Analysis and Stochastics.
+# Copyright: This package is Copyright (C) 2005-2020 Weierstrass Institute for Applied Analysis and Stochastics.
 # URL: http://www.wias-berlin.de/people/polzehl/
 # RoxygenNote: 5.0.1
 # NeedsCompilation: yes
-# Packaged: 2019-05-07 08:15:05 UTC; polzehl
+# Packaged: 2021-01-11 14:54:06 UTC; polzehl
 # Repository: CRAN
-# Date/Publication: 2019-05-08 09:20:05 UTC
+# Date/Publication: 2021-01-11 22:40:12 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

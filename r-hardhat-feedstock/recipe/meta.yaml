@@ -1,0 +1,101 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hardhat
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hardhat_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hardhat/hardhat_{{ version }}.tar.gz
+  sha256: 9497ca0fe6206c54d1da79f248d44c5faffc7d375b630091ef45dfca46c29628
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, crayon, devtools, knitr, Matrix, modeldata (>= 0.0.2), recipes (>= 0.1.8), rmarkdown (>= 2.3), roxygen2, testthat (>= 2.1.0), usethis
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-glue
+    - r-rlang >=0.4.2
+    - r-tibble
+    - r-vctrs >=0.3.0
+
+  run:
+    - r-base
+    - r-glue
+    - r-rlang >=0.4.2
+    - r-tibble
+    - r-vctrs >=0.3.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hardhat')"           # [not win]
+    - "\"%R%\" -e \"library('hardhat')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/tidymodels/hardhat
+  license: MIT
+  summary: Building modeling packages is hard. A large amount of effort generally goes into providing
+    an implementation for a new method that is efficient, fast, and correct, but often
+    less emphasis is put on the user interface. A good interface requires specialized
+    knowledge about S3 methods and formulas, which the average package developer might
+    not have.  The goal of 'hardhat' is to reduce the burden around building new modeling
+    packages by providing functionality for preprocessing, predicting, and validating
+    input.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: hardhat
+# Title: Construct Modeling Packages
+# Version: 0.2.0
+# Authors@R: c(person(given = "Davis", family = "Vaughan", role = c("aut", "cre"), email = "davis@rstudio.com"), person(given = "Max", family = "Kuhn", role = "aut", email = "max@rstudio.com"), person(given = "RStudio", role = "cph"))
+# Maintainer: Davis Vaughan <davis@rstudio.com>
+# Description: Building modeling packages is hard. A large amount of effort generally goes into providing an implementation for a new method that is efficient, fast, and correct, but often less emphasis is put on the user interface. A good interface requires specialized knowledge about S3 methods and formulas, which the average package developer might not have.  The goal of 'hardhat' is to reduce the burden around building new modeling packages by providing functionality for preprocessing, predicting, and validating input.
+# License: MIT + file LICENSE
+# URL: https://github.com/tidymodels/hardhat
+# BugReports: https://github.com/tidymodels/hardhat/issues
+# Depends: R (>= 2.10)
+# Imports: glue, rlang (>= 0.4.2), tibble, vctrs (>= 0.3.0)
+# Suggests: covr, crayon, devtools, knitr, Matrix, modeldata (>= 0.0.2), recipes (>= 0.1.8), rmarkdown (>= 2.3), roxygen2, testthat (>= 2.1.0), usethis
+# Config/Needs/website: tidyverse/tidytemplate
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.1.2
+# NeedsCompilation: no
+# Packaged: 2022-01-24 20:31:29 UTC; davis
+# Author: Davis Vaughan [aut, cre], Max Kuhn [aut], RStudio [cph]
+# Repository: CRAN
+# Date/Publication: 2022-01-24 21:12:42 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

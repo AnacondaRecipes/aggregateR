@@ -1,0 +1,116 @@
+{% set version = '1.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-keyring
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/keyring_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/keyring/keyring_{{ version }}.tar.gz
+  sha256: eaa19ac30afc4564b0f59d8c20336fee20033dd251c5e5f904273702ab3514c9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: callr, covr, mockery, testthat, withr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-askpass
+    - r-assertthat
+    - r-filelock
+    - r-openssl
+    - r-rappdirs
+    - r-sodium
+    - r-yaml
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-r6
+    - r-askpass
+    - r-assertthat
+    - r-filelock
+    - r-openssl
+    - r-rappdirs
+    - r-sodium
+    - r-yaml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('keyring')"           # [not win]
+    - "\"%R%\" -e \"library('keyring')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://r-lib.github.io/keyring/index.html, https://github.com/r-lib/keyring#readme
+  license: MIT
+  summary: 'Platform independent ''API'' to access the operating system''s credential store.
+    Currently supports: ''Keychain'' on ''macOS'', Credential Store on ''Windows'',
+    the Secret Service ''API'' on ''Linux'', and a simple, platform independent store
+    implemented with environment variables. Additional storage back-ends can be added
+    easily.'
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: keyring
+# Title: Access the System Credential Store from R
+# Version: 1.3.0
+# Authors@R: c(person(given = "Gabor", family = "Csardi", role = c("aut", "cre"), email = "csardi.gabor@gmail.com"), person(given = "Alec", family = "Wong", role = "ctb"), person("RStudio", role = "cph"))
+# Description: Platform independent 'API' to access the operating system's credential store. Currently supports: 'Keychain' on 'macOS', Credential Store on 'Windows', the Secret Service 'API' on 'Linux', and a simple, platform independent store implemented with environment variables. Additional storage back-ends can be added easily.
+# License: MIT + file LICENSE
+# URL: https://r-lib.github.io/keyring/index.html, https://github.com/r-lib/keyring#readme
+# BugReports: https://github.com/r-lib/keyring/issues
+# RoxygenNote: 7.1.2
+# Imports: assertthat, askpass, openssl, R6, utils, sodium, yaml, filelock, rappdirs, tools
+# Suggests: callr, covr, mockery, testthat, withr
+# Encoding: UTF-8
+# SystemRequirements: Optional: libsecret on Linux (libsecret-1-dev on Debian/Ubuntu, libsecret-devel on Fedora/CentOS)
+# Collate: 'api.R' 'assertions.R' 'backend-class.R' 'backend-env.R' 'backend-file.R' 'backend-macos.R' 'backend-secret-service.R' 'backend-wincred.R' 'default_backend.R' 'package.R' 'pass.R' 'utils.R'
+# NeedsCompilation: yes
+# Packaged: 2021-11-28 21:12:16 UTC; gaborcsardi
+# Author: Gabor Csardi [aut, cre], Alec Wong [ctb], RStudio [cph]
+# Maintainer: Gabor Csardi <csardi.gabor@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-11-29 09:00:13 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,4 +1,4 @@
-{% set version = '0.2-2' %}
+{% set version = '0.3-43' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,7 +11,7 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/mixsqp_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/mixsqp/mixsqp_{{ version }}.tar.gz
-  sha256: 44a5ffb23834ea91ab7f956a8a8b8759e5aab569402d053b6e0700481b20f589
+  sha256: 58042d832803462ca03197a9dbd49d022378756de8996682b89e6bc009d02ce2
 
 build:
   merge_build_host: True  # [win]
@@ -31,25 +31,24 @@ requirements:
     - {{ compiler('m2w64_c') }}        # [win]
     - {{ compiler('cxx') }}            # [not win]
     - {{ compiler('m2w64_cxx') }}      # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}make
-    - {{posix}}sed               # [win]
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
-    - llvm-openmp >=4.0.1  # [osx]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
     - r-rcpp >=0.12.15
     - r-rcpparmadillo
-    - llvm-openmp >=4.0.1  # [osx]
+    - r-irlba
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
     - r-rcpp >=0.12.15
     - r-rcpparmadillo
-    - llvm-openmp >=4.0.1  # [osx]
+    - r-irlba
 
 test:
   commands:
@@ -66,13 +65,15 @@ test:
 about:
   home: https://github.com/stephenslab/mixsqp
   license: MIT
-  summary: Provides optimization algorithms based on sequential quadratic programming (SQP) for
+  summary: Provides an optimization method based on sequential quadratic programming (SQP) for
     maximum likelihood estimation of the mixture proportions in a finite mixture model
-    where the component densities are known. The algorithms are expected to obtain solutions
+    where the component densities are known. The algorithm is expected to obtain solutions
     that are at least as accurate as the state-of-the-art MOSEK interior-point solver
     (called by function "KWDual" in the 'REBayes' package), and they are expected to
-    arrive at solutions more quickly in large data sets. The algorithms are described
-    in Y. Kim, P. Carbonetto, M. Stephens & M. Anitescu (2018) <arXiv:1806.01412>.
+    arrive at solutions more quickly when the number of samples is large and the number
+    of mixture components is not too large. This implements the "mix-SQP" algorithm,
+    with some improvements, described in Y. Kim, P. Carbonetto, M. Stephens & M. Anitescu
+    (2020) <DOI:10.1080/10618600.2019.1689985>.
   license_family: MIT
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
@@ -87,27 +88,27 @@ extra:
 # Encoding: UTF-8
 # Type: Package
 # Package: mixsqp
-# Version: 0.2-2
-# Date: 2019-10-15
+# Version: 0.3-43
+# Date: 2020-05-14
 # Title: Sequential Quadratic Programming for Fast Maximum-Likelihood Estimation of Mixture Proportions
 # Authors@R: c(person("Youngseok","Kim",role="aut", email="youngseok@uchicago.edu"), person("Peter","Carbonetto",role=c("aut","cre"), email="peter.carbonetto@gmail.com"), person("Mihai","Anitescu",role="aut"), person("Matthew","Stephens",role="aut"), person("Jason","Willwerscheid",role="ctb"), person("Jean","Morrison",role="ctb"))
 # URL: https://github.com/stephenslab/mixsqp
 # BugReports: https://github.com/stephenslab/mixsqp/issues
 # Depends: R (>= 3.3.0)
-# Description: Provides optimization algorithms based on sequential quadratic programming (SQP) for maximum likelihood estimation of the mixture proportions in a finite mixture model where the component densities are known. The algorithms are expected to obtain solutions that are at least as accurate as the state-of-the-art MOSEK interior-point solver (called by function "KWDual" in the 'REBayes' package), and they are expected to arrive at solutions more quickly in large data sets. The algorithms are described in Y. Kim, P. Carbonetto, M. Stephens & M. Anitescu (2018) <arXiv:1806.01412>.
+# Description: Provides an optimization method based on sequential quadratic programming (SQP) for maximum likelihood estimation of the mixture proportions in a finite mixture model where the component densities are known. The algorithm is expected to obtain solutions that are at least as accurate as the state-of-the-art MOSEK interior-point solver (called by function "KWDual" in the 'REBayes' package), and they are expected to arrive at solutions more quickly when the number of samples is large and the number of mixture components is not too large. This implements the "mix-SQP" algorithm, with some improvements, described in Y. Kim, P. Carbonetto, M. Stephens & M. Anitescu (2020) <DOI:10.1080/10618600.2019.1689985>.
 # License: MIT + file LICENSE
-# Imports: stats, Rcpp (>= 0.12.15)
+# Imports: utils, stats, irlba, Rcpp (>= 0.12.15)
 # Suggests: REBayes, Rmosek, testthat, knitr, rmarkdown
 # LinkingTo: Rcpp, RcppArmadillo
 # LazyData: true
 # NeedsCompilation: yes
 # VignetteBuilder: knitr
-# RoxygenNote: 6.1.1
-# Packaged: 2019-10-15 19:54:31 UTC; pcarbo
+# RoxygenNote: 7.1.0
+# Packaged: 2020-05-14 12:23:40 UTC; pcarbo
 # Author: Youngseok Kim [aut], Peter Carbonetto [aut, cre], Mihai Anitescu [aut], Matthew Stephens [aut], Jason Willwerscheid [ctb], Jean Morrison [ctb]
 # Maintainer: Peter Carbonetto <peter.carbonetto@gmail.com>
 # Repository: CRAN
-# Date/Publication: 2019-10-16 21:20:02 UTC
+# Date/Publication: 2020-05-14 14:20:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

@@ -1,0 +1,100 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-furrr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/furrr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/furrr/furrr_{{ version }}.tar.gz
+  sha256: 3fe91cc1614f9404c708ea3a15b6a40289fa57f40f3ece54452093408d91fd84
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: carrier, covr, dplyr (>= 0.7.4), knitr, listenv (>= 0.6.0), magrittr, rmarkdown, testthat (>= 3.0.0), tidyselect, withr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-future >=1.25.0
+    - r-globals >=0.14.0
+    - r-lifecycle >=1.0.1
+    - r-purrr >=0.3.4
+    - r-rlang >=1.0.2
+    - r-vctrs >=0.4.1
+
+  run:
+    - r-base
+    - r-future >=1.25.0
+    - r-globals >=0.14.0
+    - r-lifecycle >=1.0.1
+    - r-purrr >=0.3.4
+    - r-rlang >=1.0.2
+    - r-vctrs >=0.4.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('furrr')"           # [not win]
+    - "\"%R%\" -e \"library('furrr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/DavisVaughan/furrr, https://furrr.futureverse.org/
+  license: MIT
+  summary: Implementations of the family of map() functions from 'purrr' that can be resolved
+    using any 'future'-supported backend, e.g. parallel on the local machine or distributed
+    on a compute cluster.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: furrr
+# Title: Apply Mapping Functions in Parallel using Futures
+# Version: 0.3.0
+# Authors@R: c( person("Davis", "Vaughan", , "davis@rstudio.com", role = c("aut", "cre")), person("Matt", "Dancho", , "mdancho@business-science.io", role = "aut"), person("RStudio", role = c("cph", "fnd")) )
+# Description: Implementations of the family of map() functions from 'purrr' that can be resolved using any 'future'-supported backend, e.g. parallel on the local machine or distributed on a compute cluster.
+# License: MIT + file LICENSE
+# URL: https://github.com/DavisVaughan/furrr, https://furrr.futureverse.org/
+# BugReports: https://github.com/DavisVaughan/furrr/issues
+# Depends: future (>= 1.25.0), R (>= 3.4.0)
+# Imports: globals (>= 0.14.0), lifecycle (>= 1.0.1), purrr (>= 0.3.4), rlang (>= 1.0.2), vctrs (>= 0.4.1)
+# Suggests: carrier, covr, dplyr (>= 0.7.4), knitr, listenv (>= 0.6.0), magrittr, rmarkdown, testthat (>= 3.0.0), tidyselect, withr
+# Config/Needs/website: progressr
+# Config/testthat/edition: 3
+# Encoding: UTF-8
+# RoxygenNote: 7.1.2
+# NeedsCompilation: no
+# Packaged: 2022-05-04 14:36:06 UTC; davis
+# Author: Davis Vaughan [aut, cre], Matt Dancho [aut], RStudio [cph, fnd]
+# Maintainer: Davis Vaughan <davis@rstudio.com>
+# Repository: CRAN
+# Date/Publication: 2022-05-04 15:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

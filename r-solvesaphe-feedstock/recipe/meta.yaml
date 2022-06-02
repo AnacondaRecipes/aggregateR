@@ -1,0 +1,86 @@
+{% set version = '2.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-solvesaphe
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SolveSAPHE_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SolveSAPHE/SolveSAPHE_{{ version }}.tar.gz
+  sha256: d9ad1611716350c27cae7658453a3f99b326834f37d7ce85cfd2a040538082e4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SolveSAPHE')"           # [not win]
+    - "\"%R%\" -e \"library('SolveSAPHE')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SolveSAPHE
+  license: GPL-2
+  summary: Universal and robust algorithm for solving the total alkalinity-pH equation presented
+    in G. Munhoven (2013) <doi:10.5194/gmd-6-1367-2013> and G. Munhoven (2021) <doi:10.5194/gmd-2020-447>.
+    The total alkalinity-pH equation relates total alkalinity and pH for a given set
+    of acid-base concentrations in a given water sample, among which carbonic acid.
+    This package is particularly useful in marine chemistry involving dissolved inorganic
+    carbon. Original package in Fortran can be found at <doi:10.5281/zenodo.4328965>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: SolveSAPHE
+# Title: Solver Suite for Alkalinity-PH Equations
+# Version: 2.1.0
+# Date: 2021-04-09
+# Authors@R: c(person("Jean-Marie", "Epitalon", role = c("aut", "cre", "cph"), email = "jean-marie.epitalon@orange.fr"), person("Jean-Pierre", "Gattuso", role = c("cph"), email = "gattuso@obs-vlfr.fr"), person("Guy", "Munhoven", role = "aut", email = "Guy.Munhoven@ulg.ac.be") )
+# Depends: R (>= 2.10)
+# Imports: stats
+# Description: Universal and robust algorithm for solving the total alkalinity-pH equation presented in G. Munhoven (2013) <doi:10.5194/gmd-6-1367-2013> and G. Munhoven (2021) <doi:10.5194/gmd-2020-447>. The total alkalinity-pH equation relates total alkalinity and pH for a given set of acid-base concentrations in a given water sample, among which carbonic acid. This package is particularly useful in marine chemistry involving dissolved inorganic carbon. Original package in Fortran can be found at <doi:10.5281/zenodo.4328965>.
+# Encoding: UTF-8
+# URL: https://CRAN.R-project.org/package=SolveSAPHE
+# License: GPL (>= 2)
+# Repository: CRAN
+# RoxygenNote: 7.1.0
+# NeedsCompilation: no
+# Packaged: 2021-05-01 17:35:04 UTC; jean-marie
+# Author: Jean-Marie Epitalon [aut, cre, cph], Jean-Pierre Gattuso [cph], Guy Munhoven [aut]
+# Maintainer: Jean-Marie Epitalon <jean-marie.epitalon@orange.fr>
+# Date/Publication: 2021-05-01 17:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

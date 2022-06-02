@@ -1,4 +1,4 @@
-{% set version = '6.3.0' %}
+{% set version = '9.0.0' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,7 +11,7 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/SimInf_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/SimInf/SimInf_{{ version }}.tar.gz
-  sha256: eea102b9e786c6568cf4d7842ce7a442603b0b33305d5aa987f2099be3597804
+  sha256: 4d3244c757dd3764a498deb63c8d716b73058200cbc4b71908b96e7f96a66e17
 
 build:
   merge_build_host: True  # [win]
@@ -24,31 +24,34 @@ build:
     - lib/R/lib/
     - lib/
 
+# Suggests: knitr, rmarkdown
 requirements:
   build:
     - {{ compiler('c') }}              # [not win]
     - {{ compiler('m2w64_c') }}        # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}sed               # [win]
-    - {{posix}}grep              # [win]
-    - {{posix}}autoconf
-    - {{posix}}automake          # [not win]
-    - {{posix}}automake-wrapper  # [win]
-    - {{posix}}pkg-config
-    - {{posix}}make
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-mass
     - r-matrix
-    - gsl
+    - r-digest
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
+    - r-mass
     - r-matrix
-    - gsl
+    - r-digest
 
 test:
   commands:
@@ -75,7 +78,10 @@ about:
     of our design goals was to make the package extendable and enable usage of the numerical
     solvers from other R extension packages in order to facilitate complex epidemiological
     research. The package contains template models and can be extended with user-defined
-    models.
+    models. For more details see the paper by Widgren, Bauer, Eriksson and Engblom (2019)
+    <doi:10.18637/jss.v091.i12>. The package also provides functionality to fit models
+    to time series data using the Approximate Bayesian Computation Sequential Monte
+    Carlo ('ABC-SMC') algorithm of Toni and others (2009) <doi:10.1098/rsif.2008.0172>.
   license_family: GPL3
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
@@ -88,10 +94,10 @@ extra:
 
 # Package: SimInf
 # Title: A Framework for Data-Driven Stochastic Disease Spread Simulations
-# Version: 6.3.0
-# Authors@R: c(person("Stefan", "Widgren", role = c("aut", "cre"), email = "stefan.widgren@gmail.com", comment = c(ORCID = "0000-0001-5745-2284")), person("Robin", "Eriksson", role = "aut", comment = c(ORCID = "0000-0002-4291-712X")), person("Stefan", "Engblom", role = "aut", comment = c(ORCID = "0000-0002-3614-1732")), person("Pavol", "Bauer", role = "aut", comment = c(ORCID = "0000-0003-4328-7171")), person("Attractive Chaos", role = "cph", comment = "Author of 'kvec.h', a generic dynamic array"))
-# Description: Provides an efficient and very flexible framework to conduct data-driven epidemiological modeling in realistic large scale disease spread simulations. The framework integrates infection dynamics in subpopulations as continuous-time Markov chains using the Gillespie stochastic simulation algorithm and incorporates available data such as births, deaths and movements as scheduled events at predefined time-points. Using C code for the numerical solvers and 'OpenMP' (if available) to divide work over multiple processors ensures high performance when simulating a sample outcome. One of our design goals was to make the package extendable and enable usage of the numerical solvers from other R extension packages in order to facilitate complex epidemiological research. The package contains template models and can be extended with user-defined models.
-# Acknowledgements: This work was financially supported by the Swedish Research Council within the UPMARC Linnaeus center of Excellence (Pavol Bauer, Robin Eriksson, and Stefan Engblom), the Swedish Research Council Formas (Stefan Engblom and Stefan Widgren), the Swedish Board of Agriculture (Stefan Widgren), and by the Swedish strategic research program eSSENCE (Stefan Widgren).
+# Version: 9.0.0
+# Authors@R: c(person("Stefan", "Widgren", role = c("aut", "cre"), email = "stefan.widgren@gmail.com", comment = c(ORCID = "0000-0001-5745-2284")), person("Robin", "Eriksson", role = "aut", comment = c(ORCID = "0000-0002-4291-712X")), person("Stefan", "Engblom", role = "aut", comment = c(ORCID = "0000-0002-3614-1732")), person("Pavol", "Bauer", role = "aut", comment = c(ORCID = "0000-0003-4328-7171")), person("Thomas", "Rosendal", role = "ctb", comment = c(ORCID = "0000-0002-6576-9668")), person("Attractive Chaos", role = "cph", comment = "Author of 'kvec.h'."))
+# Description: Provides an efficient and very flexible framework to conduct data-driven epidemiological modeling in realistic large scale disease spread simulations. The framework integrates infection dynamics in subpopulations as continuous-time Markov chains using the Gillespie stochastic simulation algorithm and incorporates available data such as births, deaths and movements as scheduled events at predefined time-points. Using C code for the numerical solvers and 'OpenMP' (if available) to divide work over multiple processors ensures high performance when simulating a sample outcome. One of our design goals was to make the package extendable and enable usage of the numerical solvers from other R extension packages in order to facilitate complex epidemiological research. The package contains template models and can be extended with user-defined models. For more details see the paper by Widgren, Bauer, Eriksson and Engblom (2019) <doi:10.18637/jss.v091.i12>. The package also provides functionality to fit models to time series data using the Approximate Bayesian Computation Sequential Monte Carlo ('ABC-SMC') algorithm of Toni and others (2009) <doi:10.1098/rsif.2008.0172>.
+# Acknowledgements: This software has been made possible by support from the Swedish Research Council within the UPMARC Linnaeus center of Excellence (Pavol Bauer, Robin Eriksson, and Stefan Engblom), the Swedish Research Council Formas (Stefan Engblom and Stefan Widgren), the Swedish Board of Agriculture (Stefan Widgren), the Swedish strategic research program eSSENCE (Stefan Widgren), and in the framework of the Full Force project, supported by funding from the European Unions Horizon 2020 Research and Innovation programme under grant agreement No 773830: One Health European Joint Programme (Stefan Widgren).
 # License: GPL-3
 # URL: https://github.com/stewid/SimInf
 # BugReports: https://github.com/stewid/SimInf/issues
@@ -100,16 +106,18 @@ extra:
 # Biarch: true
 # NeedsCompilation: yes
 # SystemRequirements: GNU Scientific Library (GSL)
-# Depends: R(>= 3.1)
-# Imports: graphics, grDevices, methods, stats, utils, Matrix
-# Collate: 'check_arguments.R' 'SimInf_events.R' 'SimInf_model.R' 'SEIR.R' 'SIR.R' 'SISe.R' 'SISe3.R' 'SISe3_sp.R' 'SISe_sp.R' 'SimInf.R' 'degree.R' 'distance.R' 'mparse.R' 'package_skeleton.R' 'plot.R' 'prevalence.R' 'print.R' 'punchcard.R' 'run.R' 'run_outer.R' 'trajectory.R'
+# Depends: R(>= 4.0)
+# Imports: digest, graphics, grDevices, MASS, methods, stats, utils, Matrix
+# Suggests: knitr, rmarkdown
+# Collate: 'C-generator.R' 'check_arguments.R' 'init.R' 'valid.R' 'classes.R' 'SimInf_model.R' 'SEIR.R' 'SIR.R' 'SISe.R' 'SISe3.R' 'SISe3_sp.R' 'SISe_sp.R' 'SimInf.R' 'SimInf_events.R' 'run.R' 'density_ratio.R' 'abc.R' 'abc_support.R' 'degree.R' 'distance.R' 'distributions.R' 'match_compartments.R' 'mparse.R' 'n.R' 'openmp.R' 'package_skeleton.R' 'plot.R' 'prevalence.R' 'print.R' 'punchcard.R' 'trajectory.R'
 # Encoding: UTF-8
-# RoxygenNote: 6.1.1
-# Packaged: 2019-05-26 10:34:23 UTC; stefan
-# Author: Stefan Widgren [aut, cre] (<https://orcid.org/0000-0001-5745-2284>), Robin Eriksson [aut] (<https://orcid.org/0000-0002-4291-712X>), Stefan Engblom [aut] (<https://orcid.org/0000-0002-3614-1732>), Pavol Bauer [aut] (<https://orcid.org/0000-0003-4328-7171>), Attractive Chaos [cph] (Author of 'kvec.h', a generic dynamic array)
+# RoxygenNote: 7.1.2
+# VignetteBuilder: utils, knitr
+# Packaged: 2022-04-20 08:04:24 UTC; stefan
+# Author: Stefan Widgren [aut, cre] (<https://orcid.org/0000-0001-5745-2284>), Robin Eriksson [aut] (<https://orcid.org/0000-0002-4291-712X>), Stefan Engblom [aut] (<https://orcid.org/0000-0002-3614-1732>), Pavol Bauer [aut] (<https://orcid.org/0000-0003-4328-7171>), Thomas Rosendal [ctb] (<https://orcid.org/0000-0002-6576-9668>), Attractive Chaos [cph] (Author of 'kvec.h'.)
 # Maintainer: Stefan Widgren <stefan.widgren@gmail.com>
 # Repository: CRAN
-# Date/Publication: 2019-05-26 15:10:14 UTC
+# Date/Publication: 2022-04-20 08:42:33 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

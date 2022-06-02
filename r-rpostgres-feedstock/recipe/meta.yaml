@@ -1,0 +1,121 @@
+{% set version = '1.4.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rpostgres
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RPostgres_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RPostgres/RPostgres_{{ version }}.tar.gz
+  sha256: c9cc0648c432f837fd0eb4922db4903357244d5a2cedd04ea236f249b08acdfc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: callr, covr, DBItest (>= 1.7.1), knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dbi >=1.1.0
+    - r-rcpp >=1.0.7
+    - r-bit64
+    - r-blob >=1.2.0
+    - r-hms >=1.0.0
+    - r-lubridate
+    - r-plogr >=0.2.0
+    - r-withr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-dbi >=1.1.0
+    - r-rcpp >=1.0.7
+    - r-bit64
+    - r-blob >=1.2.0
+    - r-hms >=1.0.0
+    - r-lubridate
+    - r-plogr >=0.2.0
+    - r-withr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RPostgres')"           # [not win]
+    - "\"%R%\" -e \"library('RPostgres')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://rpostgres.r-dbi.org, https://github.com/r-dbi/RPostgres
+  license: GPL-3
+  summary: Fully DBI-compliant Rcpp-backed interface to PostgreSQL <https://www.postgresql.org/>,
+    an open-source relational database.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: RPostgres
+# Title: Rcpp Interface to PostgreSQL
+# Version: 1.4.4
+# Date: 2022-05-01
+# Authors@R: c(person(given = "Hadley", family = "Wickham", role = "aut"), person(given = "Jeroen", family = "Ooms", role = "aut"), person(given = "Kirill", family = "M\u00fcller", role = c("aut", "cre"), email = "krlmlr+r@mailbox.org", comment = c(ORCID = "0000-0002-1416-3412")), person(given = "RStudio", role = "cph"), person(given = "R Consortium", role = "fnd"), person(given = "Tomoaki", family = "Nishiyama", role = "ctb", comment = "Code for encoding vectors into strings derived from RPostgreSQL"))
+# Description: Fully DBI-compliant Rcpp-backed interface to PostgreSQL <https://www.postgresql.org/>, an open-source relational database.
+# License: GPL-3
+# URL: https://rpostgres.r-dbi.org, https://github.com/r-dbi/RPostgres
+# BugReports: https://github.com/r-dbi/RPostgres/issues
+# Depends: R (>= 3.1.0)
+# Imports: bit64, blob (>= 1.2.0), DBI (>= 1.1.0), hms (>= 1.0.0), lubridate, methods, Rcpp (>= 1.0.7), withr
+# Suggests: callr, covr, DBItest (>= 1.7.1), knitr, rmarkdown, testthat
+# LinkingTo: plogr (>= 0.2.0), Rcpp
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# LazyLoad: true
+# RoxygenNote: 7.1.2
+# SystemRequirements: libpq >= 9.0: libpq-dev (deb) or postgresql-devel (rpm)
+# Collate: 'PqDriver.R' 'PqConnection.R' 'PqResult.R' 'RPostgres-pkg.R' 'RcppExports.R' 'Redshift.R' 'dbAppendTable_PqConnection.R' 'dbBegin_PqConnection.R' 'dbBind_PqResult.R' 'dbClearResult_PqResult.R' 'dbColumnInfo_PqResult.R' 'dbCommit_PqConnection.R' 'dbConnect_PqDriver.R' 'dbConnect_RedshiftDriver.R' 'dbDataType_PqConnection.R' 'dbDataType_PqDriver.R' 'dbDisconnect_PqConnection.R' 'dbExistsTable_PqConnection_Id.R' 'dbExistsTable_PqConnection_character.R' 'dbFetch_PqResult.R' 'dbGetInfo_PqConnection.R' 'dbGetInfo_PqDriver.R' 'dbGetRowCount_PqResult.R' 'dbGetRowsAffected_PqResult.R' 'dbGetStatement_PqResult.R' 'dbHasCompleted_PqResult.R' 'dbIsValid_PqConnection.R' 'dbIsValid_PqDriver.R' 'dbIsValid_PqResult.R' 'dbListFields_PqConnection_Id.R' 'dbListFields_PqConnection_character.R' 'dbListObjects_PqConnection_ANY.R' 'dbListTables_PqConnection.R' 'dbQuoteIdentifier_PqConnection_Id.R' 'dbQuoteIdentifier_PqConnection_SQL.R' 'dbQuoteIdentifier_PqConnection_character.R' 'dbQuoteLiteral_PqConnection.R' 'dbQuoteString_PqConnection_SQL.R' 'dbQuoteString_PqConnection_character.R' 'dbReadTable_PqConnection_character.R' 'dbRemoveTable_PqConnection_character.R' 'dbRollback_PqConnection.R' 'dbSendQuery_PqConnection.R' 'dbUnloadDriver_PqDriver.R' 'dbUnquoteIdentifier_PqConnection_SQL.R' 'dbWriteTable_PqConnection_character_data.frame.R' 'default.R' 'export.R' 'names.R' 'quote.R' 'show_PqConnection.R' 'sqlData_PqConnection.R' 'tables.R' 'transactions.R' 'utils.R'
+# Config/autostyle/scope: line_breaks
+# Config/autostyle/strict: false
+# NeedsCompilation: yes
+# Packaged: 2022-05-01 15:58:33 UTC; kirill
+# Author: Hadley Wickham [aut], Jeroen Ooms [aut], Kirill Muller [aut, cre] (<https://orcid.org/0000-0002-1416-3412>), RStudio [cph], R Consortium [fnd], Tomoaki Nishiyama [ctb] (Code for encoding vectors into strings derived from RPostgreSQL)
+# Maintainer: Kirill Muller <krlmlr+r@mailbox.org>
+# Repository: CRAN
+# Date/Publication: 2022-05-02 08:50:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,4 +1,4 @@
-{% set version = '0.1.0' %}
+{% set version = '0.5.1' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,30 +11,57 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/mrbayes_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/mrbayes/mrbayes_{{ version }}.tar.gz
-  sha256: cf2aa3a069bba9c388759030e3132bbf2d1617511224612bd3e39dddcd0b0a5c
+  sha256: 329c43c7e2b92e54a60c712bb67ead4aa581100c11a8a231af3b80d85068c386
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: testthat, rjags (>= 4-9), tidyverse, knitr, ggplot2, ggmcmc, foreign, DescTools, bayesmeta, utils, kableExtra, roxygen2, bookdown
+# Suggests: testthat, rjags (>= 4-9), tidyverse, knitr, ggplot2, ggmcmc, foreign, DescTools, bayesmeta, utils, kableExtra, roxygen2, bookdown, MendelianRandomization
 requirements:
   build:
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-bh >=1.66.0
+    - r-rcpp >=0.12.0
+    - r-rcppeigen >=0.3.3.3.0
+    - r-stanheaders >=2.18.0
+    - r-plyr
+    - r-rstan >=2.18.1
+    - r-rstantools >=2.0.0
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.66.0
+    - r-rcpp >=0.12.0
+    - r-rcppeigen >=0.3.3.3.0
+    - r-stanheaders >=2.18.0
+    - r-plyr
+    - r-rstan >=2.18.1
+    - r-rstantools >=2.0.0
 
 test:
   commands:
@@ -51,9 +78,9 @@ test:
 about:
   home: https://github.com/okezie94/mrbayes
   license: GPL-3
-  summary: Bayesian estimation of inverse variance weighted (IVW), Burgess  et al. (2013) <doi:10.1002/gepi.21758>,
-    and MR-Egger, Bowden et  al. (2015) <doi:10.1093/ije/dyv080>, summary data models
-    for Mendelian  randomization analyses.
+  summary: Bayesian estimation of inverse variance weighted (IVW), Burgess et al. (2013) <doi:10.1002/gepi.21758>,
+    and MR-Egger, Bowden et al. (2015) <doi:10.1093/ije/dyv080>, summary data models
+    for Mendelian randomization analyses.
   license_family: GPL3
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
@@ -67,25 +94,27 @@ extra:
 # Package: mrbayes
 # Type: Package
 # Title: Bayesian Summary Data Models for Mendelian Randomization Studies
-# Version: 0.1.0
-# Authors@R: c(person("Okezie", "Uche-Ikonne",  email = "o.uche-ikonne@lancaster.ac.uk", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-8461-8099")), person("Frank", "Dondelinger", email = "f.dondelinger@lancaster.ac.uk", role = c("aut"), comment = c(ORCID = "0000-0003-1816-6300")), person("Tom", "Palmer",  email = "tom.palmer@lancaster.ac.uk", role = c("aut"), comment = c(ORCID = "0000-0003-4655-4511")))
-# Description: Bayesian estimation of inverse variance weighted (IVW), Burgess  et al. (2013) <doi:10.1002/gepi.21758>, and MR-Egger, Bowden et  al. (2015) <doi:10.1093/ije/dyv080>, summary data models for Mendelian  randomization analyses.
+# Version: 0.5.1
+# Authors@R: c( person("Okezie", "Uche-Ikonne", email = "okezieikonne@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-8461-8099")), person("Frank", "Dondelinger", email = "f.dondelinger@lancaster.ac.uk", role = c("aut"), comment = c(ORCID = "0000-0003-1816-6300")), person("Tom", "Palmer", email = "tom.palmer@bristol.ac.uk", role = c("aut"), comment = c(ORCID = "0000-0003-4655-4511")))
+# Description: Bayesian estimation of inverse variance weighted (IVW), Burgess et al. (2013) <doi:10.1002/gepi.21758>, and MR-Egger, Bowden et al. (2015) <doi:10.1093/ije/dyv080>, summary data models for Mendelian randomization analyses.
 # Depends: R (>= 3.5.0)
-# Imports: methods
+# Imports: methods, Rcpp (>= 0.12.0), rstan (>= 2.18.1), rstantools (>= 2.0.0), plyr
 # License: GPL-3
 # Encoding: UTF-8
 # LazyData: true
-# Suggests: testthat, rjags (>= 4-9), tidyverse, knitr, ggplot2, ggmcmc, foreign, DescTools, bayesmeta, utils, kableExtra, roxygen2, bookdown
+# Suggests: testthat, rjags (>= 4-9), tidyverse, knitr, ggplot2, ggmcmc, foreign, DescTools, bayesmeta, utils, kableExtra, roxygen2, bookdown, MendelianRandomization
 # URL: https://github.com/okezie94/mrbayes
 # BugReports: https://github.com/okezie94/mrbayes/issues
-# RoxygenNote: 6.1.1
-# SystemRequirements: JAGS 4.x.y
-# NeedsCompilation: no
-# Packaged: 2019-09-03 13:34:56 UTC; ucheikon
+# RoxygenNote: 7.1.2
+# SystemRequirements: GNU make
+# Biarch: true
+# LinkingTo: BH (>= 1.66.0), Rcpp (>= 0.12.0), RcppEigen (>= 0.3.3.3.0), rstan (>= 2.18.1), StanHeaders (>= 2.18.0)
+# NeedsCompilation: yes
+# Packaged: 2021-10-02 12:16:01 UTC; okezieuche-ikonne
 # Author: Okezie Uche-Ikonne [aut, cre] (<https://orcid.org/0000-0002-8461-8099>), Frank Dondelinger [aut] (<https://orcid.org/0000-0003-1816-6300>), Tom Palmer [aut] (<https://orcid.org/0000-0003-4655-4511>)
-# Maintainer: Okezie Uche-Ikonne <o.uche-ikonne@lancaster.ac.uk>
+# Maintainer: Okezie Uche-Ikonne <okezieikonne@gmail.com>
 # Repository: CRAN
-# Date/Publication: 2019-09-04 09:30:05 UTC
+# Date/Publication: 2021-10-02 14:50:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

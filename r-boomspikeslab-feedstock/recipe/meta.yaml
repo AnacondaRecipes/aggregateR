@@ -1,4 +1,4 @@
-{% set version = '1.1.1' %}
+{% set version = '1.2.5' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,43 +11,40 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/BoomSpikeSlab_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/BoomSpikeSlab/BoomSpikeSlab_{{ version }}.tar.gz
-  sha256: a2b81ce14c1891a5e87a457e92ffe8e0ed9d325a235e7d4c7a255d71d5e07466
+  sha256: bc88ad95075b91799476e9e56281e4bf421106601acdbee5de783c9048b22bf8
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
+  # no skip
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: MASS, testthat, mlbench
+# Suggests: MASS, testthat, mlbench, igraph
 requirements:
   build:
     - {{ compiler('c') }}              # [not win]
     - {{ compiler('m2w64_c') }}        # [win]
     - {{ compiler('cxx') }}            # [not win]
     - {{ compiler('m2w64_cxx') }}      # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}make
-    - {{posix}}sed               # [win]
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
-    - r-bh >=1.65.0
-    - r-boom >=0.9.1
-    - r-igraph
+    - r-boom >=0.9.8
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
-    - r-bh >=1.65.0
-    - r-boom >=0.9.1
-    - r-igraph
+    - r-boom >=0.9.8
 
 test:
   commands:
@@ -64,7 +61,14 @@ test:
 about:
   home: https://CRAN.R-project.org/package=BoomSpikeSlab
   license: LGPL-2.1
-  summary: Spike and slab regression a la McCulloch and George (1997).
+  summary: Spike and slab regression with a variety of residual error distributions corresponding
+    to Gaussian, Student T, probit, logit, SVM, and a few others.  Spike and slab regression
+    is Bayesian regression with prior distributions containing a point mass at zero.  The
+    posterior updates the amount of mass on this point, leading to a posterior distribution
+    that is actually sparse, in the sense that if you sample from it many coefficients
+    are actually zeros.  Sampling from this posterior distribution is an elegant way
+    to handle Bayesian variable selection and model averaging.  See <DOI:10.1504/IJMMNO.2014.059942>
+    for an explanation of the Gaussian case.
   license_family: LGPL
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-2.1'
@@ -77,22 +81,21 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: BoomSpikeSlab
-# Date: 2019-06-03
+# Version: 1.2.5
+# Date: 2022-05-24
 # Title: MCMC for Spike and Slab Regression
 # Author: Steven L. Scott <steve.the.bayesian@gmail.com>
 # Maintainer: Steven L. Scott <steve.the.bayesian@gmail.com>
-# Description: Spike and slab regression a la McCulloch and George (1997).
-# Depends: Boom (>= 0.9.1) , R (>= 3.1.0)
-# LinkingTo: BH (>= 1.65.0), Boom(>= 0.9.1)
-# Suggests: MASS, testthat, mlbench
-# Imports: igraph
-# Version: 1.1.1
+# Description: Spike and slab regression with a variety of residual error distributions corresponding to Gaussian, Student T, probit, logit, SVM, and a few others.  Spike and slab regression is Bayesian regression with prior distributions containing a point mass at zero.  The posterior updates the amount of mass on this point, leading to a posterior distribution that is actually sparse, in the sense that if you sample from it many coefficients are actually zeros.  Sampling from this posterior distribution is an elegant way to handle Bayesian variable selection and model averaging.  See <DOI:10.1504/IJMMNO.2014.059942> for an explanation of the Gaussian case.
 # License: LGPL-2.1 | file LICENSE
+# Depends: Boom (>= 0.9.8) , R (>= 3.5.0)
+# LinkingTo: Boom(>= 0.9.8)
+# Suggests: MASS, testthat, mlbench, igraph
 # Encoding: UTF-8
 # NeedsCompilation: yes
-# Packaged: 2019-06-06 18:43:27 UTC; stevescott
+# Packaged: 2022-05-26 14:22:58 UTC; steve
 # Repository: CRAN
-# Date/Publication: 2019-06-07 15:20:03 UTC
+# Date/Publication: 2022-05-26 17:40:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

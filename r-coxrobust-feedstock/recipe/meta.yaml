@@ -1,4 +1,4 @@
-{% set version = '1.0' %}
+{% set version = '1.0.1' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,35 +11,43 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/coxrobust_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/coxrobust/coxrobust_{{ version }}.tar.gz
-  sha256: f8a4d6f36e082ff5eb02c5bc9f67ff73986db2c346d277e3d0afbb57be031722
+  sha256: 4b1fc138d42698d720548c33e1c57d3bdbe1796d317617099f542c11bc401fbd
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
+  # no skip
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
+# Suggests: testthat (>= 3.0.0), knitr
 requirements:
   build:
     - {{ compiler('c') }}              # [not win]
     - {{ compiler('m2w64_c') }}        # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}make
-    - {{posix}}sed               # [win]
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-rcpp
+    - r-rcpparmadillo
     - r-survival
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
     - r-survival
 
 test:
@@ -55,12 +63,15 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://CRAN.R-project.org/package=coxrobust
-  license: GPL-2
-  summary: Fit robustly proportional hazards regression model
-  license_family: GPL2
+  home: https://github.com/ShanaScogin/coxrobust
+  license: GPL-3
+  summary: An implementation of robust estimation in Cox model. Functionality includes fitting
+    efficiently and robustly Cox proportional hazards regression model in its basic
+    form, where explanatory variables are time independent with one event per subject.  Method
+    is based on a smooth modification of the partial likelihood.
+  license_family: GPL3
   license_file:
-    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
 
 extra:
   recipe-maintainers:
@@ -69,19 +80,29 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: coxrobust
-# Version: 1.0
-# Depends: R (>= 2.0.0), survival
-# Date: 2006-03-05
-# Title: Robust Estimation in Cox Model
-# LazyLoad: Yes
-# Description: Fit robustly proportional hazards regression model
-# Author: Tadeusz Bednarski <t.bednarski@prawo.uni.wroc.pl>, Filip Borowicz <f.borowicz@prawo.uni.wroc.pl>
-# Maintainer: Filip Borowicz <f.borowicz@prawo.uni.wroc.pl>
-# License: GPL (>= 2)
-# Packaged: Mon Mar 6 23:03:22 2006; filu
-# Repository: CRAN
-# Date/Publication: 2006-03-15 09:12:51
+# Type: Package
+# Title: Fit Robustly Proportional Hazards Regression Model
+# Version: 1.0.1
+# Date: 2022-04-02
+# Authors@R: c(person("Tadeusz", "Bednarski", email = "t.bednarski@prawo.uni.wroc.pl", role = c("aut")), person("Filip", "Borowicz", email = "f.borowicz@prawo.uni.wroc.pl", role = c("aut")), person("Shana", "Scogin", email = "shanarscogin@gmail.com", role = c("cre"), comment = c(ORCID = "0000-0002-7801-853X")))
+# Description: An implementation of robust estimation in Cox model. Functionality includes fitting efficiently and robustly Cox proportional hazards regression model in its basic form, where explanatory variables are time independent with one event per subject.  Method is based on a smooth modification of the partial likelihood.
+# URL: https://github.com/ShanaScogin/coxrobust
+# BugReports: https://github.com/ShanaScogin/coxrobust/issues
+# License: GPL-3
 # NeedsCompilation: yes
+# Imports: survival
+# Depends: R (>= 2.0.0)
+# Suggests: testthat (>= 3.0.0), knitr
+# Encoding: UTF-8
+# LazyLoad: TRUE
+# RoxygenNote: 7.1.2
+# LinkingTo: Rcpp, RcppArmadillo
+# Config/testthat/edition: 3
+# Packaged: 2022-04-06 12:47:32 UTC; shanascogin
+# Author: Tadeusz Bednarski [aut], Filip Borowicz [aut], Shana Scogin [cre] (<https://orcid.org/0000-0002-7801-853X>)
+# Maintainer: Shana Scogin <shanarscogin@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-04-06 14:02:33 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

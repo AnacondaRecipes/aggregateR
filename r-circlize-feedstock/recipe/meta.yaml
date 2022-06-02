@@ -1,0 +1,98 @@
+{% set version = '0.4.15' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-circlize
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/circlize_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/circlize/circlize_{{ version }}.tar.gz
+  sha256: d602d55313fe7c675109153d6ed3b99bdba5292e1deefed71d5a21e0db595cc7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, dendextend (>= 1.0.1), ComplexHeatmap (>= 2.0.0), gridBase, png, markdown, bezier, covr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-globaloptions >=0.1.2
+    - r-colorspace
+    - r-shape
+
+  run:
+    - r-base
+    - r-globaloptions >=0.1.2
+    - r-colorspace
+    - r-shape
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('circlize')"           # [not win]
+    - "\"%R%\" -e \"library('circlize')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jokergoo/circlize, https://jokergoo.github.io/circlize_book/book/
+  license: MIT
+  summary: Circular layout is an efficient way for the visualization of huge amounts of information.
+    Here this package provides an implementation of circular layout generation in R
+    as well as an enhancement of available software. The flexibility of the package
+    is based on the usage of low-level graphics functions such that self-defined high-level
+    graphics can be easily implemented by users for specific purposes. Together with
+    the seamless connection between the powerful computational and visual environment
+    in R, it gives users more convenience and freedom to design figures for better understanding
+    complex patterns behind multiple dimensional data. The package is described in Gu
+    et al. 2014 <doi:10.1093/bioinformatics/btu393>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: circlize
+# Type: Package
+# Title: Circular Visualization
+# Version: 0.4.15
+# Date: 2022-05-10
+# Authors@R: person("Zuguang", "Gu", email = "z.gu@dkfz.de", role = c("aut", "cre"), comment = c('ORCID'="0000-0002-7395-8709"))
+# Depends: R (>= 3.0.0), graphics
+# Imports: GlobalOptions (>= 0.1.2), shape, grDevices, utils, stats, colorspace, methods, grid
+# Suggests: knitr, dendextend (>= 1.0.1), ComplexHeatmap (>= 2.0.0), gridBase, png, markdown, bezier, covr, rmarkdown
+# VignetteBuilder: knitr
+# Description: Circular layout is an efficient way for the visualization of huge amounts of information. Here this package provides an implementation of circular layout generation in R as well as an enhancement of available software. The flexibility of the package is based on the usage of low-level graphics functions such that self-defined high-level graphics can be easily implemented by users for specific purposes. Together with the seamless connection between the powerful computational and visual environment in R, it gives users more convenience and freedom to design figures for better understanding complex patterns behind multiple dimensional data. The package is described in Gu et al. 2014 <doi:10.1093/bioinformatics/btu393>.
+# URL: https://github.com/jokergoo/circlize, https://jokergoo.github.io/circlize_book/book/
+# License: MIT + file LICENSE
+# NeedsCompilation: no
+# Packaged: 2022-05-10 18:38:19 UTC; guz
+# Author: Zuguang Gu [aut, cre] (<https://orcid.org/0000-0002-7395-8709>)
+# Maintainer: Zuguang Gu <z.gu@dkfz.de>
+# Repository: CRAN
+# Date/Publication: 2022-05-10 19:30:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

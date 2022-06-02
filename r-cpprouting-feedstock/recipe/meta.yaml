@@ -1,4 +1,4 @@
-{% set version = '1.1' %}
+{% set version = '2.0' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,12 +11,13 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/cppRouting_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/cppRouting/cppRouting_{{ version }}.tar.gz
-  sha256: a2120bf0421cf6d8904ab194664cb55f246db557d5421b3688a6511a56a31725
+  sha256: 5993f48b55fe33db05a2778f04b299b985b321630d4155262d885acac2f3d179
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
+  # no skip
 
   # This is required to make R link correctly on Linux.
   rpaths:
@@ -30,20 +31,26 @@ requirements:
     - {{ compiler('m2w64_c') }}        # [win]
     - {{ compiler('cxx') }}            # [not win]
     - {{ compiler('m2w64_cxx') }}      # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}make
-    - {{posix}}sed               # [win]
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
     - r-rcpp >=1.0.1
+    - r-rcppparallel
+    - r-rcppprogress
+    - r-data.table
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
     - r-rcpp >=1.0.1
+    - r-rcppparallel
+    - r-rcppprogress
+    - r-data.table
 
 test:
   commands:
@@ -61,11 +68,14 @@ about:
   home: https://github.com/vlarmet/cppRouting
   license: GPL-2
   summary: Calculation of distances, shortest paths and isochrones on weighted graphs using several
-    variants of Dijkstra algorithm.  Proposed algorithms are unidirectional Dijkstra
+    variants of Dijkstra algorithm. Proposed algorithms are unidirectional Dijkstra
     (Dijkstra, E. W. (1959) <doi:10.1007/BF01386390>), bidirectional Dijkstra (Goldberg,
     Andrew & Fonseca F. Werneck, Renato (2005) <https://pdfs.semanticscholar.org/0761/18dfbe1d5a220f6ac59b4de4ad07b50283ac.pdf>),
     A* search (P. E. Hart, N. J. Nilsson et B. Raphael (1968) <doi:10.1109/TSSC.1968.300136>),
-    new bidirectional A* (Pijls & Post (2009) <http://repub.eur.nl/pub/16100/ei2009-10.pdf>).
+    new bidirectional A* (Pijls & Post (2009) <http://repub.eur.nl/pub/16100/ei2009-10.pdf>),
+    Contraction hierarchies (R. Geisberger, P. Sanders, D. Schultes and D. Delling (2008)
+    <doi:10.1007/978-3-540-68552-4_24>), PHAST (D. Delling, A.Goldberg, A. Nowatzyk,
+    R. Werneck (2011) <doi:10.1016/j.jpdc.2012.02.007>).
   license_family: GPL2
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
@@ -79,23 +89,23 @@ extra:
 # Package: cppRouting
 # Type: Package
 # Title: Fast Implementation of Dijkstra Algorithm
-# Version: 1.1
-# Date: 2019-06-15
+# Version: 2.0
+# Date: 2019-12-06
 # Author: Vincent Larmet
 # Maintainer: Vincent Larmet <larmet.vincent@gmail.com>
-# Description: Calculation of distances, shortest paths and isochrones on weighted graphs using several variants of Dijkstra algorithm.  Proposed algorithms are unidirectional Dijkstra (Dijkstra, E. W. (1959) <doi:10.1007/BF01386390>), bidirectional Dijkstra (Goldberg, Andrew & Fonseca F. Werneck, Renato (2005) <https://pdfs.semanticscholar.org/0761/18dfbe1d5a220f6ac59b4de4ad07b50283ac.pdf>), A* search (P. E. Hart, N. J. Nilsson et B. Raphael (1968) <doi:10.1109/TSSC.1968.300136>), new bidirectional A* (Pijls & Post (2009) <http://repub.eur.nl/pub/16100/ei2009-10.pdf>).
+# Description: Calculation of distances, shortest paths and isochrones on weighted graphs using several variants of Dijkstra algorithm. Proposed algorithms are unidirectional Dijkstra (Dijkstra, E. W. (1959) <doi:10.1007/BF01386390>), bidirectional Dijkstra (Goldberg, Andrew & Fonseca F. Werneck, Renato (2005) <https://pdfs.semanticscholar.org/0761/18dfbe1d5a220f6ac59b4de4ad07b50283ac.pdf>), A* search (P. E. Hart, N. J. Nilsson et B. Raphael (1968) <doi:10.1109/TSSC.1968.300136>), new bidirectional A* (Pijls & Post (2009) <http://repub.eur.nl/pub/16100/ei2009-10.pdf>), Contraction hierarchies (R. Geisberger, P. Sanders, D. Schultes and D. Delling (2008) <doi:10.1007/978-3-540-68552-4_24>), PHAST (D. Delling, A.Goldberg, A. Nowatzyk, R. Werneck (2011) <doi:10.1016/j.jpdc.2012.02.007>).
 # License: GPL (>= 2)
-# Imports: Rcpp (>= 1.0.1), parallel
-# LinkingTo: Rcpp
+# Imports: Rcpp (>= 1.0.1), RcppParallel, RcppProgress , data.table
+# LinkingTo: Rcpp, RcppParallel, RcppProgress
 # SystemRequirements: GNU make, C++11
 # RoxygenNote: 6.1.1
 # URL: https://github.com/vlarmet/cppRouting
 # Suggests: knitr, rmarkdown, igraph
 # VignetteBuilder: knitr
 # NeedsCompilation: yes
-# Packaged: 2019-06-21 13:53:49 UTC; vlarmet
+# Packaged: 2020-01-07 10:31:24 UTC; vlarmet
 # Repository: CRAN
-# Date/Publication: 2019-06-21 16:30:12 UTC
+# Date/Publication: 2020-01-07 17:00:10 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

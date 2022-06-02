@@ -1,0 +1,103 @@
+{% set version = '0.9.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ggrepel
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ggrepel_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ggrepel/ggrepel_{{ version }}.tar.gz
+  sha256: 29fb916d4799ba6503a5dd019717ffdf154d2aaae9ff1736f03e2be24af6bdfc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, gridExtra, devtools, prettydoc, ggbeeswarm, dplyr, magrittr, readr, stringr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-ggplot2 >=2.2.0
+    - r-rlang >=0.3.0
+    - r-scales >=0.5.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-ggplot2 >=2.2.0
+    - r-rlang >=0.3.0
+    - r-scales >=0.5.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ggrepel')"           # [not win]
+    - "\"%R%\" -e \"library('ggrepel')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/slowkow/ggrepel
+  license: GPL-3
+  summary: Provides text and label geoms for 'ggplot2' that help to avoid overlapping text labels.
+    Labels repel away from each other and away from the data points.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: ggrepel
+# Version: 0.9.1
+# Authors@R: c( person("Kamil", "Slowikowski", email = "kslowikowski@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-2843-6370")), person("Alicia", "Schep", role = "ctb", comment = c(ORCID = "0000-0002-3915-0618")), person("Sean", "Hughes", role = "ctb", comment = c(ORCID = "0000-0002-9409-9405")), person("Trung Kien", "Dang", role = "ctb", comment = c(ORCID = "0000-0001-7562-6495")), person("Saulius", "Lukauskas", role = "ctb"), person("Jean-Olivier", "Irisson", role = "ctb", comment = c(ORCID = "0000-0003-4920-3880")), person("Zhian N", "Kamvar", role = "ctb", comment = c(ORCID = "0000-0003-1458-7108")), person("Thompson", "Ryan", role = "ctb", comment = c(ORCID = "0000-0002-0450-8181")), person("Dervieux", "Christophe", role = "ctb", comment = c(ORCID = "0000-0003-4474-2498")), person("Yutani", "Hiroaki", role = "ctb"), person("Pierre", "Gramme", role = "ctb"), person("Amir Masoud", "Abdol", role = "ctb"), person("Malcolm", "Barrett", role = "ctb", comment = c(ORCID = "0000-0003-0299-5825")), person("Robrecht", "Cannoodt", role = "ctb", comment = c(ORCID = "0000-0003-3641-729X")), person("Micha", "Krassowski", role = "ctb", comment = c(ORCID = "0000-0002-9638-7785")), person("Michael", "Chirico", role = "ctb", comment = c(ORCID = "0000-0003-0787-087X")), person("Pedro", "Aphalo", role = "ctb", comment = c(ORCID = "0000-0003-3385-972X")) )
+# Title: Automatically Position Non-Overlapping Text Labels with 'ggplot2'
+# Description: Provides text and label geoms for 'ggplot2' that help to avoid overlapping text labels. Labels repel away from each other and away from the data points.
+# Depends: R (>= 3.0.0), ggplot2 (>= 2.2.0)
+# Imports: grid, Rcpp, rlang (>= 0.3.0), scales (>= 0.5.0)
+# Suggests: knitr, rmarkdown, testthat, gridExtra, devtools, prettydoc, ggbeeswarm, dplyr, magrittr, readr, stringr
+# VignetteBuilder: knitr
+# License: GPL-3 | file LICENSE
+# URL: https://github.com/slowkow/ggrepel
+# BugReports: https://github.com/slowkow/ggrepel/issues
+# RoxygenNote: 7.1.1
+# LinkingTo: Rcpp
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2021-01-15 21:11:36 UTC; kamil
+# Author: Kamil Slowikowski [aut, cre] (<https://orcid.org/0000-0002-2843-6370>), Alicia Schep [ctb] (<https://orcid.org/0000-0002-3915-0618>), Sean Hughes [ctb] (<https://orcid.org/0000-0002-9409-9405>), Trung Kien Dang [ctb] (<https://orcid.org/0000-0001-7562-6495>), Saulius Lukauskas [ctb], Jean-Olivier Irisson [ctb] (<https://orcid.org/0000-0003-4920-3880>), Zhian N Kamvar [ctb] (<https://orcid.org/0000-0003-1458-7108>), Thompson Ryan [ctb] (<https://orcid.org/0000-0002-0450-8181>), Dervieux Christophe [ctb] (<https://orcid.org/0000-0003-4474-2498>), Yutani Hiroaki [ctb], Pierre Gramme [ctb], Amir Masoud Abdol [ctb], Malcolm Barrett [ctb] (<https://orcid.org/0000-0003-0299-5825>), Robrecht Cannoodt [ctb] (<https://orcid.org/0000-0003-3641-729X>), Micha Krassowski [ctb] (<https://orcid.org/0000-0002-9638-7785>), Michael Chirico [ctb] (<https://orcid.org/0000-0003-0787-087X>), Pedro Aphalo [ctb] (<https://orcid.org/0000-0003-3385-972X>)
+# Maintainer: Kamil Slowikowski <kslowikowski@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-01-15 22:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

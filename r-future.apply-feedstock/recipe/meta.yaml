@@ -1,0 +1,93 @@
+{% set version = '1.9.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-future.apply
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/future.apply_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/future.apply/future.apply_{{ version }}.tar.gz
+  sha256: 6166c1c5ce30b9745059c3d30c8110f7c1d51871e58aa414f195cb1f91c467f5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: datasets, stats, tools, listenv (>= 0.8.0), R.rsp, markdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-future >=1.22.1
+    - r-globals >=0.14.0
+
+  run:
+    - r-base
+    - r-future >=1.22.1
+    - r-globals >=0.14.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('future.apply')"           # [not win]
+    - "\"%R%\" -e \"library('future.apply')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://future.apply.futureverse.org, https://github.com/HenrikBengtsson/future.apply
+  license: GPL-2
+  summary: Implementations of apply(), by(), eapply(), lapply(), Map(), .mapply(), mapply(),
+    replicate(), sapply(), tapply(), and vapply() that can be resolved using any future-supported
+    backend, e.g. parallel on the local machine or distributed on a compute cluster.  These
+    future_*apply() functions come with the same pros and cons as the corresponding
+    base-R *apply() functions but with the additional feature of being able to be processed
+    via the future framework.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: future.apply
+# Version: 1.9.0
+# Title: Apply Function to Elements in Parallel using Futures
+# Depends: R (>= 3.2.0), future (>= 1.22.1)
+# Imports: globals (>= 0.14.0), parallel, utils
+# Suggests: datasets, stats, tools, listenv (>= 0.8.0), R.rsp, markdown
+# VignetteBuilder: R.rsp
+# Authors@R: c(person("Henrik", "Bengtsson", role=c("aut", "cre", "cph"), email = "henrikb@braju.com"), person("R Core Team", role = c("cph", "ctb")))
+# Description: Implementations of apply(), by(), eapply(), lapply(), Map(), .mapply(), mapply(), replicate(), sapply(), tapply(), and vapply() that can be resolved using any future-supported backend, e.g. parallel on the local machine or distributed on a compute cluster.  These future_*apply() functions come with the same pros and cons as the corresponding base-R *apply() functions but with the additional feature of being able to be processed via the future framework.
+# License: GPL (>= 2)
+# LazyLoad: TRUE
+# URL: https://future.apply.futureverse.org, https://github.com/HenrikBengtsson/future.apply
+# BugReports: https://github.com/HenrikBengtsson/future.apply/issues
+# RoxygenNote: 7.1.2
+# NeedsCompilation: no
+# Packaged: 2022-04-25 01:12:48 UTC; hb
+# Author: Henrik Bengtsson [aut, cre, cph], R Core Team [cph, ctb]
+# Maintainer: Henrik Bengtsson <henrikb@braju.com>
+# Repository: CRAN
+# Date/Publication: 2022-04-25 22:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

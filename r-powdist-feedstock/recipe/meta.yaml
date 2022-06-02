@@ -1,0 +1,87 @@
+{% set version = '0.1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-powdist
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/powdist_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/powdist/powdist_{{ version }}.tar.gz
+  sha256: 3fdc2aa0bc27ba365f40ccdbac1778fb3e0440a2321dcf859d1c265c9e42c8d7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-gamlss.dist
+    - r-normalp
+    - r-rmutil
+
+  run:
+    - r-base
+    - r-gamlss.dist
+    - r-normalp
+    - r-rmutil
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('powdist')"           # [not win]
+    - "\"%R%\" -e \"library('powdist')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=powdist
+  license: GPL-3
+  summary: Density, distribution function, quantile function and random generation for the family
+    of power and reversal power distributions.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: powdist
+# Type: Package
+# Title: Power and Reversal Power Distributions
+# Version: 0.1.4
+# Authors@R: c(person("Susan", "Anyosa", email = "susanaliciach@gmail.com", role = c("aut", "cre")), person("Jorge Luis", "Bazan Guzman", role = "aut"), person("Artur", "Lemonte", role = "aut"))
+# Author: Susan Anyosa [aut, cre], Jorge Luis Bazan Guzman [aut], Artur Lemonte [aut]
+# Maintainer: Susan Anyosa <susanaliciach@gmail.com>
+# Imports: stats, rmutil, gamlss.dist, normalp
+# Depends: R (>= 3.1.0)
+# Description: Density, distribution function, quantile function and random generation for the family of power and reversal power distributions.
+# License: GPL-3
+# Encoding: UTF-8
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2017-11-23 11:28:14 UTC; susan
+# Repository: CRAN
+# Date/Publication: 2017-11-23 11:41:38 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

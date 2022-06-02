@@ -1,4 +1,4 @@
-{% set version = '4.1.0' %}
+{% set version = '4.2.5' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,39 +11,43 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/openxlsx_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/openxlsx/openxlsx_{{ version }}.tar.gz
-  sha256: ab7b127353061a0e1cd621783366ffdd7c858c6df31cbbdd39aaa353af10ffd8
+  sha256: 65d06d2819b656ac30fc78437ee712a83fb5a7ab750f56268e5c9e578c582519
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
+  # no skip
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: knitr, testthat
+# Suggests: knitr, rmarkdown, roxygen2, testthat
 requirements:
   build:
-    - {{ compiler('c') }}        # [not win]
-    - {{ compiler('cxx') }}      # [not win]
-    - {{native}}toolchain        # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}make
-    - {{posix}}sed               # [win]
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
     - r-rcpp
+    - r-stringi
     - r-zip
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
     - r-rcpp
+    - r-stringi
     - r-zip
 
 test:
@@ -59,13 +63,16 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://github.com/awalker89/openxlsx
-  license: MIT + file LICENSE
+  home: https://ycphs.github.io/openxlsx/index.html, https://github.com/ycphs/openxlsx
+  license: MIT
   summary: Simplifies the creation of Excel .xlsx files by providing a high level interface to
     writing, styling and editing worksheets. Through the use of 'Rcpp', read/write times
     are comparable to the 'xlsx' and 'XLConnect' packages with the added benefit of
     removing the dependency on Java.
   license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
 
 extra:
   recipe-maintainers:
@@ -73,31 +80,32 @@ extra:
 
 # The original CRAN metadata for this package was:
 
-# Package: openxlsx
 # Type: Package
-# Title: Read, Write and Edit XLSX Files
-# Version: 4.1.0
-# Date: 2018-05-26
-# Authors@R: c( person("Alexander", "Walker", email = "Alexander.Walker1989@gmail.com", role = c("aut", "cre")), person("Luca", "Braglia", role = "ctb"))
-# URL: https://github.com/awalker89/openxlsx
-# BugReports: https://github.com/awalker89/openxlsx/issues
-# Maintainer: Alexander Walker <Alexander.Walker1989@gmail.com>
+# Package: openxlsx
+# Title: Read, Write and Edit xlsx Files
+# Version: 4.2.5
+# Date: 2021-12-13
+# Authors@R: c(person(given = "Philipp", family = "Schauberger", role = c("aut", "cre"), email = "philipp@schauberger.co.at"), person(given = "Alexander", family = "Walker", role = "aut", email = "Alexander.Walker1989@gmail.com"), person(given = "Luca", family = "Braglia", role = "ctb"), person(given = "Joshua", family = "Sturm", role = "ctb"), person(given = "Jan Marvin", family = "Garbuszus", role = "ctb", email = "jan.garbuszus@ruhr-uni-bochum.de"), person(given = "Jordan Mark", family = "Barbone", role = "ctb", email = "jmbarbone@gmail.com", comment = c(ORCID = "0000-0001-9788-3628")))
 # Description: Simplifies the creation of Excel .xlsx files by providing a high level interface to writing, styling and editing worksheets. Through the use of 'Rcpp', read/write times are comparable to the 'xlsx' and 'XLConnect' packages with the added benefit of removing the dependency on Java.
 # License: MIT + file LICENSE
-# LinkingTo: Rcpp
-# Encoding: UTF-8
+# URL: https://ycphs.github.io/openxlsx/index.html, https://github.com/ycphs/openxlsx
+# BugReports: https://github.com/ycphs/openxlsx/issues
 # Depends: R (>= 3.3.0)
-# Imports: methods, Rcpp, grDevices, stats, utils, zip
+# Imports: grDevices, methods, Rcpp, stats, stringi, utils, zip
+# Suggests: knitr, rmarkdown, roxygen2, testthat
+# LinkingTo: Rcpp
 # VignetteBuilder: knitr
-# Suggests: knitr, testthat
-# RoxygenNote: 6.0.1.9000
-# Collate: 'CommentClass.R' 'HyperlinkClass.R' 'RcppExports.R' 'class_definitions.R' 'StyleClass.R' 'WorkbookClass.R' 'baseXML.R' 'borderFunctions.R' 'chartsheet_class.R' 'conditional_formatting.R' 'helperFunctions.R' 'loadWorkbook.R' 'onUnload.R' 'openXL.R' 'openxlsx.R' 'openxlsxCoerce.R' 'readWorkbook.R' 'sheet_data_class.R' 'workbook_column_widths.R' 'workbook_read_workbook.R' 'workbook_write_data.R' 'worksheet_class.R' 'wrappers.R' 'writeData.R' 'writeDataTable.R' 'writexlsx.R'
+# Encoding: UTF-8
+# Language: en-US
+# RoxygenNote: 7.1.2
+# Collate: 'CommentClass.R' 'HyperlinkClass.R' 'RcppExports.R' 'class_definitions.R' 'StyleClass.R' 'WorkbookClass.R' 'asserts.R' 'baseXML.R' 'borderFunctions.R' 'build_workbook.R' 'chartsheet_class.R' 'conditional_formatting.R' 'data-fontSizeLookupTables.R' 'helperFunctions.R' 'loadWorkbook.R' 'onUnload.R' 'openXL.R' 'openxlsx-package.R' 'openxlsx.R' 'openxlsxCoerce.R' 'readWorkbook.R' 'sheet_data_class.R' 'utils.R' 'workbook_column_widths.R' 'workbook_read_workbook.R' 'workbook_write_data.R' 'worksheet_class.R' 'wrappers.R' 'writeData.R' 'writeDataTable.R' 'writexlsx.R' 'zzz.R'
 # NeedsCompilation: yes
-# Packaged: 2018-05-26 13:55:02 UTC; Alex
-# Author: Alexander Walker [aut, cre], Luca Braglia [ctb]
+# Packaged: 2021-12-13 22:06:56 UTC; PhilippSchauberger
+# Author: Philipp Schauberger [aut, cre], Alexander Walker [aut], Luca Braglia [ctb], Joshua Sturm [ctb], Jan Marvin Garbuszus [ctb], Jordan Mark Barbone [ctb] (<https://orcid.org/0000-0001-9788-3628>)
+# Maintainer: Philipp Schauberger <philipp@schauberger.co.at>
 # Repository: CRAN
-# Date/Publication: 2018-05-26 15:20:49 UTC
+# Date/Publication: 2021-12-14 14:20:06 UTC
 
 # See
-# http://docs.continuum.io/conda/build.html for
+# https://docs.conda.io/projects/conda-build for
 # more information about meta.yaml

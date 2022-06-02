@@ -1,0 +1,100 @@
+{% set version = '0.4.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-reproj
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/reproj_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/reproj/reproj_{{ version }}.tar.gz
+  sha256: d15a2b3b0b7da4c98c664728a21907c9d1e9e78059163aa5491938d6f50ead53
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-proj >=0.1.6
+    - r-crsmeta >=0.3.0
+    - r-proj4
+
+  run:
+    - r-base
+    - r-proj >=0.1.6
+    - r-crsmeta >=0.3.0
+    - r-proj4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('reproj')"           # [not win]
+    - "\"%R%\" -e \"library('reproj')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/hypertidy/reproj/
+  license: GPL-3
+  summary: Transform coordinates from a specified source to a specified target map projection.
+    This uses the 'PROJ' library directly, by wrapping the 'PROJ' package (if functional),
+    otherwise the 'proj4' package. The 'reproj()' function is generic, methods may be
+    added to remove the need for an explicit source definition. If 'proj4' is in use
+    'reproj()' handles the requirement for conversion of angular units where necessary.
+    This is for use primarily to transform generic data formats and direct leverage
+    of the underlying 'PROJ' library. (There are transformations that aren't possible
+    with 'PROJ' and that are provided by the 'GDAL' library, a limitation which users
+    of this package should be aware of.) The 'PROJ' library is available at <https://proj.org/>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: reproj
+# Type: Package
+# Title: Coordinate System Transformations for Generic Map Data
+# Version: 0.4.2
+# Authors@R: person("Michael D.","Sumner", role = c("aut", "cre"), email = "mdsumner@gmail.com", comment=c(ORCID = "0000-0002-2471-7511"))
+# Description: Transform coordinates from a specified source to a specified target map projection. This uses the 'PROJ' library directly, by wrapping the 'PROJ' package (if functional), otherwise the 'proj4' package. The 'reproj()' function is generic, methods may be added to remove the need for an explicit source definition. If 'proj4' is in use 'reproj()' handles the requirement for conversion of angular units where necessary. This is for use primarily to transform generic data formats and direct leverage of the underlying 'PROJ' library. (There are transformations that aren't possible with 'PROJ' and that are provided by the 'GDAL' library, a limitation which users of this package should be aware of.) The 'PROJ' library is available at <https://proj.org/>.
+# License: GPL-3
+# LazyData: TRUE
+# Depends: R (>= 3.2.5)
+# Imports: proj4, PROJ (>= 0.1.6), crsmeta (>= 0.3.0)
+# Suggests: testthat, covr
+# RoxygenNote: 7.1.0
+# Encoding: UTF-8
+# SystemRequirements: PROJ (>= 4.4.6)
+# BugReports: https://github.com/hypertidy/reproj/issues/
+# URL: https://github.com/hypertidy/reproj/
+# NeedsCompilation: no
+# Packaged: 2020-04-15 14:02:41 UTC; michae_sum
+# Author: Michael D. Sumner [aut, cre] (<https://orcid.org/0000-0002-2471-7511>)
+# Maintainer: Michael D. Sumner <mdsumner@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2020-04-15 14:50:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

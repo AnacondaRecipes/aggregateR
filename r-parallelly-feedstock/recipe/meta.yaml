@@ -1,0 +1,89 @@
+{% set version = '1.31.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-parallelly
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/parallelly_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/parallelly/parallelly_{{ version }}.tar.gz
+  sha256: 40c7fc3d842fa928448e574091a521bead2367bf97545c744ca78ea9af3117da
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('parallelly')"           # [not win]
+    - "\"%R%\" -e \"library('parallelly')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://parallelly.futureverse.org, https://github.com/HenrikBengtsson/parallelly
+  license: LGPL-2.1
+  summary: Utility functions that enhance the 'parallel' package and support the built-in parallel
+    backends of the 'future' package.  For example, availableCores() gives the number
+    of CPU cores available to your R process as given by the operating system, 'cgroups'
+    and Linux containers, R options, and environment variables, including those set
+    by job schedulers on high-performance compute clusters. If none is set, it will
+    fall back to parallel::detectCores(). Another example is makeClusterPSOCK(), which
+    is backward compatible with parallel::makePSOCKcluster() while doing a better job
+    in setting up remote cluster workers without the need for configuring the firewall
+    to do port-forwarding to your local computer.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-2.1'
+
+# The original CRAN metadata for this package was:
+
+# Package: parallelly
+# Version: 1.31.1
+# Title: Enhancing the 'parallel' Package
+# Imports: parallel, tools, utils
+# Authors@R: c(person("Henrik", "Bengtsson", role=c("aut", "cre", "cph"), email = "henrikb@braju.com"))
+# Description: Utility functions that enhance the 'parallel' package and support the built-in parallel backends of the 'future' package.  For example, availableCores() gives the number of CPU cores available to your R process as given by the operating system, 'cgroups' and Linux containers, R options, and environment variables, including those set by job schedulers on high-performance compute clusters. If none is set, it will fall back to parallel::detectCores(). Another example is makeClusterPSOCK(), which is backward compatible with parallel::makePSOCKcluster() while doing a better job in setting up remote cluster workers without the need for configuring the firewall to do port-forwarding to your local computer.
+# License: LGPL (>= 2.1)
+# LazyLoad: TRUE
+# ByteCompile: TRUE
+# URL: https://parallelly.futureverse.org, https://github.com/HenrikBengtsson/parallelly
+# BugReports: https://github.com/HenrikBengtsson/parallelly/issues
+# RoxygenNote: 7.1.2
+# NeedsCompilation: no
+# Packaged: 2022-04-22 16:18:39 UTC; hb
+# Author: Henrik Bengtsson [aut, cre, cph]
+# Maintainer: Henrik Bengtsson <henrikb@braju.com>
+# Repository: CRAN
+# Date/Publication: 2022-04-22 17:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

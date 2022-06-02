@@ -1,4 +1,4 @@
-{% set version = '0.2.0' %}
+{% set version = '0.2.2' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,7 +11,7 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/vlad_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/vlad/vlad_{{ version }}.tar.gz
-  sha256: 172a2f3467d2c3cd36f47b6936861a3f9562bb791bcca9f1da9625178a0d092f
+  sha256: 530a0cd329975aac8ed5a138a51934fbebc6d1d442206a9d8ef1485baa747f30
 
 build:
   merge_build_host: True  # [win]
@@ -24,32 +24,39 @@ build:
     - lib/R/lib/
     - lib/
 
-# Suggests: dplyr, ggplot2, parallel, rmarkdown, spcadjust (>= 1.1), testthat, tidyr
+# Suggests: ggplot2, rmarkdown, spcadjust (>= 1.1), testthat, knitr
 requirements:
   build:
     - {{ compiler('c') }}              # [not win]
     - {{ compiler('m2w64_c') }}        # [win]
     - {{ compiler('cxx') }}            # [not win]
     - {{ compiler('m2w64_cxx') }}      # [win]
-    - {{posix}}filesystem        # [win]
-    - {{posix}}make
-    - {{posix}}sed               # [win]
-    - {{posix}}coreutils         # [win]
-    - {{posix}}zip               # [win]
-    - llvm-openmp >=4.0.1  # [osx]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-bh
     - r-rcpp >=0.12.12
     - r-rcpparmadillo
-    - llvm-openmp >=4.0.1  # [osx]
+    - r-checkmate
+    - r-dplyr
+    - r-magrittr
+    - r-tidyr
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
+    - r-bh
     - r-rcpp >=0.12.12
     - r-rcpparmadillo
-    - llvm-openmp >=4.0.1  # [osx]
+    - r-checkmate
+    - r-dplyr
+    - r-magrittr
+    - r-tidyr
 
 test:
   commands:
@@ -64,16 +71,16 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://CRAN.R-project.org/package=vlad
+  home: https://github.com/wittenberg/vlad
   license: GPL-2
-  summary: 'Contains functions to set up risk-adjusted quality control charts in health care.
-    For the variable life adjusted display (VLAD) proposed by  Lovegrove et al. (1997)
+  summary: Contains functions to set up risk-adjusted quality control charts in health care.
+    For the variable life adjusted display (VLAD) proposed by Lovegrove et al. (1997)
     <doi:10.1016/S0140-6736(97)06507-0> signaling rules derived in Wittenberg et al.
-    (2018) <doi: 10.1002/sim.7647> are implemented.  Additionally, for the risk-adjusted
+    (2018) <doi:10.1002/sim.7647> are implemented. Additionally, for the risk-adjusted
     cumulative sum chart based on log-likelihood ratio statistic introduced by Steiner
     et al. (2000) <doi:10.1093/biostatistics/1.4.441> average run length and control
-    limits can be computed.'
-
+    limits can be computed with fast and accurate Markov chain approximations developed
+    in Knoth et al. (2019) <doi:10.1002/sim.8104>.
   license_family: GPL2
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
@@ -87,25 +94,26 @@ extra:
 # Package: vlad
 # Type: Package
 # Title: Variable Life Adjusted Display and Other Risk-Adjusted Quality Control Charts
-# Version: 0.2.0
-# Authors@R: c( person("Philipp", "Wittenberg",  email = "pwitten@hsu-hh.de",  role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7151-8243")), person("Sven", "Knoth",  email = "<Sven.Knoth@gmx.de>",  role = c("aut", "ths"), comment = c(ORCID = "0000-0002-9666-5554")))
+# Version: 0.2.2
+# Authors@R: c( person("Philipp", "Wittenberg", email = "pwitten@hsu-hh.de", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7151-8243")), person("Sven", "Knoth", email = "<Sven.Knoth@gmx.de>", role = c("aut", "ths"), comment = c(ORCID = "0000-0002-9666-5554")))
 # Depends: R (>= 2.10)
 # Maintainer: Philipp Wittenberg <pwitten@hsu-hh.de>
+# URL: https://github.com/wittenberg/vlad
 # BugReports: https://github.com/wittenberg/vlad/issues
-# Description: Contains functions to set up risk-adjusted quality control charts in health care. For the variable life adjusted display (VLAD) proposed by  Lovegrove et al. (1997) <doi:10.1016/S0140-6736(97)06507-0> signaling rules derived in Wittenberg et al. (2018) <doi: 10.1002/sim.7647> are implemented.  Additionally, for the risk-adjusted cumulative sum chart based on log-likelihood ratio statistic introduced by Steiner et al. (2000) <doi:10.1093/biostatistics/1.4.441> average run length and control limits can be computed.
+# Description: Contains functions to set up risk-adjusted quality control charts in health care. For the variable life adjusted display (VLAD) proposed by Lovegrove et al. (1997) <doi:10.1016/S0140-6736(97)06507-0> signaling rules derived in Wittenberg et al. (2018) <doi:10.1002/sim.7647> are implemented. Additionally, for the risk-adjusted cumulative sum chart based on log-likelihood ratio statistic introduced by Steiner et al. (2000) <doi:10.1093/biostatistics/1.4.441> average run length and control limits can be computed with fast and accurate Markov chain approximations developed in Knoth et al. (2019) <doi:10.1002/sim.8104>.
 # License: GPL (>= 2)
 # NeedsCompilation: yes
 # SystemRequirements: C++11
 # Encoding: UTF-8
 # LazyData: true
-# Imports: Rcpp (>= 0.12.12)
-# Suggests: dplyr, ggplot2, parallel, rmarkdown, spcadjust (>= 1.1), testthat, tidyr
-# LinkingTo: Rcpp, RcppArmadillo
-# RoxygenNote: 6.1.1
-# Packaged: 2018-12-05 14:11:16 UTC; pwitten
+# Imports: Rcpp (>= 0.12.12), checkmate, magrittr, dplyr, tidyr
+# Suggests: ggplot2, rmarkdown, spcadjust (>= 1.1), testthat, knitr
+# LinkingTo: BH, Rcpp, RcppArmadillo
+# RoxygenNote: 7.1.1
+# Packaged: 2021-02-15 10:00:57 UTC; pwitten
 # Author: Philipp Wittenberg [aut, cre] (<https://orcid.org/0000-0001-7151-8243>), Sven Knoth [aut, ths] (<https://orcid.org/0000-0002-9666-5554>)
 # Repository: CRAN
-# Date/Publication: 2018-12-06 08:50:03 UTC
+# Date/Publication: 2021-02-15 10:30:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

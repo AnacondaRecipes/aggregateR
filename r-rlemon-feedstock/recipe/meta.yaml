@@ -1,0 +1,97 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rlemon
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rlemon_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rlemon/rlemon_{{ version }}.tar.gz
+  sha256: e06792875f05a0c6cd637b7bf16bd51c3891e0df6bad78ffba0ee195abe8d3a0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.5
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.5
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rlemon')"           # [not win]
+    - "\"%R%\" -e \"library('rlemon')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://errickson.net/rlemon/
+  license: BSL-1.0
+  summary: Allows easy access to the LEMON Graph Library set of algorithms, written in C++. See
+    the LEMON project page at <https://lemon.cs.elte.hu/trac/lemon>. Current LEMON version
+    is 1.3.1.
+  license_family: OTHER
+
+# The original CRAN metadata for this package was:
+
+# Package: rlemon
+# Type: Package
+# Title: R Access to LEMON Graph Algorithms
+# Version: 0.2.0
+# Authors@R: c(person("Arav", "Agarwal", role = "aut", email = "arava@andrew.cmu.edu"), person("Aditya", "Tewari", role = "aut", email = "atewari@palantir.com"), person("Josh", "Errickson", role = c("cre","aut"), email = "jerrick@umich.edu"))
+# Description: Allows easy access to the LEMON Graph Library set of algorithms, written in C++. See the LEMON project page at <https://lemon.cs.elte.hu/trac/lemon>. Current LEMON version is 1.3.1.
+# License: BSL-1.0
+# Imports: Rcpp (>= 1.0.5)
+# LinkingTo: Rcpp
+# URL: https://errickson.net/rlemon/
+# BugReports: https://github.com/josherrickson/rlemon/issues/
+# RoxygenNote: 7.1.2
+# Encoding: UTF-8
+# Suggests: testthat, covr
+# Depends: R (>= 2.10)
+# LazyData: true
+# Language: en-US
+# NeedsCompilation: yes
+# Packaged: 2022-04-15 13:07:34 UTC; josh
+# Author: Arav Agarwal [aut], Aditya Tewari [aut], Josh Errickson [cre, aut]
+# Maintainer: Josh Errickson <jerrick@umich.edu>
+# Repository: CRAN
+# Date/Publication: 2022-04-15 15:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
