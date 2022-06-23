@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Needed to find .pc files from CDTs
+: ${CONDA_BUILD_SYSROOT:=`"$CC" -print-sysroot`}
+export PKG_CONFIG_PATH="${CONDA_BUILD_SYSROOT}/usr/lib64/pkgconfig"
+export CFLAGS="${CFLAGS} -I${BUILD_PREFIX}/${HOST}/sysroot/usr/include"
+export CAIRO_CFLAGS="${CAIRO_CFLAGS} -I${PREFIX}/include -I${PREFIX}/include/cairo"
+export DISABLE_AUTOBREW=1
+export CAIRO_LIBS="-L${PREFIX}/lib -lcairo -lz"
+
 # 'Autobrew' is being used by more and more packages these days
 # to grab static libraries from Homebrew bottles. These bottles
 # are fetched via Homebrew's --force-bottle option which grabs
