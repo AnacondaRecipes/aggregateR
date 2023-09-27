@@ -1,0 +1,84 @@
+{% set version = '1.6.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-diagram
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/diagram_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/diagram/diagram_{{ version }}.tar.gz
+  sha256: e9c03e7712e0282c5d9f2b760bafe2aac9e99a9723578d9e6369d60301f574e4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-shape
+
+  run:
+    - r-base
+    - r-shape
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('diagram')"           # [not win]
+    - "\"%R%\" -e \"library('diagram')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=diagram
+  license: GPL-2
+  summary: Visualises simple graphs (networks) based on a transition matrix, utilities to plot
+    flow diagrams, visualising webs, electrical networks, etc. Support for the book
+    "A practical guide to ecological modelling - using R as a simulation platform" by
+    Karline Soetaert and Peter M.J. Herman (2009), Springer. and the book "Solving Differential
+    Equations in R" by Karline Soetaert, Jeff Cash and Francesca Mazzia (2012), Springer.
+    Includes demo(flowchart), demo(plotmat), demo(plotweb).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: diagram
+# Version: 1.6.5
+# Title: Functions for Visualising Simple Graphs (Networks), Plotting Flow Diagrams
+# Author: Karline Soetaert <karline.soetaert@nioz.nl>
+# Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
+# Depends: R (>= 2.01), shape
+# Imports: stats, graphics
+# Description: Visualises simple graphs (networks) based on a transition matrix, utilities to plot flow diagrams, visualising webs, electrical networks, etc. Support for the book "A practical guide to ecological modelling - using R as a simulation platform" by Karline Soetaert and Peter M.J. Herman (2009), Springer. and the book "Solving Differential Equations in R" by Karline Soetaert, Jeff Cash and Francesca Mazzia (2012), Springer. Includes demo(flowchart), demo(plotmat), demo(plotweb).
+# License: GPL (>= 2)
+# LazyData: yes
+# NeedsCompilation: no
+# Packaged: 2020-09-29 06:59:04 UTC; karlines
+# Repository: CRAN
+# Date/Publication: 2020-09-30 07:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

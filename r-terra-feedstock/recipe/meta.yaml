@@ -1,4 +1,4 @@
-{% set version = '1.5-21' %}
+{% set version = '1.7-46' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,12 +11,12 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/terra_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/terra/terra_{{ version }}.tar.gz
-  sha256: 091ee928ccaa6561aa9f8ee6c1c99f139dc89f1653c2a76a035cca14d404f43f
+  sha256: 017a3e5ef91248172dc6e5cfc135533de520c46822bf1b0ec41ae6f48a88f64a
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
-  number: 2
+  number: 0
   # no skip
 
   # This is required to make R link correctly on Linux.
@@ -24,7 +24,7 @@ build:
     - lib/R/lib/
     - lib/
 
-# Suggests: parallel, tinytest, ncdf4, sf (>= 0.9-8), deldir, XML, igraph
+# Suggests: parallel, tinytest, ncdf4, sf (>= 0.9-8), deldir, XML, leaflet, htmlwidgets
 requirements:
   build:
     - {{ compiler('c') }}              # [not win]
@@ -45,14 +45,18 @@ requirements:
 
   host:
     - r-base
-    - r-rcpp
+    - r-rcpp >=1.0_10
     - libgdal
+    - proj
+    - geos
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
-    - r-rcpp
+    - r-rcpp >=1.0_10
     - libgdal
+    - proj
+    - geos
 
 test:
   commands:
@@ -67,16 +71,16 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://rspatial.org/terra/
+  home: https://rspatial.org/
   license: GPL-3
-  summary: Methods for spatial data analysis with raster and vector data. Raster methods allow
-    for low-level data manipulation as well as high-level global, local, zonal, and
-    focal computation. The predict and interpolate methods facilitate the use of regression
-    type (interpolation, machine learning) models for spatial prediction, including
-    with satellite remote sensing data. Processing of very large files is supported.
-    See the manual and tutorials on <https://rspatial.org/terra/> to get started. 'terra'
-    is very similar to the 'raster' package; but 'terra' can do more, is easier to use,
-    and it is faster.
+  summary: Methods for spatial data analysis with vector (points, lines, polygons) and raster
+    (grid) data. Methods for vector data include geometric operations such as intersect
+    and buffer. Raster methods include local, focal, global, zonal and geometric operations.
+    The predict and interpolate methods facilitate the use of regression type (interpolation,
+    machine learning) models for spatial prediction, including with satellite remote
+    sensing data. Processing of very large files is supported. See the manual and tutorials
+    on <https://rspatial.org/> to get started. 'terra' replaces the 'raster' package
+    ('terra' can do more, and it is faster and easier to use).
   license_family: GPL3
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
@@ -86,26 +90,27 @@ about:
 # Package: terra
 # Type: Package
 # Title: Spatial Data Analysis
-# Version: 1.5-21
-# Date: 2022-02-15
+# Version: 1.7-46
+# Date: 2023-09-04
 # Depends: R (>= 3.5.0)
-# Suggests: parallel, tinytest, ncdf4, sf (>= 0.9-8), deldir, XML, igraph
+# Suggests: parallel, tinytest, ncdf4, sf (>= 0.9-8), deldir, XML, leaflet, htmlwidgets
 # LinkingTo: Rcpp
-# Imports: methods, Rcpp
-# SystemRequirements: C++11, GDAL (>= 2.2.3), GEOS (>= 3.4.0), PROJ (>= 4.9.3), sqlite3
+# Imports: methods, Rcpp (>= 1.0-10)
+# SystemRequirements: C++17, GDAL (>= 2.2.3), GEOS (>= 3.4.0), PROJ (>= 4.9.3), sqlite3
 # Encoding: UTF-8
+# Language: en-US
 # Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
-# Description: Methods for spatial data analysis with raster and vector data. Raster methods allow for low-level data manipulation as well as high-level global, local, zonal, and focal computation. The predict and interpolate methods facilitate the use of regression type (interpolation, machine learning) models for spatial prediction, including with satellite remote sensing data. Processing of very large files is supported. See the manual and tutorials on <https://rspatial.org/terra/> to get started. 'terra' is very similar to the 'raster' package; but 'terra' can do more, is easier to use, and it is faster.
+# Description: Methods for spatial data analysis with vector (points, lines, polygons) and raster (grid) data. Methods for vector data include geometric operations such as intersect and buffer. Raster methods include local, focal, global, zonal and geometric operations. The predict and interpolate methods facilitate the use of regression type (interpolation, machine learning) models for spatial prediction, including with satellite remote sensing data. Processing of very large files is supported. See the manual and tutorials on <https://rspatial.org/> to get started. 'terra' replaces the 'raster' package ('terra' can do more, and it is faster and easier to use).
 # License: GPL (>= 3)
-# URL: https://rspatial.org/terra/
+# URL: https://rspatial.org/
 # BugReports: https://github.com/rspatial/terra/issues/
 # LazyLoad: yes
-# Authors@R: c( person("Robert J.", "Hijmans", role = c("cre", "aut"), email = "r.hijmans@gmail.com", comment = c(ORCID = "0000-0001-5872-2872")), person("Roger", "Bivand",  role = "ctb", comment = c(ORCID = "0000-0003-2392-6140")), person("Jacob", "van Etten", role = "ctb", comment = c(ORCID = "0000-0001-7554-2558")), person("Karl", "Forner", role = "ctb"), person("Jeroen", "Ooms", role = "ctb", comment = c(ORCID = "0000-0002-4035-0289")), person("Edzer", "Pebesma", role = "ctb", comment = c(ORCID = "0000-0001-8049-7069")))
+# Authors@R: c( person("Robert J.", "Hijmans", role = c("cre", "aut"), email = "r.hijmans@gmail.com", comment = c(ORCID = "0000-0001-5872-2872")), person("Roger", "Bivand",  role = "ctb", comment = c(ORCID = "0000-0003-2392-6140")), person("Edzer", "Pebesma", role = "ctb", comment = c(ORCID = "0000-0001-8049-7069")), person("Michael D.", "Sumner", role = "ctb"))
 # NeedsCompilation: yes
-# Packaged: 2022-02-15 19:39:58 UTC; rhijm
-# Author: Robert J. Hijmans [cre, aut] (<https://orcid.org/0000-0001-5872-2872>), Roger Bivand [ctb] (<https://orcid.org/0000-0003-2392-6140>), Jacob van Etten [ctb] (<https://orcid.org/0000-0001-7554-2558>), Karl Forner [ctb], Jeroen Ooms [ctb] (<https://orcid.org/0000-0002-4035-0289>), Edzer Pebesma [ctb] (<https://orcid.org/0000-0001-8049-7069>)
+# Packaged: 2023-09-04 20:35:10 UTC; rhijm
+# Author: Robert J. Hijmans [cre, aut] (<https://orcid.org/0000-0001-5872-2872>), Roger Bivand [ctb] (<https://orcid.org/0000-0003-2392-6140>), Edzer Pebesma [ctb] (<https://orcid.org/0000-0001-8049-7069>), Michael D. Sumner [ctb]
 # Repository: CRAN
-# Date/Publication: 2022-02-17 00:40:02 UTC
+# Date/Publication: 2023-09-06 09:10:07 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

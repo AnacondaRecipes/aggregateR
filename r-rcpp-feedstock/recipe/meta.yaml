@@ -1,0 +1,99 @@
+{% set version = '1.0.11' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rcpp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Rcpp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Rcpp/Rcpp_{{ version }}.tar.gz
+  sha256: df757c3068599c6c05367900bcad93547ba3422d59802dbaca20fd74d4d2fa5f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tinytest, inline, rbenchmark, pkgKitten (>= 0.1.2)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Rcpp')"           # [not win]
+    - "\"%R%\" -e \"library('Rcpp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.rcpp.org, https://dirk.eddelbuettel.com/code/rcpp.html, https://github.com/RcppCore/Rcpp
+  license: GPL-2
+  summary: The 'Rcpp' package provides R functions as well as C++ classes which offer a seamless
+    integration of R and C++. Many R data types and objects can be mapped back and forth
+    to C++ equivalents which facilitates both writing of new code as well as easier
+    integration of third-party libraries. Documentation about 'Rcpp' is provided by
+    several vignettes included in this package, via the 'Rcpp Gallery' site at <https://gallery.rcpp.org>,
+    the paper by Eddelbuettel and Francois (2011, <doi:10.18637/jss.v040.i08>), the
+    book by Eddelbuettel (2013, <doi:10.1007/978-1-4614-6868-4>) and the paper by Eddelbuettel
+    and Balamuta (2018, <doi:10.1080/00031305.2017.1375990>); see 'citation("Rcpp")'
+    for details.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: Rcpp
+# Title: Seamless R and C++ Integration
+# Version: 1.0.11
+# Date: 2023-07-03
+# Author: Dirk Eddelbuettel, Romain Francois, JJ Allaire, Kevin Ushey, Qiang Kou, Nathan Russell, Inaki Ucar, Douglas Bates and John Chambers
+# Maintainer: Dirk Eddelbuettel <edd@debian.org>
+# Description: The 'Rcpp' package provides R functions as well as C++ classes which offer a seamless integration of R and C++. Many R data types and objects can be mapped back and forth to C++ equivalents which facilitates both writing of new code as well as easier integration of third-party libraries. Documentation about 'Rcpp' is provided by several vignettes included in this package, via the 'Rcpp Gallery' site at <https://gallery.rcpp.org>, the paper by Eddelbuettel and Francois (2011, <doi:10.18637/jss.v040.i08>), the book by Eddelbuettel (2013, <doi:10.1007/978-1-4614-6868-4>) and the paper by Eddelbuettel and Balamuta (2018, <doi:10.1080/00031305.2017.1375990>); see 'citation("Rcpp")' for details.
+# Imports: methods, utils
+# Suggests: tinytest, inline, rbenchmark, pkgKitten (>= 0.1.2)
+# URL: https://www.rcpp.org, https://dirk.eddelbuettel.com/code/rcpp.html, https://github.com/RcppCore/Rcpp
+# License: GPL (>= 2)
+# BugReports: https://github.com/RcppCore/Rcpp/issues
+# MailingList: rcpp-devel@lists.r-forge.r-project.org
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-07-03 15:56:55 UTC; edd
+# Repository: CRAN
+# Date/Publication: 2023-07-06 07:33:14 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
