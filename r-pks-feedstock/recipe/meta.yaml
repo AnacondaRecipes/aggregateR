@@ -1,0 +1,86 @@
+{% set version = '0.6-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pks
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pks_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pks/pks_{{ version }}.tar.gz
+  sha256: 5d1db7508777cbe548e3350f1e50046ab144a11f03b7adb9fbf3c6aaf5b5b7f2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: relations, Rgraphviz
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-sets
+
+  run:
+    - r-base
+    - r-sets
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pks')"           # [not win]
+    - "\"%R%\" -e \"library('pks')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.mathpsy.uni-tuebingen.de/wickelmaier/
+  license: GPL-2
+  summary: Fitting and testing probabilistic knowledge structures, especially the basic local
+    independence model (BLIM, Doignon & Flamagne, 1999) and the simple learning model
+    (SLM), using the minimum discrepancy maximum likelihood (MDML) method (Heller &
+    Wickelmaier, 2013 <doi:10.1016/j.endm.2013.05.145>).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: pks
+# Version: 0.6-0
+# Date: 2023-07-07
+# Title: Probabilistic Knowledge Structures
+# Authors@R: c(person(given = "Florian", family = "Wickelmaier", role = c("aut", "cre"), email = "wickelmaier@web.de"), person(given = "Juergen", family = "Heller", role = "aut"), person(given = "Julian", family = "Mollenhauer", role = "aut"), person(given = "Pasquale", family = "Anselmi", role = "ctb"), person(given = "Debora", family = "de Chiusole", role = "ctb"), person(given = "Andrea", family = "Brancaccio", role = "ctb"), person(given = "Luca", family = "Stefanutti", role = "ctb"))
+# Depends: R (>= 3.5.0), stats, sets
+# Imports: graphics
+# Suggests: relations, Rgraphviz
+# Description: Fitting and testing probabilistic knowledge structures, especially the basic local independence model (BLIM, Doignon & Flamagne, 1999) and the simple learning model (SLM), using the minimum discrepancy maximum likelihood (MDML) method (Heller & Wickelmaier, 2013 <doi:10.1016/j.endm.2013.05.145>).
+# License: GPL (>= 2)
+# URL: http://www.mathpsy.uni-tuebingen.de/wickelmaier/
+# NeedsCompilation: no
+# Packaged: 2023-07-07 10:18:52 UTC; siifw01
+# Author: Florian Wickelmaier [aut, cre], Juergen Heller [aut], Julian Mollenhauer [aut], Pasquale Anselmi [ctb], Debora de Chiusole [ctb], Andrea Brancaccio [ctb], Luca Stefanutti [ctb]
+# Maintainer: Florian Wickelmaier <wickelmaier@web.de>
+# Repository: CRAN
+# Date/Publication: 2023-07-07 12:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

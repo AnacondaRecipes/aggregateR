@@ -1,0 +1,94 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-suntools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/suntools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/suntools/suntools_{{ version }}.tar.gz
+  sha256: 42b7b39bd23ad48ded002150a0e7798fab94ed9828e5b5fdd8e5e1c9040697e2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-sf
+
+  run:
+    - r-base
+    - r-sf
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('suntools')"           # [not win]
+    - "\"%R%\" -e \"library('suntools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/adokter/suntools/
+  license: GPL-3
+  summary: 'Provides a set of convenient functions for calculating sun-related information, including
+    the sun''s position (elevation and azimuth), and the times of sunrise, sunset, solar
+    noon, and twilight for any given geographical location on Earth. These calculations
+    are based on equations provided by the National Oceanic & Atmospheric Administration
+    (NOAA) <https://gml.noaa.gov/grad/solcalc/calcdetails.html> as described in "Astronomical
+    Algorithms" by Jean Meeus (1991, ISBN: 978-0-943396-35-4). A resource for researchers
+    and professionals working in fields such as climatology, biology, and renewable
+    energy.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: suntools
+# Version: 1.0.0
+# Date: 2023-06-08
+# Title: Calculate Sun Position, Sunrise, Sunset, Solar Noon and Twilight
+# Authors@R: c( person("Roger", "Bivand", role = "aut", email = "Roger.Bivand@nhh.no", comment=c(ORCID="0000-0003-2392-6140")), person("Adriaan M.", "Dokter", role = c("ctb", "cre"), email = "amd427@cornell.edu", comment = c(ORCID = "0000-0001-6573-066X")), person("Pieter", "Huybrechts", role = "ctb", email = "pieter.huybrechts@inbo.be", comment = c(ORCID = "0000-0002-6658-6062")), person("Sebastian", "Luque", role = "aut"), person("Greg", "Pelletier", role = "ctb"), person("Alexander", "Tedeschi", role = "ctb", email = "at744@cornell.edu", comment = c(ORCID = "0000-0003-0772-6931")))
+# Encoding: UTF-8
+# Depends: R (>= 2.10)
+# Imports: methods, sf, stats
+# Description: Provides a set of convenient functions for calculating sun-related information, including the sun's position (elevation and azimuth), and the times of sunrise, sunset, solar noon, and twilight for any given geographical location on Earth. These calculations are based on equations provided by the National Oceanic & Atmospheric Administration (NOAA) <https://gml.noaa.gov/grad/solcalc/calcdetails.html> as described in "Astronomical Algorithms" by Jean Meeus (1991, ISBN: 978-0-943396-35-4). A resource for researchers and professionals working in fields such as climatology, biology, and renewable energy.
+# License: GPL (>= 3)
+# URL: https://github.com/adokter/suntools/
+# BugReports: https://github.com/adokter/suntools/issues
+# RoxygenNote: 7.2.3
+# Suggests: testthat (>= 3.0.0)
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2023-07-05 17:12:26 UTC; alexandertedeschi
+# Author: Roger Bivand [aut] (<https://orcid.org/0000-0003-2392-6140>), Adriaan M. Dokter [ctb, cre] (<https://orcid.org/0000-0001-6573-066X>), Pieter Huybrechts [ctb] (<https://orcid.org/0000-0002-6658-6062>), Sebastian Luque [aut], Greg Pelletier [ctb], Alexander Tedeschi [ctb] (<https://orcid.org/0000-0003-0772-6931>)
+# Maintainer: Adriaan M. Dokter <amd427@cornell.edu>
+# Repository: CRAN
+# Date/Publication: 2023-07-06 14:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

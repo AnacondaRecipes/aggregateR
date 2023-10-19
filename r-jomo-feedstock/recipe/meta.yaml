@@ -1,0 +1,100 @@
+{% set version = '2.7-6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-jomo
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/jomo_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/jomo/jomo_{{ version }}.tar.gz
+  sha256: 3ffa2a5521d4969fe77b23cd3ab201afdf8db3f8f708b1276c33083c01d7e2da
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: mitml
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-lme4
+    - r-ordinal
+    - r-survival
+    - r-tibble
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-lme4
+    - r-ordinal
+    - r-survival
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('jomo')"           # [not win]
+    - "\"%R%\" -e \"library('jomo')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=jomo
+  license: GPL-2
+  summary: Similarly to package 'pan', 'jomo' is a package for multilevel joint modelling multiple
+    imputation (Carpenter and Kenward, 2013) <doi:10.1002/9781119942283>. Novel aspects
+    of 'jomo' are the possibility of handling binary and categorical data through latent
+    normal variables, the option to use cluster-specific covariance matrices and to
+    impute compatibly with the substantive model.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: jomo
+# Type: Package
+# Title: Multilevel Joint Modelling Multiple Imputation
+# Version: 2.7-6
+# Date: 2023-04-13
+# Author: Matteo Quartagno, James Carpenter
+# Maintainer: Matteo Quartagno <m.quartagno@ucl.ac.uk>
+# Description: Similarly to package 'pan', 'jomo' is a package for multilevel joint modelling multiple imputation (Carpenter and Kenward, 2013) <doi:10.1002/9781119942283>. Novel aspects of 'jomo' are the possibility of handling binary and categorical data through latent normal variables, the option to use cluster-specific covariance matrices and to impute compatibly with the substantive model.
+# License: GPL-2
+# LazyData: yes
+# Suggests: mitml
+# Imports: stats, lme4, survival, MASS, ordinal, tibble
+# NeedsCompilation: yes
+# Packaged: 2023-04-14 08:57:20 UTC; rmjlmqu
+# Repository: CRAN
+# Date/Publication: 2023-04-15 09:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

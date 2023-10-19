@@ -1,0 +1,89 @@
+{% set version = '0.4.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-loadings
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/loadings_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/loadings/loadings_{{ version }}.tar.gz
+  sha256: be310a62e1da5a05dd6afb8826bc62bd50ab6e7b367d02d56cb2b07ac4e7e9c5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-geigen
+
+  run:
+    - r-base
+    - r-geigen
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('loadings')"           # [not win]
+    - "\"%R%\" -e \"library('loadings')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=loadings
+  license: LGPL-3
+  summary: Computing statistical hypothesis testing for loading in principal component analysis
+    (PCA) (Yamamoto, H. et al. (2014) <doi:10.1186/1471-2105-15-51>), orthogonal smoothed
+    PCA (OS-PCA) (Yamamoto, H. et al. (2021) <doi:10.3390/metabo11030149>), one-sided
+    kernel PCA (Yamamoto, H. (2023) <doi:10.51094/jxiv.262>), partial least squares
+    (PLS) and PLS discriminant analysis (PLS-DA) (Yamamoto, H. et al. (2009) <doi:10.1016/j.chemolab.2009.05.006>),
+    PLS with rank order of groups (PLS-ROG) (Yamamoto, H. (2017) <doi:10.1002/cem.2883>),
+    regularized canonical correlation analysis discriminant analysis (RCCA-DA) (Yamamoto,
+    H. et al. (2008) <doi:10.1016/j.bej.2007.12.009>), multiset PLS and PLS-ROG (Yamamoto,
+    H. (2022) <doi:10.1101/2022.08.30.505949>).
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: loadings
+# Type: Package
+# Title: Loadings for Principal Component Analysis and Partial Least Squares
+# Version: 0.4.1
+# Author: Hiroyuki Yamamoto
+# Maintainer: Hiroyuki Yamamoto <h.yama2396@gmail.com>
+# Description: Computing statistical hypothesis testing for loading in principal component analysis (PCA) (Yamamoto, H. et al. (2014) <doi:10.1186/1471-2105-15-51>), orthogonal smoothed PCA (OS-PCA) (Yamamoto, H. et al. (2021) <doi:10.3390/metabo11030149>), one-sided kernel PCA (Yamamoto, H. (2023) <doi:10.51094/jxiv.262>), partial least squares (PLS) and PLS discriminant analysis (PLS-DA) (Yamamoto, H. et al. (2009) <doi:10.1016/j.chemolab.2009.05.006>), PLS with rank order of groups (PLS-ROG) (Yamamoto, H. (2017) <doi:10.1002/cem.2883>), regularized canonical correlation analysis discriminant analysis (RCCA-DA) (Yamamoto, H. et al. (2008) <doi:10.1016/j.bej.2007.12.009>), multiset PLS and PLS-ROG (Yamamoto, H. (2022) <doi:10.1101/2022.08.30.505949>).
+# License: LGPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Imports: geigen
+# Depends: R (>= 2.10)
+# NeedsCompilation: no
+# Packaged: 2023-10-08 07:29:51 UTC; hyama
+# Repository: CRAN
+# Date/Publication: 2023-10-08 19:10:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

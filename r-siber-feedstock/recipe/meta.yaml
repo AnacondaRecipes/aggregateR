@@ -1,0 +1,109 @@
+{% set version = '2.1.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-siber
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SIBER_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SIBER/SIBER_{{ version }}.tar.gz
+  sha256: 8502adafd09dd220488479d1e33054b9bfea464a77ca9e9013f1adb1a5d5389e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: coda, ellipse, knitr, rmarkdown, viridis
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr
+    - r-ggplot2
+    - r-hdrcde
+    - r-magrittr
+    - r-mnormt
+    - r-purrr
+    - r-rjags
+    - r-spatstat.geom
+    - r-spatstat.utils
+    - r-tidyr
+    - jags
+
+  run:
+    - r-base
+    - r-dplyr
+    - r-ggplot2
+    - r-hdrcde
+    - r-magrittr
+    - r-mnormt
+    - r-purrr
+    - r-rjags
+    - r-spatstat.geom
+    - r-spatstat.utils
+    - r-tidyr
+    - jags
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SIBER')"           # [not win]
+    - "\"%R%\" -e \"library('SIBER')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SIBER
+  license: GPL-2
+  summary: Fits bi-variate ellipses to stable isotope data using Bayesian inference with the
+    aim being to describe and compare their isotopic niche.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: SIBER
+# Type: Package
+# Title: Stable Isotope Bayesian Ellipses in R
+# Version: 2.1.8
+# Authors@R: c( person("Andrew", "Jackson", role = c("aut", "cre"), email = "jacksoan@tcd.ie", comment = c(ORCID = "0000-0001-7334-0434")), person("Andrew", "Parnell", role = "aut", comment = c(ORCID = "0000-0001-7956-7939")) )
+# Depends: R (>= 4.0.0)
+# SystemRequirements: JAGS (>= 4.1)
+# Imports: hdrcde, graphics, grDevices, mnormt, rjags, spatstat.geom, spatstat.utils, stats, tidyr, dplyr, ggplot2, magrittr, purrr
+# Suggests: coda, ellipse, knitr, rmarkdown, viridis
+# Description: Fits bi-variate ellipses to stable isotope data using Bayesian inference with the aim being to describe and compare their isotopic niche.
+# License: GPL (>= 2)
+# Language: en-GB
+# LazyLoad: yes
+# LazyData: true
+# Encoding: UTF-8
+# Packaged: 2023-08-22 15:14:51 UTC; andrewjackson
+# NeedsCompilation: yes
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# Author: Andrew Jackson [aut, cre] (<https://orcid.org/0000-0001-7334-0434>), Andrew Parnell [aut] (<https://orcid.org/0000-0001-7956-7939>)
+# Maintainer: Andrew Jackson <jacksoan@tcd.ie>
+# Repository: CRAN
+# Date/Publication: 2023-08-22 17:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

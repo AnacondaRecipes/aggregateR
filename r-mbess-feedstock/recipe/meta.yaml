@@ -1,0 +1,115 @@
+{% set version = '4.9.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mbess
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MBESS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MBESS/MBESS_{{ version }}.tar.gz
+  sha256: 8af2f9df907371114f6670d3364e2a5868bc64cb993a2908673998d1edf90433
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: gsl
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-openmx
+    - r-boot
+    - r-lavaan
+    - r-mnormt
+    - r-nlme
+    - r-sem
+    - r-semtools
+
+  run:
+    - r-base
+    - r-mass
+    - r-openmx
+    - r-boot
+    - r-lavaan
+    - r-mnormt
+    - r-nlme
+    - r-sem
+    - r-semtools
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MBESS')"           # [not win]
+    - "\"%R%\" -e \"library('MBESS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www3.nd.edu/~kkelley/site/MBESS.html
+  license: GPL-2 | GPL-3
+  summary: Implements methods that are useful in designing research studies and analyzing data,
+    with particular emphasis on methods that are developed for or used within the behavioral,
+    educational, and social sciences (broadly defined). That being said, many of the
+    methods implemented within MBESS are applicable to a wide variety of disciplines.
+    MBESS has a suite of functions for a variety of related topics, such as effect sizes,
+    confidence intervals for effect sizes (including standardized effect sizes and noncentral
+    effect sizes), sample size planning (from the accuracy in parameter estimation [AIPE],
+    power analytic, equivalence, and minimum-risk point estimation perspectives), mediation
+    analysis, various properties of distributions, and a variety of utility functions.
+    MBESS (pronounced 'em-bes') was originally an acronym for 'Methods for the Behavioral,
+    Educational, and Social Sciences,' but MBESS became more general and now contains
+    methods applicable and used in a wide variety of fields and is an orphan acronym,
+    in the sense that what was an acronym is now literally its name. MBESS has greatly
+    benefited from others, see <https://www3.nd.edu/~kkelley/site/MBESS.html> for a
+    detailed list of those that have contributed and other details.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: MBESS
+# Type: Package
+# Title: The MBESS R Package
+# Version: 4.9.2
+# Date: 2022-09-19
+# Authors@R: c(person("Ken", "Kelley", role=c("aut", "cre"), email="kkelley@nd.edu"))
+# Maintainer: Ken Kelley <kkelley@nd.edu>
+# Depends: R (>= 3.5.0), stats
+# Imports: boot, lavaan, MASS, methods, mnormt, nlme, OpenMx, parallel, sem, semTools
+# Suggests: gsl
+# Encoding: UTF-8
+# Description: Implements methods that are useful in designing research studies and analyzing data, with particular emphasis on methods that are developed for or used within the behavioral, educational, and social sciences (broadly defined). That being said, many of the methods implemented within MBESS are applicable to a wide variety of disciplines. MBESS has a suite of functions for a variety of related topics, such as effect sizes, confidence intervals for effect sizes (including standardized effect sizes and noncentral effect sizes), sample size planning (from the accuracy in parameter estimation [AIPE], power analytic, equivalence, and minimum-risk point estimation perspectives), mediation analysis, various properties of distributions, and a variety of utility functions. MBESS (pronounced 'em-bes') was originally an acronym for 'Methods for the Behavioral, Educational, and Social Sciences,' but MBESS became more general and now contains methods applicable and used in a wide variety of fields and is an orphan acronym, in the sense that what was an acronym is now literally its name. MBESS has greatly benefited from others, see <https://www3.nd.edu/~kkelley/site/MBESS.html> for a detailed list of those that have contributed and other details.
+# License: GPL-2 | GPL-3
+# URL: https://www3.nd.edu/~kkelley/site/MBESS.html
+# RoxygenNote: 7.2.0
+# NeedsCompilation: no
+# Packaged: 2022-09-19 14:16:32 UTC; kkelley
+# Author: Ken Kelley [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2022-09-19 16:06:15 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

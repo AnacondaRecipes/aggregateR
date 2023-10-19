@@ -1,0 +1,93 @@
+{% set version = '0.6.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rintcal
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rintcal_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rintcal/rintcal_{{ version }}.tar.gz
+  sha256: 7a79fbe2070164cce092420bba0edbf8175dd96f709d403bdbb0ae0debe7863d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, utf8
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-data.table
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rintcal')"           # [not win]
+    - "\"%R%\" -e \"library('rintcal')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rintcal
+  license: GPL-2
+  summary: The IntCal20 radiocarbon calibration curves (Reimer et al. 2020 <doi:10.1017/RDC.2020.68>)
+    are provided as a data package, together with previous IntCal curves (IntCal13,
+    IntCal09, IntCal04, IntCal98) and postbomb curves. Also provided are functions to
+    copy the curves into memory, to plot the curves and their underlying data, to calibrate
+    radiocarbon dates and to transform between different radiocarbon 'domains'.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: rintcal
+# Type: Package
+# Title: Radiocarbon Calibration Curves
+# Version: 0.6.4
+# Author: Maarten Blaauw [aut, cre] (<https://orcid.org/0000-0002-5680-1515>)
+# Authors@R: c( person("Maarten", "Blaauw", email = "maarten.blaauw@qub.ac.uk", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-5680-1515")))
+# Maintainer: Maarten Blaauw <maarten.blaauw@qub.ac.uk>
+# Description: The IntCal20 radiocarbon calibration curves (Reimer et al. 2020 <doi:10.1017/RDC.2020.68>) are provided as a data package, together with previous IntCal curves (IntCal13, IntCal09, IntCal04, IntCal98) and postbomb curves. Also provided are functions to copy the curves into memory, to plot the curves and their underlying data, to calibrate radiocarbon dates and to transform between different radiocarbon 'domains'.
+# License: GPL (>= 2)
+# RoxygenNote: 7.2.3
+# Suggests: knitr, rmarkdown, utf8
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Imports: data.table, jsonlite
+# Language: en-GB
+# Depends: R (>= 3.5.0)
+# LazyData: true
+# Packaged: 2023-10-06 12:28:04 UTC; maarten
+# Repository: CRAN
+# Date/Publication: 2023-10-06 13:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,134 @@
+{% set version = '2.21.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-openmx
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/OpenMx_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/OpenMx/OpenMx_{{ version }}.tar.gz
+  sha256: bfe13368360434ab5804496bb7f28053f75669b6b264e0e679261a3e705a74ef
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: mvtnorm, numDeriv, roxygen2 (>= 6.1), rpf (>= 0.45), snowfall, lme4, covr, testthat, umx, ifaTools, knitr, markdown, rmarkdown, reshape2, ggplot2
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh >=1.69.0_1
+    - r-mass
+    - r-matrix >=1.2_16
+    - r-rcpp
+    - r-rcppeigen
+    - r-rcppparallel
+    - r-stanheaders >=2.10.0.2
+    - r-digest
+    - r-lifecycle
+    - r-rpf >=0.45
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.69.0_1
+    - r-mass
+    - r-matrix >=1.2_16
+    - r-rcpp
+    - r-rcppeigen
+    - r-rcppparallel
+    - r-stanheaders >=2.10.0.2
+    - r-digest
+    - r-lifecycle
+    - r-rpf >=0.45
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('OpenMx')"           # [not win]
+    - "\"%R%\" -e \"library('OpenMx')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://openmx.ssri.psu.edu, https://github.com/OpenMx/OpenMx
+  license: Apache License (== 2.0)
+  summary: Create structural equation models that can be manipulated programmatically. Models
+    may be specified with matrices or paths (LISREL or RAM) Example models include confirmatory
+    factor, multiple group, mixture distribution, categorical threshold, modern test
+    theory, differential Fit functions include full information maximum likelihood,
+    maximum likelihood, and weighted least squares. equations, state space, and many
+    others. Support and advanced package binaries available at <http://openmx.ssri.psu.edu>.
+    The software is described in Neale, Hunter, Pritikin, Zahery, Brick, Kirkpatrick,
+    Estabrook, Bates, Maes, & Boker (2016) <doi:10.1007/s11336-014-9435-8>.
+  license_family: APACHE
+
+# The original CRAN metadata for this package was:
+
+# Encoding: UTF-8
+# Package: OpenMx
+# Date: 2023-04-05
+# Title: Extended Structural Equation Modelling
+# Authors@R: c(person(c("Steven", "M."), "Boker", role="aut"), person(c("Michael", "C."), "Neale", role="aut"), person(c("Hermine", "H."), "Maes", role="aut"), person(c("Michael", "J."), "Wilde", role="ctb"), person("Michael", "Spiegel", role="aut"), person(c("Timothy", "R."), "Brick", role="aut"), person("Ryne", "Estabrook", role="aut"), person(c("Timothy", "C."), "Bates", role="aut"), person("Paras", "Mehta", role="ctb"), person("Timo", c("von", "Oertzen"), role="ctb"), person(c("Ross", "J."), "Gore", role="aut"), person(c("Michael", "D."), "Hunter", role="aut"), person(c("Daniel", "C."), "Hackett", role="ctb"), person("Julian", "Karch", role="ctb"), person(c("Andreas", "M."), "Brandmaier", role="ctb"), person(c("Joshua", "N."), "Pritikin", email="jpritikin@pobox.com", role=c("aut", 'cre')), person("Mahsa", "Zahery", role="aut"), person(c("Robert", "M."), "Kirkpatrick", role="aut"), person(c("Yang"), "Wang", role="ctb"), person("Ben", "Goodrich", email="goodrich.ben@gmail.com", role="ctb"), person(c("Charles"), "Driver", email="driver@mpib-berlin.mpg.de", role="ctb"), person("Massachusetts Institute of Technology", role="cph"), person("S. G.", "Johnson", role="cph"), person("Association for Computing Machinery", role="cph"), person("Dieter", "Kraft", role="cph"), person("Stefan", "Wilhelm", role="cph"), person("Sarah", "Medland", role="cph"), person(c("Carl", 'F.'), "Falk", role="cph"), person("Matt", "Keller", role="cph"), person("Manjunath B G", role="cph"), person("The Regents of the University of California", role="cph"), person("Lester", "Ingber", role="cph"), person("Wong", "Shao Voon", role="cph"), person("Juan", "Palacios", role="cph"), person("Jiang", "Yang", role="cph"), person("Gael", "Guennebaud", role="cph"), person("Jitse", "Niesen", role="cph"))
+# URL: http://openmx.ssri.psu.edu, https://github.com/OpenMx/OpenMx
+# BugReports: http://openmx.ssri.psu.edu/forums
+# Description: Create structural equation models that can be manipulated programmatically. Models may be specified with matrices or paths (LISREL or RAM) Example models include confirmatory factor, multiple group, mixture distribution, categorical threshold, modern test theory, differential Fit functions include full information maximum likelihood, maximum likelihood, and weighted least squares. equations, state space, and many others. Support and advanced package binaries available at <http://openmx.ssri.psu.edu>. The software is described in Neale, Hunter, Pritikin, Zahery, Brick, Kirkpatrick, Estabrook, Bates, Maes, & Boker (2016) <doi:10.1007/s11336-014-9435-8>.
+# SystemRequirements: GNU make, C++17
+# ByteCompile: yes
+# Language: en-US
+# License: Apache License (== 2.0)
+# LinkingTo: Rcpp, RcppEigen, RcppParallel, StanHeaders (>= 2.10.0.2), BH (>= 1.69.0-1), rpf (>= 0.45)
+# Imports: digest, MASS, Matrix (>= 1.2-16), methods, Rcpp, RcppParallel, parallel, lifecycle
+# Depends: R (>= 3.5.0)
+# Suggests: mvtnorm, numDeriv, roxygen2 (>= 6.1), rpf (>= 0.45), snowfall, lme4, covr, testthat, umx, ifaTools, knitr, markdown, rmarkdown, reshape2, ggplot2
+# VignetteBuilder: knitr
+# LazyLoad: yes
+# LazyData: yes
+# Collate: '0ClassUnion.R' 'cache.R' 'MxBaseNamed.R' 'MxData.R' 'MxDataWLS.R' 'DefinitionVars.R' 'MxReservedNames.R' 'MxNamespace.R' 'MxSearchReplace.R' 'MxFlatSearchReplace.R' 'MxUntitled.R' 'MxAlgebraFunctions.R' 'MxExponential.R' 'MxMatrix.R' 'DiagMatrix.R' 'FullMatrix.R' 'IdenMatrix.R' 'LowerMatrix.R' 'SdiagMatrix.R' 'StandMatrix.R' 'SymmMatrix.R' 'UnitMatrix.R' 'ZeroMatrix.R' 'MxMatrixFunctions.R' 'MxAlgebra.R' 'MxCycleDetection.R' 'MxDependencies.R' 'MxAlgebraConvert.R' 'MxSquareBracket.R' 'MxEval.R' 'MxRename.R' 'MxPath.R' 'MxObjectiveMetaData.R' 'MxExpectation.R' 'MxExpectationNormal.R' 'MxExpectationRAM.R' 'MxExpectationLISREL.R' 'MxFitFunction.R' 'MxFitFunctionAlgebra.R' 'MxFitFunctionML.R' 'MxFitFunctionMultigroup.R' 'MxFitFunctionRow.R' 'MxFitFunctionWLS.R' 'MxRAMObjective.R' 'MxLISRELObjective.R' 'MxFIMLObjective.R' 'MxMLObjective.R' 'MxRowObjective.R' 'MxAlgebraObjective.R' 'MxBounds.R' 'MxConstraint.R' 'MxInterval.R' 'MxTypes.R' 'MxCompute.R' 'MxModel.R' 'MxRAMModel.R' 'MxLISRELModel.R' 'MxModelDisplay.R' 'MxFlatModel.R' 'MxMultiModel.R' 'MxModelFunctions.R' 'MxModelParameters.R' 'MxUnitTesting.R' 'MxApply.R' 'MxRun.R' 'MxRunHelperFunctions.R' 'MxSummary.R' 'MxCompare.R' 'MxSwift.R' 'MxOptions.R' 'MxThreshold.R' 'OriginalMx.R' 'MxGraph.R' 'MxGraphviz.R' 'MxDeparse.R' 'MxCommunication.R' 'MxRestore.R' 'MxVersion.R' 'MxPPML.R' 'MxRAMtoML.R' 'MxErrorHandling.R' 'MxDetectCores.R' 'MxSaturatedModel.R' 'omxBrownie.R' 'omxConstrainThresholds.R' 'omxGetNPSOL.R' 'MxFitFunctionR.R' 'MxRObjective.R' 'MxExpectationHiddenMarkov.R' 'MxExpectationMixture.R' 'MxExpectationStateSpace.R' 'MxExpectationBA81.R' 'MxFitFunctionGREML.R' 'MxExpectationGREML.R' 'MxMI.R' 'MxFactorScores.R' 'MxRobustSE.R' 'MxAvailableOptimizers.R' 'MxTryHard.R' 'MxSE.R' 'MxAutoStart.R' 'MxRetro.R' 'MxPenalty.R' 'MxMMI.R' 'omxReadGRMBin.R' 'MxPredict.R' 'zzz.R'
+# RdMacros: lifecycle
+# Biarch: true
+# Version: 2.21.8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-04-05 17:41:48 UTC; joshua
+# Author: Steven M. Boker [aut], Michael C. Neale [aut], Hermine H. Maes [aut], Michael J. Wilde [ctb], Michael Spiegel [aut], Timothy R. Brick [aut], Ryne Estabrook [aut], Timothy C. Bates [aut], Paras Mehta [ctb], Timo von Oertzen [ctb], Ross J. Gore [aut], Michael D. Hunter [aut], Daniel C. Hackett [ctb], Julian Karch [ctb], Andreas M. Brandmaier [ctb], Joshua N. Pritikin [aut, cre], Mahsa Zahery [aut], Robert M. Kirkpatrick [aut], Yang Wang [ctb], Ben Goodrich [ctb], Charles Driver [ctb], Massachusetts Institute of Technology [cph], S. G. Johnson [cph], Association for Computing Machinery [cph], Dieter Kraft [cph], Stefan Wilhelm [cph], Sarah Medland [cph], Carl F. Falk [cph], Matt Keller [cph], Manjunath B G [cph], The Regents of the University of California [cph], Lester Ingber [cph], Wong Shao Voon [cph], Juan Palacios [cph], Jiang Yang [cph], Gael Guennebaud [cph], Jitse Niesen [cph]
+# Maintainer: Joshua N. Pritikin <jpritikin@pobox.com>
+# Repository: CRAN
+# Date/Publication: 2023-04-05 20:43:20 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

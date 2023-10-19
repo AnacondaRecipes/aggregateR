@@ -1,0 +1,109 @@
+{% set version = '2022.11-16' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ordinal
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ordinal_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ordinal/ordinal_{{ version }}.tar.gz
+  sha256: 5488ad1dfa531a09d017d68d7393d376c8bc49cceeaa6a3e5f7d57b99168d493
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lme4, nnet, xtable, testthat (>= 0.8), tools
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-nlme
+    - r-numderiv
+    - r-ucminf
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-matrix
+    - r-nlme
+    - r-numderiv
+    - r-ucminf
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ordinal')"           # [not win]
+    - "\"%R%\" -e \"library('ordinal')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/runehaubo/ordinal
+  license: GPL-2
+  summary: Implementation of cumulative link (mixed) models also known as ordered regression
+    models, proportional odds models, proportional hazards models for grouped survival
+    times and ordered logit/probit/... models. Estimation is via maximum likelihood
+    and mixed models are fitted with the Laplace approximation and adaptive Gauss-Hermite
+    quadrature. Multiple random effect terms are allowed and they may be nested, crossed
+    or partially nested/crossed. Restrictions of symmetry and equidistance can be imposed
+    on the thresholds (cut-points/intercepts). Standard model methods are available
+    (summary, anova, drop-methods, step, confint, predict etc.) in addition to profile
+    methods and slice methods for visualizing the likelihood function and checking convergence.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: ordinal
+# Type: Package
+# Title: Regression Models for Ordinal Data
+# Version: 2022.11-16
+# Date: 2022-11-16
+# Authors@R: person(given="Rune Haubo Bojesen", family="Christensen", email="rune.haubo@gmail.com", role=c("aut", "cre"))
+# LazyData: true
+# ByteCompile: yes
+# Depends: R (>= 2.13.0), stats, methods
+# Imports: ucminf, MASS, Matrix, numDeriv, nlme
+# Suggests: lme4, nnet, xtable, testthat (>= 0.8), tools
+# Description: Implementation of cumulative link (mixed) models also known as ordered regression models, proportional odds models, proportional hazards models for grouped survival times and ordered logit/probit/... models. Estimation is via maximum likelihood and mixed models are fitted with the Laplace approximation and adaptive Gauss-Hermite quadrature. Multiple random effect terms are allowed and they may be nested, crossed or partially nested/crossed. Restrictions of symmetry and equidistance can be imposed on the thresholds (cut-points/intercepts). Standard model methods are available (summary, anova, drop-methods, step, confint, predict etc.) in addition to profile methods and slice methods for visualizing the likelihood function and checking convergence.
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# URL: https://github.com/runehaubo/ordinal
+# BugReports: https://github.com/runehaubo/ordinal/issues
+# Packaged: 2022-11-16 08:47:20 UTC; rhbc
+# Author: Rune Haubo Bojesen Christensen [aut, cre]
+# Maintainer: Rune Haubo Bojesen Christensen <rune.haubo@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-11-16 22:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
