@@ -1,4 +1,4 @@
-{% set version = '1.0.1' %}
+{% set version = '1.1.1' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,14 +11,13 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/GaussianHMM1d_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/GaussianHMM1d/GaussianHMM1d_{{ version }}.tar.gz
-  sha256: 5db13dd8dbc2629bd245320b09e2546e4e7419aede1a870915feb37301e42cc8
+  sha256: 5d8d1c1ccc592483e2f6dd298caf0a2e3e83e4693f2e802e27c07942de823331
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
@@ -27,6 +26,12 @@ build:
 
 requirements:
   build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
     - {{ posix }}zip               # [win]
 
   host:
@@ -36,6 +41,7 @@ requirements:
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
     - r-doparallel
     - r-foreach
 
@@ -70,19 +76,19 @@ extra:
 
 # Package: GaussianHMM1d
 # Title: Inference, Goodness-of-Fit and Forecast for Univariate Gaussian Hidden Markov Models
-# Version: 1.0.1
-# Author: Bouchra R. Nasri and Bruno N. Remillard
-# Maintainer: Bouchra Nasri <bouchra.nasri@gmail.com>
+# Version: 1.1.1
+# Authors@R: c(person(c("Bouchra","R."), "Nasri", role = c("aut", "cre","cph"), email = "bouchra.nasri@umontreal.ca"),person(c("Bruno","N"), "Remillard", role = c("aut", "ctb","cph"), email = "bruno.remillard@hec.ca"))
 # Description: Inference, goodness-of-fit test, and prediction densities and intervals for univariate Gaussian Hidden Markov Models (HMM). The goodness-of-fit is based on a Cramer-von Mises statistic and uses parametric bootstrap to estimate the p-value. The description of the methodology is taken from Chapter 10.2 of Remillard (2013) <doi:10.1201/b14285>.
+# Depends: R (>= 3.5.0), doParallel, parallel, foreach, stats
 # License: GPL (>= 2)
 # Encoding: UTF-8
-# LazyData: true
-# Depends: foreach, doParallel, parallel
-# RoxygenNote: 6.1.1
-# NeedsCompilation: no
-# Packaged: 2019-03-06 18:12:51 UTC; Utilisateur
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-06-26 22:37:30 UTC; Utilisateur
+# Author: Bouchra R. Nasri [aut, cre, cph], Bruno N Remillard [aut, ctb, cph]
+# Maintainer: Bouchra R. Nasri <bouchra.nasri@umontreal.ca>
 # Repository: CRAN
-# Date/Publication: 2019-03-07 17:22:53 UTC
+# Date/Publication: 2023-07-08 10:50:10 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

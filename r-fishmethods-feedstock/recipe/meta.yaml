@@ -1,4 +1,4 @@
-{% set version = '1.11-3' %}
+{% set version = '1.12-1' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,14 +11,13 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/fishmethods_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/fishmethods/fishmethods_{{ version }}.tar.gz
-  sha256: 387a5883de0b60209b2e67c18ecffb64c9d9e56d6f7971d342ba1356a987cf9d
+  sha256: db189f12bc192019958b97d9212b1a83c7e75f11c79402e004619742f3c84d51
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
@@ -27,11 +26,20 @@ build:
 
 requirements:
   build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
     - {{ posix }}zip               # [win]
 
   host:
     - r-base
     - r-mass
+    - r-tmb
     - r-boot
     - r-bootstrap
     - r-data.table
@@ -40,7 +48,9 @@ requirements:
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
     - r-mass
+    - r-tmb
     - r-boot
     - r-bootstrap
     - r-data.table
@@ -74,21 +84,22 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: fishmethods
-# Version: 1.11-3
-# Date: 2022-01-05
+# Version: 1.12-1
+# Date: 2023-4-25
 # Title: Fishery Science Methods and Models
 # Author: Gary A. Nelson <gary.nelson@mass.gov>
 # Maintainer: Gary A. Nelson <gary.nelson@mass.gov>
-# Depends: R (>= 2.7.0)
-# Imports: methods, data.table, MASS, boot, lme4, bootstrap, numDeriv
+# Depends: R (>= 3.5.0)
+# LinkingTo: TMB
+# Imports: methods, data.table, MASS, boot, lme4, bootstrap, numDeriv, TMB
 # Description: Functions for applying a wide range of fisheries stock assessment methods.
 # License: GPL (>= 2)
 # LazyData: true
-# RoxygenNote: 6.0.1
-# NeedsCompilation: no
-# Packaged: 2022-01-05 14:00:51 UTC; GNelson
+# RoxygenNote: 7.2.0
+# NeedsCompilation: yes
+# Packaged: 2023-04-26 11:58:16 UTC; Gary
 # Repository: CRAN
-# Date/Publication: 2022-01-05 14:20:02 UTC
+# Date/Publication: 2023-04-27 08:33:01 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

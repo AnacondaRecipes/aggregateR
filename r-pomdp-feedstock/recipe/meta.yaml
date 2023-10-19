@@ -1,4 +1,4 @@
-{% set version = '1.0.3' %}
+{% set version = '1.1.2' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,34 +11,50 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/pomdp_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/pomdp/pomdp_{{ version }}.tar.gz
-  sha256: f9dcf8957a1f1fa1651557b2409a44c6581c2977af80ffe5712e97bc80d71ecc
+  sha256: 798dd77c18ccaf64ab7ef4eb8096a5474bd7a08cfc8fc464f801ee187b919b6c
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: knitr, rmarkdown, testthat, Ternary, visNetwork, sarsop
+# Suggests: knitr, rmarkdown, testthat, Ternary, visNetwork, sarsop, doParallel
 requirements:
   build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
     - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-matrix
+    - r-rcpp
+    - r-foreach
     - r-igraph
-    - r-pomdpsolve
+    - r-pomdpsolve >=1.0.4
+    - r-processx
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-rcpp
+    - r-foreach
     - r-igraph
-    - r-pomdpsolve
+    - r-pomdpsolve >=1.0.4
+    - r-processx
 
 test:
   commands:
@@ -71,28 +87,30 @@ extra:
 
 # Package: pomdp
 # Title: Infrastructure for Partially Observable Markov Decision Processes (POMDP)
-# Version: 1.0.3
-# Date: 2022-05-18
-# Authors@R: c(person(given = "Michael", family = "Hahsler", role = c("aut", "cph", "cre"), email = "mhahsler@lyle.smu.edu"), person(given = "Hossein", family = "Kamalzadeh", role = c("ctb")))
+# Version: 1.1.2
+# Date: 2023-09-07
+# Authors@R: c( person(given = "Michael", family = "Hahsler", role = c("aut", "cph", "cre"), email = "mhahsler@lyle.smu.edu", comment = c(ORCID = "0000-0003-2716-1405")), person(given = "Hossein", family = "Kamalzadeh", role = c("ctb")))
 # Description: Provides the infrastructure to define and analyze the solutions of Partially Observable Markov Decision Process (POMDP) models. Interfaces for various exact and approximate solution algorithms are available including value iteration, point-based value iteration and SARSOP. Smallwood and Sondik (1973) <doi:10.1287/opre.21.5.1071>.
 # Classification/ACM: G.4, G.1.6, I.2.6
 # URL: https://github.com/mhahsler/pomdp
 # BugReports: https://github.com/mhahsler/pomdp/issues
 # Depends: R (>= 3.5.0)
-# Imports: pomdpSolve, igraph
-# Suggests: knitr, rmarkdown, testthat, Ternary, visNetwork, sarsop
+# Imports: pomdpSolve (>= 1.0.4), processx, stats, methods, Matrix, Rcpp, foreach, igraph
+# SystemRequirements: C++17
+# LinkingTo: Rcpp
+# Suggests: knitr, rmarkdown, testthat, Ternary, visNetwork, sarsop, doParallel
 # VignetteBuilder: knitr
 # Encoding: UTF-8
 # License: GPL (>= 3)
 # Copyright: Copyright (C) Michael Hahsler and Hossein Kamalzadeh.
-# RoxygenNote: 7.1.2
-# Collate: 'AAA_check_installed.R' 'AAA_imports.R' 'AAA_pomdp-package.R' 'POMDP.R' 'MDP.R' 'Maze.R' 'Tiger.R' 'colors.R' 'optimal_action.R' 'plot_belief_space.R' 'plot_policy_graph.R' 'plot_value_function.R' 'policy.R' 'print.text.R' 'read_write_POMDP.R' 'read_write_pomdp_solve.R' 'reward.R' 'round_stochchastic.R' 'sample_belief_space.R' 'simulate_MDP.R' 'simulate_POMDP.R' 'solve_MDP.R' 'solve_POMDP.R' 'solve_SARSOP.R' 'transition_matrix.R' 'update_belief.R' 'visNetwork.R'
-# NeedsCompilation: no
-# Packaged: 2022-05-18 15:04:54 UTC; hahsler
-# Author: Michael Hahsler [aut, cph, cre], Hossein Kamalzadeh [ctb]
+# RoxygenNote: 7.2.3
+# Collate: 'AAA_check_installed.R' 'AAA_pomdp-package.R' 'POMDP.R' 'MDP.R' 'Maze.R' 'POMDP_accessors.R' 'RcppExports.R' 'Tiger.R' 'colors.R' 'estimate_belief_for_nodes.R' 'foreach_helper.R' 'optimal_action.R' 'plot_belief_space.R' 'plot_policy_graph.R' 'policy.R' 'policy_graph.R' 'print.text.R' 'projection.R' 'queue.R' 'read_write_POMDP.R' 'read_write_pomdp_solve.R' 'regret.R' 'reward.R' 'round_stochchastic.R' 'sample_belief_space.R' 'simulate_MDP.R' 'simulate_POMDP.R' 'solve_MDP.R' 'solve_POMDP.R' 'solve_SARSOP.R' 'stack.R' 'transition_graph.R' 'update_belief.R' 'value_function.R'
+# NeedsCompilation: yes
+# Packaged: 2023-09-07 17:55:13 UTC; hahsler
+# Author: Michael Hahsler [aut, cph, cre] (<https://orcid.org/0000-0003-2716-1405>), Hossein Kamalzadeh [ctb]
 # Maintainer: Michael Hahsler <mhahsler@lyle.smu.edu>
 # Repository: CRAN
-# Date/Publication: 2022-05-19 07:50:02 UTC
+# Date/Publication: 2023-09-08 22:00:03 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

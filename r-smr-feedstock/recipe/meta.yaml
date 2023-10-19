@@ -1,4 +1,4 @@
-{% set version = '2.0.2' %}
+{% set version = '2.1.0' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,14 +11,13 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/SMR_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/SMR/SMR_{{ version }}.tar.gz
-  sha256: 7ebca309fafa433285cd300d422e2ea741e2c923028fdbddfc997e9dae36bad1
+  sha256: 35bdf4a1d4419af3d8b312f4de1fbe272bd1d6344392facb1c7cb38b0755e33d
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
@@ -27,13 +26,24 @@ build:
 
 requirements:
   build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
     - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-rcpp
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
 
 test:
   commands:
@@ -64,18 +74,21 @@ extra:
 
 # Package: SMR
 # Title: Externally Studentized Midrange Distribution
-# Version: 2.0.2
-# Authors@R: c( person("Ben", "Deivide", email = "ben.deivide@ufsj.edu.br", role = c("aut"), comment = c(ORCID = '0000-0001-7019-8794')), person("Daniel", "Furtado", email = "danielff@ufla.br", role = c("aut", "cre"), comment = c(ORCID = '0000-0002-4371-5239')))
+# Version: 2.1.0
+# Authors@R: c( person("Ben", "Deivide de Oliveira Batista", email = "ben.deivide@ufsj.edu.br", role = c("aut"), comment = c(ORCID = '0000-0001-7019-8794')), person("Daniel", "Furtado Ferreira", email = "danielff@ufla.br", role = c("aut", "cre"), comment = c(ORCID = '0000-0002-4371-5239')), person("Diego", "Arthur Bispo Justino de Oliveira", email = "digo.arthur@hotmail.com", role = "ctb"), person("Matheus", "Fernando Rodrigues Santos", email = "matheusfers3500@gmail.com", role = "ctb"))
 # Description: Computes the studentized midrange distribution (pdf, cdf and quantile) and generates random numbers.
 # License: GPL (>= 2)
 # URL: https://bendeivide.github.io/SMR/, https://github.com/bendeivide/SMR
 # BugReports: https://github.com/bendeivide/SMR/issues
-# NeedsCompilation: no
-# Packaged: 2022-05-07 00:15:15 UTC; MABENLA
-# Author: Ben Deivide [aut] (<https://orcid.org/0000-0001-7019-8794>), Daniel Furtado [aut, cre] (<https://orcid.org/0000-0002-4371-5239>)
-# Maintainer: Daniel Furtado <danielff@ufla.br>
+# RoxygenNote: 7.2.0
+# LinkingTo: Rcpp
+# Imports: Rcpp
+# NeedsCompilation: yes
+# Packaged: 2023-10-07 17:19:49 UTC; MABENLA
+# Author: Ben Deivide de Oliveira Batista [aut] (<https://orcid.org/0000-0001-7019-8794>), Daniel Furtado Ferreira [aut, cre] (<https://orcid.org/0000-0002-4371-5239>), Diego Arthur Bispo Justino de Oliveira [ctb], Matheus Fernando Rodrigues Santos [ctb]
+# Maintainer: Daniel Furtado Ferreira <danielff@ufla.br>
 # Repository: CRAN
-# Date/Publication: 2022-05-08 03:30:02 UTC
+# Date/Publication: 2023-10-07 22:40:10 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

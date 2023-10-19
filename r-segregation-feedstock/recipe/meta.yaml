@@ -1,4 +1,4 @@
-{% set version = '0.6.0' %}
+{% set version = '1.0.0' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,31 +11,45 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/segregation_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/segregation/segregation_{{ version }}.tar.gz
-  sha256: 7dc1b59853418ee2c89a216587d89a4882ef3677c5976c165d66cebcf25a5279
+  sha256: eb25be1d0419579afd48888fbd89930b1d41c48e1add49efffd3c4acfc8c169c
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
-# Suggests: testthat, covr, knitr, rmarkdown, dplyr, ggplot2, tidycensus, tigris
+# Suggests: testthat, covr, knitr, rmarkdown, dplyr, ggplot2, scales, tidycensus, tigris
 requirements:
   build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
     - {{ posix }}zip               # [win]
 
   host:
     - r-base
+    - r-rcpp
+    - r-rcppprogress
+    - r-checkmate
     - r-data.table
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcppprogress
+    - r-checkmate
     - r-data.table
 
 test:
@@ -62,7 +76,8 @@ about:
     units and groups (local segregation), and by within and between terms. The package
     also provides a method to decompose differences in segregation as described by Elbers
     (2021) <doi:10.1177/0049124121986204>. The package includes standard error estimation
-    by bootstrapping, which also corrects for small sample bias.
+    by bootstrapping, which also corrects for small sample bias. The package also contains
+    functions for visualizing segregation patterns.
   license_family: MIT
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
@@ -77,24 +92,26 @@ extra:
 # Package: segregation
 # Type: Package
 # Title: Entropy-Based Segregation Indices
-# Version: 0.6.0
+# Version: 1.0.0
 # Authors@R: person("Benjamin", "Elbers", email = "be2239@columbia.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5392-3448"))
-# Description: Computes segregation indices, including the Index of Dissimilarity, as well as the information-theoretic indices developed by Theil (1971) <isbn:978-0471858454>, namely the Mutual Information Index (M) and Theil's Information Index (H). The M, further described by Mora and Ruiz-Castillo (2011) <doi:10.1111/j.1467-9531.2011.01237.x> and Frankel and Volij (2011) <doi:10.1016/j.jet.2010.10.008>, is a measure of segregation that is highly decomposable. The package provides tools to decompose the index by units and groups (local segregation), and by within and between terms. The package also provides a method to decompose differences in segregation as described by Elbers (2021) <doi:10.1177/0049124121986204>. The package includes standard error estimation by bootstrapping, which also corrects for small sample bias.
+# Description: Computes segregation indices, including the Index of Dissimilarity, as well as the information-theoretic indices developed by Theil (1971) <isbn:978-0471858454>, namely the Mutual Information Index (M) and Theil's Information Index (H). The M, further described by Mora and Ruiz-Castillo (2011) <doi:10.1111/j.1467-9531.2011.01237.x> and Frankel and Volij (2011) <doi:10.1016/j.jet.2010.10.008>, is a measure of segregation that is highly decomposable. The package provides tools to decompose the index by units and groups (local segregation), and by within and between terms. The package also provides a method to decompose differences in segregation as described by Elbers (2021) <doi:10.1177/0049124121986204>. The package includes standard error estimation by bootstrapping, which also corrects for small sample bias. The package also contains functions for visualizing segregation patterns.
 # License: MIT + file LICENSE
-# Imports: data.table
+# Depends: R (>= 3.5.0)
+# Imports: data.table, checkmate, Rcpp, RcppProgress,
 # Encoding: UTF-8
 # LazyData: true
-# Suggests: testthat, covr, knitr, rmarkdown, dplyr, ggplot2, tidycensus, tigris
+# Suggests: testthat, covr, knitr, rmarkdown, dplyr, ggplot2, scales, tidycensus, tigris
 # URL: https://elbersb.github.io/segregation/
 # BugReports: https://github.com/elbersb/segregation/issues
-# RoxygenNote: 7.1.1
+# RoxygenNote: 7.2.3
 # VignetteBuilder: knitr
-# NeedsCompilation: no
-# Packaged: 2021-09-01 09:59:47 UTC; benjamin
+# LinkingTo: Rcpp, RcppProgress
+# NeedsCompilation: yes
+# Packaged: 2023-08-24 20:20:56 UTC; benjamin
 # Author: Benjamin Elbers [aut, cre] (<https://orcid.org/0000-0001-5392-3448>)
 # Maintainer: Benjamin Elbers <be2239@columbia.edu>
 # Repository: CRAN
-# Date/Publication: 2021-09-02 15:10:02 UTC
+# Date/Publication: 2023-08-24 22:20:02 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

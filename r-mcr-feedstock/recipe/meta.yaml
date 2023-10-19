@@ -1,4 +1,4 @@
-{% set version = '1.2.2' %}
+{% set version = '1.3.3' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,7 +11,7 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/mcr_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/mcr/mcr_{{ version }}.tar.gz
-  sha256: 4c772d9cac6addb1a5487face9271ecbd5157bbc6b9b8aaa074227793e6a3c58
+  sha256: 80b4a2160e04bb2b876d3be5915137d1c81703c6d3fed6cd73a49cd01ad78aae
 
 build:
   merge_build_host: True  # [win]
@@ -24,11 +24,12 @@ build:
     - lib/R/lib/
     - lib/
 
-# Suggests: RUnit, XML
 requirements:
   build:
     - {{ compiler('c') }}              # [not win]
     - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
     - {{ posix }}filesystem        # [win]
     - {{ posix }}make
     - {{ posix }}sed               # [win]
@@ -37,10 +38,12 @@ requirements:
 
   host:
     - r-base
+    - r-robslopes
 
   run:
     - r-base
     - {{native}}gcc-libs         # [win]
+    - r-robslopes
 
 test:
   commands:
@@ -57,11 +60,15 @@ test:
 about:
   home: https://CRAN.R-project.org/package=mcr
   license: GPL-3
-  summary: Regression methods to quantify the relation between two measurement methods. In particular
-    it addresses regression problems with errors in both variables and without repeated
-    measurements. The package provides implementations of Deming regression, weighted
-    Deming regression, and Passing-Bablok regression following the CLSI EP09-A3 recommendations
-    for analytical method comparison and bias estimation using patient samples.
+  summary: Regression methods to quantify the relation between two measurement methods are provided
+    by this package. In particular it addresses regression problems with errors in both
+    variables and without repeated measurements. It implements the CLSI recommendations
+    (see J. A. Budd et al. (2018, <https://clsi.org/standards/products/method-evaluation/documents/ep09/>)
+    for analytical method comparison and bias estimation using patient samples. Furthermore,
+    algorithms for Theil-Sen and equivariant Passing-Bablok estimators are implemented,
+    see F. Dufey (2020, <doi:10.1515/ijb-2019-0157>) and J. Raymaekers and F. Dufey
+    (2022, <arXiv:2202:08060>). A comprehensive overview over the implemented methods
+    and references can be found in the manual pages "mcr-package" and "mcreg".
   license_family: GPL3
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
@@ -73,20 +80,24 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: mcr
-# Version: 1.2.2
-# Date: 2021-04-21
+# Version: 1.3.3
+# Date: 2023-10-04
 # Title: Method Comparison Regression
-# Author: Ekaterina Manuilova <ekaterina.manuilova@roche.com> Andre Schuetzenmeister <andre.schuetzenmeister@roche.com> Fabian Model <fabian.model@roche.com>
 # Maintainer: Sergej Potapov <sergej.potapov@roche.com>
-# Depends: R (>= 3.0.0), methods
-# Suggests: RUnit, XML
-# Description: Regression methods to quantify the relation between two measurement methods. In particular it addresses regression problems with errors in both variables and without repeated measurements. The package provides implementations of Deming regression, weighted Deming regression, and Passing-Bablok regression following the CLSI EP09-A3 recommendations for analytical method comparison and bias estimation using patient samples.
+# Authors@R: c( person("Sergej", "Potapov", , "sergej.potapov@roche.com", role = c("aut", "cre"), comment=c(ORCID="0009-0002-6251-0279")), person("Fabian", "Model", , , role = c("aut")), person("Andre", "Schuetzenmeister", , "andre.schuetzenmeister@roche.com", role = c("aut"), comment=c(ORCID="0000-0002-2964-5502")), person("Ekaterina", "Manuilova", , "ekaterina.manuilova@roche.com", role = c("aut")), person("Florian", "Dufey", , "florian.dufey@roche.com", role = c("aut"), comment = c(ORCID = "0000-0001-6467-8556")), person("Jakob", "Raymaekers", ,"jakob.raymaekers@kuleuven.com", role = c("aut"), comment=c(ORCID="0000-0002-2093-3137")), person(given = "Venkatraman E.", family = "Seshan", role = c("ctb"), email = "seshanv@mskcc.org"), person("Roche", role = c("cph", "fnd")) )
+# Copyright: This package includes code from the 'clinfun' library owned by Ventatraman E. Seshan (ktau.r and ktau.f).
+# Depends: R (>= 3.0.0), parallel, robslopes
+# Imports: stats, graphics, grDevices, methods
+# Description: Regression methods to quantify the relation between two measurement methods are provided by this package. In particular it addresses regression problems with errors in both variables and without repeated measurements. It implements the CLSI recommendations (see J. A. Budd et al. (2018, <https://clsi.org/standards/products/method-evaluation/documents/ep09/>) for analytical method comparison and bias estimation using patient samples. Furthermore, algorithms for Theil-Sen and equivariant Passing-Bablok estimators are implemented, see F. Dufey (2020, <doi:10.1515/ijb-2019-0157>) and J. Raymaekers and F. Dufey (2022, <arXiv:2202:08060>). A comprehensive overview over the implemented methods and references can be found in the manual pages "mcr-package" and "mcreg".
 # License: GPL (>= 3)
-# Collate: "mcrMisc.r" "mcLinReg.r" "mcDeming.r" "mcWDeming.r" "mcPaBaLarge.r" "mcPaBa.r" "mcCalcCI.r" "mcCalcTstar.r" "mcBootstrap.r" "MCResultMethods.r" "MCResult.r" "MCResultAnalyticalMethods.r" "MCResultAnalytical.r" "MCResultJackknifeMethods.r" "MCResultJackknife.r" "MCResultResamplingMethods.r" "MCResultResampling.r" "MCResultBCaMethods.r" "MCResultBCa.r" "mcrInterface.r" "mcrCompareFit.r" "mcrIncludeLegend.r" "zzz.r"
-# Packaged: 2021-04-22 19:56:33 UTC; potapovs
+# Collate: "mcrMisc.r" "mcLinReg.r" "mcDeming.r" "mcWDeming.r" "mcPaBaLarge.r" "mcPaBa.r" "mcPBequi.r" "mcCalcCI.r" "mcCalcTstar.r" "mcBootstrap.r" "MCResultMethods.r" "MCResult.r" "MCResultAnalyticalMethods.r" "MCResultAnalytical.r" "MCResultJackknifeMethods.r" "MCResultJackknife.r" "MCResultResamplingMethods.r" "MCResultResampling.r" "MCResultBCaMethods.r" "MCResultBCa.r" "mcrInterface.r" "mcrCompareFit.r" "mcrIncludeLegend.r" "zzz.r" "ktau.r"
+# RoxygenNote: 7.2.3
+# LazyData: true
 # NeedsCompilation: yes
+# Packaged: 2023-10-11 11:10:03 UTC; potapovs
+# Author: Sergej Potapov [aut, cre] (<https://orcid.org/0009-0002-6251-0279>), Fabian Model [aut], Andre Schuetzenmeister [aut] (<https://orcid.org/0000-0002-2964-5502>), Ekaterina Manuilova [aut], Florian Dufey [aut] (<https://orcid.org/0000-0001-6467-8556>), Jakob Raymaekers [aut] (<https://orcid.org/0000-0002-2093-3137>), Venkatraman E. Seshan [ctb], Roche [cph, fnd]
 # Repository: CRAN
-# Date/Publication: 2021-04-23 08:20:09 UTC
+# Date/Publication: 2023-10-11 12:10:03 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

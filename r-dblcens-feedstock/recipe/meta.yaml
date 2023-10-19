@@ -1,4 +1,4 @@
-{% set version = '1.1.7' %}
+{% set version = '1.1.9' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,22 +11,28 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/dblcens_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/dblcens/dblcens_{{ version }}.tar.gz
-  sha256: 9cf1b67a02cd2fa3ed90c41104d64267c968356292320463bff23cacfc4ec308
+  sha256: 5205878b6b884f06a3ace172f296c44968a375040e5530842b30179b3a44bbd4
 
 build:
   merge_build_host: True  # [win]
   # If this is a new build for the same version, increment the build number.
   number: 0
   # no skip
-  noarch: generic
 
   # This is required to make R link correctly on Linux.
   rpaths:
     - lib/R/lib/
     - lib/
 
+# Suggests: testthat (>= 3.0.0)
 requirements:
   build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
     - {{ posix }}zip               # [win]
 
   host:
@@ -34,6 +40,7 @@ requirements:
 
   run:
     - r-base
+    - {{native}}gcc-libs         # [win]
 
 test:
   commands:
@@ -48,15 +55,17 @@ test:
     # Put any additional test requirements here.
 
 about:
-  home: https://CRAN.R-project.org/package=dblcens
+  home: https://github.com/yfyang86/dblcens/
   license: GPL-2
-  summary: Use EM algorithm to compute the NPMLE of CDF and also the two censoring distributions.
-    For doubly censored data (as described in Chang and Yang (1987) Ann. Stat. 1536-47).
-    You can also specify a constraint, it will return the constrained NPMLE and the
-    -2 log empirical likelihood ratio. This can be used to test the hypothesis about
-    the constraint and find confidence intervals for probability or quantile via empirical
-    likelihood ratio theorem. Influence function of hat F may also be calculated (but
-    may be slow).
+  summary: 'Doubly censored data, as described in Chang and Yang (1987) <doi: 10.1214/aos/1176350608>),
+    are commonly seen in many fields. We use EM algorithm to compute the non-parametric
+    MLE (NPMLE) of the cummulative probability function/survival function and the two
+    censoring distributions. One can also specify a constraint F(T)=C, it will return
+    the constrained NPMLE and the -2 log empirical likelihood ratio for this constraint.
+    This can be used to test the hypothesis about the constraint and, by inverting the
+    test, find confidence intervals for probability or quantile via empirical likelihood
+    ratio theorem. Influence functions of hat F may also be calculated, but currently,
+    the it may be slow.'
   license_family: GPL2
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
@@ -68,16 +77,22 @@ extra:
 # The original CRAN metadata for this package was:
 
 # Package: dblcens
-# Title: Compute the NPMLE of distribution from doubly censored data
-# Version: 1.1.7
-# Depends: R (>= 2.15.0)
-# Author: Mai Zhou, Li Lee, Kun Chen.
-# Description: Use EM algorithm to compute the NPMLE of CDF and also the two censoring distributions. For doubly censored data (as described in Chang and Yang (1987) Ann. Stat. 1536-47). You can also specify a constraint, it will return the constrained NPMLE and the -2 log empirical likelihood ratio. This can be used to test the hypothesis about the constraint and find confidence intervals for probability or quantile via empirical likelihood ratio theorem. Influence function of hat F may also be calculated (but may be slow).
-# Maintainer: Mai Zhou <mai@ms.uky.edu>
+# Title: Compute the NPMLE of Distribution Function from Doubly Censored Data, Plus the Empirical Likelihood Ratio for F(T)
+# Version: 1.1.9
+# Depends: R (>= 3.5)
+# Suggests: testthat (>= 3.0.0)
+# Authors@R: c( person("Mai", "Zhou", role = c("aut")), person("Li", "Lee", role = "aut"), person("Kun", "Chen", role = "aut"), person("Yifan", "Yang",  role = c("aut", "cre", "cph"), email = "yfyang.86@hotmail.com"))
+# Description: Doubly censored data, as described in Chang and Yang (1987) <doi: 10.1214/aos/1176350608>), are commonly seen in many fields. We use EM algorithm to compute the non-parametric MLE (NPMLE) of the cummulative probability function/survival function and the two censoring distributions. One can also specify a constraint F(T)=C, it will return the constrained NPMLE and the -2 log empirical likelihood ratio for this constraint. This can be used to test the hypothesis about the constraint and, by inverting the test, find confidence intervals for probability or quantile via empirical likelihood ratio theorem. Influence functions of hat F may also be calculated, but currently, the it may be slow.
+# Maintainer: Yifan Yang <yfyang.86@hotmail.com>
+# URL: https://github.com/yfyang86/dblcens/
 # License: GPL (>= 2)
-# Packaged: 2012-12-16 22:48:26 UTC; mai
 # Repository: CRAN
-# Date/Publication: 2012-12-17 05:50:03
+# NeedsCompilation: yes
+# Date: 2023-1-13 16:00:00
+# Config/testthat/edition: 3
+# Packaged: 2023-01-13 08:30:18 UTC; yifanyang
+# Author: Mai Zhou [aut], Li Lee [aut], Kun Chen [aut], Yifan Yang [aut, cre, cph]
+# Date/Publication: 2023-01-13 13:50:05 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for

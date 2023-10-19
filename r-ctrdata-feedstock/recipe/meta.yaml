@@ -1,4 +1,4 @@
-{% set version = '1.9.1' %}
+{% set version = '1.15.2' %}
 
 {% set posix = 'm2-' if win else '' %}
 {% set native = 'm2w64-' if win else '' %}
@@ -11,7 +11,7 @@ source:
   url:
     - {{ cran_mirror }}/src/contrib/ctrdata_{{ version }}.tar.gz
     - {{ cran_mirror }}/src/contrib/Archive/ctrdata/ctrdata_{{ version }}.tar.gz
-  sha256: 727eb1d4fcf9c9c6613c8c9ae2982f9e732bb9ec60855d7afe7e58f520c010fa
+  sha256: b47e09df2f6862302244ab07f6c485b68eccf3816d28b801161c708279fa1a67
 
 build:
   merge_build_host: True  # [win]
@@ -25,7 +25,7 @@ build:
     - lib/R/lib/
     - lib/
 
-# Suggests: devtools, knitr, rmarkdown, RSQLite (>= 2.2.4), mongolite, tinytest (>= 1.2.1), R.rsp
+# Suggests: devtools, knitr, rmarkdown, RSQLite (>= 2.2.4), mongolite, tinytest (>= 1.2.1), R.rsp, RPostgres, duckdb
 requirements:
   build:
     - {{ posix }}zip               # [win]
@@ -33,27 +33,29 @@ requirements:
   host:
     - r-base
     - r-clipr
-    - r-curl
+    - r-curl >=5.0
     - r-dplyr
     - r-httr
+    - r-jqr
     - r-jsonlite
     - r-lubridate
-    - r-nodbi >=0.7.0
-    - r-rvest
+    - r-nodbi >=0.9.3
     - r-stringi
+    - r-tibble
     - r-xml2
 
   run:
     - r-base
     - r-clipr
-    - r-curl
+    - r-curl >=5.0
     - r-dplyr
     - r-httr
+    - r-jqr
     - r-jsonlite
     - r-lubridate
-    - r-nodbi >=0.7.0
-    - r-rvest
+    - r-nodbi >=0.9.3
     - r-stringi
+    - r-tibble
     - r-xml2
 
 test:
@@ -72,15 +74,19 @@ about:
   home: https://cran.r-project.org/package=ctrdata
   license: MIT
   summary: A system for querying, retrieving and analyzing protocol- and results-related information
-    on clinical trials from three public registers, the 'European Union Clinical Trials
+    on clinical trials from four public registers, the 'European Union Clinical Trials
     Register' ('EUCTR', <https://www.clinicaltrialsregister.eu/>), 'ClinicalTrials.gov'
-    ('CTGOV', <https://clinicaltrials.gov/>) and the 'ISRCTN' (<http://www.isrctn.com/>).
-    Trial information is downloaded, converted and stored in a database ('PostgreSQL',
-    'SQLite' or 'MongoDB'; via package 'nodbi'). Functions are included to identify
-    de-duplicated records, to easily find and extract variables (fields) of interest
-    even from complex nesting as used by the registers, and to update previous queries.
-    The package can be used for meta-analysis and trend-analysis of the design and conduct
-    as well as for results of clinical trials.
+    ('CTGOV', using the classic interface at <https://classic.clinicaltrials.gov/>,
+    and 'CTGOV2', using the current interface at <https://www.clinicaltrials.gov/>),
+    the 'ISRCTN' (<http://www.isrctn.com/>) and the 'European Union Clinical Trials
+    Information System' ('CTIS', <https://euclinicaltrials.eu/>). Trial information
+    is downloaded, converted and stored in a database ('PostgreSQL', 'SQLite', 'DuckDB'
+    or 'MongoDB'; via package 'nodbi'). All documents in registers associated with trials
+    can also be downloaded. Other functions identify deduplicated records, easily find
+    and extract variables (fields) of interest even from complex nested data as used
+    by the registers, merge variables and update queries. The package can be used for
+    meta-analysis and trend-analysis of the design and conduct as well as of the results
+    of clinical trials.
   license_family: MIT
   license_file:
     - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
@@ -95,24 +101,24 @@ extra:
 # Package: ctrdata
 # Type: Package
 # Title: Retrieve and Analyze Clinical Trials in Public Registers
-# Version: 1.9.1
-# Imports: jsonlite, httr, curl, clipr, xml2, rvest, nodbi (>= 0.7.0), stringi, dplyr, lubridate
+# Version: 1.15.2
+# Imports: jsonlite, httr, curl (>= 5.0), clipr, xml2, nodbi (>= 0.9.3), stringi, tibble, lubridate, jqr, dplyr
 # SystemRequirements: sed, php, cat, perl
 # URL: https://cran.r-project.org/package=ctrdata
 # BugReports: https://github.com/rfhb/ctrdata/issues
-# Description: A system for querying, retrieving and analyzing protocol- and results-related information on clinical trials from three public registers, the 'European Union Clinical Trials Register' ('EUCTR', <https://www.clinicaltrialsregister.eu/>), 'ClinicalTrials.gov' ('CTGOV', <https://clinicaltrials.gov/>) and the 'ISRCTN' (<http://www.isrctn.com/>). Trial information is downloaded, converted and stored in a database ('PostgreSQL', 'SQLite' or 'MongoDB'; via package 'nodbi'). Functions are included to identify de-duplicated records, to easily find and extract variables (fields) of interest even from complex nesting as used by the registers, and to update previous queries. The package can be used for meta-analysis and trend-analysis of the design and conduct as well as for results of clinical trials.
+# Description: A system for querying, retrieving and analyzing protocol- and results-related information on clinical trials from four public registers, the 'European Union Clinical Trials Register' ('EUCTR', <https://www.clinicaltrialsregister.eu/>), 'ClinicalTrials.gov' ('CTGOV', using the classic interface at <https://classic.clinicaltrials.gov/>, and 'CTGOV2', using the current interface at <https://www.clinicaltrials.gov/>), the 'ISRCTN' (<http://www.isrctn.com/>) and the 'European Union Clinical Trials Information System' ('CTIS', <https://euclinicaltrials.eu/>). Trial information is downloaded, converted and stored in a database ('PostgreSQL', 'SQLite', 'DuckDB' or 'MongoDB'; via package 'nodbi'). All documents in registers associated with trials can also be downloaded. Other functions identify deduplicated records, easily find and extract variables (fields) of interest even from complex nested data as used by the registers, merge variables and update queries. The package can be used for meta-analysis and trend-analysis of the design and conduct as well as of the results of clinical trials.
 # License: MIT + file LICENSE
-# RoxygenNote: 7.1.2
-# Suggests: devtools, knitr, rmarkdown, RSQLite (>= 2.2.4), mongolite, tinytest (>= 1.2.1), R.rsp
+# RoxygenNote: 7.2.3
+# Suggests: devtools, knitr, rmarkdown, RSQLite (>= 2.2.4), mongolite, tinytest (>= 1.2.1), R.rsp, RPostgres, duckdb
 # VignetteBuilder: R.rsp
 # NeedsCompilation: no
 # Encoding: UTF-8
 # Authors@R: person(given = "Ralf", family = "Herold", role = c("aut", "cre"), email = "ralf.herold@mailbox.org", comment = c(ORCID = "0000-0002-8148-6748"))
-# Packaged: 2022-04-24 14:11:43 UTC; ralfherold
+# Packaged: 2023-09-17 21:03:41 UTC; ralfherold
 # Author: Ralf Herold [aut, cre] (<https://orcid.org/0000-0002-8148-6748>)
 # Maintainer: Ralf Herold <ralf.herold@mailbox.org>
 # Repository: CRAN
-# Date/Publication: 2022-04-24 14:30:09 UTC
+# Date/Publication: 2023-09-17 22:50:15 UTC
 
 # See
 # https://docs.conda.io/projects/conda-build for
