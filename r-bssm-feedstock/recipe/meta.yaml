@@ -1,0 +1,126 @@
+{% set version = '2.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bssm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bssm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bssm/bssm_{{ version }}.tar.gz
+  sha256: d67b911c560e3b9da62fbe83751e8163e756500aea1579fb497cfc6245582e88
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, ggplot2 (>= 2.0.0), KFAS (>= 1.2.1), knitr (>= 1.11), MASS, rmarkdown (>= 0.8.1), ramcmc, sde, sitmo, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.3
+    - r-rcpparmadillo
+    - r-bayesplot
+    - r-checkmate
+    - r-coda >=0.18_1
+    - r-diagis
+    - r-dplyr
+    - r-posterior
+    - r-ramcmc
+    - r-rlang
+    - r-sitmo
+    - r-tidyr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.3
+    - r-rcpparmadillo
+    - r-bayesplot
+    - r-checkmate
+    - r-coda >=0.18_1
+    - r-diagis
+    - r-dplyr
+    - r-posterior
+    - r-ramcmc
+    - r-rlang
+    - r-sitmo
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bssm')"           # [not win]
+    - "\"%R%\" -e \"library('bssm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/helske/bssm
+  license: GPL-2
+  summary: Efficient methods for Bayesian inference of state space models via Markov chain Monte
+    Carlo (MCMC) based on parallel importance sampling type weighted estimators (Vihola,
+    Helske, and Franks, 2020, <doi:10.1111/sjos.12492>), particle MCMC, and its delayed
+    acceptance version. Gaussian, Poisson, binomial, negative binomial, and Gamma observation
+    densities and basic stochastic volatility models with linear-Gaussian state dynamics,
+    as well as general non-linear Gaussian models and discretised diffusion models are
+    supported. See Helske and Vihola (2021, <doi:10.32614/RJ-2021-103>) for details.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: bssm
+# Type: Package
+# Title: Bayesian Inference of Non-Linear and Non-Gaussian State Space Models
+# Version: 2.0.2
+# Authors@R: c(person(given = "Jouni", family = "Helske", role = c("aut", "cre"), email = "jouni.helske@iki.fi", comment = c(ORCID = "0000-0001-7130-793X")), person(given = "Matti", family = "Vihola", role = "aut", comment = c(ORCID = "0000-0002-8041-7222")))
+# Description: Efficient methods for Bayesian inference of state space models via Markov chain Monte Carlo (MCMC) based on parallel importance sampling type weighted estimators (Vihola, Helske, and Franks, 2020, <doi:10.1111/sjos.12492>), particle MCMC, and its delayed acceptance version. Gaussian, Poisson, binomial, negative binomial, and Gamma observation densities and basic stochastic volatility models with linear-Gaussian state dynamics, as well as general non-linear Gaussian models and discretised diffusion models are supported. See Helske and Vihola (2021, <doi:10.32614/RJ-2021-103>) for details.
+# License: GPL (>= 2)
+# Depends: R (>= 4.1.0)
+# Suggests: covr, ggplot2 (>= 2.0.0), KFAS (>= 1.2.1), knitr (>= 1.11), MASS, rmarkdown (>= 0.8.1), ramcmc, sde, sitmo, testthat
+# Imports: bayesplot, checkmate, coda (>= 0.18-1), diagis, dplyr, posterior, Rcpp (>= 0.12.3), rlang, tidyr
+# LinkingTo: ramcmc, Rcpp, RcppArmadillo, sitmo
+# SystemRequirements: pandoc (>= 1.12.3, needed for vignettes)
+# VignetteBuilder: knitr
+# BugReports: https://github.com/helske/bssm/issues
+# URL: https://github.com/helske/bssm
+# ByteCompile: true
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# RoxygenNote: 7.2.3
+# Packaged: 2023-10-27 10:43:10 UTC; jvhels
+# Author: Jouni Helske [aut, cre] (<https://orcid.org/0000-0001-7130-793X>), Matti Vihola [aut] (<https://orcid.org/0000-0002-8041-7222>)
+# Maintainer: Jouni Helske <jouni.helske@iki.fi>
+# Repository: CRAN
+# Date/Publication: 2023-10-27 12:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
