@@ -9,6 +9,22 @@
 # https://github.com/jeroen/autobrew/issues/3
 export DISABLE_AUTOBREW=1
 
+# Following changes from conda-forge/r-openmx-feedstock
+# BSD-3-Clause license
+# Copyright (c) 2015-2022, conda-forge contributors
+#
+# The OpenMx uses this var to toggle debug behavior within
+# its own build system. Conda sets this var also, causing
+# the OpenMx build to crash. Better unset it here so
+# OpenMx can use its own DEBUG_CXXFLAGS
+unset DEBUG_CXXFLAGS
+#
+# OpenMx should not build fortran code with -fopenmp because
+# of this issue: https://github.com/OpenMx/OpenMx/issues/284
+# So take ALL_FFLAGS and ALL_CFFLAGS from Makeconf, remove
+# -fopenmp and append them to the pkg Makevars as overrides
+cat $PREFIX/lib/R/etc/Makeconf | awk '/^ALL_FFLAGS/ || /^ALL_FCFLAGS/ {m=$1;$1=$2=""; printf "override %s = $(filter-out -fopenmp, %s)\n",m,$0}' >> src/Makevars.in
+
 # R refuses to build packages that mark themselves as Priority: Recommended
 mv DESCRIPTION DESCRIPTION.old
 grep -va '^Priority: ' DESCRIPTION.old > DESCRIPTION
