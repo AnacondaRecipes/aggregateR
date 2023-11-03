@@ -1,0 +1,129 @@
+{% set version = '10.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nns
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/NNS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/NNS/NNS_{{ version }}.tar.gz
+  sha256: ccec871ac0ff03d07b566e8c865f3106419cc1036a345ecba392545b827edf60
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcppparallel
+    - r-rfast
+    - r-caret
+    - r-data.table
+    - r-doparallel
+    - r-foreach
+    - r-meboot
+    - r-quantmod
+    - r-rgl
+    - r-stringr
+    - r-xts
+    - r-zoo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcppparallel
+    - r-rfast
+    - r-caret
+    - r-data.table
+    - r-doparallel
+    - r-foreach
+    - r-meboot
+    - r-quantmod
+    - r-rgl
+    - r-stringr
+    - r-xts
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('NNS')"           # [not win]
+    - "\"%R%\" -e \"library('NNS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=NNS
+  license: GPL-3
+  summary: 'Nonlinear nonparametric statistics using partial moments.  Partial moments are the
+    elements of variance and asymptotically approximate the area of f(x).  These robust
+    statistics provide the basis for nonlinear analysis while retaining linear equivalences.  NNS
+    offers: Numerical integration, Numerical differentiation, Clustering, Correlation,
+    Dependence, Causal analysis, ANOVA, Regression, Classification, Seasonality, Autoregressive
+    modeling, Normalization and Stochastic dominance.  All routines based on: Viole,
+    F. and Nawrocki, D. (2013), Nonlinear Nonparametric Statistics: Using Partial Moments
+    (ISBN: 1490523995).'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: NNS
+# Type: Package
+# Title: Nonlinear Nonparametric Statistics
+# Version: 10.2
+# Date: 2023-10-02
+# Authors@R: c( person("Fred", "Viole", role=c("aut","cre"), email="ovvo.financial.systems@gmail.com"), person("Roberto", "Spadim", role=c("ctb")) )
+# Maintainer: Fred Viole <ovvo.financial.systems@gmail.com>
+# Description: Nonlinear nonparametric statistics using partial moments.  Partial moments are the elements of variance and asymptotically approximate the area of f(x).  These robust statistics provide the basis for nonlinear analysis while retaining linear equivalences.  NNS offers: Numerical integration, Numerical differentiation, Clustering, Correlation, Dependence, Causal analysis, ANOVA, Regression, Classification, Seasonality, Autoregressive modeling, Normalization and Stochastic dominance.  All routines based on: Viole, F. and Nawrocki, D. (2013), Nonlinear Nonparametric Statistics: Using Partial Moments (ISBN: 1490523995).
+# License: GPL-3
+# BugReports: https://github.com/OVVO-Financial/NNS/issues
+# Depends: R (>= 3.6.0), doParallel
+# Imports: caret, data.table, foreach, meboot, quantmod, Rcpp, RcppParallel, Rfast, rgl, stringr, xts, zoo
+# Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
+# VignetteBuilder: knitr
+# LinkingTo: Rcpp, RcppParallel
+# SystemRequirements: GNU make
+# Config/testthat/edition: 3
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-10-02 15:53:20 UTC; fredv
+# Author: Fred Viole [aut, cre], Roberto Spadim [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-10-03 13:00:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

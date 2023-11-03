@@ -1,0 +1,101 @@
+{% set version = '0.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ggirread
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GGIRread_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GGIRread/GGIRread_{{ version }}.tar.gz
+  sha256: ea11abe7092f78a0aa0ed6ce23ccab72e9fbef20f8989999c108dce189785aad
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.10
+    - r-bitops
+    - r-matlab
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.10
+    - r-bitops
+    - r-matlab
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GGIRread')"           # [not win]
+    - "\"%R%\" -e \"library('GGIRread')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/wadpac/GGIRread/
+  license: Apache License (== 2.0)
+  summary: 'Reads data collected from wearable acceleratometers as used in sleep and physical
+    activity research. Currently supports file formats: binary data from ''GENEActiv''
+    <https://activinsights.com/>, binary data from GENEA devices (not for sale), and
+    .cwa-format and .wav-format data from ''Axivity'' <https://axivity.com>. Primarily
+    designed to complement R package GGIR <https://CRAN.R-project.org/package=GGIR>.'
+  license_family: APACHE
+
+# The original CRAN metadata for this package was:
+
+# Package: GGIRread
+# Type: Package
+# Title: Wearable Accelerometer Data File Readers
+# Version: 0.3.1
+# Date: 2023-10-11
+# Authors@R: c(person("Vincent T","van Hees",role=c("aut","cre"), email="v.vanhees@accelting.com"), person(given = "Patrick",family = "Bos", role = c("aut"), email = "egpbos@gmail.com", comment = c(ORCID = "0000-0002-6033-960X")), person("Lena","Kushleyeva",role="ctb"), person("Jing Hua","Zhao",role="ctb"), person("Evgeny","Mirkes",role="ctb"), person("Dan","Jackson",role="ctb"), person("Jairo H","Migueles",role="ctb"), person("Medical Research Council UK",  role = c("cph", "fnd")), person("Accelting",  role = c("cph", "fnd")))
+# Maintainer: Vincent T van Hees <v.vanhees@accelting.com>
+# Description: Reads data collected from wearable acceleratometers as used in sleep and physical activity research. Currently supports file formats: binary data from 'GENEActiv' <https://activinsights.com/>, binary data from GENEA devices (not for sale), and .cwa-format and .wav-format data from 'Axivity' <https://axivity.com>. Primarily designed to complement R package GGIR <https://CRAN.R-project.org/package=GGIR>.
+# URL: https://github.com/wadpac/GGIRread/
+# BugReports: https://github.com/wadpac/GGIRread/issues
+# License: Apache License (== 2.0)
+# Suggests: testthat
+# Imports: matlab, bitops, Rcpp (>= 0.12.10)
+# Depends: stats, utils, R (>= 3.5.0)
+# NeedsCompilation: yes
+# LinkingTo: Rcpp
+# ByteCompile: yes
+# Packaged: 2023-10-11 14:11:24 UTC; vvanh
+# Author: Vincent T van Hees [aut, cre], Patrick Bos [aut] (<https://orcid.org/0000-0002-6033-960X>), Lena Kushleyeva [ctb], Jing Hua Zhao [ctb], Evgeny Mirkes [ctb], Dan Jackson [ctb], Jairo H Migueles [ctb], Medical Research Council UK [cph, fnd], Accelting [cph, fnd]
+# Repository: CRAN
+# Date/Publication: 2023-10-11 18:10:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

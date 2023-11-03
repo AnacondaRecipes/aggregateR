@@ -1,0 +1,108 @@
+{% set version = '2.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-carat
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/carat_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/carat/carat_{{ version }}.tar.gz
+  sha256: cc352bbc487f394f5a7a4bb05037cf16c07cffeb03ff117773b5efb41021f440
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dplyr (>= 0.8.5)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.4.6
+    - r-rcpparmadillo
+    - r-ggplot2 >=3.3.0
+    - r-gridextra >=2.3
+    - r-stringr >=1.4.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.4.6
+    - r-rcpparmadillo
+    - r-ggplot2 >=3.3.0
+    - r-gridextra >=2.3
+    - r-stringr >=1.4.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('carat')"           # [not win]
+    - "\"%R%\" -e \"library('carat')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=carat
+  license: GPL-2
+  summary: 'Provides functions and command-line user interface to generate allocation sequence
+    by covariate-adaptive randomization for clinical trials. The package currently supports
+    six covariate-adaptive randomization procedures. Three hypothesis testing methods
+    that are valid and robust under covariate-adaptive randomization are also available
+    in the package to facilitate the inference for treatment effect under the included
+    randomization procedures. Additionally, the package provides comprehensive and efficient
+    tools to allow one to evaluate and compare the performance of randomization procedures
+    and tests based on various criteria. See Ma W, Ye X, Tu F, and Hu F (2023) <doi:
+    10.18637/jss.v107.i02> for details.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: carat
+# Type: Package
+# Title: Covariate-Adaptive Randomization for Clinical Trials
+# Version: 2.2.1
+# Date: 2023-09-05
+# Authors@R: c( person(given="Fuyi", family="Tu", email="fuyi.tu@ruc.edu.cn", role="aut"), person(given="Xiaoqing", family="Ye", email="ye_xiaoq@163.com", role=c("aut","cre")), person(given="Wei", family="Ma", email="mawei@ruc.edu.cn", role=c("aut", "ths")), person(given="Feifang", family="Hu", email="ffhu68@163.com", role=c("aut","ths")) )
+# Author: Fuyi Tu [aut], Xiaoqing Ye [aut, cre], Wei Ma [aut, ths], Feifang Hu [aut, ths]
+# Maintainer: Xiaoqing Ye <ye_xiaoq@163.com>
+# Description: Provides functions and command-line user interface to generate allocation sequence by covariate-adaptive randomization for clinical trials. The package currently supports six covariate-adaptive randomization procedures. Three hypothesis testing methods that are valid and robust under covariate-adaptive randomization are also available in the package to facilitate the inference for treatment effect under the included randomization procedures. Additionally, the package provides comprehensive and efficient tools to allow one to evaluate and compare the performance of randomization procedures and tests based on various criteria. See Ma W, Ye X, Tu F, and Hu F (2023) <doi: 10.18637/jss.v107.i02> for details.
+# License: GPL (>= 2)
+# Imports: Rcpp (>= 1.0.4.6), ggplot2 (>= 3.3.0), gridExtra (>= 2.3), stringr (>= 1.4.0), methods
+# Suggests: dplyr (>= 0.8.5)
+# Depends: R (>= 3.6.0)
+# NeedsCompilation: yes
+# LinkingTo: Rcpp, RcppArmadillo
+# Packaged: 2023-09-05 06:21:06 UTC; YeXiaoqing
+# Repository: CRAN
+# Date/Publication: 2023-09-05 15:30:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

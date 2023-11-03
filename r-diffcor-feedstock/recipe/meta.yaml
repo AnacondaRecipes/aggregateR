@@ -1,0 +1,82 @@
+{% set version = '0.8.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-diffcor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/diffcor_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/diffcor/diffcor_{{ version }}.tar.gz
+  sha256: d460e353637117e7e4d1a3b6550388c2ae138a222515d822e993f59e9f4da192
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+
+  run:
+    - r-base
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('diffcor')"           # [not win]
+    - "\"%R%\" -e \"library('diffcor')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=diffcor
+  license: GPL-2
+  summary: Computations of Fisher's z-tests concerning different kinds of correlation differences.
+    Additionally, approaches to estimating statistical power via Monte Carlo simulations
+    are implemented.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: diffcor
+# Type: Package
+# Title: Fisher's z-Tests Concerning Difference of Correlations
+# Version: 0.8.1
+# Depends: R (>= 4.3.0), MASS
+# Date: 2023-10-30
+# Author: Christian Blotner
+# Maintainer: Christian Blotner <c.bloetner@gmail.com>
+# Description: Computations of Fisher's z-tests concerning different kinds of correlation differences. Additionally, approaches to estimating statistical power via Monte Carlo simulations are implemented.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2023-10-30 11:53:10 UTC; christianblotner
+# Repository: CRAN
+# Date/Publication: 2023-10-30 12:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,99 @@
+{% set version = '1.2-12' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sampleselection
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sampleSelection_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sampleSelection/sampleSelection_{{ version }}.tar.gz
+  sha256: be0584c2a017843a2dbc34e9c42d7c5c15992e276bcc5c1b7b47382218e2a1aa
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lmtest, Ecdat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula >=1.1_1
+    - r-vgam >=1.1_1
+    - r-maxlik >=0.7_3
+    - r-misctools >=0.6_3
+    - r-mvtnorm >=0.9_9994
+    - r-systemfit >=1.0_0
+
+  run:
+    - r-base
+    - r-formula >=1.1_1
+    - r-vgam >=1.1_1
+    - r-maxlik >=0.7_3
+    - r-misctools >=0.6_3
+    - r-mvtnorm >=0.9_9994
+    - r-systemfit >=1.0_0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sampleSelection')"           # [not win]
+    - "\"%R%\" -e \"library('sampleSelection')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.sampleSelection.org
+  license: GPL-2
+  summary: 'Two-step and maximum likelihood estimation of Heckman-type sample selection models:
+    standard sample selection models (Tobit-2), endogenous switching regression models
+    (Tobit-5), sample selection models with binary dependent outcome variable, interval
+    regression with sample selection (only ML estimation), and endogenous treatment
+    effects models. These methods are described in the three vignettes that are included
+    in this package and in econometric textbooks such as Greene (2011, Econometric Analysis,
+    7th edition, Pearson).'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: sampleSelection
+# Version: 1.2-12
+# Date: 2020-12-14
+# Title: Sample Selection Models
+# Authors@R: c( person( given = "Arne", family = "Henningsen", role = c( "aut", "cre" ), email = "arne.henningsen@gmail.com" ), person( given = "Ott", family = "Toomet", role = "aut" ), person( given = "Sebastian", family = "Petersen", role = "ctb" ) )
+# Author: Arne Henningsen [aut, cre], Ott Toomet [aut], Sebastian Petersen [ctb]
+# Maintainer: Arne Henningsen <arne.henningsen@gmail.com>
+# Depends: R (>= 2.10), maxLik (>= 0.7-3), stats
+# Imports: miscTools (>= 0.6-3), systemfit (>= 1.0-0), Formula (>= 1.1-1), VGAM (>= 1.1-1), mvtnorm (>= 0.9-9994)
+# Suggests: lmtest, Ecdat
+# Description: Two-step and maximum likelihood estimation of Heckman-type sample selection models: standard sample selection models (Tobit-2), endogenous switching regression models (Tobit-5), sample selection models with binary dependent outcome variable, interval regression with sample selection (only ML estimation), and endogenous treatment effects models. These methods are described in the three vignettes that are included in this package and in econometric textbooks such as Greene (2011, Econometric Analysis, 7th edition, Pearson).
+# License: GPL (>= 2)
+# URL: http://www.sampleSelection.org
+# NeedsCompilation: no
+# Packaged: 2020-12-14 22:31:03 UTC; gsl324
+# Repository: CRAN
+# Date/Publication: 2020-12-15 07:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

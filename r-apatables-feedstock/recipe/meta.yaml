@@ -1,0 +1,102 @@
+{% set version = '2.0.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-apatables
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/apaTables_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/apaTables/apaTables_{{ version }}.tar.gz
+  sha256: 6d8712f01c8b2ddbe4ef77096cf44b0ac3e7bb1bcf430ca39c18ef983ee8c64b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mbess
+    - r-boot
+    - r-broom
+    - r-car
+    - r-dplyr
+    - r-tibble
+
+  run:
+    - r-base
+    - r-mbess
+    - r-boot
+    - r-broom
+    - r-car
+    - r-dplyr
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('apaTables')"           # [not win]
+    - "\"%R%\" -e \"library('apaTables')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/dstanley4/apaTables
+  license: MIT License + file LICENSE
+  summary: A common task faced by researchers is the creation of APA style (i.e., American Psychological
+    Association style) tables from statistical output. In R a large number of function
+    calls are often needed to obtain all of the desired information for a single APA
+    style table. As well, the process of manually creating APA style tables in a word
+    processor is prone to transcription errors. This package creates Word files (.doc
+    files) containing APA style tables for several types of analyses. Using this package
+    minimizes transcription errors and reduces the number commands needed by the user.
+  license_family: MIT
+  license_file:
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: apaTables
+# Version: 2.0.8
+# Authors@R: person("David", "Stanley", , "dstanley@uoguelph.ca", role = c("aut", "cre"))
+# Title: Create American Psychological Association (APA) Style Tables
+# Description: A common task faced by researchers is the creation of APA style (i.e., American Psychological Association style) tables from statistical output. In R a large number of function calls are often needed to obtain all of the desired information for a single APA style table. As well, the process of manually creating APA style tables in a word processor is prone to transcription errors. This package creates Word files (.doc files) containing APA style tables for several types of analyses. Using this package minimizes transcription errors and reduces the number commands needed by the user.
+# URL: https://github.com/dstanley4/apaTables
+# BugReports: https://github.com/dstanley4/apaTables/issues
+# Depends: R (>= 3.1.2)
+# Imports: stats, utils, methods, car, broom, dplyr, boot, tibble, MBESS
+# Suggests: testthat, knitr
+# RoxygenNote: 7.1.1
+# License: MIT License + file LICENSE
+# LazyData: true
+# Date: 2020-12-18
+# NeedsCompilation: no
+# Packaged: 2020-12-18 16:05:46 UTC; dstanley
+# Author: David Stanley [aut, cre]
+# Maintainer: David Stanley <dstanley@uoguelph.ca>
+# Repository: CRAN
+# Date/Publication: 2021-01-04 19:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

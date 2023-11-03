@@ -1,0 +1,107 @@
+{% set version = '3.5.1-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cmfrec
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cmfrec_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cmfrec/cmfrec_{{ version }}.tar.gz
+  sha256: 9f0842c58b1c7cfc9a1db2acd54fb9ce525f60d81b80fb5ecf80950bd8ea6a4c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Matrix, MatrixExtra, RhpcBLASctl, recosystem (>= 0.5), recommenderlab (>= 0.2-7), MASS, knitr, rmarkdown, kableExtra
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cmfrec')"           # [not win]
+    - "\"%R%\" -e \"library('cmfrec')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/david-cortes/cmfrec
+  license: MIT
+  summary: Collective matrix factorization (a.k.a. multi-view or multi-way factorization, Singh,
+    Gordon, (2008) <doi:10.1145/1401890.1401969>) tries to approximate a (potentially
+    very sparse or having many missing values) matrix 'X' as the product of two low-dimensional
+    matrices, optionally aided with secondary information matrices about rows and/or
+    columns of 'X', which are also factorized using the same latent components. The
+    intended usage is for recommender systems, dimensionality reduction, and missing
+    value imputation. Implements extensions of the original model (Cortes, (2018) <arXiv:1809.00366>)
+    and can produce different factorizations such as the weighted 'implicit-feedback'
+    model (Hu, Koren, Volinsky, (2008) <doi:10.1109/ICDM.2008.22>), the 'weighted-lambda-regularization'
+    model, (Zhou, Wilkinson, Schreiber, Pan, (2008) <doi:10.1007/978-3-540-68880-8_32>),
+    or the enhanced model with 'implicit features' (Rendle, Zhang, Koren, (2019) <arXiv:1905.01395>),
+    with or without side information. Can use gradient-based procedures or alternating-least
+    squares procedures (Koren, Bell, Volinsky, (2009) <doi:10.1109/MC.2009.263>), with
+    either a Cholesky solver, a faster conjugate gradient solver (Takacs, Pilaszy, Tikk,
+    (2011) <doi:10.1145/2043932.2043987>), or a non-negative coordinate descent solver
+    (Franc, Hlavac, Navara, (2005) <doi:10.1007/11556121_50>), providing efficient methods
+    for sparse and dense data, and mixtures thereof. Supports L1 and L2 regularization
+    in the main models, offers alternative most-popular and content-based models, and
+    implements functionality for cold-start recommendations and imputation of 2D data.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: cmfrec
+# Type: Package
+# Title: Collective Matrix Factorization for Recommender Systems
+# Version: 3.5.1-1
+# Authors@R: c( person(given="David", family="Cortes", role=c("aut", "cre", "cph"), email="david.cortes.rivera@gmail.com"), person(given="Jorge", family="Nocedal", role="cph", comment="Copyright holder of included LBFGS library"), person(given="Naoaki", family="Okazaki", role="cph", comment="Copyright holder of included LBFGS library"), person(given="David", family="Blackman", role="cph", comment="Copyright holder of original Xoshiro code"), person(given="Sebastiano", family="Vigna", role="cph", comment="Copyright holder of original Xoshiro code"), person(given="NumPy", family="Developers", role="cph", comment="Copyright holder of formatted ziggurat tables") )
+# Maintainer: David Cortes <david.cortes.rivera@gmail.com>
+# URL: https://github.com/david-cortes/cmfrec
+# BugReports: https://github.com/david-cortes/cmfrec/issues
+# Description: Collective matrix factorization (a.k.a. multi-view or multi-way factorization, Singh, Gordon, (2008) <doi:10.1145/1401890.1401969>) tries to approximate a (potentially very sparse or having many missing values) matrix 'X' as the product of two low-dimensional matrices, optionally aided with secondary information matrices about rows and/or columns of 'X', which are also factorized using the same latent components. The intended usage is for recommender systems, dimensionality reduction, and missing value imputation. Implements extensions of the original model (Cortes, (2018) <arXiv:1809.00366>) and can produce different factorizations such as the weighted 'implicit-feedback' model (Hu, Koren, Volinsky, (2008) <doi:10.1109/ICDM.2008.22>), the 'weighted-lambda-regularization' model, (Zhou, Wilkinson, Schreiber, Pan, (2008) <doi:10.1007/978-3-540-68880-8_32>), or the enhanced model with 'implicit features' (Rendle, Zhang, Koren, (2019) <arXiv:1905.01395>), with or without side information. Can use gradient-based procedures or alternating-least squares procedures (Koren, Bell, Volinsky, (2009) <doi:10.1109/MC.2009.263>), with either a Cholesky solver, a faster conjugate gradient solver (Takacs, Pilaszy, Tikk, (2011) <doi:10.1145/2043932.2043987>), or a non-negative coordinate descent solver (Franc, Hlavac, Navara, (2005) <doi:10.1007/11556121_50>), providing efficient methods for sparse and dense data, and mixtures thereof. Supports L1 and L2 regularization in the main models, offers alternative most-popular and content-based models, and implements functionality for cold-start recommendations and imputation of 2D data.
+# License: MIT + file LICENSE
+# Suggests: Matrix, MatrixExtra, RhpcBLASctl, recosystem (>= 0.5), recommenderlab (>= 0.2-7), MASS, knitr, rmarkdown, kableExtra
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-04-11 16:37:56 UTC; david
+# Author: David Cortes [aut, cre, cph], Jorge Nocedal [cph] (Copyright holder of included LBFGS library), Naoaki Okazaki [cph] (Copyright holder of included LBFGS library), David Blackman [cph] (Copyright holder of original Xoshiro code), Sebastiano Vigna [cph] (Copyright holder of original Xoshiro code), NumPy Developers [cph] (Copyright holder of formatted ziggurat tables)
+# Repository: CRAN
+# Date/Publication: 2023-04-11 17:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

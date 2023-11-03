@@ -1,0 +1,94 @@
+{% set version = '4.1-6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rseis
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RSEIS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RSEIS/RSEIS_{{ version }}.tar.gz
+  sha256: 6a4a3e57fb4935676a3105597e879ff79839bba86349fca35aba7bab13e87aed
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: stats
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rpmg
+    - r-rwave
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rpmg
+    - r-rwave
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RSEIS')"           # [not win]
+    - "\"%R%\" -e \"library('RSEIS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RSEIS
+  license: GPL-2
+  summary: Multiple interactive codes to view and analyze seismic data, via spectrum analysis,
+    wavelet transforms, particle motion, hodograms.  Includes general time-series tools,
+    plotting, filtering, interactive display.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: RSEIS
+# Type: Package
+# Title: Seismic Time Series Analysis Tools
+# Version: 4.1-6
+# Date: 2023-08-19
+# Depends: R (>= 3.0)
+# Imports: RPMG, Rwave
+# Suggests: stats
+# Authors@R: c(person(given="Jonathan M.", family="Lees", role = c("aut", "cre"),email = "jonathan.lees@unc.edu"), person(given="Jake", family="Anderson", role = "ctb", email = "ajakef@gmail.com"), person(given='Leonard', family='Lisapaly', role = "ctb", email = "leonardl@fisika.ui.ac.id"), person(given='Dave', family='Harris', role=c('aut', 'cph') ) )
+# Author: Jonathan M. Lees [aut, cre], Jake Anderson [ctb], Leonard Lisapaly [ctb], Dave Harris [aut, cph]
+# Maintainer: Jonathan M. Lees <jonathan.lees@unc.edu>
+# Description: Multiple interactive codes to view and analyze seismic data, via spectrum analysis, wavelet transforms, particle motion, hodograms.  Includes general time-series tools, plotting, filtering, interactive display.
+# License: GPL (>= 2)
+# Copyright: see inst/COPYRIGHTS
+# Packaged: 2023-08-19 10:19:22 UTC; lees
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2023-08-19 12:32:32 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,112 @@
+{% set version = '1.2.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-odin
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/odin_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/odin/odin_{{ version }}.tar.gz
+  sha256: 3798105f123829c15675322d9438d999aa2491ab04063ea1a73696d1877b9fb9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dde (>= 1.0.0), jsonvalidate (>= 1.1.0), knitr, mockery, pkgbuild, pkgload, rlang, rmarkdown, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-cinterpolate >=1.0.0
+    - r-desolve
+    - r-digest
+    - r-glue
+    - r-jsonlite
+    - r-ring
+    - r-withr
+
+  run:
+    - r-base
+    - r-r6
+    - r-cinterpolate >=1.0.0
+    - r-desolve
+    - r-digest
+    - r-glue
+    - r-jsonlite
+    - r-ring
+    - r-withr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('odin')"           # [not win]
+    - "\"%R%\" -e \"library('odin')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mrc-ide/odin
+  license: MIT
+  summary: Generate systems of ordinary differential equations (ODE) and integrate them, using
+    a domain specific language (DSL).  The DSL uses R's syntax, but compiles to C in
+    order to efficiently solve the system.  A solver is not provided, but instead interfaces
+    to the packages 'deSolve' and 'dde' are generated.  With these, while solving the
+    differential equations, no allocations are done and the calculations remain entirely
+    in compiled code.  Alternatively, a model can be transpiled to R for use in contexts
+    where a C compiler is not present.  After compilation, models can be inspected to
+    return information about parameters and outputs, or intermediate values after calculations.
+    'odin' is not targeted at any particular domain and is suitable for any system that
+    can be expressed primarily as mathematical expressions.  Additional support is provided
+    for working with delays (delay differential equations, DDE), using interpolated
+    functions during interpolation, and for integrating quantities that represent arrays.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: odin
+# Title: ODE Generation and Integration
+# Version: 1.2.5
+# Authors@R: c(person("Rich", "FitzJohn", role = c("aut", "cre"), email = "rich.fitzjohn@gmail.com"), person("Thibaut", "Jombart", role = "ctb"), person("Imperial College of Science, Technology and Medicine", role = "cph"))
+# Description: Generate systems of ordinary differential equations (ODE) and integrate them, using a domain specific language (DSL).  The DSL uses R's syntax, but compiles to C in order to efficiently solve the system.  A solver is not provided, but instead interfaces to the packages 'deSolve' and 'dde' are generated.  With these, while solving the differential equations, no allocations are done and the calculations remain entirely in compiled code.  Alternatively, a model can be transpiled to R for use in contexts where a C compiler is not present.  After compilation, models can be inspected to return information about parameters and outputs, or intermediate values after calculations. 'odin' is not targeted at any particular domain and is suitable for any system that can be expressed primarily as mathematical expressions.  Additional support is provided for working with delays (delay differential equations, DDE), using interpolated functions during interpolation, and for integrating quantities that represent arrays.
+# License: MIT + file LICENSE
+# URL: https://github.com/mrc-ide/odin
+# BugReports: https://github.com/mrc-ide/odin/issues
+# Imports: R6, cinterpolate (>= 1.0.0), deSolve, digest, glue, jsonlite, ring, withr
+# Suggests: dde (>= 1.0.0), jsonvalidate (>= 1.1.0), knitr, mockery, pkgbuild, pkgload, rlang, rmarkdown, testthat
+# VignetteBuilder: knitr
+# RoxygenNote: 7.1.1
+# Encoding: UTF-8
+# Language: en-GB
+# NeedsCompilation: no
+# Packaged: 2023-10-02 11:35:14 UTC; rfitzjoh
+# Author: Rich FitzJohn [aut, cre], Thibaut Jombart [ctb], Imperial College of Science, Technology and Medicine [cph]
+# Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-02 13:40:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

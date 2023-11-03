@@ -1,0 +1,95 @@
+{% set version = '1.0.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-changepoint.np
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/changepoint.np_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/changepoint.np/changepoint.np_{{ version }}.tar.gz
+  sha256: c9eeb0be6ec58fc9a44fc5a88a29df4e21430644bcf7d2c28961ae5ac10fd2cf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rdpack
+    - r-changepoint
+    - r-zoo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rdpack
+    - r-changepoint
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('changepoint.np')"           # [not win]
+    - "\"%R%\" -e \"library('changepoint.np')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=changepoint.np
+  license: GPL-3
+  summary: Implements the multiple changepoint algorithm PELT with a nonparametric cost function
+    based on the empirical distribution of the data. This package extends the changepoint
+    package (see Killick, R and Eckley, I (2014) <doi:10.18637/jss.v058.i03> ).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: changepoint.np
+# Type: Package
+# Title: Methods for Nonparametric Changepoint Detection
+# Version: 1.0.5
+# Date: 2022-10-20
+# Authors@R: c(person("Kaylea","Haynes",email="k.haynes1@lancaster.ac.uk",role=c("aut")),person("Rebecca","Killick",email="r.killick@lancaster.ac.uk",role=c("aut")),person("Paul","Fearnhead",email="p.fearnhead@lancaster.ac.uk",role=c("ths","ctb")),person("Idris","Eckley",email="i.eckley@lancaster.ac.uk",role=c("ths")),person("Daniel","Grose",email="changepoints@lancaster.ac.uk",role=c("ctb","cre")))
+# Description: Implements the multiple changepoint algorithm PELT with a nonparametric cost function based on the empirical distribution of the data. This package extends the changepoint package (see Killick, R and Eckley, I (2014) <doi:10.18637/jss.v058.i03> ).
+# Depends: changepoint
+# RdMacros: Rdpack
+# Imports: methods,zoo,Rdpack
+# License: GPL
+# RoxygenNote: 7.1.1
+# NeedsCompilation: yes
+# Packaged: 2022-10-20 13:34:41 UTC; grosedj
+# Author: Kaylea Haynes [aut], Rebecca Killick [aut], Paul Fearnhead [ths, ctb], Idris Eckley [ths], Daniel Grose [ctb, cre]
+# Maintainer: Daniel Grose <changepoints@lancaster.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2022-10-20 17:15:27 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

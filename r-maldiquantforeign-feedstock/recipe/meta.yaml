@@ -1,0 +1,99 @@
+{% set version = '0.14' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-maldiquantforeign
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MALDIquantForeign_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MALDIquantForeign/MALDIquantForeign_{{ version }}.tar.gz
+  sha256: c8dc2dc26ba8fe688d51b2fa8a3c5970e4a46b515874963d1c14e777129dc9d1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, testthat (>= 0.8), RNetCDF (>= 1.6.1)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-maldiquant >=1.16.4
+    - r-xml
+    - r-base64enc
+    - r-digest
+    - r-readbrukerflexdata >=1.7
+    - r-readmzxmldata >=2.7
+
+  run:
+    - r-base
+    - r-maldiquant >=1.16.4
+    - r-xml
+    - r-base64enc
+    - r-digest
+    - r-readbrukerflexdata >=1.7
+    - r-readmzxmldata >=2.7
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MALDIquantForeign')"           # [not win]
+    - "\"%R%\" -e \"library('MALDIquantForeign')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://strimmerlab.github.io/software/maldiquant/ https://github.com/sgibb/MALDIquantForeign/
+  license: GPL-3
+  summary: Functions for reading (tab, csv, Bruker fid, Ciphergen XML, mzXML, mzML, imzML, Analyze
+    7.5, CDF, mMass MSD) and writing (tab, csv, mMass MSD, mzML, imzML) different file
+    formats of mass spectrometry data into/from 'MALDIquant' objects.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: MALDIquantForeign
+# Version: 0.14
+# Date: 2023-08-11
+# Title: Import/Export Routines for 'MALDIquant'
+# Authors@R: c(person("Sebastian", "Gibb", role=c("aut", "cre"), email="mail@sebastiangibb.de", comment=c(ORCID="0000-0001-7406-4443")), person("Pietro", "Franceschi", role=c("ctb"), email="pietro.franceschi@fmach.it"))
+# Depends: R (>= 3.2.2), methods, MALDIquant (>= 1.16.4)
+# Imports: base64enc, digest, readBrukerFlexData (>= 1.7), readMzXmlData (>= 2.7), XML
+# Suggests: knitr, testthat (>= 0.8), RNetCDF (>= 1.6.1)
+# Description: Functions for reading (tab, csv, Bruker fid, Ciphergen XML, mzXML, mzML, imzML, Analyze 7.5, CDF, mMass MSD) and writing (tab, csv, mMass MSD, mzML, imzML) different file formats of mass spectrometry data into/from 'MALDIquant' objects.
+# License: GPL (>= 3)
+# URL: https://strimmerlab.github.io/software/maldiquant/ https://github.com/sgibb/MALDIquantForeign/
+# BugReports: https://github.com/sgibb/MALDIquantForeign/issues/
+# LazyLoad: yes
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-08-11 11:43:53 UTC; sebastian
+# Author: Sebastian Gibb [aut, cre] (<https://orcid.org/0000-0001-7406-4443>), Pietro Franceschi [ctb]
+# Maintainer: Sebastian Gibb <mail@sebastiangibb.de>
+# Repository: CRAN
+# Date/Publication: 2023-08-11 21:53:46 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

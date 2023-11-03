@@ -1,0 +1,106 @@
+{% set version = '2.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gb2
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GB2_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GB2/GB2_{{ version }}.tar.gz
+  sha256: d98b1ef5066ad6078f4fd7cb2b0510b88d8dddc467697d237e70b24ea5f71b16
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: simFrame
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-cubature
+    - r-hypergeo
+    - r-laeken
+    - r-numderiv
+    - r-survey
+
+  run:
+    - r-base
+    - r-cubature
+    - r-hypergeo
+    - r-laeken
+    - r-numderiv
+    - r-survey
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GB2')"           # [not win]
+    - "\"%R%\" -e \"library('GB2')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=GB2
+  license: GPL-2
+  summary: Package GB2 explores the Generalized Beta distribution of the second kind. Density,
+    cumulative distribution function, quantiles and moments of the distributions are
+    given. Functions for the full log-likelihood, the profile log-likelihood and the
+    scores are provided. Formulas for various indicators of inequality and poverty under
+    the GB2 are implemented. The GB2 is fitted by the methods of maximum pseudo-likelihood
+    estimation using the full and profile log-likelihood, and non-linear least squares
+    estimation of the model parameters. Various plots for the visualization and analysis
+    of the results are provided. Variance estimation of the parameters is provided for
+    the method of maximum pseudo-likelihood estimation. A mixture distribution based
+    on the compounding property of the GB2 is presented (denoted as "compound" in the
+    documentation). This mixture distribution is based on the discretization of the
+    distribution of the underlying random scale parameter. The discretization can be
+    left or right tail. Density, cumulative distribution function, moments and quantiles
+    for the mixture distribution are provided. The compound mixture distribution is
+    fitted using the method of maximum pseudo-likelihood estimation. The fit can also
+    incorporate the use of auxiliary information. In this new version of the package,
+    the mixture case is complemented with new functions for variance estimation by linearization
+    and comparative density plots.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: GB2
+# Version: 2.1.1
+# Date: 2015-05-01
+# Title: Generalized Beta Distribution of the Second Kind: Properties, Likelihood, Estimation
+# Author: Monique Graf <monique.p.n.graf@bluewin.ch>, Desislava Nedyalkova <desislava.nedyalkova@gmail.com>.
+# Maintainer: Desislava Nedyalkova <desislava.nedyalkova@gmail.com>
+# Depends: R (>= 3.1.0)
+# Imports: cubature, hypergeo, laeken, numDeriv, stats, survey
+# Suggests: simFrame
+# Description: Package GB2 explores the Generalized Beta distribution of the second kind. Density, cumulative distribution function, quantiles and moments of the distributions are given. Functions for the full log-likelihood, the profile log-likelihood and the scores are provided. Formulas for various indicators of inequality and poverty under the GB2 are implemented. The GB2 is fitted by the methods of maximum pseudo-likelihood estimation using the full and profile log-likelihood, and non-linear least squares estimation of the model parameters. Various plots for the visualization and analysis of the results are provided. Variance estimation of the parameters is provided for the method of maximum pseudo-likelihood estimation. A mixture distribution based on the compounding property of the GB2 is presented (denoted as "compound" in the documentation). This mixture distribution is based on the discretization of the distribution of the underlying random scale parameter. The discretization can be left or right tail. Density, cumulative distribution function, moments and quantiles for the mixture distribution are provided. The compound mixture distribution is fitted using the method of maximum pseudo-likelihood estimation. The fit can also incorporate the use of auxiliary information. In this new version of the package, the mixture case is complemented with new functions for variance estimation by linearization and comparative density plots.
+# License: GPL (>= 2)
+# Packaged: 2022-06-22 05:38:15 UTC; hornik
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2022-06-22 05:53:16 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

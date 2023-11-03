@@ -1,0 +1,100 @@
+{% set version = '0.7.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stylo
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/stylo_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/stylo/stylo_{{ version }}.tar.gz
+  sha256: 8bdd2b9ecc8e0ef3a7ee25bb62c9f24aafd6384b523fa04e573ab7bbc8bf4e6e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: stringi, networkD3, readr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ape
+    - r-class
+    - r-e1071
+    - r-lattice
+    - r-pamr
+    - r-tcltk2
+    - r-tsne
+
+  run:
+    - r-base
+    - r-ape
+    - r-class
+    - r-e1071
+    - r-lattice
+    - r-pamr
+    - r-tcltk2
+    - r-tsne
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('stylo')"           # [not win]
+    - "\"%R%\" -e \"library('stylo')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/computationalstylistics/stylo
+  license: GPL-3
+  summary: Supervised and unsupervised multivariate methods, supplemented by GUI and some visualizations,
+    to perform various analyses in the field of computational stylistics, authorship
+    attribution, etc. For further reference, see Eder et al. (2016), <https://journal.r-project.org/archive/2016/RJ-2016-007/index.html>.
+    You are also encouraged to visit the Computational Stylistics Group's website <https://computationalstylistics.github.io/>,
+    where a reasonable amount of information about the package and related projects
+    are provided.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: stylo
+# Type: Package
+# Title: Stylometric Multivariate Analyses
+# Version: 0.7.4
+# Date: 2020-12-5
+# Author: Maciej Eder, Jan Rybicki, Mike Kestemont, Steffen Pielstroem
+# Maintainer: Maciej Eder <maciejeder@gmail.com>
+# URL: https://github.com/computationalstylistics/stylo
+# Depends: R (>= 2.14)
+# Imports: tcltk, tcltk2, ape, pamr, e1071, class, lattice, tsne
+# Suggests: stringi, networkD3, readr
+# Description: Supervised and unsupervised multivariate methods, supplemented by GUI and some visualizations, to perform various analyses in the field of computational stylistics, authorship attribution, etc. For further reference, see Eder et al. (2016), <https://journal.r-project.org/archive/2016/RJ-2016-007/index.html>. You are also encouraged to visit the Computational Stylistics Group's website <https://computationalstylistics.github.io/>, where a reasonable amount of information about the package and related projects are provided.
+# License: GPL (>= 3)
+# NeedsCompilation: no
+# Packaged: 2020-12-06 11:13:23 UTC; m
+# Repository: CRAN
+# Date/Publication: 2020-12-06 11:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

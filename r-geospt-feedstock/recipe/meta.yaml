@@ -1,0 +1,107 @@
+{% set version = '1.0-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-geospt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/geospt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/geospt/geospt_{{ version }}.tar.gz
+  sha256: 2b6613ccfef88b6a23902ff193466ed72e81c5747d7ae662455197043b73e7aa
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-teachingdemos
+    - r-fields
+    - r-genalg
+    - r-gsl
+    - r-gstat
+    - r-limsolve
+    - r-minqa
+    - r-plyr
+    - r-sgeostat
+    - r-sp
+
+  run:
+    - r-base
+    - r-mass
+    - r-teachingdemos
+    - r-fields
+    - r-genalg
+    - r-gsl
+    - r-gstat
+    - r-limsolve
+    - r-minqa
+    - r-plyr
+    - r-sgeostat
+    - r-sp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('geospt')"           # [not win]
+    - "\"%R%\" -e \"library('geospt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/amsantac/geospt
+  license: GPL-2
+  summary: Estimation of the variogram through trimmed mean, radial basis functions (optimization,
+    prediction and cross-validation), summary statistics from cross-validation, pocket
+    plot, and design of optimal sampling networks through sequential and simultaneous
+    points methods.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: geospt
+# Type: Package
+# Title: Geostatistical Analysis and Design of Optimal Spatial Sampling Networks
+# Version: 1.0-3
+# Date: 2023-10-10
+# Author: Carlos Melo <cmelo@udistrital.edu.co>, Ali Santacruz, Oscar Melo <oomelom@unal.edu.co>
+# Maintainer: Ali Santacruz <amsantac@unal.edu.co>
+# Depends: R (>= 2.15.0), gstat, genalg, MASS, sp, minqa
+# Imports: limSolve, fields, gsl, plyr, TeachingDemos, sgeostat, grDevices, stats, methods, graphics, utils
+# Description: Estimation of the variogram through trimmed mean, radial basis functions (optimization, prediction and cross-validation), summary statistics from cross-validation, pocket plot, and design of optimal sampling networks through sequential and simultaneous points methods.
+# License: GPL (>= 2)
+# BugReports: https://github.com/amsantac/geospt/issues
+# URL: https://github.com/amsantac/geospt
+# Encoding: UTF-8
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2023-10-10 15:05:33 UTC; spaziu
+# Repository: CRAN
+# Date/Publication: 2023-10-10 19:00:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

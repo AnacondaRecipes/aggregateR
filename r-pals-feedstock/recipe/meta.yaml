@@ -1,0 +1,94 @@
+{% set version = '1.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pals
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pals_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pals/pals_{{ version }}.tar.gz
+  sha256: 0b52dfccd8b2b04b0e30bdcd72c790ac652c35024ed21f77d77cac83e79ed47c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: classInt, ggplot2, knitr, latticeExtra, reshape2, rgl, rmarkdown, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-colorspace
+    - r-dichromat
+    - r-mapproj
+    - r-maps
+
+  run:
+    - r-base
+    - r-colorspace
+    - r-dichromat
+    - r-mapproj
+    - r-maps
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pals')"           # [not win]
+    - "\"%R%\" -e \"library('pals')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://kwstat.github.io/pals/
+  license: MIT
+  summary: A comprehensive collection of color palettes, colormaps, and tools to evaluate them.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: pals
+# Version: 1.8
+# Authors@R: person("Kevin","Wright", email="kw.stat@gmail.com", comment=c(ORCID = "0000-0002-0617-8673"), role=c("aut","cre"))
+# Title: Color Palettes, Colormaps, and Tools to Evaluate Them
+# Description: A comprehensive collection of color palettes, colormaps, and tools to evaluate them.
+# URL: https://kwstat.github.io/pals/
+# BugReports: https://github.com/kwstat/pals/issues
+# VignetteBuilder: knitr
+# Language: en-US
+# Encoding: UTF-8
+# Depends: R (>= 2.10)
+# Imports: dichromat, colorspace, graphics, grDevices, mapproj, maps, methods, stats
+# Suggests: classInt, ggplot2, knitr, latticeExtra, reshape2, rgl, rmarkdown, testthat
+# License: MIT + file LICENSE
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-08-22 20:43:54 UTC; wrightkevi
+# Author: Kevin Wright [aut, cre] (<https://orcid.org/0000-0002-0617-8673>)
+# Maintainer: Kevin Wright <kw.stat@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-08-23 04:20:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,86 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dendser
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DendSer_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DendSer/DendSer_{{ version }}.tar.gz
+  sha256: cecbf23afdf49f7c57a5a72681d437899d338ad3ed69f7207e63e959ba465fd9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-gclus
+    - r-seriation
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-gclus
+    - r-seriation
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DendSer')"           # [not win]
+    - "\"%R%\" -e \"library('DendSer')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DendSer
+  license: GPL-2
+  summary: Re-arranges a dendrogram to optimize visualisation-based cost functions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: DendSer
+# Version: 1.0.2
+# Date: 2022-04-27
+# Author: Catherine B. Hurley and Denise Earle
+# Maintainer: Catherine Hurley <catherine.hurley@mu.ie>
+# Title: Dendrogram Seriation: Ordering for Visualisation
+# Description: Re-arranges a dendrogram to optimize visualisation-based cost functions.
+# Depends: gclus,seriation
+# License: GPL-2
+# NeedsCompilation: yes
+# Packaged: 2022-04-27 13:23:17 UTC; catherine
+# Repository: CRAN
+# Date/Publication: 2022-04-27 14:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

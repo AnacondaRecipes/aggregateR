@@ -1,0 +1,112 @@
+{% set version = '1.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-assetcorr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/AssetCorr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/AssetCorr/AssetCorr_{{ version }}.tar.gz
+  sha256: 6e62d272588043a800be9f43cca80d35d50b2f3a14406361b8cac14e45a42865
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: markdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rdpack
+    - r-vinecopula
+    - r-boot
+    - r-ggplot2
+    - r-knitr
+    - r-mvquad
+    - r-mvtnorm
+    - r-numderiv
+    - r-qpdf
+
+  run:
+    - r-base
+    - r-rdpack
+    - r-vinecopula
+    - r-boot
+    - r-ggplot2
+    - r-knitr
+    - r-mvquad
+    - r-mvtnorm
+    - r-numderiv
+    - r-qpdf
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('AssetCorr')"           # [not win]
+    - "\"%R%\" -e \"library('AssetCorr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=AssetCorr
+  license: GPL-3
+  summary: 'Functions for the estimation of intra- and inter-cohort correlations in the Vasicek
+    credit portfolio model. For intra-cohort correlations, the package covers the two
+    method of moments estimators of Gordy (2000) <doi:10.1016/S0378-4266(99)00054-0>,
+    the method of moments estimator of Lucas (1995) <https://jfi.pm-research.com/content/4/4/76>
+    and a Binomial approximation extension of this approach. Moreover, the maximum likelihood
+    estimators of Gordy and Heitfield (2010) <http://elsa.berkeley.edu/~mcfadden/e242_f03/heitfield.pdf>
+    and Duellmann and Gehde-Trapp (2004) <http://hdl.handle.net/10419/19729> are implemented.
+    For inter-cohort correlations, the method of moments estimator of Bluhm and Overbeck
+    (2003) <doi:10.1007/978-3-642-59365-9_2>/Bams et al. (2016) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2676595>
+    is provided and the maximum likelihood estimators comprise the approaches of Gordy
+    and Heitfield (2010)/Kalkbrener and Onwunta (2010) <ISBN: 978-1906348250> and Pfeuffer
+    et al. (2020). Bootstrap and Jackknife procedures for bias correction are included
+    as well as the method of moments estimator of Frei and Wunsch (2018) <doi:10.21314/JCR.2017.231>
+    for auto-correlated time series.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: AssetCorr
+# Type: Package
+# Title: Estimating Asset Correlations from Default Data
+# Version: 1.0.4
+# Date: 2021-05-04
+# Author: Maximilian Nagl [aut,cre], Yevhen Havrylenko [aut], Marius Pfeuffer [aut], Kevin Jakob [aut], Matthias Fischer [aut], Daniel Roesch [aut]
+# Maintainer: Maximilian Nagl <maximilian.nagl@ur.de>
+# Description: Functions for the estimation of intra- and inter-cohort correlations in the Vasicek credit portfolio model. For intra-cohort correlations, the package covers the two method of moments estimators of Gordy (2000) <doi:10.1016/S0378-4266(99)00054-0>, the method of moments estimator of Lucas (1995) <https://jfi.pm-research.com/content/4/4/76> and a Binomial approximation extension of this approach. Moreover, the maximum likelihood estimators of Gordy and Heitfield (2010) <http://elsa.berkeley.edu/~mcfadden/e242_f03/heitfield.pdf> and Duellmann and Gehde-Trapp (2004) <http://hdl.handle.net/10419/19729> are implemented. For inter-cohort correlations, the method of moments estimator of Bluhm and Overbeck (2003) <doi:10.1007/978-3-642-59365-9_2>/Bams et al. (2016) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2676595> is provided and the maximum likelihood estimators comprise the approaches of Gordy and Heitfield (2010)/Kalkbrener and Onwunta (2010) <ISBN: 978-1906348250> and Pfeuffer et al. (2020). Bootstrap and Jackknife procedures for bias correction are included as well as the method of moments estimator of Frei and Wunsch (2018) <doi:10.21314/JCR.2017.231> for auto-correlated time series.
+# License: GPL-3
+# Imports: VineCopula, mvtnorm, boot, numDeriv, mvQuad, ggplot2, Rdpack,knitr,qpdf
+# Suggests: markdown
+# VignetteBuilder: knitr
+# RdMacros: Rdpack
+# NeedsCompilation: no
+# Packaged: 2021-05-05 14:53:18 UTC; LocalAdmin
+# Repository: CRAN
+# Date/Publication: 2021-05-05 15:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

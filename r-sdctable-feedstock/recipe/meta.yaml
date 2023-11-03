@@ -1,0 +1,127 @@
+{% set version = '0.32.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sdctable
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sdcTable_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sdcTable/sdcTable_{{ version }}.tar.gz
+  sha256: 223c6ad6a2248e94ba7659e5c04ca66bb867054eb406b7a58190f6fa8b605296
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 0.3), rmarkdown, webshot, digest, RegSDC
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix >=1.3_0
+    - r-rcpp >=0.11.0
+    - r-rglpk
+    - r-ssbtools
+    - r-data.table
+    - r-glpkapi
+    - r-knitr
+    - r-progress
+    - r-rlang
+    - r-sdchierarchies >=0.19.1
+    - r-slam
+    - r-stringr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix >=1.3_0
+    - r-rcpp >=0.11.0
+    - r-rglpk
+    - r-ssbtools
+    - r-data.table
+    - r-glpkapi
+    - r-knitr
+    - r-progress
+    - r-rlang
+    - r-sdchierarchies >=0.19.1
+    - r-slam
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sdcTable')"           # [not win]
+    - "\"%R%\" -e \"library('sdcTable')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/sdcTools/sdcTable
+  license: GPL-2
+  summary: Methods for statistical disclosure control in tabular data such as primary and secondary
+    cell suppression as described for example in Hundepol et al. (2012) <doi:10.1002/9781118348239>
+    are covered in this package.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: sdcTable
+# Version: 0.32.6
+# Date: 2023-08-10
+# Title: Methods for Statistical Disclosure Control in Tabular Data
+# Description: Methods for statistical disclosure control in tabular data such as primary and secondary cell suppression as described for example in Hundepol et al. (2012) <doi:10.1002/9781118348239> are covered in this package.
+# Authors@R: person("Bernhard", "Meindl", email = "bernhard.meindl@gmail.com", role = c("aut", "cre"))
+# URL: https://github.com/sdcTools/sdcTable
+# BugReports: https://github.com/sdcTools/userSupport/issues
+# Depends: R (>= 3.5.0), Rcpp (>= 0.11.0), sdcHierarchies (>= 0.19.1)
+# Imports: data.table, knitr, rlang, stringr, methods, Rglpk, slam, glpkAPI, progress, utils, Matrix (>= 1.3-0), SSBtools
+# Suggests: testthat (>= 0.3), rmarkdown, webshot, digest, RegSDC
+# LinkingTo: Rcpp
+# License: GPL (>= 2)
+# LazyData: true
+# SystemRequirements: GLPK library, including -dev or -devel part
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2023-08-11 05:44:29 UTC; bernhard
+# Author: Bernhard Meindl [aut, cre]
+# Maintainer: Bernhard Meindl <bernhard.meindl@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-08-11 07:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

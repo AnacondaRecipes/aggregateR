@@ -1,0 +1,105 @@
+{% set version = '1.2.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spatialepi
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SpatialEpi_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SpatialEpi/SpatialEpi_{{ version }}.tar.gz
+  sha256: 6d2407d16c7bbbc973234dcb144aac0ccbb2a09970fe32b5553d8cea14d32460
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rmarkdown, markdown, knitr, testthat (>= 3.0.0), ggplot2, dplyr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-sp
+    - r-spdep
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-sp
+    - r-spdep
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SpatialEpi')"           # [not win]
+    - "\"%R%\" -e \"library('SpatialEpi')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/rudeboybert/SpatialEpi
+  license: GPL-2
+  summary: Methods and data for cluster detection and disease mapping.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: SpatialEpi
+# Type: Package
+# Title: Methods and Data for Spatial Epidemiology
+# Version: 1.2.8
+# Authors@R: c( person("Cici", "Chen", email = "cicichen@u.washington.edu", role = "ctb"), person("Albert Y.", "Kim", email = "albert.ys.kim@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7824-306X")), person("Michelle", "Ross", email = "micher3@u.washington.edu", role = "ctb"), person("Jon", "Wakefield", email = "jonno@uw.edu", role = c("aut")), person("Mikael","Moise", email = "amoise@smith.edu", role = c("aut"),comment = c(ORCID = "0000-0002-3608-1178")) )
+# Maintainer: Albert Y. Kim <albert.ys.kim@gmail.com>
+# Description: Methods and data for cluster detection and disease mapping.
+# Depends: R (>= 3.0.2), sp
+# License: GPL-2
+# LazyData: true
+# URL: https://github.com/rudeboybert/SpatialEpi
+# BugReports: https://github.com/rudeboybert/SpatialEpi/issues
+# Imports: Rcpp, MASS, spdep
+# LinkingTo: Rcpp, RcppArmadillo
+# NeedsCompilation: yes
+# RoxygenNote: 7.2.2
+# Suggests: rmarkdown, markdown, knitr, testthat (>= 3.0.0), ggplot2, dplyr
+# Config/testthat/edition: 3
+# Encoding: UTF-8
+# Packaged: 2023-02-22 00:30:28 UTC; rudeboybert
+# Author: Cici Chen [ctb], Albert Y. Kim [aut, cre] (<https://orcid.org/0000-0001-7824-306X>), Michelle Ross [ctb], Jon Wakefield [aut], Mikael Moise [aut] (<https://orcid.org/0000-0002-3608-1178>)
+# Repository: CRAN
+# Date/Publication: 2023-02-22 00:50:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

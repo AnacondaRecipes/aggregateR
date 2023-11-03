@@ -1,0 +1,88 @@
+{% set version = '0.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-digitize
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/digitize_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/digitize/digitize_{{ version }}.tar.gz
+  sha256: a09bddbc50dd1fd42a765e414ca8dcd6308b8ce1aa89959a4e47e79d3ee984e3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-readbitmap >=0.1_4
+
+  run:
+    - r-base
+    - r-readbitmap >=0.1_4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('digitize')"           # [not win]
+    - "\"%R%\" -e \"library('digitize')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/tpoisot/digitize/
+  license: GPL-2
+  summary: Import data from a digital image; it requires user input for calibration and to locate
+    the data points. The end result is similar to 'DataThief' and other other programs
+    that 'digitize' published plots or graphs.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: digitize
+# Version: 0.0.4
+# Date: 2016-08-26
+# Title: Use Data from Published Plots in R
+# Authors@R: c( person("Timothee", "Poisot", email =  "tim@poisotlab.io", role  = c("aut")), person("Rene", "Sachse", email = "rene.sachse@googlemail.com", role = c("aut")), person("Jaime", "Ashander", email = "jashander@ucdavis.edu", role  = c("aut", "cre")), person("Tal", "Galili",  email = "tal.galili@gmail.com", role  = c("aut")) )
+# Depends: R (>= 2.2.0)
+# Description: Import data from a digital image; it requires user input for calibration and to locate the data points. The end result is similar to 'DataThief' and other other programs that 'digitize' published plots or graphs.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# URL: https://github.com/tpoisot/digitize/
+# BugReports: https://github.com/tpoisot/digitize/issues
+# Imports: graphics, readbitmap (>= 0.1-4)
+# RoxygenNote: 5.0.1
+# Suggests: testthat
+# NeedsCompilation: no
+# Packaged: 2016-08-27 00:45:39 UTC; jaime
+# Author: Timothee Poisot [aut], Rene Sachse [aut], Jaime Ashander [aut, cre], Tal Galili [aut]
+# Maintainer: Jaime Ashander <jashander@ucdavis.edu>
+# Repository: CRAN
+# Date/Publication: 2016-08-27 07:52:45
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

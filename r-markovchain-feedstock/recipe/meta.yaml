@@ -1,0 +1,116 @@
+{% set version = '0.9.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-markovchain
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/markovchain_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/markovchain/markovchain_{{ version }}.tar.gz
+  sha256: eef926d660dbd54362551b7fff64a9f2ac284f1f87bfe07cdffc99632489c77c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, testthat, diagram, DiagrammeR, msm, Rsolnp, rmarkdown, ctmcd, bookdown, rticles
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix >=1.5_0
+    - r-rcpp >=1.0.2
+    - r-rcpparmadillo >=0.9.600.4.0
+    - r-rcppparallel
+    - r-expm
+    - r-igraph
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix >=1.5_0
+    - r-rcpp >=1.0.2
+    - r-rcpparmadillo >=0.9.600.4.0
+    - r-rcppparallel
+    - r-expm
+    - r-igraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('markovchain')"           # [not win]
+    - "\"%R%\" -e \"library('markovchain')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/spedygiorgio/markovchain/
+  license: MIT
+  summary: Functions and S4 methods to create and manage discrete time Markov chains more easily.
+    In addition functions to perform statistical (fitting and drawing random variates)
+    and probabilistic (analysis of their structural proprieties) analysis are provided.
+    See Spedicato (2017) <doi:10.32614/RJ-2017-036>. Some functions for continuous times
+    Markov chains depends on the suggested ctmcd package, that, as May 2023, can be
+    retrieved from <https://cran.r-project.org/src/contrib/Archive/ctmcd/ctmcd_1.4.2.tar.gz>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: markovchain
+# Type: Package
+# Title: Easy Handling Discrete Time Markov Chains
+# Version: 0.9.5
+# Authors@R: c( person("Giorgio Alfredo", "Spedicato", role = c("aut", "cre"), email = "spedicato_giorgio@yahoo.it",comment = c(ORCID = "0000-0002-0315-8888")), person("Tae", "Seung Kang", role = "aut"), person("Sai", "Bhargav Yalamanchi", role = "aut"), person("Mildenberger", "Thoralf", role = "ctb", comment = c(ORCID = "0000-0001-7242-1873")), person("Deepak", "Yadav", role = "aut"), person("Ignacio", "Cordon", role = "aut", comment = c(ORCID = "0000-0002-3152-0231")), person("Vandit", "Jain", role = "ctb"), person("Toni", "Giorgino", role="ctb", comment = c(ORCID = "0000-0001-6449-0596")), person("Richel J.C.", "Bilderbeek", role = "ctb", comment = c(ORCID = "0000-0003-1107-7049")), person("Daniel", "Ebbert", email = "daniel@ebbert.nrw", role = "ctb", comment = c(ORCID = "0000-0003-3666-7205")), person("Shreyash", "Maheshwari", email = "coolshreysh1000@gmail.com", role = "ctb") )
+# Maintainer: Giorgio Alfredo Spedicato <spedicato_giorgio@yahoo.it>
+# Description: Functions and S4 methods to create and manage discrete time Markov chains more easily. In addition functions to perform statistical (fitting and drawing random variates) and probabilistic (analysis of their structural proprieties) analysis are provided. See Spedicato (2017) <doi:10.32614/RJ-2017-036>. Some functions for continuous times Markov chains depends on the suggested ctmcd package, that, as May 2023, can be retrieved from <https://cran.r-project.org/src/contrib/Archive/ctmcd/ctmcd_1.4.2.tar.gz>.
+# License: MIT + file LICENSE
+# Depends: R (>= 4.2.0), methods
+# Imports: igraph, Matrix (>= 1.5-0), expm, stats4, parallel, Rcpp (>= 1.0.2), RcppParallel, utils, stats, grDevices
+# Suggests: knitr, testthat, diagram, DiagrammeR, msm, Rsolnp, rmarkdown, ctmcd, bookdown, rticles
+# Enhances: etm
+# VignetteBuilder: rmarkdown, knitr, bookdown, rticles
+# LinkingTo: Rcpp, RcppParallel, RcppArmadillo (>= 0.9.600.4.0)
+# SystemRequirements: GNU make
+# LazyLoad: yes
+# ByteCompile: yes
+# Encoding: UTF-8
+# BugReports: https://github.com/spedygiorgio/markovchain/issues
+# URL: https://github.com/spedygiorgio/markovchain/
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-09-24 08:41:22 UTC; giorgio
+# Author: Giorgio Alfredo Spedicato [aut, cre] (<https://orcid.org/0000-0002-0315-8888>), Tae Seung Kang [aut], Sai Bhargav Yalamanchi [aut], Mildenberger Thoralf [ctb] (<https://orcid.org/0000-0001-7242-1873>), Deepak Yadav [aut], Ignacio Cordon [aut] (<https://orcid.org/0000-0002-3152-0231>), Vandit Jain [ctb], Toni Giorgino [ctb] (<https://orcid.org/0000-0001-6449-0596>), Richel J.C. Bilderbeek [ctb] (<https://orcid.org/0000-0003-1107-7049>), Daniel Ebbert [ctb] (<https://orcid.org/0000-0003-3666-7205>), Shreyash Maheshwari [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-09-24 09:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

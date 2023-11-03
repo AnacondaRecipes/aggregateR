@@ -1,0 +1,99 @@
+{% set version = '3.18.17' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bma
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BMA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BMA/BMA_{{ version }}.tar.gz
+  sha256: 6d8c514fa179f8a48c2105b551a8a08e28ea4375d06150a4b8ab4ccda577daf5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-inline
+    - r-leaps
+    - r-robustbase
+    - r-rrcov
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-inline
+    - r-leaps
+    - r-robustbase
+    - r-rrcov
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BMA')"           # [not win]
+    - "\"%R%\" -e \"library('BMA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://stats.research.att.com/volinsky/bma.html, https://github.com/hanase/BMA
+  license: GPL-2
+  summary: Package for Bayesian model averaging and variable selection for linear models, generalized
+    linear models and survival models (cox regression).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: BMA
+# Version: 3.18.17
+# Date: 2022-04-22
+# Title: Bayesian Model Averaging
+# Author: Adrian Raftery <raftery@uw.edu>, Jennifer Hoeting, Chris Volinsky, Ian Painter, Ka Yee Yeung
+# Maintainer: Hana Sevcikova <hanas@uw.edu>
+# Description: Package for Bayesian model averaging and variable selection for linear models, generalized linear models and survival models (cox regression).
+# Depends: survival, leaps, robustbase, inline, rrcov
+# Imports: methods
+# Suggests: MASS
+# License: GPL (>= 2)
+# URL: http://stats.research.att.com/volinsky/bma.html, https://github.com/hanase/BMA
+# NeedsCompilation: yes
+# Packaged: 2022-04-22 20:58:54 UTC; hana
+# Repository: CRAN
+# Date/Publication: 2022-04-22 21:50:13 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

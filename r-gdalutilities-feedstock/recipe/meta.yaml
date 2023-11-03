@@ -1,0 +1,94 @@
+{% set version = '1.2.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gdalutilities
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gdalUtilities_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gdalUtilities/gdalUtilities_{{ version }}.tar.gz
+  sha256: 2a72e990080ad626205c78edc6614959b564413b7fc23132008b7259723571a7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: terra, stars, RColorBrewer, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-sf >=1.0_11
+
+  run:
+    - r-base
+    - r-sf >=1.0_11
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gdalUtilities')"           # [not win]
+    - "\"%R%\" -e \"library('gdalUtilities')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/JoshOBrien/gdalUtilities/
+  license: GPL-2
+  summary: R's 'sf' package ships with self-contained 'GDAL' executables, including a bare bones
+    interface to several 'GDAL'-related utility programs collectively known as the 'GDAL
+    utilities'. For each of those utilities, this package provides an R wrapper whose
+    formal arguments closely mirror those of the 'GDAL' command line interface. The
+    utilities operate on data stored in files and typically write their output to other
+    files. Therefore, to process data stored in any of R's more common spatial formats
+    (i.e. those supported by the 'sf' and 'terra' packages), first write them to disk,
+    then process them with the package's wrapper functions before reading the outputted
+    results back into R. GDAL function arguments introduced in GDAL version 3.5.2 or
+    earlier are supported.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: gdalUtilities
+# Type: Package
+# Title: Wrappers for 'GDAL' Utilities Executables
+# Version: 1.2.5
+# Date: 2023-08-09
+# Author: Joshua O'Brien
+# Maintainer: Joshua O'Brien <joshmobrien@gmail.com>
+# Description: R's 'sf' package ships with self-contained 'GDAL' executables, including a bare bones interface to several 'GDAL'-related utility programs collectively known as the 'GDAL utilities'. For each of those utilities, this package provides an R wrapper whose formal arguments closely mirror those of the 'GDAL' command line interface. The utilities operate on data stored in files and typically write their output to other files. Therefore, to process data stored in any of R's more common spatial formats (i.e. those supported by the 'sf' and 'terra' packages), first write them to disk, then process them with the package's wrapper functions before reading the outputted results back into R. GDAL function arguments introduced in GDAL version 3.5.2 or earlier are supported.
+# License: GPL (>= 2)
+# URL: https://github.com/JoshOBrien/gdalUtilities/
+# BugReports: https://github.com/JoshOBrien/gdalUtilities/issues/
+# Imports: sf (>= 1.0-11)
+# Suggests: terra, stars, RColorBrewer, testthat
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2023-08-09 23:41:45 UTC; Josh
+# Repository: CRAN
+# Date/Publication: 2023-08-10 16:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

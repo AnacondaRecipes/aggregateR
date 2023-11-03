@@ -1,0 +1,94 @@
+{% set version = '0.6-6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-coarsedatatools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/coarseDataTools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/coarseDataTools/coarseDataTools_{{ version }}.tar.gz
+  sha256: 37b0ed3ee5b90b49d7aef999794086a9a5cbb1128e6214f20f18b62daeef30bd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: markdown, knitr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mcmcpack
+
+  run:
+    - r-base
+    - r-mcmcpack
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('coarseDataTools')"           # [not win]
+    - "\"%R%\" -e \"library('coarseDataTools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://cran.r-project.org/package=coarseDataTools
+  license: GPL-2
+  summary: 'Functions to analyze coarse data. Specifically, it contains functions to (1) fit
+    parametric accelerated failure time models to interval-censored survival time data,
+    and (2) estimate the case-fatality ratio in scenarios with under-reporting. This
+    package''s development was motivated by applications to infectious disease: in particular,
+    problems with estimating the incubation period and the case fatality ratio of a
+    given disease.  Sample data files are included in the package. See Reich et al.
+    (2009) <doi:10.1002/sim.3659>, Reich et al. (2012) <doi:10.1111/j.1541-0420.2011.01709.x>,
+    and Lessler et al. (2009) <doi:10.1016/S1473-3099(09)70069-6>.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: coarseDataTools
+# Version: 0.6-6
+# Date: 2021-12-07
+# Title: Analysis of Coarsely Observed Data
+# Authors@R: c(person("Nicholas G.", "Reich", email = "nick@umass.edu", role = c("aut", "cre")), person("Justin", "Lessler", email = "jlessler@unc.edu", role = "aut"), person("Andrew", "Azman", email = "andrewazman@gmail.com", role = "aut"), person("Zhian N.", "Kamvar", email = "zkamvar@gmail.com", role = "ctb"))
+# Maintainer: Nicholas G. Reich <nick@umass.edu>
+# License: GPL (>= 2)
+# URL: https://cran.r-project.org/package=coarseDataTools
+# Encoding: UTF-8
+# Imports: MCMCpack, graphics, stats, methods
+# Suggests: markdown, knitr
+# Description: Functions to analyze coarse data. Specifically, it contains functions to (1) fit parametric accelerated failure time models to interval-censored survival time data, and (2) estimate the case-fatality ratio in scenarios with under-reporting. This package's development was motivated by applications to infectious disease: in particular, problems with estimating the incubation period and the case fatality ratio of a given disease.  Sample data files are included in the package. See Reich et al. (2009) <doi:10.1002/sim.3659>, Reich et al. (2012) <doi:10.1111/j.1541-0420.2011.01709.x>, and Lessler et al. (2009) <doi:10.1016/S1473-3099(09)70069-6>.
+# Collate: 'CFR_estimation.R' 'dic.fit.mcmc.R' 'dic.fit.R' 'get.obs.type.R' 'S4stuff.R' 'sampleSizeSimulation.R' 'coarseDataTools-package.R'
+# VignetteBuilder: knitr
+# RoxygenNote: 7.1.2
+# NeedsCompilation: no
+# Packaged: 2021-12-09 15:50:04 UTC; ngr
+# Author: Nicholas G. Reich [aut, cre], Justin Lessler [aut], Andrew Azman [aut], Zhian N. Kamvar [ctb]
+# Depends: R (>= 3.5.0)
+# Repository: CRAN
+# Date/Publication: 2021-12-09 17:20:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

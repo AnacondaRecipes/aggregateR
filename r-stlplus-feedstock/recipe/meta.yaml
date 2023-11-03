@@ -1,0 +1,107 @@
+{% set version = '0.5.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stlplus
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/stlplus_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/stlplus/stlplus_{{ version }}.tar.gz
+  sha256: e51be75503d199cc53d6e323f97dd414f3750f180faf4c9e4e5fa0547547e290
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-lattice
+    - r-yaimpute
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-lattice
+    - r-yaimpute
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('stlplus')"           # [not win]
+    - "\"%R%\" -e \"library('stlplus')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/hafen/stlplus
+  license: BSD_3_clause
+  summary: Decompose a time series into seasonal, trend, and remainder components using an implementation
+    of Seasonal Decomposition of Time Series by Loess (STL) that provides several enhancements
+    over the STL method in the stats package.  These enhancements include handling missing
+    values, providing higher order (quadratic) loess smoothing with automated parameter
+    choices, frequency component smoothing beyond the seasonal and trend components,
+    and some basic plot methods for diagnostics.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_3_clause'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: stlplus
+# Type: Package
+# Title: Enhanced Seasonal Decomposition of Time Series by Loess
+# Version: 0.5.1
+# Date: 2016-01-05
+# Authors@R: person("Ryan", "Hafen", email = "rhafen@gmail.com", role = c("aut", "cre"))
+# Maintainer: Ryan Hafen <rhafen@gmail.com>
+# Description: Decompose a time series into seasonal, trend, and remainder components using an implementation of Seasonal Decomposition of Time Series by Loess (STL) that provides several enhancements over the STL method in the stats package.  These enhancements include handling missing values, providing higher order (quadratic) loess smoothing with automated parameter choices, frequency component smoothing beyond the seasonal and trend components, and some basic plot methods for diagnostics.
+# LazyLoad: yes
+# LazyData: yes
+# NeedsCompilation: yes
+# Imports: lattice, yaImpute, stats, Rcpp
+# Suggests: testthat
+# LinkingTo: Rcpp
+# License: BSD_3_clause + file LICENSE
+# URL: https://github.com/hafen/stlplus
+# BugReports: https://github.com/hafen/stlplus/issues
+# Note: This is experimental software distributed free of charge and comes with no warranty!  Exercise professional caution.
+# RoxygenNote: 5.0.1
+# Packaged: 2016-01-06 09:27:21 UTC; hafen
+# Author: Ryan Hafen [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2016-01-06 10:42:19
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

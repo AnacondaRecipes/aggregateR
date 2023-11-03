@@ -1,0 +1,110 @@
+{% set version = '0.7.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bbotk
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bbotk_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bbotk/bbotk_{{ version }}.tar.gz
+  sha256: a9de87ebdf45012c6bb5bf86c0f0799bbc7441d6298310127571a41dd7cc80bf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: adagio, emoa, GenSA, irace (>= 3.5), knitr, nloptr, progressr, rmarkdown, testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-checkmate >=2.0.0
+    - r-data.table
+    - r-lgr
+    - r-mlr3misc >=0.11.0
+    - r-paradox >=0.7.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-r6
+    - r-checkmate >=2.0.0
+    - r-data.table
+    - r-lgr
+    - r-mlr3misc >=0.11.0
+    - r-paradox >=0.7.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bbotk')"           # [not win]
+    - "\"%R%\" -e \"library('bbotk')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://bbotk.mlr-org.com, https://github.com/mlr-org/bbotk
+  license: LGPL-3
+  summary: Features highly configurable search spaces via the 'paradox' package and optimizes
+    every user-defined objective function. The package includes several optimization
+    algorithms e.g. Random Search, Iterated Racing, Bayesian Optimization (in 'mlr3mbo')
+    and Hyperband (in 'mlr3hyperband'). bbotk is the base package of 'mlr3tuning', 'mlr3fselect'
+    and 'miesmuschel'.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: bbotk
+# Title: Black-Box Optimization Toolkit
+# Version: 0.7.2
+# Authors@R: c(person(given = "Marc", family = "Becker", role = c("cre", "aut"), email = "marcbecker@posteo.de", comment = c(ORCID = "0000-0002-8115-0400")), person(given = "Jakob", family = "Richter", role = "aut", email = "jakob1richter@gmail.com", comment = c(ORCID = "0000-0003-4481-5554")), person(given = "Michel", family = "Lang", role = "aut", email = "michellang@gmail.com", comment = c(ORCID = "0000-0001-9754-0393")), person(given = "Bernd", family = "Bischl", role = "aut", email = "bernd_bischl@gmx.net", comment = c(ORCID = "0000-0001-6002-6980")), person(given = "Martin", family = "Binder", role = "aut", email = "martin.binder@mail.com"), person(given = "Olaf", family = "Mersmann", role = "ctb", email = "olafm@statistik.tu-dortmund.de"))
+# Description: Features highly configurable search spaces via the 'paradox' package and optimizes every user-defined objective function. The package includes several optimization algorithms e.g. Random Search, Iterated Racing, Bayesian Optimization (in 'mlr3mbo') and Hyperband (in 'mlr3hyperband'). bbotk is the base package of 'mlr3tuning', 'mlr3fselect' and 'miesmuschel'.
+# License: LGPL-3
+# URL: https://bbotk.mlr-org.com, https://github.com/mlr-org/bbotk
+# BugReports: https://github.com/mlr-org/bbotk/issues
+# Depends: paradox (>= 0.7.0), R (>= 3.1.0)
+# Imports: checkmate (>= 2.0.0), data.table, lgr, methods, mlr3misc (>= 0.11.0), R6
+# Suggests: adagio, emoa, GenSA, irace (>= 3.5), knitr, nloptr, progressr, rmarkdown, testthat (>= 3.0.0)
+# VignetteBuilder: knitr
+# Config/testthat/edition: 3
+# Config/testthat/parallel: false
+# Encoding: UTF-8
+# Language: en-US
+# NeedsCompilation: yes
+# RoxygenNote: 7.2.2
+# Collate: 'Archive.R' 'ArchiveBest.R' 'CallbackOptimization.R' 'Codomain.R' 'ContextOptimization.R' 'Objective.R' 'ObjectiveRFun.R' 'ObjectiveRFunDt.R' 'ObjectiveRFunMany.R' 'OptimInstance.R' 'OptimInstanceMultiCrit.R' 'OptimInstanceSingleCrit.R' 'mlr_optimizers.R' 'Optimizer.R' 'OptimizerCmaes.R' 'OptimizerDesignPoints.R' 'OptimizerFocusSearch.R' 'OptimizerGenSA.R' 'OptimizerGridSearch.R' 'OptimizerIrace.R' 'OptimizerNLoptr.R' 'OptimizerRandomSearch.R' 'Progressor.R' 'mlr_terminators.R' 'Terminator.R' 'TerminatorClockTime.R' 'TerminatorCombo.R' 'TerminatorEvals.R' 'TerminatorNone.R' 'TerminatorPerfReached.R' 'TerminatorRunTime.R' 'TerminatorStagnation.R' 'TerminatorStagnationBatch.R' 'assertions.R' 'bb_optimize.R' 'bbotk_reflections.R' 'bibentries.R' 'helper.R' 'mlr_callbacks.R' 'nds_selection.R' 'reexport.R' 'sugar.R' 'zzz.R'
+# Packaged: 2022-12-08 07:20:23 UTC; marc
+# Author: Marc Becker [cre, aut] (<https://orcid.org/0000-0002-8115-0400>), Jakob Richter [aut] (<https://orcid.org/0000-0003-4481-5554>), Michel Lang [aut] (<https://orcid.org/0000-0001-9754-0393>), Bernd Bischl [aut] (<https://orcid.org/0000-0001-6002-6980>), Martin Binder [aut], Olaf Mersmann [ctb]
+# Maintainer: Marc Becker <marcbecker@posteo.de>
+# Repository: CRAN
+# Date/Publication: 2022-12-08 08:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,90 @@
+{% set version = '1.7.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mrbin
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mrbin_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mrbin/mrbin_{{ version }}.tar.gz
+  sha256: ad6a85d71c0eeeba1e2972b4a842bf01eadc2614652f2b465357a6ae109a6786
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: parallel, keras
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mrbin')"           # [not win]
+    - "\"%R%\" -e \"library('mrbin')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.kleinomicslab.com/software/, https://github.com/kleinomicslab/mrbin
+  license: GPL-3
+  summary: A collection of functions for processing and analyzing metabolite data. The namesake
+    function mrbin() converts 1D or 2D Nuclear Magnetic Resonance data into a matrix
+    of values suitable for further data analysis and performs basic processing steps
+    in a reproducible way. Negative values, a common issue in such data, can be replaced
+    by positive values (<doi:10.1021/acs.jproteome.0c00684>). All used parameters are
+    stored in a readable text file and can be restored from that file to enable exact
+    reproduction of the data at a later time. The function fia() ranks features according
+    to their impact on classifier models, especially artificial neural network models.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: mrbin
+# Title: Metabolomics Data Analysis Functions
+# Version: 1.7.4
+# Authors@R: person(given = "Matthias", family = "Klein", role = c("aut", "cre"), email = "matthias.s.klein@gmx.net", comment = c(ORCID = "0000-0001-7455-5381"))
+# Description: A collection of functions for processing and analyzing metabolite data. The namesake function mrbin() converts 1D or 2D Nuclear Magnetic Resonance data into a matrix of values suitable for further data analysis and performs basic processing steps in a reproducible way. Negative values, a common issue in such data, can be replaced by positive values (<doi:10.1021/acs.jproteome.0c00684>). All used parameters are stored in a readable text file and can be restored from that file to enable exact reproduction of the data at a later time. The function fia() ranks features according to their impact on classifier models, especially artificial neural network models.
+# Imports: grDevices, graphics, stats, utils, methods
+# Depends: R (>= 2.10)
+# License: GPL-3
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Suggests: parallel, keras
+# VignetteBuilder: utils
+# URL: http://www.kleinomicslab.com/software/, https://github.com/kleinomicslab/mrbin
+# NeedsCompilation: no
+# Packaged: 2023-04-11 02:12:23 UTC; klein.663
+# Author: Matthias Klein [aut, cre] (<https://orcid.org/0000-0001-7455-5381>)
+# Maintainer: Matthias Klein <matthias.s.klein@gmx.net>
+# Repository: CRAN
+# Date/Publication: 2023-04-11 03:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

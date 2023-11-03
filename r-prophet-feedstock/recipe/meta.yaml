@@ -1,0 +1,139 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-prophet
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/prophet_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/prophet/prophet_{{ version }}.tar.gz
+  sha256: 94bea364c7c625bd34fee08da221b7a6c4d3ef939869f22229b2273fb7f2b91a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, testthat, readr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh >=1.66.0
+    - r-rcpp >=0.12.0
+    - r-rcppeigen >=0.3.3.3.0
+    - r-rcppparallel >=5.0.1
+    - r-stanheaders
+    - r-dplyr >=0.7.7
+    - r-dygraphs >=1.1.1.4
+    - r-extradistr
+    - r-ggplot2
+    - r-lubridate
+    - r-rlang >=0.3.0.1
+    - r-rstan >=2.18.1
+    - r-rstantools >=2.0.0
+    - r-scales
+    - r-tidyr >=0.6.1
+    - r-xts
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.66.0
+    - r-rcpp >=0.12.0
+    - r-rcppeigen >=0.3.3.3.0
+    - r-rcppparallel >=5.0.1
+    - r-stanheaders
+    - r-dplyr >=0.7.7
+    - r-dygraphs >=1.1.1.4
+    - r-extradistr
+    - r-ggplot2
+    - r-lubridate
+    - r-rlang >=0.3.0.1
+    - r-rstan >=2.18.1
+    - r-rstantools >=2.0.0
+    - r-scales
+    - r-tidyr >=0.6.1
+    - r-xts
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('prophet')"           # [not win]
+    - "\"%R%\" -e \"library('prophet')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/facebook/prophet
+  license: MIT
+  summary: Implements a procedure for forecasting time series data based on an additive model
+    where non-linear trends are fit with yearly, weekly, and daily seasonality, plus
+    holiday effects. It works best with time series that have strong seasonal effects
+    and several seasons of historical data. Prophet is robust to missing data and shifts
+    in the trend, and typically handles outliers well.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: prophet
+# Title: Automatic Forecasting Procedure
+# Version: 1.0
+# Date: 2021-03-08
+# Authors@R: c( person("Sean", "Taylor", email = "sjtz@pm.me", role = c("cre", "aut")), person("Ben", "Letham", email = "bletham@fb.com", role = "aut") )
+# Description: Implements a procedure for forecasting time series data based on an additive model where non-linear trends are fit with yearly, weekly, and daily seasonality, plus holiday effects. It works best with time series that have strong seasonal effects and several seasons of historical data. Prophet is robust to missing data and shifts in the trend, and typically handles outliers well.
+# URL: https://github.com/facebook/prophet
+# BugReports: https://github.com/facebook/prophet/issues
+# Depends: R (>= 3.4.0), Rcpp (>= 0.12.0), rlang (>= 0.3.0.1)
+# Imports: dplyr (>= 0.7.7), dygraphs (>= 1.1.1.4), extraDistr, ggplot2, grid, lubridate, methods, RcppParallel (>= 5.0.1), rstan (>= 2.18.1), rstantools (>= 2.0.0), scales, StanHeaders, stats, tidyr (>= 0.6.1), xts
+# Suggests: knitr, testthat, readr, rmarkdown
+# SystemRequirements: GNU make, C++11
+# Biarch: true
+# License: MIT + file LICENSE
+# LinkingTo: BH (>= 1.66.0), Rcpp (>= 0.12.0), RcppParallel (>= 5.0.1), RcppEigen (>= 0.3.3.3.0), rstan (>= 2.18.1), StanHeaders (>= 2.18.0)
+# LazyData: true
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# RoxygenNote: 7.1.1
+# NeedsCompilation: yes
+# Packaged: 2021-03-30 00:55:01 UTC; seant
+# Author: Sean Taylor [cre, aut], Ben Letham [aut]
+# Maintainer: Sean Taylor <sjtz@pm.me>
+# Repository: CRAN
+# Date/Publication: 2021-03-30 12:10:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

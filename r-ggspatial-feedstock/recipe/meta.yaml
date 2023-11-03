@@ -1,0 +1,104 @@
+{% set version = '1.1.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ggspatial
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ggspatial_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ggspatial/ggspatial_{{ version }}.tar.gz
+  sha256: 170d0a9a9ef22f69d85b30cacea8bd3eb2e710342aad5a10dbc84b3606730393
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: prettymapr, knitr, rmarkdown, sp, raster, terra, testthat (>= 3.0.0), dplyr, withr, ggrepel, stars, covr, vdiffr, lwgeom
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-abind
+    - r-ggplot2 >=3.0.0
+    - r-glue
+    - r-rlang
+    - r-rosm >=0.2
+    - r-scales
+    - r-sf
+    - r-tibble
+    - r-tidyr
+
+  run:
+    - r-base
+    - r-abind
+    - r-ggplot2 >=3.0.0
+    - r-glue
+    - r-rlang
+    - r-rosm >=0.2
+    - r-scales
+    - r-sf
+    - r-tibble
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ggspatial')"           # [not win]
+    - "\"%R%\" -e \"library('ggspatial')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://paleolimbot.github.io/ggspatial/, https://github.com/paleolimbot/ggspatial
+  license: GPL-3
+  summary: Spatial data plus the power of the ggplot2 framework means easier mapping when input
+    data are already in the form of spatial objects.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: ggspatial
+# Type: Package
+# Title: Spatial Data Framework for ggplot2
+# Version: 1.1.9
+# Authors@R: c( person("Dewey", "Dunnington", email = "dewey@fishandwhistle.net", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9415-4582") ), person("Brent", "Thorne", role = "ctb", comment = c(ORCID = "0000-0002-1099-3857")), person("Diego", "Hernangomez", role = "ctb", comment = c(ORCID = "0000-0001-8457-4658")) )
+# Maintainer: Dewey Dunnington <dewey@fishandwhistle.net>
+# Description: Spatial data plus the power of the ggplot2 framework means easier mapping when input data are already in the form of spatial objects.
+# License: GPL-3
+# Depends: R (>= 2.10)
+# Imports: sf, ggplot2 (>= 3.0.0), rosm (>= 0.2), abind, methods, tibble, scales, tidyr, rlang, grid, glue
+# Suggests: prettymapr, knitr, rmarkdown, sp, raster, terra, testthat (>= 3.0.0), dplyr, withr, ggrepel, stars, covr, vdiffr, lwgeom
+# URL: https://paleolimbot.github.io/ggspatial/, https://github.com/paleolimbot/ggspatial
+# BugReports: https://github.com/paleolimbot/ggspatial/issues
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2023-08-15 19:24:53 UTC; deweydunnington
+# Author: Dewey Dunnington [aut, cre] (<https://orcid.org/0000-0002-9415-4582>), Brent Thorne [ctb] (<https://orcid.org/0000-0002-1099-3857>), Diego Hernangomez [ctb] (<https://orcid.org/0000-0001-8457-4658>)
+# Repository: CRAN
+# Date/Publication: 2023-08-17 15:32:38 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

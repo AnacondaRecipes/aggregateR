@@ -1,0 +1,106 @@
+{% set version = '0.7.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-questionr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/questionr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/questionr/questionr_{{ version }}.tar.gz
+  sha256: af72e59fe652c6063282a7e5b0f487993b9361cc9ed052a632d64a5a6db76ba9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, roxygen2, dplyr, ggplot2, tidyr, janitor, forcats, knitr, rmarkdown, survey, Hmisc
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-classint
+    - r-highr
+    - r-htmltools
+    - r-labelled >=2.6.0
+    - r-miniui
+    - r-rlang
+    - r-rstudioapi
+    - r-shiny >=1.0.5
+    - r-styler
+
+  run:
+    - r-base
+    - r-classint
+    - r-highr
+    - r-htmltools
+    - r-labelled >=2.6.0
+    - r-miniui
+    - r-rlang
+    - r-rstudioapi
+    - r-shiny >=1.0.5
+    - r-styler
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('questionr')"           # [not win]
+    - "\"%R%\" -e \"library('questionr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://juba.github.io/questionr/
+  license: GPL-2
+  summary: 'Set of functions to make the processing and analysis of surveys easier : interactive
+    shiny apps and addins for data recoding, contingency tables, dataset metadata handling,
+    and several convenience functions.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: questionr
+# Maintainer: Julien Barnier <julien.barnier@cnrs.fr>
+# Authors@R: c(person("Julien", "Barnier", email="julien.barnier@cnrs.fr", role=c("aut","cre")), person("Francois", "Briatte", email="f.briatte@gmail.com", role="aut"), person("Joseph", "Larmarange", email="joseph@larmarange.net", role="aut"))
+# Version: 0.7.8
+# Date: 2023-01-31
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# Title: Functions to Make Surveys Processing Easier
+# Description: Set of functions to make the processing and analysis of surveys easier : interactive shiny apps and addins for data recoding, contingency tables, dataset metadata handling, and several convenience functions.
+# Depends: R (>= 3.5.0)
+# Imports: shiny (>= 1.0.5), miniUI, rstudioapi, highr, styler, classInt, htmltools, graphics, stats, utils, rlang, labelled (>= 2.6.0)
+# Suggests: testthat, roxygen2, dplyr, ggplot2, tidyr, janitor, forcats, knitr, rmarkdown, survey, Hmisc
+# SystemRequirements: xclip (Linux)
+# VignetteBuilder: knitr
+# URL: https://juba.github.io/questionr/
+# BugReports: https://github.com/juba/questionr/issues
+# RoxygenNote: 7.1.2
+# NeedsCompilation: no
+# Packaged: 2023-01-31 13:05:25 UTC; julien
+# Author: Julien Barnier [aut, cre], Francois Briatte [aut], Joseph Larmarange [aut]
+# Repository: CRAN
+# Date/Publication: 2023-01-31 14:30:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

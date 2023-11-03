@@ -1,0 +1,91 @@
+{% set version = '0.4.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ggjoy
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ggjoy_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ggjoy/ggjoy_{{ version }}.tar.gz
+  sha256: d2f778bc40203d7fbb7c81b40beed8614c36ea10448e911663cc6109aa685504
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggplot2
+    - r-ggridges >=0.4.0
+
+  run:
+    - r-base
+    - r-ggplot2
+    - r-ggridges >=0.4.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ggjoy')"           # [not win]
+    - "\"%R%\" -e \"library('ggjoy')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/clauswilke/ggjoy
+  license: GPL-2
+  summary: Joyplots provide a convenient way of visualizing changes in distributions over time
+    or space. This package enables the creation of such plots in 'ggplot2'.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: ggjoy
+# Type: Package
+# Title: Joyplots in 'ggplot2'
+# Version: 0.4.1
+# Authors@R: c( person("Claus O.", "Wilke", , "wilke@austin.utexas.edu", c("cre", "aut")))
+# Description: Joyplots provide a convenient way of visualizing changes in distributions over time or space. This package enables the creation of such plots in 'ggplot2'.
+# URL: https://github.com/clauswilke/ggjoy
+# Depends: R (>= 3.2), ggridges (>= 0.4.0)
+# Imports: ggplot2
+# License: GPL-2 | file LICENSE
+# LazyData: true
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# Collate: 'ggjoy.R'
+# RoxygenNote: 6.0.1.9000
+# NeedsCompilation: no
+# Packaged: 2018-05-18 03:36:32 UTC; wilke
+# Author: Claus O. Wilke [cre, aut]
+# Maintainer: Claus O. Wilke <wilke@austin.utexas.edu>
+# Repository: CRAN
+# Date/Publication: 2018-05-18 04:21:54 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,103 @@
+{% set version = '2.3-10' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sparr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sparr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sparr/sparr_{{ version }}.tar.gz
+  sha256: f00383febda4e626078124b92289b0503d4ab0c82f920b9c961bf13bf733b70d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: fftwtools (>= 0.9.8)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-doparallel
+    - r-foreach
+    - r-misc3d
+    - r-spatstat >=2.3_0
+    - r-spatstat.explore
+    - r-spatstat.geom
+    - r-spatstat.random
+    - r-spatstat.utils
+
+  run:
+    - r-base
+    - r-doparallel
+    - r-foreach
+    - r-misc3d
+    - r-spatstat >=2.3_0
+    - r-spatstat.explore
+    - r-spatstat.geom
+    - r-spatstat.random
+    - r-spatstat.utils
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sparr')"           # [not win]
+    - "\"%R%\" -e \"library('sparr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://tilmandavies.github.io/sparr/, https://github.com/tilmandavies/sparr/
+  license: GPL-2
+  summary: 'Provides functions to estimate kernel-smoothed spatial and spatio-temporal densities
+    and relative risk functions, and perform subsequent inference. Methodological details
+    can be found in the accompanying tutorial: Davies et al. (2018) <DOI:10.1002/sim.7577>.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: sparr
+# Type: Package
+# Title: Spatial and Spatiotemporal Relative Risk
+# Version: 2.3-10
+# Date: 2023-03-08
+# Authors@R: c( person(c("Tilman", "M."), "Davies", role = c("aut", "cre"), email = "tilman.davies@otago.ac.nz"), person(c("Jonathan", "C."), "Marshall", role = c("aut"), email = "j.c.marshall@massey.ac.nz"))
+# Description: Provides functions to estimate kernel-smoothed spatial and spatio-temporal densities and relative risk functions, and perform subsequent inference. Methodological details can be found in the accompanying tutorial: Davies et al. (2018) <DOI:10.1002/sim.7577>.
+# Depends: R (>= 2.10.1), spatstat (>= 2.3-0)
+# Imports: spatstat.utils, spatstat.geom, spatstat.explore, spatstat.random, doParallel, parallel, foreach, misc3d
+# Suggests: fftwtools (>= 0.9.8)
+# License: GPL (>= 2)
+# LazyLoad: yes
+# NeedsCompilation: no
+# RoxygenNote: 7.2.3
+# URL: https://tilmandavies.github.io/sparr/, https://github.com/tilmandavies/sparr/
+# BugReports: https://github.com/tilmandavies/sparr/issues/
+# Packaged: 2023-03-08 22:53:06 UTC; tilmandavies
+# Author: Tilman M. Davies [aut, cre], Jonathan C. Marshall [aut]
+# Maintainer: Tilman M. Davies <tilman.davies@otago.ac.nz>
+# Repository: CRAN
+# Date/Publication: 2023-03-08 23:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

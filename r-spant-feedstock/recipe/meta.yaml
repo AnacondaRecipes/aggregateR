@@ -1,0 +1,132 @@
+{% set version = '2.16.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spant
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/spant_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/spant/spant_{{ version }}.tar.gz
+  sha256: f1a62f275a4fed07289981e32f3a1642f700fe15f840681f9fe0a696b7adc2a6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: viridisLite, shiny, ggplot2, miniUI, knitr, rmarkdown, testthat, ragg, doParallel
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rnifti
+    - r-rniftyreg
+    - r-abind
+    - r-expm
+    - r-fields
+    - r-irlba
+    - r-jsonlite
+    - r-minpack.lm
+    - r-mmand
+    - r-nloptr
+    - r-numderiv
+    - r-plyr
+    - r-pracma
+    - r-ptw
+    - r-signal
+    - r-smoother
+    - r-stringr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rnifti
+    - r-rniftyreg
+    - r-abind
+    - r-expm
+    - r-fields
+    - r-irlba
+    - r-jsonlite
+    - r-minpack.lm
+    - r-mmand
+    - r-nloptr
+    - r-numderiv
+    - r-plyr
+    - r-pracma
+    - r-ptw
+    - r-signal
+    - r-smoother
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('spant')"           # [not win]
+    - "\"%R%\" -e \"library('spant')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://martin3141.github.io/spant/, https://github.com/martin3141/spant/
+  license: GPL-3
+  summary: 'Tools for reading, visualising and processing Magnetic Resonance Spectroscopy data.
+    The package includes methods for spectral fitting: Wilson (2021) <DOI:10.1002/mrm.28385>
+    and spectral alignment: Wilson (2018) <DOI:10.1002/mrm.27605>.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: spant
+# Type: Package
+# Title: MR Spectroscopy Analysis Tools
+# Version: 2.16.0
+# Date: 2023-10-23
+# Authors@R: c( person("Martin", "Wilson", email = "martin@pipegrep.co.uk", role = c("cre", "aut"), comment = c(ORCID = "0000-0002-2089-3956")), person("Yong", "Wang", role = "ctb"), person("John", "Muschelli", role = "ctb"))
+# Description: Tools for reading, visualising and processing Magnetic Resonance Spectroscopy data. The package includes methods for spectral fitting: Wilson (2021) <DOI:10.1002/mrm.28385> and spectral alignment: Wilson (2018) <DOI:10.1002/mrm.27605>.
+# BugReports: https://github.com/martin3141/spant/issues/
+# License: GPL-3
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# LazyData: yes
+# Depends: R (>= 2.10)
+# Imports: abind, plyr, pracma, stringr, expm, signal, minpack.lm, utils, graphics, grDevices, smoother, ptw, mmand, RNifti, RNiftyReg, fields, numDeriv, nloptr, irlba, jsonlite
+# Suggests: viridisLite, shiny, ggplot2, miniUI, knitr, rmarkdown, testthat, ragg, doParallel
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# Language: en-GB
+# URL: https://martin3141.github.io/spant/, https://github.com/martin3141/spant/
+# Packaged: 2023-10-23 14:35:31 UTC; martinwilson
+# Author: Martin Wilson [cre, aut] (<https://orcid.org/0000-0002-2089-3956>), Yong Wang [ctb], John Muschelli [ctb]
+# Maintainer: Martin Wilson <martin@pipegrep.co.uk>
+# Repository: CRAN
+# Date/Publication: 2023-10-23 15:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

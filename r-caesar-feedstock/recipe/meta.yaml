@@ -1,0 +1,91 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-caesar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/caesar_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/caesar/caesar_{{ version }}.tar.gz
+  sha256: 42dd9e6a63a0496517de70d2c3b1ed64b4d1520e87d2e516321d29c2424d819f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr, knitr, rmarkdown, spelling
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-binhf
+
+  run:
+    - r-base
+    - r-binhf
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('caesar')"           # [not win]
+    - "\"%R%\" -e \"library('caesar')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jacobkap/caesar
+  license: MIT
+  summary: Encrypts and decrypts strings using either the Caesar cipher or a pseudorandom number
+    generation (using set.seed()) method.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: caesar
+# Type: Package
+# Title: Encrypts and Decrypts Strings
+# Version: 1.1.0
+# Authors@R: person("Jacob", "Kaplan", email = "jkkaplan6@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0601-0387"))
+# Description: Encrypts and decrypts strings using either the Caesar cipher or a pseudorandom number generation (using set.seed()) method.
+# Imports: binhf
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# URL: https://github.com/jacobkap/caesar
+# BugReports: https://github.com/jacobkap/caesar/issues
+# RoxygenNote: 7.1.1
+# Suggests: testthat, covr, knitr, rmarkdown, spelling
+# VignetteBuilder: knitr
+# Language: en-US
+# Depends: R (>= 2.10)
+# NeedsCompilation: no
+# Packaged: 2020-09-03 13:39:29 UTC; user
+# Author: Jacob Kaplan [aut, cre] (<https://orcid.org/0000-0002-0601-0387>)
+# Maintainer: Jacob Kaplan <jkkaplan6@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2020-09-03 13:52:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,98 @@
+{% set version = '0.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-localmodel
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/localModel_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/localModel/localModel_{{ version }}.tar.gz
+  sha256: 526bb0d7951bfabd8b22de34185b1ab52a62268aa4dff5609d99d2c6e01a7d8a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, knitr, rmarkdown, randomForest, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dalex
+    - r-ggplot2
+    - r-glmnet
+    - r-ingredients
+    - r-partykit
+
+  run:
+    - r-base
+    - r-dalex
+    - r-ggplot2
+    - r-glmnet
+    - r-ingredients
+    - r-partykit
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('localModel')"           # [not win]
+    - "\"%R%\" -e \"library('localModel')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ModelOriented/localModel
+  license: GPL-3
+  summary: Local explanations of machine learning models describe, how features contributed to
+    a single prediction. This package implements an explanation method based on LIME
+    (Local Interpretable Model-agnostic Explanations, see Tulio Ribeiro, Singh, Guestrin
+    (2016) <doi:10.1145/2939672.2939778>) in which interpretable inputs are created
+    based on local rather than global behaviour of each original feature.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: localModel
+# Title: LIME-Based Explanations with Interpretable Inputs Based on Ceteris Paribus Profiles
+# Version: 0.5
+# Authors@R: c(person("Przemyslaw", "Biecek", email = "przemyslaw.biecek@gmail.com", role = c("aut", "cre")), person("Mateusz", "Staniak", role = "aut"), person("Krystian", "Igras", role = "ctb"), person("Alicja", "Gosiewska", role = "ctb"), person("Harel", "Lustiger", role = "ctb"), person("Willy", "Tadema", role = "ctb") )
+# Maintainer: Przemyslaw Biecek <przemyslaw.biecek@gmail.com>
+# Description: Local explanations of machine learning models describe, how features contributed to a single prediction. This package implements an explanation method based on LIME (Local Interpretable Model-agnostic Explanations, see Tulio Ribeiro, Singh, Guestrin (2016) <doi:10.1145/2939672.2939778>) in which interpretable inputs are created based on local rather than global behaviour of each original feature.
+# URL: https://github.com/ModelOriented/localModel
+# BugReports: https://github.com/ModelOriented/localModel/issues
+# Depends: R (>= 3.5)
+# License: GPL
+# Encoding: UTF-8
+# Imports: glmnet, DALEX, ggplot2, partykit, ingredients
+# RoxygenNote: 7.1.1
+# Suggests: covr, knitr, rmarkdown, randomForest, testthat
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2021-09-03 19:29:03 UTC; pbiecek
+# Author: Przemyslaw Biecek [aut, cre], Mateusz Staniak [aut], Krystian Igras [ctb], Alicja Gosiewska [ctb], Harel Lustiger [ctb], Willy Tadema [ctb]
+# Repository: CRAN
+# Date/Publication: 2021-09-14 16:50:01 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

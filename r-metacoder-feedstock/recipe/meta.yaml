@@ -1,0 +1,138 @@
+{% set version = '0.3.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-metacoder
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/metacoder_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/metacoder/metacoder_{{ version }}.tar.gz
+  sha256: a2ab9675e1b08f4bf7027a74c4e7a1777e71850420e0a901784da0ddbdc5f896
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, zlibbioc, BiocManager, phyloseq, phylotate, traits, biomformat, DESeq2
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ga
+    - r-r6
+    - r-rcurl
+    - r-rcpp
+    - r-ape
+    - r-cowplot
+    - r-crayon
+    - r-dplyr
+    - r-ggfittext
+    - r-ggplot2
+    - r-igraph
+    - r-lazyeval
+    - r-magrittr
+    - r-readr
+    - r-rlang
+    - r-seqinr
+    - r-stringr
+    - r-taxize
+    - r-tibble
+    - r-vegan
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-ga
+    - r-r6
+    - r-rcurl
+    - r-rcpp
+    - r-ape
+    - r-cowplot
+    - r-crayon
+    - r-dplyr
+    - r-ggfittext
+    - r-ggplot2
+    - r-igraph
+    - r-lazyeval
+    - r-magrittr
+    - r-readr
+    - r-rlang
+    - r-seqinr
+    - r-stringr
+    - r-taxize
+    - r-tibble
+    - r-vegan
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('metacoder')"           # [not win]
+    - "\"%R%\" -e \"library('metacoder')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://grunwaldlab.github.io/metacoder_documentation/
+  license: GPL-2 | GPL-3
+  summary: A set of tools for parsing, manipulating, and graphing data classified by a hierarchy
+    (e.g. a taxonomy).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: metacoder
+# Title: Tools for Parsing, Manipulating, and Graphing Taxonomic Abundance Data
+# Version: 0.3.6
+# Authors@R: c(person("Zachary", "Foster", email = "zacharyfoster1989@gmail.com", role = c("aut", "cre")), person("Niklaus", "Grunwald", email = "grunwaln@science.oregonstate.edu", role = c("ths")), person("Rob", "Gilmore", email = "rgilmore@ummc.edu", role = "ctb"))
+# Maintainer: Zachary Foster <zacharyfoster1989@gmail.com>
+# Description: A set of tools for parsing, manipulating, and graphing data classified by a hierarchy (e.g. a taxonomy).
+# Depends: R (>= 3.0.2)
+# License: GPL-2 | GPL-3
+# LazyData: true
+# URL: https://grunwaldlab.github.io/metacoder_documentation/
+# BugReports: https://github.com/grunwaldlab/metacoder/issues
+# Imports: stringr, ggplot2, igraph, grid, taxize, seqinr, RCurl, ape, stats, grDevices, utils, lazyeval, dplyr, magrittr, readr, rlang, ggfittext, vegan, cowplot, GA, Rcpp, crayon, tibble, R6
+# Suggests: knitr, rmarkdown, testthat, zlibbioc, BiocManager, phyloseq, phylotate, traits, biomformat, DESeq2
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# Date: 2023-04-03
+# Encoding: UTF-8
+# biocViews:
+# LinkingTo: Rcpp
+# NeedsCompilation: yes
+# Packaged: 2023-04-04 01:17:17 UTC; fosterz
+# Author: Zachary Foster [aut, cre], Niklaus Grunwald [ths], Rob Gilmore [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-04-04 02:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

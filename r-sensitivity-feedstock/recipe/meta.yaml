@@ -1,0 +1,104 @@
+{% set version = '1.29.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sensitivity
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sensitivity_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sensitivity/sensitivity_{{ version }}.tar.gz
+  sha256: c7d2135cbd60fa5d28900ae90d715d66ffd2e274db813182a4ba1269ec5cccaf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: condMVNorm, DiceDesign, DiceKriging, doParallel, evd, ggExtra, grid, gplots, gtools, igraph, IncDTW, ks, lattice, MASS, mc2d, mvtnorm, parallel, plotrix, pracma, proxy, randtoolbox, RANN, reshape2, rgl, stringr, triangle, TSP, viridisLite, whitening
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-boot
+    - r-dtwclust
+    - r-foreach
+    - r-ggplot2
+    - r-numbers
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-boot
+    - r-dtwclust
+    - r-foreach
+    - r-ggplot2
+    - r-numbers
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sensitivity')"           # [not win]
+    - "\"%R%\" -e \"library('sensitivity')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=sensitivity
+  license: GPL-2
+  summary: A collection of functions for sensitivity analysis of model outputs (factor screening,
+    global sensitivity analysis and robustness analysis), as well as for interpretability
+    of machine learning models. Most of the functions have to be applied on scalar output,
+    but several functions support multi-dimensional outputs.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: sensitivity
+# Version: 1.29.0
+# Title: Global Sensitivity Analysis of Model Outputs
+# Author: Bertrand Iooss, Sebastien Da Veiga, Alexandre Janon and Gilles Pujol, with contributions from Baptiste Broto, Khalid Boumhaout, Laura Clouvel, Thibault Delage, Reda El Amri, Jana Fruth, Laurent Gilquin, Joseph Guillaume, Margot Herin, Marouane Il Idrissi, Loic Le Gratiet, Paul Lemaitre, Amandine Marrel, Anouar Meynaoui, Barry L. Nelson, Filippo Monari, Roelof Oomen, Oldrich Rakovec, Bernardo Ramos, Olivier Roustant, Gabriel Sarazin, Eunhye Song, Jeremy Staum, Roman Sueur, Taieb Touati, Vanessa Verges, Frank Weber
+# Maintainer: Bertrand Iooss <biooss@yahoo.fr>
+# Depends: R (>= 3.0.0)
+# Imports: boot, numbers, methods, ggplot2, Rcpp, foreach, dtwclust
+# LinkingTo: Rcpp, RcppArmadillo
+# Suggests: condMVNorm, DiceDesign, DiceKriging, doParallel, evd, ggExtra, grid, gplots, gtools, igraph, IncDTW, ks, lattice, MASS, mc2d, mvtnorm, parallel, plotrix, pracma, proxy, randtoolbox, RANN, reshape2, rgl, stringr, triangle, TSP, viridisLite, whitening
+# Description: A collection of functions for sensitivity analysis of model outputs (factor screening, global sensitivity analysis and robustness analysis), as well as for interpretability of machine learning models. Most of the functions have to be applied on scalar output, but several functions support multi-dimensional outputs.
+# License: GPL-2
+# NeedsCompilation: yes
+# Repository: CRAN
+# Packaged: 2023-08-31 09:06:12 UTC; F80570
+# Date/Publication: 2023-08-31 10:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

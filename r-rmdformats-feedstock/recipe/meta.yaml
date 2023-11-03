@@ -1,0 +1,92 @@
+{% set version = '1.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rmdformats
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rmdformats_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rmdformats/rmdformats_{{ version }}.tar.gz
+  sha256: 9f29c4a8214849d551f2efbff8d463645e06c19a7fa951cd263ee8493b672c02
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: questionr, DT, palmerpenguins, ggplot2
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bookdown
+    - r-htmltools
+    - r-knitr
+    - r-rmarkdown
+
+  run:
+    - r-base
+    - r-bookdown
+    - r-htmltools
+    - r-knitr
+    - r-rmarkdown
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rmdformats')"           # [not win]
+    - "\"%R%\" -e \"library('rmdformats')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/juba/rmdformats
+  license: GPL-2
+  summary: HTML formats and templates for 'rmarkdown' documents, with some extra features such
+    as automatic table of contents, lightboxed figures, dynamic crosstab helper.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: rmdformats
+# Maintainer: Julien Barnier <julien.barnier@cnrs.fr>
+# Authors@R: c(person("Julien", "Barnier", email="julien.barnier@cnrs.fr", role=c("aut","cre")))
+# Version: 1.0.4
+# Date: 2022-05-10
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# Title: HTML Output Formats and Templates for 'rmarkdown' Documents
+# Description: HTML formats and templates for 'rmarkdown' documents, with some extra features such as automatic table of contents, lightboxed figures, dynamic crosstab helper.
+# Imports: knitr, rmarkdown, bookdown, htmltools
+# Suggests: questionr, DT, palmerpenguins, ggplot2
+# URL: https://github.com/juba/rmdformats
+# BugReports: https://github.com/juba/rmdformats/issues
+# RoxygenNote: 7.1.2
+# NeedsCompilation: no
+# Packaged: 2022-05-17 08:05:52 UTC; julien
+# Author: Julien Barnier [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2022-05-17 08:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,103 @@
+{% set version = '0.1.13' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rbcb
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rbcb_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rbcb/rbcb_{{ version }}.tar.gz
+  sha256: 233fc09199df146175312fd0a50da762119c4dec3ae6afd2f1f8b80b1f734aa8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 3.0.0), miniUI, shiny, dplyr, covr, withr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-digest
+    - r-httr
+    - r-jsonlite
+    - r-purrr
+    - r-tibble
+    - r-xml2
+    - r-xts
+
+  run:
+    - r-base
+    - r-digest
+    - r-httr
+    - r-jsonlite
+    - r-purrr
+    - r-tibble
+    - r-xml2
+    - r-xts
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rbcb')"           # [not win]
+    - "\"%R%\" -e \"library('rbcb')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/wilsonfreitas/rbcb, https://wilsonfreitas.github.io/rbcb/
+  license: MIT
+  summary: The Brazilian Central Bank API delivers many datasets which regard economic activity,
+    regional economy, international economy, public finances, credit indicators and
+    many more. For more information please see <http://dadosabertos.bcb.gov.br/>. These
+    datasets can be accessed through 'rbcb' functions and can be obtained in different
+    data structures common to R ('tibble', 'data.frame', 'xts', ...).
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: rbcb
+# Type: Package
+# Title: R Interface to Brazilian Central Bank Web Services
+# Version: 0.1.13
+# Author: Wilson Freitas <wilson.freitas@gmail.com>
+# Maintainer: Wilson Freitas <wilson.freitas@gmail.com>
+# Description: The Brazilian Central Bank API delivers many datasets which regard economic activity, regional economy, international economy, public finances, credit indicators and many more. For more information please see <http://dadosabertos.bcb.gov.br/>. These datasets can be accessed through 'rbcb' functions and can be obtained in different data structures common to R ('tibble', 'data.frame', 'xts', ...).
+# URL: https://github.com/wilsonfreitas/rbcb, https://wilsonfreitas.github.io/rbcb/
+# BugReports: https://github.com/wilsonfreitas/rbcb/issues
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Imports: httr, jsonlite, tibble, xts, xml2, utils, stats, methods, purrr, digest
+# RoxygenNote: 7.2.3
+# Suggests: testthat (>= 3.0.0), miniUI, shiny, dplyr, covr, withr
+# Collate: 'rbcb-package.R' 'rbcb_get.R' 'sgs.R' 'datasets.R' 'addins.R' 'rbcb_get_series.R' 'currency_helpers.R' 'utils.R' 'rbcb_get_currencies.R' 'odata-expectativas.R' 'odata_ptax.R'
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2023-10-12 21:21:36 UTC; wilso
+# Repository: CRAN
+# Date/Publication: 2023-10-12 22:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

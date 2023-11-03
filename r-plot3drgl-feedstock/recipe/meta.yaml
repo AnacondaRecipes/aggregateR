@@ -1,0 +1,78 @@
+{% set version = '1.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-plot3drgl
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/plot3Drgl_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/plot3Drgl/plot3Drgl_{{ version }}.tar.gz
+  sha256: 6d87a9a32aba3aa64f751268cabd14dbd3e0eca2bd5f0a4b11366cd1e2f51bdd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-plot3d
+    - r-rgl
+
+  run:
+    - r-base
+    - r-plot3d
+    - r-rgl
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('plot3Drgl')"           # [not win]
+    - "\"%R%\" -e \"library('plot3Drgl')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=plot3Drgl
+  license: GPL (>= 3.0)
+  summary: The 'rgl' implementation of plot3D functions.
+  license_family: GPL3
+
+# The original CRAN metadata for this package was:
+
+# Package: plot3Drgl
+# Version: 1.0.4
+# Title: Plotting Multi-Dimensional Data - Using 'rgl'
+# Author: Karline Soetaert <karline.soetaert@nioz.nl>
+# Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
+# Depends: rgl, plot3D, R (>= 3.2.3)
+# Imports: grDevices
+# Description: The 'rgl' implementation of plot3D functions.
+# License: GPL (>= 3.0)
+# NeedsCompilation: no
+# Packaged: 2023-01-19 12:55:11 UTC; karlines
+# Repository: CRAN
+# Date/Publication: 2023-01-19 18:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

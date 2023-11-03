@@ -1,0 +1,101 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-calculus
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/calculus_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/calculus/calculus_{{ version }}.tar.gz
+  sha256: 20e09335be946c08f80b5c55358fd8ad67d0f8c2dc9ece503adf2464de5b00dd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: cubature, testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.1
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('calculus')"           # [not win]
+    - "\"%R%\" -e \"library('calculus')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://calculus.eguidotti.com
+  license: GPL-3
+  summary: 'Efficient C++ optimized functions for numerical and symbolic calculus as described
+    in Guidotti (2022) <doi:10.18637/jss.v104.i05>. It includes basic arithmetic, tensor
+    calculus, Einstein summing convention, fast computation of the Levi-Civita symbol
+    and generalized Kronecker delta, Taylor series expansion, multivariate Hermite polynomials,
+    high-order derivatives, ordinary differential equations, differential operators
+    (Gradient, Jacobian, Hessian, Divergence, Curl, Laplacian) and numerical integration
+    in arbitrary orthogonal coordinate systems: cartesian, polar, spherical, cylindrical,
+    parabolic or user defined by custom scale factors.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: calculus
+# Type: Package
+# Title: High Dimensional Numerical and Symbolic Calculus
+# Version: 1.0.1
+# Authors@R: person(given = "Emanuele", family = "Guidotti", email = "emanuele.guidotti@unine.ch", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-8961-6623"))
+# Description: Efficient C++ optimized functions for numerical and symbolic calculus as described in Guidotti (2022) <doi:10.18637/jss.v104.i05>. It includes basic arithmetic, tensor calculus, Einstein summing convention, fast computation of the Levi-Civita symbol and generalized Kronecker delta, Taylor series expansion, multivariate Hermite polynomials, high-order derivatives, ordinary differential equations, differential operators (Gradient, Jacobian, Hessian, Divergence, Curl, Laplacian) and numerical integration in arbitrary orthogonal coordinate systems: cartesian, polar, spherical, cylindrical, parabolic or user defined by custom scale factors.
+# License: GPL-3
+# URL: https://calculus.eguidotti.com
+# BugReports: https://github.com/eguidotti/calculus/issues
+# LinkingTo: Rcpp
+# Imports: Rcpp (>= 1.0.1)
+# Suggests: cubature, testthat, knitr, rmarkdown
+# RoxygenNote: 7.2.1
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2023-03-09 22:28:41 UTC; eguidotti
+# Author: Emanuele Guidotti [aut, cre] (<https://orcid.org/0000-0002-8961-6623>)
+# Maintainer: Emanuele Guidotti <emanuele.guidotti@unine.ch>
+# Repository: CRAN
+# Date/Publication: 2023-03-09 23:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

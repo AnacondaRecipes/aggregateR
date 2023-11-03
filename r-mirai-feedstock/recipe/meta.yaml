@@ -1,0 +1,91 @@
+{% set version = '0.11.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mirai
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mirai_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mirai/mirai_{{ version }}.tar.gz
+  sha256: b683e58d3da4b886fd62a775f475b2d0a3b4341b4241a7b567df04f8beba2934
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-nanonext >=0.10.2
+
+  run:
+    - r-base
+    - r-nanonext >=0.10.2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mirai')"           # [not win]
+    - "\"%R%\" -e \"library('mirai')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://shikokuchuo.net/mirai/, https://github.com/shikokuchuo/mirai/
+  license: GPL-3
+  summary: Lightweight parallel code execution and distributed computing. Designed for simplicity,
+    a 'mirai' evaluates an R expression asynchronously, on local or network resources,
+    resolving automatically upon completion. Features efficient task scheduling, fast
+    inter-process communications, and Transport Layer Security over TCP/IP for remote
+    connections, courtesy of 'nanonext' and 'NNG' (Nanomsg Next Gen).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: mirai
+# Type: Package
+# Title: Minimalist Async Evaluation Framework for R
+# Version: 0.11.0
+# Description: Lightweight parallel code execution and distributed computing. Designed for simplicity, a 'mirai' evaluates an R expression asynchronously, on local or network resources, resolving automatically upon completion. Features efficient task scheduling, fast inter-process communications, and Transport Layer Security over TCP/IP for remote connections, courtesy of 'nanonext' and 'NNG' (Nanomsg Next Gen).
+# Authors@R: c(person(given = "Charlie", family = "Gao", role = c("aut", "cre"), email = "charlie.gao@shikokuchuo.net", comment = c(ORCID = "0000-0002-0750-061X")), person(given = "Hibiki AI Limited", role = "cph"))
+# License: GPL (>= 3)
+# BugReports: https://github.com/shikokuchuo/mirai/issues
+# URL: https://shikokuchuo.net/mirai/, https://github.com/shikokuchuo/mirai/
+# Encoding: UTF-8
+# Depends: R (>= 3.5)
+# Imports: nanonext (>= 0.10.2), parallel
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-10-06 11:51:41 UTC; cg334
+# Author: Charlie Gao [aut, cre] (<https://orcid.org/0000-0002-0750-061X>), Hibiki AI Limited [cph]
+# Maintainer: Charlie Gao <charlie.gao@shikokuchuo.net>
+# Repository: CRAN
+# Date/Publication: 2023-10-06 14:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

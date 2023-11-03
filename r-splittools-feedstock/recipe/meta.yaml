@@ -1,0 +1,89 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-splittools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/splitTools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/splitTools/splitTools_{{ version }}.tar.gz
+  sha256: d7b0fce80cc76f031e5b5f7e431a00b96cad772735b2a6df36e2147c6fcca9e2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('splitTools')"           # [not win]
+    - "\"%R%\" -e \"library('splitTools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mayer79/splitTools
+  license: GPL-2
+  summary: Fast, lightweight toolkit for data splitting. Data sets can be partitioned into disjoint
+    groups (e.g. into training, validation, and test) or into (repeated) k-folds for
+    subsequent cross-validation. Besides basic splits, the package supports stratified,
+    grouped as well as blocked splitting. Furthermore, cross-validation folds for time
+    series data can be created. See e.g. Hastie et al. (2001) <doi:10.1007/978-0-387-84858-7>
+    for the basic background on data partitioning and cross-validation.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: splitTools
+# Title: Tools for Data Splitting
+# Version: 1.0.1
+# Authors@R: person("Michael", "Mayer", , "mayermichael79@gmail.com", role = c("aut", "cre"))
+# Description: Fast, lightweight toolkit for data splitting. Data sets can be partitioned into disjoint groups (e.g. into training, validation, and test) or into (repeated) k-folds for subsequent cross-validation. Besides basic splits, the package supports stratified, grouped as well as blocked splitting. Furthermore, cross-validation folds for time series data can be created. See e.g. Hastie et al. (2001) <doi:10.1007/978-0-387-84858-7> for the basic background on data partitioning and cross-validation.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Imports: stats
+# Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
+# URL: https://github.com/mayer79/splitTools
+# BugReports: https://github.com/mayer79/splitTools/issues
+# VignetteBuilder: knitr
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2023-06-06 13:37:09 UTC; Michael
+# Author: Michael Mayer [aut, cre]
+# Maintainer: Michael Mayer <mayermichael79@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-06-06 14:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

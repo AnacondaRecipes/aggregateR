@@ -1,0 +1,85 @@
+{% set version = '0.2.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dfa.cancor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DFA.CANCOR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DFA.CANCOR/DFA.CANCOR_{{ version }}.tar.gz
+  sha256: aab144636f95034ae8f8db6d32eb024248bd6d773e4a5e35e6b2014778720bc4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bayesfactor
+    - r-mvn
+
+  run:
+    - r-base
+    - r-bayesfactor
+    - r-mvn
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DFA.CANCOR')"           # [not win]
+    - "\"%R%\" -e \"library('DFA.CANCOR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DFA.CANCOR
+  license: GPL-2
+  summary: Produces SPSS- and SAS-like output for linear discriminant function analysis and canonical
+    correlation analysis. The methods are described in Manly & Alberto (2017, ISBN:9781498728966),
+    Rencher (2002, ISBN:0-471-41889-7), and Tabachnik & Fidell (2019, ISBN:9780134790541).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: DFA.CANCOR
+# Type: Package
+# Title: Linear Discriminant Function and Canonical Correlation Analysis
+# Version: 0.2.8
+# Date: 2023-06-28
+# Author: Brian P. O'Connor
+# Maintainer: Brian P. O'Connor  <brian.oconnor@ubc.ca>
+# Description: Produces SPSS- and SAS-like output for linear discriminant function analysis and canonical correlation analysis. The methods are described in Manly & Alberto (2017, ISBN:9781498728966), Rencher (2002, ISBN:0-471-41889-7), and Tabachnik & Fidell (2019, ISBN:9780134790541).
+# Imports: graphics, stats, BayesFactor, MVN, utils
+# LazyLoad: yes
+# LazyData: yes
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2023-06-28 09:59:16 UTC; brianoconnor
+# Repository: CRAN
+# Date/Publication: 2023-06-29 14:50:12 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

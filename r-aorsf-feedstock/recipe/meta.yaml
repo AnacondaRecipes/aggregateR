@@ -1,0 +1,108 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-aorsf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/aorsf_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/aorsf/aorsf_{{ version }}.tar.gz
+  sha256: 9aaee8923ee6316ce4b92a2f415b3e90baee8a2cbbd439c9a870952a2e6830f7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: survival, SurvMetrics, ggplot2, testthat (>= 3.0.0), knitr, rmarkdown, glmnet, covr, units, tibble
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-collapse
+    - r-data.table
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-collapse
+    - r-data.table
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('aorsf')"           # [not win]
+    - "\"%R%\" -e \"library('aorsf')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ropensci/aorsf, https://docs.ropensci.org/aorsf/
+  license: MIT
+  summary: Fit, interpret, and make predictions with oblique random survival forests. Oblique
+    decision trees are notoriously slow compared to their axis based counterparts, but
+    'aorsf' runs as fast or faster than axis-based decision tree algorithms for right-censored
+    time-to-event outcomes. Methods to accelerate and interpret the oblique random survival
+    forest are described in Jaeger et al., (2023) <DOI:10.1080/10618600.2023.2231048>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: aorsf
+# Title: Accelerated Oblique Random Survival Forests
+# Version: 0.1.1
+# Authors@R: c( person(given = "Byron", family = "Jaeger", role = c("aut", "cre"), email = "bjaeger@wakehealth.edu", comment = c(ORCID = "0000-0001-7399-2299")), person(given = "Nicholas", family = "Pajewski", role = "ctb"), person(given = "Sawyer", family = "Welden", role = "ctb", email = "swelden@wakehealth.edu"), person(given = "Christopher", family = "Jackson", email = "chris.jackson@mrc-bsu.cam.ac.uk", role = "rev"), person(given = "Marvin", family = "Wright", role = "rev"), person(given = "Lukas", family = "Burk", role = "rev") )
+# Description: Fit, interpret, and make predictions with oblique random survival forests. Oblique decision trees are notoriously slow compared to their axis based counterparts, but 'aorsf' runs as fast or faster than axis-based decision tree algorithms for right-censored time-to-event outcomes. Methods to accelerate and interpret the oblique random survival forest are described in Jaeger et al., (2023) <DOI:10.1080/10618600.2023.2231048>.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.3
+# LinkingTo: Rcpp, RcppArmadillo
+# Imports: Rcpp, data.table, utils, stats, collapse
+# URL: https://github.com/ropensci/aorsf, https://docs.ropensci.org/aorsf/
+# BugReports: https://github.com/ropensci/aorsf/issues/
+# Depends: R (>= 3.6)
+# Suggests: survival, SurvMetrics, ggplot2, testthat (>= 3.0.0), knitr, rmarkdown, glmnet, covr, units, tibble
+# Config/testthat/edition: 3
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2023-10-26 00:49:41 UTC; byron
+# Author: Byron Jaeger [aut, cre] (<https://orcid.org/0000-0001-7399-2299>), Nicholas Pajewski [ctb], Sawyer Welden [ctb], Christopher Jackson [rev], Marvin Wright [rev], Lukas Burk [rev]
+# Maintainer: Byron Jaeger <bjaeger@wakehealth.edu>
+# Repository: CRAN
+# Date/Publication: 2023-10-26 16:40:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

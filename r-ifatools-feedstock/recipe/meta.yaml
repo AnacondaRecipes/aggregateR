@@ -1,0 +1,94 @@
+{% set version = '0.23' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ifatools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ifaTools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ifaTools/ifaTools_{{ version }}.tar.gz
+  sha256: 820e5fbea83a6bf42fc3c440998d768df38639b1a00e82921bb0ce574c18ae9b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, roxygen2, knitr (>= 1.8), gridExtra, plyr, xtable
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-openmx >=2.3.1
+    - r-ggplot2
+    - r-reshape2
+    - r-rpf >=0.48
+    - r-shiny >=0.10
+
+  run:
+    - r-base
+    - r-openmx >=2.3.1
+    - r-ggplot2
+    - r-reshape2
+    - r-rpf >=0.48
+    - r-shiny >=0.10
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ifaTools')"           # [not win]
+    - "\"%R%\" -e \"library('ifaTools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jpritikin/ifaTools
+  license: AGPL-3
+  summary: Tools, tutorials, and demos of Item Factor Analysis using 'OpenMx'. This software
+    is described in Pritikin & Falk (2020) <doi:10.1177/0146621620929431>.
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: ifaTools
+# Date: 2022-01-19
+# Title: Toolkit for Item Factor Analysis with 'OpenMx'
+# Authors@R: c(person(c("Joshua","N."), family="Pritikin", email="jpritikin@pobox.com", role=c('cre','aut')))
+# Version: 0.23
+# Description: Tools, tutorials, and demos of Item Factor Analysis using 'OpenMx'. This software is described in Pritikin & Falk (2020) <doi:10.1177/0146621620929431>.
+# License: AGPL (>= 3)
+# VignetteBuilder: knitr
+# Imports: methods
+# Suggests: testthat, roxygen2, knitr (>= 1.8), gridExtra, plyr, xtable
+# Depends: shiny (>= 0.10), ggplot2, reshape2, rpf (>= 0.48), OpenMx (>= 2.3.1), R (>= 2.14.0)
+# URL: https://github.com/jpritikin/ifaTools
+# RoxygenNote: 7.1.1
+# NeedsCompilation: no
+# Packaged: 2022-01-19 21:06:57 UTC; joshua
+# Author: Joshua N. Pritikin [cre, aut]
+# Maintainer: Joshua N. Pritikin <jpritikin@pobox.com>
+# Repository: CRAN
+# Date/Publication: 2022-01-19 22:12:42 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

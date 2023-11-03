@@ -1,0 +1,91 @@
+{% set version = '2.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rcartocolor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rcartocolor_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rcartocolor/rcartocolor_{{ version }}.tar.gz
+  sha256: 00b33368b90596553b79f577861fbf825d1ff1717b64a2fc8154becd72bd1153
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, MASS, testthat, vdiffr, sf, spData
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggplot2
+    - r-scales
+
+  run:
+    - r-base
+    - r-ggplot2
+    - r-scales
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rcartocolor')"           # [not win]
+    - "\"%R%\" -e \"library('rcartocolor')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/Nowosad/rcartocolor
+  license: MIT
+  summary: 'Provides color schemes for maps and other graphics designed by ''CARTO'' as described
+    at <https://carto.com/carto-colors/>. It includes four types of palettes: aggregation,
+    diverging, qualitative, and quantitative.'
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: rcartocolor
+# Title: 'CARTOColors' Palettes
+# Version: 2.1.1
+# Authors@R: person("Jakub", "Nowosad", email = "nowosad.jakub@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1057-3721"))
+# Description: Provides color schemes for maps and other graphics designed by 'CARTO' as described at <https://carto.com/carto-colors/>. It includes four types of palettes: aggregation, diverging, qualitative, and quantitative.
+# Depends: R (>= 3.4)
+# Imports: ggplot2, scales
+# URL: https://github.com/Nowosad/rcartocolor
+# BugReports: https://github.com/Nowosad/rcartocolor/issues
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.3
+# Suggests: covr, MASS, testthat, vdiffr, sf, spData
+# NeedsCompilation: no
+# Packaged: 2023-05-13 09:42:16 UTC; jn
+# Author: Jakub Nowosad [aut, cre] (<https://orcid.org/0000-0002-1057-3721>)
+# Maintainer: Jakub Nowosad <nowosad.jakub@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-05-13 10:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,110 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-grim
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gRim_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gRim/gRim_{{ version }}.tar.gz
+  sha256: 4a7417c2d9b94b5c0d585178392316337e7455e75ee94d85efbd69e1b19335c6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.1.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.1
+    - r-rcpparmadillo
+    - r-rcppeigen
+    - r-grain >=1.3.10
+    - r-grbase >=2.0.0
+    - r-igraph
+    - r-magrittr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.1
+    - r-rcpparmadillo
+    - r-rcppeigen
+    - r-grain >=1.3.10
+    - r-grbase >=2.0.0
+    - r-igraph
+    - r-magrittr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gRim')"           # [not win]
+    - "\"%R%\" -e \"library('gRim')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://people.math.aau.dk/~sorenh/software/gR/
+  license: GPL-2
+  summary: "Provides the following types of models: Models for contingency tables (i.e. log-linear
+    models) Graphical Gaussian models for multivariate normal data (i.e. covariance
+    selection models) Mixed interaction models. Documentation about 'gRim' is provided
+    by vignettes included in this package and the book by H\xF8jsgaard, Edwards and
+    Lauritzen (2012, <doi:10.1007/978-1-4614-2299-0>); see 'citation(\"gRim\")' for
+    details."
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: gRim
+# Version: 0.3.0
+# Title: Graphical Interaction Models
+# Author: Sren Hjsgaard <sorenh@math.aau.dk>
+# Maintainer: Sren Hjsgaard <sorenh@math.aau.dk>
+# Description: Provides the following types of models: Models for contingency tables (i.e. log-linear models) Graphical Gaussian models for multivariate normal data (i.e. covariance selection models) Mixed interaction models. Documentation about 'gRim' is provided by vignettes included in this package and the book by Hjsgaard, Edwards and Lauritzen (2012, <doi:10.1007/978-1-4614-2299-0>); see 'citation("gRim")' for details.
+# License: GPL (>= 2)
+# URL: https://people.math.aau.dk/~sorenh/software/gR/
+# Encoding: UTF-8
+# Depends: R (>= 3.6.0), methods, gRbase (>= 2.0.0)
+# Suggests: testthat (>= 2.1.0)
+# Imports: igraph, stats4, gRain (>= 1.3.10), magrittr, Rcpp (>= 0.11.1)
+# ByteCompile: yes
+# LinkingTo: Rcpp (>= 0.11.1), RcppArmadillo, RcppEigen, gRbase (>= 2.0.0)
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-10-02 02:24:30 UTC; sorenh
+# Repository: CRAN
+# Date/Publication: 2023-10-02 03:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

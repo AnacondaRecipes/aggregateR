@@ -1,0 +1,88 @@
+{% set version = '0.57' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rdd
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rdd_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rdd/rdd_{{ version }}.tar.gz
+  sha256: 17db64fcd75600edf42de6aa6f3e3aa970ed64cb3734923f0fa5a3d024fbf3d2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-aer
+    - r-formula
+    - r-lmtest
+    - r-sandwich
+
+  run:
+    - r-base
+    - r-aer
+    - r-formula
+    - r-lmtest
+    - r-sandwich
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rdd')"           # [not win]
+    - "\"%R%\" -e \"library('rdd')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rdd
+  license: Apache License (== 2.0)
+  summary: Provides the tools to undertake estimation in Regression Discontinuity Designs. Both
+    sharp and fuzzy designs are supported. Estimation is accomplished using local linear
+    regression. A provided function will utilize Imbens-Kalyanaraman optimal bandwidth
+    calculation. A function is also included to test the assumption of no-sorting effects.
+  license_family: APACHE
+
+# The original CRAN metadata for this package was:
+
+# Package: rdd
+# Maintainer: Drew Dimmery <drewd@nyu.edu>
+# Author: Drew Dimmery
+# Version: 0.57
+# License: Apache License (== 2.0)
+# Title: Regression Discontinuity Estimation
+# Description: Provides the tools to undertake estimation in Regression Discontinuity Designs. Both sharp and fuzzy designs are supported. Estimation is accomplished using local linear regression. A provided function will utilize Imbens-Kalyanaraman optimal bandwidth calculation. A function is also included to test the assumption of no-sorting effects.
+# Type: Package
+# Date: 2016-03-14
+# Depends: R (>= 2.15.0), sandwich, lmtest, AER, Formula
+# Collate: 'kernelwts.R' 'DCdensity.R' 'IKbandwidth.R' 'RDestimate.R' 'plot.RD.R' 'print.RD.R' 'rdd-package.R' 'summary.RD.R'
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-03-14 18:42:16 UTC; drewdimmery
+# Repository: CRAN
+# Date/Publication: 2016-03-14 23:46:03
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

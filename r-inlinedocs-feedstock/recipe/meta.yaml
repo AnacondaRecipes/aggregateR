@@ -1,0 +1,87 @@
+{% set version = '2023.9.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-inlinedocs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/inlinedocs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/inlinedocs/inlinedocs_{{ version }}.tar.gz
+  sha256: 635a0e2619028ac5b07e11ea8c807dd7f9743e6eb52085ab584cc9eaccb3b584
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: future.apply, future, R.methodsS3
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('inlinedocs')"           # [not win]
+    - "\"%R%\" -e \"library('inlinedocs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/tdhock/inlinedocs
+  license: GPL-2 | GPL-3
+  summary: Generates Rd files from R source code with comments. The main features of the default
+    syntax are that (1) docs are defined in comments near the relevant code, (2) function
+    argument names are not repeated in comments, and (3) examples are defined in R code,
+    not comments. It is also easy to define a new syntax.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: inlinedocs
+# Title: Convert Inline Comments to Documentation
+# Type: Package
+# Version: 2023.9.4
+# Authors@R: c(person("Toby Dylan","Hocking",role=c("aut","cre"), email="toby.hocking@r-project.org"), person("Keith","Ponting",role="aut"), person("Thomas","Wutzler",role="aut"), person("Philippe","Grosjean",role="aut"), person("Markus","Muller",role="aut"), person("R Core Team",role=c("ctb","cph")))
+# Description: Generates Rd files from R source code with comments. The main features of the default syntax are that (1) docs are defined in comments near the relevant code, (2) function argument names are not repeated in comments, and (3) examples are defined in R code, not comments. It is also easy to define a new syntax.
+# URL: https://github.com/tdhock/inlinedocs
+# BugReports: https://github.com/tdhock/inlinedocs/issues
+# Depends: methods, utils, R (>= 2.9)
+# License: GPL-2 | GPL-3
+# LazyLoad: yes
+# Encoding: UTF-8
+# Suggests: future.apply, future, R.methodsS3
+# NeedsCompilation: no
+# Packaged: 2023-10-17 21:32:29 UTC; tdhock
+# Author: Toby Dylan Hocking [aut, cre], Keith Ponting [aut], Thomas Wutzler [aut], Philippe Grosjean [aut], Markus Muller [aut], R Core Team [ctb, cph]
+# Maintainer: Toby Dylan Hocking <toby.hocking@r-project.org>
+# Repository: CRAN
+# Date/Publication: 2023-10-18 18:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

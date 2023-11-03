@@ -1,0 +1,102 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-winch
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/winch_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/winch/winch_{{ version }}.tar.gz
+  sha256: ab1b9a39c20143d75b2a6d380f2fd81ea18800c427c498125c96d45cb2f3536c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: DBI, knitr, magrittr, purrr, rlang (>= 0.4.8), rmarkdown, RSQLite, testthat (>= 3.0.0), vctrs
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-lifecycle
+    - r-procmaps >=0.0.2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-lifecycle
+    - r-procmaps >=0.0.2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('winch')"           # [not win]
+    - "\"%R%\" -e \"library('winch')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://r-prof.github.io/winch/, https://github.com/r-prof/winch
+  license: GPL-3
+  summary: Obtain the native stack trace and fuse it with R's stack trace for easier debugging
+    of R packages with native code.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: winch
+# Title: Portable Native and Joint Stack Traces
+# Version: 0.1.0
+# Date: 2023-04-19
+# Authors@R: c(person(given = "Kirill", family = "Muller", role = c("aut", "cre"), email = "kirill@cynkra.com", comment = c(ORCID = "0000-0002-1416-3412")), person(given = "R Consortium", role = "fnd"), person(given = "Ian Lance", family = "Taylor", role = "aut", comment = "Bundled libbacktrace library"), person(given = "Free Software Foundation", role = "cph", comment = "Bundled libbacktrace library"))
+# Description: Obtain the native stack trace and fuse it with R's stack trace for easier debugging of R packages with native code.
+# License: GPL-3
+# URL: https://r-prof.github.io/winch/, https://github.com/r-prof/winch
+# BugReports: https://github.com/r-prof/winch/issues
+# Imports: lifecycle, procmaps (>= 0.0.2)
+# Suggests: DBI, knitr, magrittr, purrr, rlang (>= 0.4.8), rmarkdown, RSQLite, testthat (>= 3.0.0), vctrs
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# Biarch: yes
+# RoxygenNote: 7.2.3
+# Config/testthat/edition: 3
+# NeedsCompilation: yes
+# Packaged: 2023-04-19 09:38:43 UTC; kirill
+# Author: Kirill Muller [aut, cre] (<https://orcid.org/0000-0002-1416-3412>), R Consortium [fnd], Ian Lance Taylor [aut] (Bundled libbacktrace library), Free Software Foundation [cph] (Bundled libbacktrace library)
+# Maintainer: Kirill Muller <kirill@cynkra.com>
+# Repository: CRAN
+# Date/Publication: 2023-04-20 07:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

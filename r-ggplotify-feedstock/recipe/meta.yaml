@@ -1,0 +1,95 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ggplotify
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ggplotify_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ggplotify/ggplotify_{{ version }}.tar.gz
+  sha256: 01bae5759e14e211bddb04413e094ba31399b513989894ea08602d202f990e87
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: aplot, colorspace, cowplot, ggimage, knitr, rmarkdown, lattice, prettydoc, vcd, utils
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggplot2
+    - r-gridgraphics
+    - r-yulab.utils
+
+  run:
+    - r-base
+    - r-ggplot2
+    - r-gridgraphics
+    - r-yulab.utils
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ggplotify')"           # [not win]
+    - "\"%R%\" -e \"library('ggplotify')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/GuangchuangYu/ggplotify
+  license: Artistic-2.0
+  summary: Convert plot function call (using expression or formula) to 'grob' or 'ggplot' object
+    that compatible to the 'grid' and 'ggplot2' ecosystem. With this package, we are
+    able to e.g. using 'cowplot' to align plots produced by 'base' graphics, 'ComplexHeatmap',
+    'eulerr', 'grid', 'lattice', 'magick', 'pheatmap', 'vcd' etc. by converting them
+    to 'ggplot' objects.
+  license_family: OTHER
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/Artistic-2.0'
+
+# The original CRAN metadata for this package was:
+
+# Package: ggplotify
+# Title: Convert Plot to 'grob' or 'ggplot' Object
+# Version: 0.1.2
+# Authors@R: c(person("Guangchuang", "Yu", email = "guangchuangyu@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-6485-8781")))
+# Description: Convert plot function call (using expression or formula) to 'grob' or 'ggplot' object that compatible to the 'grid' and 'ggplot2' ecosystem. With this package, we are able to e.g. using 'cowplot' to align plots produced by 'base' graphics, 'ComplexHeatmap', 'eulerr', 'grid', 'lattice', 'magick', 'pheatmap', 'vcd' etc. by converting them to 'ggplot' objects.
+# Depends: R (>= 3.4.0)
+# Imports: ggplot2, graphics, grDevices, grid, gridGraphics, yulab.utils
+# Suggests: aplot, colorspace, cowplot, ggimage, knitr, rmarkdown, lattice, prettydoc, vcd, utils
+# VignetteBuilder: knitr
+# ByteCompile: true
+# License: Artistic-2.0
+# URL: https://github.com/GuangchuangYu/ggplotify
+# BugReports: https://github.com/GuangchuangYu/ggplotify/issues
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-08-08 15:24:01 UTC; HUAWEI
+# Author: Guangchuang Yu [aut, cre] (<https://orcid.org/0000-0002-6485-8781>)
+# Maintainer: Guangchuang Yu <guangchuangyu@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-08-09 22:50:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,116 @@
+{% set version = '0.9.12-4.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bayesfactor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BayesFactor_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BayesFactor/BayesFactor_{{ version }}.tar.gz
+  sha256: b0a61f78cedb0bdb87903848f7196c952c75fb39610dc5a5d697abcf3ea66c81
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: doMC, foreach, testthat, knitr, markdown, rmarkdown, arm, lme4, xtable, languageR
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix >=1.1_1
+    - r-matrixmodels
+    - r-rcpp >=0.11.2
+    - r-rcppeigen >=0.3.2.2.0
+    - r-coda
+    - r-hypergeo
+    - r-mvtnorm
+    - r-pbapply
+    - r-stringr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix >=1.1_1
+    - r-matrixmodels
+    - r-rcpp >=0.11.2
+    - r-rcppeigen >=0.3.2.2.0
+    - r-coda
+    - r-hypergeo
+    - r-mvtnorm
+    - r-pbapply
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BayesFactor')"           # [not win]
+    - "\"%R%\" -e \"library('BayesFactor')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://richarddmorey.github.io/BayesFactor/
+  license: GPL-2
+  summary: A suite of functions for computing various Bayes factors for simple designs, including
+    contingency tables, one- and two-sample designs, one-way designs, general ANOVA
+    designs, and linear regression.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: BayesFactor
+# Type: Package
+# Title: Computation of Bayes Factors for Common Designs
+# Version: 0.9.12-4.5
+# Date: 2023-09-21
+# Authors@R: c(person("Richard D.", "Morey", role = c("aut", "cre", "cph"), email = "richarddmorey@gmail.com"), person("Jeffrey N.", "Rouder", role = "aut", email = "jrouder@uci.edu"), person("Tahira", "Jamil", role = c("ctb","cph"), email = "tahjamil@gmail.com"), person("Simon", "Urbanek", role = c("ctb", "cph"), email = "simon.urbanek@r-project.org"), person("Karl", "Forner", role = c("ctb", "cph"), email = "karl.forner@gmail.com"), person("Alexander", "Ly", role = c("ctb", "cph"), email = "Alexander.Ly.NL@gmail.com"))
+# Description: A suite of functions for computing various Bayes factors for simple designs, including contingency tables, one- and two-sample designs, one-way designs, general ANOVA designs, and linear regression.
+# License: GPL-2
+# VignetteBuilder: knitr
+# Depends: R (>= 3.2.0), coda, Matrix (>= 1.1-1)
+# Imports: pbapply, mvtnorm, stringr, utils, graphics, MatrixModels, Rcpp (>= 0.11.2), methods, hypergeo
+# Suggests: doMC, foreach, testthat, knitr, markdown, rmarkdown, arm, lme4, xtable, languageR
+# URL: https://richarddmorey.github.io/BayesFactor/
+# BugReports: https://github.com/richarddmorey/BayesFactor/issues
+# LazyLoad: yes
+# LinkingTo: Rcpp (>= 0.11.2), RcppEigen (>= 0.3.2.2.0)
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-09-21 15:41:22 UTC; richa
+# Author: Richard D. Morey [aut, cre, cph], Jeffrey N. Rouder [aut], Tahira Jamil [ctb, cph], Simon Urbanek [ctb, cph], Karl Forner [ctb, cph], Alexander Ly [ctb, cph]
+# Maintainer: Richard D. Morey <richarddmorey@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-09-21 22:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,112 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-data.validator
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/data.validator_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/data.validator/data.validator_{{ version }}.tar.gz
+  sha256: dc8f3374e93eeba58dea4dbf04195daa121aa54b8abbddbeb007adae26a7cb6c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, fixtuRes, lintr, rcmdcheck, shiny, spelling, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-assertr >=2.8
+    - r-dplyr
+    - r-htmltools
+    - r-htmlwidgets
+    - r-knitr
+    - r-purrr
+    - r-rlang
+    - r-rmarkdown
+    - r-shiny.semantic >=0.3.3
+    - r-tibble
+    - r-tidyr
+
+  run:
+    - r-base
+    - r-r6
+    - r-assertr >=2.8
+    - r-dplyr
+    - r-htmltools
+    - r-htmlwidgets
+    - r-knitr
+    - r-purrr
+    - r-rlang
+    - r-rmarkdown
+    - r-shiny.semantic >=0.3.3
+    - r-tibble
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('data.validator')"           # [not win]
+    - "\"%R%\" -e \"library('data.validator')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://appsilon.github.io/data.validator/, https://github.com/Appsilon/data.validator
+  license: MIT
+  summary: Validate dataset by columns and rows using convenient predicates inspired by 'assertr'
+    package. Generate good looking HTML report or print console output to display in
+    logs of your data processing pipeline.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: data.validator
+# Type: Package
+# Title: Automatic Data Validation and Reporting
+# Version: 0.2.0
+# Authors@R: c(person("Marcin", "Dubel", email = "opensource+marcin@appsilon.com", role = c("aut", "cre")), person("Pawe", "Przytua", email = "pawel@appsilon.com", role = c("aut")), person("Jakub", "Nowicki", email = "kuba@appsilon.com", role = c("aut")), person("Krystian", "Igras", email = "krystian8207@gmail.com", role = c("aut")), person("Dominik", "Krzeminski", email = "craymon92@gmail.com", role = c("ctb")), person("Servet Ahmet", "Cizmeli", email = "ahmet.cizmeli@contractors.appsilon.com", role = c("ctb")), person(family = "Appsilon Sp. z o.o.", role = c("cph")))
+# Description: Validate dataset by columns and rows using convenient predicates inspired by 'assertr' package. Generate good looking HTML report or print console output to display in logs of your data processing pipeline.
+# URL: https://appsilon.github.io/data.validator/, https://github.com/Appsilon/data.validator
+# BugReports: https://github.com/Appsilon/data.validator/issues
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Language: en-US
+# Imports: assertr (>= 2.8), shiny.semantic (>= 0.3.3), knitr, purrr, dplyr, tidyr, utils, R6, rlang, rmarkdown, htmltools, htmlwidgets, tibble
+# Suggests: covr, fixtuRes, lintr, rcmdcheck, shiny, spelling, testthat
+# Collate: 'results_parsers.R' 'semantic_report_constructors.R' 'utils.R' 'report.R' 'assertions.R'
+# NeedsCompilation: no
+# Packaged: 2023-05-08 13:38:42 UTC; kuba
+# Author: Marcin Dubel [aut, cre], Pawe Przytua [aut], Jakub Nowicki [aut], Krystian Igras [aut], Dominik Krzeminski [ctb], Servet Ahmet Cizmeli [ctb], Appsilon Sp. z o.o. [cph]
+# Maintainer: Marcin Dubel <opensource+marcin@appsilon.com>
+# Repository: CRAN
+# Date/Publication: 2023-05-08 14:30:25 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,114 @@
+{% set version = '0.16.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-marginaleffects
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/marginaleffects_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/marginaleffects/marginaleffects_{{ version }}.tar.gz
+  sha256: ad1a62f393ff7832f289d1c8824ff82c6be0ae49bc8c8b69942f8eec90b10371
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: AER, Amelia, afex, aod, bench, betareg, BH, bife, biglm, blme, boot, brglm2, brms, brmsmargins, broom, car, carData, causaldata, collapse, conflicted, covr, crch, DALEXtra, DCchoice, distributional, dplyr, emmeans, equivalence, estimatr, fixest, fmeffects, fontquiver, future, fwb, gam, gamlss, gamlss.dist, geepack, ggdag, ggdist, ggokabeito, ggplot2, ggrepel, glmmTMB, glmx, haven, here, itsadug, ivreg, kableExtra, knitr, lme4, lmerTest, logistf, magrittr, margins, MatchIt, MASS, mclogit, MCMCglmm, missRanger, mgcv, mhurdle, mice, miceadds, mlogit, mlr3verse, modelbased, modelsummary, nlme, nnet, numDeriv, optmatch, ordinal, parameters, parsnip, patchwork, pkgdown, phylolm, plm, polspline, poorman, posterior, prediction, pscl, purrr, quantreg, Rchoice, remotes, rmarkdown, rms, robust, robustbase, robustlmm, rsample, rstanarm, rstantools, rsvg, sampleSelection, sandwich, scam, spelling, speedglm, survey, survival, svglite, systemfonts, tibble, tidymodels, tidyr, tidyverse, tinysnapshot, tinytest, titanic, truncreg, tsModel, withr, workflows, yaml, xgboost, testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.0
+    - r-rcppeigen
+    - r-checkmate
+    - r-data.table
+    - r-generics
+    - r-insight >=0.19.1
+    - r-rlang
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.0
+    - r-rcppeigen
+    - r-checkmate
+    - r-data.table
+    - r-generics
+    - r-insight >=0.19.1
+    - r-rlang
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('marginaleffects')"           # [not win]
+    - "\"%R%\" -e \"library('marginaleffects')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://marginaleffects.com/
+  license: GPL-3
+  summary: Compute and plot predictions, slopes, marginal means, and comparisons (contrasts,
+    risk ratios, odds, etc.) for over 100 classes of statistical and machine learning
+    models in R. Conduct linear and non-linear hypothesis tests, or equivalence tests.
+    Calculate uncertainty estimates using the delta method, bootstrapping, or simulation-based
+    inference.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: marginaleffects
+# Title: Predictions, Comparisons, Slopes, Marginal Means, and Hypothesis Tests
+# Version: 0.16.0
+# Authors@R: c(person(given = "Vincent", family = "Arel-Bundock", role = c("aut", "cre", "cph"), email = "vincent.arel-bundock@umontreal.ca", comment = c(ORCID = "0000-0003-2042-7063")), person(given = "Marcio Augusto", family = "Diniz", role = "ctb", email = "marcio.diniz@cshs.org", comment = c(ORCID = "0000-0002-2427-7843")), person(given = "Noah", family = "Greifer", role = "ctb", email = "noah.greifer@gmail.com", comment = c(ORCID = "0000-0003-3067-7154")), person("Etienne", "Bacher", email = "etienne.bacher@protonmail.com", role = "ctb", comment = c(ORCID = "0000-0002-9271-5075")))
+# Description: Compute and plot predictions, slopes, marginal means, and comparisons (contrasts, risk ratios, odds, etc.) for over 100 classes of statistical and machine learning models in R. Conduct linear and non-linear hypothesis tests, or equivalence tests. Calculate uncertainty estimates using the delta method, bootstrapping, or simulation-based inference.
+# License: GPL (>= 3)
+# Copyright: inst/COPYRIGHTS
+# Encoding: UTF-8
+# URL: https://marginaleffects.com/
+# BugReports: https://github.com/vincentarelbundock/marginaleffects/issues
+# RoxygenNote: 7.2.3.9000
+# Depends: R (>= 3.6.0)
+# Imports: checkmate, data.table, generics, insight (>= 0.19.1), methods, rlang, Rcpp (>= 1.0.0)
+# LinkingTo: Rcpp, RcppEigen
+# Suggests: AER, Amelia, afex, aod, bench, betareg, BH, bife, biglm, blme, boot, brglm2, brms, brmsmargins, broom, car, carData, causaldata, collapse, conflicted, covr, crch, DALEXtra, DCchoice, distributional, dplyr, emmeans, equivalence, estimatr, fixest, fmeffects, fontquiver, future, fwb, gam, gamlss, gamlss.dist, geepack, ggdag, ggdist, ggokabeito, ggplot2, ggrepel, glmmTMB, glmx, haven, here, itsadug, ivreg, kableExtra, knitr, lme4, lmerTest, logistf, magrittr, margins, MatchIt, MASS, mclogit, MCMCglmm, missRanger, mgcv, mhurdle, mice, miceadds, mlogit, mlr3verse, modelbased, modelsummary, nlme, nnet, numDeriv, optmatch, ordinal, parameters, parsnip, patchwork, pkgdown, phylolm, plm, polspline, poorman, posterior, prediction, pscl, purrr, quantreg, Rchoice, remotes, rmarkdown, rms, robust, robustbase, robustlmm, rsample, rstanarm, rstantools, rsvg, sampleSelection, sandwich, scam, spelling, speedglm, survey, survival, svglite, systemfonts, tibble, tidymodels, tidyr, tidyverse, tinysnapshot, tinytest, titanic, truncreg, tsModel, withr, workflows, yaml, xgboost, testthat (>= 3.0.0)
+# Collate: 'RcppExports.R' 'backtransform.R' 'bootstrap_boot.R' 'bootstrap_fwb.R' 'bootstrap_rsample.R' 'broom.R' 'by.R' 'ci.R' 'comparisons.R' 'complete_levels.R' 'conformal.R' 'datagrid.R' 'equivalence.R' 'get_averages.R' 'get_coef.R' 'get_contrast_data.R' 'get_contrast_data_character.R' 'get_contrast_data_factor.R' 'get_contrast_data_logical.R' 'get_contrast_data_numeric.R' 'get_contrasts.R' 'get_group_names.R' 'get_hypothesis.R' 'get_jacobian.R' 'get_model_matrix.R' 'get_model_matrix_attribute.R' 'get_modeldata.R' 'get_predict.R' 'get_se_delta.R' 'get_term_labels.R' 'get_vcov.R' 'github_issue.R' 'hush.R' 'hypotheses.R' 'hypotheses_joint.R' 'imputation.R' 'inferences.R' 'marginal_means.R' 'mean_or_mode.R' 'methods.R' 'set_coef.R' 'methods_MASS.R' 'methods_MCMCglmm.R' 'methods_Rchoice.R' 'methods_afex.R' 'methods_aod.R' 'methods_betareg.R' 'methods_bife.R' 'methods_biglm.R' 'methods_nnet.R' 'methods_brglm2.R' 'sanity_model.R' 'methods_brms.R' 'methods_crch.R' 'methods_dataframe.R' 'methods_fixest.R' 'methods_gamlss.R' 'methods_glmmTMB.R' 'methods_glmx.R' 'methods_inferences_simulation.R' 'methods_lme4.R' 'methods_mclogit.R' 'methods_mgcv.R' 'methods_mhurdle.R' 'methods_mlm.R' 'methods_mlogit.R' 'methods_mlr3.R' 'methods_nlme.R' 'methods_ordinal.R' 'methods_plm.R' 'methods_pscl.R' 'methods_quantreg.R' 'methods_rms.R' 'methods_robustlmm.R' 'methods_rstanarm.R' 'methods_sampleSelection.R' 'methods_scam.R' 'methods_stats.R' 'methods_survey.R' 'methods_survival.R' 'methods_tidymodels.R' 'methods_tobit1.R' 'modelarchive.R' 'myTryCatch.R' 'package.R' 'plot.R' 'plot_build.R' 'plot_comparisons.R' 'plot_predictions.R' 'plot_slopes.R' 'posterior_draws.R' 'predictions.R' 'print.R' 'recall.R' 'sanitize_comparison.R' 'sanitize_condition.R' 'sanitize_conf_level.R' 'sanitize_hypothesis.R' 'sanitize_interaction.R' 'sanitize_newdata.R' 'sanitize_numderiv.R' 'sanitize_type.R' 'sanitize_variables.R' 'sanitize_vcov.R' 'sanity.R' 'sanity_by.R' 'sanity_dots.R' 'settings.R' 'slopes.R' 'sort.R' 'summary.R' 'tinytest.R' 'type_dictionary.R' 'unpack_matrix_cols.R' 'utils.R'
+# Language: en-US
+# Config/testthat/edition: 3
+# NeedsCompilation: yes
+# Packaged: 2023-10-19 22:40:37 UTC; vincent
+# Author: Vincent Arel-Bundock [aut, cre, cph] (<https://orcid.org/0000-0003-2042-7063>), Marcio Augusto Diniz [ctb] (<https://orcid.org/0000-0002-2427-7843>), Noah Greifer [ctb] (<https://orcid.org/0000-0003-3067-7154>), Etienne Bacher [ctb] (<https://orcid.org/0000-0002-9271-5075>)
+# Maintainer: Vincent Arel-Bundock <vincent.arel-bundock@umontreal.ca>
+# Repository: CRAN
+# Date/Publication: 2023-10-19 23:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

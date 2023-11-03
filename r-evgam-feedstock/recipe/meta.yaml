@@ -1,0 +1,99 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-evgam
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/evgam_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/evgam/evgam_{{ version }}.tar.gz
+  sha256: 7835174f749df9135b3a96e319fac12d2399f9339224839bc29f762c58120a39
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.8.3
+    - r-rcpparmadillo
+    - r-mgcv
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.8.3
+    - r-rcpparmadillo
+    - r-mgcv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('evgam')"           # [not win]
+    - "\"%R%\" -e \"library('evgam')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=evgam
+  license: GPL-3
+  summary: Methods for fitting various extreme value distributions with parameters of generalised
+    additive model (GAM) form are provided. For details of distributions see Coles,
+    S.G. (2001) <doi:10.1007/978-1-4471-3675-0>, GAMs see Wood, S.N. (2017) <doi:10.1201/9781315370279>,
+    and the fitting approach see Wood, S.N., Pya, N. & Safken, B. (2016) <doi:10.1080/01621459.2016.1180986>.
+    Details of how evgam works and various examples are given in Youngman, B.D. (2022)
+    <doi:10.18637/jss.v103.i03>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: evgam
+# Type: Package
+# Title: Generalised Additive Extreme Value Models
+# Version: 1.0.0
+# Date: 2022-06-28
+# Author: Ben Youngman
+# Maintainer: Ben Youngman <b.youngman@exeter.ac.uk>
+# Description: Methods for fitting various extreme value distributions with parameters of generalised additive model (GAM) form are provided. For details of distributions see Coles, S.G. (2001) <doi:10.1007/978-1-4471-3675-0>, GAMs see Wood, S.N. (2017) <doi:10.1201/9781315370279>, and the fitting approach see Wood, S.N., Pya, N. & Safken, B. (2016) <doi:10.1080/01621459.2016.1180986>. Details of how evgam works and various examples are given in Youngman, B.D. (2022) <doi:10.18637/jss.v103.i03>.
+# License: GPL-3
+# Imports: Rcpp (>= 1.0.8.3), mgcv
+# LinkingTo: Rcpp, RcppArmadillo
+# Depends: R (>= 3.5.0)
+# RoxygenNote: 7.2.0
+# NeedsCompilation: yes
+# Packaged: 2022-06-28 11:07:30 UTC; ben
+# Repository: CRAN
+# Date/Publication: 2022-06-28 14:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

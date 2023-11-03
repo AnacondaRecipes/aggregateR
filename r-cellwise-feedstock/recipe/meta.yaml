@@ -1,0 +1,125 @@
+{% set version = '2.5.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cellwise
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cellWise_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cellWise/cellWise_{{ version }}.tar.gz
+  sha256: 89c065c09f98e8e3970ecedb3d73d9a3397d5887d6df439c4fb5d35184af512b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, robustHD, MASS, ellipse, markdown, rospca, GSE
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.10.14
+    - r-rcpparmadillo >=0.7.600.1.0
+    - r-ggplot2
+    - r-gridextra
+    - r-matrixstats
+    - r-reshape2
+    - r-robustbase
+    - r-rrcov
+    - r-scales
+    - r-shape
+    - r-svd
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.10.14
+    - r-rcpparmadillo >=0.7.600.1.0
+    - r-ggplot2
+    - r-gridextra
+    - r-matrixstats
+    - r-reshape2
+    - r-robustbase
+    - r-rrcov
+    - r-scales
+    - r-shape
+    - r-svd
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cellWise')"           # [not win]
+    - "\"%R%\" -e \"library('cellWise')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cellWise
+  license: GPL-2
+  summary: 'Tools for detecting cellwise outliers and robust methods to analyze data which may
+    contain them. Contains the implementation of the algorithms described in Rousseeuw
+    and Van den Bossche (2018) <doi:10.1080/00401706.2017.1340909> (open access) Hubert
+    et al. (2019) <doi:10.1080/00401706.2018.1562989> (open access), Raymaekers and
+    Rousseeuw (2021) <doi:10.1080/00401706.2019.1677270> (open access), Raymaekers and
+    Rousseeuw (2021) <doi:10.1007/s10994-021-05960-5> (open access), Raymaekers and
+    Rousseeuw (2021) <doi:10.52933/jdssv.v1i3.18> (open access), Raymaekers and Rousseeuw
+    (2022) <arXiv:2207.13493> (open access) Rousseeuw (2022) <doi:10.1016/j.ecosta.2023.01.007>
+    (open access). Examples can be found in the vignettes: "DDC_examples", "MacroPCA_examples",
+    "wrap_examples", "transfo_examples", "DI_examples", "cellMCD_examples" , "Correspondence_analysis_examples",
+    and "cellwise_weights_examples".'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: cellWise
+# Type: Package
+# Version: 2.5.3
+# Date: 2023-10-25
+# Title: Analyzing Data with Cellwise Outliers
+# Authors@R: c( person(given="Jakob",family="Raymaekers", role = c("aut","cre"), email="jakob.raymaekers@kuleuven.be"), person(given="Peter",family="Rousseeuw", role = c("aut")), person(given="Wannes",family="Van den Bossche", role = c("ctb")), person(given="Mia",family="Hubert", role = c("ctb")) )
+# Depends: R (>= 4.0.0)
+# Suggests: knitr, robustHD, MASS, ellipse, markdown, rospca, GSE
+# Imports: reshape2, scales, ggplot2, matrixStats, gridExtra, robustbase, rrcov, svd, stats, utils, shape, Rcpp (>= 0.12.10.14)
+# LinkingTo: Rcpp, RcppArmadillo (>= 0.7.600.1.0)
+# Description: Tools for detecting cellwise outliers and robust methods to analyze data which may contain them. Contains the implementation of the algorithms described in Rousseeuw and Van den Bossche (2018) <doi:10.1080/00401706.2017.1340909> (open access) Hubert et al. (2019) <doi:10.1080/00401706.2018.1562989> (open access), Raymaekers and Rousseeuw (2021) <doi:10.1080/00401706.2019.1677270> (open access), Raymaekers and Rousseeuw (2021) <doi:10.1007/s10994-021-05960-5> (open access), Raymaekers and Rousseeuw (2021) <doi:10.52933/jdssv.v1i3.18> (open access), Raymaekers and Rousseeuw (2022) <arXiv:2207.13493> (open access) Rousseeuw (2022) <doi:10.1016/j.ecosta.2023.01.007> (open access). Examples can be found in the vignettes: "DDC_examples", "MacroPCA_examples", "wrap_examples", "transfo_examples", "DI_examples", "cellMCD_examples" , "Correspondence_analysis_examples", and "cellwise_weights_examples".
+# License: GPL (>= 2)
+# LazyData: No
+# Author: Jakob Raymaekers [aut, cre], Peter Rousseeuw [aut], Wannes Van den Bossche [ctb], Mia Hubert [ctb]
+# Maintainer: Jakob Raymaekers <jakob.raymaekers@kuleuven.be>
+# VignetteBuilder: knitr
+# RoxygenNote: 7.1.2
+# NeedsCompilation: yes
+# Packaged: 2023-10-25 12:14:44 UTC; u0105404
+# Repository: CRAN
+# Date/Publication: 2023-10-25 13:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

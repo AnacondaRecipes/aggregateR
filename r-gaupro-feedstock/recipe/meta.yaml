@@ -1,0 +1,104 @@
+{% set version = '0.2.11' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gaupro
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GauPro_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GauPro/GauPro_{{ version }}.tar.gz
+  sha256: 30c0d0ab2c163410d71d7e5a2b838243d620dd0fb57c1f0be040f3cb5ce12d04
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, microbenchmark, numDeriv, ContourFunctions, dplyr, ggplot2, ggrepel, gridExtra, lhs, mixopt (> 0.1.0), rlang, splitfngr, tidyr, MASS
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-lbfgs
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-r6
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-lbfgs
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GauPro')"           # [not win]
+    - "\"%R%\" -e \"library('GauPro')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/CollinErickson/GauPro
+  license: GPL-3
+  summary: Fits a Gaussian process model to data. Gaussian processes are commonly used in computer
+    experiments to fit an interpolating model. The model is stored as an 'R6' object
+    and can be easily updated with new data. There are options to run in parallel, and
+    'Rcpp' has been used to speed up calculations. For more info about Gaussian process
+    software, see Erickson et al. (2018) <doi:10.1016/j.ejor.2017.10.002>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: GauPro
+# Type: Package
+# Title: Gaussian Process Fitting
+# Version: 0.2.11
+# Author: Collin Erickson
+# Maintainer: Collin Erickson <collinberickson@gmail.com>
+# Description: Fits a Gaussian process model to data. Gaussian processes are commonly used in computer experiments to fit an interpolating model. The model is stored as an 'R6' object and can be easily updated with new data. There are options to run in parallel, and 'Rcpp' has been used to speed up calculations. For more info about Gaussian process software, see Erickson et al. (2018) <doi:10.1016/j.ejor.2017.10.002>.
+# License: GPL-3
+# LinkingTo: Rcpp, RcppArmadillo
+# Imports: Rcpp, R6, lbfgs
+# RoxygenNote: 7.2.3
+# Suggests: testthat, knitr, rmarkdown, microbenchmark, numDeriv, ContourFunctions, dplyr, ggplot2, ggrepel, gridExtra, lhs, mixopt (> 0.1.0), rlang, splitfngr, tidyr, MASS
+# VignetteBuilder: knitr
+# URL: https://github.com/CollinErickson/GauPro
+# BugReports: https://github.com/CollinErickson/GauPro/issues
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-04-11 02:42:48 UTC; colli
+# Repository: CRAN
+# Date/Publication: 2023-04-11 11:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

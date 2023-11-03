@@ -1,0 +1,96 @@
+{% set version = '1.0-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sdprior
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sdPrior_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sdPrior/sdPrior_{{ version }}.tar.gz
+  sha256: 67c07289815bc40085466ab0839e907bcb800c93e5ab614539bf6fab15cd8c3c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-gb2
+    - r-mass
+    - r-doparallel
+    - r-mgcv
+    - r-mvtnorm
+    - r-pscl
+
+  run:
+    - r-base
+    - r-gb2
+    - r-mass
+    - r-doparallel
+    - r-mgcv
+    - r-mvtnorm
+    - r-pscl
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sdPrior')"           # [not win]
+    - "\"%R%\" -e \"library('sdPrior')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=sdPrior
+  license: GPL-2
+  summary: Utility functions for scale-dependent and alternative hyperpriors. The distribution
+    parameters may capture location, scale, shape, etc. and every parameter may depend
+    on complex additive terms (fixed, random, smooth, spatial, etc.) similar to a generalized
+    additive model. Hyperpriors for all effects can be elicitated within the package.
+    Including complex tensor product interaction terms and variable selection priors.
+    The basic model is explained in in Klein and Kneib (2016) <doi:10.1214/15-BA983>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: sdPrior
+# Title: Scale-Dependent Hyperpriors in Structured Additive Distributional Regression
+# Version: 1.0-0
+# Authors@R: c(person(given = "Nadja", family = "Klein", role = c("aut", "cre"), email = "nadja.klein@hu-berlin.de"))
+# Maintainer: Nadja Klein <nadja.klein@hu-berlin.de>
+# Description: Utility functions for scale-dependent and alternative hyperpriors. The distribution parameters may capture location, scale, shape, etc. and every parameter may depend on complex additive terms (fixed, random, smooth, spatial, etc.) similar to a generalized additive model. Hyperpriors for all effects can be elicitated within the package. Including complex tensor product interaction terms and variable selection priors. The basic model is explained in in Klein and Kneib (2016) <doi:10.1214/15-BA983>.
+# Depends: R (>= 3.1.0)
+# Imports: splines, GB2, MASS, stats, pscl, mvtnorm, mgcv, graphics, doParallel, parallel
+# LazyData: true
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2018-10-06 11:34:16 UTC; nadja.klein
+# RoxygenNote: 6.0.1
+# Author: Nadja Klein [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2018-10-06 21:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

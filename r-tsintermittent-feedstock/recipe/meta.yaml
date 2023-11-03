@@ -1,0 +1,87 @@
+{% set version = '1.10' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tsintermittent
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tsintermittent_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tsintermittent/tsintermittent_{{ version }}.tar.gz
+  sha256: c2742811463984389d0f0f00434bde97b8d4717d6b8374e19f3e3996997ae7fd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mapa
+
+  run:
+    - r-base
+    - r-mapa
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tsintermittent')"           # [not win]
+    - "\"%R%\" -e \"library('tsintermittent')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://kourentzes.com/forecasting/2014/06/23/intermittent-demand-forecasting-package-for-r/
+  license: GPL-2
+  summary: Time series methods for intermittent demand forecasting. Includes Croston's method
+    and its variants (Moving Average, SBA), and the TSB method. Users can obtain optimal
+    parameters on a variety of loss functions, or use fixed ones (Kourenztes (2014)
+    <doi:10.1016/j.ijpe.2014.06.007>). Intermittent time series classification methods
+    and iMAPA that uses multiple temporal aggregation levels are also provided (Petropoulos
+    & Kourenztes (2015) <doi:10.1057/jors.2014.62>).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: tsintermittent
+# Type: Package
+# Title: Intermittent Time Series Forecasting
+# Version: 1.10
+# Date: 2022-07-15
+# Authors@R: c( person("Nikolaos", "Kourentzes", email = "nikolaos@kourentzes.com", role = c("cre","aut"), comment = c(ORCID = "0000-0003-0211-5218")), person("Fotios", "Petropoulos", email = "F.Petropoulos@bath.ac.uk", role = "ctb", comment = c(ORCID = "0000-0003-3039-4955")))
+# Description: Time series methods for intermittent demand forecasting. Includes Croston's method and its variants (Moving Average, SBA), and the TSB method. Users can obtain optimal parameters on a variety of loss functions, or use fixed ones (Kourenztes (2014) <doi:10.1016/j.ijpe.2014.06.007>). Intermittent time series classification methods and iMAPA that uses multiple temporal aggregation levels are also provided (Petropoulos & Kourenztes (2015) <doi:10.1057/jors.2014.62>).
+# LazyData: yes
+# License: GPL (>= 2)
+# Imports: MAPA, parallel
+# URL: https://kourentzes.com/forecasting/2014/06/23/intermittent-demand-forecasting-package-for-r/
+# NeedsCompilation: no
+# Packaged: 2022-07-17 10:15:29 UTC; Nikos
+# Author: Nikolaos Kourentzes [cre, aut] (<https://orcid.org/0000-0003-0211-5218>), Fotios Petropoulos [ctb] (<https://orcid.org/0000-0003-3039-4955>)
+# Maintainer: Nikolaos Kourentzes <nikolaos@kourentzes.com>
+# Repository: CRAN
+# Date/Publication: 2022-07-18 08:10:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

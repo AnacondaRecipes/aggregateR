@@ -1,0 +1,107 @@
+{% set version = '0.3.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tigerstats
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tigerstats_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tigerstats/tigerstats_{{ version }}.tar.gz
+  sha256: 94f771fa4fef45fa676b3914b9df2f4a5b3e1dbe944c68f300d27e052026bf5c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, shiny, shinyjs
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-abd
+    - r-ggplot2
+    - r-lattice
+    - r-manipulate
+    - r-mosaic
+    - r-mosaicdata
+    - r-rlang
+
+  run:
+    - r-base
+    - r-mass
+    - r-abd
+    - r-ggplot2
+    - r-lattice
+    - r-manipulate
+    - r-mosaic
+    - r-mosaicdata
+    - r-rlang
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tigerstats')"           # [not win]
+    - "\"%R%\" -e \"library('tigerstats')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=tigerstats
+  license: GPL-3
+  summary: A collection of data sets and functions that are useful in the teaching of statistics
+    at an elementary level to students who may have little or no previous experience
+    with the command line.  The functions for elementary inferential procedures follow
+    a uniform interface for user input.  Some of the functions are instructional applets
+    that can only be run on the R Studio integrated development environment with package
+    'manipulate' installed.  Other instructional applets are Shiny apps that may be
+    run locally. In teaching the package is used alongside of package 'mosaic', 'mosaicData'
+    and 'abd', which are therefore listed as dependencies.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: tigerstats
+# Type: Package
+# Title: R Functions for Elementary Statistics
+# Version: 0.3.2
+# Date: 2020-06-14
+# Author: Rebekah Robinson <rebekahmusselwhite23@gmail.com> and Homer White <hwhite0@georgetowncollege.edu>
+# Maintainer: Homer White <hwhite0@georgetowncollege.edu>
+# Description: A collection of data sets and functions that are useful in the teaching of statistics at an elementary level to students who may have little or no previous experience with the command line.  The functions for elementary inferential procedures follow a uniform interface for user input.  Some of the functions are instructional applets that can only be run on the R Studio integrated development environment with package 'manipulate' installed.  Other instructional applets are Shiny apps that may be run locally. In teaching the package is used alongside of package 'mosaic', 'mosaicData' and 'abd', which are therefore listed as dependencies.
+# License: GPL (>= 3)
+# Depends: R(>= 3.0), abd, mosaic, mosaicData
+# Imports: ggplot2, lattice, manipulate, MASS, methods, rlang
+# Suggests: knitr, shiny, shinyjs
+# LazyLoad: yes
+# LazyData: true
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2020-06-14 23:46:07 UTC; homer
+# RoxygenNote: 7.1.0
+# Repository: CRAN
+# Date/Publication: 2020-06-15 06:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

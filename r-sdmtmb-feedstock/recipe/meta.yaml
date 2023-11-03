@@ -1,0 +1,133 @@
+{% set version = '0.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sdmtmb
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sdmTMB_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sdmTMB/sdmTMB_{{ version }}.tar.gz
+  sha256: b614e53381c16754aff32e59a9bd8136cb917f37451fee3422b3dbb63c5f1403
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dplyr, effects (>= 4.0-1), estimability, emmeans (>= 1.4), future, future.apply, ggeffects, ggforce, glmmTMB, ggplot2, knitr, rmarkdown, sf, splancs, testthat, tibble, visreg
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-rcppeigen
+    - r-tmb >=1.8.0
+    - r-assertthat
+    - r-cli
+    - r-clisymbols
+    - r-fishmod
+    - r-fmesher
+    - r-generics
+    - r-lifecycle
+    - r-lme4
+    - r-mgcv
+    - r-mvtnorm
+    - r-nlme
+    - r-rlang
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-rcppeigen
+    - r-tmb >=1.8.0
+    - r-assertthat
+    - r-cli
+    - r-clisymbols
+    - r-fishmod
+    - r-fmesher
+    - r-generics
+    - r-lifecycle
+    - r-lme4
+    - r-mgcv
+    - r-mvtnorm
+    - r-nlme
+    - r-rlang
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sdmTMB')"           # [not win]
+    - "\"%R%\" -e \"library('sdmTMB')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://pbs-assess.github.io/sdmTMB/index.html, https://pbs-assess.github.io/sdmTMB/
+  license: GPL-3
+  summary: Implements spatial and spatiotemporal GLMMs (Generalized Linear Mixed Effect Models)
+    using 'TMB', 'INLA', and the SPDE (Stochastic Partial Differential Equation) approximation
+    to Gaussian random fields. One common application is for spatially explicit species
+    distribution models (SDMs). See Anderson et al. (2022) <doi:10.1101/2022.03.24.485545>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: sdmTMB
+# Title: Spatial and Spatiotemporal SPDE-Based GLMMs with 'TMB'
+# Version: 0.4.0
+# Authors@R: c( person(c("Sean", "C."), "Anderson", , "sean@seananderson.ca", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9563-1937")), person(c("Eric", "J."), "Ward", role = "aut", comment = c(ORCID = "0000-0002-4359-0296")), person(c("Lewis", "A.", "K."), "Barnett", role = "aut", comment = c(ORCID = "0000-0002-9381-8375")), person(c("Philina", "A."), "English", role = "aut", comment = c(ORCID = "0000-0003-2992-6782")), person(c("James", "T."), "Thorson", role = c("ctb", "cph"), comment = c(ORCID = "0000-0001-7415-1010", "VAST author")), person("Joe", "Watson", role = "ctb", comment = "Censored Poisson"), person("Julia", "Indivero", role = c("ctb"), comment = c("Vignette writing")), person(c("Jillian", "C."), "Dunic", role = c("ctb"), comment = c(ORCID = "0000-0002-0729-3083")), person(c("Cole", "C."), "Monnahan", role = c("ctb", "cph"), comment = c(ORCID = "0000-0003-0871-6700", "VAST contributor")), person("Mollie", "Brooks", role = c("ctb", "cph"), comment = c(ORCID = "0000-0001-6963-8326", "glmmTMB author")), person("Ben", "Bolker", role = c("ctb", "cph"), comment = c(ORCID = "0000-0002-2127-0443", "glmmTMB author")), person("Kasper", "Kristensen", role = c("ctb", "cph"), comment = "TMB/glmmTMB author"), person("Martin", "Maechler", role = c("ctb", "cph"), comment = c(ORCID = "0000-0002-8685-9910", "glmmTMB author")), person("Arni", "Magnusson", role = c("ctb", "cph"), comment = c(ORCID = "0000-0003-2769-6741", "glmmTMB author")), person(c("Hans", "J."), "Skaug", role = c("ctb", "cph"), comment = "glmmTMB author, SPDE barrier"), person("Anders", "Nielsen", role = c("ctb", "cph"), comment = c(ORCID = "0000-0001-9683-9262", "glmmTMB author")), person("Casper", "Berg", role = c("ctb", "cph"), comment = c(ORCID = "0000-0002-3812-5269", "glmmTMB author")), person("Koen", "van Bentham", role = c("ctb", "cph"), comment = "glmmTMB author"), person(c("Olav", "Nikolai"), "Breivik", role = c("ctb", "cph"), comment = "SPDE barrier"), person("Simon", "Wood", role = c("ctb", "cph"), comment = "mgcv: smoother prediction"), person("Paul-Christian", "Burkner", role = c("ctb", "cph"), comment = "brms: smoother matrix parsing"), person(paste("His Majesty the King in Right of Canada, as represented by", "the Minister of the Department of Fisheries and Oceans"), role = "cph") )
+# Description: Implements spatial and spatiotemporal GLMMs (Generalized Linear Mixed Effect Models) using 'TMB', 'INLA', and the SPDE (Stochastic Partial Differential Equation) approximation to Gaussian random fields. One common application is for spatially explicit species distribution models (SDMs). See Anderson et al. (2022) <doi:10.1101/2022.03.24.485545>.
+# License: GPL-3
+# Copyright: inst/COPYRIGHTS
+# URL: https://pbs-assess.github.io/sdmTMB/index.html, https://pbs-assess.github.io/sdmTMB/
+# BugReports: https://github.com/pbs-assess/sdmTMB/issues
+# Depends: R (>= 3.5.0)
+# Imports: assertthat, clisymbols, cli, fmesher, fishMod, generics, graphics, lifecycle, lme4, Matrix, methods, mgcv, mvtnorm, nlme, rlang, stats, TMB (>= 1.8.0)
+# Suggests: dplyr, effects (>= 4.0-1), estimability, emmeans (>= 1.4), future, future.apply, ggeffects, ggforce, glmmTMB, ggplot2, knitr, rmarkdown, sf, splancs, testthat, tibble, visreg
+# LinkingTo: RcppEigen, TMB
+# VignetteBuilder: knitr
+# ByteCompile: true
+# Config/testthat/edition: 3
+# Config/testthat/parallel: true
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.3
+# SystemRequirements: GNU make
+# NeedsCompilation: yes
+# Packaged: 2023-10-19 18:44:09 UTC; seananderson
+# Author: Sean C. Anderson [aut, cre] (<https://orcid.org/0000-0001-9563-1937>), Eric J. Ward [aut] (<https://orcid.org/0000-0002-4359-0296>), Lewis A. K. Barnett [aut] (<https://orcid.org/0000-0002-9381-8375>), Philina A. English [aut] (<https://orcid.org/0000-0003-2992-6782>), James T. Thorson [ctb, cph] (<https://orcid.org/0000-0001-7415-1010>, VAST author), Joe Watson [ctb] (Censored Poisson), Julia Indivero [ctb] (Vignette writing), Jillian C. Dunic [ctb] (<https://orcid.org/0000-0002-0729-3083>), Cole C. Monnahan [ctb, cph] (<https://orcid.org/0000-0003-0871-6700>, VAST contributor), Mollie Brooks [ctb, cph] (<https://orcid.org/0000-0001-6963-8326>, glmmTMB author), Ben Bolker [ctb, cph] (<https://orcid.org/0000-0002-2127-0443>, glmmTMB author), Kasper Kristensen [ctb, cph] (TMB/glmmTMB author), Martin Maechler [ctb, cph] (<https://orcid.org/0000-0002-8685-9910>, glmmTMB author), Arni Magnusson [ctb, cph] (<https://orcid.org/0000-0003-2769-6741>, glmmTMB author), Hans J. Skaug [ctb, cph] (glmmTMB author, SPDE barrier), Anders Nielsen [ctb, cph] (<https://orcid.org/0000-0001-9683-9262>, glmmTMB author), Casper Berg [ctb, cph] (<https://orcid.org/0000-0002-3812-5269>, glmmTMB author), Koen van Bentham [ctb, cph] (glmmTMB author), Olav Nikolai Breivik [ctb, cph] (SPDE barrier), Simon Wood [ctb, cph] (mgcv: smoother prediction), Paul-Christian Burkner [ctb, cph] (brms: smoother matrix parsing), His Majesty the King in Right of Canada, as represented by the Minister of the Department of Fisheries and Oceans [cph]
+# Maintainer: Sean C. Anderson <sean@seananderson.ca>
+# Repository: CRAN
+# Date/Publication: 2023-10-20 15:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,123 @@
+{% set version = '0.45.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-imager
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/imager_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/imager/imager_{{ version }}.tar.gz
+  sha256: 49848bcb03dd3fc3605799893d39986b521921faaa5647815274eb204bb9bf56
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown,ggplot2,dplyr,scales, testthat,raster,spatstat.geom,magick,Cairo
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.5
+    - r-downloader
+    - r-igraph
+    - r-jpeg
+    - r-magrittr
+    - r-png
+    - r-purrr
+    - r-readbitmap
+    - r-stringr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.5
+    - r-downloader
+    - r-igraph
+    - r-jpeg
+    - r-magrittr
+    - r-png
+    - r-purrr
+    - r-readbitmap
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('imager')"           # [not win]
+    - "\"%R%\" -e \"library('imager')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://asgr.github.io/imager/, https://github.com/asgr/imager/
+  license: LGPL-3
+  summary: Fast image processing for images in up to 4 dimensions (two spatial dimensions, one
+    time/depth dimension, one colour dimension). Provides most traditional image processing
+    tools (filtering, morphology, transformations, etc.) as well as various functions
+    for easily analysing image data using R. The package wraps 'CImg', <http://cimg.eu>,
+    a simple, modern C++ library for image processing.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: imager
+# Type: Package
+# Title: Image Processing Library Based on 'CImg'
+# Version: 0.45.2
+# Authors@R: c(person("Simon","Barthelme",email="simon.barthelme@gipsa-lab.fr",role=c("aut")), person("David","Tschumperle",role=c("ctb")), person("Jan","Wijffels",role=c("ctb")), person("Haz Edine","Assemlal",role=c("ctb")), person("Shota","Ochi",email="shotaochi1990@gmail.com",role=c("ctb")), person("Aaron","Robotham",email="aaron.robotham@uwa.edu.au",role=c("cre")), person("Rodrigo","Tobar",role=c("ctb")))
+# Description: Fast image processing for images in up to 4 dimensions (two spatial dimensions, one time/depth dimension, one colour dimension). Provides most traditional image processing tools (filtering, morphology, transformations, etc.) as well as various functions for easily analysing image data using R. The package wraps 'CImg', <http://cimg.eu>, a simple, modern C++ library for image processing.
+# License: LGPL-3
+# Imports: Rcpp (>= 0.11.5),methods,stringr,png,jpeg,readbitmap,grDevices,purrr,downloader,igraph
+# Depends: R (>= 2.10.0),magrittr
+# URL: https://asgr.github.io/imager/, https://github.com/asgr/imager/
+# BugReports: https://github.com/asgr/imager/issues
+# SystemRequirements: fftw3,libtiff,X11
+# LinkingTo: Rcpp
+# LazyData: true
+# RoxygenNote: 7.2.3
+# Suggests: knitr, rmarkdown,ggplot2,dplyr,scales, testthat,raster,spatstat.geom,magick,Cairo
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-05-09 13:55:42 UTC; rtobar
+# Author: Simon Barthelme [aut], David Tschumperle [ctb], Jan Wijffels [ctb], Haz Edine Assemlal [ctb], Shota Ochi [ctb], Aaron Robotham [cre], Rodrigo Tobar [ctb]
+# Maintainer: Aaron Robotham <aaron.robotham@uwa.edu.au>
+# Repository: CRAN
+# Date/Publication: 2023-05-10 07:40:12 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

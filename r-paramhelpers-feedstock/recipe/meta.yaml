@@ -1,0 +1,101 @@
+{% set version = '1.14.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-paramhelpers
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ParamHelpers_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ParamHelpers/ParamHelpers_{{ version }}.tar.gz
+  sha256: 0450ff8489b0d4d0842130f6a9713ede97da936d7909c43d43587bf2d5a01a21
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: interp, covr, eaf, emoa, GGally, ggplot2, grid, gridExtra, irace (>= 2.1), lhs, plyr, reshape2, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bbmisc >=1.10
+    - r-backports
+    - r-checkmate >=1.8.2
+    - r-fastmatch
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bbmisc >=1.10
+    - r-backports
+    - r-checkmate >=1.8.2
+    - r-fastmatch
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ParamHelpers')"           # [not win]
+    - "\"%R%\" -e \"library('ParamHelpers')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://paramhelpers.mlr-org.com, https://github.com/mlr-org/ParamHelpers
+  license: BSD_2_clause
+  summary: Functions for parameter descriptions and operations in black-box optimization, tuning
+    and machine learning. Parameters can be described (type, constraints, defaults,
+    etc.), combined to parameter sets and can in general be programmed on. A useful
+    OptPath object (archive) to log function evaluations is also provided.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_2_clause'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: ParamHelpers
+# Title: Helpers for Parameters in Black-Box Optimization, Tuning and Machine Learning
+# Version: 1.14.1
+# Authors@R: c(person(given = "Bernd", family = "Bischl", role = "aut", email = "bernd_bischl@gmx.net", comment = c(ORCID = "0000-0001-6002-6980")), person(given = "Michel", family = "Lang", role = "aut", email = "michellang@gmail.com", comment = c(ORCID = "0000-0001-9754-0393")), person(given = "Jakob", family = "Richter", role = c("cre", "aut"), email = "code@jakob-r.de", comment = c(ORCID = "0000-0003-4481-5554")), person(given = "Jakob", family = "Bossek", role = "aut", email = "j.bossek@gmail.com"), person(given = "Daniel", family = "Horn", role = "aut", email = "daniel.horn@tu-dortmund.de"), person(given = "Karin", family = "Schork", role = "ctb", email = "karin.schork@tu-dortmund.de"), person(given = "Pascal", family = "Kerschke", role = "aut", email = "kerschke@uni-muenster.de"))
+# Description: Functions for parameter descriptions and operations in black-box optimization, tuning and machine learning. Parameters can be described (type, constraints, defaults, etc.), combined to parameter sets and can in general be programmed on. A useful OptPath object (archive) to log function evaluations is also provided.
+# License: BSD_2_clause + file LICENSE
+# URL: https://paramhelpers.mlr-org.com, https://github.com/mlr-org/ParamHelpers
+# BugReports: https://github.com/mlr-org/ParamHelpers/issues
+# Imports: backports, BBmisc (>= 1.10), checkmate (>= 1.8.2), fastmatch, methods
+# Suggests: interp, covr, eaf, emoa, GGally, ggplot2, grid, gridExtra, irace (>= 2.1), lhs, plyr, reshape2, testthat
+# ByteCompile: yes
+# Encoding: UTF-8
+# RoxygenNote: 7.1.0
+# NeedsCompilation: yes
+# Packaged: 2022-07-04 09:34:57 UTC; ripley
+# Author: Bernd Bischl [aut] (<https://orcid.org/0000-0001-6002-6980>), Michel Lang [aut] (<https://orcid.org/0000-0001-9754-0393>), Jakob Richter [cre, aut] (<https://orcid.org/0000-0003-4481-5554>), Jakob Bossek [aut], Daniel Horn [aut], Karin Schork [ctb], Pascal Kerschke [aut]
+# Maintainer: Jakob Richter <code@jakob-r.de>
+# Repository: CRAN
+# Date/Publication: 2022-07-04 11:29:28 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

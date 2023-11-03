@@ -1,0 +1,94 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tidylog
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tidylog_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tidylog/tidylog_{{ version }}.tar.gz
+  sha256: 67625de38920e1c3c9f6a996de4ef406a0d23eeef6d3b846e52630afc0a8ca1c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr, forcats, knitr, rmarkdown, bench
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-clisymbols
+    - r-dplyr
+    - r-glue
+    - r-tidyr
+
+  run:
+    - r-base
+    - r-clisymbols
+    - r-dplyr
+    - r-glue
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tidylog')"           # [not win]
+    - "\"%R%\" -e \"library('tidylog')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/elbersb/tidylog/
+  license: MIT
+  summary: Provides feedback about 'dplyr' and 'tidyr' operations.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: tidylog
+# Type: Package
+# Title: Logging for 'dplyr' and 'tidyr' Functions
+# Version: 1.0.2
+# Authors@R: c( person("Benjamin", "Elbers", email = "elbersb@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5392-3448")), person("Damiano", "Oldoni", email = "damiano.oldoni@inbo.be", role = c("ctb"), comment = c(ORCID = "0000-0003-3445-7562")) )
+# Description: Provides feedback about 'dplyr' and 'tidyr' operations.
+# License: MIT + file LICENSE
+# Imports: dplyr, tidyr, glue, clisymbols
+# Suggests: testthat, covr, forcats, knitr, rmarkdown, bench
+# Encoding: UTF-8
+# LazyData: true
+# URL: https://github.com/elbersb/tidylog/
+# BugReports: https://github.com/elbersb/tidylog/issues
+# RoxygenNote: 7.0.2
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2020-07-03 13:14:16 UTC; benjamin
+# Author: Benjamin Elbers [aut, cre] (<https://orcid.org/0000-0001-5392-3448>), Damiano Oldoni [ctb] (<https://orcid.org/0000-0003-3445-7562>)
+# Maintainer: Benjamin Elbers <elbersb@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2020-07-03 13:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

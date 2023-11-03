@@ -1,0 +1,115 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ergm.ego
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ergm.ego_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ergm.ego/ergm.ego_{{ version }}.tar.gz
+  sha256: f415b8e28bcfd23dbfc21f337e182446e298f6087d14fc3bf071764392dcd4f1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.1.1), covr (>= 3.2.1)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcolorbrewer >=1.1.2
+    - r-dplyr
+    - r-egor
+    - r-ergm >=4.5.0
+    - r-network >=1.17.1
+    - r-purrr >=0.3.2
+    - r-statnet.common >=4.5.0
+    - r-survey
+    - r-tibble >=2.1.1
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcolorbrewer >=1.1.2
+    - r-dplyr
+    - r-egor
+    - r-ergm >=4.5.0
+    - r-network >=1.17.1
+    - r-purrr >=0.3.2
+    - r-statnet.common >=4.5.0
+    - r-survey
+    - r-tibble >=2.1.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ergm.ego')"           # [not win]
+    - "\"%R%\" -e \"library('ergm.ego')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://statnet.org
+  license: GPL-3
+  summary: Utilities for managing egocentrically sampled network data and a wrapper around the
+    'ergm' package to facilitate ERGM inference and simulation from such data. See Krivitsky
+    and Morris (2017) <doi:10.1214/16-AOAS1010>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: ergm.ego
+# Version: 1.1.0
+# Date: 2023-05-30
+# Title: Fit, Simulate and Diagnose Exponential-Family Random Graph Models to Egocentrically Sampled Network Data
+# Authors@R: c( person(c("Pavel", "N."), "Krivitsky", role=c("aut","cre"), email="pavel@statnet.org", comment=c(ORCID="0000-0002-9101-3362")), person(c("Steven", "M."), "Goodreau", role=c("ctb"), email="goodreau@u.washington.edu"), person("Martina", "Morris", role=c("ctb"), email="morrism@u.washington.edu"), person("Kirk", "Li", role=c("ctb"), email="kirkli@uw.edu"), person(c("Emily", "N."), "Beylerian", role=c("ctb"), email="ebey@uw.edu"), person("Micha", "Bojanowski", role=c("ctb"), email="michal2992@gmail.com", comment=c(ORCID="0000-0001-7503-852X")), person("Chad", "Klumb", role=c("ctb"), email="cklumb@gmail.com"))
+# Depends: R (>= 4.1.0), ergm (>= 4.5.0), egor, network (>= 1.17.1)
+# LinkingTo: ergm
+# Imports: statnet.common (>= 4.5.0), RColorBrewer (>= 1.1.2), purrr (>= 0.3.2), tibble (>= 2.1.1), dplyr, survey, stats, methods
+# Suggests: testthat (>= 2.1.1), covr (>= 3.2.1)
+# Description: Utilities for managing egocentrically sampled network data and a wrapper around the 'ergm' package to facilitate ERGM inference and simulation from such data. See Krivitsky and Morris (2017) <doi:10.1214/16-AOAS1010>.
+# License: GPL-3 + file LICENSE
+# URL: https://statnet.org
+# BugReports: https://github.com/statnet/ergm.ego/issues
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# LazyData: true
+# Config/testthat/parallel: true
+# Config/testthat/edition: 3
+# NeedsCompilation: yes
+# Packaged: 2023-05-30 13:32:13 UTC; pavel
+# Author: Pavel N. Krivitsky [aut, cre] (<https://orcid.org/0000-0002-9101-3362>), Steven M. Goodreau [ctb], Martina Morris [ctb], Kirk Li [ctb], Emily N. Beylerian [ctb], Micha Bojanowski [ctb] (<https://orcid.org/0000-0001-7503-852X>), Chad Klumb [ctb]
+# Maintainer: Pavel N. Krivitsky <pavel@statnet.org>
+# Repository: CRAN
+# Date/Publication: 2023-05-30 14:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

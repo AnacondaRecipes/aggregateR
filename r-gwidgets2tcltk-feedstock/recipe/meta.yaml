@@ -1,0 +1,87 @@
+{% set version = '1.0-8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gwidgets2tcltk
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gWidgets2tcltk_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gWidgets2tcltk/gWidgets2tcltk_{{ version }}.tar.gz
+  sha256: 10399cc636eeeb5484c3379970c37c56df10d979bf866a35b66d0c75b7222c0a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-digest
+    - r-gwidgets2 >=1.0.7
+    - r-memoise
+
+  run:
+    - r-base
+    - r-digest
+    - r-gwidgets2 >=1.0.7
+    - r-memoise
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gWidgets2tcltk')"           # [not win]
+    - "\"%R%\" -e \"library('gWidgets2tcltk')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jverzani/gWidgets2tcltk
+  license: GPL-2
+  summary: Port of the 'gWidgets2' API for the 'tcltk' package.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: gWidgets2tcltk
+# Version: 1.0-8
+# Title: Toolkit Implementation of gWidgets2 for tcltk
+# Author: John Verzani
+# Maintainer: John Verzani <jverzani@gmail.com>
+# URL: https://github.com/jverzani/gWidgets2tcltk
+# Depends: R (>= 2.12.0), methods, digest, memoise, tcltk(>= 2.7.0), gWidgets2(>= 1.0.7)
+# Suggests: testthat
+# Description: Port of the 'gWidgets2' API for the 'tcltk' package.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# Collate: 'List.R' 'gWidgets2tcltk-package.R' 'misc.R' 'tcltk-misc.R' 'dnd.R' 'GComponent.R' 'GContainer.R' 'GWidget.R' 'dialogs.R' 'gmenu.R' 'gaction.R' 'gbutton.R' 'gcalendar.R' 'gcheckbox.R' 'gtable.R' 'gcheckboxgroup.R' 'gcombobox.R' 'tablelist.R' 'gdf.R' 'gedit.R' 'gexpandgroup.R' 'gfile.R' 'gformlayout.R' 'ggroup.R' 'gframe.R' 'gimage.R' 'glabel.R' 'glayout.R' 'gnotebook.R' 'gpanedgroup.R' 'gprogressbar.R' 'gradio.R' 'gseparator.R' 'gslider.R' 'gspinbutton.R' 'gstackwidget.R' 'gstatusbar.R' 'gtext.R' 'gtimer.R' 'gtoolbar.R' 'gtree.R' 'gvarbrowser.R' 'gwindow.R' 'icons.R' 'tk2tip.R' 'zzz.R'
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2022-02-16 20:19:36 UTC; jverzani
+# Repository: CRAN
+# Date/Publication: 2022-02-16 23:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,125 @@
+{% set version = '0.5.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fdapace
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fdapace_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fdapace/fdapace_{{ version }}.tar.gz
+  sha256: 0e41687ecd71ce74e470eceb6062812c5774d64da5d18dcbec20097f5a18479a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: plot3D, rgl, aplpack, mgcv, ks, gtools, knitr, rmarkdown, EMCluster, minqa, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-hmisc
+    - r-mass
+    - r-matrix
+    - r-rcpp >=0.11.5
+    - r-rcppeigen
+    - r-numderiv
+    - r-pracma
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-hmisc
+    - r-mass
+    - r-matrix
+    - r-rcpp >=0.11.5
+    - r-rcppeigen
+    - r-numderiv
+    - r-pracma
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fdapace')"           # [not win]
+    - "\"%R%\" -e \"library('fdapace')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/functionaldata/tPACE
+  license: BSD_3_clause
+  summary: "A versatile package that provides implementation of various methods of Functional
+    Data Analysis (FDA) and Empirical Dynamics. The core of this package is Functional
+    Principal Component Analysis (FPCA), a key technique for functional data analysis,
+    for sparsely or densely sampled random trajectories and time courses, via the Principal
+    Analysis by Conditional Estimation (PACE) algorithm. This core algorithm yields
+    covariance and mean functions, eigenfunctions and principal component (scores),
+    for both functional data and derivatives, for both dense (functional) and sparse
+    (longitudinal) sampling designs. For sparse designs, it provides fitted continuous
+    trajectories with confidence bands, even for subjects with very few longitudinal
+    observations. PACE is a viable and flexible alternative to random effects modeling
+    of longitudinal data. There is also a Matlab version (PACE) that contains some methods
+    not available on fdapace and vice versa. Updates to fdapace were supported by grants
+    from NIH Echo and NSF DMS-1712864 and DMS-2014626. Please cite our package if you
+    use it (You may run the command citation(\"fdapace\") to get the citation format
+    and bibtex entry). References: Wang, J.L., Chiou, J., M\xFCller, H.G. (2016) <doi:10.1146/annurev-statistics-041715-033624>;
+    Chen, K., Zhang, X., Petersen, A., M\xFCller, H.G. (2017) <doi:10.1007/s12561-015-9137-5>."
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_3_clause'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: fdapace
+# Type: Package
+# Title: Functional Data Analysis and Empirical Dynamics
+# URL: https://github.com/functionaldata/tPACE
+# BugReports: https://github.com/functionaldata/tPACE/issues
+# Version: 0.5.9
+# Encoding: UTF-8
+# Date: 2022-08-15,
+# Authors@R: c(person("Yidong", "Zhou", email="ydzhou@ucdavis.edu", role=c("aut","cre")), person("Satarupa","Bhattacharjee", role=c("aut")), person("Cody","Carroll", email="cjcarroll@ucdavis.edu", role=c("aut"), comment =  c(ORCID = "0000-0003-3525-8653")), person("Yaqing","Chen", email="yaqchen@ucdavis.edu", role=c("aut")), person("Xiongtao","Dai", email="dai@ucdavis.edu", role=c("aut")), person("Jianing","Fan", role=c("aut")), person("Alvaro","Gajardo", role=c("aut")), person("Pantelis Z.","Hadjipantelis", role=c("aut")), person("Kyunghee","Han", role="aut"), person("Hao","Ji", role=c("aut")), person("Changbo","Zhu", role=c("aut")), person("Shu-Chin", "Lin", role="ctb"), person("Paromita", "Dubey", role="ctb"), person("Hans-Georg", "Muller", role=c("cph","ths","aut")), person("Jane-Ling", "Wang", role=c("cph","ths","aut")))
+# Maintainer: Yidong Zhou <ydzhou@ucdavis.edu>
+# Description: A versatile package that provides implementation of various methods of Functional Data Analysis (FDA) and Empirical Dynamics. The core of this package is Functional Principal Component Analysis (FPCA), a key technique for functional data analysis, for sparsely or densely sampled random trajectories and time courses, via the Principal Analysis by Conditional Estimation (PACE) algorithm. This core algorithm yields covariance and mean functions, eigenfunctions and principal component (scores), for both functional data and derivatives, for both dense (functional) and sparse (longitudinal) sampling designs. For sparse designs, it provides fitted continuous trajectories with confidence bands, even for subjects with very few longitudinal observations. PACE is a viable and flexible alternative to random effects modeling of longitudinal data. There is also a Matlab version (PACE) that contains some methods not available on fdapace and vice versa. Updates to fdapace were supported by grants from NIH Echo and NSF DMS-1712864 and DMS-2014626. Please cite our package if you use it (You may run the command citation("fdapace") to get the citation format and bibtex entry). References: Wang, J.L., Chiou, J., Muller, H.G. (2016) <doi:10.1146/annurev-statistics-041715-033624>; Chen, K., Zhang, X., Petersen, A., Muller, H.G. (2017) <doi:10.1007/s12561-015-9137-5>.
+# License: BSD_3_clause + file LICENSE
+# LazyData: false
+# Imports: Rcpp (>= 0.11.5), Hmisc, MASS, Matrix, pracma, numDeriv
+# LinkingTo: Rcpp, RcppEigen
+# Suggests: plot3D, rgl, aplpack, mgcv, ks, gtools, knitr, rmarkdown, EMCluster, minqa, testthat
+# NeedsCompilation: yes
+# RoxygenNote: 7.2.1
+# VignetteBuilder: knitr
+# Packaged: 2022-08-15 22:55:42 UTC; alvaro
+# Author: Yidong Zhou [aut, cre], Satarupa Bhattacharjee [aut], Cody Carroll [aut] (<https://orcid.org/0000-0003-3525-8653>), Yaqing Chen [aut], Xiongtao Dai [aut], Jianing Fan [aut], Alvaro Gajardo [aut], Pantelis Z. Hadjipantelis [aut], Kyunghee Han [aut], Hao Ji [aut], Changbo Zhu [aut], Shu-Chin Lin [ctb], Paromita Dubey [ctb], Hans-Georg Muller [cph, ths, aut], Jane-Ling Wang [cph, ths, aut]
+# Repository: CRAN
+# Date/Publication: 2022-08-16 13:00:28 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

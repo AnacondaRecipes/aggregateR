@@ -1,0 +1,86 @@
+{% set version = '0.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lic
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LIC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LIC/LIC_{{ version }}.tar.gz
+  sha256: b8dd18a1df2a1ba125b2f38cca593fdf99349ab1f480fb41253f038cebe89807
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LIC')"           # [not win]
+    - "\"%R%\" -e \"library('LIC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=LIC
+  license: MIT
+  summary: The LIC criterion is to determine the most informative subsets so that the subset
+    can retain most of the information contained in the complete data. The philosophy
+    of the package is described in Guo G. (2022) <doi:10.1080/02664763.2022.2053949>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: LIC
+# Title: The LIC Criterion for Optimal Subset Selection
+# Version: 0.0.2
+# Authors@R: c(person("Guangbao", "Guo",role = c("aut", "cre"), email = "ggb11111111@163.com", comment = c(ORCID = " ")), person("Yue", "Sun", role="aut"), person("Guoqi", "Qian", role="aut"), person("Qian", "Wang", role="aut"))
+# Description: The LIC criterion is to determine the most informative subsets so that the subset can retain most of the information contained in the complete data. The philosophy of the package is described in Guo G. (2022) <doi:10.1080/02664763.2022.2053949>.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.1.2
+# Imports: stats
+# Suggests: testthat (>= 3.0.0)
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2022-03-28 03:48:02 UTC; GD
+# Author: Guangbao Guo [aut, cre], Yue Sun [aut], Guoqi Qian [aut], Qian Wang [aut]
+# Maintainer: Guangbao Guo <ggb11111111@163.com>
+# Depends: R (>= 3.5.0)
+# Repository: CRAN
+# Date/Publication: 2022-03-28 06:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

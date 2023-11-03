@@ -1,0 +1,98 @@
+{% set version = '2.0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-activepathways
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ActivePathways_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ActivePathways/ActivePathways_{{ version }}.tar.gz
+  sha256: 30dd04b851f4b9c3b32a1bf26dbe135daa3bf6c490d73f43665602acf0edfb55
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, RColorBrewer
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-ggplot2
+
+  run:
+    - r-base
+    - r-data.table
+    - r-ggplot2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ActivePathways')"           # [not win]
+    - "\"%R%\" -e \"library('ActivePathways')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: ''
+  license: GPL-3
+  summary: 'Framework for analysing multiple omics datasets in the context of molecular pathways,
+    biological processes and other types of gene sets. The package uses p-value merging
+    to combine gene- or protein-level signals, followed by ranked hypergeometric tests
+    to determine enriched pathways and processes. This approach allows researchers to
+    interpret a series of omics datasets in the context of known biology and gene function,
+    and discover associations that are only apparent when several datasets are combined.
+    The first version of the package is part of the following publication: Integrative
+    Pathway Enrichment Analysis of Multivariate Omics Data. Paczkowska M^, Barenboim
+    J^, Sintupisut N, Fox NS, Zhu H, Abd-Rabbo D, Mee MW, Boutros PC, PCAWG Drivers
+    and Functional Interpretation Working Group; Reimand J, PCAWG Consortium. Nature
+    Communications (2020) <doi:10.1038/s41467-019-13983-9>.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: ActivePathways
+# Title: Integrative Pathway Enrichment Analysis of Multivariate Omics Data
+# Version: 2.0.3
+# Authors@R: c(person("Juri", "Reimand", email = "juri.reimand@utoronto.ca", role = c("aut", "cre")), person("Jonathan", "Barenboim", email = "jon.barenboim@gmail.com", role = "ctb"), person("Mykhaylo", "Slobodyanyuk", email = "michael.slobodyanyuk@oicr.on.ca", role = "aut"))
+# Description: Framework for analysing multiple omics datasets in the context of molecular pathways, biological processes and other types of gene sets. The package uses p-value merging to combine gene- or protein-level signals, followed by ranked hypergeometric tests to determine enriched pathways and processes. This approach allows researchers to interpret a series of omics datasets in the context of known biology and gene function, and discover associations that are only apparent when several datasets are combined. The first version of the package is part of the following publication: Integrative Pathway Enrichment Analysis of Multivariate Omics Data. Paczkowska M^, Barenboim J^, Sintupisut N, Fox NS, Zhu H, Abd-Rabbo D, Mee MW, Boutros PC, PCAWG Drivers and Functional Interpretation Working Group; Reimand J, PCAWG Consortium. Nature Communications (2020) <doi:10.1038/s41467-019-13983-9>.
+# Depends: R (>= 3.6)
+# Imports: data.table, ggplot2
+# License: GPL-3
+# URL:
+# BugReports: https://github.com/reimandlab/ActivePathways/issues
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Suggests: testthat, knitr, rmarkdown, RColorBrewer
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2023-10-31 19:24:44 UTC; jreimand
+# Author: Juri Reimand [aut, cre], Jonathan Barenboim [ctb], Mykhaylo Slobodyanyuk [aut]
+# Maintainer: Juri Reimand <juri.reimand@utoronto.ca>
+# Repository: CRAN
+# Date/Publication: 2023-10-31 20:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

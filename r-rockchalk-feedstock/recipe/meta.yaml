@@ -1,0 +1,96 @@
+{% set version = '1.8.157' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rockchalk
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rockchalk_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rockchalk/rockchalk_{{ version }}.tar.gz
+  sha256: 814099ca8b1193992cd6e0af759a7d5bac74b891fbb4518c7f0e7fd56dcbe28d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tables, Hmisc, car, mvtnorm, scatterplot3d, HH
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-cardata
+    - r-kutils
+    - r-lme4
+
+  run:
+    - r-base
+    - r-mass
+    - r-cardata
+    - r-kutils
+    - r-lme4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rockchalk')"           # [not win]
+    - "\"%R%\" -e \"library('rockchalk')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rockchalk
+  license: GPL (>= 3.0)
+  summary: A collection of functions for interpretation and presentation of regression analysis.  These
+    functions are used to produce the statistics lectures in <https://pj.freefaculty.org/guides/>.
+    Includes regression diagnostics, regression tables, and plots of interactions and
+    "moderator" variables. The emphasis is on "mean-centered" and "residual-centered"
+    predictors. The vignette 'rockchalk' offers a fairly comprehensive overview.  The
+    vignette 'Rstyle' has advice about coding in R.  The package title 'rockchalk' refers
+    to our school motto, 'Rock Chalk Jayhawk, Go K.U.'.
+  license_family: GPL3
+
+# The original CRAN metadata for this package was:
+
+# Package: rockchalk
+# Type: Package
+# Title: Regression Estimation and Presentation
+# Version: 1.8.157
+# Date: 2022-07-25
+# Authors@R: c(person("Paul E.","Johnson",email="pauljohn@ku.edu",role = c("aut", "cre")), person("Gabor", "Grothendieck",email="ggrothendieck@gmail.com", role="ctb"), person("Dimitri", "Papadopoulos OrfanosGabor", email="dimitri.papadopoulos@cea.fr", role="ctb"))
+# Maintainer: Paul E. Johnson <pauljohn@ku.edu>
+# Description: A collection of functions for interpretation and presentation of regression analysis.  These functions are used to produce the statistics lectures in <https://pj.freefaculty.org/guides/>. Includes regression diagnostics, regression tables, and plots of interactions and "moderator" variables. The emphasis is on "mean-centered" and "residual-centered" predictors. The vignette 'rockchalk' offers a fairly comprehensive overview.  The vignette 'Rstyle' has advice about coding in R.  The package title 'rockchalk' refers to our school motto, 'Rock Chalk Jayhawk, Go K.U.'.
+# License: GPL (>= 3.0)
+# LazyLoad: yes
+# Depends: R (>= 2.10)
+# Imports: grDevices, methods, lme4, carData, MASS, kutils
+# Suggests: tables, Hmisc, car, mvtnorm, scatterplot3d, HH
+# Encoding: UTF-8
+# RoxygenNote: 7.2.0
+# NeedsCompilation: no
+# Packaged: 2022-07-26 01:06:41 UTC; pauljohn
+# Author: Paul E. Johnson [aut, cre], Gabor Grothendieck [ctb], Dimitri Papadopoulos OrfanosGabor [ctb]
+# Repository: CRAN
+# Date/Publication: 2022-08-06 17:00:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

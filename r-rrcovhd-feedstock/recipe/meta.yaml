@@ -1,0 +1,110 @@
+{% set version = '0.2-7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rrcovhd
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rrcovHD_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rrcovHD/rrcovHD_{{ version }}.tar.gz
+  sha256: 6ed43c16ab74e3ed5ea7651f5f58aca0cfdd7da6796d7a1deef53e860b7f3deb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-pcapp
+    - r-pls
+    - r-robusthd
+    - r-robustbase >=0.92_1
+    - r-rrcov >=1.3_7
+    - r-spls
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-pcapp
+    - r-pls
+    - r-robusthd
+    - r-robustbase >=0.92_1
+    - r-rrcov >=1.3_7
+    - r-spls
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rrcovHD')"           # [not win]
+    - "\"%R%\" -e \"library('rrcovHD')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rrcovHD
+  license: GPL-2
+  summary: Robust multivariate methods for high dimensional data including outlier detection
+    (Filzmoser and Todorov (2013) <doi:10.1016/j.ins.2012.10.017>), robust sparse PCA
+    (Croux et al. (2013) <doi:10.1080/00401706.2012.727746>, Todorov and Filzmoser (2013)
+    <doi:10.1007/978-3-642-33042-1_31>), robust PLS (Todorov and Filzmoser (2014) <doi:10.17713/ajs.v43i4.44>),
+    and robust sparse classification (Ortner et al. (2020) <doi:10.1007/s10618-019-00666-8>).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: rrcovHD
+# Date: 2021-04-21
+# Title: Robust Multivariate Methods for High Dimensional Data
+# Version: 0.2-7
+# VersionNote: Released 0.2-6 on 2019-11-29 on CRAN
+# Authors@R: c(person("Valentin", "Todorov", role = c("aut", "cre"), email = "valentin.todorov@chello.at", comment=c(ORCID = "0000-0003-4215-0245")))
+# Description: Robust multivariate methods for high dimensional data including outlier detection (Filzmoser and Todorov (2013) <doi:10.1016/j.ins.2012.10.017>), robust sparse PCA (Croux et al. (2013) <doi:10.1080/00401706.2012.727746>, Todorov and Filzmoser (2013) <doi:10.1007/978-3-642-33042-1_31>), robust PLS (Todorov and Filzmoser (2014) <doi:10.17713/ajs.v43i4.44>), and robust sparse classification (Ortner et al. (2020) <doi:10.1007/s10618-019-00666-8>).
+# Maintainer: Valentin Todorov <valentin.todorov@chello.at>
+# Depends: rrcov (>= 1.3-7), robustbase (>= 0.92-1), methods
+# Imports: stats4, pls, spls, pcaPP, robustHD, Rcpp
+# LinkingTo: Rcpp
+# Suggests: MASS
+# LazyLoad: yes
+# LazyData: yes
+# License: GPL (>= 2)
+# Packaged: 2021-04-22 21:44:41 UTC; valen
+# NeedsCompilation: yes
+# Repository: CRAN
+# Author: Valentin Todorov [aut, cre] (<https://orcid.org/0000-0003-4215-0245>)
+# Date/Publication: 2021-04-23 08:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

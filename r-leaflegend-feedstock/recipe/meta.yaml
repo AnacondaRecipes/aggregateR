@@ -1,0 +1,96 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-leaflegend
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/leaflegend_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/leaflegend/leaflegend_{{ version }}.tar.gz
+  sha256: acf463989452cbfb70310b5ffbad77c7a499d4d00b73448cb4d00de85e5a01ae
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-base64enc
+    - r-htmltools
+    - r-htmlwidgets
+    - r-leaflet
+
+  run:
+    - r-base
+    - r-base64enc
+    - r-htmltools
+    - r-htmlwidgets
+    - r-leaflet
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('leaflegend')"           # [not win]
+    - "\"%R%\" -e \"library('leaflegend')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://leaflegend.roh.engineering, https://github.com/tomroh/leaflegend
+  license: MIT
+  summary: Provides extensions to the 'leaflet' package to customize legends with images, text
+    styling, orientation, sizing, and symbology and functions to create symbols to plot
+    on maps.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: leaflegend
+# Type: Package
+# Title: Add Custom Legends to 'leaflet' Maps
+# Version: 1.1.1
+# Authors@R: c( person("Thomas", "Roh", email = "thomas@roh.engineering", role = c("aut", "cre")), person("Ricardo Rodrigo", "Basa", email = "radbasa@gmail.com", role = c("ctb")))
+# Description: Provides extensions to the 'leaflet' package to customize legends with images, text styling, orientation, sizing, and symbology and functions to create symbols to plot on maps.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Depends: R (>= 3.3.0)
+# Imports: leaflet, htmltools, stats, base64enc, htmlwidgets
+# RoxygenNote: 7.2.3
+# URL: https://leaflegend.roh.engineering, https://github.com/tomroh/leaflegend
+# BugReports: https://github.com/tomroh/leaflegend/issues
+# Suggests: covr, testthat (>= 3.0.0)
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2023-08-19 15:24:52 UTC; thoma
+# Author: Thomas Roh [aut, cre], Ricardo Rodrigo Basa [ctb]
+# Maintainer: Thomas Roh <thomas@roh.engineering>
+# Repository: CRAN
+# Date/Publication: 2023-08-19 16:12:41 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,100 @@
+{% set version = '0.3.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dimora
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DIMORA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DIMORA/DIMORA_{{ version }}.tar.gz
+  sha256: 12f3d7b17577a8da0670eb985ba340215a9f99a37d108d5d9b615c92b71db1e1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-desolve
+    - r-forecast
+    - r-minpack.lm
+    - r-numderiv
+    - r-reshape2
+
+  run:
+    - r-base
+    - r-desolve
+    - r-forecast
+    - r-minpack.lm
+    - r-numderiv
+    - r-reshape2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DIMORA')"           # [not win]
+    - "\"%R%\" -e \"library('DIMORA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DIMORA
+  license: GPL-3
+  summary: 'The implemented methods are: Standard Bass model, Generalized Bass model (with rectangular
+    shock, exponential shock, and mixed shock. You can choose to add from 1 to 3 shocks),
+    Guseo-Guidolin model and Variable Potential Market model, and UCRCD model. The Bass
+    model consists of a simple differential equation that describes the process of how
+    new products get adopted in a population, the Generalized Bass model is a generalization
+    of the Bass model in which there is a "carrier" function x(t) that allows to change
+    the speed of time sliding. In some real processes the reachable potential of the
+    resource available in a temporal instant may appear to be not constant over time,
+    because of this we use Variable Potential Market model, in which the Guseo-Guidolin
+    has a particular specification for the market function. The UCRCD model (Unbalanced
+    Competition and Regime Change Diachronic) is a diffusion model used to capture the
+    dynamics of the competitive or collaborative transition.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: DIMORA
+# Date: 2023-10-07
+# Type: Package
+# Title: Diffusion Models R Analysis
+# Version: 0.3.6
+# Author: Zanghi Federico, Savio Andrea, Filippo Ziliotto, Bessi Alessandro
+# Depends: R (>= 3.2.1), minpack.lm, numDeriv, stats, forecast, reshape2, deSolve
+# Maintainer: Savio Andrea <svandr97@gmail.com>
+# Description: The implemented methods are: Standard Bass model, Generalized Bass model (with rectangular shock, exponential shock, and mixed shock. You can choose to add from 1 to 3 shocks), Guseo-Guidolin model and Variable Potential Market model, and UCRCD model. The Bass model consists of a simple differential equation that describes the process of how new products get adopted in a population, the Generalized Bass model is a generalization of the Bass model in which there is a "carrier" function x(t) that allows to change the speed of time sliding. In some real processes the reachable potential of the resource available in a temporal instant may appear to be not constant over time, because of this we use Variable Potential Market model, in which the Guseo-Guidolin has a particular specification for the market function. The UCRCD model (Unbalanced Competition and Regime Change Diachronic) is a diffusion model used to capture the dynamics of the competitive or collaborative transition.
+# Encoding: UTF-8
+# License: GPL (>= 3)
+# RoxygenNote: 6.1.0.9000
+# NeedsCompilation: no
+# Packaged: 2023-10-07 11:44:17 UTC; andre
+# Repository: CRAN
+# Date/Publication: 2023-10-07 12:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

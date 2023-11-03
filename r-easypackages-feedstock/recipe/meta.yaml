@@ -1,0 +1,92 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-easypackages
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/easypackages_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/easypackages/easypackages_{{ version }}.tar.gz
+  sha256: aeacf036bee83305b113b69d3730cbedea779ab96dbab82f3059a2a13d0d2165
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-assertthat
+    - r-devtools
+
+  run:
+    - r-base
+    - r-assertthat
+    - r-devtools
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('easypackages')"           # [not win]
+    - "\"%R%\" -e \"library('easypackages')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=easypackages
+  license: MIT
+  summary: Easily load and install multiple packages from different sources, including CRAN and
+    GitHub. The libraries function allows you to load or attach multiple packages in
+    the same function call. The packages function will load one or more packages, and
+    install any packages that are not installed on your system (after prompting you).
+    Also included is a from_import function that allows you to import specific functions
+    from a package into the global environment.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: easypackages
+# Title: Easy Loading and Installing of Packages
+# Version: 0.1.0
+# Authors@R: person("Jake", "Sherman", email = "jake@jakesherman.com", role = c("aut", "cre"))
+# Description: Easily load and install multiple packages from different sources, including CRAN and GitHub. The libraries function allows you to load or attach multiple packages in the same function call. The packages function will load one or more packages, and install any packages that are not installed on your system (after prompting you). Also included is a from_import function that allows you to import specific functions from a package into the global environment.
+# Depends: R (>= 3.0.0)
+# Imports: assertthat, devtools, utils
+# License: MIT + file LICENSE
+# LazyData: true
+# RoxygenNote: 5.0.1
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2016-12-05 14:55:59 UTC; hornik
+# Author: Jake Sherman [aut, cre]
+# Maintainer: Jake Sherman <jake@jakesherman.com>
+# Repository: CRAN
+# Date/Publication: 2016-12-05 18:28:47
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,103 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mixr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mixR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mixR/mixR_{{ version }}.tar.gz
+  sha256: 0c5f51a9b5c3347723f9884d17a0b53334cf7b09e4f80026fb237a79b4d759c5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rmarkdown, knitr, testthat (>= 3.0.0), mockery
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.6
+    - r-ggplot2 >=3.3.3
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.6
+    - r-ggplot2 >=3.3.3
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mixR')"           # [not win]
+    - "\"%R%\" -e \"library('mixR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mixR
+  license: GPL-2
+  summary: Performs maximum likelihood estimation for finite mixture models for families including
+    Normal, Weibull, Gamma and Lognormal by using EM algorithm, together with Newton-Raphson
+    algorithm or bisection method when necessary. It also conducts mixture model selection
+    by using information criteria or bootstrap likelihood ratio test. The data used
+    for mixture model fitting can be raw data or binned data. The model fitting process
+    is accelerated by using R package 'Rcpp'.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: mixR
+# Type: Package
+# Title: Finite Mixture Modeling for Raw and Binned Data
+# Version: 0.2.0
+# Date: 2021-05-06
+# Authors@R: person("Youjiao", "Yu", email = "jiaoisjiao@gmail.com", role = c("aut", "cre"))
+# Maintainer: Youjiao Yu <jiaoisjiao@gmail.com>
+# Description: Performs maximum likelihood estimation for finite mixture models for families including Normal, Weibull, Gamma and Lognormal by using EM algorithm, together with Newton-Raphson algorithm or bisection method when necessary. It also conducts mixture model selection by using information criteria or bootstrap likelihood ratio test. The data used for mixture model fitting can be raw data or binned data. The model fitting process is accelerated by using R package 'Rcpp'.
+# License: GPL (>= 2)
+# LazyData: TRUE
+# Depends: R(>= 3.5.0)
+# Imports: ggplot2 (>= 3.3.3), graphics, Rcpp (>= 1.0.6), stats
+# LinkingTo: Rcpp
+# RoxygenNote: 7.1.1
+# NeedsCompilation: yes
+# Author: Youjiao Yu [aut, cre]
+# Repository: CRAN
+# Suggests: rmarkdown, knitr, testthat (>= 3.0.0), mockery
+# VignetteBuilder: knitr
+# Config/testthat/edition: 3
+# Packaged: 2021-06-01 14:39:24 UTC; xiaozhen
+# Date/Publication: 2021-06-01 15:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

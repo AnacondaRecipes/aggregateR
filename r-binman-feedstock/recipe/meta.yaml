@@ -1,0 +1,101 @@
+{% set version = '0.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-binman
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/binman_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/binman/binman_{{ version }}.tar.gz
+  sha256: 1c52d02b8e634e08d3a1116ab5fdf22460a32a4032a350ae03b5c5ae869fe9f7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr, knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-assertthat
+    - r-httr
+    - r-jsonlite
+    - r-rappdirs
+    - r-semver
+    - r-xml2
+    - r-yaml
+
+  run:
+    - r-base
+    - r-assertthat
+    - r-httr
+    - r-jsonlite
+    - r-rappdirs
+    - r-semver
+    - r-xml2
+    - r-yaml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('binman')"           # [not win]
+    - "\"%R%\" -e \"library('binman')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://docs.ropensci.org/binman/, https://github.com/ropensci/binman
+  license: MIT
+  summary: Tools and functions for managing the download of binary files. Binary repositories
+    are defined in 'YAML' format. Defining new pre-download, download and post-download
+    templates allow additional repositories to be added.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: binman
+# Title: A Binary Download Manager
+# Version: 0.1.3
+# Authors@R: c( person("John", "Harrison", , "johndharrison0@gmail.com", role = "aut", comment = "original author"), person("Ju Yeong", "Kim", , "jkim2345@fredhutch.org", role = "cre", comment = "rOpenSci maintainer"))
+# Description: Tools and functions for managing the download of binary files. Binary repositories are defined in 'YAML' format. Defining new pre-download, download and post-download templates allow additional repositories to be added.
+# Depends: R (>= 3.3)
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Suggests: testthat, covr, knitr, rmarkdown
+# Imports: rappdirs, yaml, httr, jsonlite, xml2, utils, stats, assertthat, semver
+# URL: https://docs.ropensci.org/binman/, https://github.com/ropensci/binman
+# BugReports: https://github.com/ropensci/binman/issues
+# RoxygenNote: 7.2.1
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2022-09-01 03:48:06 UTC; juyeongkim
+# Author: John Harrison [aut] (original author), Ju Yeong Kim [cre] (rOpenSci maintainer)
+# Maintainer: Ju Yeong Kim <jkim2345@fredhutch.org>
+# Repository: CRAN
+# Date/Publication: 2022-09-01 04:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

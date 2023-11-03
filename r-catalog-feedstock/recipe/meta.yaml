@@ -1,0 +1,91 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-catalog
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/catalog_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/catalog/catalog_{{ version }}.tar.gz
+  sha256: 2438178fc4842096649c99b5aa9ea5693f9fbb2bb84535f5459bce86c96083c8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: DBI, knitr, rmarkdown, roxygen2, tinytest
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr
+    - r-sparklyr
+
+  run:
+    - r-base
+    - r-dplyr
+    - r-sparklyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('catalog')"           # [not win]
+    - "\"%R%\" -e \"library('catalog')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://nathaneastwood.github.io/catalog/, https://github.com/nathaneastwood/catalog
+  license: GPL-2
+  summary: Gain access to the 'Spark Catalog' API making use of the 'sparklyr' API. 'Catalog'
+    <https://spark.apache.org/docs/2.4.3/api/java/org/apache/spark/sql/catalog/Catalog.html>
+    is the interface for managing a metastore (aka metadata catalog) of relational entities
+    (e.g. database(s), tables, functions, table columns and temporary views).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: catalog
+# Type: Package
+# Title: Access the 'Spark Catalog' API via 'sparklyr'
+# Version: 0.1.1
+# Authors@R: person("Nathan", "Eastwood", "", "nathan.eastwood@icloud.com", role = c("aut", "cre"))
+# Maintainer: Nathan Eastwood <nathan.eastwood@icloud.com>
+# Description: Gain access to the 'Spark Catalog' API making use of the 'sparklyr' API. 'Catalog' <https://spark.apache.org/docs/2.4.3/api/java/org/apache/spark/sql/catalog/Catalog.html> is the interface for managing a metastore (aka metadata catalog) of relational entities (e.g. database(s), tables, functions, table columns and temporary views).
+# URL: https://nathaneastwood.github.io/catalog/, https://github.com/nathaneastwood/catalog
+# BugReports: https://github.com/nathaneastwood/catalog/issues
+# Depends: R (>= 3.5)
+# Imports: dplyr, sparklyr
+# Suggests: DBI, knitr, rmarkdown, roxygen2, tinytest
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# RoxygenNote: 7.2.1
+# NeedsCompilation: no
+# Packaged: 2022-08-22 20:56:08 UTC; nathan
+# Author: Nathan Eastwood [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2022-08-22 21:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

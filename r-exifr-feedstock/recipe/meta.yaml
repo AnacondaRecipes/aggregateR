@@ -1,0 +1,102 @@
+{% set version = '0.3.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-exifr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/exifr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/exifr/exifr_{{ version }}.tar.gz
+  sha256: 8c24724ebf5ce190de78ab8ec546aabae27c17144e55f4e0c0a1a40347281547
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-curl
+    - r-jsonlite
+    - r-plyr
+    - r-rappdirs
+    - r-tibble
+
+  run:
+    - r-base
+    - r-curl
+    - r-jsonlite
+    - r-plyr
+    - r-rappdirs
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('exifr')"           # [not win]
+    - "\"%R%\" -e \"library('exifr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/paleolimbot/exifr
+  license: GPL-2
+  summary: Reads EXIF data using ExifTool <https://exiftool.org> and returns results as a data
+    frame. ExifTool is a platform-independent Perl library plus a command-line application
+    for reading, writing and editing meta information in a wide variety of files. ExifTool
+    supports many different metadata formats including EXIF, GPS, IPTC, XMP, JFIF, GeoTIFF,
+    ICC Profile, Photoshop IRB, FlashPix, AFCP and ID3, as well as the maker notes of
+    many digital cameras by Canon, Casio, FLIR, FujiFilm, GE, HP, JVC/Victor, Kodak,
+    Leaf, Minolta/Konica-Minolta, Motorola, Nikon, Nintendo, Olympus/Epson, Panasonic/Leica,
+    Pentax/Asahi, Phase One, Reconyx, Ricoh, Samsung, Sanyo, Sigma/Foveon and Sony.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: exifr
+# Type: Package
+# Title: EXIF Image Data in R
+# Version: 0.3.2
+# Authors@R: c( person("Dewey", "Dunnington", email = "dewey@fishandwhistle.net", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9415-4582") ), person("Phil", "Harvey", role = "aut") )
+# Maintainer: Dewey Dunnington <dewey@fishandwhistle.net>
+# Description: Reads EXIF data using ExifTool <https://exiftool.org> and returns results as a data frame. ExifTool is a platform-independent Perl library plus a command-line application for reading, writing and editing meta information in a wide variety of files. ExifTool supports many different metadata formats including EXIF, GPS, IPTC, XMP, JFIF, GeoTIFF, ICC Profile, Photoshop IRB, FlashPix, AFCP and ID3, as well as the maker notes of many digital cameras by Canon, Casio, FLIR, FujiFilm, GE, HP, JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Motorola, Nikon, Nintendo, Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Phase One, Reconyx, Ricoh, Samsung, Sanyo, Sigma/Foveon and Sony.
+# License: GPL-2
+# LazyData: TRUE
+# Encoding: UTF-8
+# Imports: curl, plyr, tibble, jsonlite, utils, rappdirs
+# SystemRequirements: Perl
+# URL: https://github.com/paleolimbot/exifr
+# BugReports: https://github.com/paleolimbot/exifr/issues
+# RoxygenNote: 7.1.1
+# Suggests: testthat, covr
+# NeedsCompilation: no
+# Packaged: 2021-03-20 15:24:53 UTC; dewey
+# Author: Dewey Dunnington [aut, cre] (<https://orcid.org/0000-0002-9415-4582>), Phil Harvey [aut]
+# Repository: CRAN
+# Date/Publication: 2021-03-20 20:40:20 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

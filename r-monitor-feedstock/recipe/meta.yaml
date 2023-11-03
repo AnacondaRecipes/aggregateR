@@ -1,0 +1,87 @@
+{% set version = '1.0.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-monitor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/monitoR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/monitoR/monitoR_{{ version }}.tar.gz
+  sha256: 3631d63f824afdb98e0486bb9f2d881bbb05d4d16432defb19bf8e2043052fc0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: fftw, parallel, RODBC, knitr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-tuner
+
+  run:
+    - r-base
+    - r-tuner
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('monitoR')"           # [not win]
+    - "\"%R%\" -e \"library('monitoR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.uvm.edu/rsenr/vtcfwru/R/?Page=monitoR/monitoR.htm
+  license: GPL-2
+  summary: Acoustic template detection and monitoring database interface. Create, modify, save,
+    and use templates for detection of animal vocalizations. View, verify, and extract
+    results. Upload a MySQL schema to a existing instance, manage survey metadata, write
+    and read templates and detections locally or to the database.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: monitoR
+# Type: Package
+# Title: Acoustic Template Detection in R
+# Version: 1.0.7
+# Date: 2018-02-14
+# Author: Sasha D. Hafner <sdh11@cornell.edu> and Jon Katz <jonkatz4@gmail.com>, with code for the Fourier transform from the seewave package (by Jerome Sueur, Thierry Aubin, and Caroline Simonis), and code for the readMP3 function from the tuneR package (by Uwe Ligges). Therese Donovan provided creative direction and database design support.
+# Maintainer: Sasha D. Hafner <sdh11@cornell.edu>
+# Depends: R (>= 2.10), tuneR, methods
+# Imports: graphics, grDevices, stats, utils
+# Suggests: fftw, parallel, RODBC, knitr
+# Description: Acoustic template detection and monitoring database interface. Create, modify, save, and use templates for detection of animal vocalizations. View, verify, and extract results. Upload a MySQL schema to a existing instance, manage survey metadata, write and read templates and detections locally or to the database.
+# License: GPL-2
+# URL: http://www.uvm.edu/rsenr/vtcfwru/R/?Page=monitoR/monitoR.htm
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2018-02-14 09:56:14 UTC; sasha
+# Repository: CRAN
+# Date/Publication: 2018-02-14 16:38:52 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

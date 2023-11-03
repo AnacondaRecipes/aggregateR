@@ -1,0 +1,82 @@
+{% set version = '1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-envnicher
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/EnvNicheR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/EnvNicheR/EnvNicheR_{{ version }}.tar.gz
+  sha256: 5702d50d4326fb52cc7b5c99ab01e32c6aecb229c6210f3e393443eb0b4fe5fd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-idpmisc
+
+  run:
+    - r-base
+    - r-idpmisc
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('EnvNicheR')"           # [not win]
+    - "\"%R%\" -e \"library('EnvNicheR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=EnvNicheR
+  license: GPL-2
+  summary: 'A plot overlying the niche of multiple species is obtained: 1) to determine the niche
+    conditions which favor a higher species richness, 2) to create a box plot with the
+    range of environmental variables of the species, 3) to obtain a list of species
+    in an area of the niche selected by the user and, 4) to estimate niche overlap among
+    the species.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: EnvNicheR
+# Version: 1.5
+# Title: Niche Estimation
+# Author: Castor Guisande Gonzalez
+# Maintainer: Castor Guisande Gonzalez <castor@uvigo.es>
+# Description: A plot overlying the niche of multiple species is obtained: 1) to determine the niche conditions which favor a higher species richness, 2) to create a box plot with the range of environmental variables of the species, 3) to obtain a list of species in an area of the niche selected by the user and, 4) to estimate niche overlap among the species.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# Depends: R (>= 3.1.1), IDPmisc, stats, utils, graphics, grDevices
+# Repository: CRAN
+# NeedsCompilation: no
+# Packaged: 2023-10-07 20:07:59 UTC; castor
+# Date/Publication: 2023-10-07 22:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

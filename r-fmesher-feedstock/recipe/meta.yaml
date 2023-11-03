@@ -1,0 +1,122 @@
+{% set version = '0.1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fmesher
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fmesher_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fmesher/fmesher_{{ version }}.tar.gz
+  sha256: 27b2231ee5f07a8b769f3b7f8e75a048b3c31bba4ba7b538753f03a985295b99
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggplot2, ggpolypath, inlabru (>= 2.8.0), knitr, testthat (>= 3.0.0), terra, tidyterra, rgl, rmarkdown, splancs, gsl
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-rcpp
+    - r-dplyr
+    - r-lifecycle
+    - r-rlang
+    - r-sf
+    - r-sp >=1.6_1
+    - r-tibble
+    - r-withr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-rcpp
+    - r-dplyr
+    - r-lifecycle
+    - r-rlang
+    - r-sf
+    - r-sp >=1.6_1
+    - r-tibble
+    - r-withr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fmesher')"           # [not win]
+    - "\"%R%\" -e \"library('fmesher')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://inlabru-org.github.io/fmesher/, https://github.com/inlabru-org/fmesher
+  license: MPL-2.0
+  summary: Generate planar and spherical triangle meshes, compute finite element calculations
+    for 1- and 2-dimensional flat and curved manifolds with associated basis function
+    spaces, methods for lines and polygons, and transparent handling of coordinate reference
+    systems and coordinate transformation, including 'sf' and 'sp' geometries. The core
+    'fmesher' library code was originally part of the 'INLA' package, and implements
+    parts of "Triangulations and Applications" by Hjelle and Daehlen (2006) <doi:10.1007/3-540-33261-8>.
+  license_family: OTHER
+
+# The original CRAN metadata for this package was:
+
+# Package: fmesher
+# Type: Package
+# Title: Triangle Meshes and Related Geometry Tools
+# Version: 0.1.4
+# Authors@R: c( person("Finn", "Lindgren", email = "finn.lindgren@gmail.com", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0002-5833-2011", "Finn Lindgren wrote the main code")), person("Seaton", "Andy", email = "andy.e.seaton@gmail.com", role = c("ctb"), comment = "Andy Seaton constributed features to the sf support"), person("Suen", "Man Ho", email = "M.H.Suen@sms.ed.ac.uk", role = c("ctb"), comment = "Man Ho Suen contributed features and code structure design for the integration methods"), person("Fabian E.", "Bachl", email = "bachlfab@gmail.com", role = c("ctb"), comment = "Fabian Bachl co-developed precursors of fm_pixels and fm_split_lines in inlabru") )
+# Description: Generate planar and spherical triangle meshes, compute finite element calculations for 1- and 2-dimensional flat and curved manifolds with associated basis function spaces, methods for lines and polygons, and transparent handling of coordinate reference systems and coordinate transformation, including 'sf' and 'sp' geometries. The core 'fmesher' library code was originally part of the 'INLA' package, and implements parts of "Triangulations and Applications" by Hjelle and Daehlen (2006) <doi:10.1007/3-540-33261-8>.
+# Depends: R (>= 4.0), methods
+# Imports: dplyr, graphics, grDevices, lifecycle, Matrix, rlang, sf, sp (>= 1.6-1), stats, tibble, utils, withr, Rcpp
+# Suggests: ggplot2, ggpolypath, inlabru (>= 2.8.0), knitr, testthat (>= 3.0.0), terra, tidyterra, rgl, rmarkdown, splancs, gsl
+# URL: https://inlabru-org.github.io/fmesher/, https://github.com/inlabru-org/fmesher
+# BugReports: https://github.com/inlabru-org/fmesher/issues
+# License: MPL-2.0
+# Copyright: 2010-2023 Finn Lindgren, except src/predicates.cc by Jonathan Richard Shewchuk, 1996
+# NeedsCompilation: yes
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# Config/testthat/edition: 3
+# Config/testthat/parallel: true
+# SystemRequirements: C++17
+# LinkingTo: Rcpp
+# VignetteBuilder: knitr
+# BuildVignettes: true
+# Collate: 'RcppExports.R' 'deprecated.R' 'bary.R' 'bbox.R' 'print.R' 'crs.R' 'data-fmexample.R' 'diameter.R' 'evaluator.R' 'fem.R' 'fm.R' 'fmesher-package.R' 'fmesher.R' 'ggplot.R' 'integration.R' 'lattice_2d.R' 'list.R' 'local.R' 'manifold.R' 'mapping.R' 'matern.R' 'mesh.R' 'mesh_1d.R' 'mesh_2d.R' 'nonconvex_hull.R' 'onload.R' 'plot.R' 'segm.R' 'sf_mesh.R' 'sf_utils.R' 'simplify.R' 'sp_mesh.R' 'split_lines.R' 'tensor.R' 'utils.R'
+# LazyData: true
+# Packaged: 2023-10-28 22:39:37 UTC; flindgre
+# Author: Finn Lindgren [aut, cre, cph] (<https://orcid.org/0000-0002-5833-2011>, Finn Lindgren wrote the main code), Seaton Andy [ctb] (Andy Seaton constributed features to the sf support), Suen Man Ho [ctb] (Man Ho Suen contributed features and code structure design for the integration methods), Fabian E. Bachl [ctb] (Fabian Bachl co-developed precursors of fm_pixels and fm_split_lines in inlabru)
+# Maintainer: Finn Lindgren <finn.lindgren@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-28 23:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

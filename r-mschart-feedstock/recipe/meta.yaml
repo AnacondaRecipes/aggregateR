@@ -1,0 +1,102 @@
+{% set version = '0.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mschart
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mschart_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mschart/mschart_{{ version }}.tar.gz
+  sha256: 319bcd9c4500adb1b6f28fb31f70d2889c6b89b5182e400cc7696afc67a5de7e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tinytest, doconv
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-cellranger
+    - r-data.table
+    - r-htmltools
+    - r-officer >=0.3.6
+    - r-writexl
+    - r-xml2 >=1.1.0
+
+  run:
+    - r-base
+    - r-cellranger
+    - r-data.table
+    - r-htmltools
+    - r-officer >=0.3.6
+    - r-writexl
+    - r-xml2 >=1.1.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mschart')"           # [not win]
+    - "\"%R%\" -e \"library('mschart')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://ardata-fr.github.io/officeverse/, https://ardata-fr.github.io/mschart/
+  license: MIT
+  summary: Create native charts for 'Microsoft PowerPoint' and 'Microsoft Word' documents. These
+    can then be edited and annotated. Functions are provided to let users create charts,
+    modify and format their content. The chart's underlying data is automatically saved
+    within the 'Word' document or 'PowerPoint' presentation. It extends package 'officer'
+    that does not contain any feature for 'Microsoft' native charts production.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: mschart
+# Type: Package
+# Title: Chart Generation for 'Microsoft Word' and 'Microsoft PowerPoint' Documents
+# Version: 0.4.0
+# Authors@R: c( person("David", "Gohel", role = c("aut", "cre"), email = "david.gohel@ardata.fr"), person(given = "ArData", role = "cph"), person("YouGov", role = "fnd"), person("Jan Marvin", "Garbuszus", role = "ctb", comment = "support for openxls2"), person("Marlon", "Molina", role = "ctb", comment = "added table feature"), person("Rokas", "Klydzia", role = "ctb", comment = "custom labels"), person("David", "Camposeco", role = "ctb", email = "david.camposeco.paulsen@gmail.com", comment = "chart_data_smooth function"), person("Dan", "Joplin", role = "ctb", comment = "fix scatter plot data structure") )
+# Description: Create native charts for 'Microsoft PowerPoint' and 'Microsoft Word' documents. These can then be edited and annotated. Functions are provided to let users create charts, modify and format their content. The chart's underlying data is automatically saved within the 'Word' document or 'PowerPoint' presentation. It extends package 'officer' that does not contain any feature for 'Microsoft' native charts production.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 2.10)
+# Imports: stats, data.table, officer (>= 0.3.6), cellranger, writexl, grDevices, xml2 (>= 1.1.0), htmltools, utils
+# URL: https://ardata-fr.github.io/officeverse/, https://ardata-fr.github.io/mschart/
+# BugReports: https://github.com/ardata-fr/mschart/issues
+# RoxygenNote: 7.2.2
+# Suggests: tinytest, doconv
+# NeedsCompilation: no
+# Packaged: 2022-11-30 20:35:26 UTC; davidgohel
+# Author: David Gohel [aut, cre], ArData [cph], YouGov [fnd], Jan Marvin Garbuszus [ctb] (support for openxls2), Marlon Molina [ctb] (added table feature), Rokas Klydzia [ctb] (custom labels), David Camposeco [ctb] (chart_data_smooth function), Dan Joplin [ctb] (fix scatter plot data structure)
+# Maintainer: David Gohel <david.gohel@ardata.fr>
+# Repository: CRAN
+# Date/Publication: 2022-11-30 21:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

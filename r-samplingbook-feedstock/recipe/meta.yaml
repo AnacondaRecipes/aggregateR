@@ -1,0 +1,91 @@
+{% set version = '1.2.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-samplingbook
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/samplingbook_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/samplingbook/samplingbook_{{ version }}.tar.gz
+  sha256: 4d0559feac51bd373dffb1c7e9d6bcf1b51744284280fa1485459cf5adfad021
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-pps
+    - r-sampling
+    - r-survey
+
+  run:
+    - r-base
+    - r-pps
+    - r-sampling
+    - r-survey
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('samplingbook')"           # [not win]
+    - "\"%R%\" -e \"library('samplingbook')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.samplingbook.manitz.org
+  license: GPL-2
+  summary: Sampling procedures from the book 'Stichproben - Methoden und praktische Umsetzung
+    mit R' by Goeran Kauermann and Helmut Kuechenhoff (2010).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: samplingbook
+# Type: Package
+# Title: Survey Sampling Procedures
+# Version: 1.2.4
+# Date: 2021-04-02
+# Author: Juliane Manitz [aut,cre], Mark Hempelmann [ctb], Goeran Kauermann [ctb], Helmut Kuechenhoff [aut],  Shuai Shao [ctb], Cornelia Oberhauser [ctb], Nina Westerheide [ctb], Manuel Wiesenfarth [ctb]
+# Maintainer: Juliane Manitz <r@manitz.org>
+# URL: https://www.samplingbook.manitz.org
+# BugReports: https://github.com/jmanitz/samplingbook/issues
+# Depends: pps, sampling, survey
+# Suggests: testthat, knitr, rmarkdown, covr
+# VignetteBuilder: knitr
+# Description: Sampling procedures from the book 'Stichproben - Methoden und praktische Umsetzung mit R' by Goeran Kauermann and Helmut Kuechenhoff (2010).
+# License: GPL (>= 2)
+# LazyLoad: yes
+# NeedsCompilation: no
+# Repository: CRAN
+# RoxygenNote: 7.1.1
+# Packaged: 2021-04-02 21:23:24 UTC; M254773
+# Date/Publication: 2021-04-02 21:40:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

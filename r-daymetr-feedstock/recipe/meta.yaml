@@ -1,0 +1,100 @@
+{% set version = '1.7.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-daymetr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/daymetr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/daymetr/daymetr_{{ version }}.tar.gz
+  sha256: cf6eab22043daef7dd60fc58b56b6f058ccc1c604a39824f373a7ae13b3f3a19
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggplot2, dplyr, knitr, markdown, covr, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+    - r-ncdf4
+    - r-sf
+    - r-terra
+    - r-tibble
+    - r-tidyr
+
+  run:
+    - r-base
+    - r-httr
+    - r-ncdf4
+    - r-sf
+    - r-terra
+    - r-tibble
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('daymetr')"           # [not win]
+    - "\"%R%\" -e \"library('daymetr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/bluegreen-labs/daymetr
+  license: AGPL-3
+  summary: Programmatic interface to the 'Daymet' web services (<http://daymet.ornl.gov>). Allows
+    for easy downloads of 'Daymet' climate data directly to your R workspace or your
+    computer. Routines for both single pixel data downloads and gridded (netCDF) data
+    are provided.
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: daymetr
+# Title: Interface to the 'Daymet' Web Services
+# Version: 1.7.1
+# Authors@R: c(person( family = "Hufkens", given = "Koen", email = "koen.hufkens@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-5070-8109")), person( given = "BlueGreen Labs", role = c("cph", "fnd") ) )
+# Description: Programmatic interface to the 'Daymet' web services (<http://daymet.ornl.gov>). Allows for easy downloads of 'Daymet' climate data directly to your R workspace or your computer. Routines for both single pixel data downloads and gridded (netCDF) data are provided.
+# Depends: R (>= 3.6)
+# Imports: sf, terra, ncdf4, httr, tidyr, tibble, tools, utils
+# License: AGPL-3
+# LazyData: true
+# ByteCompile: true
+# RoxygenNote: 7.2.3
+# Suggests: ggplot2, dplyr, knitr, markdown, covr, testthat
+# VignetteBuilder: knitr
+# URL: https://github.com/bluegreen-labs/daymetr
+# BugReports: https://github.com/bluegreen-labs/daymetr/issues
+# NeedsCompilation: no
+# Packaged: 2023-09-15 14:24:39 UTC; khufkens
+# Author: Koen Hufkens [aut, cre] (<https://orcid.org/0000-0002-5070-8109>), BlueGreen Labs [cph, fnd]
+# Maintainer: Koen Hufkens <koen.hufkens@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-09-15 14:52:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

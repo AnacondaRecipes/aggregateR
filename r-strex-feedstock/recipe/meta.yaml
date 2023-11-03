@@ -1,0 +1,108 @@
+{% set version = '1.6.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-strex
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/strex_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/strex/strex_{{ version }}.tar.gz
+  sha256: 38fa8de9a7c55bffe8b47bdd57b8df7646064964737b44bc784b14e076fee5ef
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: bench, covr, knitr, purrr, rmarkdown, spelling, testthat (>= 3.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-checkmate >=1.9.3
+    - r-magrittr >=1.5
+    - r-rlang >=1.0
+    - r-stringi >=1.7.8
+    - r-stringr >=1.5
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-checkmate >=1.9.3
+    - r-magrittr >=1.5
+    - r-rlang >=1.0
+    - r-stringi >=1.7.8
+    - r-stringr >=1.5
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('strex')"           # [not win]
+    - "\"%R%\" -e \"library('strex')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://rorynolan.github.io/strex/, https://github.com/rorynolan/strex
+  license: GPL-3
+  summary: 'There are some things that I wish were easier with the ''stringr'' or ''stringi''
+    packages. The foremost of these is the extraction of numbers from strings. ''stringr''
+    and ''stringi'' make you figure out the regular expression for yourself; ''strex''
+    takes care of this for you. There are many other handy functionalities in ''strex''.
+    Contributions to this package are encouraged: it is intended as a miscellany of
+    string manipulation functions that cannot be found in ''stringi'' or ''stringr''.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: strex
+# Title: Extra String Manipulation Functions
+# Version: 1.6.1
+# Authors@R: person("Rory", "Nolan", , "rorynoolan@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-5239-4043"))
+# Description: There are some things that I wish were easier with the 'stringr' or 'stringi' packages. The foremost of these is the extraction of numbers from strings. 'stringr' and 'stringi' make you figure out the regular expression for yourself; 'strex' takes care of this for you. There are many other handy functionalities in 'strex'. Contributions to this package are encouraged: it is intended as a miscellany of string manipulation functions that cannot be found in 'stringi' or 'stringr'.
+# License: GPL-3
+# URL: https://rorynolan.github.io/strex/, https://github.com/rorynolan/strex
+# BugReports: https://github.com/rorynolan/strex/issues
+# Depends: R (>= 3.5), stringr (>= 1.5)
+# Imports: checkmate (>= 1.9.3), magrittr (>= 1.5), rlang (>= 1.0), stats, stringi (>= 1.7.8), utils
+# Suggests: bench, covr, knitr, purrr, rmarkdown, spelling, testthat (>= 3.0)
+# VignetteBuilder: knitr
+# Biarch: TRUE
+# Config/testthat/edition: 3
+# Encoding: UTF-8
+# Language: en-US
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-10-30 03:09:21 UTC; rnolan
+# Author: Rory Nolan [aut, cre] (<https://orcid.org/0000-0002-5239-4043>)
+# Maintainer: Rory Nolan <rorynoolan@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-30 04:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

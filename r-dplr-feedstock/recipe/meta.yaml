@@ -1,0 +1,117 @@
+{% set version = '1.7.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dplr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dplR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dplR/dplR_{{ version }}.tar.gz
+  sha256: 59d82097dfc388a35305470ac0643ccfcf1841b9463dc843addf2bc2ad921470
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Cairo (>= 1.5-0), dichromat (>= 1.2-3), foreach, forecast (>= 3.6), gmp (>= 0.5-5), iterators, knitr, RColorBrewer, rmarkdown, testthat (>= 0.8), tikzDevice, waveslim
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix >=1.0_3
+    - r-r.utils >=1.32.1
+    - r-xml >=2.1_0
+    - r-boot
+    - r-digest >=0.2.3
+    - r-lattice >=0.13_6
+    - r-matrixstats >=0.50.2
+    - r-plyr >=1.8
+    - r-png >=0.1_2
+    - r-signal
+    - r-stringi >=0.2_3
+    - r-stringr >=0.4
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix >=1.0_3
+    - r-r.utils >=1.32.1
+    - r-xml >=2.1_0
+    - r-boot
+    - r-digest >=0.2.3
+    - r-lattice >=0.13_6
+    - r-matrixstats >=0.50.2
+    - r-plyr >=1.8
+    - r-png >=0.1_2
+    - r-signal
+    - r-stringi >=0.2_3
+    - r-stringr >=0.4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dplR')"           # [not win]
+    - "\"%R%\" -e \"library('dplR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/AndyBunn/dplR
+  license: GPL-2
+  summary: Perform tree-ring analyses such as detrending, chronology building, and cross dating.  Read
+    and write standard file formats used in dendrochronology.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Encoding: UTF-8
+# Package: dplR
+# Type: Package
+# Title: Dendrochronology Program Library in R
+# Version: 1.7.5
+# Authors@R: c(person("Andy", "Bunn", role = c("aut", "cph","cre", "trl"), email = "bunna@wwu.edu"), person("Mikko","Korpela", role = c("aut", "cph", "trl")), person("Franco", "Biondi", role = c("aut", "cph")), person("Filipe", "Campelo", role = c("aut", "cph")), person("Pierre", "Merian", role = c("aut","cph")), person("Fares", "Qeadan", role = c("aut", "cph")), person("Christian", "Zang", role = c("aut", "cph")), person("Allan", "Buras", role = "ctb"), person("Alice","Cecile", role = "ctb"), person("Manfred", "Mudelsee", role ="ctb"), person("Michael", "Schulz", role = "ctb"), person("Stefan","Klesse", role = "ctb"), person("David", "Frank",role = "ctb"), person("Ronald","Visser", role = "ctb"), person("Ed","Cook", role = "ctb"), person("Kevin","Anchukaitis", role = "ctb"))
+# Copyright: Authors and file inst/COPYRIGHTS
+# Depends: R (>= 3.5.0)
+# Imports: graphics, grDevices, grid, stats, utils, lattice (>= 0.13-6), Matrix (>= 1.0-3), digest (>= 0.2.3), matrixStats (>= 0.50.2), png (>= 0.1-2), R.utils (>= 1.32.1), stringi (>= 0.2-3), stringr (>= 0.4), XML (>= 2.1-0), plyr (>= 1.8), signal, boot
+# Suggests: Cairo (>= 1.5-0), dichromat (>= 1.2-3), foreach, forecast (>= 3.6), gmp (>= 0.5-5), iterators, knitr, RColorBrewer, rmarkdown, testthat (>= 0.8), tikzDevice, waveslim
+# Description: Perform tree-ring analyses such as detrending, chronology building, and cross dating.  Read and write standard file formats used in dendrochronology.
+# LazyData: no
+# License: GPL (>= 2)
+# URL: https://github.com/AndyBunn/dplR
+# NeedsCompilation: yes
+# Packaged: 2023-08-30 01:11:15 UTC; bunna
+# Author: Andy Bunn [aut, cph, cre, trl], Mikko Korpela [aut, cph, trl], Franco Biondi [aut, cph], Filipe Campelo [aut, cph], Pierre Merian [aut, cph], Fares Qeadan [aut, cph], Christian Zang [aut, cph], Allan Buras [ctb], Alice Cecile [ctb], Manfred Mudelsee [ctb], Michael Schulz [ctb], Stefan Klesse [ctb], David Frank [ctb], Ronald Visser [ctb], Ed Cook [ctb], Kevin Anchukaitis [ctb]
+# Maintainer: Andy Bunn <bunna@wwu.edu>
+# Repository: CRAN
+# Date/Publication: 2023-08-30 04:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

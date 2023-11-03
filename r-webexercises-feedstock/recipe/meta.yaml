@@ -1,0 +1,92 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-webexercises
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/webexercises_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/webexercises/webexercises_{{ version }}.tar.gz
+  sha256: fe43647664dedd333e3e331b2b398fcdb22d35e364639e2b29982095d07b5ce4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, bookdown, quarto, xfun
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-jsonlite
+    - r-knitr
+    - r-rmarkdown >=2.2
+    - r-rstudioapi
+    - r-yaml
+
+  run:
+    - r-base
+    - r-jsonlite
+    - r-knitr
+    - r-rmarkdown >=2.2
+    - r-rstudioapi
+    - r-yaml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('webexercises')"           # [not win]
+    - "\"%R%\" -e \"library('webexercises')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/psyteachr/webexercises
+  license: CC BY-SA 4.0
+  summary: Functions for easily creating interactive web pages using 'R Markdown' that students
+    can use in self-guided learning.
+  license_family: CC
+
+# The original CRAN metadata for this package was:
+
+# Package: webexercises
+# Version: 1.1.0
+# Date: 2023-04-18
+# Title: Create Interactive Web Exercises in 'R Markdown' (Formerly 'webex')
+# Description: Functions for easily creating interactive web pages using 'R Markdown' that students can use in self-guided learning.
+# Authors@R: c( person("Dale","Barr", email = "dalejbarr@protonmail.com", role = c("aut")), person("Lisa", "DeBruine", email = "debruine@gmail.com", role = c("aut", "cre")))
+# URL: https://github.com/psyteachr/webexercises
+# Depends: R (>= 3.1.2)
+# Imports: jsonlite, knitr, yaml, utils, grDevices, rstudioapi, rmarkdown (>= 2.2)
+# License: CC BY-SA 4.0
+# RoxygenNote: 7.2.1
+# Suggests: testthat, bookdown, quarto, xfun
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2023-05-15 10:46:57 UTC; lisad
+# Author: Dale Barr [aut], Lisa DeBruine [aut, cre]
+# Maintainer: Lisa DeBruine <debruine@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-05-15 13:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,96 @@
+{% set version = '0.0.4.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rmvl
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RMVL_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RMVL/RMVL_{{ version }}.tar.gz
+  sha256: ed58216df57f392904af8187e58a130172c2ad1cd4068851227a7816fb73f322
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RMVL')"           # [not win]
+    - "\"%R%\" -e \"library('RMVL')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RMVL
+  license: LGPL-2.1
+  summary: Mappable vector library provides convenient way to access large datasets. Use all
+    of your data at once, with few limits. Memory mapped data can be shared between
+    multiple R processes. Access speed depends on storage medium, so solid state drive
+    is recommended, preferably with PCI Express (or M.2 nvme) interface or a fast network
+    file system. The data is memory mapped into R and then accessed using usual R list
+    and array subscription operators. Convenience functions are provided for merging,
+    grouping and indexing large vectors and data.frames. The layout of underlying MVL
+    files is optimized for large datasets. The vectors are stored to guarantee alignment
+    for vector intrinsics after memory map. The package is built on top of libMVL, which
+    can be used as a standalone C library. libMVL has simple C API making it easy to
+    interchange datasets with outside programs.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-2.1'
+
+# The original CRAN metadata for this package was:
+
+# Package: RMVL
+# Title: Mappable Vector Library for Handling Large Datasets
+# Version: 0.0.4.9
+# Authors@R: person(given = "Vladimir", family = "Dergachev", role = c("aut", "cre"), email = "support@altumrete.com", comment = structure("https://orcid.org/0000-0003-4708-6625", .Names = "ORCID"))
+# Description: Mappable vector library provides convenient way to access large datasets. Use all of your data at once, with few limits. Memory mapped data can be shared between multiple R processes. Access speed depends on storage medium, so solid state drive is recommended, preferably with PCI Express (or M.2 nvme) interface or a fast network file system. The data is memory mapped into R and then accessed using usual R list and array subscription operators. Convenience functions are provided for merging, grouping and indexing large vectors and data.frames. The layout of underlying MVL files is optimized for large datasets. The vectors are stored to guarantee alignment for vector intrinsics after memory map. The package is built on top of libMVL, which can be used as a standalone C library. libMVL has simple C API making it easy to interchange datasets with outside programs.
+# License: LGPL-2.1
+# Depends: R (>= 3.5.0)
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-10-30 11:28:50 UTC; volodya
+# Author: Vladimir Dergachev [aut, cre] (<https://orcid.org/0000-0003-4708-6625>)
+# Maintainer: Vladimir Dergachev <support@altumrete.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-30 20:00:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

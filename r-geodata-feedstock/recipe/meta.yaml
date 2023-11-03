@@ -1,0 +1,85 @@
+{% set version = '0.5-9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-geodata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/geodata_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/geodata/geodata_{{ version }}.tar.gz
+  sha256: 1aaee99dbd9eb3802404bb0886fc03d3ebee2b2be5a025f448ab833568e74f14
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: jsonlite, R.utils, httr, archive
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-terra >=1.6.41
+
+  run:
+    - r-base
+    - r-terra >=1.6.41
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('geodata')"           # [not win]
+    - "\"%R%\" -e \"library('geodata')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=geodata
+  license: GPL-3
+  summary: Functions for downloading of geographic data for use in spatial analysis and mapping.
+    The package facilitates access to climate, crops, elevation, land use, soil, species
+    occurrence, accessibility, administrative boundaries and other data.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: geodata
+# Type: Package
+# Title: Download Geographic Data
+# Version: 0.5-9
+# Date: 2023-10-12
+# Depends: R (>= 3.5.0), terra (>= 1.6.41)
+# Encoding: UTF-8
+# Suggests: jsonlite, R.utils, httr, archive
+# Author: Robert J. Hijmans [cre, aut], Marcia Barbosa [ctb], Aniruddha Ghosh [ctb], Alex Mandel [ctb]
+# Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
+# Description: Functions for downloading of geographic data for use in spatial analysis and mapping. The package facilitates access to climate, crops, elevation, land use, soil, species occurrence, accessibility, administrative boundaries and other data.
+# License: GPL (>= 3)
+# BugReports: https://github.com/rspatial/geodata/issues/
+# NeedsCompilation: no
+# Packaged: 2023-10-13 08:14:54 UTC; rhijm
+# Repository: CRAN
+# Date/Publication: 2023-10-13 08:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

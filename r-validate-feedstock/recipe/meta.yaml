@@ -1,0 +1,103 @@
+{% set version = '1.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-validate
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/validate_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/validate/validate_{{ version }}.tar.gz
+  sha256: f2a8249cdc8442a681425b2b771fbf774501e9df7a3f3de1c9d83bd2b0211408
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rsdmx, tinytest (>= 0.9.6), knitr, bookdown, lumberjack, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-settings
+    - r-yaml
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-settings
+    - r-yaml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('validate')"           # [not win]
+    - "\"%R%\" -e \"library('validate')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/data-cleaning/validate
+  license: GPL-3
+  summary: Declare data validation rules and data quality indicators; confront data with them
+    and analyze or visualize the results. The package supports rules that are per-field,
+    in-record, cross-record or cross-dataset. Rules can be automatically analyzed for
+    rule type and connectivity. Supports checks implied by an SDMX DSD file as well.
+    See also Van der Loo and De Jonge (2018) <doi:10.1002/9781118897126>, Chapter 6
+    and the JSS paper (2021) <doi:10.18637/jss.v097.i10>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: validate
+# Maintainer: Mark van der Loo <mark.vanderloo@gmail.com>
+# License: GPL-3
+# Title: Data Validation Infrastructure
+# LazyData: no
+# Type: Package
+# LazyLoad: yes
+# Authors@R: c(person("Mark", "van der Loo" , role   = c("cre","aut") , email  = "mark.vanderloo@gmail.com" , comment= c(ORCID="0000-0002-9807-4686")) , person("Edwin", "de Jonge" , role = "aut" , comment=c(ORCID="0000-0002-6580-4718")) , person("Paul","Hsieh" , role = "ctb" ))
+# Description: Declare data validation rules and data quality indicators; confront data with them and analyze or visualize the results. The package supports rules that are per-field, in-record, cross-record or cross-dataset. Rules can be automatically analyzed for rule type and connectivity. Supports checks implied by an SDMX DSD file as well. See also Van der Loo and De Jonge (2018) <doi:10.1002/9781118897126>, Chapter 6 and the JSS paper (2021) <doi:10.18637/jss.v097.i10>.
+# Version: 1.1.3
+# Depends: R (>= 3.5.0), methods
+# URL: https://github.com/data-cleaning/validate
+# BugReports: https://github.com/data-cleaning/validate/issues
+# Imports: stats, graphics, grid, settings, yaml
+# Suggests: rsdmx, tinytest (>= 0.9.6), knitr, bookdown, lumberjack, rmarkdown
+# VignetteBuilder: knitr
+# Collate: 'rule.R' 'sugar.R' 'validate_pkg.R' 'parse.R' 'expressionset.R' 'indicator.R' 'validator.R' 'confrontation.R' 'compare.R' 'factory.R' 'genericrules.R' 'lumberjack.R' 'plot.R' 'retailers.R' 'run_validation.R' 'sdmx.R' 'syntax.R' 'utils.R' 'yaml.R'
+# RoxygenNote: 7.2.1
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-03-28 09:17:38 UTC; mark
+# Author: Mark van der Loo [cre, aut] (<https://orcid.org/0000-0002-9807-4686>), Edwin de Jonge [aut] (<https://orcid.org/0000-0002-6580-4718>), Paul Hsieh [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-03-28 13:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

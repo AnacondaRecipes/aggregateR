@@ -1,0 +1,121 @@
+{% set version = '0.9.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sarima
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sarima_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sarima/sarima_{{ version }}.tar.gz
+  sha256: 58c308cbaafd8a08cd34f87bd2c4bef80bc66882b352e65978a38470c8f9433e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, KFAS, FKF, FitARMA, fGarch, forecast
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+    - r-polynomf >=1.0_0
+    - r-rcpp >=0.12.14
+    - r-rcpparmadillo
+    - r-rdpack
+    - r-lagged >=0.2.1
+    - r-ltsa
+    - r-numderiv
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-formula
+    - r-polynomf >=1.0_0
+    - r-rcpp >=0.12.14
+    - r-rcpparmadillo
+    - r-rdpack
+    - r-lagged >=0.2.1
+    - r-ltsa
+    - r-numderiv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sarima')"           # [not win]
+    - "\"%R%\" -e \"library('sarima')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/GeoBosh/sarima (devel) https://geobosh.github.io/sarima/ (doc)
+  license: GPL-2
+  summary: Functions, classes and methods for time series modelling with ARIMA and related models.
+    The aim of the package is to provide consistent interface for the user. For example,
+    a single function autocorrelations() computes various kinds of theoretical and sample
+    autocorrelations. This is work in progress, see the documentation and vignettes
+    for the current functionality.  Function sarima() fits extended multiplicative seasonal
+    ARIMA models with trends, exogenous variables and arbitrary roots on the unit circle,
+    which can be fixed or estimated (for the algebraic basis for this see <arXiv:2208.05055>,
+    a paper on the methodology is being prepared). The suggested package 'FitARMA' can
+    be installed with 'remotes::install_github("cran/FitARMA")' if necessary but is
+    no longer needed in normal use.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: sarima
+# Type: Package
+# Title: Simulation and Prediction with Seasonal ARIMA Models
+# Version: 0.9.1
+# Date: 2022-08-11
+# Authors@R: c( person(given = c("Georgi", "N."), family = "Boshnakov", role = c("aut", "cre"), email = "georgi.boshnakov@manchester.ac.uk"), person(given = "Jamie", family = "Halliday", role = "aut", email = "jamie.halliday@manchester.ac.uk") )
+# Description: Functions, classes and methods for time series modelling with ARIMA and related models. The aim of the package is to provide consistent interface for the user. For example, a single function autocorrelations() computes various kinds of theoretical and sample autocorrelations. This is work in progress, see the documentation and vignettes for the current functionality.  Function sarima() fits extended multiplicative seasonal ARIMA models with trends, exogenous variables and arbitrary roots on the unit circle, which can be fixed or estimated (for the algebraic basis for this see <arXiv:2208.05055>, a paper on the methodology is being prepared). The suggested package 'FitARMA' can be installed with 'remotes::install_github("cran/FitARMA")' if necessary but is no longer needed in normal use.
+# URL: https://github.com/GeoBosh/sarima (devel) https://geobosh.github.io/sarima/ (doc)
+# BugReports: https://github.com/GeoBosh/sarima/issues
+# Depends: R (>= 2.10), stats4
+# Imports: methods, graphics, stats, utils, PolynomF (>= 1.0-0), Formula, lagged (>= 0.2.1), Rcpp (>= 0.12.14), Rdpack, numDeriv, ltsa
+# Suggests: testthat, KFAS, FKF, FitARMA, fGarch, forecast
+# RdMacros: Rdpack
+# License: GPL (>= 2)
+# LazyLoad: yes
+# Collate: RcppExports.R utils.R generics.R filterClasses.R modelClasses.R sarima.R autocovariances.R armacalc.R fit.R wrapKFAS.R arma_Q0dotdotstats.R Kalman.R fitTools.R periodogram.R predict.Sarima.R zzz.R
+# LinkingTo: Rcpp, RcppArmadillo
+# RoxygenNote: 7.1.1
+# NeedsCompilation: yes
+# Packaged: 2022-08-11 10:04:41 UTC; georgi
+# Author: Georgi N. Boshnakov [aut, cre], Jamie Halliday [aut]
+# Maintainer: Georgi N. Boshnakov <georgi.boshnakov@manchester.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2022-08-11 10:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

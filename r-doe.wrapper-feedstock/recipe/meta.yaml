@@ -1,0 +1,98 @@
+{% set version = '0.12' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-doe.wrapper
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DoE.wrapper_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DoE.wrapper/DoE.wrapper_{{ version }}.tar.gz
+  sha256: b5adee2ed080c0a28f4a795cdf9f7fe5b506dfa97202dce4f78bf5e3de11df58
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: skpr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-algdesign >=1.1
+    - r-dicedesign
+    - r-doe.base >=0.23_4
+    - r-frf2 >=1.6_5
+    - r-lhs
+    - r-rsm
+
+  run:
+    - r-base
+    - r-algdesign >=1.1
+    - r-dicedesign
+    - r-doe.base >=0.23_4
+    - r-frf2 >=1.6_5
+    - r-lhs
+    - r-rsm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DoE.wrapper')"           # [not win]
+    - "\"%R%\" -e \"library('DoE.wrapper')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://prof.bht-berlin.de/groemping/DoE/, https://prof.bht-berlin.de/groemping/
+  license: GPL-2
+  summary: Various kinds of designs for (industrial) experiments can be created. The package
+    uses, and sometimes enhances, design generation routines from other packages. So
+    far, response surface designs from package 'rsm', Latin hypercube samples from packages
+    'lhs' and 'DiceDesign', and D-optimal designs from package 'AlgDesign' have been
+    implemented.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: DoE.wrapper
+# Title: Wrapper Package for Design of Experiments Functionality
+# Version: 0.12
+# Depends: R(>= 3.1.0), FrF2(>= 1.6-5), DoE.base(>= 0.23-4), rsm
+# Imports: stats, lhs, DiceDesign, AlgDesign(>= 1.1)
+# Suggests: skpr
+# Date: 2023-08-28
+# Authors@R: c(person("Ulrike", "Groemping", role = c("aut", "cre"), email = "ulrike.groemping@bht-berlin.de"), person("Lenth", "Russ", role = "ctb"))
+# Description: Various kinds of designs for (industrial) experiments can be created. The package uses, and sometimes enhances, design generation routines from other packages. So far, response surface designs from package 'rsm', Latin hypercube samples from packages 'lhs' and 'DiceDesign', and D-optimal designs from package 'AlgDesign' have been implemented.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# URL: https://prof.bht-berlin.de/groemping/DoE/, https://prof.bht-berlin.de/groemping/
+# NeedsCompilation: no
+# Packaged: 2023-08-21 11:38:35 UTC; Gr<c3><b6>mping
+# Author: Ulrike Groemping [aut, cre], Lenth Russ [ctb]
+# Maintainer: Ulrike Groemping <ulrike.groemping@bht-berlin.de>
+# Repository: CRAN
+# Date/Publication: 2023-08-21 14:30:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

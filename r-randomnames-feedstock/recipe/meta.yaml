@@ -1,0 +1,96 @@
+{% set version = '1.5-0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-randomnames
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/randomNames_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/randomNames/randomNames_{{ version }}.tar.gz
+  sha256: 708733c570fe207e3f83fa7e2492b96b6b0c86ba8d208f5f90403f4e16de61d3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-crayon
+    - r-data.table >=1.14.0
+    - r-toordinal >=1.1
+
+  run:
+    - r-base
+    - r-crayon
+    - r-data.table >=1.14.0
+    - r-toordinal >=1.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('randomNames')"           # [not win]
+    - "\"%R%\" -e \"library('randomNames')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CenterForAssessment.github.io/randomNames, https://github.com/CenterForAssessment/randomNames,
+    https://cran.r-project.org/package=randomNames
+  license: GPL-3
+  summary: Function for generating random gender and ethnicity correct first and/or last names.
+    Names are chosen proportionally based upon their probability of appearing in a large
+    scale data base of real names.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: randomNames
+# Version: 1.5-0.0
+# Date: 2021-4-21
+# Title: Generate Random Given and Surnames
+# Depends: R (>= 4.0)
+# Suggests: knitr, rmarkdown
+# Imports: crayon, data.table (>= 1.14.0), toOrdinal (>= 1.1)
+# Authors@R: c(person(given=c("Damian", "W."), family="Betebenner", email="dbetebenner@nciea.org", role=c("aut", "cre")))
+# Maintainer: Damian W. Betebenner <dbetebenner@nciea.org>
+# Description: Function for generating random gender and ethnicity correct first and/or last names. Names are chosen proportionally based upon their probability of appearing in a large scale data base of real names.
+# URL: https://CenterForAssessment.github.io/randomNames, https://github.com/CenterForAssessment/randomNames, https://cran.r-project.org/package=randomNames
+# BugReports: https://github.com/CenterForAssessment/randomNames/issues
+# VignetteBuilder: knitr
+# LazyLoad: Yes
+# LazyData: Yes
+# LazyDataCompression: xz
+# ByteCompile: TRUE
+# License: GPL-3
+# NeedsCompilation: no
+# Packaged: 2021-04-21 19:33:51 UTC; conet
+# Author: Damian W. Betebenner [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2021-04-22 15:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

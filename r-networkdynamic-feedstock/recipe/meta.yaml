@@ -1,0 +1,98 @@
+{% set version = '0.11.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-networkdynamic
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/networkDynamic_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/networkDynamic/networkDynamic_{{ version }}.tar.gz
+  sha256: 2c664fd0d85c0cdc099480d67a18e6afbb0cc1036963b6664a8a756874648e5b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-network >=1.17.0
+    - r-networklite
+    - r-statnet.common
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-network >=1.17.0
+    - r-networklite
+    - r-statnet.common
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('networkDynamic')"           # [not win]
+    - "\"%R%\" -e \"library('networkDynamic')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://statnet.org/
+  license: GPL-3
+  summary: Simple interface routines to facilitate the handling of network objects with complex
+    intertemporal data. This is a part of the "statnet" suite of packages for network
+    analysis.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: networkDynamic
+# Version: 0.11.3
+# Date: 2023-02-15
+# Title: Dynamic Extensions for Network Objects
+# Type: Package
+# Depends: R (>= 3.0.0), network (>= 1.17.0)
+# Imports: statnet.common, methods, networkLite
+# Suggests: testthat
+# LinkingTo: network
+# Authors@R: c( person("Carter T.", "Butts", role=c("aut"), email="buttsc@uci.edu"), person("Ayn", "Leslie-Cook", role=c("aut"), email="aynlc3@uw.edu"), person("Pavel N.", "Krivitsky", role=c("aut"), email="pavel@uow.edu.au"), person("Skye", "Bender-deMoll", role=c("aut","cre"), email="skyebend@uw.edu"), person("Zack", "Almquist", role=c("ctb"), email="almquist@uci.edu"), person("David R.", "Hunter", role=c("ctb"), email="dhunter@stat.psu.edu"), person("Li","Wang",role=c("ctb"),email="lxwang@gmail.com"), person("Kirk","Li",role=c("ctb"),email="kirkli@uw.edu"), person("Steven M.","Goodreau",role=c("ctb"),email="goodreau@uw.edu"), person("Jeffrey", "Horner", role=c("ctb"), email="jeffrey.horner@gmail.com"), person("Martina", "Morris", role=c("ctb"), email="morrism@u.washington.edu"))
+# Description: Simple interface routines to facilitate the handling of network objects with complex intertemporal data. This is a part of the "statnet" suite of packages for network analysis.
+# License: GPL-3
+# LazyLoad: yes
+# URL: https://statnet.org/
+# NeedsCompilation: yes
+# Packaged: 2023-02-16 07:54:47 UTC; skyebend
+# Author: Carter T. Butts [aut], Ayn Leslie-Cook [aut], Pavel N. Krivitsky [aut], Skye Bender-deMoll [aut, cre], Zack Almquist [ctb], David R. Hunter [ctb], Li Wang [ctb], Kirk Li [ctb], Steven M. Goodreau [ctb], Jeffrey Horner [ctb], Martina Morris [ctb]
+# Maintainer: Skye Bender-deMoll <skyebend@uw.edu>
+# Repository: CRAN
+# Date/Publication: 2023-02-16 08:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

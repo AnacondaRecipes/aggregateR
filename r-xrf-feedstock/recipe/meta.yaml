@@ -1,0 +1,103 @@
+{% set version = '0.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-xrf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/xrf_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/xrf/xrf_{{ version }}.tar.gz
+  sha256: ae44f014bab5e30fdad5925b4508b9c9c2e8b9594572be9a0362193a1b642724
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-dplyr
+    - r-fuzzyjoin
+    - r-glmnet >=3.0
+    - r-rlang
+    - r-xgboost >=0.71.2
+
+  run:
+    - r-base
+    - r-matrix
+    - r-dplyr
+    - r-fuzzyjoin
+    - r-glmnet >=3.0
+    - r-rlang
+    - r-xgboost >=0.71.2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('xrf')"           # [not win]
+    - "\"%R%\" -e \"library('xrf')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/holub008/xrf
+  license: MIT
+  summary: An implementation of the RuleFit algorithm as described in Friedman & Popescu (2008)
+    <doi:10.1214/07-AOAS148>. eXtreme Gradient Boosting ('XGBoost') is used to build
+    rules, and 'glmnet' is used to fit a sparse linear model on the raw and rule features.
+    The result is a model that learns similarly to a tree ensemble, while often offering
+    improved interpretability and achieving improved scoring runtime in live applications.
+    Several algorithms for reducing rule complexity are provided, most notably hyperrectangle
+    de-overlapping. All algorithms scale to several million rows and support sparse
+    representations to handle tens of thousands of dimensions.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: xrf
+# Title: eXtreme RuleFit
+# Version: 0.2.2
+# Authors@R: person("Karl", "Holub", email = "karljholub@gmail.com", role = c("aut", "cre"))
+# Description: An implementation of the RuleFit algorithm as described in Friedman & Popescu (2008) <doi:10.1214/07-AOAS148>. eXtreme Gradient Boosting ('XGBoost') is used to build rules, and 'glmnet' is used to fit a sparse linear model on the raw and rule features. The result is a model that learns similarly to a tree ensemble, while often offering improved interpretability and achieving improved scoring runtime in live applications. Several algorithms for reducing rule complexity are provided, most notably hyperrectangle de-overlapping. All algorithms scale to several million rows and support sparse representations to handle tens of thousands of dimensions.
+# URL: https://github.com/holub008/xrf
+# BugReports: https://github.com/holub008/xrf/issues
+# Depends: R (>= 3.1.0)
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# RoxygenNote: 7.1.1
+# Imports: Matrix, glmnet (>= 3.0), xgboost (>= 0.71.2), dplyr, fuzzyjoin, rlang, methods
+# Suggests: testthat, covr
+# NeedsCompilation: no
+# Packaged: 2022-10-04 05:41:07 UTC; kholub
+# Author: Karl Holub [aut, cre]
+# Maintainer: Karl Holub <karljholub@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-10-04 06:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

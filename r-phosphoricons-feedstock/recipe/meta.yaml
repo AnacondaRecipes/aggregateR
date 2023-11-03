@@ -1,0 +1,87 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-phosphoricons
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/phosphoricons_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/phosphoricons/phosphoricons_{{ version }}.tar.gz
+  sha256: c3904dc35db6cdbeb24a29b1fe44bced2cbcebf474ff9c651de7c46ffbc3383d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, shiny, tinytest
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-htmltools >=0.3
+
+  run:
+    - r-base
+    - r-htmltools >=0.3
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('phosphoricons')"           # [not win]
+    - "\"%R%\" -e \"library('phosphoricons')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://dreamrs.github.io/phosphoricons/
+  license: MIT
+  summary: Use 'Phosphor' icons in 'shiny' applications or 'rmarkdown' documents. Icons are available
+    in 5 different weights and can be customized by setting color, size, orientation
+    and more.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: phosphoricons
+# Title: 'Phosphor' Icons for R
+# Version: 0.2.0
+# Authors@R: c(person(given = "Victor", family = "Perrier", role = c("aut", "cre", "cph"), email = "victor.perrier@dreamrs.fr"), person(given = "Fanny", family = "Meyer", role = "aut"), person(given = "Phosphor Icons", role = "cph", comment = "Phosphor Icons <https://github.com/phosphor-icons>"))
+# Description: Use 'Phosphor' icons in 'shiny' applications or 'rmarkdown' documents. Icons are available in 5 different weights and can be customized by setting color, size, orientation and more.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Depends: R (>= 2.10)
+# Imports: htmltools (>= 0.3)
+# Suggests: covr, shiny, tinytest
+# URL: https://dreamrs.github.io/phosphoricons/
+# NeedsCompilation: no
+# Packaged: 2023-05-17 11:25:50 UTC; victorp
+# Author: Victor Perrier [aut, cre, cph], Fanny Meyer [aut], Phosphor Icons [cph] (Phosphor Icons <https://github.com/phosphor-icons>)
+# Maintainer: Victor Perrier <victor.perrier@dreamrs.fr>
+# Repository: CRAN
+# Date/Publication: 2023-05-17 12:30:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

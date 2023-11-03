@@ -1,0 +1,95 @@
+{% set version = '0.9.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fsa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/FSA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/FSA/FSA_{{ version }}.tar.gz
+  sha256: e08db2986b84ef84c93a160c34e0bd1b7fa12d92863e464234edc50375702f2d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: DescTools, dplyr, fishmethods, FSAdata, knitr, marked, nlme, nlstools, pkgdown, plyr, psych, Rcapture, rmarkdown, testthat, tibble, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-car
+    - r-dunn.test
+    - r-lmtest
+    - r-plotrix
+    - r-withr
+
+  run:
+    - r-base
+    - r-car
+    - r-dunn.test
+    - r-lmtest
+    - r-plotrix
+    - r-withr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('FSA')"           # [not win]
+    - "\"%R%\" -e \"library('FSA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://fishr-core-team.github.io/FSA/
+  license: GPL-2
+  summary: A variety of simple fish stock assessment methods.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: FSA
+# Version: 0.9.5
+# Date: 2023-8-25
+# Title: Simple Fisheries Stock Assessment Methods
+# Description: A variety of simple fish stock assessment methods.
+# Authors@R: c( person(c("Derek","H."), "Ogle", email="DerekOgle51@gmail.com", role=c("aut","cre"), comment=c(ORCID="0000-0002-0370-9299")), person(c("Jason","C."), "Doll", email="jason.doll@fmarion.edu", role=c("aut")), person(c("A.","Powell"), "Wheeler", email="powell.wheeler@gmail.com", role="aut"), person("Alexis", "Dinno", email="alexis.dinno@pdx.edu", role="aut", comment="Provided base functionality of dunnTest()") )
+# URL: https://fishr-core-team.github.io/FSA/
+# BugReports: https://github.com/fishR-Core-Team/FSA/issues
+# License: GPL (>= 2)
+# LazyData: true
+# Depends: R (>= 3.5.0)
+# Imports: graphics, grDevices, stats, tools, utils, car, dunn.test, lmtest, plotrix, withr
+# Suggests: DescTools, dplyr, fishmethods, FSAdata, knitr, marked, nlme, nlstools, pkgdown, plyr, psych, Rcapture, rmarkdown, testthat, tibble, covr
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-08-26 18:16:51 UTC; derek
+# Author: Derek H. Ogle [aut, cre] (<https://orcid.org/0000-0002-0370-9299>), Jason C. Doll [aut], A. Powell Wheeler [aut], Alexis Dinno [aut] (Provided base functionality of dunnTest())
+# Maintainer: Derek H. Ogle <DerekOgle51@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-08-26 18:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

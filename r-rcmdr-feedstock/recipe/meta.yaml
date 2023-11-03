@@ -1,0 +1,98 @@
+{% set version = '2.9-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rcmdr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Rcmdr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Rcmdr/Rcmdr_{{ version }}.tar.gz
+  sha256: d0835a86e14c711d4245ab4b7bcf4e5b2101ee0550c7123dd83a615dce93670d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: aplpack, boot, colorspace, e1071, foreign, grid, Hmisc, knitr, lattice, leaps, lmtest, markdown, MASS, mgcv, multcomp (>= 0.991-2), nlme, nnet, nortest, readxl, rgl (>= 0.110.2), rmarkdown (>= 0.9.5), sem (>= 2.1-1)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcmdrmisc >=2.9_1
+    - r-abind
+    - r-car >=3.1_0
+    - r-effects >=4.0_3
+    - r-lme4
+    - r-relimp >=1.0_5
+    - r-tcltk2 >=1.2_6
+
+  run:
+    - r-base
+    - r-rcmdrmisc >=2.9_1
+    - r-abind
+    - r-car >=3.1_0
+    - r-effects >=4.0_3
+    - r-lme4
+    - r-relimp >=1.0_5
+    - r-tcltk2 >=1.2_6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Rcmdr')"           # [not win]
+    - "\"%R%\" -e \"library('Rcmdr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://r-forge.r-project.org/projects/rcmdr/, https://www.r-project.org, https://socialsciences.mcmaster.ca/jfox/Misc/Rcmdr/,
+    https://socialsciences.mcmaster.ca/jfox/Books/RCommander/
+  license: GPL-2
+  summary: A platform-independent basic-statistics GUI (graphical user interface) for R, based
+    on the tcltk package.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: Rcmdr
+# Version: 2.9-1
+# Date: 2023-09-25
+# Title: R Commander
+# Authors@R: c(person("John", "Fox", role = c("aut", "cre"), email = "jfox@mcmaster.ca"), person("Milan", "Bouchet-Valat", role = "aut"), person("Manuel", "Munoz Marquez", role = "aut"), person("Liviu", "Andronic", role = "ctb"), person("Michael", "Ash", role = "ctb"), person("Theophilius", "Boye", role = "ctb"), person("Stefano", "Calza", role = "ctb"), person("Andy", "Chang", role = "ctb"), person("Vilmantas", "Gegzna", role = "ctb"), person("Philippe", "Grosjean", role = "ctb"), person("Richard", "Heiberger", role = "ctb"), person("Yoshinobu",  "Kanda", role = "ctb"), person("Kosar", "Karimi Pour", role = "ctb"), person("G. Jay", "Kerns", role = "ctb"), person("Renaud", "Lancelot", role = "ctb"), person("Matthieu", "Lesnoff", role = "ctb"), person("Uwe", "Ligges", role = "ctb"), person("Samir", "Messad", role = "ctb"), person("Martin", "Maechler", role = "ctb"), person("Robert", "Muenchen", role = "ctb"), person("Duncan", "Murdoch", role = "ctb"), person("Erich", "Neuwirth", role = "ctb"), person("Dan", "Putler", role = "ctb"), person("Brian", "Ripley", role = "ctb"), person("Miroslav", "Ristic", role = "ctb"), person("Peter", "Wolf", role = "ctb"), person("Kevin", "Wright", role="ctb") )
+# Depends: R (>= 3.5.0), grDevices, graphics, methods, stats, utils, splines, RcmdrMisc (>= 2.9-1), car (>= 3.1-0), effects (>= 4.0-3)
+# Imports: tcltk, tcltk2 (>= 1.2-6), abind, relimp (>= 1.0-5), lme4, tools
+# Suggests: aplpack, boot, colorspace, e1071, foreign, grid, Hmisc, knitr, lattice, leaps, lmtest, markdown, MASS, mgcv, multcomp (>= 0.991-2), nlme, nnet, nortest, readxl, rgl (>= 0.110.2), rmarkdown (>= 0.9.5), sem (>= 2.1-1)
+# ByteCompile: yes
+# Description: A platform-independent basic-statistics GUI (graphical user interface) for R, based on the tcltk package.
+# License: GPL (>= 2)
+# URL: https://r-forge.r-project.org/projects/rcmdr/, https://www.r-project.org, https://socialsciences.mcmaster.ca/jfox/Misc/Rcmdr/, https://socialsciences.mcmaster.ca/jfox/Books/RCommander/
+# NeedsCompilation: no
+# Packaged: 2023-09-25 15:59:45 UTC; johnfox
+# Author: John Fox [aut, cre], Milan Bouchet-Valat [aut], Manuel Munoz Marquez [aut], Liviu Andronic [ctb], Michael Ash [ctb], Theophilius Boye [ctb], Stefano Calza [ctb], Andy Chang [ctb], Vilmantas Gegzna [ctb], Philippe Grosjean [ctb], Richard Heiberger [ctb], Yoshinobu Kanda [ctb], Kosar Karimi Pour [ctb], G. Jay Kerns [ctb], Renaud Lancelot [ctb], Matthieu Lesnoff [ctb], Uwe Ligges [ctb], Samir Messad [ctb], Martin Maechler [ctb], Robert Muenchen [ctb], Duncan Murdoch [ctb], Erich Neuwirth [ctb], Dan Putler [ctb], Brian Ripley [ctb], Miroslav Ristic [ctb], Peter Wolf [ctb], Kevin Wright [ctb]
+# Maintainer: John Fox <jfox@mcmaster.ca>
+# Repository: CRAN
+# Date/Publication: 2023-09-28 16:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

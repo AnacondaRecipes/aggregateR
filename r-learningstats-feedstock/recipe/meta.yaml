@@ -1,0 +1,110 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-learningstats
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LearningStats_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LearningStats/LearningStats_{{ version }}.tar.gz
+  sha256: c8804f298f596d714ff5a26c23e45989acb8d0180f0c6bb915f213cda5593977
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-haven
+    - r-readods
+    - r-readxl
+
+  run:
+    - r-base
+    - r-data.table
+    - r-haven
+    - r-readods
+    - r-readxl
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LearningStats')"           # [not win]
+    - "\"%R%\" -e \"library('LearningStats')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=LearningStats
+  license: GPL-2
+  summary: Provides tools to teach students elemental statistics. The main topics covered are
+    descriptive statistics, probability models (discrete and continuous variables) and
+    statistical inference (confidence intervals and hypothesis tests). One of the main
+    advantages of this package is that allows the user to read quite a variety of types
+    of data files with one unique command. Moreover it includes shortcuts to simple
+    but up-to-now not in R descriptive features such a complete frequency table or an
+    histogram with the optimal number of intervals. Related to model distributions (both
+    discrete and continuous), the package allows the student to easy plot the mass/density
+    function, distribution function and quantile function just detailing as input arguments
+    the known population parameters. The inference related tools are basically confidence
+    interval and hypothesis testing. Having defined independent commands for these two
+    tools makes it easier for the student to understand what the software is performing,
+    and it also helps the student to have a better knowledge on which specific tool
+    they need to use in each situation. Moreover, the hypothesis testing commands provide
+    not only the numeric result on the screen but also a very intuitive graph (which
+    includes the statistic distribution, the observed value of the statistic, the rejection
+    area and the p-value) that is very useful for the student to visualise the process.
+    The regression section includes up to now, a simple linear model, with one single
+    command the student can obtain the numeric summary as well as the corresponding
+    diagram with the adjusted regression model and a legend with basic information (formula
+    of the adjusted model and R-squared).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: LearningStats
+# Type: Package
+# Title: Elemental Descriptive and Inferential Statistics
+# Version: 0.1.0
+# Authors@R: c( person("Maria Isabel", "Borrajo-Garcia", role = c("aut", "cre"), email = "mariaisabel.borrajo@usc.es"), person("Mercedes", "Conde-Amboage", role = "aut", email = "mercedes.amboage@usc.es"), person("Alejandra", "Lopez-Perez", role = "aut", email = "alejandralopez.perez@usc.es") )
+# Description: Provides tools to teach students elemental statistics. The main topics covered are descriptive statistics, probability models (discrete and continuous variables) and statistical inference (confidence intervals and hypothesis tests). One of the main advantages of this package is that allows the user to read quite a variety of types of data files with one unique command. Moreover it includes shortcuts to simple but up-to-now not in R descriptive features such a complete frequency table or an histogram with the optimal number of intervals. Related to model distributions (both discrete and continuous), the package allows the student to easy plot the mass/density function, distribution function and quantile function just detailing as input arguments the known population parameters. The inference related tools are basically confidence interval and hypothesis testing. Having defined independent commands for these two tools makes it easier for the student to understand what the software is performing, and it also helps the student to have a better knowledge on which specific tool they need to use in each situation. Moreover, the hypothesis testing commands provide not only the numeric result on the screen but also a very intuitive graph (which includes the statistic distribution, the observed value of the statistic, the rejection area and the p-value) that is very useful for the student to visualise the process. The regression section includes up to now, a simple linear model, with one single command the student can obtain the numeric summary as well as the corresponding diagram with the adjusted regression model and a legend with basic information (formula of the adjusted model and R-squared).
+# Language: en-GB
+# License: GPL-2
+# Encoding: UTF-8
+# Depends: R (>= 3.5.0)
+# LazyData: true
+# RoxygenNote: 7.1.1
+# Imports: stats, grDevices, graphics, utils, tools, data.table, readxl, haven, readODS
+# NeedsCompilation: no
+# Packaged: 2021-04-20 07:13:56 UTC; maribel
+# Author: Maria Isabel Borrajo-Garcia [aut, cre], Mercedes Conde-Amboage [aut], Alejandra Lopez-Perez [aut]
+# Maintainer: Maria Isabel Borrajo-Garcia <mariaisabel.borrajo@usc.es>
+# Repository: CRAN
+# Date/Publication: 2021-04-21 07:10:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

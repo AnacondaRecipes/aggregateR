@@ -1,0 +1,95 @@
+{% set version = '1.2-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pma
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PMA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PMA/PMA_{{ version }}.tar.gz
+  sha256: 34f2a4236b5c9793cfea2c6367c61146687c277749dbbff0524425a8f335bdb9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PMA')"           # [not win]
+    - "\"%R%\" -e \"library('PMA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/bnaras/PMA
+  license: GPL-2
+  summary: 'Performs Penalized Multivariate Analysis: a penalized matrix decomposition, sparse
+    principal components analysis, and sparse canonical correlation analysis, described
+    in Witten, Tibshirani and Hastie (2009) <doi:10.1093/biostatistics/kxp008> and Witten
+    and Tibshirani (2009) Extensions of sparse canonical correlation analysis, with
+    applications to genomic data <doi:10.2202/1544-6115.1470>.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: PMA
+# Type: Package
+# Title: Penalized Multivariate Analysis
+# Version: 1.2-2
+# Date: 2023-07-19
+# URL: https://github.com/bnaras/PMA
+# BugReports: https://github.com/bnaras/PMA/issues
+# Authors@R: c(person("Daniela", "Witten", role = c("aut")), person("Rob", "Tibshirani", email = "tibs@stanford.edu", role = c("aut", "cre")), person("Sam", "Gross", role = c("aut")), person("Balasubramanian", "Narasimhan", role = c("aut"), email = "naras@stanford.edu"))
+# Description: Performs Penalized Multivariate Analysis: a penalized matrix decomposition, sparse principal components analysis, and sparse canonical correlation analysis, described in Witten, Tibshirani and Hastie (2009) <doi:10.1093/biostatistics/kxp008> and Witten and Tibshirani (2009) Extensions of sparse canonical correlation analysis, with applications to genomic data <doi:10.2202/1544-6115.1470>.
+# Depends: R (>= 2.10)
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Imports: utils
+# NeedsCompilation: yes
+# Packaged: 2023-07-20 17:25:51 UTC; tibs
+# Author: Daniela Witten [aut], Rob Tibshirani [aut, cre], Sam Gross [aut], Balasubramanian Narasimhan [aut]
+# Maintainer: Rob Tibshirani <tibs@stanford.edu>
+# Repository: CRAN
+# Date/Publication: 2023-07-20 21:20:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

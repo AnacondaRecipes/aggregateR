@@ -1,0 +1,121 @@
+{% set version = '1.6.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gdalraster
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gdalraster_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gdalraster/gdalraster_{{ version }}.tar.gz
+  sha256: e8f64442f50e1c77ead2ba4e2e4f7fdb100d90dbcc22a9ba9219d2f3f99869a5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: gt, knitr, rmarkdown, scales, testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.7
+    - r-xml2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.7
+    - r-xml2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gdalraster')"           # [not win]
+    - "\"%R%\" -e \"library('gdalraster')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://usdaforestservice.github.io/gdalraster/, https://github.com/USDAForestService/gdalraster
+  license: MIT
+  summary: 'Interface to the Raster API of the ''Geospatial Data Abstraction Library'' (''GDAL'')
+    supporting manual creation of uninitialized datasets, creation from existing raster
+    as template, low level I/O, configuration of virtual raster (VRT), coordinate transformation,
+    and access to ''gdalwarp'' for reprojection. Includes several ''GDAL'' algorithms
+    and functions for working with spatial reference systems. Calling signatures resemble
+    the native C, C++ and Python APIs provided by the ''GDAL'' project (<https://gdal.org>).
+    Bindings are implemented via exposed C++ class encapsulating a ''GDALDataset'' and
+    its associated ''GDALRasterBand'' objects, plus several stand-alone functions. Additional
+    functionality includes: class ''RunningStats'' for efficient summary statistics
+    on large data streams; class ''CmbTable'' for counting unique combinations of integers
+    with a hash table; raster ''combine()'' to identify and count unique pixel combinations
+    across multiple input layers; raster ''calc()'' to evaluate an R expression on a
+    stack of layers with pixel coordinates available as variables in the expression;
+    and raster display using base ''graphics''. ''gdalraster'' may be suitable for applications
+    that primarily need low-level I/O or prefer a direct ''GDAL'' API. The additional
+    functionality is somewhat aimed at thematic data analysis but may have other utility.'
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: gdalraster
+# Title: Bindings to the 'Geospatial Data Abstraction Library' Raster API
+# Version: 1.6.0
+# Authors@R: c( person("Chris", "Toney", email = "chris.toney@usda.gov", role = c("aut", "cre"), comment = "R interface/additional functionality"), person("Frank", "Warmerdam", role = c("ctb", "cph"), comment = "GDAL API documentation; src/progress_r.cpp from gdal/port/cpl_progress.cpp"), person("Even", "Rouault", role = c("ctb", "cph"), comment = "GDAL API documentation"), person("Marius", "Appel", role = c("ctb", "cph"), comment = "configure.ac based on https://github.com/appelmar/gdalcubes"), person("Daniel", "James", role = c("ctb", "cph"), comment = "Boost combine hashes method in src/cmb_table.h"), person("Peter", "Dimov", role = c("ctb", "cph"), comment = "Boost combine hashes method in src/cmb_table.h"))
+# Description: Interface to the Raster API of the 'Geospatial Data Abstraction Library' ('GDAL') supporting manual creation of uninitialized datasets, creation from existing raster as template, low level I/O, configuration of virtual raster (VRT), coordinate transformation, and access to 'gdalwarp' for reprojection. Includes several 'GDAL' algorithms and functions for working with spatial reference systems. Calling signatures resemble the native C, C++ and Python APIs provided by the 'GDAL' project (<https://gdal.org>). Bindings are implemented via exposed C++ class encapsulating a 'GDALDataset' and its associated 'GDALRasterBand' objects, plus several stand-alone functions. Additional functionality includes: class 'RunningStats' for efficient summary statistics on large data streams; class 'CmbTable' for counting unique combinations of integers with a hash table; raster 'combine()' to identify and count unique pixel combinations across multiple input layers; raster 'calc()' to evaluate an R expression on a stack of layers with pixel coordinates available as variables in the expression; and raster display using base 'graphics'. 'gdalraster' may be suitable for applications that primarily need low-level I/O or prefer a direct 'GDAL' API. The additional functionality is somewhat aimed at thematic data analysis but may have other utility.
+# License: MIT + file LICENSE
+# Copyright: See file inst/COPYRIGHTS for details.
+# URL: https://usdaforestservice.github.io/gdalraster/, https://github.com/USDAForestService/gdalraster
+# BugReports: https://github.com/USDAForestService/gdalraster/issues
+# Depends: R (>= 4.2.0)
+# Imports: graphics, grDevices, methods, Rcpp (>= 1.0.7), stats, tools, utils, xml2
+# LinkingTo: Rcpp
+# Suggests: gt, knitr, rmarkdown, scales, testthat (>= 3.0.0)
+# NeedsCompilation: yes
+# SystemRequirements: GDAL (>= 2.4.0, built against GEOS), PROJ (>= 4.8.0), sqlite3
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# Config/testthat/edition: 3
+# Packaged: 2023-10-27 03:30:12 UTC; ctoney
+# Author: Chris Toney [aut, cre] (R interface/additional functionality), Frank Warmerdam [ctb, cph] (GDAL API documentation; src/progress_r.cpp from gdal/port/cpl_progress.cpp), Even Rouault [ctb, cph] (GDAL API documentation), Marius Appel [ctb, cph] (configure.ac based on https://github.com/appelmar/gdalcubes), Daniel James [ctb, cph] (Boost combine hashes method in src/cmb_table.h), Peter Dimov [ctb, cph] (Boost combine hashes method in src/cmb_table.h)
+# Maintainer: Chris Toney <chris.toney@usda.gov>
+# Repository: CRAN
+# Date/Publication: 2023-10-27 22:40:12 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

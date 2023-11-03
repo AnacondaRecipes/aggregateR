@@ -1,0 +1,91 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-regplot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/regplot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/regplot/regplot_{{ version }}.tar.gz
+  sha256: 5c14b99f407f9872be266262944c02d14cf63c798243a9eb111379d12c041c11
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-beanplot
+    - r-lme4
+    - r-sm
+    - r-survival
+    - r-vioplot
+
+  run:
+    - r-base
+    - r-beanplot
+    - r-lme4
+    - r-sm
+    - r-survival
+    - r-vioplot
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('regplot')"           # [not win]
+    - "\"%R%\" -e \"library('regplot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=regplot
+  license: GPL-2
+  summary: A function to plot a regression nomogram of regression objects. Covariate distributions
+    are superimposed on nomogram scales and the plot can be animated to allow on-the-fly
+    changes to distribution representation and to enable outcome calculation.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: regplot
+# Type: Package
+# Title: Enhanced Regression Nomogram Plot
+# Version: 1.1
+# Date: 2020-07-01
+# Authors@R: person("Roger", "Marshall", role = c("aut", "cre"), email = "rj.marshall@auckland.ac.nz")
+# Description: A function to plot a regression nomogram of regression objects. Covariate distributions are superimposed on nomogram scales and the plot can be animated to allow on-the-fly changes to distribution representation and to enable outcome calculation.
+# License: GPL-2
+# Imports: vioplot, sm, beanplot, survival, graphics, stats, lme4
+# RoxygenNote: 7.0.2
+# NeedsCompilation: no
+# Packaged: 2020-06-25 21:51:00 UTC; rmar073
+# Author: Roger Marshall [aut, cre]
+# Maintainer: Roger Marshall <rj.marshall@auckland.ac.nz>
+# Repository: CRAN
+# Date/Publication: 2020-06-26 05:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

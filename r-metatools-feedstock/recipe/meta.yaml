@@ -1,0 +1,102 @@
+{% set version = '0.1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-metatools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/metatools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/metatools/metatools_{{ version }}.tar.gz
+  sha256: 45541bce5be89f7635c9237daa4df3fbaa5ad089be9d88b23b99cd7126c09751
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 3.0.0), haven, covr, safetyData, admiral.test
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr
+    - r-magrittr
+    - r-metacore >=0.0.4
+    - r-purrr
+    - r-rlang
+    - r-stringr
+    - r-tibble
+    - r-tidyr
+
+  run:
+    - r-base
+    - r-dplyr
+    - r-magrittr
+    - r-metacore >=0.0.4
+    - r-purrr
+    - r-rlang
+    - r-stringr
+    - r-tibble
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('metatools')"           # [not win]
+    - "\"%R%\" -e \"library('metatools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://pharmaverse.github.io/metatools/
+  license: MIT
+  summary: Uses the metadata information stored in 'metacore' objects to check and build metadata
+    associated columns.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: metatools
+# Type: Package
+# Title: Enable the Use of 'metacore' to Help Create and Check Dataset
+# Version: 0.1.5
+# Authors@R: c( person(given = "Christina", family = "Fillmore", role = c("aut", "cre"), email = "christina.e.fillmore@gsk.com", comment = c(ORCID = "0000-0003-0595-2302")), person(given = "Mike", family = "Stackhouse", role = c("aut"), email = "mike.stackhouse@atorusresearch.com", comment = c(ORCID = "0000-0001-6030-723X")), person("GlaxoSmithKline LLC", role = c("cph", "fnd")), person("F. Hoffmann-La Roche AG", role = c("cph", "fnd")), person("Atorus Research LLC", role = c("cph", "fnd")) )
+# Description: Uses the metadata information stored in 'metacore' objects to check and build metadata associated columns.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Imports: dplyr, metacore (>= 0.0.4), purrr, rlang, stringr, tidyr, tibble, magrittr
+# Suggests: testthat (>= 3.0.0), haven, covr, safetyData, admiral.test
+# Config/testthat/edition: 3
+# URL: https://pharmaverse.github.io/metatools/
+# BugReports: https://github.com/pharmaverse/metatools/issues
+# NeedsCompilation: no
+# Packaged: 2023-03-13 09:03:49 UTC; christinafillmore
+# Author: Christina Fillmore [aut, cre] (<https://orcid.org/0000-0003-0595-2302>), Mike Stackhouse [aut] (<https://orcid.org/0000-0001-6030-723X>), GlaxoSmithKline LLC [cph, fnd], F. Hoffmann-La Roche AG [cph, fnd], Atorus Research LLC [cph, fnd]
+# Maintainer: Christina Fillmore <christina.e.fillmore@gsk.com>
+# Repository: CRAN
+# Date/Publication: 2023-03-13 10:00:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

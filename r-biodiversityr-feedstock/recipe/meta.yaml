@@ -1,0 +1,95 @@
+{% set version = '2.15-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-biodiversityr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BiodiversityR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BiodiversityR/BiodiversityR_{{ version }}.tar.gz
+  sha256: 8b4194d87d52877cb7834c8ceb7821c56b4b5c2b04eab97faa834d9d0fe81c4d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: vegan3d, rgl, permute, lattice, MASS, mgcv, cluster, car, RODBC, rpart, effects, multcomp, ellipse, sp, splancs, spatial, nnet, dismo, raster (>= 3.6-11), terra (>= 1.6-47), maxlike, gbm, randomForest, gam (>= 1.15), earth, mda, kernlab, e1071, glmnet, tools, methods, bootstrap, PresenceAbsence, geosphere, ENMeval, red, igraph, Rlof, maxnet, party, readxl, colorspace, dplyr, rlang, sf, blockCV, envirem (>= 3.0), concaveman, pvclust
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcmdr >=2.9_1
+    - r-ggplot2 >=3.3.3
+    - r-vegan >=2.6_4
+
+  run:
+    - r-base
+    - r-rcmdr >=2.9_1
+    - r-ggplot2 >=3.3.3
+    - r-vegan >=2.6_4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BiodiversityR')"           # [not win]
+    - "\"%R%\" -e \"library('BiodiversityR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.worldagroforestry.org/output/tree-diversity-analysis
+  license: GPL-3
+  summary: Graphical User Interface (via the R-Commander) and utility functions (often based
+    on the vegan package) for statistical analysis of biodiversity and ecological communities,
+    including species accumulation curves, diversity indices, Renyi profiles, GLMs for
+    analysis of species abundance and presence-absence, distance matrices, Mantel tests,
+    and cluster, constrained and unconstrained ordination analysis. A book on biodiversity
+    and community ecology analysis is available for free download from the website.
+    In 2012, methods for (ensemble) suitability modelling and mapping were expanded
+    in the package.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: BiodiversityR
+# Type: Package
+# Title: Package for Community Ecology and Suitability Analysis
+# Version: 2.15-4
+# Date: 2023-10-22
+# Author: Roeland Kindt [cre, aut] (<https://orcid.org/0000-0002-7672-0712>)
+# Authors@R: c(person(given = "Roeland", family = "Kindt", role = c("cre", "aut"), email = "RoelandCEKindt@gmail.com", comment = c(ORCID = "0000-0002-7672-0712")))
+# Maintainer: Roeland Kindt <RoelandCEKindt@gmail.com>
+# Description: Graphical User Interface (via the R-Commander) and utility functions (often based on the vegan package) for statistical analysis of biodiversity and ecological communities, including species accumulation curves, diversity indices, Renyi profiles, GLMs for analysis of species abundance and presence-absence, distance matrices, Mantel tests, and cluster, constrained and unconstrained ordination analysis. A book on biodiversity and community ecology analysis is available for free download from the website. In 2012, methods for (ensemble) suitability modelling and mapping were expanded in the package.
+# License: GPL-3
+# URL: http://www.worldagroforestry.org/output/tree-diversity-analysis
+# Depends: R (>= 3.2.2), tcltk, vegan (>= 2.6-4)
+# Imports: Rcmdr (>= 2.9-1), ggplot2 (>= 3.3.3)
+# Suggests: vegan3d, rgl, permute, lattice, MASS, mgcv, cluster, car, RODBC, rpart, effects, multcomp, ellipse, sp, splancs, spatial, nnet, dismo, raster (>= 3.6-11), terra (>= 1.6-47), maxlike, gbm, randomForest, gam (>= 1.15), earth, mda, kernlab, e1071, glmnet, tools, methods, bootstrap, PresenceAbsence, geosphere, ENMeval, red, igraph, Rlof, maxnet, party, readxl, colorspace, dplyr, rlang, sf, blockCV, envirem (>= 3.0), concaveman, pvclust
+# Packaged: 2023-10-22 09:17:12 UTC; RKINDT
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2023-10-22 11:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

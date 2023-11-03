@@ -1,0 +1,101 @@
+{% set version = '1.9-6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-asbio
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/asbio_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/asbio/asbio_{{ version }}.tar.gz
+  sha256: 25257219241321b6b4b4a367597cedb252b8e9ebd11c6dcd085fc2aa2e9c41e0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: boot, tkrplot, R.rsp
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-desolve
+    - r-gwidgets2
+    - r-gwidgets2tcltk
+    - r-lattice
+    - r-multcompview
+    - r-mvtnorm
+    - r-pixmap
+    - r-plotrix
+    - r-scatterplot3d
+
+  run:
+    - r-base
+    - r-desolve
+    - r-gwidgets2
+    - r-gwidgets2tcltk
+    - r-lattice
+    - r-multcompview
+    - r-mvtnorm
+    - r-pixmap
+    - r-plotrix
+    - r-scatterplot3d
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('asbio')"           # [not win]
+    - "\"%R%\" -e \"library('asbio')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=asbio
+  license: GPL-2
+  summary: 'Contains functions from: Aho, K. (2014) Foundational and Applied Statistics for Biologists
+    using R.  CRC/Taylor and Francis, Boca Raton, FL, ISBN: 978-1-4398-7338-0.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: asbio
+# Type: Package
+# Title: A Collection of Statistical Tools for Biologists
+# Version: 1.9-6
+# Depends: R (>= 3.5.0), tcltk
+# Imports: scatterplot3d, pixmap, plotrix, mvtnorm, deSolve, lattice, multcompView, grDevices, graphics, stats, utils, gWidgets2, gWidgets2tcltk
+# Suggests: boot, tkrplot, R.rsp
+# Date: 2023-8-18
+# SystemRequirements: BWidget
+# Author: Ken Aho
+# Maintainer: Ken Aho <kenaho1@gmail.com>
+# Description: Contains functions from: Aho, K. (2014) Foundational and Applied Statistics for Biologists using R.  CRC/Taylor and Francis, Boca Raton, FL, ISBN: 978-1-4398-7338-0.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2023-08-19 23:34:44 UTC; ahoken
+# Repository: CRAN
+# Date/Publication: 2023-08-20 02:22:36 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,105 @@
+{% set version = '1.1.10' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-drgee
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/drgee_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/drgee/drgee_{{ version }}.tar.gz
+  sha256: e684f07f7dfec922380d4202922c11094f859721f77b31ff38b0d35d0f42c743
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-data.table
+    - r-nleqslv
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-data.table
+    - r-nleqslv
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('drgee')"           # [not win]
+    - "\"%R%\" -e \"library('drgee')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=drgee
+  license: GPL-2 | GPL-3
+  summary: "Fit restricted mean models for the conditional association between an exposure and
+    an outcome, given covariates. Three methods are implemented: O-estimation, where
+    a nuisance model for the association between the covariates and the outcome is used;
+    E-estimation where a nuisance model for the association between the covariates and
+    the exposure is used, and doubly robust (DR) estimation where both nuisance models
+    are used. In DR-estimation, the estimates will be consistent when at least one of
+    the nuisance models is correctly specified, not necessarily both. For more information,
+    see Zetterqvist and Sj\xF6lander (2015) <doi:10.1515/em-2014-0021>."
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: drgee
+# Type: Package
+# Title: Doubly Robust Generalized Estimating Equations
+# Version: 1.1.10
+# Date: 2020-01-08
+# Author: Johan Zetterqvist <drjohanzetterqvist at gmail.com> , Arvid Sjolander <arvid.sjolander at ki.se> with contributions from Alexander Ploner.
+# Maintainer: Johan Zetterqvist <drjohanzetterqvist@gmail.com>
+# Description: Fit restricted mean models for the conditional association between an exposure and an outcome, given covariates. Three methods are implemented: O-estimation, where a nuisance model for the association between the covariates and the outcome is used; E-estimation where a nuisance model for the association between the covariates and the exposure is used, and doubly robust (DR) estimation where both nuisance models are used. In DR-estimation, the estimates will be consistent when at least one of the nuisance models is correctly specified, not necessarily both. For more information, see Zetterqvist and Sjolander (2015) <doi:10.1515/em-2014-0021>.
+# Imports: nleqslv, survival, Rcpp, data.table
+# LinkingTo: Rcpp, RcppArmadillo
+# License: GPL-2 | GPL-3
+# NeedsCompilation: yes
+# Encoding: UTF-8
+# Packaged: 2020-01-08 20:27:30 UTC; johan
+# Repository: CRAN
+# Date/Publication: 2020-01-09 07:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

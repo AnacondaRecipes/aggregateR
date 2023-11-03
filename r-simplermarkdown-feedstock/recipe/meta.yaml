@@ -1,0 +1,89 @@
+{% set version = '0.0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-simplermarkdown
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/simplermarkdown_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/simplermarkdown/simplermarkdown_{{ version }}.tar.gz
+  sha256: 06d0b05455623737c1187524c864c29b70d381079b084827c40c370db3e6ce51
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rjson
+
+  run:
+    - r-base
+    - r-rjson
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('simplermarkdown')"           # [not win]
+    - "\"%R%\" -e \"library('simplermarkdown')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/djvanderlaan/simplermarkdown
+  license: GPL-3
+  summary: Runs R-code present in a pandoc markdown file and includes the resulting output in
+    the resulting markdown file. This file can then be converted into any of the output
+    formats supported by pandoc. The package can also be used as an engine for writing
+    package vignettes.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: simplermarkdown
+# Title: Simple Engine for Generating Reports using R
+# Version: 0.0.6
+# Authors@R: person(given = "Jan", family = "van der Laan", role = c("aut", "cre"), email = "r@eoos.dds.nl", comment = c(ORCID = "0000-0002-0693-1514"))
+# Description: Runs R-code present in a pandoc markdown file and includes the resulting output in the resulting markdown file. This file can then be converted into any of the output formats supported by pandoc. The package can also be used as an engine for writing package vignettes.
+# BugReports: https://github.com/djvanderlaan/simplermarkdown/issues
+# URL: https://github.com/djvanderlaan/simplermarkdown
+# License: GPL (>= 3)
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Imports: rjson, tools
+# Suggests: MASS
+# VignetteBuilder: simplermarkdown
+# SystemRequirements: Pandoc (http://pandoc.org) needs to installed and available in the search path.
+# NeedsCompilation: no
+# Packaged: 2023-03-24 07:55:56 UTC; eoos
+# Author: Jan van der Laan [aut, cre] (<https://orcid.org/0000-0002-0693-1514>)
+# Maintainer: Jan van der Laan <r@eoos.dds.nl>
+# Repository: CRAN
+# Date/Publication: 2023-03-24 15:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

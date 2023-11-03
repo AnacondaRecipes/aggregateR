@@ -1,0 +1,92 @@
+{% set version = '1.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-diffdf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/diffdf_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/diffdf/diffdf_{{ version }}.tar.gz
+  sha256: 72471845f9de52432c91ef71ad0ef8a91598a2a9fabd3813910db2abf703990d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, lubridate, knitr, rmarkdown, purrr, dplyr, stringi, stringr, devtools, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-tibble
+
+  run:
+    - r-base
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('diffdf')"           # [not win]
+    - "\"%R%\" -e \"library('diffdf')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/gowerc/diffdf
+  license: MIT
+  summary: Functions for comparing two data.frames against each other. The core functionality
+    is to provide a detailed breakdown of any differences between two data.frames as
+    well as providing utility functions to help narrow down the source of problems and
+    differences.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: diffdf
+# Type: Package
+# Title: Dataframe Difference Tool
+# Version: 1.0.4
+# Authors@R: c( person("Craig" ,"Gower-Page" , email = "craig.gower-page@roche.com" , role = c("cre","aut")), person("Kieran", "Martin" , email = "kieran.martin@roche.com" , role = "aut") )
+# Description: Functions for comparing two data.frames against each other. The core functionality is to provide a detailed breakdown of any differences between two data.frames as well as providing utility functions to help narrow down the source of problems and differences.
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 3.1.2)
+# Imports: tibble
+# Suggests: testthat, lubridate, knitr, rmarkdown, purrr, dplyr, stringi, stringr, devtools, covr
+# RoxygenNote: 7.0.2
+# VignetteBuilder: knitr
+# License: MIT + file LICENSE
+# URL: https://github.com/gowerc/diffdf
+# BugReports: https://github.com/gowerc/diffdf/issues
+# NeedsCompilation: no
+# Packaged: 2020-03-16 19:05:45 UTC; gowerc
+# Author: Craig Gower-Page [cre, aut], Kieran Martin [aut]
+# Maintainer: Craig Gower-Page <craig.gower-page@roche.com>
+# Repository: CRAN
+# Date/Publication: 2020-03-17 23:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

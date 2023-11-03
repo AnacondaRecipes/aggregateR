@@ -1,0 +1,105 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pchc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pchc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pchc/pchc_{{ version }}.tar.gz
+  sha256: 629229b1a746fa4c789f9a933a314a978989fd8337321b0ad45c085e930d2b40
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: bigreadr, Rgraphviz
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rfast
+    - r-rfast2
+    - r-bigstatsr
+    - r-bnlearn
+    - r-dcov
+    - r-doparallel
+    - r-foreach
+    - r-robustbase
+
+  run:
+    - r-base
+    - r-rfast
+    - r-rfast2
+    - r-bigstatsr
+    - r-bnlearn
+    - r-dcov
+    - r-doparallel
+    - r-foreach
+    - r-robustbase
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pchc')"           # [not win]
+    - "\"%R%\" -e \"library('pchc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: ''
+  license: GPL-2
+  summary: 'Bayesian network learning using the PCHC algorithm. PCHC stands for PC Hill-Climbing,
+    a new hybrid algorithm that uses PC to construct the skeleton of the BN and then
+    applies the Hill-Climbing greedy search. More algorithms and variants have been
+    added, such as MMHC, FEDHC, and the Tabu search variants, PCTABU, MMTABU and FEDTABU.
+    The relevant papers are: a) Tsagris M. (2021). A new scalable Bayesian network learning
+    algorithm with applications to economics. Computational Economics, 57(1): 341-367.
+    <doi:10.1007/s10614-020-10065-7>. b) Tsagris M. (2022). The FEDHC Bayesian Network
+    Learning Algorithm. Mathematics 2022, 10(15): 2604. <doi:10.3390/math10152604>.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: pchc
+# Type: Package
+# Title: Bayesian Network Learning with the PCHC and Related Algorithms
+# Version: 1.2
+# URL:
+# Date: 2023-09-06
+# Authors@R: c(person("Michail", "Tsagris", role = c("aut", "cre"), email = "mtsagris@uoc.gr"))
+# Author: Michail Tsagris [aut, cre]
+# Maintainer: Michail Tsagris <mtsagris@uoc.gr>
+# Depends: R (>= 4.0)
+# Imports: bigstatsr, bnlearn, dcov, foreach, doParallel, parallel, Rfast, Rfast2, robustbase, stats
+# Suggests: bigreadr, Rgraphviz
+# Description: Bayesian network learning using the PCHC algorithm. PCHC stands for PC Hill-Climbing, a new hybrid algorithm that uses PC to construct the skeleton of the BN and then applies the Hill-Climbing greedy search. More algorithms and variants have been added, such as MMHC, FEDHC, and the Tabu search variants, PCTABU, MMTABU and FEDTABU. The relevant papers are: a) Tsagris M. (2021). A new scalable Bayesian network learning algorithm with applications to economics. Computational Economics, 57(1): 341-367. <doi:10.1007/s10614-020-10065-7>. b) Tsagris M. (2022). The FEDHC Bayesian Network Learning Algorithm. Mathematics 2022, 10(15): 2604. <doi:10.3390/math10152604>.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2023-09-06 15:33:02 UTC; tsagris
+# Repository: CRAN
+# Date/Publication: 2023-09-06 16:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,116 @@
+{% set version = '1.0-45' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-microplot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/microplot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/microplot/microplot_{{ version }}.tar.gz
+  sha256: 098d3d8c8d149044869ab8b06910521bb9c29c9b1ea306291851a5fd8bddf962
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: reshape2, latticeExtra, xtable, markdown, rmarkdown, knitr, htmlTable
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-hh
+    - r-hmisc >=4.1_1
+    - r-cowplot
+    - r-flextable >=0.5_11
+    - r-ggplot2
+    - r-htmltools
+    - r-lattice
+    - r-officer
+
+  run:
+    - r-base
+    - r-hh
+    - r-hmisc >=4.1_1
+    - r-cowplot
+    - r-flextable >=0.5_11
+    - r-ggplot2
+    - r-htmltools
+    - r-lattice
+    - r-officer
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('microplot')"           # [not win]
+    - "\"%R%\" -e \"library('microplot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=microplot
+  license: GPL-2
+  summary: The microplot function writes a set of R graphics files to be used as microplots (sparklines)
+    in tables in either 'LaTeX', 'HTML', 'Word', or 'Excel' files.  For 'LaTeX', we
+    provide methods for the Hmisc::latex() generic function to construct 'latex' tabular
+    environments which include the graphs.  These can be used directly with the operating
+    system 'pdflatex' or 'latex' command, or by using one of 'Sweave', 'knitr', 'rmarkdown',
+    or 'Emacs org-mode' as an intermediary.  For 'MS Word', the msWord() function uses
+    the 'flextable' package to construct 'Word' tables which include the graphs.  There
+    are several distinct approaches for constructing HTML files.  The simplest is to
+    use the msWord() function with argument filetype="html".  Alternatively, use either
+    'Emacs org-mode' or the htmlTable::htmlTable() function to construct an 'HTML' file
+    containing tables which include the graphs.  See the documentation for our as.htmlimg()
+    function.  For 'Excel' use on 'Windows', the file examples/irisExcel.xls includes
+    'VBA' code which brings the individual panels into individual cells in the spreadsheet.
+    Examples in the examples and demo subdirectories are shown with 'lattice' graphics,
+    'ggplot2' graphics, and 'base' graphics. Examples for 'LaTeX' include 'Sweave' (both
+    'LaTeX'-style and 'Noweb'-style), 'knitr', 'emacs org-mode', and 'rmarkdown' input
+    files and their 'pdf' output files.  Examples for 'HTML' include 'org-mode' and
+    'Rmd' input files and their webarchive 'HTML' output files.  In addition, the as.orgtable()
+    function can display a data.frame in an 'org-mode' document.  The examples for 'MS
+    Word' (with either filetype="docx" or filetype="html") work with all operating systems.  The
+    package does not require the installation of 'LaTeX' or 'MS Word' to be able to
+    write '.tex' or '.docx' files.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: microplot
+# Type: Package
+# Title: Microplots (Sparklines) in 'LaTeX', 'Word', 'HTML', 'Excel'
+# Version: 1.0-45
+# Date: 2022-01-26
+# Author: Richard M. Heiberger, with contributions from Karen Byron and Nooreen Dabbish.
+# Maintainer: Richard M. Heiberger <rmh@temple.edu>
+# Description: The microplot function writes a set of R graphics files to be used as microplots (sparklines) in tables in either 'LaTeX', 'HTML', 'Word', or 'Excel' files.  For 'LaTeX', we provide methods for the Hmisc::latex() generic function to construct 'latex' tabular environments which include the graphs.  These can be used directly with the operating system 'pdflatex' or 'latex' command, or by using one of 'Sweave', 'knitr', 'rmarkdown', or 'Emacs org-mode' as an intermediary.  For 'MS Word', the msWord() function uses the 'flextable' package to construct 'Word' tables which include the graphs.  There are several distinct approaches for constructing HTML files.  The simplest is to use the msWord() function with argument filetype="html".  Alternatively, use either 'Emacs org-mode' or the htmlTable::htmlTable() function to construct an 'HTML' file containing tables which include the graphs.  See the documentation for our as.htmlimg() function.  For 'Excel' use on 'Windows', the file examples/irisExcel.xls includes 'VBA' code which brings the individual panels into individual cells in the spreadsheet. Examples in the examples and demo subdirectories are shown with 'lattice' graphics, 'ggplot2' graphics, and 'base' graphics. Examples for 'LaTeX' include 'Sweave' (both 'LaTeX'-style and 'Noweb'-style), 'knitr', 'emacs org-mode', and 'rmarkdown' input files and their 'pdf' output files.  Examples for 'HTML' include 'org-mode' and 'Rmd' input files and their webarchive 'HTML' output files.  In addition, the as.orgtable() function can display a data.frame in an 'org-mode' document.  The examples for 'MS Word' (with either filetype="docx" or filetype="html") work with all operating systems.  The package does not require the installation of 'LaTeX' or 'MS Word' to be able to write '.tex' or '.docx' files.
+# Imports: Hmisc (>= 4.1-1), HH, lattice, grid, flextable (>= 0.5-11), officer, ggplot2, htmltools, cowplot
+# Suggests: reshape2, latticeExtra, xtable, markdown, rmarkdown, knitr, htmlTable
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2022-01-26 21:51:27 UTC; rmh
+# Repository: CRAN
+# Date/Publication: 2022-01-26 22:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

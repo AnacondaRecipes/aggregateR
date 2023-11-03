@@ -1,0 +1,114 @@
+{% set version = '0.8.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ggiraph
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ggiraph_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ggiraph/ggiraph_{{ version }}.tar.gz
+  sha256: 5664276c2de831c47e315f453a42bc027bdb63d3b64295f7172b66cadfe2e441
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, tinytest, rmarkdown, maps, hexbin, shiny, sf (>= 1.0), ggrepel (>= 0.9.1), quantreg, xml2 (>= 1.0), dplyr, gdtools (>= 0.3.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0
+    - r-ggplot2 >=3.4.0
+    - r-htmltools
+    - r-htmlwidgets >=1.5
+    - r-purrr
+    - r-rlang
+    - r-systemfonts
+    - r-uuid
+    - r-vctrs
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0
+    - r-ggplot2 >=3.4.0
+    - r-htmltools
+    - r-htmlwidgets >=1.5
+    - r-purrr
+    - r-rlang
+    - r-systemfonts
+    - r-uuid
+    - r-vctrs
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ggiraph')"           # [not win]
+    - "\"%R%\" -e \"library('ggiraph')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://davidgohel.github.io/ggiraph/
+  license: GPL-3
+  summary: Create interactive 'ggplot2' graphics using 'htmlwidgets'.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: ggiraph
+# Type: Package
+# Title: Make 'ggplot2' Graphics Interactive
+# Description: Create interactive 'ggplot2' graphics using 'htmlwidgets'.
+# Version: 0.8.7
+# Authors@R: c( person("David", "Gohel", role = c("aut", "cre"), email = "david.gohel@ardata.fr"), person("Panagiotis", "Skintzos", role = c("aut"), email = "sigmapi@posteo.net"), person("Mike", "Bostock", role = c("cph"), comment = "d3.js"), person("Speros", "Kokenes", role = c("cph"), comment = "d3-lasso"), person("Eric", "Shull", role = c("cph"), comment = "saveSvgAsPng js library"), person("Lee", "Thomason", role = c("cph"), comment = "TinyXML2"), person("Vladimir", "Agafonkin", role = c("cph"), comment = "Flatbush"), person("Eric", "Book", role = c("ctb"), comment = "hline and vline geoms") )
+# License: GPL-3
+# Copyright: See file COPYRIGHTS.
+# Encoding: UTF-8
+# SystemRequirements: libpng
+# Imports: grid, ggplot2 (>= 3.4.0), htmlwidgets (>= 1.5), stats, htmltools, Rcpp (>= 1.0), systemfonts, purrr, rlang, uuid, vctrs
+# LinkingTo: Rcpp, systemfonts
+# Suggests: knitr, tinytest, rmarkdown, maps, hexbin, shiny, sf (>= 1.0), ggrepel (>= 0.9.1), quantreg, xml2 (>= 1.0), dplyr, gdtools (>= 0.3.0)
+# VignetteBuilder: knitr
+# URL: https://davidgohel.github.io/ggiraph/
+# BugReports: https://github.com/davidgohel/ggiraph/issues
+# RoxygenNote: 7.2.3
+# Collate: 'RcppExports.R' 'ipar.R' 'utils_ggplot2_performance.R' 'utils_ggplot2.R' 'utils.R' 'annotate_interactive.R' 'annotation_raster_interactive.R' 'utils_css.R' 'fonts.R' 'girafe_options.R' 'default.R' 'dsvg.R' 'dsvg_view.R' 'element_interactive.R' 'facet_interactive.R' 'geom_abline_interactive.R' 'geom_path_interactive.R' 'geom_polygon_interactive.R' 'geom_rect_interactive.R' 'geom_bar_interactive.R' 'geom_bin_2d_interactive.R' 'geom_boxplot_interactive.R' 'geom_col_interactive.R' 'geom_contour_interactive.R' 'geom_count_interactive.R' 'geom_crossbar_interactive.R' 'geom_curve_interactive.R' 'geom_density_2d_interactive.R' 'geom_density_interactive.R' 'geom_dotplot_interactive.R' 'geom_errorbar_interactive.R' 'geom_errorbarh_interactive.R' 'geom_freqpoly_interactive.R' 'geom_hex_interactive.R' 'geom_histogram_interactive.R' 'geom_hline_interactive.R' 'geom_jitter_interactive.R' 'geom_label_interactive.R' 'geom_linerange_interactive.R' 'geom_map_interactive.R' 'geom_point_interactive.R' 'geom_pointrange_interactive.R' 'geom_quantile_interactive.R' 'geom_raster_interactive.R' 'geom_ribbon_interactive.R' 'geom_segment_interactive.R' 'geom_sf_interactive.R' 'geom_smooth_interactive.R' 'geom_spoke_interactive.R' 'geom_text_interactive.R' 'geom_text_repel_interactive.R' 'geom_tile_interactive.R' 'geom_violin_interactive.R' 'geom_vline_interactive.R' 'ggiraph.R' 'girafe.R' 'grob_interactive.R' 'guide_bins_interactive.R' 'guide_colourbar_interactive.R' 'guide_coloursteps_interactive.R' 'guide_interactive.R' 'guide_legend_interactive.R' 'interactive_circle_grob.R' 'interactive_curve_grob.R' 'interactive_path_grob.R' 'interactive_points_grob.R' 'interactive_polygon_grob.R' 'interactive_polyline_grob.R' 'interactive_raster_grob.R' 'interactive_rect_grob.R' 'interactive_roundrect_grob.R' 'interactive_segments_grob.R' 'interactive_text_grob.R' 'labeller_interactive.R' 'layer_interactive.R' 'scale_alpha_interactive.R' 'scale_brewer_interactive.R' 'scale_colour_interactive.R' 'scale_gradient_interactive.R' 'scale_interactive.R' 'scale_linetype_interactive.R' 'scale_manual_interactive.R' 'scale_shape_interactive.R' 'scale_size_interactive.R' 'scale_steps_interactive.R' 'scale_viridis_interactive.R' 'tracers.R'
+# NeedsCompilation: yes
+# Packaged: 2023-03-17 12:23:25 UTC; davidgohel
+# Author: David Gohel [aut, cre], Panagiotis Skintzos [aut], Mike Bostock [cph] (d3.js), Speros Kokenes [cph] (d3-lasso), Eric Shull [cph] (saveSvgAsPng js library), Lee Thomason [cph] (TinyXML2), Vladimir Agafonkin [cph] (Flatbush), Eric Book [ctb] (hline and vline geoms)
+# Maintainer: David Gohel <david.gohel@ardata.fr>
+# Repository: CRAN
+# Date/Publication: 2023-03-17 13:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

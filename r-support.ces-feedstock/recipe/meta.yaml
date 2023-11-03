@@ -1,0 +1,88 @@
+{% set version = '0.6-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-support.ces
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/support.CEs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/support.CEs/support.CEs_{{ version }}.tar.gz
+  sha256: 4c105786ecf8ef5c233790783870cb42504b827c59aa055896c1da1d40784f48
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: survival
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-doe.base
+    - r-mass
+    - r-simex
+
+  run:
+    - r-base
+    - r-doe.base
+    - r-mass
+    - r-simex
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('support.CEs')"           # [not win]
+    - "\"%R%\" -e \"library('support.CEs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=support.CEs
+  license: GPL-2
+  summary: Provides basic functions that support an implementation of (discrete) choice experiments
+    (CEs). CEs is a question-based survey method measuring people's preferences for
+    goods/services and their characteristics. Refer to Louviere et al. (2000) <doi:10.1017/CBO9780511753831>
+    for details on CEs, and Aizaki (2012) <doi:10.18637/jss.v050.c02> for the package.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: support.CEs
+# Type: Package
+# Title: Basic Functions for Supporting an Implementation of Choice Experiments
+# Version: 0.6-0
+# Date: 2023-08-11
+# Author: Hideo Aizaki
+# Maintainer: Hideo Aizaki <azk-r@spa.nifty.com>
+# Description: Provides basic functions that support an implementation of (discrete) choice experiments (CEs). CEs is a question-based survey method measuring people's preferences for goods/services and their characteristics. Refer to Louviere et al. (2000) <doi:10.1017/CBO9780511753831> for details on CEs, and Aizaki (2012) <doi:10.18637/jss.v050.c02> for the package.
+# License: GPL (>= 2)
+# Imports: DoE.base, MASS, simex, stats
+# Suggests: survival
+# NeedsCompilation: no
+# Packaged: 2023-08-11 08:00:18 UTC; rpkgdev
+# Repository: CRAN
+# Date/Publication: 2023-08-11 08:50:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

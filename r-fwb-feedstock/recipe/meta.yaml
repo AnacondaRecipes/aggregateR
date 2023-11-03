@@ -1,0 +1,95 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fwb
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fwb_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fwb/fwb_{{ version }}.tar.gz
+  sha256: 0228691f33537ee8ec8053bea0ba609bd8903e91aba49450ee84e89f136cdec0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: survival, boot, sandwich (>= 2.4-0), lmtest, parallel
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-chk
+    - r-pbapply
+    - r-rlang
+
+  run:
+    - r-base
+    - r-chk
+    - r-pbapply
+    - r-rlang
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fwb')"           # [not win]
+    - "\"%R%\" -e \"library('fwb')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ngreifer/fwb, https://ngreifer.github.io/fwb/
+  license: GPL-2
+  summary: An implementation of the fractional weighted bootstrap to be used as a drop-in for
+    functions in the 'boot' package. The fractional weighted bootstrap (also known as
+    the Bayesian bootstrap) involves drawing weights randomly that are applied to the
+    data rather than resampling units from the data. See Xu et al. (2020) <doi:10.1080/00031305.2020.1731599>
+    for details.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: fwb
+# Type: Package
+# Title: Fractional Weighted Bootstrap
+# Version: 0.1.2
+# Authors@R: c( person("Noah", "Greifer", role=c("aut", "cre"), email = "noah.greifer@gmail.com", comment=c(ORCID="0000-0003-3067-7154")) )
+# Description: An implementation of the fractional weighted bootstrap to be used as a drop-in for functions in the 'boot' package. The fractional weighted bootstrap (also known as the Bayesian bootstrap) involves drawing weights randomly that are applied to the data rather than resampling units from the data. See Xu et al. (2020) <doi:10.1080/00031305.2020.1731599> for details.
+# Depends: R (>= 3.0.0)
+# Imports: rlang, chk, pbapply, stats, utils, graphics
+# Suggests: survival, boot, sandwich (>= 2.4-0), lmtest, parallel
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# URL: https://github.com/ngreifer/fwb, https://ngreifer.github.io/fwb/
+# BugReports: https://github.com/ngreifer/fwb/issues
+# RoxygenNote: 7.2.3
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2023-10-02 19:03:29 UTC; NoahGreifer
+# Author: Noah Greifer [aut, cre] (<https://orcid.org/0000-0003-3067-7154>)
+# Maintainer: Noah Greifer <noah.greifer@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-02 21:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

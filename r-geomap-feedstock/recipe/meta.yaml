@@ -1,0 +1,98 @@
+{% set version = '2.5-5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-geomap
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GEOmap_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GEOmap/GEOmap_{{ version }}.tar.gz
+  sha256: 8a17a78926cda3f885584f797db6765d218f89b39eda512ff8af379651fb483f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: geomapdata, maps
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mba
+    - r-rpmg
+    - r-fields
+    - r-sf
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mba
+    - r-rpmg
+    - r-fields
+    - r-sf
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GEOmap')"           # [not win]
+    - "\"%R%\" -e \"library('GEOmap')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=GEOmap
+  license: GPL-2
+  summary: Set of routines for making map projections (forward and inverse), topographic maps,
+    perspective plots, geological maps, geological map symbols, geological databases,
+    interactive plotting and selection of focus regions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: GEOmap
+# Type: Package
+# Title: Topographic and Geologic Mapping
+# Version: 2.5-5
+# Date: 2023-09-01
+# Depends: R (>= 3.0)
+# Imports: RPMG, fields, sf, MBA
+# Suggests: geomapdata, maps
+# LazyData: yes
+# Authors@R: c(person(given="Jonathan M.", family="Lees", role = c("aut", "cre"),email = "jonathan.lees@unc.edu"))
+# Author: Jonathan M. Lees [aut, cre]
+# Maintainer: Jonathan M. Lees <jonathan.lees@unc.edu>
+# Description: Set of routines for making map projections (forward and inverse), topographic maps, perspective plots, geological maps, geological map symbols, geological databases, interactive plotting and selection of focus regions.
+# License: GPL (>= 2)
+# Packaged: 2023-09-01 12:12:45 UTC; lees
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2023-09-01 12:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

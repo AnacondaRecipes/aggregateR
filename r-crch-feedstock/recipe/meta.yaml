@@ -1,0 +1,103 @@
+{% set version = '1.1-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-crch
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/crch_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/crch/crch_{{ version }}.tar.gz
+  sha256: 38a7a72fcbdcdc7a7a256e80b08f2213a8e3073acc091d175f3a141c11ae8ac7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: distributions3 (>= 0.2.1), glmx, lmtest, memisc
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+    - r-ordinal
+    - r-sandwich
+    - r-scoringrules
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-formula
+    - r-ordinal
+    - r-sandwich
+    - r-scoringrules
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('crch')"           # [not win]
+    - "\"%R%\" -e \"library('crch')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=crch
+  license: GPL-2 | GPL-3
+  summary: Different approaches to censored or truncated regression with conditional heteroscedasticity
+    are provided. First, continuous distributions can be used for the (right and/or
+    left censored or truncated) response with separate linear predictors for the mean
+    and variance. Second, cumulative link models for ordinal data (obtained by interval-censoring
+    continuous data) can be employed for heteroscedastic extended logistic regression
+    (HXLR). In the latter type of models, the intercepts depend on the thresholds that
+    define the intervals. Infrastructure for working with censored or truncated normal,
+    logistic, and Student-t distributions, i.e., d/p/q/r functions and distributions3
+    objects.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: crch
+# Title: Censored Regression with Conditional Heteroscedasticity
+# Version: 1.1-2
+# Date: 2023-03-25
+# Authors@R: c(person(given = "Jakob", family = "Messner", role = c("aut", "cre"), email = "jakob.messner@posteo.net", comment = c(ORCID = "0000-0002-1027-3673")), person(given = "Achim", family = "Zeileis", role = "aut", email = "Achim.Zeileis@R-project.org", comment = c(ORCID = "0000-0003-0918-3766")), person(given = "Reto", family = "Stauffer", role = "aut", email = "reto.stauffer@uibk.ac.at", comment = c(ORCID = "0000-0002-3798-5507")))
+# Depends: R (>= 3.6.0)
+# Imports: stats, Formula, ordinal, sandwich, scoringRules
+# Suggests: distributions3 (>= 0.2.1), glmx, lmtest, memisc
+# Description: Different approaches to censored or truncated regression with conditional heteroscedasticity are provided. First, continuous distributions can be used for the (right and/or left censored or truncated) response with separate linear predictors for the mean and variance. Second, cumulative link models for ordinal data (obtained by interval-censoring continuous data) can be employed for heteroscedastic extended logistic regression (HXLR). In the latter type of models, the intercepts depend on the thresholds that define the intervals. Infrastructure for working with censored or truncated normal, logistic, and Student-t distributions, i.e., d/p/q/r functions and distributions3 objects.
+# License: GPL-2 | GPL-3
+# NeedsCompilation: yes
+# Packaged: 2023-03-27 12:08:39 UTC; jakob
+# Author: Jakob Messner [aut, cre] (<https://orcid.org/0000-0002-1027-3673>), Achim Zeileis [aut] (<https://orcid.org/0000-0003-0918-3766>), Reto Stauffer [aut] (<https://orcid.org/0000-0002-3798-5507>)
+# Maintainer: Jakob Messner <jakob.messner@posteo.net>
+# Repository: CRAN
+# Date/Publication: 2023-03-27 12:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

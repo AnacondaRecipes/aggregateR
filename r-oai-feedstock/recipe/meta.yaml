@@ -1,0 +1,99 @@
+{% set version = '0.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-oai
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/oai_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/oai/oai_{{ version }}.tar.gz
+  sha256: f540de066de5538e303cd535cbd2e771b40474bc2c6e8d08a4894a868543ee33
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: DBI, knitr, RSQLite, testthat, markdown, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr >=1.2.0
+    - r-plyr >=1.8.4
+    - r-stringr >=1.1.0
+    - r-tibble >=1.2
+    - r-xml2 >=1.0.0
+
+  run:
+    - r-base
+    - r-httr >=1.2.0
+    - r-plyr >=1.8.4
+    - r-stringr >=1.1.0
+    - r-tibble >=1.2
+    - r-xml2 >=1.0.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('oai')"           # [not win]
+    - "\"%R%\" -e \"library('oai')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://docs.ropensci.org/oai/, https://github.com/ropensci/oai
+  license: MIT
+  summary: 'A general purpose client to work with any ''OAI-PMH'' (Open Archives Initiative Protocol
+    for ''Metadata'' Harvesting) service. The ''OAI-PMH'' protocol is described at <http://www.openarchives.org/OAI/openarchivesprotocol.html>.
+    Functions are provided to work with the ''OAI-PMH'' verbs: ''GetRecord'', ''Identify'',
+    ''ListIdentifiers'', ''ListMetadataFormats'', ''ListRecords'', and ''ListSets''.'
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: oai
+# Type: Package
+# Title: General Purpose 'Oai-PMH' Services Client
+# Description: A general purpose client to work with any 'OAI-PMH' (Open Archives Initiative Protocol for 'Metadata' Harvesting) service. The 'OAI-PMH' protocol is described at <http://www.openarchives.org/OAI/openarchivesprotocol.html>. Functions are provided to work with the 'OAI-PMH' verbs: 'GetRecord', 'Identify', 'ListIdentifiers', 'ListMetadataFormats', 'ListRecords', and 'ListSets'.
+# Version: 0.4.0
+# License: MIT + file LICENSE
+# Authors@R: c( person("Scott", "Chamberlain", role = "aut", email = "myrmecocystus@gmail.com"), person("Michal", "Bojanowski", role = c("aut", "cre"), email = "michal2992@gmail.com", comment=c(ORCID="0000-0001-7503-852X")), person("National Science Centre", role = "fnd", comment = "Supported MB through grant 2012/07/D/HS6/01971, <https://ncn.gov.pl>") )
+# URL: https://docs.ropensci.org/oai/, https://github.com/ropensci/oai
+# BugReports: https://github.com/ropensci/oai/issues
+# VignetteBuilder: knitr
+# LazyData: true
+# Encoding: UTF-8
+# Imports: xml2 (>= 1.0.0), httr (>= 1.2.0), plyr (>= 1.8.4), stringr (>= 1.1.0), tibble (>= 1.2)
+# Suggests: DBI, knitr, RSQLite, testthat, markdown, covr
+# RoxygenNote: 7.2.1
+# NeedsCompilation: no
+# Packaged: 2022-11-10 11:32:01 UTC; mbojan
+# Author: Scott Chamberlain [aut], Michal Bojanowski [aut, cre] (<https://orcid.org/0000-0001-7503-852X>), National Science Centre [fnd] (Supported MB through grant 2012/07/D/HS6/01971, <https://ncn.gov.pl>)
+# Maintainer: Michal Bojanowski <michal2992@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-11-10 16:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

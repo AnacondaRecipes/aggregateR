@@ -1,0 +1,120 @@
+{% set version = '1.5.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-seriation
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/seriation_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/seriation/seriation_{{ version }}.tar.gz
+  sha256: 4a05398026daf287b523069050864eacb78ae4842a4bbf410f1ac7d7d9a6a260
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dbscan, DendSer, dendextend, doParallel, GA, ggplot2, keras, Rtsne, scales, smacof, tensorflow, testthat, umap
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-tsp
+    - r-ca
+    - r-cluster
+    - r-colorspace
+    - r-foreach
+    - r-gclus
+    - r-qap
+    - r-registry
+    - r-vegan
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-tsp
+    - r-ca
+    - r-cluster
+    - r-colorspace
+    - r-foreach
+    - r-gclus
+    - r-qap
+    - r-registry
+    - r-vegan
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('seriation')"           # [not win]
+    - "\"%R%\" -e \"library('seriation')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mhahsler/seriation
+  license: GPL-3
+  summary: Infrastructure for ordering objects with an implementation of several seriation/sequencing/ordination
+    techniques to reorder matrices, dissimilarity matrices, and dendrograms. Also provides
+    (optimally) reordered heatmaps, color images and clustering visualizations like
+    dissimilarity plots, and visual assessment of cluster tendency plots (VAT and iVAT).
+    Hahsler et al (2008) <doi:10.18637/jss.v025.i03>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: seriation
+# Type: Package
+# Title: Infrastructure for Ordering Objects Using Seriation
+# Version: 1.5.1
+# Date: 2023-07-20
+# Authors@R: c( person("Michael", "Hahsler", role = c("aut", "cre", "cph"), email = "mhahsler@lyle.smu.edu", comment = c(ORCID = "0000-0003-2716-1405")), person("Christian", "Buchta", role = c("aut", "cph")), person("Kurt", "Hornik", role = c("aut", "cph"), comment = c(ORCID = "0000-0003-4198-9911")), person("David", "Barnett", role = c("ctb")), person("Michael", "Brusco", role = c("ctb", "cph")), person("Michael", "Friendly", role = c("ctb")), person("Hans-Friedrich", "Koehn", role = c("ctb", "cph")), person("Fionn", "Murtagh", role = c("ctb", "cph")), person("Stephanie", "Stahl", role = c("ctb", "cph")))
+# Description: Infrastructure for ordering objects with an implementation of several seriation/sequencing/ordination techniques to reorder matrices, dissimilarity matrices, and dendrograms. Also provides (optimally) reordered heatmaps, color images and clustering visualizations like dissimilarity plots, and visual assessment of cluster tendency plots (VAT and iVAT). Hahsler et al (2008) <doi:10.18637/jss.v025.i03>.
+# Classification/ACM: G.1.6, G.2.1, G.4
+# URL: https://github.com/mhahsler/seriation
+# BugReports: https://github.com/mhahsler/seriation/issues
+# Depends: R (>= 2.14.0)
+# Imports: ca, cluster, colorspace, foreach, gclus, grDevices, grid, MASS, qap, registry, stats, TSP, vegan
+# Suggests: dbscan, DendSer, dendextend, doParallel, GA, ggplot2, keras, Rtsne, scales, smacof, tensorflow, testthat, umap
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# License: GPL-3
+# Copyright: The code in src/bea.f is Copyright (C) 1991 F. Murtagh; src/bbwrcg.f, src/arsa.f and src/bburcg.f are Copyright (C) 2005 M. Brusco, H.F. Koehn, and S. Stahl. All other code is Copyright (C) Michael Hahsler, Christian Buchta, and Kurt Hornik.
+# Collate: 'AAA_check_installed.R' 'AAA_color_palette.R' 'AAA_defaults.R' 'AAA_map.R' 'AAA_parameters.R' 'AAA_registry_criterion.R' 'AAA_registry_seriate.R' 'AAA_seriation-package.R' 'Chameleon.R' 'Irish.R' 'Munsingen.R' 'Psych24.R' 'SupremeCourt.R' 'Townships.R' 'VAT.R' 'Wood.R' 'Zoo.R' 'bea.R' 'bertinplot.R' 'criterion.R' 'criterion.array.R' 'criterion.dist.R' 'criterion.matrix.R' 'dissplot.R' 'get_order.R' 'ggVAT.R' 'ggbertinplot.R' 'ggdissplot.R' 'hmap.R' 'gghmap.R' 'pimage.R' 'ggpimage.R' 'grid_helpers.R' 'hclust_greedy.R' 'lines_and_ordered_data.R' 'lle.R' 'permute.R' 'register_DendSer.R' 'register_GA.R' 'register_optics.R' 'register_smacof.R' 'register_tsne.R' 'register_umap.R' 'reorder.hclust.R' 'robinson.R' 'ser_dist.R' 'ser_permutation.R' 'ser_permutation_vector.R' 'ser_permutation_vector2matrix.R' 'seriate.R' 'seriate.dist.R' 'seriate.matrix.R' 'seriate.array.R' 'seriate.data.frame.R' 'seriate.table.R' 'seriate_ARSA_Branch-Bound.R' 'seriate_TSP.R' 'seriate_BEA.R' 'seriate_CA.R' 'seriate_GSA.R' 'seriate_HC.R' 'seriate_LLE.R' 'seriate_MDS.R' 'seriate_Mean.R' 'seriate_PCA.R' 'seriate_QAP.R' 'seriate_R2E.R' 'seriate_SGD.R' 'seriate_SPIN.R' 'seriate_VAT.R' 'seriate_best.R' 'seriate_enumerate.R' 'seriate_heatmap.R' 'seriate_identity.R' 'seriate_random.R' 'seriate_reverse.R' 'seriate_spectral.R' 'seriate_vegan.R' 'uniscale.R'
+# NeedsCompilation: yes
+# Packaged: 2023-07-20 17:53:21 UTC; hahsler
+# Author: Michael Hahsler [aut, cre, cph] (<https://orcid.org/0000-0003-2716-1405>), Christian Buchta [aut, cph], Kurt Hornik [aut, cph] (<https://orcid.org/0000-0003-4198-9911>), David Barnett [ctb], Michael Brusco [ctb, cph], Michael Friendly [ctb], Hans-Friedrich Koehn [ctb, cph], Fionn Murtagh [ctb, cph], Stephanie Stahl [ctb, cph]
+# Maintainer: Michael Hahsler <mhahsler@lyle.smu.edu>
+# Repository: CRAN
+# Date/Publication: 2023-07-20 21:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

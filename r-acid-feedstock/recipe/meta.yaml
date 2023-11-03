@@ -1,0 +1,91 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-acid
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/acid_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/acid/acid_{{ version }}.tar.gz
+  sha256: 0d26c73539daaec5de3eaea529c563ebd5b3d35e973159f5da7120a19107110c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ineq
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-hmisc
+    - r-gamlss
+    - r-gamlss.dist
+
+  run:
+    - r-base
+    - r-hmisc
+    - r-gamlss
+    - r-gamlss.dist
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('acid')"           # [not win]
+    - "\"%R%\" -e \"library('acid')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=acid
+  license: GPL-3
+  summary: Functions for the analysis of income distributions for subgroups of the population
+    as defined by a set of variables like age, gender, region, etc. This entails a Kolmogorov-Smirnov
+    test for a mixture distribution as well as functions for moments, inequality measures,
+    entropy measures and polarisation measures of income distributions. This package
+    thus aides the analysis of income inequality by offering tools for the exploratory
+    analysis of income distributions at the disaggregated level.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: acid
+# Type: Package
+# Title: Analysing Conditional Income Distributions
+# Version: 1.1
+# Date: 2016-02-01
+# Author: Alexander Sohn
+# Maintainer: Alexander Sohn <asohn@uni-goettingen.de>
+# Description: Functions for the analysis of income distributions for subgroups of the population as defined by a set of variables like age, gender, region, etc. This entails a Kolmogorov-Smirnov test for a mixture distribution as well as functions for moments, inequality measures, entropy measures and polarisation measures of income distributions. This package thus aides the analysis of income inequality by offering tools for the exploratory analysis of income distributions at the disaggregated level.
+# Depends: gamlss,gamlss.dist,Hmisc,stats,graphics,splines
+# Imports: grDevices,utils,datasets,methods
+# Suggests: ineq
+# License: GPL-3
+# Packaged: 2016-02-01 06:36:11 UTC; admin
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2016-02-01 13:34:52
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

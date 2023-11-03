@@ -1,0 +1,95 @@
+{% set version = '3.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-assertr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/assertr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/assertr/assertr_{{ version }}.tar.gz
+  sha256: d7dd657c6e4e4b8604204b9c49e7d4ce6f22e117a3ae6a1ee69b3264d2af23f2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, testthat, magrittr, rmarkdown, tibble, plyr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-dplyr >=0.7.0
+    - r-rlang >=0.3.0
+
+  run:
+    - r-base
+    - r-mass
+    - r-dplyr >=0.7.0
+    - r-rlang >=0.3.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('assertr')"           # [not win]
+    - "\"%R%\" -e \"library('assertr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://docs.ropensci.org/assertr/ (website) https://github.com/ropensci/assertr
+  license: MIT
+  summary: Provides functionality to assert conditions that have to be met so that errors in
+    data used in analysis pipelines can fail quickly. Similar to 'stopifnot()' but more
+    powerful, friendly, and easier for use in pipelines.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: assertr
+# Type: Package
+# Title: Assertive Programming for R Analysis Pipelines
+# Version: 3.0.0
+# Authors@R: person("Tony", "Fischetti", email="tony.fischetti@gmail.com", role = c("aut", "cre"))
+# Description: Provides functionality to assert conditions that have to be met so that errors in data used in analysis pipelines can fail quickly. Similar to 'stopifnot()' but more powerful, friendly, and easier for use in pipelines.
+# URL: https://docs.ropensci.org/assertr/ (website) https://github.com/ropensci/assertr
+# BugReports: https://github.com/ropensci/assertr/issues
+# License: MIT + file LICENSE
+# ByteCompile: TRUE
+# Depends: R (>= 3.1.0)
+# Imports: dplyr (>= 0.7.0), MASS, methods, stats, utils, rlang (>= 0.3.0)
+# Suggests: knitr, testthat, magrittr, rmarkdown, tibble, plyr
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.1
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2022-11-05 22:49:05 UTC; tony
+# Author: Tony Fischetti [aut, cre]
+# Maintainer: Tony Fischetti <tony.fischetti@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-11-05 23:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,87 @@
+{% set version = '2021.6-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tfplot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tfplot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tfplot/tfplot_{{ version }}.tar.gz
+  sha256: acd36cc54dda3f9bbd90a03460c58ef8116f10d842cfcdfb3689ca4d454b1570
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: googleVis
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-tframe
+
+  run:
+    - r-base
+    - r-tframe
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tfplot')"           # [not win]
+    - "\"%R%\" -e \"library('tfplot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://tsanalysis.r-forge.r-project.org/
+  license: GPL-2
+  summary: Utilities for simple manipulation and quick plotting of time series data. These utilities
+    use the 'tframe' package which provides a programming kernel for time series. Extensions
+    to 'tframe' provided in 'tframePlus' can also be used. See the Guide vignette for
+    examples.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: tfplot
+# Version: 2021.6-1
+# Title: Time Frame User Utilities
+# Description: Utilities for simple manipulation and quick plotting of time series data. These utilities use the 'tframe' package which provides a programming kernel for time series. Extensions to 'tframe' provided in 'tframePlus' can also be used. See the Guide vignette for examples.
+# Depends: R (>= 2.12.0), tframe
+# Imports: stats, graphics, grDevices
+# Suggests: googleVis
+# Enhances: tframePlus
+# LazyLoad: yes
+# License: GPL-2
+# Copyright: 1993-1996,1998-2011 Bank of Canada. 1997,2012-2014 Paul Gilbert
+# Author: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
+# Maintainer: Paul Gilbert <pgilbert.ttv9z@ncf.ca>
+# URL: http://tsanalysis.r-forge.r-project.org/
+# NeedsCompilation: no
+# Packaged: 2021-06-02 19:49:48 UTC; paul
+# Repository: CRAN
+# Date/Publication: 2021-06-02 21:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

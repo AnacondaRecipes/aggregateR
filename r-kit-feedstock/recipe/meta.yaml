@@ -1,0 +1,95 @@
+{% set version = '0.0.15' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-kit
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/kit_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/kit/kit_{{ version }}.tar.gz
+  sha256: 557eee17077157120a129294c10eeaa18ae97d897d460cc3c69a2b3390ebfabf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('kit')"           # [not win]
+    - "\"%R%\" -e \"library('kit')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=kit
+  license: GPL-3
+  summary: Basic functions, implemented in C, for large data manipulation. Fast vectorised ifelse()/nested
+    if()/switch() functions, psum()/pprod() functions equivalent to pmin()/pmax() plus
+    others which are missing from base R. Most of these functions are callable at C
+    level.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: kit
+# Type: Package
+# Title: Data Manipulation Functions Implemented in C
+# Version: 0.0.15
+# Date: 2023-10-01
+# Authors@R: c(person("Morgan", "Jacob", role = c("aut", "cre", "cph"), email = "morgan.emailbox@gmail.com"), person("Sebastian", "Krantz", role = "ctb"))
+# Author: Morgan Jacob [aut, cre, cph], Sebastian Krantz [ctb]
+# Maintainer: Morgan Jacob <morgan.emailbox@gmail.com>
+# Description: Basic functions, implemented in C, for large data manipulation. Fast vectorised ifelse()/nested if()/switch() functions, psum()/pprod() functions equivalent to pmin()/pmax() plus others which are missing from base R. Most of these functions are callable at C level.
+# License: GPL-3
+# Depends: R (>= 3.1.0)
+# Encoding: UTF-8
+# BugReports: https://github.com/2005m/kit/issues
+# NeedsCompilation: yes
+# ByteCompile: TRUE
+# Repository: CRAN
+# Packaged: 2023-10-01 09:27:14 UTC; giuliabertuzzi
+# Date/Publication: 2023-10-01 10:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

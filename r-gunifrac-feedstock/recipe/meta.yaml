@@ -1,0 +1,128 @@
+{% set version = '1.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gunifrac
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GUniFrac_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GUniFrac/GUniFrac_{{ version }}.tar.gz
+  sha256: aea41a3f94fe1fff4f4284f786a43f90bfd4f7f3c9db067c17c6e8b3206a80fb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ade4, knitr, markdown, ggpubr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-rcpp >=0.12.13
+    - r-ape
+    - r-dirmult
+    - r-foreach
+    - r-ggplot2
+    - r-ggrepel
+    - r-inline
+    - r-matrixstats
+    - r-modeest
+    - r-rmutil
+    - r-statmod
+    - r-vegan
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-matrix
+    - r-rcpp >=0.12.13
+    - r-ape
+    - r-dirmult
+    - r-foreach
+    - r-ggplot2
+    - r-ggrepel
+    - r-inline
+    - r-matrixstats
+    - r-modeest
+    - r-rmutil
+    - r-statmod
+    - r-vegan
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GUniFrac')"           # [not win]
+    - "\"%R%\" -e \"library('GUniFrac')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=GUniFrac
+  license: GPL-3
+  summary: 'A suite of methods for powerful and robust microbiome data analysis including data
+    normalization, data simulation, community-level association testing and differential
+    abundance analysis. It implements generalized UniFrac distances,  Geometric Mean
+    of Pairwise Ratios (GMPR) normalization, semiparametric data simulator, distance-based
+    statistical methods, and feature-based statistical methods. The distance-based statistical
+    methods include three extensions of PERMANOVA: (1) PERMANOVA using the Freedman-Lane
+    permutation scheme, (2) PERMANOVA omnibus test using multiple matrices, and  (3)
+    analytical approach to approximating PERMANOVA p-value. Feature-based statistical
+    methods include linear model-based methods for differential abundance analysis of
+    zero-inflated high-dimensional compositional data.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: GUniFrac
+# Type: Package
+# Title: Generalized UniFrac Distances, Distance-Based Multivariate Methods and Feature-Based Univariate Methods for Microbiome Data Analysis
+# Version: 1.8
+# Date: 2023-09-13
+# Author: Jun Chen, Xianyang Zhang, Lu Yang, Lujun Zhang
+# Maintainer: Jun Chen <chen.jun2@mayo.edu>
+# Description: A suite of methods for powerful and robust microbiome data analysis including data normalization, data simulation, community-level association testing and differential abundance analysis. It implements generalized UniFrac distances,  Geometric Mean of Pairwise Ratios (GMPR) normalization, semiparametric data simulator, distance-based statistical methods, and feature-based statistical methods. The distance-based statistical methods include three extensions of PERMANOVA: (1) PERMANOVA using the Freedman-Lane permutation scheme, (2) PERMANOVA omnibus test using multiple matrices, and  (3) analytical approach to approximating PERMANOVA p-value. Feature-based statistical methods include linear model-based methods for differential abundance analysis of zero-inflated high-dimensional compositional data.
+# Depends: R (>= 3.5.0)
+# Suggests: ade4, knitr, markdown, ggpubr
+# Imports: Rcpp (>= 0.12.13), vegan, ggplot2, matrixStats, Matrix, ape, parallel, stats, utils, statmod, rmutil, dirmult, MASS, ggrepel, foreach, modeest, inline, methods
+# LinkingTo: Rcpp
+# NeedsCompilation: yes
+# VignetteBuilder: knitr
+# License: GPL-3
+# Encoding: UTF-8
+# Packaged: 2023-09-13 22:22:15 UTC; m123485
+# Repository: CRAN
+# Date/Publication: 2023-09-14 00:02:32 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

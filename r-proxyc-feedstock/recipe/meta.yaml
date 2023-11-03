@@ -1,0 +1,105 @@
+{% set version = '0.3.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-proxyc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/proxyC_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/proxyC/proxyC_{{ version }}.tar.gz
+  sha256: f39d1d3d34b4e26694e3916002ea370b2f4e745c0992e718bb024ed03a2b78ea
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, entropy, proxy, knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix >=1.2
+    - r-rcpp >=0.12.12
+    - r-rcpparmadillo >=0.7.600.1.0
+    - r-rcppparallel
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix >=1.2
+    - r-rcpp >=0.12.12
+    - r-rcpparmadillo >=0.7.600.1.0
+    - r-rcppparallel
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('proxyC')"           # [not win]
+    - "\"%R%\" -e \"library('proxyC')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/koheiw/proxyC
+  license: GPL-3
+  summary: Computes proximity between rows or columns of large matrices efficiently in C++. Functions
+    are optimised for large sparse matrices using the Armadillo and Intel TBB libraries.
+    Among several built-in similarity/distance measures, computation of correlation,
+    cosine similarity and Euclidean distance is particularly fast.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: proxyC
+# Type: Package
+# Title: Computes Proximity in Large Sparse Matrices
+# Version: 0.3.4
+# Authors@R: c( person("Kohei", "Watanabe", email = "watanabe.kohei@gmail.com", role = c("cre", "aut", "cph"), comment = c(ORCID = "0000-0001-6519-5265")), person("Robrecht", "Cannoodt", email = "rcannood@gmail.com", role = c("aut"), comment = c(ORCID = "0000-0003-3641-729X")) )
+# Description: Computes proximity between rows or columns of large matrices efficiently in C++. Functions are optimised for large sparse matrices using the Armadillo and Intel TBB libraries. Among several built-in similarity/distance measures, computation of correlation, cosine similarity and Euclidean distance is particularly fast.
+# URL: https://github.com/koheiw/proxyC
+# BugReports: https://github.com/koheiw/proxyC/issues
+# License: GPL-3
+# Depends: R (>= 3.1.0), methods
+# Imports: Matrix (>= 1.2), Rcpp (>= 0.12.12), RcppParallel
+# Suggests: testthat, entropy, proxy, knitr, rmarkdown
+# LinkingTo: Rcpp, RcppParallel, RcppArmadillo (>= 0.7.600.1.0)
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2023-10-25 00:38:56 UTC; watan
+# Author: Kohei Watanabe [cre, aut, cph] (<https://orcid.org/0000-0001-6519-5265>), Robrecht Cannoodt [aut] (<https://orcid.org/0000-0003-3641-729X>)
+# Maintainer: Kohei Watanabe <watanabe.kohei@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-25 04:20:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

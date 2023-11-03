@@ -1,0 +1,139 @@
+{% set version = '0.6.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-metabma
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/metaBMA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/metaBMA/metaBMA_{{ version }}.tar.gz
+  sha256: c1e43fdc4c866a065c11bfa65b9f895256d0a11a19861c5212fbd4f82a6205f8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, spelling
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh >=1.78.0
+    - r-laplacesdemon
+    - r-rcpp >=1.0.0
+    - r-rcppeigen >=0.3.3.9.1
+    - r-rcppparallel >=5.0.1
+    - r-stanheaders >=2.26.0
+    - r-bridgesampling
+    - r-coda
+    - r-logspline
+    - r-mvtnorm
+    - r-rstan >=2.26.0
+    - r-rstantools >=2.3.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.78.0
+    - r-laplacesdemon
+    - r-rcpp >=1.0.0
+    - r-rcppeigen >=0.3.3.9.1
+    - r-rcppparallel >=5.0.1
+    - r-stanheaders >=2.26.0
+    - r-bridgesampling
+    - r-coda
+    - r-logspline
+    - r-mvtnorm
+    - r-rstan >=2.26.0
+    - r-rstantools >=2.3.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('metaBMA')"           # [not win]
+    - "\"%R%\" -e \"library('metaBMA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/danheck/metaBMA, https://danheck.github.io/metaBMA/
+  license: GPL-3
+  summary: Computes the posterior model probabilities for standard meta-analysis models (null
+    model vs. alternative model assuming either fixed- or random-effects, respectively).
+    These posterior probabilities are used to estimate the overall mean effect size
+    as the weighted average of the mean effect size estimates of the random- and fixed-effect
+    model as proposed by Gronau, Van Erp, Heck, Cesario, Jonas, & Wagenmakers (2017,
+    <doi:10.1080/23743603.2017.1326760>). The user can define a wide range of non-informative
+    or informative priors for the mean effect size and the heterogeneity coefficient.
+    Moreover, using pre-compiled Stan models, meta-analysis with continuous and discrete
+    moderators with Jeffreys-Zellner-Siow (JZS) priors can be fitted and tested. This
+    allows to compute Bayes factors and perform Bayesian model averaging across random-
+    and fixed-effects meta-analysis with and without moderators. For a primer on Bayesian
+    model-averaged meta-analysis, see Gronau, Heck, Berkhout, Haaf, & Wagenmakers (2021,
+    <doi:10.1177/25152459211031256>).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: metaBMA
+# Type: Package
+# Date: 2023-09-12
+# Title: Bayesian Model Averaging for Random and Fixed Effects Meta-Analysis
+# Version: 0.6.9
+# Authors@R: c(person(given = "Daniel W.", family = "Heck", email="daniel.heck@uni-marburg.de", role=c("aut","cre"), comment = c(ORCID = "0000-0002-6302-9252")), person(given = "Quentin F.", family = "Gronau", email="quentingronau@web.de", role = "ctb"), person(given = "Eric-Jan", family = "Wagenmakers", email="ej.wagenmakers@gmail.com", role = "ctb"), person(given = "Indrajeet", family = "Patil", email = "patilindrajeet.science@gmail.com", role = "ctb", comment = c(ORCID = "0000-0003-1995-6531")))
+# Description: Computes the posterior model probabilities for standard meta-analysis models (null model vs. alternative model assuming either fixed- or random-effects, respectively). These posterior probabilities are used to estimate the overall mean effect size as the weighted average of the mean effect size estimates of the random- and fixed-effect model as proposed by Gronau, Van Erp, Heck, Cesario, Jonas, & Wagenmakers (2017, <doi:10.1080/23743603.2017.1326760>). The user can define a wide range of non-informative or informative priors for the mean effect size and the heterogeneity coefficient. Moreover, using pre-compiled Stan models, meta-analysis with continuous and discrete moderators with Jeffreys-Zellner-Siow (JZS) priors can be fitted and tested. This allows to compute Bayes factors and perform Bayesian model averaging across random- and fixed-effects meta-analysis with and without moderators. For a primer on Bayesian model-averaged meta-analysis, see Gronau, Heck, Berkhout, Haaf, & Wagenmakers (2021, <doi:10.1177/25152459211031256>).
+# Depends: R (>= 4.0.0), Rcpp (>= 1.0.0), methods
+# Imports: bridgesampling, coda, LaplacesDemon, logspline, mvtnorm, RcppParallel (>= 5.0.1), rstan (>= 2.26.0), rstantools (>= 2.3.0)
+# Suggests: testthat, knitr, rmarkdown, spelling
+# LinkingTo: BH (>= 1.78.0), Rcpp (>= 1.0.0), RcppEigen (>= 0.3.3.9.1), RcppParallel (>= 5.0.1), rstan (>= 2.26.0), StanHeaders (>= 2.26.0)
+# VignetteBuilder: knitr
+# URL: https://github.com/danheck/metaBMA, https://danheck.github.io/metaBMA/
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: yes
+# SystemRequirements: GNU make
+# Biarch: true
+# Language: en-US
+# RoxygenNote: 7.2.3
+# Packaged: 2023-09-12 21:04:25 UTC; daniel
+# Author: Daniel W. Heck [aut, cre] (<https://orcid.org/0000-0002-6302-9252>), Quentin F. Gronau [ctb], Eric-Jan Wagenmakers [ctb], Indrajeet Patil [ctb] (<https://orcid.org/0000-0003-1995-6531>)
+# Maintainer: Daniel W. Heck <daniel.heck@uni-marburg.de>
+# Repository: CRAN
+# Date/Publication: 2023-09-13 07:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

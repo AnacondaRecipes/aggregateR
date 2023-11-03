@@ -1,0 +1,108 @@
+{% set version = '0.0-16' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-qrmtools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/qrmtools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/qrmtools/qrmtools_{{ version }}.tar.gz
+  sha256: 9f2d24b78fa35080a9c2d4867817c69a91a4881e51dd67619e3354026d376990
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: combinat, copula, qrng, sfsmisc, RColorBrewer, sn, knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-adgoftest
+    - r-quandl
+    - r-lattice
+    - r-quantmod
+    - r-rugarch
+    - r-xts
+    - r-zoo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-adgoftest
+    - r-quandl
+    - r-lattice
+    - r-quantmod
+    - r-rugarch
+    - r-xts
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('qrmtools')"           # [not win]
+    - "\"%R%\" -e \"library('qrmtools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=qrmtools
+  license: GPL-3
+  summary: 'Functions and data sets for reproducing selected results from the book "Quantitative
+    Risk Management: Concepts, Techniques and Tools". Furthermore, new developments
+    and auxiliary functions for Quantitative Risk Management practice.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+    - LICENCE
+
+# The original CRAN metadata for this package was:
+
+# Package: qrmtools
+# Version: 0.0-16
+# Encoding: UTF-8
+# Title: Tools for Quantitative Risk Management
+# Description: Functions and data sets for reproducing selected results from the book "Quantitative Risk Management: Concepts, Techniques and Tools". Furthermore, new developments and auxiliary functions for Quantitative Risk Management practice.
+# Authors@R: c(person(given = "Marius", family = "Hofert", role = c("aut", "cre"), email = "marius.hofert@uwaterloo.ca"), person(given = "Kurt", family = "Hornik", role = "aut", email = "Kurt.Hornik@R-project.org"), person(given = "Alexander J.", family = "McNeil", role = "aut", email = "alexander.mcneil@york.ac.uk"))
+# Author: Marius Hofert [aut, cre], Kurt Hornik [aut], Alexander J. McNeil [aut]
+# Maintainer: Marius Hofert <marius.hofert@uwaterloo.ca>
+# Depends: R (>= 3.2.0)
+# Imports: graphics, lattice, quantmod, Quandl, zoo, xts, methods, grDevices, stats, rugarch, utils, ADGofTest
+# Suggests: combinat, copula, qrng, sfsmisc, RColorBrewer, sn, knitr, rmarkdown
+# Enhances:
+# License: GPL (>= 3) | file LICENCE
+# NeedsCompilation: yes
+# VignetteBuilder: knitr
+# Repository: CRAN
+# Date/Publication: 2022-08-12 12:20:02 UTC
+# Repository/R-Forge/Project: qrmtools
+# Repository/R-Forge/Revision: 292
+# Repository/R-Forge/DateTimeStamp: 2022-08-12 11:01:23
+# Packaged: 2022-08-12 11:11:51 UTC; rforge
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

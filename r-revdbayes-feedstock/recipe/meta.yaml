@@ -1,0 +1,116 @@
+{% set version = '1.5.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-revdbayes
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/revdbayes_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/revdbayes/revdbayes_{{ version }}.tar.gz
+  sha256: 6f69ead6d070ca901cd3c73d556ee3d084b3c4b0f37a7f3752ee034af0b90196
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggplot2 (>= 2.2.1), knitr, microbenchmark, rmarkdown, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-bayesplot >=1.1.0
+    - r-exdex
+    - r-rust >=1.2.2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-bayesplot >=1.1.0
+    - r-exdex
+    - r-rust >=1.2.2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('revdbayes')"           # [not win]
+    - "\"%R%\" -e \"library('revdbayes')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://paulnorthrop.github.io/revdbayes/, https://github.com/paulnorthrop/revdbayes
+  license: GPL-2
+  summary: Provides functions for the Bayesian analysis of extreme value models.  The 'rust'
+    package <https://cran.r-project.org/package=rust> is used to simulate a random sample
+    from the required posterior distribution. The functionality of 'revdbayes' is similar
+    to the 'evdbayes' package <https://cran.r-project.org/package=evdbayes>, which uses
+    Markov Chain Monte Carlo ('MCMC') methods for posterior simulation.  In addition,
+    there are functions for making inferences about the extremal index, using the models
+    for threshold inter-exceedance times of Suveges and Davison (2010) <doi:10.1214/09-AOAS292>
+    and Holesovsky and Fusek (2020) <doi:10.1007/s10687-020-00374-3>. Also provided
+    are d,p,q,r functions for the Generalised Extreme Value ('GEV') and Generalised
+    Pareto ('GP') distributions that deal appropriately with cases where the shape parameter
+    is very close to zero.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: revdbayes
+# Title: Ratio-of-Uniforms Sampling for Bayesian Extreme Value Analysis
+# Version: 1.5.2
+# Date: 2023-09-09
+# Authors@R: c(person(c("Paul", "J."), "Northrop", email = "p.northrop@ucl.ac.uk", role = c("aut", "cre", "cph")), person(c("Scott", "D."), "Grimshaw", role = c("ctb")))
+# Description: Provides functions for the Bayesian analysis of extreme value models.  The 'rust' package <https://cran.r-project.org/package=rust> is used to simulate a random sample from the required posterior distribution. The functionality of 'revdbayes' is similar to the 'evdbayes' package <https://cran.r-project.org/package=evdbayes>, which uses Markov Chain Monte Carlo ('MCMC') methods for posterior simulation.  In addition, there are functions for making inferences about the extremal index, using the models for threshold inter-exceedance times of Suveges and Davison (2010) <doi:10.1214/09-AOAS292> and Holesovsky and Fusek (2020) <doi:10.1007/s10687-020-00374-3>. Also provided are d,p,q,r functions for the Generalised Extreme Value ('GEV') and Generalised Pareto ('GP') distributions that deal appropriately with cases where the shape parameter is very close to zero.
+# Imports: bayesplot (>= 1.1.0), exdex, graphics, Rcpp, rust (>= 1.2.2), stats, utils
+# License: GPL (>= 2)
+# LazyData: TRUE
+# Encoding: UTF-8
+# Depends: R (>= 3.3.0),
+# RoxygenNote: 7.2.3
+# Suggests: ggplot2 (>= 2.2.1), knitr, microbenchmark, rmarkdown, testthat
+# VignetteBuilder: knitr
+# URL: https://paulnorthrop.github.io/revdbayes/, https://github.com/paulnorthrop/revdbayes
+# BugReports: https://github.com/paulnorthrop/revdbayes/issues
+# LinkingTo: Rcpp (>= 0.12.10), RcppArmadillo
+# Config/testthat/edition: 3
+# NeedsCompilation: yes
+# Packaged: 2023-09-09 21:30:21 UTC; paul
+# Author: Paul J. Northrop [aut, cre, cph], Scott D. Grimshaw [ctb]
+# Maintainer: Paul J. Northrop <p.northrop@ucl.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2023-09-10 00:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

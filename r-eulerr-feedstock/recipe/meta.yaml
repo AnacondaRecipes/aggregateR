@@ -1,0 +1,109 @@
+{% set version = '7.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-eulerr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/eulerr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/eulerr/eulerr_{{ version }}.tar.gz
+  sha256: 9c22eb41cbdb807bf159ccdf7c8723d14a4a1936f64390a3c631ecd785224899
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, knitr, lattice, pBrackets, RConics, rmarkdown, testthat, spelling
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-gensa
+    - r-rcpp
+    - r-rcpparmadillo >=0.7.600.1.0
+    - r-polyclip
+    - r-polylabelr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-gensa
+    - r-rcpp
+    - r-rcpparmadillo >=0.7.600.1.0
+    - r-polyclip
+    - r-polylabelr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('eulerr')"           # [not win]
+    - "\"%R%\" -e \"library('eulerr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jolars/eulerr, https://jolars.github.io/eulerr/
+  license: GPL-3
+  summary: Generate area-proportional Euler diagrams using numerical optimization. An Euler diagram
+    is a generalization of a Venn diagram, relaxing the criterion that all interactions
+    need to be represented. Diagrams may be fit with ellipses and circles via a wide
+    range of inputs and can be visualized in numerous ways.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: eulerr
+# Title: Area-Proportional Euler and Venn Diagrams with Ellipses
+# Version: 7.0.0
+# Authors@R: c(person("Johan", "Larsson", email = "johanlarsson@outlook.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-4029-5945")), person("A. Jonathan R.", "Godfrey", role = "ctb"), person("Peter", "Gustafsson", role = "ctb"), person("David H.", "Eberly", role = "ctb", comment = "geometric algorithms"), person("Emanuel", "Huber", role = "ctb", comment = "root solver code"), person("Florian", "Prive", role = "ctb"))
+# Description: Generate area-proportional Euler diagrams using numerical optimization. An Euler diagram is a generalization of a Venn diagram, relaxing the criterion that all interactions need to be represented. Diagrams may be fit with ellipses and circles via a wide range of inputs and can be visualized in numerous ways.
+# Depends: R (>= 3.3.0)
+# Imports: GenSA, graphics, grDevices, grid, polyclip, polylabelr, Rcpp, stats, utils
+# Suggests: covr, knitr, lattice, pBrackets, RConics, rmarkdown, testthat, spelling
+# LinkingTo: Rcpp (>= 0.12.12), RcppArmadillo (>= 0.7.600.1.0)
+# SystemRequirements: C++14
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# VignetteBuilder: knitr
+# URL: https://github.com/jolars/eulerr, https://jolars.github.io/eulerr/
+# BugReports: https://github.com/jolars/eulerr/issues
+# RoxygenNote: 7.2.2
+# Language: en-US
+# NeedsCompilation: yes
+# Packaged: 2022-12-09 15:54:58 UTC; gerd-jln
+# Author: Johan Larsson [aut, cre] (<https://orcid.org/0000-0002-4029-5945>), A. Jonathan R. Godfrey [ctb], Peter Gustafsson [ctb], David H. Eberly [ctb] (geometric algorithms), Emanuel Huber [ctb] (root solver code), Florian Prive [ctb]
+# Maintainer: Johan Larsson <johanlarsson@outlook.com>
+# Repository: CRAN
+# Date/Publication: 2022-12-10 00:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

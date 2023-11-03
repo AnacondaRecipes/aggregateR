@@ -1,0 +1,110 @@
+{% set version = '1.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-remote
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/remote_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/remote/remote_{{ version }}.tar.gz
+  sha256: 7c8c594151e4160a26827641db92eaca92442fa92a45cd9949e368b557971fc6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: maps, lattice, grid, sp
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.10.3
+    - r-gridextra
+    - r-latticeextra
+    - r-mapdata
+    - r-raster
+    - r-scales
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.10.3
+    - r-gridextra
+    - r-latticeextra
+    - r-mapdata
+    - r-raster
+    - r-scales
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('remote')"           # [not win]
+    - "\"%R%\" -e \"library('remote')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=remote
+  license: GPL-3
+  summary: Empirical orthogonal teleconnections in R. 'remote' is short for 'R(-based) EMpirical
+    Orthogonal TEleconnections'. It implements a collection of functions to facilitate
+    empirical orthogonal teleconnection analysis. Empirical Orthogonal Teleconnections
+    (EOTs) denote a regression based approach to decompose spatio-temporal fields into
+    a set of independent orthogonal patterns. They are quite similar to Empirical Orthogonal
+    Functions (EOFs) with EOTs producing less abstract results. In contrast to EOFs,
+    which are orthogonal in both space and time, EOT analysis produces patterns that
+    are orthogonal in either space or time.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: remote
+# Type: Package
+# Title: Empirical Orthogonal Teleconnections in R
+# Version: 1.2.1
+# Date: 2016-09-17
+# Author: Tim Appelhans, Florian Detsch, Thomas Nauss
+# Maintainer: Tim Appelhans <tim.appelhans@gmail.com>
+# Description: Empirical orthogonal teleconnections in R. 'remote' is short for 'R(-based) EMpirical Orthogonal TEleconnections'. It implements a collection of functions to facilitate empirical orthogonal teleconnection analysis. Empirical Orthogonal Teleconnections (EOTs) denote a regression based approach to decompose spatio-temporal fields into a set of independent orthogonal patterns. They are quite similar to Empirical Orthogonal Functions (EOFs) with EOTs producing less abstract results. In contrast to EOFs, which are orthogonal in both space and time, EOT analysis produces patterns that are orthogonal in either space or time.
+# License: GPL (>= 3) | file LICENSE
+# Depends: R (>= 2.10), Rcpp (>= 0.10.3), raster, methods
+# Imports: grDevices, gridExtra, latticeExtra, mapdata, scales, stats, utils
+# Suggests: maps, lattice, grid, sp
+# LinkingTo: Rcpp
+# RoxygenNote: 5.0.1
+# NeedsCompilation: yes
+# Packaged: 2016-09-17 09:32:58 UTC; ede
+# Repository: CRAN
+# Date/Publication: 2016-09-17 18:03:36
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

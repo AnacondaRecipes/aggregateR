@@ -1,0 +1,94 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-base.rms
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/base.rms_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/base.rms/base.rms_{{ version }}.tar.gz
+  sha256: 0a7c2ea08c6695c900b5cd6131b87aaaaec651f6132716f16dc3165c375b4b53
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-do
+    - r-rms
+    - r-survival
+
+  run:
+    - r-base
+    - r-do
+    - r-rms
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('base.rms')"           # [not win]
+    - "\"%R%\" -e \"library('base.rms')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=base.rms
+  license: GPL-3
+  summary: We perform linear, logistic, and cox regression using the base functions lm(), glm(),
+    and coxph() in the R software and the 'survival' package. Likewise, we can use ols(),
+    lrm() and cph() from the 'rms' package for the same functionality. Each of these
+    two sets of commands has a different focus. In many cases, we need to use both sets
+    of commands in the same situation, e.g. we need to filter the full subset model
+    using AIC, and we need to build a visualization graph for the final model. 'base.rms'
+    package can help you to switch between the two sets of commands easily.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: base.rms
+# Title: Convert Regression Between Base Function and 'rms' Package
+# Version: 1.0
+# Authors@R: c( person("Jing","Zhang",role = c("aut", "cre"),email = "zj391120@163.com"), person("Zhi", "Jin", role="aut") )
+# Description: We perform linear, logistic, and cox regression using the base functions lm(), glm(), and coxph() in the R software and the 'survival' package. Likewise, we can use ols(), lrm() and cph() from the 'rms' package for the same functionality. Each of these two sets of commands has a different focus. In many cases, we need to use both sets of commands in the same situation, e.g. we need to filter the full subset model using AIC, and we need to build a visualization graph for the final model. 'base.rms' package can help you to switch between the two sets of commands easily.
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.1.1
+# Imports: rms, survival, do, splines, stats
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2020-07-27 13:36:47 UTC; asus
+# Author: Jing Zhang [aut, cre], Zhi Jin [aut]
+# Maintainer: Jing Zhang <zj391120@163.com>
+# Repository: CRAN
+# Date/Publication: 2020-08-01 11:10:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

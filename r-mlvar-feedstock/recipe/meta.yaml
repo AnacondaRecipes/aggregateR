@@ -1,0 +1,104 @@
+{% set version = '0.5.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mlvar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mlVAR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mlVAR/mlVAR_{{ version }}.tar.gz
+  sha256: c7189122de990e925a44e24c86a7067e72ecff2682836d577a7c4deb19162061
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mplusautomation
+    - r-abind
+    - r-arm
+    - r-clustergeneration
+    - r-corpcor
+    - r-dplyr >=0.5.0
+    - r-graphicalvar
+    - r-lme4
+    - r-mvtnorm
+    - r-plyr
+    - r-qgraph
+    - r-rlang
+
+  run:
+    - r-base
+    - r-mplusautomation
+    - r-abind
+    - r-arm
+    - r-clustergeneration
+    - r-corpcor
+    - r-dplyr >=0.5.0
+    - r-graphicalvar
+    - r-lme4
+    - r-mvtnorm
+    - r-plyr
+    - r-qgraph
+    - r-rlang
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mlVAR')"           # [not win]
+    - "\"%R%\" -e \"library('mlVAR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mlVAR
+  license: GPL-2
+  summary: 'Estimates the multi-level vector autoregression model on time-series data. Three
+    network structures are obtained: temporal networks, contemporaneous networks and
+    between-subjects networks.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: mlVAR
+# Type: Package
+# Title: Multi-Level Vector Autoregression
+# Version: 0.5.1
+# Depends: R (>= 3.3.0)
+# Imports: lme4, arm, qgraph, dplyr (>= 0.5.0), clusterGeneration, mvtnorm, corpcor, plyr, abind, methods, parallel, MplusAutomation, graphicalVAR, rlang
+# Authors@R: c( person("Sacha", "Epskamp", email = "mail@sachaepskamp.com",role = c("aut", "cre")), person("Marie K.", "Deserno", role = c("aut")), person("Laura F.", "Bringmann", role = c("aut")), person("Myrthe", "Veenman", role = c("ctb")))
+# Maintainer: Sacha Epskamp <mail@sachaepskamp.com>
+# Description: Estimates the multi-level vector autoregression model on time-series data. Three network structures are obtained: temporal networks, contemporaneous networks and between-subjects networks.
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2023-05-16 11:40:33 UTC; sachaepskamp
+# Author: Sacha Epskamp [aut, cre], Marie K. Deserno [aut], Laura F. Bringmann [aut], Myrthe Veenman [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-05-16 12:10:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

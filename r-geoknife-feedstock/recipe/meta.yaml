@@ -1,0 +1,100 @@
+{% set version = '1.6.11' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-geoknife
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/geoknife_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/geoknife/geoknife_{{ version }}.tar.gz
+  sha256: b5b2823f5484cf8ec8848b6ee9dbaf9582220d7631de9b8b0e30d6ec83ae260d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, xtable, knitr, rmarkdown, ggmap, dplyr, rasterVis, ggplot2, sp, raster
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-curl
+    - r-httr >=1.0.0
+    - r-progress >=1.1.2
+    - r-sf
+    - r-whisker
+    - r-xml2
+
+  run:
+    - r-base
+    - r-curl
+    - r-httr >=1.0.0
+    - r-progress >=1.1.2
+    - r-sf
+    - r-whisker
+    - r-xml2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('geoknife')"           # [not win]
+    - "\"%R%\" -e \"library('geoknife')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/DOI-USGS/geoknife
+  license: CC0
+  summary: Processes gridded datasets found on the U.S. Geological Survey Geo Data Portal web
+    application or elsewhere, using a web-enabled workflow that eliminates the need
+    to download and store large datasets that are reliably hosted on the Internet. The
+    package provides access to several data subset and summarization algorithms that
+    are available on remote web processing servers (Read et al. (2015) <doi:10.1111/ecog.01880>).
+  license_family: CC
+
+# The original CRAN metadata for this package was:
+
+# Package: geoknife
+# Type: Package
+# Title: Web-Processing of Large Gridded Datasets
+# Version: 1.6.11
+# Authors@R: c( person("Jordan", "Read", role = c("aut"), email = "jread@usgs.gov"), person("Jordan", "Walker", role = c("aut"), email = "jiwalker@usgs.gov"), person("Alison", "Appling", role = c("aut"), email = "aappling@usgs.gov"), person("David", "Blodgett", role = c("aut", "cre"), email = "dblodgett@usgs.gov"), person("Emily", "Read", role = c("aut"), email = "eread@usgs.gov"), person("Luke", "Winslow", role = c("aut"), email = "lwinslow@usgs.gov"), person("Lindsay", "Carr", role = c("aut"), email = "lcarr@usgs.gov"), person("David", "Watkins", role = c("aut"), email = "wwatkins@usgs.gov"))
+# Description: Processes gridded datasets found on the U.S. Geological Survey Geo Data Portal web application or elsewhere, using a web-enabled workflow that eliminates the need to download and store large datasets that are reliably hosted on the Internet. The package provides access to several data subset and summarization algorithms that are available on remote web processing servers (Read et al. (2015) <doi:10.1111/ecog.01880>).
+# License: CC0
+# URL: https://github.com/DOI-USGS/geoknife
+# BugReports: https://github.com/DOI-USGS/geoknife/issues
+# Copyright: This software is in the public domain because it contains materials that originally came from the United States Geological Survey, an agency of the United States Department of Interior.
+# Depends: R (>= 3.5)
+# Imports: whisker, xml2, methods, httr (>= 1.0.0), curl, utils, progress (>= 1.1.2), sf
+# Suggests: testthat, xtable, knitr, rmarkdown, ggmap, dplyr, rasterVis, ggplot2, sp, raster
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-07-03 19:46:46 UTC; dblodgett
+# Author: Jordan Read [aut], Jordan Walker [aut], Alison Appling [aut], David Blodgett [aut, cre], Emily Read [aut], Luke Winslow [aut], Lindsay Carr [aut], David Watkins [aut]
+# Maintainer: David Blodgett <dblodgett@usgs.gov>
+# Repository: CRAN
+# Date/Publication: 2023-07-06 08:00:12 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

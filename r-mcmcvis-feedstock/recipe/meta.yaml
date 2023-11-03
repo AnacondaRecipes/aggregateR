@@ -1,0 +1,99 @@
+{% set version = '0.16.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mcmcvis
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MCMCvis_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MCMCvis/MCMCvis_{{ version }}.tar.gz
+  sha256: 0e2eb6fdd846e2fb9f303d3f8f31a4c5c2b3cd5798986e6aae588fb1ca6d4419
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, cmdstanr (>= 0.5.0), posterior
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-coda
+    - r-colorspace
+    - r-overlapping
+    - r-rstan
+
+  run:
+    - r-base
+    - r-coda
+    - r-colorspace
+    - r-overlapping
+    - r-rstan
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MCMCvis')"           # [not win]
+    - "\"%R%\" -e \"library('MCMCvis')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/caseyyoungflesh/MCMCvis
+  license: GPL-3
+  summary: Performs key functions for MCMC analysis using minimal code - visualizes, manipulates,
+    and summarizes MCMC output. Functions support simple and straightforward subsetting
+    of model parameters within the calls, and produce presentable and 'publication-ready'
+    output. MCMC output may be derived from Bayesian model output fit with 'Stan', 'NIMBLE',
+    'JAGS', and other software.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: MCMCvis
+# Type: Package
+# Title: Tools to Visualize, Manipulate, and Summarize MCMC Output
+# Version: 0.16.3
+# Authors@R: c( person("Casey", "Youngflesh", role = c("aut", "cre"), email = "caseyyoungflesh@gmail.com", comment = c(ORCID = "0000-0001-6343-3311")), person("Christian", "Che-Castaldo", role = c("aut"), email = "christian.che-castaldo@stonybrook.edu", comment = c(ORCID = "0000-0002-7670-2178")), person("Tyler", "Hardy", role = c("ctb")))
+# Maintainer: Casey Youngflesh <caseyyoungflesh@gmail.com>
+# Description: Performs key functions for MCMC analysis using minimal code - visualizes, manipulates, and summarizes MCMC output. Functions support simple and straightforward subsetting of model parameters within the calls, and produce presentable and 'publication-ready' output. MCMC output may be derived from Bayesian model output fit with 'Stan', 'NIMBLE', 'JAGS', and other software.
+# License: GPL-3
+# URL: https://github.com/caseyyoungflesh/MCMCvis
+# BugReports: https://github.com/caseyyoungflesh/MCMCvis/issues
+# LazyData: TRUE
+# Imports: coda, rstan, methods, overlapping, colorspace
+# Depends: R (>= 3.5.0)
+# RoxygenNote: 7.2.3
+# Suggests: knitr, rmarkdown, testthat, cmdstanr (>= 0.5.0), posterior
+# Additional_repositories: https://mc-stan.org/r-packages/
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2023-10-17 16:03:10 UTC; caseyyoungflesh
+# Author: Casey Youngflesh [aut, cre] (<https://orcid.org/0000-0001-6343-3311>), Christian Che-Castaldo [aut] (<https://orcid.org/0000-0002-7670-2178>), Tyler Hardy [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-10-17 22:40:24 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

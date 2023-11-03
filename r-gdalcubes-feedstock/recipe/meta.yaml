@@ -1,0 +1,120 @@
+{% set version = '0.6.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gdalcubes
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gdalcubes_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gdalcubes/gdalcubes_{{ version }}.tar.gz
+  sha256: eddb8caac79c195715aa5dc45e7388bcc099092fac4411730828c4c39a327dff
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, magrittr, rmarkdown, stars, av, gifski, sf, tinytest, lubridate
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh
+    - r-rcpp
+    - r-jsonlite
+    - r-ncdf4
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-rcpp
+    - r-jsonlite
+    - r-ncdf4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gdalcubes')"           # [not win]
+    - "\"%R%\" -e \"library('gdalcubes')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/appelmar/gdalcubes
+  license: MIT
+  summary: Processing collections of Earth observation images as on-demand multispectral, multitemporal
+    raster data cubes. Users define cubes by spatiotemporal extent, resolution, and
+    spatial reference system and let 'gdalcubes' automatically apply cropping, reprojection,
+    and resampling using the 'Geospatial Data Abstraction Library' ('GDAL'). Implemented
+    functions on data cubes include reduction over space and time, applying arithmetic
+    expressions on pixel band values, moving window aggregates over time, filtering
+    by space, time, bands, and predicates on pixel values, exporting data cubes as 'netCDF'
+    or 'GeoTIFF' files, plotting, and extraction from spatial and or spatiotemporal
+    features. All computational parts are implemented in C++, linking to the 'GDAL',
+    'netCDF', 'CURL', and 'SQLite' libraries. See Appel and Pebesma (2019) <doi:10.3390/data4030092>
+    for further details.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: gdalcubes
+# Title: Earth Observation Data Cubes from Satellite Image Collections
+# Version: 0.6.4
+# Date: 2023-04-14
+# Authors@R: c( person(given = "Marius", family = "Appel", role = c("aut", "cre"), email = "marius.appel@uni-muenster.de", comment = c(ORCID = "0000-0001-5281-3896")), person(given = "Edzer", family = "Pebesma", role = "ctb", comment = c(ORCID = "0000-0001-8049-7069")), person(given = "Roger", family = "Bivand", role = "ctb"), person(given = "Jeroen", family = "Ooms", role = "ctb", comment = c(ORCID = "0000-0002-4035-0289")), person(given = "Lewis", family = "Van Winkle", role = "cph"), person(given = "Ole Christian", family = "Eidheim", role = "cph"), person(given = "Howard", family = "Hinnant", role = "cph"), person(given = "Adrian", family = "Colomitchi", role = "cph"), person(given = "Florian", family = "Dang", role = "cph"), person(given = "Paul", family = "Thompson", role = "cph"), person(given = "Tomasz", family = "Kaminski", role = "cph"), person(given = "Dropbox, Inc.", role = "cph"))
+# Description: Processing collections of Earth observation images as on-demand multispectral, multitemporal raster data cubes. Users define cubes by spatiotemporal extent, resolution, and spatial reference system and let 'gdalcubes' automatically apply cropping, reprojection, and resampling using the 'Geospatial Data Abstraction Library' ('GDAL'). Implemented functions on data cubes include reduction over space and time, applying arithmetic expressions on pixel band values, moving window aggregates over time, filtering by space, time, bands, and predicates on pixel values, exporting data cubes as 'netCDF' or 'GeoTIFF' files, plotting, and extraction from spatial and or spatiotemporal features. All computational parts are implemented in C++, linking to the 'GDAL', 'netCDF', 'CURL', and 'SQLite' libraries. See Appel and Pebesma (2019) <doi:10.3390/data4030092> for further details.
+# Depends: R (>= 3.4)
+# Imports: Rcpp, jsonlite, ncdf4
+# License: MIT + file LICENSE
+# URL: https://github.com/appelmar/gdalcubes
+# BugReports: https://github.com/appelmar/gdalcubes/issues/
+# Encoding: UTF-8
+# RoxygenNote: 7.2.2
+# LinkingTo: Rcpp, BH
+# Suggests: knitr, magrittr, rmarkdown, stars, av, gifski, sf, tinytest, lubridate
+# VignetteBuilder: knitr
+# Copyright: file inst/COPYRIGHTS
+# NeedsCompilation: yes
+# SystemRequirements: GDAL (>= 2.0.1), PROJ (>= 4.8.0), netcdf, sqlite3
+# Packaged: 2023-04-14 09:12:24 UTC; marius
+# Author: Marius Appel [aut, cre] (<https://orcid.org/0000-0001-5281-3896>), Edzer Pebesma [ctb] (<https://orcid.org/0000-0001-8049-7069>), Roger Bivand [ctb], Jeroen Ooms [ctb] (<https://orcid.org/0000-0002-4035-0289>), Lewis Van Winkle [cph], Ole Christian Eidheim [cph], Howard Hinnant [cph], Adrian Colomitchi [cph], Florian Dang [cph], Paul Thompson [cph], Tomasz Kaminski [cph], Dropbox, Inc. [cph]
+# Maintainer: Marius Appel <marius.appel@uni-muenster.de>
+# Repository: CRAN
+# Date/Publication: 2023-04-14 11:50:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

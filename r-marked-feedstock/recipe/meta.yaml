@@ -1,0 +1,128 @@
+{% set version = '1.2.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-marked
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/marked_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/marked/marked_{{ version }}.tar.gz
+  sha256: a280731c5afa0686cf7e09f38bbf4f9cb58e35f409c986adc5ad99078c57bbc4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggplot2
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-r2admb
+    - r-rcpp >=0.9.13
+    - r-tmb
+    - r-bookdown
+    - r-coda
+    - r-data.table
+    - r-expm
+    - r-kableextra
+    - r-knitr
+    - r-lme4
+    - r-numderiv
+    - r-optimx >=2013.8.6
+    - r-truncnorm
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-r2admb
+    - r-rcpp >=0.9.13
+    - r-tmb
+    - r-bookdown
+    - r-coda
+    - r-data.table
+    - r-expm
+    - r-kableextra
+    - r-knitr
+    - r-lme4
+    - r-numderiv
+    - r-optimx >=2013.8.6
+    - r-truncnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('marked')"           # [not win]
+    - "\"%R%\" -e \"library('marked')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=marked
+  license: GPL-2
+  summary: Functions for fitting various models to capture-recapture data including mixed-effects
+    Cormack-Jolly-Seber(CJS) and multistate models and the multi-variate state model
+    structure for survival estimation and POPAN structured Jolly-Seber models for abundance
+    estimation. There are also Hidden Markov model (HMM) implementations of CJS and
+    multistate models with and without state uncertainty and a simulation capability
+    for HMM models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: marked
+# Version: 1.2.8
+# Date: 2023-10-13
+# Title: Mark-Recapture Analysis for Survival and Abundance Estimation
+# Author: Jeff Laake <jefflaake@gmail.com>, Devin Johnson <devin.johnson@noaa.gov>, Paul Conn <paul.conn@noaa.gov>, example for simHMM from Jay Rotella
+# Maintainer: Jeff Laake <jefflaake@gmail.com>
+# Description: Functions for fitting various models to capture-recapture data including mixed-effects Cormack-Jolly-Seber(CJS) and multistate models and the multi-variate state model structure for survival estimation and POPAN structured Jolly-Seber models for abundance estimation. There are also Hidden Markov model (HMM) implementations of CJS and multistate models with and without state uncertainty and a simulation capability for HMM models.
+# Depends: R (>= 3.5.0), lme4, methods, parallel
+# Imports: graphics, stats, utils, R2admb, truncnorm, coda, Matrix, numDeriv, expm, Rcpp (>= 0.9.13), TMB, optimx (>= 2013.8.6), data.table, knitr, kableExtra, bookdown
+# Suggests: ggplot2
+# LinkingTo: Rcpp
+# SystemRequirements: ADMB version 11 <http://admb-project.org/> for use.admb=TRUE; see readme.txt
+# LazyLoad: yes
+# VignetteBuilder: knitr
+# License: GPL (>= 2)
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-10-19 16:11:56 UTC; jeffl
+# Repository: CRAN
+# Date/Publication: 2023-10-19 17:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,119 @@
+{% set version = '0.6.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-text2vec
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/text2vec_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/text2vec/text2vec_{{ version }}.tar.gz
+  sha256: c713a947a99be9fd732e7d58680207a922eae30adf5a4e8973ebcd7e56f327c2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: magrittr, udpipe (>= 0.6), glmnet, testthat, covr, knitr, rmarkdown, proxy
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix >=1.5
+    - r-r6 >=2.3.0
+    - r-rcpp >=1.0.3
+    - r-data.table >=1.9.6
+    - r-digest >=0.6.8
+    - r-lgr >=0.2
+    - r-mlapi >=0.1.0
+    - r-rsparse >=0.3.3.4
+    - r-stringi >=1.1.5
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix >=1.5
+    - r-r6 >=2.3.0
+    - r-rcpp >=1.0.3
+    - r-data.table >=1.9.6
+    - r-digest >=0.6.8
+    - r-lgr >=0.2
+    - r-mlapi >=0.1.0
+    - r-rsparse >=0.3.3.4
+    - r-stringi >=1.1.5
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('text2vec')"           # [not win]
+    - "\"%R%\" -e \"library('text2vec')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://text2vec.org
+  license: GPL-2
+  summary: Fast and memory-friendly tools for text vectorization, topic modeling (LDA, LSA),
+    word embeddings (GloVe), similarities. This package provides a source-agnostic streaming
+    API, which allows researchers to perform analysis of collections of documents which
+    are larger than available RAM. All core functions are parallelized to benefit from
+    multicore machines.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: text2vec
+# Type: Package
+# Version: 0.6.3
+# Title: Modern Text Mining Framework for R
+# License: GPL (>= 2) | file LICENSE
+# Description: Fast and memory-friendly tools for text vectorization, topic modeling (LDA, LSA), word embeddings (GloVe), similarities. This package provides a source-agnostic streaming API, which allows researchers to perform analysis of collections of documents which are larger than available RAM. All core functions are parallelized to benefit from multicore machines.
+# Authors@R: c( person("Dmitriy", "Selivanov", role = c("aut", "cre", "cph"), email = "selivanov.dmitriy@gmail.com"), person("Manuel", "Bickel", role = c("aut", "cph"), comment = "Coherence measures for topic models"), person("Qing", "Wang", role = c("aut", "cph"), comment = "Author of the WaprLDA C++ code"))
+# Maintainer: Dmitriy Selivanov <selivanov.dmitriy@gmail.com>
+# Encoding: UTF-8
+# SystemRequirements: C++11
+# Depends: R (>= 3.6.0), methods
+# Imports: Matrix (>= 1.5), Rcpp (>= 1.0.3), R6 (>= 2.3.0), data.table(>= 1.9.6), rsparse (>= 0.3.3.4), stringi (>= 1.1.5), mlapi (>= 0.1.0), lgr (>= 0.2), digest (>= 0.6.8)
+# LinkingTo: Rcpp, digest (>= 0.6.8)
+# Suggests: magrittr, udpipe (>= 0.6), glmnet, testthat, covr, knitr, rmarkdown, proxy
+# URL: http://text2vec.org
+# BugReports: https://github.com/dselivanov/text2vec/issues
+# VignetteBuilder: knitr
+# LazyData: true
+# RoxygenNote: 7.2.1
+# NeedsCompilation: yes
+# Packaged: 2022-11-30 03:33:46 UTC; dselivanov
+# Author: Dmitriy Selivanov [aut, cre, cph], Manuel Bickel [aut, cph] (Coherence measures for topic models), Qing Wang [aut, cph] (Author of the WaprLDA C++ code)
+# Repository: CRAN
+# Date/Publication: 2022-11-30 09:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

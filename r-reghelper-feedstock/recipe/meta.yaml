@@ -1,0 +1,99 @@
+{% set version = '1.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-reghelper
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/reghelper_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/reghelper/reghelper_{{ version }}.tar.gz
+  sha256: 2366ea49d1a928555a388a1a7ae19a0287aef6e8df54ff8bb9d2cf144e9ba8ed
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 0.8.1)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-ggplot2 >=1.0.0
+    - r-lme4
+    - r-nlme
+    - r-rlang
+
+  run:
+    - r-base
+    - r-mass
+    - r-ggplot2 >=1.0.0
+    - r-lme4
+    - r-nlme
+    - r-rlang
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('reghelper')"           # [not win]
+    - "\"%R%\" -e \"library('reghelper')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jeff-hughes/reghelper
+  license: GPL-3
+  summary: A set of functions used to automate commonly used methods in regression analysis.
+    This includes plotting interactions, and calculating simple slopes, standardized
+    coefficients, regions of significance (Johnson & Neyman, 1936; cf. Spiller et al.,
+    2012), etc. See the reghelper documentation for more information, documentation,
+    and examples.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: reghelper
+# Type: Package
+# Title: Helper Functions for Regression Analysis
+# Version: 1.1.2
+# Date: 2023-09-02
+# Authors@R: c( person("Jeffrey", "Hughes", email="jeff.hughes@gmail.com", role=c("aut", "cre")), person("David", "Beiner", email="beiner.reghelper@gmail.com", role=c("aut")))
+# Description: A set of functions used to automate commonly used methods in regression analysis. This includes plotting interactions, and calculating simple slopes, standardized coefficients, regions of significance (Johnson & Neyman, 1936; cf. Spiller et al., 2012), etc. See the reghelper documentation for more information, documentation, and examples.
+# License: GPL-3
+# URL: https://github.com/jeff-hughes/reghelper
+# BugReports: https://github.com/jeff-hughes/reghelper/issues
+# Depends: R (>= 3.1.0)
+# Imports: ggplot2 (>= 1.0.0), rlang, stats, nlme, lme4, MASS, utils
+# Suggests: testthat (>= 0.8.1)
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-09-02 23:13:01 UTC; jeff
+# Author: Jeffrey Hughes [aut, cre], David Beiner [aut]
+# Maintainer: Jeffrey Hughes <jeff.hughes@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-09-02 23:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

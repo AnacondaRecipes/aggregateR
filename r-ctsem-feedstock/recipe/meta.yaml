@@ -1,0 +1,153 @@
+{% set version = '3.9.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ctsem
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ctsem_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ctsem/ctsem_{{ version }}.tar.gz
+  sha256: c7de03b7f589bec782a0150ab20ea3b1627e443621060f25934e6df449ebedda
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, testthat, devtools, DEoptim, tinytex, lme4, shiny, gridExtra, arules
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh >=1.66.0_1
+    - r-deriv
+    - r-mass
+    - r-matrix
+    - r-rcpp >=0.12.16
+    - r-rcppeigen >=0.3.3.4.0
+    - r-rcppparallel >=5.0.1
+    - r-stanheaders >=2.26.0
+    - r-code
+    - r-data.table >=1.12.8
+    - r-expm
+    - r-ggplot2
+    - r-mize
+    - r-mvtnorm
+    - r-plyr
+    - r-rstan >=2.26.0
+    - r-rstantools >=2.3.0
+    - r-tibble
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.66.0_1
+    - r-deriv
+    - r-mass
+    - r-matrix
+    - r-rcpp >=0.12.16
+    - r-rcppeigen >=0.3.3.4.0
+    - r-rcppparallel >=5.0.1
+    - r-stanheaders >=2.26.0
+    - r-code
+    - r-data.table >=1.12.8
+    - r-expm
+    - r-ggplot2
+    - r-mize
+    - r-mvtnorm
+    - r-plyr
+    - r-rstan >=2.26.0
+    - r-rstantools >=2.3.0
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ctsem')"           # [not win]
+    - "\"%R%\" -e \"library('ctsem')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/cdriveraus/ctsem
+  license: GPL-3
+  summary: Hierarchical continuous (and discrete) time state space modelling, for linear and
+    nonlinear systems measured by  continuous variables, with limited support for binary
+    data. The subject specific dynamic system is modelled as a stochastic differential
+    equation (SDE) or difference equation, measurement models are typically multivariate
+    normal factor models. Linear mixed effects SDE's estimated via maximum likelihood
+    and optimization are the default. Nonlinearities,  (state dependent parameters)
+    and random effects on all parameters are possible, using either max likelihood /
+    max a posteriori optimization (with optional importance sampling) or Stan's Hamiltonian
+    Monte Carlo sampling. See  <https://github.com/cdriveraus/ctsem/raw/master/vignettes/hierarchicalmanual.pdf>
+    for details. Priors may be used. For the conceptual overview of the hierarchical
+    Bayesian linear SDE approach, see <https://www.researchgate.net/publication/324093594_Hierarchical_Bayesian_Continuous_Time_Dynamic_Modeling>.
+    Exogenous inputs may also be included, for an overview of such possibilities see
+    <https://www.researchgate.net/publication/328221807_Understanding_the_Time_Course_of_Interventions_with_Continuous_Time_Dynamic_Models>
+    . Stan based functions are not available on 32 bit Windows systems at present. <https://cdriver.netlify.app/>
+    contains some tutorial blog posts.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: ctsem
+# Type: Package
+# Title: Continuous Time Structural Equation Modelling
+# Version: 3.9.1
+# Date: 2023-10-30
+# Authors@R: c(person("Charles", "Driver", role = c("aut","cre","cph"),email="charles.driver@ife.uzh.ch"), person("Manuel", "Voelkle", role = c("aut","cph")), person("Han", "Oud", role = c("aut","cph") ), person("Trustees of Columbia University",role='cph'))
+# Description: Hierarchical continuous (and discrete) time state space modelling, for linear and nonlinear systems measured by  continuous variables, with limited support for binary data. The subject specific dynamic system is modelled as a stochastic differential equation (SDE) or difference equation, measurement models are typically multivariate normal factor models. Linear mixed effects SDE's estimated via maximum likelihood and optimization are the default. Nonlinearities,  (state dependent parameters) and random effects on all parameters are possible, using either max likelihood / max a posteriori optimization (with optional importance sampling) or Stan's Hamiltonian Monte Carlo sampling. See  <https://github.com/cdriveraus/ctsem/raw/master/vignettes/hierarchicalmanual.pdf> for details. Priors may be used. For the conceptual overview of the hierarchical Bayesian linear SDE approach, see <https://www.researchgate.net/publication/324093594_Hierarchical_Bayesian_Continuous_Time_Dynamic_Modeling>. Exogenous inputs may also be included, for an overview of such possibilities see <https://www.researchgate.net/publication/328221807_Understanding_the_Time_Course_of_Interventions_with_Continuous_Time_Dynamic_Models> . Stan based functions are not available on 32 bit Windows systems at present. <https://cdriver.netlify.app/> contains some tutorial blog posts.
+# License: GPL-3
+# Depends: R (>= 4.2.0), Rcpp (>= 0.12.16)
+# URL: https://github.com/cdriveraus/ctsem
+# Imports: cOde, data.table (>= 1.12.8), datasets, Deriv, expm, ggplot2, graphics, grDevices, MASS, Matrix, methods, mize, mvtnorm, parallel, plyr, RcppParallel (>= 5.0.1), rstan (>= 2.26.0), rstantools (>= 2.3.0), stats, tibble, tools, utils
+# Encoding: UTF-8
+# LazyData: true
+# ByteCompile: true
+# LinkingTo: BH (>= 1.66.0-1), Rcpp (>= 0.12.16), RcppEigen (>= 0.3.3.4.0), RcppParallel (>= 5.0.1), rstan (>= 2.26), StanHeaders (>= 2.26.0), RcppParallel (>= 5.0.1)
+# Suggests: knitr, testthat, devtools, DEoptim, tinytex, lme4, shiny, gridExtra, arules
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# SystemRequirements: GNU make
+# NeedsCompilation: yes
+# Biarch: true
+# Packaged: 2023-10-30 12:24:21 UTC; Driver
+# Author: Charles Driver [aut, cre, cph], Manuel Voelkle [aut, cph], Han Oud [aut, cph], Trustees of Columbia University [cph]
+# Maintainer: Charles Driver <charles.driver@ife.uzh.ch>
+# Repository: CRAN
+# Date/Publication: 2023-10-30 14:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

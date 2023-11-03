@@ -1,0 +1,93 @@
+{% set version = '1.1-7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ic.infer
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ic.infer_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ic.infer/ic.infer_{{ version }}.tar.gz
+  sha256: 055329e68eb3b9ab5248a58ede2c6f45faa8b6678c938b8e287c4db0b53d213f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: relaimpo
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-boot
+    - r-kappalab
+    - r-mvtnorm
+    - r-quadprog
+
+  run:
+    - r-base
+    - r-boot
+    - r-kappalab
+    - r-mvtnorm
+    - r-quadprog
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ic.infer')"           # [not win]
+    - "\"%R%\" -e \"library('ic.infer')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://prof.bht-berlin.de/groemping/
+  license: GPL-2
+  summary: Implements inequality constrained inference. This includes parameter estimation in
+    normal (linear) models under linear equality and inequality constraints, as well
+    as normal likelihood ratio tests involving inequality-constrained hypotheses. For
+    inequality-constrained linear models, averaging over R-squared for different orderings
+    of regressors is also included.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: ic.infer
+# Title: Inequality Constrained Inference in Linear Normal Situations
+# Version: 1.1-7
+# Depends: R(>= 2.5.0)
+# Imports: quadprog, mvtnorm, boot, kappalab
+# Suggests: relaimpo
+# Date: 2023-10-04
+# Author: Ulrike Groemping
+# Maintainer: Ulrike Groemping <ulrike.groemping@bht-berlin.de>
+# Description: Implements inequality constrained inference. This includes parameter estimation in normal (linear) models under linear equality and inequality constraints, as well as normal likelihood ratio tests involving inequality-constrained hypotheses. For inequality-constrained linear models, averaging over R-squared for different orderings of regressors is also included.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# URL: https://prof.bht-berlin.de/groemping/
+# NeedsCompilation: no
+# Packaged: 2023-10-04 14:27:00 UTC; groemping
+# Repository: CRAN
+# Date/Publication: 2023-10-04 17:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

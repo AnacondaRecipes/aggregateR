@@ -1,0 +1,105 @@
+{% set version = '0.0.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ubl
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/UBL_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/UBL/UBL_{{ version }}.tar.gz
+  sha256: 906a789e14cc0aade82f6bfdf259a0887b819f76014c0575522088a26820f5ca
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, rpart, testthat, DMwR2, ggplot2, e1071
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mba
+    - r-automap
+    - r-gstat
+    - r-randomforest
+    - r-sp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mba
+    - r-automap
+    - r-gstat
+    - r-randomforest
+    - r-sp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('UBL')"           # [not win]
+    - "\"%R%\" -e \"library('UBL')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/paobranco/UBL
+  license: GPL-2
+  summary: Provides a set of functions that can be used to obtain better predictive performance
+    on cost-sensitive and cost/benefits tasks (for both regression and classification).
+    This includes re-sampling approaches that modify the original data set biasing it
+    towards the user preferences.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: UBL
+# Type: Package
+# Title: An Implementation of Re-Sampling Approaches to Utility-Based Learning for Both Classification and Regression Tasks
+# Description: Provides a set of functions that can be used to obtain better predictive performance on cost-sensitive and cost/benefits tasks (for both regression and classification). This includes re-sampling approaches that modify the original data set biasing it towards the user preferences.
+# Version: 0.0.9
+# Depends: R(>= 3.0), methods, grDevices, graphics, stats, MBA, gstat, automap, sp, randomForest
+# Suggests: MASS, rpart, testthat, DMwR2, ggplot2, e1071
+# Date: 2023-10-07
+# Authors@R: c(person("Paula", "Branco", email = "paobranco@gmail.com", role = c("aut", "cre")), person("Rita", "Ribeiro", email = "rpribeiro@dcc.fc.up.pt", role = c("aut", "ctb")), person("Luis", "Torgo", email = "ltorgo@dcc.fc.up.pt", role = c("aut", "ctb")))
+# URL: https://github.com/paobranco/UBL
+# BugReports: https://github.com/paobranco/UBL/issues
+# License: GPL (>= 2)
+# LazyLoad: yes
+# LazyData: yes
+# NeedsCompilation: yes
+# Packaged: 2023-10-07 14:14:41 UTC; paulab
+# Author: Paula Branco [aut, cre], Rita Ribeiro [aut, ctb], Luis Torgo [aut, ctb]
+# Maintainer: Paula Branco <paobranco@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-07 20:40:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

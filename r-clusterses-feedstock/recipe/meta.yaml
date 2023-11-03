@@ -1,0 +1,98 @@
+{% set version = '2.6.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-clusterses
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/clusterSEs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/clusterSEs/clusterSEs_{{ version }}.tar.gz
+  sha256: da9effda34daa0c1cf70f4d0baa8179a097555ba42e03e7abdae73f06a3a0b35
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-aer
+    - r-formula
+    - r-dfidx
+    - r-lmtest
+    - r-mlogit >=1.1_0
+    - r-plm
+    - r-sandwich
+
+  run:
+    - r-base
+    - r-aer
+    - r-formula
+    - r-dfidx
+    - r-lmtest
+    - r-mlogit >=1.1_0
+    - r-plm
+    - r-sandwich
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('clusterSEs')"           # [not win]
+    - "\"%R%\" -e \"library('clusterSEs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=clusterSEs
+  license: GPL-2
+  summary: Calculate p-values and confidence intervals using cluster-adjusted t-statistics (based
+    on Ibragimov and Muller (2010) <DOI:10.1198/jbes.2009.08046>, pairs cluster bootstrapped
+    t-statistics, and wild cluster bootstrapped t-statistics (the latter two techniques
+    based on Cameron, Gelbach, and Miller (2008) <DOI:10.1162/rest.90.3.414>. Procedures
+    are included for use with GLM, ivreg, plm (pooling or fixed effects), and mlogit
+    models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: clusterSEs
+# Title: Calculate Cluster-Robust p-Values and Confidence Intervals
+# Version: 2.6.5
+# Authors@R: person("Justin", "Esarey", , "justin@justinesarey.com", role = c("aut", "cre"))
+# Description: Calculate p-values and confidence intervals using cluster-adjusted t-statistics (based on Ibragimov and Muller (2010) <DOI:10.1198/jbes.2009.08046>, pairs cluster bootstrapped t-statistics, and wild cluster bootstrapped t-statistics (the latter two techniques based on Cameron, Gelbach, and Miller (2008) <DOI:10.1162/rest.90.3.414>. Procedures are included for use with GLM, ivreg, plm (pooling or fixed effects), and mlogit models.
+# Depends: R (>= 3.3.0), AER, Formula, plm, stats
+# Imports: sandwich, lmtest, mlogit (>= 1.1-0), utils, dfidx
+# License: GPL (>= 2)
+# RoxygenNote: 7.1.1
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2021-04-05 19:51:21 UTC; justi
+# Author: Justin Esarey [aut, cre]
+# Maintainer: Justin Esarey <justin@justinesarey.com>
+# Repository: CRAN
+# Date/Publication: 2021-04-05 20:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

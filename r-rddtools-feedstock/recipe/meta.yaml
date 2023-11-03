@@ -1,0 +1,107 @@
+{% set version = '1.6.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rddtools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rddtools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rddtools/rddtools_{{ version }}.tar.gz
+  sha256: adf686b90f192a044ed9e0fa006403c34fd681863824fde72c9643f7d56d9d8a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: stats4, car, knitr, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-aer
+    - r-formula
+    - r-kernsmooth
+    - r-ggplot2
+    - r-lmtest
+    - r-locpol
+    - r-np
+    - r-rdd
+    - r-rdrobust
+    - r-rmarkdown
+    - r-sandwich
+
+  run:
+    - r-base
+    - r-aer
+    - r-formula
+    - r-kernsmooth
+    - r-ggplot2
+    - r-lmtest
+    - r-locpol
+    - r-np
+    - r-rdd
+    - r-rdrobust
+    - r-rmarkdown
+    - r-sandwich
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rddtools')"           # [not win]
+    - "\"%R%\" -e \"library('rddtools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://qua.st/rddtools/
+  license: GPL-2
+  summary: Set of functions for Regression Discontinuity Design ('RDD'), for data visualisation,
+    estimation and testing.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: rddtools
+# Version: 1.6.0
+# Title: Toolbox for Regression Discontinuity Design ('RDD')
+# Description: Set of functions for Regression Discontinuity Design ('RDD'), for data visualisation, estimation and testing.
+# Authors@R: c( person("Matthieu", "Stigler", role = "aut", comment=c(ORCID="0000-0002-6802-4290"), email="Matthieu.Stigler@gmail.com"), person("Bastiaan", "Quast", email = "bquast@gmail.com", role=c("aut", "cre"), comment=c(ORCID="0000-0002-2951-3577") ) )
+# Maintainer: Bastiaan Quast <bquast@gmail.com>
+# Imports: KernSmooth, ggplot2, rdd, sandwich, lmtest, Formula, locpol, methods, rdrobust, rmarkdown
+# Depends: AER, np
+# Suggests: stats4, car, knitr, testthat
+# License: GPL (>= 2)
+# URL: https://qua.st/rddtools/
+# BugReports: https://github.com/bquast/rddtools/issues
+# VignetteBuilder: knitr
+# RoxygenNote: 7.1.2
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2022-01-10 11:18:42 UTC; bquast
+# Author: Matthieu Stigler [aut] (<https://orcid.org/0000-0002-6802-4290>), Bastiaan Quast [aut, cre] (<https://orcid.org/0000-0002-2951-3577>)
+# Repository: CRAN
+# Date/Publication: 2022-01-10 12:42:49 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

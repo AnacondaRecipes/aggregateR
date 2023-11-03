@@ -1,0 +1,85 @@
+{% set version = '2.0-7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-usingr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/UsingR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/UsingR/UsingR_{{ version }}.tar.gz
+  sha256: 60bca08fcf3478e58b9f7e99d53e8ac2ff7a53a7668c203d40b13a4835a5929e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: zoo, ggplot2, vcd, lubridate, aplpack
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-histdata
+    - r-hmisc
+    - r-mass
+
+  run:
+    - r-base
+    - r-histdata
+    - r-hmisc
+    - r-mass
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('UsingR')"           # [not win]
+    - "\"%R%\" -e \"library('UsingR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=UsingR
+  license: GPL-2
+  summary: A collection of data sets to accompany the textbook "Using R for Introductory Statistics,"
+    second edition.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: UsingR
+# Version: 2.0-7
+# Title: Data Sets, Etc. for the Text "Using R for Introductory Statistics", Second Edition
+# Author: John Verzani <verzani@math.csi.cuny.edu>
+# Maintainer: John Verzani <verzani@math.csi.cuny.edu>
+# Description: A collection of data sets to accompany the textbook "Using R for Introductory Statistics," second edition.
+# Depends: R (>= 2.15.0), MASS, HistData, Hmisc
+# Suggests: zoo, ggplot2, vcd, lubridate, aplpack
+# License: GPL (>= 2)
+# LazyData: TRUE
+# NeedsCompilation: no
+# Packaged: 2022-01-10 19:16:26 UTC; jverzani
+# Repository: CRAN
+# Date/Publication: 2022-01-11 09:52:45 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,104 @@
+{% set version = '1.6-13' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-entropart
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/entropart_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/entropart/entropart_{{ version }}.tar.gz
+  sha256: 578a9f8f38f64cb71790e54ceaf0707e4028a73b40c69fde005c948fad6b4ff8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ade4, knitr, pkgdown, rmarkdown, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-entropyestimation
+    - r-ape
+    - r-ggplot2
+    - r-ggpubr
+    - r-reshape2
+    - r-rlang
+    - r-tibble
+    - r-vegan
+
+  run:
+    - r-base
+    - r-entropyestimation
+    - r-ape
+    - r-ggplot2
+    - r-ggpubr
+    - r-reshape2
+    - r-rlang
+    - r-tibble
+    - r-vegan
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('entropart')"           # [not win]
+    - "\"%R%\" -e \"library('entropart')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/EricMarcon/entropart
+  license: GPL-3
+  summary: Measurement and partitioning of diversity, based on Tsallis entropy, following Marcon
+    and Herault (2015) <doi:10.18637/jss.v067.i08>. 'entropart' provides functions to
+    calculate alpha, beta and gamma diversity of communities, including phylogenetic
+    and functional diversity. Estimation-bias corrections are available.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: entropart
+# Type: Package
+# Title: Entropy Partitioning to Measure Diversity
+# Version: 1.6-13
+# Authors@R: c( person("Eric", "Marcon", email="eric.marcon@agroparistech.fr", role=c("aut", "cre"), comment=c(ORCID="0000-0002-5249-321X")), person("Bruno", "Herault", email="bruno.herault@cirad.fr", role="aut", comment=c(ORCID="0000-0002-6950-7286")) )
+# Description: Measurement and partitioning of diversity, based on Tsallis entropy, following Marcon and Herault (2015) <doi:10.18637/jss.v067.i08>. 'entropart' provides functions to calculate alpha, beta and gamma diversity of communities, including phylogenetic and functional diversity. Estimation-bias corrections are available.
+# URL: https://github.com/EricMarcon/entropart
+# BugReports: https://github.com/EricMarcon/entropart/issues
+# License: GNU General Public License
+# Imports: ape, EntropyEstimation, ggplot2, ggpubr, graphics, grDevices, parallel, reshape2, rlang, stats, tibble, utils, vegan
+# Suggests: ade4, knitr, pkgdown, rmarkdown, testthat
+# LazyData: true
+# VignetteBuilder: knitr
+# SystemRequirements: pandoc
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2023-09-26 13:22:30 UTC; emarc
+# Author: Eric Marcon [aut, cre] (<https://orcid.org/0000-0002-5249-321X>), Bruno Herault [aut] (<https://orcid.org/0000-0002-6950-7286>)
+# Maintainer: Eric Marcon <eric.marcon@agroparistech.fr>
+# Repository: CRAN
+# Date/Publication: 2023-09-26 14:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

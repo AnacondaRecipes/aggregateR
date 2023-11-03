@@ -1,0 +1,99 @@
+{% set version = '2.9.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-distrmod
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/distrMod_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/distrMod/distrMod_{{ version }}.tar.gz
+  sha256: 87071411bd5655f2b5898db3251fa27264b93602f0a10a2f38c0299dc48b2e78
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ismev, evd,
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-randvar >=1.2.0
+    - r-distr >=2.8.0
+    - r-distrex >=2.8.0
+    - r-sfsmisc
+    - r-startupmsg
+
+  run:
+    - r-base
+    - r-mass
+    - r-randvar >=1.2.0
+    - r-distr >=2.8.0
+    - r-distrex >=2.8.0
+    - r-sfsmisc
+    - r-startupmsg
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('distrMod')"           # [not win]
+    - "\"%R%\" -e \"library('distrMod')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://distr.r-forge.r-project.org/
+  license: LGPL-3
+  summary: Implements S4 classes for probability models based on packages 'distr' and 'distrEx'.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: distrMod
+# Version: 2.9.0
+# Date: 2022-11-14
+# Title: Object Oriented Implementation of Probability Models
+# Description: Implements S4 classes for probability models based on packages 'distr' and 'distrEx'.
+# Authors@R: c(person("Matthias", "Kohl", role=c("aut", "cph")), person("Peter", "Ruckdeschel", role=c("cre", "cph"), email="peter.ruckdeschel@uni-oldenburg.de"), person("R Core Team", role = c("ctb", "cph"), comment="for source file 'format.perc'"))
+# Depends: R(>= 3.4), distr(>= 2.8.0), distrEx(>= 2.8.0), RandVar(>= 1.2.0), MASS, stats4, methods
+# Imports: startupmsg, sfsmisc, graphics, stats, grDevices
+# Suggests: ismev, evd,
+# Enhances: RobExtremes
+# ByteCompile: yes
+# License: LGPL-3
+# Encoding: latin1
+# URL: http://distr.r-forge.r-project.org/
+# LastChangedDate: {$LastChangedDate: 2022-06-13 19:41:57 +0200 (Mo, 13 Jun 2022) $}
+# LastChangedRevision: {$LastChangedRevision: 1367 $}
+# VCS/SVNRevision: 1395
+# NeedsCompilation: no
+# Packaged: 2022-11-14 19:18:44 UTC; ruckdesc
+# Author: Matthias Kohl [aut, cph], Peter Ruckdeschel [cre, cph], R Core Team [ctb, cph] (for source file 'format.perc')
+# Maintainer: Peter Ruckdeschel <peter.ruckdeschel@uni-oldenburg.de>
+# Repository: CRAN
+# Date/Publication: 2022-11-16 03:50:18 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

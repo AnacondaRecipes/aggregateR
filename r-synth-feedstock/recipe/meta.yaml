@@ -1,0 +1,91 @@
+{% set version = '1.1-8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-synth
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Synth_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Synth/Synth_{{ version }}.tar.gz
+  sha256: 192ccbb13aee58bc235827fcad0302de91454dece419849f4b04e1140ee7c46e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-kernlab
+    - r-optimx
+    - r-rgenoud
+
+  run:
+    - r-base
+    - r-kernlab
+    - r-optimx
+    - r-rgenoud
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Synth')"           # [not win]
+    - "\"%R%\" -e \"library('Synth')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://web.stanford.edu/~jhain/
+  license: GPL-2
+  summary: Implements the synthetic control group method for comparative case studies as described
+    in Abadie and Gardeazabal (2003) and Abadie, Diamond, and Hainmueller (2010, 2011,
+    2014). The synthetic control method allows for effect estimation in settings where
+    a single unit (a state, country, firm, etc.) is exposed to an event or intervention.
+    It provides a data-driven procedure to construct synthetic control units based on
+    a weighted combination of comparison units that approximates the characteristics
+    of the unit that is exposed to the intervention. A combination of comparison units
+    often provides a better comparison for the unit exposed to the intervention than
+    any comparison unit alone.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: Synth
+# Version: 1.1-8
+# Date: 2023-06-01
+# Title: Synthetic Control Group Method for Comparative Case Studies
+# Author: Jens Hainmueller <jhain@stanford.edu> and Alexis Diamond <adiamond@fas.harvard.edu>
+# Maintainer: Jens Hainmueller <jhain@stanford.edu>
+# Description: Implements the synthetic control group method for comparative case studies as described in Abadie and Gardeazabal (2003) and Abadie, Diamond, and Hainmueller (2010, 2011, 2014). The synthetic control method allows for effect estimation in settings where a single unit (a state, country, firm, etc.) is exposed to an event or intervention. It provides a data-driven procedure to construct synthetic control units based on a weighted combination of comparison units that approximates the characteristics of the unit that is exposed to the intervention. A combination of comparison units often provides a better comparison for the unit exposed to the intervention than any comparison unit alone.
+# Imports: kernlab, optimx,rgenoud
+# License: GPL (>= 2)
+# URL: https://web.stanford.edu/~jhain/
+# NeedsCompilation: no
+# Packaged: 2023-06-01 19:10:32 UTC; jhainmueller
+# Repository: CRAN
+# Date/Publication: 2023-06-02 09:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,114 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-did2s
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/did2s_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/did2s/did2s_{{ version }}.tar.gz
+  sha256: 064a31ff655f5de09e3a170298ed059b5916b8a078a9bb7616a246c1c937df47
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rmarkdown, knitr, haven, testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-matrixextra
+    - r-sparsem
+    - r-boot
+    - r-broom
+    - r-data.table
+    - r-did
+    - r-didimputation
+    - r-fixest >=0.10.1
+    - r-ggplot2
+    - r-rlang
+    - r-staggered
+
+  run:
+    - r-base
+    - r-matrix
+    - r-matrixextra
+    - r-sparsem
+    - r-boot
+    - r-broom
+    - r-data.table
+    - r-did
+    - r-didimputation
+    - r-fixest >=0.10.1
+    - r-ggplot2
+    - r-rlang
+    - r-staggered
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('did2s')"           # [not win]
+    - "\"%R%\" -e \"library('did2s')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://kylebutts.github.io/did2s/
+  license: MIT
+  summary: Estimates Two-way Fixed Effects difference-in-differences/event-study models using
+    the approach proposed by Gardner (2021) <doi:10.48550/arXiv.2207.05943>. To avoid
+    the problems caused by OLS estimation of the Two-way Fixed Effects model, this function
+    first estimates the fixed effects and covariates using untreated observations and
+    then in a second stage, estimates the treatment effects.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: did2s
+# Title: Two-Stage Difference-in-Differences Following Gardner (2021)
+# Version: 1.0.2
+# Authors@R: c(person(given = "Kyle", family = "Butts", role = c("aut","cre"), email = "kyle.butts@colorado.edu", comment = c(ORCID = "0000-0002-9048-8059")), person(given = "John", family = "Gardner", role = "aut", email = "jrgardne@olemiss.edu", comment = c(ORCID = "0000-0002-4028-6862")), person(given = "Grant", family = "McDermott", role = "ctb", email = "grantmcd@uoregon.edu", comment = c(ORCID = "0000-0001-7883-8573")), person(given = "Laurent", family = "Berge", role = "ctb", email = "laurent.berge@u-bordeaux.fr"))
+# Description: Estimates Two-way Fixed Effects difference-in-differences/event-study models using the approach proposed by Gardner (2021) <doi:10.48550/arXiv.2207.05943>. To avoid the problems caused by OLS estimation of the Two-way Fixed Effects model, this function first estimates the fixed effects and covariates using untreated observations and then in a second stage, estimates the treatment effects.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.3
+# Depends: R (>= 3.5.0), fixest (>= 0.10.1)
+# Imports: data.table, SparseM, MatrixExtra, Matrix, stats, boot, broom, ggplot2, rlang, did, staggered, didimputation
+# URL: https://kylebutts.github.io/did2s/
+# Suggests: rmarkdown, knitr, haven, testthat (>= 3.0.0)
+# VignetteBuilder: knitr
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2023-04-02 18:41:56 UTC; kylebutts
+# Author: Kyle Butts [aut, cre] (<https://orcid.org/0000-0002-9048-8059>), John Gardner [aut] (<https://orcid.org/0000-0002-4028-6862>), Grant McDermott [ctb] (<https://orcid.org/0000-0001-7883-8573>), Laurent Berge [ctb]
+# Maintainer: Kyle Butts <kyle.butts@colorado.edu>
+# Repository: CRAN
+# Date/Publication: 2023-04-07 15:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

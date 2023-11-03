@@ -1,0 +1,115 @@
+{% set version = '0.6.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-crew
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/crew_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/crew/crew_{{ version }}.tar.gz
+  sha256: 4ec344f2916e4030b5e079dec54941fcbb1d606fef257b2d32890e1bfcf9292c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr (>= 1.30), markdown (>= 1.1), rmarkdown (>= 2.4), testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-data.table
+    - r-getip
+    - r-mirai >=0.11.0
+    - r-nanonext >=0.10.2
+    - r-processx
+    - r-ps
+    - r-rlang
+    - r-tibble
+    - r-tidyselect
+
+  run:
+    - r-base
+    - r-r6
+    - r-data.table
+    - r-getip
+    - r-mirai >=0.11.0
+    - r-nanonext >=0.10.2
+    - r-processx
+    - r-ps
+    - r-rlang
+    - r-tibble
+    - r-tidyselect
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('crew')"           # [not win]
+    - "\"%R%\" -e \"library('crew')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://wlandau.github.io/crew/, https://github.com/wlandau/crew
+  license: MIT
+  summary: In computationally demanding analysis projects, statisticians and data scientists
+    asynchronously deploy long-running tasks to distributed systems, ranging from traditional
+    clusters to cloud services. The 'NNG'-powered 'mirai' R package by Gao (2023) <https://CRAN.R-project.org/package=mirai>
+    is a sleek and sophisticated scheduler that efficiently processes these intense
+    workloads. The 'crew' package extends 'mirai' with a unifying interface for third-party
+    worker launchers. Inspiration also comes from packages. 'future' by Bengtsson (2021)
+    <doi:10.32614/RJ-2021-048>, 'rrq' by FitzJohn and Ashton (2023) <https://github.com/mrc-ide/rrq>,
+    'clustermq' by Schubert (2019) <doi:10.1093/bioinformatics/btz284>), and 'batchtools'
+    by Lang, Bischel, and Surmann (2017) <doi:10.21105/joss.00135>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: crew
+# Title: A Distributed Worker Launcher Framework
+# Description: In computationally demanding analysis projects, statisticians and data scientists asynchronously deploy long-running tasks to distributed systems, ranging from traditional clusters to cloud services. The 'NNG'-powered 'mirai' R package by Gao (2023) <https://CRAN.R-project.org/package=mirai> is a sleek and sophisticated scheduler that efficiently processes these intense workloads. The 'crew' package extends 'mirai' with a unifying interface for third-party worker launchers. Inspiration also comes from packages. 'future' by Bengtsson (2021) <doi:10.32614/RJ-2021-048>, 'rrq' by FitzJohn and Ashton (2023) <https://github.com/mrc-ide/rrq>, 'clustermq' by Schubert (2019) <doi:10.1093/bioinformatics/btz284>), and 'batchtools' by Lang, Bischel, and Surmann (2017) <doi:10.21105/joss.00135>.
+# Version: 0.6.0
+# License: MIT + file LICENSE
+# URL: https://wlandau.github.io/crew/, https://github.com/wlandau/crew
+# BugReports: https://github.com/wlandau/crew/issues
+# Authors@R: c( person( given = c("William", "Michael"), family = "Landau", role = c("aut", "cre"), email = "will.landau.oss@gmail.com", comment = c(ORCID = "0000-0003-1878-3253") ), person( given = "Daniel", family = "Woodie", role = "ctb" ), person( family = "Eli Lilly and Company", role = "cph" ))
+# Depends: R (>= 4.0.0)
+# Imports: data.table, getip, mirai (>= 0.11.0), nanonext (>= 0.10.2), processx, ps, R6, rlang, stats, tibble, tidyselect, utils
+# Suggests: knitr (>= 1.30), markdown (>= 1.1), rmarkdown (>= 2.4), testthat (>= 3.0.0)
+# Encoding: UTF-8
+# Language: en-US
+# VignetteBuilder: knitr
+# Config/testthat/edition: 3
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-10-11 19:10:32 UTC; C240390
+# Author: William Michael Landau [aut, cre] (<https://orcid.org/0000-0003-1878-3253>), Daniel Woodie [ctb], Eli Lilly and Company [cph]
+# Maintainer: William Michael Landau <will.landau.oss@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-12 09:50:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

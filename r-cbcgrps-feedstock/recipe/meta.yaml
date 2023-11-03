@@ -1,0 +1,83 @@
+{% set version = '2.8.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cbcgrps
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CBCgrps_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CBCgrps/CBCgrps_{{ version }}.tar.gz
+  sha256: 0e4b24dc7507965360624bc6b234060f28eaf6a5c7a8414ba0e1d2821bdb647c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-nortest >=1.0_4
+
+  run:
+    - r-base
+    - r-nortest >=1.0_4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CBCgrps')"           # [not win]
+    - "\"%R%\" -e \"library('CBCgrps')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CBCgrps
+  license: GPL-2
+  summary: Compare baseline characteristics between two or more groups. The variables being compared
+    can be factor and numeric variables. The function will automatically judge the type
+    and distribution of the variables, and make statistical description and bivariate
+    analysis.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: CBCgrps
+# Type: Package
+# Title: Compare Baseline Characteristics Between Groups
+# Version: 2.8.2
+# Date: 2021-4-16
+# Author: Zhongheng Zhang, Sir Run Run Shaw hospital, Zhejiang university school of medicine
+# Maintainer: Zhongheng Zhang <zh_zhang1984@zju.edu.cn>
+# Depends: R (>= 3.2.0), nortest (>= 1.0-4)
+# Description: Compare baseline characteristics between two or more groups. The variables being compared can be factor and numeric variables. The function will automatically judge the type and distribution of the variables, and make statistical description and bivariate analysis.
+# License: GPL-2
+# RoxygenNote: 7.1.1
+# NeedsCompilation: no
+# Packaged: 2021-04-15 05:20:58 UTC; zhang
+# Repository: CRAN
+# Date/Publication: 2021-04-15 06:00:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

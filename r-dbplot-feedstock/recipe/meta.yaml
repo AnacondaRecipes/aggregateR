@@ -1,0 +1,96 @@
+{% set version = '0.3.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dbplot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dbplot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dbplot/dbplot_{{ version }}.tar.gz
+  sha256: 3938fcdbb5cc5dbe6638b427cf555117b76debd0895214a33f81340693fc71eb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dbplyr (>= 1.4.0), testthat, tidyr, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr >=0.7
+    - r-ggplot2
+    - r-magrittr
+    - r-purrr
+    - r-rlang >=0.3
+
+  run:
+    - r-base
+    - r-dplyr >=0.7
+    - r-ggplot2
+    - r-magrittr
+    - r-purrr
+    - r-rlang >=0.3
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dbplot')"           # [not win]
+    - "\"%R%\" -e \"library('dbplot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/edgararuiz/dbplot
+  license: GPL-3
+  summary: 'Leverages ''dplyr'' to process the calculations of a plot inside a database. This
+    package provides helper functions that abstract the work at three levels: outputs
+    a ''ggplot'', outputs the calculations, outputs the formula needed to calculate
+    bins.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: dbplot
+# Version: 0.3.3
+# Title: Simplifies Plotting Data Inside Databases
+# Description: Leverages 'dplyr' to process the calculations of a plot inside a database. This package provides helper functions that abstract the work at three levels: outputs a 'ggplot', outputs the calculations, outputs the formula needed to calculate bins.
+# Authors@R: person("Edgar", "Ruiz", email = "edgararuiz@gmail.com", role = c("aut", "cre"))
+# Depends: R (>= 3.1)
+# Imports: dplyr (>= 0.7), rlang (>= 0.3), ggplot2, purrr, magrittr
+# Suggests: dbplyr (>= 1.4.0), testthat, tidyr, covr
+# License: GPL-3
+# URL: https://github.com/edgararuiz/dbplot
+# BugReports: https://github.com/edgararuiz/dbplot/issues
+# RoxygenNote: 7.0.2
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2020-02-06 21:32:08 UTC; edgar
+# Author: Edgar Ruiz [aut, cre]
+# Maintainer: Edgar Ruiz <edgararuiz@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2020-02-07 01:10:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

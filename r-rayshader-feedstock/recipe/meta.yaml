@@ -1,0 +1,127 @@
+{% set version = '0.35.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rayshader
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rayshader_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rayshader/rayshader_{{ version }}.tar.gz
+  sha256: db36836a6c72f1bb7ea58a6e486b0e4f91b23613845061c7135b2c5309306392
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: reshape2, viridis, av, magick, ggplot2, sf, isoband, car (>= 3.1-1), geosphere, gifski, ambient, terra, lidR, elevatr, gridExtra, testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-doparallel
+    - r-foreach
+    - r-jpeg
+    - r-magrittr
+    - r-png
+    - r-progress
+    - r-raster
+    - r-rayimage >=0.9.0
+    - r-rayrender >=0.29.6
+    - r-rayvertex >=0.7.6
+    - r-rgl >=0.110.7
+    - r-scales
+    - r-terrainmeshr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-doparallel
+    - r-foreach
+    - r-jpeg
+    - r-magrittr
+    - r-png
+    - r-progress
+    - r-raster
+    - r-rayimage >=0.9.0
+    - r-rayrender >=0.29.6
+    - r-rayvertex >=0.7.6
+    - r-rgl >=0.110.7
+    - r-scales
+    - r-terrainmeshr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rayshader')"           # [not win]
+    - "\"%R%\" -e \"library('rayshader')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.rayshader.com, https://github.com/tylermorganwall/rayshader
+  license: GPL-3
+  summary: Uses a combination of raytracing and multiple hill shading methods to produce 2D and
+    3D data visualizations and maps. Includes water detection and layering functions,
+    programmable color palette generation, several built-in textures for hill shading,
+    2D and 3D plotting options, a built-in path tracer, 'Wavefront' OBJ file export,
+    and the ability to save 3D visualizations to a 3D printable format.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: rayshader
+# Type: Package
+# Title: Create Maps and Visualize Data in 2D and 3D
+# Version: 0.35.7
+# Date: 2023-06-08
+# Author: Tyler Morgan-Wall
+# Maintainer: Tyler Morgan-Wall <tylermw@gmail.com>
+# Description: Uses a combination of raytracing and multiple hill shading methods to produce 2D and 3D data visualizations and maps. Includes water detection and layering functions, programmable color palette generation, several built-in textures for hill shading, 2D and 3D plotting options, a built-in path tracer, 'Wavefront' OBJ file export, and the ability to save 3D visualizations to a 3D printable format.
+# License: GPL-3
+# LazyData: true
+# Depends: R (>= 4.1)
+# Imports: doParallel, foreach, Rcpp, progress, raster, scales, png, jpeg, magrittr, rgl (>= 0.110.7), grDevices, grid, utils, methods, terrainmeshr, rayimage (>= 0.9.0), rayvertex (>= 0.7.6), rayrender (>= 0.29.6)
+# Suggests: reshape2, viridis, av, magick, ggplot2, sf, isoband, car (>= 3.1-1), geosphere, gifski, ambient, terra, lidR, elevatr, gridExtra, testthat (>= 3.0.0)
+# LinkingTo: Rcpp, progress, RcppArmadillo
+# RoxygenNote: 7.2.3
+# URL: https://www.rayshader.com, https://github.com/tylermorganwall/rayshader
+# BugReports: https://github.com/tylermorganwall/rayshader/issues
+# NeedsCompilation: yes
+# Packaged: 2023-06-12 01:51:14 UTC; tyler
+# Repository: CRAN
+# Date/Publication: 2023-06-13 07:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

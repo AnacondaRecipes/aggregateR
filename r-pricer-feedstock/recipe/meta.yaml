@@ -1,0 +1,106 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pricer
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/priceR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/priceR/priceR_{{ version }}.tar.gz
+  sha256: 0cb750ce31f65381953b1c2a65256d67e29916aad172c4849e40a1baf683c779
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr
+    - r-gsubfn
+    - r-jsonlite
+    - r-lubridate
+    - r-purrr
+    - r-stringi
+    - r-stringr
+    - r-tidyr
+
+  run:
+    - r-base
+    - r-dplyr
+    - r-gsubfn
+    - r-jsonlite
+    - r-lubridate
+    - r-purrr
+    - r-stringi
+    - r-stringr
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('priceR')"           # [not win]
+    - "\"%R%\" -e \"library('priceR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/stevecondylios/priceR
+  license: MIT
+  summary: Functions to aid in micro and macro economic analysis and handling of price and currency
+    data. Includes extraction of relevant inflation and exchange rate data from World
+    Bank API, data cleaning/parsing, and standardisation. Inflation adjustment calculations
+    as found in Principles of Macroeconomics by Gregory Mankiw et al (2014). Current
+    and historical end of day exchange rates for 171 currencies from the European Central
+    Bank Statistical Data Warehouse (2020) <https://sdw.ecb.europa.eu/curConverter.do>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: priceR
+# Type: Package
+# Title: Economics and Pricing Tools
+# Version: 1.0.1
+# Imports: dplyr, gsubfn, stringr, purrr, jsonlite, stats, lubridate, stringi, tidyr
+# Authors@R: c(person(given="Steve", family="Condylios", role=c("aut", "cre"), email="steve.condylios@gmail.com", comment("https://orcid.org/0000-0003-0599-844X")), person(given="Bruno", family="Mioto", role="ctb", email="brunomioto97@gmail.com"), person(given = "Bryan", family = "Shalloway", role = "ctb", email = "brshallodev@gmail.com"))
+# Maintainer: Steve Condylios <steve.condylios@gmail.com>
+# BugReports: https://github.com/stevecondylios/priceR/issues
+# License: MIT + file LICENSE
+# URL: https://github.com/stevecondylios/priceR
+# Description: Functions to aid in micro and macro economic analysis and handling of price and currency data. Includes extraction of relevant inflation and exchange rate data from World Bank API, data cleaning/parsing, and standardisation. Inflation adjustment calculations as found in Principles of Macroeconomics by Gregory Mankiw et al (2014). Current and historical end of day exchange rates for 171 currencies from the European Central Bank Statistical Data Warehouse (2020) <https://sdw.ecb.europa.eu/curConverter.do>.
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Suggests: testthat
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2023-10-21 23:48:37 UTC; st
+# Author: Steve Condylios [aut, cre], Bruno Mioto [ctb], Bryan Shalloway [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-10-22 00:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

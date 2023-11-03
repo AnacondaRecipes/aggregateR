@@ -1,0 +1,113 @@
+{% set version = '1.0.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-vdiffr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/vdiffr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/vdiffr/vdiffr_{{ version }}.tar.gz
+  sha256: ed432e5b67ee8b08e1aab5f7edb89da74e768da68ae6c6e2be483fcc354952d2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, ggplot2 (>= 3.2.0), roxygen2, withr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-cpp11
+    - r-diffobj
+    - r-glue
+    - r-htmltools
+    - r-lifecycle
+    - r-rlang
+    - r-testthat >=3.0.3
+    - r-xml2 >=1.0.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-cpp11
+    - r-diffobj
+    - r-glue
+    - r-htmltools
+    - r-lifecycle
+    - r-rlang
+    - r-testthat >=3.0.3
+    - r-xml2 >=1.0.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('vdiffr')"           # [not win]
+    - "\"%R%\" -e \"library('vdiffr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://vdiffr.r-lib.org/, https://github.com/r-lib/vdiffr
+  license: MIT
+  summary: An extension to the 'testthat' package that makes it easy to add graphical unit tests.
+    It provides a Shiny application to manage the test cases.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: vdiffr
+# Title: Visual Regression Testing and Graphical Diffing
+# Version: 1.0.7
+# Authors@R: c( person("Lionel", "Henry", , "lionel@posit.co", c("cre", "aut")), person("Thomas Lin", "Pedersen", , "thomas.pedersen@posit.co", role = "aut", comment = c(ORCID = "0000-0002-5147-4711")), person("Posit Software, PBC", role = c("cph", "fnd")), person("T Jake", "Luciani", , "jake@apache.org", "aut", comment = "svglite"), person("Matthieu", "Decorde", , "matthieu.decorde@ens-lyon.fr", "aut", comment = "svglite"), person("Vaudor", "Lise", , "lise.vaudor@ens-lyon.fr", "aut", comment = "svglite"), person("Tony", "Plate", role = "ctb", comment = "svglite: Early line dashing code"), person("David", "Gohel", role = "ctb", comment = "svglite: Line dashing code and raster code"), person("Yixuan", "Qiu", role = "ctb", comment = "svglite: Improved styles; polypath implementation"), person("Hakon", "Malmedal", role = "ctb", comment = "svglite: Opacity code") )
+# Encoding: UTF-8
+# Description: An extension to the 'testthat' package that makes it easy to add graphical unit tests. It provides a Shiny application to manage the test cases.
+# License: MIT + file LICENSE
+# ByteCompile: true
+# Depends: R (>= 3.2.0)
+# Imports: diffobj, glue, grDevices, htmltools, lifecycle, rlang, testthat (>= 3.0.3), xml2 (>= 1.0.0)
+# Suggests: covr, ggplot2 (>= 3.2.0), roxygen2, withr
+# LinkingTo: cpp11
+# RoxygenNote: 7.1.2
+# URL: https://vdiffr.r-lib.org/, https://github.com/r-lib/vdiffr
+# BugReports: https://github.com/r-lib/vdiffr/issues
+# SystemRequirements: C++11, libpng
+# Config/Needs/website: tidyverse/tidytemplate
+# NeedsCompilation: yes
+# Packaged: 2023-09-21 14:48:37 UTC; lionel
+# Author: Lionel Henry [cre, aut], Thomas Lin Pedersen [aut] (<https://orcid.org/0000-0002-5147-4711>), Posit Software, PBC [cph, fnd], T Jake Luciani [aut] (svglite), Matthieu Decorde [aut] (svglite), Vaudor Lise [aut] (svglite), Tony Plate [ctb] (svglite: Early line dashing code), David Gohel [ctb] (svglite: Line dashing code and raster code), Yixuan Qiu [ctb] (svglite: Improved styles; polypath implementation), Hakon Malmedal [ctb] (svglite: Opacity code)
+# Maintainer: Lionel Henry <lionel@posit.co>
+# Repository: CRAN
+# Date/Publication: 2023-09-22 07:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

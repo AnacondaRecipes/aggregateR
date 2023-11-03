@@ -1,0 +1,93 @@
+{% set version = '0.1.4.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ggcorrplot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ggcorrplot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ggcorrplot/ggcorrplot_{{ version }}.tar.gz
+  sha256: b810950cff07e95865ddd042ad060a40e66414b69fc604b1242410ed6831a879
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 3.0.0), knitr, spelling, vdiffr (>= 1.0.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggplot2 >=3.3.6
+    - r-reshape2
+
+  run:
+    - r-base
+    - r-ggplot2 >=3.3.6
+    - r-reshape2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ggcorrplot')"           # [not win]
+    - "\"%R%\" -e \"library('ggcorrplot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.sthda.com/english/wiki/ggcorrplot-visualization-of-a-correlation-matrix-using-ggplot2
+  license: GPL-2
+  summary: The 'ggcorrplot' package can be used to visualize easily a correlation matrix using
+    'ggplot2'. It provides a solution for reordering the correlation matrix and displays
+    the significance level on the plot. It also includes a function for computing a
+    matrix of correlation p-values.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: ggcorrplot
+# Title: Visualization of a Correlation Matrix using 'ggplot2'
+# Version: 0.1.4.1
+# Authors@R: c(person(given = "Alboukadel", family = "Kassambara", role = c("aut", "cre"), email = "alboukadel.kassambara@gmail.com"), person(given = "Indrajeet", family = "Patil", role = "ctb", email = "patilindrajeet.science@gmail.com", comment = c(ORCID = "0000-0003-1995-6531", Twitter = "@patilindrajeets")))
+# Description: The 'ggcorrplot' package can be used to visualize easily a correlation matrix using 'ggplot2'. It provides a solution for reordering the correlation matrix and displays the significance level on the plot. It also includes a function for computing a matrix of correlation p-values.
+# License: GPL-2
+# URL: http://www.sthda.com/english/wiki/ggcorrplot-visualization-of-a-correlation-matrix-using-ggplot2
+# BugReports: https://github.com/kassambara/ggcorrplot/issues
+# Depends: R (>= 3.3), ggplot2 (>= 3.3.6)
+# Imports: reshape2, stats
+# Suggests: testthat (>= 3.0.0), knitr, spelling, vdiffr (>= 1.0.0)
+# Encoding: UTF-8
+# Language: en-US
+# RoxygenNote: 7.1.0
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2023-09-05 15:45:33 UTC; hornik
+# Author: Alboukadel Kassambara [aut, cre], Indrajeet Patil [ctb] (<https://orcid.org/0000-0003-1995-6531>, @patilindrajeets)
+# Maintainer: Alboukadel Kassambara <alboukadel.kassambara@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-09-05 15:50:48 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

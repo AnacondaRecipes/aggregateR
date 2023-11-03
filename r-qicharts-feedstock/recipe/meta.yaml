@@ -1,0 +1,97 @@
+{% set version = '0.5.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-qicharts
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/qicharts_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/qicharts/qicharts_{{ version }}.tar.gz
+  sha256: 2db8978ebabfa43305c6f5d98f20906b617e99d529fd143f30532cd7d2da12d9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggplot2 >=2.0.0
+    - r-lattice
+    - r-latticeextra
+    - r-scales
+
+  run:
+    - r-base
+    - r-ggplot2 >=2.0.0
+    - r-lattice
+    - r-latticeextra
+    - r-scales
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('qicharts')"           # [not win]
+    - "\"%R%\" -e \"library('qicharts')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=qicharts
+  license: GPL-3
+  summary: Functions for making run charts [Anhoej, Olesen (2014) <doi:10.1371/journal.pone.0113825>]
+    and basic Shewhart control charts [Mohammed, Worthington, Woodall (2008) <doi:10.1136/qshc.2004.012047>]
+    for measure and count data. The main function, qic(), creates run and control charts
+    and has a simple interface with a rich set of options to control data analysis and
+    plotting, including options for automatic data aggregation by subgroups, easy analysis
+    of before-and-after data, exclusion of one or more data points from analysis, and
+    splitting charts into sequential time periods. Missing values and empty subgroups
+    are handled gracefully.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: qicharts
+# Version: 0.5.8
+# Title: Quality Improvement Charts
+# Authors@R: c(person("Jacob", "Anhoej", email = "jacob@anhoej.net", role = c("aut", "cre")), person("Timo", "Roeder", role = "ctb"))
+# Description: Functions for making run charts [Anhoej, Olesen (2014) <doi:10.1371/journal.pone.0113825>] and basic Shewhart control charts [Mohammed, Worthington, Woodall (2008) <doi:10.1136/qshc.2004.012047>] for measure and count data. The main function, qic(), creates run and control charts and has a simple interface with a rich set of options to control data analysis and plotting, including options for automatic data aggregation by subgroups, easy analysis of before-and-after data, exclusion of one or more data points from analysis, and splitting charts into sequential time periods. Missing values and empty subgroups are handled gracefully.
+# Depends: R (>= 3.0.0)
+# Imports: lattice, latticeExtra, graphics, grDevices, stats, scales, ggplot2 (>= 2.0.0),
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# License: GPL-3
+# Encoding: UTF-8
+# RoxygenNote: 7.1.1
+# NeedsCompilation: no
+# Packaged: 2021-04-20 03:45:20 UTC; jacob
+# Author: Jacob Anhoej [aut, cre], Timo Roeder [ctb]
+# Maintainer: Jacob Anhoej <jacob@anhoej.net>
+# Repository: CRAN
+# Date/Publication: 2021-04-20 12:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

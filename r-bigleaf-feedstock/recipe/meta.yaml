@@ -1,0 +1,94 @@
+{% set version = '0.8.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bigleaf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bigleaf_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bigleaf/bigleaf_{{ version }}.tar.gz
+  sha256: e41d82fb6298150c46f57128e959a1f1c6cfa55e916c32544bab7be69b0b6df7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-robustbase
+    - r-solartime
+
+  run:
+    - r-base
+    - r-robustbase
+    - r-solartime
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bigleaf')"           # [not win]
+    - "\"%R%\" -e \"library('bigleaf')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://bitbucket.org/juergenknauer/bigleaf
+  license: GPL-2
+  summary: Calculation of physical (e.g. aerodynamic conductance, surface temperature), and physiological
+    (e.g. canopy conductance, water-use efficiency) ecosystem properties from eddy covariance
+    data and accompanying meteorological measurements. Calculations assume the land
+    surface to behave like a 'big-leaf' and return bulk ecosystem/canopy variables.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: bigleaf
+# Type: Package
+# Version: 0.8.2
+# Date: 2022-08-22
+# Title: Physical and Physiological Ecosystem Properties from Eddy Covariance Data
+# Authors@R: c( person("Juergen", "Knauer", role=c("aut","cre"), email="J.Knauer@westernsydney.edu.au", comment=c(ORCID="0000-0002-4947-7067")), person("Thomas", "Wutzler", role=c("aut"), email="twutz@bgc-jena.mpg.de", comment=c(ORCID="0000-0003-4159-5445")), person("Alison", "Bennett", role=c("aut"), email="bennetta2@student.unimelb.edu.au", comment=c(ORCID="0000-0002-8249-976X")), person("Soenke", "Zaehle", role=c("ctb"), email="szaehle@bgc-jena.mpg.de", comment=c(ORCID="0000-0001-5602-7956")), person("Tarek", "El-Madany", role=c("ctb"), email="telmad@bgc-jena.mpg.de", comment=c(ORCID="0000-0002-0726-7141")), person("Mirco", "Migliavacca", role=c("ctb"), email="mmiglia@bgc-jena.mpg.de", comment=c(ORCID="0000-0003-3546-8407")) )
+# Maintainer: Juergen Knauer <J.Knauer@westernsydney.edu.au>
+# Description: Calculation of physical (e.g. aerodynamic conductance, surface temperature), and physiological (e.g. canopy conductance, water-use efficiency) ecosystem properties from eddy covariance data and accompanying meteorological measurements. Calculations assume the land surface to behave like a 'big-leaf' and return bulk ecosystem/canopy variables.
+# URL: https://bitbucket.org/juergenknauer/bigleaf
+# BugReports: https://bitbucket.org/juergenknauer/bigleaf/issues
+# Depends: R (>= 2.10)
+# Imports: robustbase, solartime
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: yes
+# RoxygenNote: 7.2.1
+# Suggests: knitr, rmarkdown, testthat
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2022-08-22 05:21:04 UTC; 30044953
+# Author: Juergen Knauer [aut, cre] (<https://orcid.org/0000-0002-4947-7067>), Thomas Wutzler [aut] (<https://orcid.org/0000-0003-4159-5445>), Alison Bennett [aut] (<https://orcid.org/0000-0002-8249-976X>), Soenke Zaehle [ctb] (<https://orcid.org/0000-0001-5602-7956>), Tarek El-Madany [ctb] (<https://orcid.org/0000-0002-0726-7141>), Mirco Migliavacca [ctb] (<https://orcid.org/0000-0003-3546-8407>)
+# Repository: CRAN
+# Date/Publication: 2022-08-22 06:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

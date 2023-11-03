@@ -1,0 +1,108 @@
+{% set version = '2.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mixtools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mixtools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mixtools/mixtools_{{ version }}.tar.gz
+  sha256: 854e7482230b9a5dde61bab191b78e06aa8f9b0cdfe3c03e046afa133b317e0d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-kernlab
+    - r-plotly
+    - r-scales
+    - r-segmented
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-kernlab
+    - r-plotly
+    - r-scales
+    - r-segmented
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mixtools')"           # [not win]
+    - "\"%R%\" -e \"library('mixtools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/dsy109/mixtools
+  license: GPL-2
+  summary: 'Analyzes finite mixture models for various parametric and semiparametric settings.  This
+    includes mixtures of parametric distributions (normal, multivariate normal, multinomial,
+    gamma), various Reliability Mixture Models (RMMs), mixtures-of-regressions settings
+    (linear regression, logistic regression, Poisson regression, linear regression with
+    changepoints, predictor-dependent mixing proportions, random effects regressions,
+    hierarchical mixtures-of-experts), and tools for selecting the number of components
+    (bootstrapping the likelihood ratio test statistic, mixturegrams, and model selection
+    criteria).  Bayesian estimation of mixtures-of-linear-regressions models is available
+    as well as a novel data depth method for obtaining credible bands.  This package
+    is based upon work supported by the National Science Foundation under Grant No.
+    SES-0518772 and the Chan Zuckerberg Initiative: Essential Open Source Software for
+    Science (Grant No. 2020-255193).'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: mixtools
+# Version: 2.0.0
+# Date: 2022-12-04
+# Title: Tools for Analyzing Finite Mixture Models
+# Authors@R: c(person("Derek", "Young", role = c("aut", "cre"), email = "derek.young@uky.edu", comment = c(ORCID = "0000-0002-3048-3803")), person("Tatiana", "Benaglia", role = "aut"), person("Didier", "Chauveau", role = "aut"), person("David", "Hunter", role = "aut"), person("Kedai", "Cheng", role = "aut"), person("Ryan", "Elmore", role = "ctb"), person("Thomas", "Hettmansperger", role = "ctb"), person("Hoben", "Thomas", role = "ctb"), person("Fengjuan", "Xuan", role = "ctb"))
+# Depends: R (>= 4.0.0)
+# Imports: kernlab, MASS, plotly, scales, segmented, stats, survival
+# URL: https://github.com/dsy109/mixtools
+# Description: Analyzes finite mixture models for various parametric and semiparametric settings.  This includes mixtures of parametric distributions (normal, multivariate normal, multinomial, gamma), various Reliability Mixture Models (RMMs), mixtures-of-regressions settings (linear regression, logistic regression, Poisson regression, linear regression with changepoints, predictor-dependent mixing proportions, random effects regressions, hierarchical mixtures-of-experts), and tools for selecting the number of components (bootstrapping the likelihood ratio test statistic, mixturegrams, and model selection criteria).  Bayesian estimation of mixtures-of-linear-regressions models is available as well as a novel data depth method for obtaining credible bands.  This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772 and the Chan Zuckerberg Initiative: Essential Open Source Software for Science (Grant No. 2020-255193).
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2022-12-05 06:17:17 UTC; derekyoung
+# Author: Derek Young [aut, cre] (<https://orcid.org/0000-0002-3048-3803>), Tatiana Benaglia [aut], Didier Chauveau [aut], David Hunter [aut], Kedai Cheng [aut], Ryan Elmore [ctb], Thomas Hettmansperger [ctb], Hoben Thomas [ctb], Fengjuan Xuan [ctb]
+# Maintainer: Derek Young <derek.young@uky.edu>
+# Repository: CRAN
+# Date/Publication: 2022-12-05 14:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

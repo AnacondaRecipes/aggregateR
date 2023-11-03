@@ -1,0 +1,99 @@
+{% set version = '4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-setmethods
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SetMethods_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SetMethods/SetMethods_{{ version }}.tar.gz
+  sha256: a8982fe432def2b4952dcd8c1fc28a53639613161c0b9036ecdacac31666fd5f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-qca
+    - r-admisc
+    - r-betareg
+    - r-fmsb
+    - r-ggplot2
+    - r-ggrepel
+    - r-scatterplot3d
+    - r-stargazer
+
+  run:
+    - r-base
+    - r-qca
+    - r-admisc
+    - r-betareg
+    - r-fmsb
+    - r-ggplot2
+    - r-ggrepel
+    - r-scatterplot3d
+    - r-stargazer
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SetMethods')"           # [not win]
+    - "\"%R%\" -e \"library('SetMethods')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SetMethods
+  license: GPL-2
+  summary: "Functions for performing set-theoretic multi-method research, QCA for clustered data,
+    theory evaluation, Enhanced Standard Analysis, indirect calibration, radar visualisations.
+    Additionally it includes data to replicate the \texamples in the books by Oana,
+    I.E, C. Q. Schneider, and E. Thomann. Qualitative Comparative Analysis (QCA) using
+    R: A Beginner's Guide. Cambridge University Press and C. Q. Schneider and C. Wagemann
+    \"Set Theoretic Methods for the Social Sciences\", Cambridge University Press."
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: SetMethods
+# Type: Package
+# Title: Functions for Set-Theoretic Multi-Method Research and Advanced QCA
+# Version: 4.0
+# Date: 2023-03-29
+# Author: Ioana-Elena Oana [aut, cre], Juraj Medzihorsky [aut], Mario Quaranta [aut], Carsten Q. Schneider [aut]
+# Maintainer: Ioana-Elena Oana <ioana.oana@eui.eu>
+# Description: Functions for performing set-theoretic multi-method research, QCA for clustered data, theory evaluation, Enhanced Standard Analysis, indirect calibration, radar visualisations. Additionally it includes data to replicate the 	examples in the books by Oana, I.E, C. Q. Schneider, and E. Thomann. Qualitative Comparative Analysis (QCA) using R: A Beginner's Guide. Cambridge University Press and C. Q. Schneider and C. Wagemann "Set Theoretic Methods for the Social Sciences", Cambridge University Press.
+# Depends: QCA, admisc, methods, ggplot2, ggrepel, stargazer, R (>= 3.5.0)
+# Imports: scatterplot3d, fmsb, betareg
+# License: GPL-2
+# Packaged: 2023-03-31 09:01:58 UTC; ioana
+# NeedsCompilation: no
+# Date/Publication: 2023-03-31 09:20:07 UTC
+# Repository: CRAN
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

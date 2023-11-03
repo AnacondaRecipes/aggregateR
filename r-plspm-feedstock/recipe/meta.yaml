@@ -1,0 +1,100 @@
+{% set version = '0.5.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-plspm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/plspm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/plspm/plspm_{{ version }}.tar.gz
+  sha256: 7a0cc6a37d1d9142fa440d6414b13c134b5c9fa93f2f6b4e00465a52e83d0c65
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: FactoMineR, ggplot2, reshape, testthat, knitr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-amap
+    - r-diagram
+    - r-shape
+    - r-tester
+    - r-turner
+
+  run:
+    - r-base
+    - r-amap
+    - r-diagram
+    - r-shape
+    - r-tester
+    - r-turner
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('plspm')"           # [not win]
+    - "\"%R%\" -e \"library('plspm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/gastonstat/plspm
+  license: GPL-3
+  summary: Partial Least Squares Path Modeling (PLS-PM), Tenenhaus, Esposito Vinzi, Chatelin,
+    Lauro (2005) <doi:10.1016/j.csda.2004.03.005>, analysis for both metric and non-metric
+    data, as well as REBUS analysis, Esposito Vinzi, Trinchera, Squillacciotti, and
+    Tenenhaus (2008) <doi:10.1002/asmb.728>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: plspm
+# Type: Package
+# Title: Partial Least Squares Path Modeling (PLS-PM)
+# Version: 0.5.0
+# Date: 2023-03-12
+# Authors@R: c( person(given = "Frederic", family= "Bertrand", role = c("cre"), email = "frederic.bertrand@utt.fr", comment = c(ORCID = "0000-0002-0837-8281")), person("Gaston", "Sanchez", email = "gaston.stat@gmail.com", role = c("aut")), person("Laura", "Trinchera", role = "aut"), person("Giorgio", "Russolillo", role = "aut"))
+# Description: Partial Least Squares Path Modeling (PLS-PM), Tenenhaus, Esposito Vinzi, Chatelin, Lauro (2005) <doi:10.1016/j.csda.2004.03.005>, analysis for both metric and non-metric data, as well as REBUS analysis, Esposito Vinzi, Trinchera, Squillacciotti, and Tenenhaus (2008) <doi:10.1002/asmb.728>.
+# URL: https://github.com/gastonstat/plspm
+# BugReports: https://github.com/gastonstat/plspm/issues
+# Depends: R (>= 3.0.1)
+# Imports: tester, turner, diagram, shape, amap, methods
+# Suggests: FactoMineR, ggplot2, reshape, testthat, knitr
+# VignetteBuilder: knitr
+# License: GPL-3
+# LazyLoad: yes
+# Collate: 'plspm.R' 'auxiliar.R' 'check_arguments.R' 'check_specifications.R' 'get_alpha.R' 'get_ave.R' 'get_boots.R' 'get_dummies.R' 'get_effects.R' 'get_generals.R' 'get_gof.R' 'get_inner_summary.R' 'get_manifests.R' 'get_metric.R' 'get_nom_scale.R' 'get_num_scale.R' 'get_ord_scale.R' 'get_path_scheme.R' 'get_paths.R' 'get_plsr1.R' 'get_PLSRdoubleQ.R' 'get_rank.R' 'get_rho.R' 'get_scores.R' 'get_treated_data.R' 'get_unidim.R' 'get_weights.R' 'get_weights_nonmetric.R' 'innerplot.R' 'outerplot.R' 'plot.plspm.R' 'rescale.R' 'summary_plspm.R' 'test_manifest_scaling.R' 'test_null_weights.R' 'unidimensionality.R' 'test_factors.R' 'russett-data.R' 'plspm.fit.R' 'plspm.groups.R' 'test_dataset.R' 'get_GQI.R' 'get_locals_test.R' 'get_scaled_data.R' 'it.reb.R' 'local.models.R' 'print.rebus.R' 'rebus.pls.R' 'rebus.test.R' 'res.clus.R' 'get_PLSR.R' 'get_PLSR_NA.R' 'quantiplot.R' 'plspm-package.R'
+# NeedsCompilation: no
+# Author: Frederic Bertrand [cre] (<https://orcid.org/0000-0002-0837-8281>), Gaston Sanchez [aut], Laura Trinchera [aut], Giorgio Russolillo [aut]
+# Maintainer: Frederic Bertrand <frederic.bertrand@utt.fr>
+# Encoding: UTF-8
+# Packaged: 2023-03-13 09:52:25 UTC; fbertran
+# Repository: CRAN
+# Date/Publication: 2023-03-13 11:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,95 @@
+{% set version = '0.4.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-textdata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/textdata_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/textdata/textdata_{{ version }}.tar.gz
+  sha256: a7751678f8f0b70fda86a4b645cb301cecd8b0e22f8673033fc65d0f9b26e7c3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, knitr, rmarkdown, testthat (>= 2.1.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-fs
+    - r-rappdirs
+    - r-readr
+    - r-tibble
+
+  run:
+    - r-base
+    - r-fs
+    - r-rappdirs
+    - r-readr
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('textdata')"           # [not win]
+    - "\"%R%\" -e \"library('textdata')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/EmilHvitfeldt/textdata
+  license: MIT
+  summary: Provides a framework to download, parse, and store text datasets on the disk and load
+    them when needed. Includes various sentiment lexicons and labeled text data sets
+    for classification and analysis.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: textdata
+# Title: Download and Load Various Text Datasets
+# Version: 0.4.4
+# Authors@R: c( person("Emil", "Hvitfeldt", , "emilhhvitfeldt@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0679-1945")), person("Julia", "Silge", , "julia.silge@gmail.com", role = "ctb", comment = c(ORCID = "0000-0002-3671-836X")) )
+# Description: Provides a framework to download, parse, and store text datasets on the disk and load them when needed. Includes various sentiment lexicons and labeled text data sets for classification and analysis.
+# License: MIT + file LICENSE
+# URL: https://github.com/EmilHvitfeldt/textdata
+# BugReports: https://github.com/EmilHvitfeldt/textdata/issues
+# Imports: fs, rappdirs, readr, tibble
+# Suggests: covr, knitr, rmarkdown, testthat (>= 2.1.0)
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# RoxygenNote: 7.2.1.9000
+# Collate: 'cache_info.R' 'dataset_ag_news.R' 'dataset_dbpedia.R' 'dataset_imdb.R' 'dataset_sentence_polarity.R' 'dataset_trec.R' 'embedding_glove.R' 'lexicon_nrc_vad.R' 'lexicon_nrc_eil.R' 'lexicon_nrc.R' 'lexicon_bing.R' 'lexicon_loughran.R' 'lexicon_afinn.R' 'download_functions.R' 'info.R' 'load_dataset.R' 'printer.R' 'process_functions.R' 'textdata-package.R'
+# NeedsCompilation: no
+# Packaged: 2022-09-02 01:14:19 UTC; emilhvitfeldt
+# Author: Emil Hvitfeldt [aut, cre] (<https://orcid.org/0000-0002-0679-1945>), Julia Silge [ctb] (<https://orcid.org/0000-0002-3671-836X>)
+# Maintainer: Emil Hvitfeldt <emilhhvitfeldt@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-09-02 06:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,100 @@
+{% set version = '1.2-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-predictabel
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PredictABEL_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PredictABEL/PredictABEL_{{ version }}.tar.gz
+  sha256: c8f10098af0c3ef378f6449aa1ef46dbe32cc7099eb800caab5a0b73b5ab9d90
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-hmisc
+    - r-pbsmodelling
+    - r-rocr
+    - r-lazyeval
+
+  run:
+    - r-base
+    - r-hmisc
+    - r-pbsmodelling
+    - r-rocr
+    - r-lazyeval
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PredictABEL')"           # [not win]
+    - "\"%R%\" -e \"library('PredictABEL')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PredictABEL
+  license: GPL-2
+  summary: We included functions to assess the performance of risk models. The package contains
+    functions for the various measures that are used in empirical studies, including
+    univariate and multivariate odds ratios (OR) of the predictors, the c-statistic
+    (or area under the receiver operating characteristic (ROC) curve (AUC)), Hosmer-Lemeshow
+    goodness of fit test, reclassification table, net reclassification improvement (NRI)
+    and integrated discrimination improvement (IDI). Also included are functions to
+    create plots, such as risk distributions, ROC curves, calibration plot, discrimination
+    box plot and predictiveness curves. In addition to functions to assess the performance
+    of risk models, the package includes functions to obtain weighted and unweighted
+    risk scores as well as predicted risks using logistic regression analysis. These
+    logistic regression functions are specifically written for models that include genetic
+    variables, but they can also be applied to models that are based on non-genetic
+    risk factors only. Finally, the package includes function to construct a simulated
+    dataset with genotypes, genetic risks, and disease status for a hypothetical population,
+    which is used for the evaluation of genetic risk models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: PredictABEL
+# Title: Assessment of Risk Prediction Models
+# Version: 1.2-4
+# Date: 2020-02-17
+# Author: Suman Kundu, Yurii S. Aulchenko, A. Cecile J.W. Janssens
+# Maintainer: Suman Kundu <suman_math@yahoo.com>
+# Depends: R (>= 2.12.0)
+# Imports: Hmisc, ROCR, PBSmodelling, lazyeval, methods
+# Description: We included functions to assess the performance of risk models. The package contains functions for the various measures that are used in empirical studies, including univariate and multivariate odds ratios (OR) of the predictors, the c-statistic (or area under the receiver operating characteristic (ROC) curve (AUC)), Hosmer-Lemeshow goodness of fit test, reclassification table, net reclassification improvement (NRI) and integrated discrimination improvement (IDI). Also included are functions to create plots, such as risk distributions, ROC curves, calibration plot, discrimination box plot and predictiveness curves. In addition to functions to assess the performance of risk models, the package includes functions to obtain weighted and unweighted risk scores as well as predicted risks using logistic regression analysis. These logistic regression functions are specifically written for models that include genetic variables, but they can also be applied to models that are based on non-genetic risk factors only. Finally, the package includes function to construct a simulated dataset with genotypes, genetic risks, and disease status for a hypothetical population, which is used for the evaluation of genetic risk models.
+# License: GPL (>= 2)
+# Packaged: 2020-03-09 20:50:19 UTC; kundus
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2020-03-09 21:20:02 UTC
+# RoxygenNote: 7.0.2
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

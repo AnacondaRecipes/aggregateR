@@ -1,0 +1,113 @@
+{% set version = '0.4.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pkgnet
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pkgnet_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pkgnet/pkgnet_{{ version }}.tar.gz
+  sha256: 7bbf5dab94463e6e07d1f51da5b9f161fd5b6ac91ef9e8ad7e0a2063f52d2b78
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggplot2, pkgdown, testthat, webshot, withr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dt
+    - r-r6
+    - r-assertthat
+    - r-covr
+    - r-data.table
+    - r-futile.logger
+    - r-glue
+    - r-igraph
+    - r-knitr
+    - r-magrittr
+    - r-rlang
+    - r-rmarkdown >=1.9
+    - r-visnetwork
+
+  run:
+    - r-base
+    - r-dt
+    - r-r6
+    - r-assertthat
+    - r-covr
+    - r-data.table
+    - r-futile.logger
+    - r-glue
+    - r-igraph
+    - r-knitr
+    - r-magrittr
+    - r-rlang
+    - r-rmarkdown >=1.9
+    - r-visnetwork
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pkgnet')"           # [not win]
+    - "\"%R%\" -e \"library('pkgnet')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/uptake/pkgnet, https://uptake.github.io/pkgnet/
+  license: BSD_3_clause
+  summary: Tools from the domain of graph theory can be used to quantify the complexity and vulnerability
+    to failure of a software package. That is the guiding philosophy of this package.
+    'pkgnet' provides tools to analyze the dependencies between functions in an R package
+    and between its imported packages.  See the pkgnet website for vignettes and other
+    supplementary information.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_3_clause'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: pkgnet
+# Type: Package
+# Title: Get Network Representation of an R Package
+# Version: 0.4.2
+# Authors@R: c( person("Brian", "Burns", email = "brian.burns.opensource@gmail.com", role = c("aut", "cre")), person("James", "Lamb", email = "jaylamb20@gmail.com", role = c("aut")), person("Jay", "Qi", email = "jayqi.opensource@gmail.com", role = c("aut")) )
+# Maintainer: Brian Burns <brian.burns.opensource@gmail.com>
+# Description: Tools from the domain of graph theory can be used to quantify the complexity and vulnerability to failure of a software package. That is the guiding philosophy of this package. 'pkgnet' provides tools to analyze the dependencies between functions in an R package and between its imported packages.  See the pkgnet website for vignettes and other supplementary information.
+# Imports: assertthat, covr, data.table, DT, futile.logger, glue, igraph, knitr, magrittr, methods, R6, rlang, rmarkdown(>= 1.9), tools, visNetwork
+# Suggests: ggplot2, pkgdown, testthat, webshot, withr
+# License: BSD_3_clause + file LICENSE
+# URL: https://github.com/uptake/pkgnet, https://uptake.github.io/pkgnet/
+# BugReports: https://github.com/uptake/pkgnet/issues
+# RoxygenNote: 7.1.0
+# NeedsCompilation: no
+# Packaged: 2021-12-22 02:14:18 UTC; root
+# Author: Brian Burns [aut, cre], James Lamb [aut], Jay Qi [aut]
+# Repository: CRAN
+# Date/Publication: 2021-12-23 08:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,113 @@
+{% set version = '2.15.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-qgcomp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/qgcomp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/qgcomp/qgcomp_{{ version }}.tar.gz
+  sha256: 57c79c9297cab8cc7e83dab8cf0e3e227f537e71431e2bf91ca6d5fa0bcc9462
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: broom, devtools, knitr, markdown, MASS, mice
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-arm
+    - r-future
+    - r-future.apply
+    - r-generics
+    - r-ggplot2 >=3.3.0
+    - r-gridextra
+    - r-nnet
+    - r-pscl
+    - r-survival
+    - r-tibble
+
+  run:
+    - r-base
+    - r-arm
+    - r-future
+    - r-future.apply
+    - r-generics
+    - r-ggplot2 >=3.3.0
+    - r-gridextra
+    - r-nnet
+    - r-pscl
+    - r-survival
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('qgcomp')"           # [not win]
+    - "\"%R%\" -e \"library('qgcomp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/alexpkeil1/qgcomp/
+  license: GPL-2
+  summary: 'G-computation for a set of time-fixed exposures with quantile-based basis functions,
+    possibly under linearity and homogeneity assumptions. This approach estimates a
+    regression line corresponding to the expected change in the outcome (on the link
+    basis) given a simultaneous increase in the quantile-based category for all exposures.
+    Works with continuous, binary, and right-censored time-to-event outcomes.  Reference:
+    Alexander P. Keil, Jessie P. Buckley, Katie M. OBrien, Kelly K. Ferguson, Shanshan
+    Zhao, and Alexandra J. White (2019) A quantile-based g-computation approach to addressing
+    the effects of exposure mixtures; <doi:10.1289/EHP5838>.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: qgcomp
+# Title: Quantile G-Computation
+# Version: 2.15.2
+# Date: 2023-08-09
+# Authors@R: person("Alexander", "Keil", , "alex.keil@nih.gov", role = c("aut", "cre"))
+# Description: G-computation for a set of time-fixed exposures with quantile-based basis functions, possibly under linearity and homogeneity assumptions. This approach estimates a regression line corresponding to the expected change in the outcome (on the link basis) given a simultaneous increase in the quantile-based category for all exposures. Works with continuous, binary, and right-censored time-to-event outcomes.  Reference: Alexander P. Keil, Jessie P. Buckley, Katie M. OBrien, Kelly K. Ferguson, Shanshan Zhao, and Alexandra J. White (2019) A quantile-based g-computation approach to addressing the effects of exposure mixtures; <doi:10.1289/EHP5838>.
+# License: GPL (>= 2)
+# URL: https://github.com/alexpkeil1/qgcomp/
+# BugReports: https://github.com/alexpkeil1/qgcomp/issues
+# Depends: R (>= 3.5.0)
+# Imports: arm, future, future.apply, generics, ggplot2 (>= 3.3.0), grDevices, grid, gridExtra, nnet, pscl, stats, survival, tibble
+# Suggests: broom, devtools, knitr, markdown, MASS, mice
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# Language: en-US
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-08-09 05:04:04 UTC; keilap
+# Author: Alexander Keil [aut, cre]
+# Maintainer: Alexander Keil <alex.keil@nih.gov>
+# Repository: CRAN
+# Date/Publication: 2023-08-10 09:10:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

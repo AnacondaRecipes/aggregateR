@@ -1,0 +1,113 @@
+{% set version = '2.0.11' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-geiger
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/geiger_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/geiger/geiger_{{ version }}.tar.gz
+  sha256: dcc5a0a988439110078867e0aaf09b048e27db7f02e4cbdfe35783611fde3f69
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: TreeSim
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-rcpp >=0.11.0
+    - r-ape >=3.0_6
+    - r-coda
+    - r-colorspace
+    - r-desolve >=1.7
+    - r-digest
+    - r-mvtnorm
+    - r-ncbit
+    - r-phytools >=1.5_1
+    - r-subplex
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-rcpp >=0.11.0
+    - r-ape >=3.0_6
+    - r-coda
+    - r-colorspace
+    - r-desolve >=1.7
+    - r-digest
+    - r-mvtnorm
+    - r-ncbit
+    - r-phytools >=1.5_1
+    - r-subplex
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('geiger')"           # [not win]
+    - "\"%R%\" -e \"library('geiger')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=geiger
+  license: GPL-2
+  summary: Methods for fitting macroevolutionary models to phylogenetic trees Pennell (2014)
+    <doi:10.1093/bioinformatics/btu181>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: geiger
+# Type: Package
+# Title: Analysis of Evolutionary Diversification
+# Version: 2.0.11
+# Date: 2023-04-01
+# Author: Luke Harmon, Matthew Pennell, Chad Brock, Joseph Brown, Wendell Challenger, Jon Eastman, Rich FitzJohn, Rich Glor, Gene Hunt, Liam Revell, Graham Slater, Josef Uyeda, Jason Weir and CRAN team (corrections in 2022)
+# Maintainer: Luke Harmon <lukeh@uidaho.edu>
+# Depends: ape (>= 3.0-6), R (>= 2.15.0), phytools (>= 1.5-1)
+# Imports: MASS, mvtnorm, subplex, deSolve (>= 1.7), digest, Rcpp (>= 0.11.0), coda, ncbit, colorspace, methods
+# Suggests: TreeSim
+# LinkingTo: Rcpp
+# Description: Methods for fitting macroevolutionary models to phylogenetic trees Pennell (2014) <doi:10.1093/bioinformatics/btu181>.
+# License: GPL (>= 2)
+# ByteCompile: yes
+# NeedsCompilation: yes
+# Packaged: 2023-04-01 18:14:35 UTC; liamj
+# Repository: CRAN
+# Date/Publication: 2023-04-03 20:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

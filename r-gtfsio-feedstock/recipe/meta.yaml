@@ -1,0 +1,95 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gtfsio
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gtfsio_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gtfsio/gtfsio_{{ version }}.tar.gz
+  sha256: 5feaa6ac0733432f58b61ff516b07b86829fab8bf2612c0452e7080f40167c1a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, tinytest
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-zip
+
+  run:
+    - r-base
+    - r-data.table
+    - r-zip
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gtfsio')"           # [not win]
+    - "\"%R%\" -e \"library('gtfsio')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://r-transit.github.io/gtfsio/, https://github.com/r-transit/gtfsio
+  license: MIT
+  summary: Tools for the development of packages related to General Transit Feed Specification
+    (GTFS) files. Establishes a standard for representing GTFS feeds using R data types.
+    Provides fast and flexible functions to read and write GTFS feeds while sticking
+    to this standard. Defines a basic 'gtfs' class which is meant to be extended by
+    packages that depend on it. And offers utility functions that support checking the
+    structure of GTFS objects.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: gtfsio
+# Title: Read and Write General Transit Feed Specification (GTFS) Files
+# Version: 1.1.1
+# Authors@R: c(person(given = "Daniel", family = "Herszenhut", role = c("aut", "cre"), email = "dhersz@gmail.com", comment = c(ORCID = "0000-0001-8066-1105")), person(given = "Flavio", family = "Poletti", role = "aut", email = "flavio.poletti@hotmail.ch"), person(given = "Mark", family = "Padgham", role = "aut", email = "mark.padgham@email.com"), person(given = "Rafael H. M.", family = "Pereira", role = "rev", email = "rafa.pereira.br@gmail.com", comment = c(ORCID = "0000-0003-2125-7465")), person(given = "Tom", family = "Buckley", role = "rev", email = "tom@tbuckl.com"), person(given = "Ipea - Institute for Applied Economic Research", role = c("cph", "fnd")))
+# Description: Tools for the development of packages related to General Transit Feed Specification (GTFS) files. Establishes a standard for representing GTFS feeds using R data types. Provides fast and flexible functions to read and write GTFS feeds while sticking to this standard. Defines a basic 'gtfs' class which is meant to be extended by packages that depend on it. And offers utility functions that support checking the structure of GTFS objects.
+# License: MIT + file LICENSE
+# URL: https://r-transit.github.io/gtfsio/, https://github.com/r-transit/gtfsio
+# BugReports: https://github.com/r-transit/gtfsio/issues
+# Imports: data.table, utils, zip
+# Suggests: knitr, rmarkdown, tinytest
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Collate: 'gtfsio_error.R' 'assert_gtfs.R' 'assert_inputs.R' 'checks.R' 'export_gtfs.R' 'get_gtfs_standards.R' 'gtfs_methods.R' 'gtfs_subset.R' 'gtfsio.R' 'import_gtfs.R' 'new_gtfs.R'
+# NeedsCompilation: no
+# Packaged: 2023-10-20 02:47:55 UTC; dhersz
+# Author: Daniel Herszenhut [aut, cre] (<https://orcid.org/0000-0001-8066-1105>), Flavio Poletti [aut], Mark Padgham [aut], Rafael H. M. Pereira [rev] (<https://orcid.org/0000-0003-2125-7465>), Tom Buckley [rev], Ipea - Institute for Applied Economic Research [cph, fnd]
+# Maintainer: Daniel Herszenhut <dhersz@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-20 04:50:23 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

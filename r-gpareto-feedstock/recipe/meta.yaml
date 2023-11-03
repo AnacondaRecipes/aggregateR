@@ -1,0 +1,120 @@
+{% set version = '1.1.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gpareto
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GPareto_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GPareto/GPareto_{{ version }}.tar.gz
+  sha256: 21d67d904ff03c70c69a6f240aa1162b99e0c6f4f98172926f031e0847370b16
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, DiceOptim
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dicedesign
+    - r-dicekriging
+    - r-kriginv
+    - r-mass
+    - r-rcpp >=0.12.15
+    - r-emoa
+    - r-ks
+    - r-pbivnorm
+    - r-pso
+    - r-randtoolbox
+    - r-rgenoud
+    - r-rgl
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-dicedesign
+    - r-dicekriging
+    - r-kriginv
+    - r-mass
+    - r-rcpp >=0.12.15
+    - r-emoa
+    - r-ks
+    - r-pbivnorm
+    - r-pso
+    - r-randtoolbox
+    - r-rgenoud
+    - r-rgl
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GPareto')"           # [not win]
+    - "\"%R%\" -e \"library('GPareto')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mbinois/GPareto
+  license: GPL-3
+  summary: Gaussian process regression models, a.k.a. Kriging models, are applied to global multi-objective
+    optimization of black-box functions. Multi-objective Expected Improvement and Step-wise
+    Uncertainty Reduction sequential infill criteria are available. A quantification
+    of uncertainty on Pareto fronts is provided using conditional simulations.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: GPareto
+# Type: Package
+# Title: Gaussian Processes for Pareto Front Estimation and Optimization
+# Version: 1.1.7
+# Date: 2022-06-23
+# Author: Mickael Binois, Victor Picheny
+# Maintainer: Mickael Binois <mickael.binois@inria.fr>
+# Description: Gaussian process regression models, a.k.a. Kriging models, are applied to global multi-objective optimization of black-box functions. Multi-objective Expected Improvement and Step-wise Uncertainty Reduction sequential infill criteria are available. A quantification of uncertainty on Pareto fronts is provided using conditional simulations.
+# License: GPL-3
+# Depends: DiceKriging, emoa
+# Imports: Rcpp (>= 0.12.15), methods, rgenoud, pbivnorm, pso, randtoolbox, KrigInv, MASS, DiceDesign, ks, rgl
+# Suggests: knitr, DiceOptim
+# VignetteBuilder: knitr
+# LinkingTo: Rcpp
+# Repository: CRAN
+# URL: https://github.com/mbinois/GPareto
+# BugReports: https://github.com/mbinois/GPareto/issues
+# RoxygenNote: 7.2.0
+# NeedsCompilation: yes
+# Packaged: 2022-06-24 08:24:23 UTC; mbinois
+# Date/Publication: 2022-06-24 12:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

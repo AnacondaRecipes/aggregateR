@@ -1,0 +1,95 @@
+{% set version = '1.0-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pdfcluster
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pdfCluster_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pdfCluster/pdfCluster_{{ version }}.tar.gz
+  sha256: d510c63ce1825d0acd0204613f880969402c731267b4ff800c8549fd73eda234
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: cluster
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-geometry
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-geometry
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pdfCluster')"           # [not win]
+    - "\"%R%\" -e \"library('pdfCluster')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=pdfCluster
+  license: GPL-2
+  summary: Cluster analysis via nonparametric density estimation is performed. Operationally,
+    the kernel method is used throughout to estimate the density. Diagnostics methods
+    for evaluating the quality of the clustering are available. The package includes
+    also a routine to estimate the probability density function obtained by the kernel
+    method, given a set of data with arbitrary dimensions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: pdfCluster
+# Type: Package
+# Title: Cluster Analysis via Nonparametric Density Estimation
+# Version: 1.0-4
+# Date: 2022-12-01
+# Authors@R: c( person("Menardi", "Giovanna", role = c("aut", "cre"), email = "menardi@stat.unipd.it"), person("Azzalini", "Adelchi", role = c("aut")), person("Rosolin", "Tiziana", role = c("ctb"), comment = "up to version 0.1-13") )
+# Maintainer: Menardi Giovanna <menardi@stat.unipd.it>
+# Description: Cluster analysis via nonparametric density estimation is performed. Operationally, the kernel method is used throughout to estimate the density. Diagnostics methods for evaluating the quality of the clustering are available. The package includes also a routine to estimate the probability density function obtained by the kernel method, given a set of data with arbitrary dimensions.
+# License: GPL-2
+# LazyLoad: yes
+# Imports: geometry, methods
+# Suggests: cluster
+# Packaged: 2022-12-01 16:50:50 UTC; giovanna
+# NeedsCompilation: yes
+# Repository: CRAN
+# Date/Publication: 2022-12-02 09:50:02 UTC
+# Encoding: UTF-8
+# Language: en-US
+# Author: Menardi Giovanna [aut, cre], Azzalini Adelchi [aut], Rosolin Tiziana [ctb] (up to version 0.1-13)
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,107 @@
+{% set version = '4.5.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cobalt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cobalt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cobalt/cobalt_{{ version }}.tar.gz
+  sha256: 799b68805033a92900c5a884862a315670b0379ed8fc8c3f3c20c61e402c27c0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MatchIt (>= 4.0.0), WeightIt (>= 0.14.0), twang (>= 1.6), twangContinuous, Matching, optmatch, ebal, CBPS (>= 0.17), designmatch, optweight, mice (>= 3.8.0), MatchThem (>= 0.9.3), cem (>= 1.1.30), sbw (>= 1.1.5), gbm (>= 2.1.7), brglm2 (>= 0.9), knitr, rmarkdown, testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-backports >=1.1.9
+    - r-chk >=0.8.1
+    - r-crayon
+    - r-ggplot2 >=3.4.1
+    - r-gridextra >=2.3
+    - r-gtable >=0.3.0
+    - r-rlang >=0.4.0
+
+  run:
+    - r-base
+    - r-backports >=1.1.9
+    - r-chk >=0.8.1
+    - r-crayon
+    - r-ggplot2 >=3.4.1
+    - r-gridextra >=2.3
+    - r-gtable >=0.3.0
+    - r-rlang >=0.4.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cobalt')"           # [not win]
+    - "\"%R%\" -e \"library('cobalt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://ngreifer.github.io/cobalt/, https://github.com/ngreifer/cobalt
+  license: GPL-2
+  summary: Generate balance tables and plots for covariates of groups preprocessed through matching,
+    weighting or subclassification, for example, using propensity scores. Includes integration
+    with 'MatchIt', 'twang', 'Matching', 'optmatch', 'CBPS', 'ebal', 'WeightIt', 'cem',
+    'sbw', and 'designmatch' for assessing balance on the output of their preprocessing
+    functions. Users can also specify data for balance assessment not generated through
+    the above packages. Also included are methods for assessing balance in clustered
+    or multiply imputed data sets or data sets with multi-category, continuous, or longitudinal
+    treatments.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: cobalt
+# Title: Covariate Balance Tables and Plots
+# Version: 4.5.1
+# Authors@R: c( person("Noah", "Greifer", role=c("aut", "cre"), email = "noah.greifer@gmail.com", comment=c(ORCID="0000-0003-3067-7154")) )
+# Description: Generate balance tables and plots for covariates of groups preprocessed through matching, weighting or subclassification, for example, using propensity scores. Includes integration with 'MatchIt', 'twang', 'Matching', 'optmatch', 'CBPS', 'ebal', 'WeightIt', 'cem', 'sbw', and 'designmatch' for assessing balance on the output of their preprocessing functions. Users can also specify data for balance assessment not generated through the above packages. Also included are methods for assessing balance in clustered or multiply imputed data sets or data sets with multi-category, continuous, or longitudinal treatments.
+# Depends: R (>= 3.3.0)
+# Imports: stats, utils, grid, grDevices, ggplot2 (>= 3.4.1), gtable (>= 0.3.0), gridExtra (>= 2.3), chk (>= 0.8.1), rlang (>= 0.4.0), crayon, backports (>= 1.1.9)
+# Suggests: MatchIt (>= 4.0.0), WeightIt (>= 0.14.0), twang (>= 1.6), twangContinuous, Matching, optmatch, ebal, CBPS (>= 0.17), designmatch, optweight, mice (>= 3.8.0), MatchThem (>= 0.9.3), cem (>= 1.1.30), sbw (>= 1.1.5), gbm (>= 2.1.7), brglm2 (>= 0.9), knitr, rmarkdown, testthat (>= 3.0.0)
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# VignetteBuilder: knitr
+# URL: https://ngreifer.github.io/cobalt/, https://github.com/ngreifer/cobalt
+# BugReports: https://github.com/ngreifer/cobalt/issues
+# Config/testthat/edition: 3
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-04-27 20:43:45 UTC; NoahGreifer
+# Author: Noah Greifer [aut, cre] (<https://orcid.org/0000-0003-3067-7154>)
+# Maintainer: Noah Greifer <noah.greifer@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-04-28 16:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

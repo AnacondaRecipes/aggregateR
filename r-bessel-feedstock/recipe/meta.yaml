@@ -1,0 +1,92 @@
+{% set version = '0.6-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bessel
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Bessel_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Bessel/Bessel_{{ version }}.tar.gz
+  sha256: 8ea97867985eb39da0f60a766795a3c4121a94492236ccf82771470a2d029547
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: gsl, sfsmisc
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rmpfr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rmpfr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Bessel')"           # [not win]
+    - "\"%R%\" -e \"library('Bessel')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://specfun.r-forge.r-project.org/
+  license: GPL-2
+  summary: Computations for Bessel function for complex, real and partly 'mpfr' (arbitrary precision)
+    numbers; notably interfacing TOMS 644; approximations for large arguments, experiments,
+    etc.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Title: Computations and Approximations for Bessel Functions
+# Package: Bessel
+# Version: 0.6-0
+# VersionNote: Last CRAN: 0.5-5, on 2013-12-10
+# Date: 2019-04-24
+# Description: Computations for Bessel function for complex, real and partly 'mpfr' (arbitrary precision) numbers; notably interfacing TOMS 644; approximations for large arguments, experiments, etc.
+# Author: Martin Maechler
+# Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
+# Imports: methods, Rmpfr
+# Suggests: gsl, sfsmisc
+# SuggestsNote: only 'gsl' may be used in code; the others are for vignettes only
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# URL: http://specfun.r-forge.r-project.org/
+# NeedsCompilation: yes
+# Packaged: 2019-04-25 07:30:47 UTC; maechler
+# Repository: CRAN
+# Date/Publication: 2019-05-02 09:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,88 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ggpolypath
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ggpolypath_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ggpolypath/ggpolypath_{{ version }}.tar.gz
+  sha256: fef684499cba1ce52419a5365cf571ecc8b90dd77d9621468dbdb15b210df646
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rmarkdown, knitr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggplot2 >=2.1.0
+
+  run:
+    - r-base
+    - r-ggplot2 >=2.1.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ggpolypath')"           # [not win]
+    - "\"%R%\" -e \"library('ggpolypath')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://mdsumner.github.io/ggpolypath/, http://rpubs.com/kohske/3522/
+  license: GPL-3
+  summary: Tools for working with polygons with holes in 'ggplot2', with a new 'geom' for drawing
+    a 'polypath' applying the 'evenodd' or 'winding' rules.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: ggpolypath
+# Type: Package
+# Title: Polygons with Holes for the Grammar of Graphics
+# Version: 0.3.0
+# Description: Tools for working with polygons with holes in 'ggplot2', with a new 'geom' for drawing a 'polypath' applying the 'evenodd' or 'winding' rules.
+# Authors@R: c(person("Michael D.","Sumner", role = c("aut", "cre"), email = "mdsumner@gmail.com"), person(given = "Kohske", family = "Takahashi", email = "takahashi.kohske@gmail.com", role = "ctb", comment = "original author of 'geom_holygon'"))
+# URL: https://mdsumner.github.io/ggpolypath/, http://rpubs.com/kohske/3522/
+# BugReports: https://github.com/mdsumner/ggpolypath/issues/
+# Depends: R (>= 3.1), ggplot2 (>= 2.1.0)
+# Suggests: rmarkdown, knitr
+# LazyData: yes
+# License: GPL-3
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2023-09-25 00:36:59 UTC; mdsumner
+# Author: Michael D. Sumner [aut, cre], Kohske Takahashi [ctb] (original author of 'geom_holygon')
+# Maintainer: Michael D. Sumner <mdsumner@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-09-25 05:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

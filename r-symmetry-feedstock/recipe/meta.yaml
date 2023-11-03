@@ -1,0 +1,104 @@
+{% set version = '0.2.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-symmetry
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/symmetry_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/symmetry/symmetry_{{ version }}.tar.gz
+  sha256: e68b9d8585a40b0a479398553cc45223905dd840938742e11d112738cd065307
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, sn, fGarch, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-rdpack
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-rdpack
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('symmetry')"           # [not win]
+    - "\"%R%\" -e \"library('symmetry')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=symmetry
+  license: MIT
+  summary: Implementations of a large number of tests for symmetry and their bootstrap variants,
+    which can be used for testing the symmetry of random samples around a known or unknown
+    mean. Functions are also there for testing the symmetry of model residuals around
+    zero. Currently, the supported models are linear models and generalized autoregressive
+    conditional heteroskedasticity (GARCH) models (fitted with the 'fGarch' package).
+    All tests are implemented using the 'Rcpp' package which ensures great performance
+    of the code.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: symmetry
+# Title: Testing for Symmetry of Data and Model Residuals
+# Version: 0.2.3
+# Author: Blagoje Ivanovic [aut, cre] Bojana Milosevic [aut] Marko Obradovic [aut]
+# Date: 2023-03-10
+# Maintainer: Blagoje Ivanovic <blagoje.ivanovic@matf.bg.ac.rs>
+# Description: Implementations of a large number of tests for symmetry and their bootstrap variants, which can be used for testing the symmetry of random samples around a known or unknown mean. Functions are also there for testing the symmetry of model residuals around zero. Currently, the supported models are linear models and generalized autoregressive conditional heteroskedasticity (GARCH) models (fitted with the 'fGarch' package). All tests are implemented using the 'Rcpp' package which ensures great performance of the code.
+# Depends: R (>= 3.1.0)
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Imports: Rcpp, Rdpack
+# RdMacros: Rdpack
+# LinkingTo: Rcpp, RcppArmadillo
+# RoxygenNote: 7.2.2
+# Suggests: knitr, rmarkdown, sn, fGarch, testthat
+# NeedsCompilation: yes
+# Packaged: 2023-03-10 15:45:56 UTC; blaza
+# Repository: CRAN
+# Date/Publication: 2023-03-10 17:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

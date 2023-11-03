@@ -1,0 +1,94 @@
+{% set version = '1.7.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-incidence
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/incidence_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/incidence/incidence_{{ version }}.tar.gz
+  sha256: e70bd75ce86841ed92fbc316784a392d17f2f53e11c4895d0aa4327dae80bdf1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: magrittr, outbreaks, testthat, vdiffr, covr, knitr, rmarkdown, scales, cowplot
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-aweek >=0.2.0
+    - r-ggplot2 >=3.3.2
+
+  run:
+    - r-base
+    - r-aweek >=0.2.0
+    - r-ggplot2 >=3.3.2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('incidence')"           # [not win]
+    - "\"%R%\" -e \"library('incidence')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.repidemicsconsortium.org/incidence/
+  license: MIT
+  summary: Provides functions and classes to compute, handle and visualise incidence from dated
+    events for a defined time interval. Dates can be provided in various standard formats.
+    The class 'incidence' is used to store computed incidence and can be easily manipulated,
+    subsetted, and plotted. In addition, log-linear models can be fitted to 'incidence'
+    objects using 'fit'. This package is part of the RECON (<https://www.repidemicsconsortium.org/>)
+    toolkit for outbreak analysis.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: incidence
+# Type: Package
+# Title: Compute, Handle, Plot and Model Incidence of Dated Events
+# Version: 1.7.3
+# Authors@R: c( person("Thibaut", "Jombart", role = c("aut"), email = "thibautjombart@gmail.com"), person("Zhian N.", "Kamvar", role = "aut", email = "zkamvar@gmail.com", comment = c(ORCID = "0000-0003-1458-7108")), person("Rich", "FitzJohn", role = "aut", email = "rich.fitzjohn@gmail.com"), person("Tim", "Taylor", role = "cre", email = "tim.taylor@hiddenelephants.co.uk", comment = c(ORCID = "0000-0002-8587-7113")), person("Jun", "Cai", role = "ctb", email = "cai-j12@mails.tsinghua.edu.cn", comment = c(ORCID = "0000-0001-9495-1226")), person("Sangeeta", "Bhatia", role = "ctb", email = "sangeetabhatia03@gmail.com"), person("Jakob", "Schumacher", role = "ctb"), person("Juliet R.C.", "Pulliam", role = "ctb", email = "pulliam@sun.ac.za", comment = c(ORCID = "0000-0003-3314-8223")) )
+# Description: Provides functions and classes to compute, handle and visualise incidence from dated events for a defined time interval. Dates can be provided in various standard formats. The class 'incidence' is used to store computed incidence and can be easily manipulated, subsetted, and plotted. In addition, log-linear models can be fitted to 'incidence' objects using 'fit'. This package is part of the RECON (<https://www.repidemicsconsortium.org/>) toolkit for outbreak analysis.
+# Encoding: UTF-8
+# License: MIT + file LICENSE
+# URL: https://www.repidemicsconsortium.org/incidence/
+# BugReports: https://github.com/reconhub/incidence/issues
+# RoxygenNote: 7.1.1
+# Imports: ggplot2 (>= 3.3.2), aweek (>= 0.2.0)
+# Suggests: magrittr, outbreaks, testthat, vdiffr, covr, knitr, rmarkdown, scales, cowplot
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2020-11-03 17:29:35 UTC; tim
+# Author: Thibaut Jombart [aut], Zhian N. Kamvar [aut] (<https://orcid.org/0000-0003-1458-7108>), Rich FitzJohn [aut], Tim Taylor [cre] (<https://orcid.org/0000-0002-8587-7113>), Jun Cai [ctb] (<https://orcid.org/0000-0001-9495-1226>), Sangeeta Bhatia [ctb], Jakob Schumacher [ctb], Juliet R.C. Pulliam [ctb] (<https://orcid.org/0000-0003-3314-8223>)
+# Maintainer: Tim Taylor <tim.taylor@hiddenelephants.co.uk>
+# Repository: CRAN
+# Date/Publication: 2020-11-04 16:30:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

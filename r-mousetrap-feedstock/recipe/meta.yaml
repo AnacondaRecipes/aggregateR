@@ -1,0 +1,129 @@
+{% set version = '3.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mousetrap
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mousetrap_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mousetrap/mousetrap_{{ version }}.tar.gz
+  sha256: b7b8c9fabf63d2012dd235c29f061063d7a5aba4c3b7b582e8748162707f0f8f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: readbulk, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcolorbrewer
+    - r-rcpp >=0.11.4
+    - r-cstab
+    - r-diptest
+    - r-dplyr >=0.5.0
+    - r-fastcluster
+    - r-fields
+    - r-ggplot2
+    - r-lifecycle
+    - r-magrittr
+    - r-pracma
+    - r-psych >=1.2.4
+    - r-rlang
+    - r-scales
+    - r-tidyr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcolorbrewer
+    - r-rcpp >=0.11.4
+    - r-cstab
+    - r-diptest
+    - r-dplyr >=0.5.0
+    - r-fastcluster
+    - r-fields
+    - r-ggplot2
+    - r-lifecycle
+    - r-magrittr
+    - r-pracma
+    - r-psych >=1.2.4
+    - r-rlang
+    - r-scales
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mousetrap')"           # [not win]
+    - "\"%R%\" -e \"library('mousetrap')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/pascalkieslich/mousetrap
+  license: GPL-3
+  summary: 'Mouse-tracking, the analysis of mouse movements in computerized experiments, is a
+    method that is becoming increasingly popular in the cognitive sciences. The mousetrap
+    package offers functions for importing, preprocessing, analyzing, aggregating, and
+    visualizing mouse-tracking data. An introduction into mouse-tracking analyses using
+    mousetrap can be found in Wulff, Kieslich, Henninger, Haslbeck, & Schulte-Mecklenbeck
+    (2023) <doi:10.31234/osf.io/v685r> (preprint: <https://osf.io/preprints/psyarxiv/v685r>).'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: mousetrap
+# Type: Package
+# Version: 3.2.2
+# Title: Process and Analyze Mouse-Tracking Data
+# Description: Mouse-tracking, the analysis of mouse movements in computerized experiments, is a method that is becoming increasingly popular in the cognitive sciences. The mousetrap package offers functions for importing, preprocessing, analyzing, aggregating, and visualizing mouse-tracking data. An introduction into mouse-tracking analyses using mousetrap can be found in Wulff, Kieslich, Henninger, Haslbeck, & Schulte-Mecklenbeck (2023) <doi:10.31234/osf.io/v685r> (preprint: <https://osf.io/preprints/psyarxiv/v685r>).
+# Maintainer: Pascal J. Kieslich <pascal.kieslich@gmail.com>
+# Authors@R: c( person(c("Pascal","J."), "Kieslich", role= c("aut", "cre"), email= "pascal.kieslich@gmail.com", comment = c(ORCID = "0000-0002-0853-9364")), person(c("Dirk","U."), "Wulff", role = "aut", email = "dirk.wulff@gmail.com", comment = c(ORCID = "0000-0002-4008-8022")), person("Felix", "Henninger", role = "aut", email= "mailbox@felixhenninger.com", comment = c(ORCID = "0000-0002-7730-9511")), person(c("Jonas","M. B."), "Haslbeck", role = "aut", email = "jonas.haslbeck@googlemail.com"), person("Sarah", "Brockhaus", role = "ctb") )
+# URL: https://github.com/pascalkieslich/mousetrap
+# BugReports: https://github.com/pascalkieslich/mousetrap/issues
+# License: GPL-3
+# Depends: R (>= 3.1.0),
+# Imports: utils, stats, pracma, dplyr (>= 0.5.0), tidyr, magrittr, graphics, grDevices, ggplot2, scales, psych (>= 1.2.4), Rcpp (>= 0.11.4), diptest, RColorBrewer, cstab, fastcluster, parallel, fields, rlang, lifecycle
+# Suggests: readbulk, testthat
+# LinkingTo: Rcpp
+# Encoding: UTF-8
+# LazyData: TRUE
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-10-23 14:34:40 UTC; Pascal
+# Author: Pascal J. Kieslich [aut, cre] (<https://orcid.org/0000-0002-0853-9364>), Dirk U. Wulff [aut] (<https://orcid.org/0000-0002-4008-8022>), Felix Henninger [aut] (<https://orcid.org/0000-0002-7730-9511>), Jonas M. B. Haslbeck [aut], Sarah Brockhaus [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-10-23 17:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

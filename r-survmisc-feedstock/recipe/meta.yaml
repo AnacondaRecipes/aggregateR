@@ -1,0 +1,102 @@
+{% set version = '0.5.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-survmisc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/survMisc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/survMisc/survMisc_{{ version }}.tar.gz
+  sha256: d911125bc374dfc67f31a81ebeaf98a09cac8f81e30259655ab136ebf4718c04
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-kmsurv
+    - r-data.table
+    - r-ggplot2
+    - r-gridextra
+    - r-km.ci
+    - r-knitr
+    - r-survival
+    - r-xtable
+    - r-zoo
+
+  run:
+    - r-base
+    - r-kmsurv
+    - r-data.table
+    - r-ggplot2
+    - r-gridextra
+    - r-km.ci
+    - r-knitr
+    - r-survival
+    - r-xtable
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('survMisc')"           # [not win]
+    - "\"%R%\" -e \"library('survMisc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=survMisc
+  license: GPL-2
+  summary: A collection of functions to help in the analysis of right-censored survival data.
+    These extend the methods available in package:survival.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: survMisc
+# Type: Package
+# Version: 0.5.6
+# Date: 2022-04-07
+# Depends: survival
+# Imports: graphics, grDevices, stats, utils, knitr, KMsurv, ggplot2, data.table, zoo, grid, gridExtra, km.ci, xtable
+# Author: Chris Dardis
+# Maintainer: Chris Dardis <christopherdardis@gmail.com>
+# License: GPL-2
+# Title: Miscellaneous Functions for Survival Data
+# Description: A collection of functions to help in the analysis of right-censored survival data. These extend the methods available in package:survival.
+# BugReports: https://github.com/dardisco/survMisc/issues
+# LazyData: true
+# VignetteBuilder: knitr
+# Collate: 'ten.R' 'nc.R' 'sf.R' 'ci.R' 'autoplotTAP.R' 'autoplotTen.R' 'print.R' 'asWide.R' 'COV.R' 'predict.R' 'comp.R' 'cutp.R' 'gastric.R' 'gof.R' 'onAttach.R' 'profLik.R' 'rsq.R' 'survMisc_package.R' 'xtable.R'
+# NeedsCompilation: no
+# RoxygenNote: 7.1.2
+# Packaged: 2022-04-07 15:42:53 UTC; cd
+# Repository: CRAN
+# Date/Publication: 2022-04-07 16:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

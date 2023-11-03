@@ -1,0 +1,90 @@
+{% set version = '0.2-9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dcluster
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DCluster_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DCluster/DCluster_{{ version }}.tar.gz
+  sha256: acc2fc755a41fe2cf4774f51dd313feb34a268af58481d31d005b8b3476bc5e3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-boot
+    - r-spdep
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-boot
+    - r-spdep
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DCluster')"           # [not win]
+    - "\"%R%\" -e \"library('DCluster')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DCluster
+  license: GPL-2
+  summary: A set of functions for the detection of spatial clusters of disease using count data.
+    Bootstrap is used to estimate sampling distributions of statistics.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: DCluster
+# Version: 0.2-9
+# Date: 2023-09-01
+# Title: Functions for the Detection of Spatial Clusters of Diseases
+# Encoding: UTF-8
+# Author: Virgilio Gomez-Rubio, Juan Ferrandiz-Ferragud and Antonio Lopez-Quilez, with contributions by Roger Bivand.
+# Maintainer: Virgilio Gomez-Rubio <Virgilio.Gomez@uclm.es>
+# Depends: R (>= 1.6.2), boot, spdep, MASS
+# Description: A set of functions for the detection of spatial clusters of disease using count data. Bootstrap is used to estimate sampling distributions of statistics.
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2023-09-03 09:20:09 UTC; virgil
+# Repository: CRAN
+# Date/Publication: 2023-09-03 09:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

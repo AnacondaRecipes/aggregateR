@@ -1,0 +1,107 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tidysynth
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tidysynth_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tidysynth/tidysynth_{{ version }}.tar.gz
+  sha256: 255cd3832e4561d6f3fb1ae2dad3c270ea6bc5ba36f79f793fc457c3c7963bab
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr
+    - r-forcats
+    - r-ggplot2
+    - r-kernlab
+    - r-magrittr
+    - r-optimx
+    - r-rgenoud
+    - r-rlang
+    - r-tibble
+    - r-tidyr
+
+  run:
+    - r-base
+    - r-dplyr
+    - r-forcats
+    - r-ggplot2
+    - r-kernlab
+    - r-magrittr
+    - r-optimx
+    - r-rgenoud
+    - r-rlang
+    - r-tibble
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tidysynth')"           # [not win]
+    - "\"%R%\" -e \"library('tidysynth')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=tidysynth
+  license: MIT
+  summary: A synthetic control offers a way of evaluating the effect of an intervention in comparative
+    case studies. The package makes a number of improvements when implementing the method
+    in R. These improvements allow users to inspect, visualize, and tune the synthetic
+    control more easily. A key benefit of a tidy implementation is that the entire preparation
+    process for building the synthetic control can be accomplished in a single pipe.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: tidysynth
+# Title: A Tidy Implementation of the Synthetic Control Method
+# Version: 0.2.0
+# Authors@R: person(given = "Eric", family = "Dunford", role = c("aut", "cre"), email = "ed769@georgetown.edu", comment = c(ORCID = "0000-0003-3056-8687"))
+# Description: A synthetic control offers a way of evaluating the effect of an intervention in comparative case studies. The package makes a number of improvements when implementing the method in R. These improvements allow users to inspect, visualize, and tune the synthetic control more easily. A key benefit of a tidy implementation is that the entire preparation process for building the synthetic control can be accomplished in a single pipe.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.3
+# Depends: R (>= 3.5.0)
+# Imports: magrittr, tibble, dplyr, ggplot2, tidyr, forcats, rlang, kernlab, rgenoud, optimx, stats
+# Suggests: testthat
+# NeedsCompilation: no
+# Packaged: 2023-05-20 18:10:37 UTC; ed769
+# Author: Eric Dunford [aut, cre] (<https://orcid.org/0000-0003-3056-8687>)
+# Maintainer: Eric Dunford <ed769@georgetown.edu>
+# Repository: CRAN
+# Date/Publication: 2023-05-21 07:10:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

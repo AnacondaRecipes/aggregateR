@@ -1,0 +1,106 @@
+{% set version = '0.3.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rvg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rvg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rvg/rvg_{{ version }}.tar.gz
+  sha256: 15c8157ae2383c9452988b31420648be5bc8b4d0e5181be66c65e73262743d55
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, grid
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.12
+    - r-gdtools >=0.3.3
+    - r-officer >=0.6.2
+    - r-rlang
+    - r-xml2 >=1.0.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.12
+    - r-gdtools >=0.3.3
+    - r-officer >=0.6.2
+    - r-rlang
+    - r-xml2 >=1.0.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rvg')"           # [not win]
+    - "\"%R%\" -e \"library('rvg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://ardata-fr.github.io/officeverse/, https://davidgohel.github.io/rvg/
+  license: GPL-3
+  summary: Vector Graphics devices for 'Microsoft PowerPoint' and 'Microsoft Excel'. Functions
+    extending package 'officer' are provided to embed 'DrawingML' graphics into 'Microsoft
+    PowerPoint' presentations and 'Microsoft Excel' workbooks.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: rvg
+# Type: Package
+# Title: R Graphics Devices for 'Office' Vector Graphics Output
+# Version: 0.3.3
+# Authors@R: c( person("David", "Gohel", role = c("aut", "cre"), email = "david.gohel@ardata.fr"), person(given = "ArData", role = "cph"), person("Bob", "Rudis", role = c("ctb"), comment = "the javascript code used by function set_attr"), person("Francois", "Brunetti", role = c("ctb"), email = "francois.brunetti@lysis-consultants.fr", comment = "clipping algorithms") )
+# Description: Vector Graphics devices for 'Microsoft PowerPoint' and 'Microsoft Excel'. Functions extending package 'officer' are provided to embed 'DrawingML' graphics into 'Microsoft PowerPoint' presentations and 'Microsoft Excel' workbooks.
+# SystemRequirements: libpng
+# License: GPL-3
+# Encoding: UTF-8
+# Depends: R (>= 3.0)
+# Imports: grDevices, Rcpp (>= 0.12.12), officer (>= 0.6.2), gdtools (>= 0.3.3), xml2 (>= 1.0.0), rlang
+# LinkingTo: Rcpp, gdtools
+# Suggests: testthat, grid
+# URL: https://ardata-fr.github.io/officeverse/, https://davidgohel.github.io/rvg/
+# BugReports: https://github.com/davidgohel/rvg/issues
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-05-10 08:31:18 UTC; davidgohel
+# Author: David Gohel [aut, cre], ArData [cph], Bob Rudis [ctb] (the javascript code used by function set_attr), Francois Brunetti [ctb] (clipping algorithms)
+# Maintainer: David Gohel <david.gohel@ardata.fr>
+# Repository: CRAN
+# Date/Publication: 2023-05-10 09:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

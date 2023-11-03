@@ -1,0 +1,91 @@
+{% set version = '0.6.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-leaflet.minicharts
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/leaflet.minicharts_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/leaflet.minicharts/leaflet.minicharts_{{ version }}.tar.gz
+  sha256: b1cb73353bce3bad82fd7d3d207615e9c4419b6cf4843547a8ed973f58caaf5e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, dplyr, shiny, manipulateWidget, testthat, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-htmltools
+    - r-leaflet >=1.1.0
+
+  run:
+    - r-base
+    - r-htmltools
+    - r-leaflet >=1.1.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('leaflet.minicharts')"           # [not win]
+    - "\"%R%\" -e \"library('leaflet.minicharts')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=leaflet.minicharts
+  license: GPL-2
+  summary: Add and modify small charts on an interactive map created with package 'leaflet'.
+    These charts can be used to represent at same time multiple variables on a single
+    map.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: leaflet.minicharts
+# Type: Package
+# Title: Mini Charts for Interactive Maps
+# Version: 0.6.2
+# Authors@R: c( person(given = "Veronique", family = "Bachelier", role = c("aut", "cre"), email = "veronique.bachelier@rte-france.com"), person("Jalal-Edine", "ZAWAM", role = "aut"), person("Benoit", "Thieurmel", email = "benoit.thieurmel@datastorm.fr", role = "aut"), person("Francois", "Guillem", role = "aut"), person("RTE", role = "cph") )
+# Description: Add and modify small charts on an interactive map created with package 'leaflet'. These charts can be used to represent at same time multiple variables on a single map.
+# License: GPL (>= 2) | file LICENSE
+# Depends: R (>= 2.10)
+# Imports: leaflet (>= 1.1.0), htmltools
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.1.1
+# Suggests: knitr, rmarkdown, dplyr, shiny, manipulateWidget, testthat, covr
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2021-05-11 08:41:37 UTC; bthie
+# Author: Veronique Bachelier [aut, cre], Jalal-Edine ZAWAM [aut], Benoit Thieurmel [aut], Francois Guillem [aut], RTE [cph]
+# Maintainer: Veronique Bachelier <veronique.bachelier@rte-france.com>
+# Repository: CRAN
+# Date/Publication: 2021-05-11 09:20:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

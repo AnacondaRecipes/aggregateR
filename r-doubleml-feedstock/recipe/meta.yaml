@@ -1,0 +1,114 @@
+{% set version = '0.5.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-doubleml
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DoubleML_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DoubleML/DoubleML_{{ version }}.tar.gz
+  sha256: db2ba5b225b61fe93f87bb0de822371c6eed425ab7d5748b59849aef0bbe3fe8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, covr, patrick (>= 0.1.0), paradox (>= 0.4.0), dplyr, glmnet, lgr, ranger, sandwich, AER, rpart, bbotk, mlr3pipelines
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6 >=2.4.1
+    - r-checkmate
+    - r-clustergeneration
+    - r-data.table >=1.12.8
+    - r-mlr3 >=0.5.0
+    - r-mlr3learners >=0.3.0
+    - r-mlr3misc
+    - r-mlr3tuning >=0.3.0
+    - r-mvtnorm
+    - r-readstata13
+
+  run:
+    - r-base
+    - r-r6 >=2.4.1
+    - r-checkmate
+    - r-clustergeneration
+    - r-data.table >=1.12.8
+    - r-mlr3 >=0.5.0
+    - r-mlr3learners >=0.3.0
+    - r-mlr3misc
+    - r-mlr3tuning >=0.3.0
+    - r-mvtnorm
+    - r-readstata13
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DoubleML')"           # [not win]
+    - "\"%R%\" -e \"library('DoubleML')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://docs.doubleml.org/stable/index.html, https://github.com/DoubleML/doubleml-for-r/
+  license: MIT
+  summary: Implementation of the double/debiased machine learning framework of Chernozhukov et
+    al. (2018) <doi:10.1111/ectj.12097> for partially linear regression models, partially
+    linear instrumental variable regression models, interactive regression models and
+    interactive instrumental variable regression models. 'DoubleML' allows estimation
+    of the nuisance parts in these models by machine learning methods and computation
+    of the Neyman orthogonal score functions. 'DoubleML' is built on top of 'mlr3' and
+    the 'mlr3' ecosystem. The object-oriented implementation of 'DoubleML' based on
+    the 'R6' package is very flexible.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: DoubleML
+# Type: Package
+# Title: Double Machine Learning in R
+# Version: 0.5.3
+# Authors@R: c( person("Philipp", "Bach", email = "philipp.bach@uni-hamburg.de", role=c("aut", "cre")), person("Victor", "Chernozhukov", role="aut"), person("Malte S.", "Kurz", email = "mkurz-software@gmx.de", role="aut"), person("Martin", "Spindler", email="martin.spindler@gmx.de", role="aut"), person("Klaassen", "Sven", email="sven.klaassen@uni-hamburg.de", role="aut"))
+# Description: Implementation of the double/debiased machine learning framework of Chernozhukov et al. (2018) <doi:10.1111/ectj.12097> for partially linear regression models, partially linear instrumental variable regression models, interactive regression models and interactive instrumental variable regression models. 'DoubleML' allows estimation of the nuisance parts in these models by machine learning methods and computation of the Neyman orthogonal score functions. 'DoubleML' is built on top of 'mlr3' and the 'mlr3' ecosystem. The object-oriented implementation of 'DoubleML' based on the 'R6' package is very flexible.
+# License: MIT + file LICENSE
+# URL: https://docs.doubleml.org/stable/index.html, https://github.com/DoubleML/doubleml-for-r/
+# BugReports: https://github.com/DoubleML/doubleml-for-r/issues
+# Encoding: UTF-8
+# Depends: R (>= 3.5.0)
+# Imports: R6 (>= 2.4.1), data.table (>= 1.12.8), stats, checkmate, mlr3 (>= 0.5.0), mlr3tuning (>= 0.3.0), mvtnorm, utils, clusterGeneration, readstata13, mlr3learners (>= 0.3.0), mlr3misc
+# RoxygenNote: 7.2.3
+# Suggests: knitr, rmarkdown, testthat, covr, patrick (>= 0.1.0), paradox (>= 0.4.0), dplyr, glmnet, lgr, ranger, sandwich, AER, rpart, bbotk, mlr3pipelines
+# VignetteBuilder: knitr
+# Collate: 'double_ml.R' 'double_ml_data.R' 'double_ml_iivm.R' 'double_ml_irm.R' 'double_ml_pliv.R' 'double_ml_plr.R' 'helper.R' 'datasets.R' 'zzz.R'
+# NeedsCompilation: no
+# Packaged: 2023-03-28 14:34:09 UTC; runner
+# Author: Philipp Bach [aut, cre], Victor Chernozhukov [aut], Malte S. Kurz [aut], Martin Spindler [aut], Klaassen Sven [aut]
+# Maintainer: Philipp Bach <philipp.bach@uni-hamburg.de>
+# Repository: CRAN
+# Date/Publication: 2023-03-31 10:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

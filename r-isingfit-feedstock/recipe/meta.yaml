@@ -1,0 +1,89 @@
+{% set version = '0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-isingfit
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/IsingFit_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/IsingFit/IsingFit_{{ version }}.tar.gz
+  sha256: 18ab6a8d366fc8d1c4ff8305419b97b28503820ffd84dbc2d3ec1012e550b7df
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: IsingSampler
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-glmnet
+    - r-qgraph
+
+  run:
+    - r-base
+    - r-matrix
+    - r-glmnet
+    - r-qgraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('IsingFit')"           # [not win]
+    - "\"%R%\" -e \"library('IsingFit')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=IsingFit
+  license: GPL-2
+  summary: This network estimation procedure eLasso, which is based on the Ising model, combines
+    l1-regularized logistic regression with model selection based on the Extended Bayesian
+    Information Criterion (EBIC). EBIC is a fit measure that identifies relevant relationships
+    between variables. The resulting network consists of variables as nodes and relevant
+    relationships as edges. Can deal with binary data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: IsingFit
+# Type: Package
+# Title: Fitting Ising Models Using the ELasso Method
+# Version: 0.4
+# Depends: R (>= 3.0.0)
+# Imports: qgraph, Matrix, glmnet
+# Suggests: IsingSampler
+# Author: Claudia van Borkulo, Sacha Epskamp; with contributions from Alexander Robitzsch and Mihai Alexandru Constantin
+# Maintainer: Sacha Epskamp <mail@sachaepskamp.com>
+# Description: This network estimation procedure eLasso, which is based on the Ising model, combines l1-regularized logistic regression with model selection based on the Extended Bayesian Information Criterion (EBIC). EBIC is a fit measure that identifies relevant relationships between variables. The resulting network consists of variables as nodes and relevant relationships as edges. Can deal with binary data.
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2023-10-03 06:51:16 UTC; sachaepskamp
+# Repository: CRAN
+# Date/Publication: 2023-10-03 22:00:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

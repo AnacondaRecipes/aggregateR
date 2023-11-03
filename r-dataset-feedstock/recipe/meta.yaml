@@ -1,0 +1,100 @@
+{% set version = '0.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dataset
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dataset_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dataset/dataset_{{ version }}.tar.gz
+  sha256: 1839c56a9b617c92971e1e3cd8126de2a13e3419e9b3cb9e9b20a03ff011eedc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dataspice, covr, declared, dplyr, eurostat, here, kableExtra, knitr, rdflib, readxl, rmarkdown, spelling, statcodelists, testthat (>= 3.0.0), tidyr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-isocodes
+    - r-assertthat
+
+  run:
+    - r-base
+    - r-isocodes
+    - r-assertthat
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dataset')"           # [not win]
+    - "\"%R%\" -e \"library('dataset')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/dataobservatory-eu/dataset
+  license: GPL-3
+  summary: The aim of the 'dataset' package is to make tidy datasets easier to release, exchange
+    and reuse. It organizes and formats data frame 'R' objects into well-referenced,
+    well-described, interoperable datasets into release and reuse ready form. A subjective
+    interpretation of the  W3C  DataSet recommendation and the datacube model  <https://www.w3.org/TR/vocab-data-cube/>,
+    which is also used in the global Statistical Data and Metadata eXchange standards,
+    the application of the connected Dublin Core <https://www.dublincore.org/specifications/dublin-core/dcmi-terms/>
+    and DataCite <https://support.datacite.org/docs/datacite-metadata-schema-44/> standards
+    preferred by European open science repositories to improve the findability, accessibility,
+    interoperability and reusability of the datasets.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: dataset
+# Title: Create Data Frames that are Easier to Exchange and Reuse
+# Date: 2023-03-18
+# Version: 0.2.1
+# Authors@R: c(person(given = "Daniel", family = "Antal", email = "daniel.antal@dataobservatory.eu", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7513-6760") ), person(given = "Marcelo", family =  "Perlin", role = c("rev"), comment = c(ORCID = "0000-0002-9839-4268") ) )
+# Description: The aim of the 'dataset' package is to make tidy datasets easier to release, exchange and reuse. It organizes and formats data frame 'R' objects into well-referenced, well-described, interoperable datasets into release and reuse ready form. A subjective interpretation of the  W3C  DataSet recommendation and the datacube model  <https://www.w3.org/TR/vocab-data-cube/>, which is also used in the global Statistical Data and Metadata eXchange standards, the application of the connected Dublin Core <https://www.dublincore.org/specifications/dublin-core/dcmi-terms/> and DataCite <https://support.datacite.org/docs/datacite-metadata-schema-44/> standards preferred by European open science repositories to improve the findability, accessibility, interoperability and reusability of the datasets.
+# License: GPL (>= 3)
+# URL: https://github.com/dataobservatory-eu/dataset
+# BugReports: https://github.com/dataobservatory-eu/dataset/issues
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Depends: R (>= 2.10)
+# LazyData: true
+# Imports: assertthat, ISOcodes, stats, utils
+# Suggests: dataspice, covr, declared, dplyr, eurostat, here, kableExtra, knitr, rdflib, readxl, rmarkdown, spelling, statcodelists, testthat (>= 3.0.0), tidyr
+# VignetteBuilder: knitr
+# Config/testthat/edition: 3
+# Language: en-US
+# NeedsCompilation: no
+# Packaged: 2023-03-18 10:21:17 UTC; antaldaniel
+# Author: Daniel Antal [aut, cre] (<https://orcid.org/0000-0001-7513-6760>), Marcelo Perlin [rev] (<https://orcid.org/0000-0002-9839-4268>)
+# Maintainer: Daniel Antal <daniel.antal@dataobservatory.eu>
+# Repository: CRAN
+# Date/Publication: 2023-03-18 12:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

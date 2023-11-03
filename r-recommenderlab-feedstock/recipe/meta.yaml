@@ -1,0 +1,101 @@
+{% set version = '1.0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-recommenderlab
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/recommenderlab_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/recommenderlab/recommenderlab_{{ version }}.tar.gz
+  sha256: 304cccafe70766cdd72dd97e8b35d5bea2c66404ec53c4438fdcc1b1eb6bb7b7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-arules
+    - r-irlba
+    - r-matrixstats
+    - r-proxy >=0.4_26
+    - r-recosystem
+    - r-registry
+
+  run:
+    - r-base
+    - r-matrix
+    - r-arules
+    - r-irlba
+    - r-matrixstats
+    - r-proxy >=0.4_26
+    - r-recosystem
+    - r-registry
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('recommenderlab')"           # [not win]
+    - "\"%R%\" -e \"library('recommenderlab')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mhahsler/recommenderlab
+  license: GPL-2
+  summary: Provides a research infrastructure to develop and evaluate collaborative filtering
+    recommender algorithms. This includes a sparse representation for user-item matrices,
+    many popular algorithms, top-N recommendations, and cross-validation. Hahsler (2022)
+    <doi:10.48550/arXiv.2205.12371>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: recommenderlab
+# Version: 1.0.6
+# Date: 2023-09-19
+# Title: Lab for Developing and Testing Recommender Algorithms
+# Authors@R: c(person("Michael", "Hahsler", role = c("aut", "cre", "cph"), email = "mhahsler@lyle.smu.edu", comment = c(ORCID = "0000-0003-2716-1405")), person("Bregt", "Vereet", role = c("ctb")))
+# Description: Provides a research infrastructure to develop and evaluate collaborative filtering recommender algorithms. This includes a sparse representation for user-item matrices, many popular algorithms, top-N recommendations, and cross-validation. Hahsler (2022) <doi:10.48550/arXiv.2205.12371>.
+# Classification/ACM: G.4, H.2.8
+# Depends: R (>= 3.5.0), Matrix, arules, proxy (>= 0.4-26)
+# Imports: registry, methods, utils, stats, irlba, recosystem, matrixStats
+# Suggests: testthat
+# BugReports: https://github.com/mhahsler/recommenderlab/issues
+# URL: https://github.com/mhahsler/recommenderlab
+# License: GPL-2
+# Copyright: (C) Michael Hahsler
+# NeedsCompilation: no
+# Packaged: 2023-09-19 16:47:44 UTC; hahsler
+# Author: Michael Hahsler [aut, cre, cph] (<https://orcid.org/0000-0003-2716-1405>), Bregt Vereet [ctb]
+# Maintainer: Michael Hahsler <mhahsler@lyle.smu.edu>
+# Repository: CRAN
+# Date/Publication: 2023-09-20 07:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

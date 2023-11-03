@@ -1,0 +1,113 @@
+{% set version = '1.2.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rnewsflow
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RNewsflow_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RNewsflow/RNewsflow_{{ version }}.tar.gz
+  sha256: f09cd5dc9788585cbca6192714b63f853d7ac41ec8f20b9b294101e14f915e22
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr (>= 1.40), rmarkdown (>= 2.16)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix >=1.5
+    - r-rcpp >=0.12.12
+    - r-rcppeigen >=0.3.3.9.2
+    - r-rcppprogress >=0.4.2
+    - r-data.table >=1.10.4
+    - r-igraph >=1.3.4
+    - r-quanteda >=3.2.3
+    - r-scales >=1.2.1
+    - r-stringi >=1.7.8
+    - r-wordcloud >=2.6
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix >=1.5
+    - r-rcpp >=0.12.12
+    - r-rcppeigen >=0.3.3.9.2
+    - r-rcppprogress >=0.4.2
+    - r-data.table >=1.10.4
+    - r-igraph >=1.3.4
+    - r-quanteda >=3.2.3
+    - r-scales >=1.2.1
+    - r-stringi >=1.7.8
+    - r-wordcloud >=2.6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RNewsflow')"           # [not win]
+    - "\"%R%\" -e \"library('RNewsflow')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RNewsflow
+  license: GPL-3
+  summary: A collection of tools for measuring the similarity of text messages and tracing the
+    flow of messages over time and across media.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: RNewsflow
+# Type: Package
+# Title: Tools for Comparing Text Messages Across Time and Media
+# Version: 1.2.7
+# Author: Kasper Welbers & Wouter van Atteveldt
+# Maintainer: Kasper Welbers <kasperwelbers@gmail.com>
+# Description: A collection of tools for measuring the similarity of text messages and tracing the flow of messages over time and across media.
+# License: GPL-3
+# Depends: R (>= 3.5.0), igraph (>= 1.3.4), Matrix (>= 1.5)
+# Imports: stringi (>= 1.7.8), scales (>= 1.2.1), wordcloud (>= 2.6), data.table (>= 1.10.4), methods, quanteda (>= 3.2.3), Rcpp (>= 0.12.12)
+# LinkingTo: Rcpp (>= 1.0.9), RcppEigen (>= 0.3.3.9.2), RcppProgress (>= 0.4.2)
+# LazyData: true
+# RoxygenNote: 7.2.1
+# Suggests: knitr (>= 1.40), rmarkdown (>= 2.16)
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-05-07 13:55:51 UTC; kasper
+# Repository: CRAN
+# Date/Publication: 2023-05-07 14:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

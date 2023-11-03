@@ -1,0 +1,97 @@
+{% set version = '1.0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cmaesr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cmaesr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cmaesr/cmaesr_{{ version }}.tar.gz
+  sha256: 492e877a0b21e8b14475e58c075c55004ba915d717417fa5ac9513c1b315fd0f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bbmisc >=1.6
+    - r-paramhelpers >=1.8
+    - r-checkmate >=1.1
+    - r-ggplot2
+    - r-smoof >=1.4
+
+  run:
+    - r-base
+    - r-bbmisc >=1.6
+    - r-paramhelpers >=1.8
+    - r-checkmate >=1.1
+    - r-ggplot2
+    - r-smoof >=1.4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cmaesr')"           # [not win]
+    - "\"%R%\" -e \"library('cmaesr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jakobbossek/cmaesr
+  license: BSD_2_clause
+  summary: Pure R implementation of the Covariance Matrix Adaptation - Evolution Strategy (CMA-ES)
+    with optional restarts (IPOP-CMA-ES).
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_2_clause'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: cmaesr
+# Type: Package
+# Title: Covariance Matrix Adaptation Evolution Strategy
+# Description: Pure R implementation of the Covariance Matrix Adaptation - Evolution Strategy (CMA-ES) with optional restarts (IPOP-CMA-ES).
+# Version: 1.0.3
+# Date: 2016-12-04
+# Authors@R: c(person("Jakob", "Bossek", email = "j.bossek@gmail.com", role = c("aut", "cre")))
+# Maintainer: Jakob Bossek <j.bossek@gmail.com>
+# URL: https://github.com/jakobbossek/cmaesr
+# BugReports: https://github.com/jakobbossek/cmaesr/issues
+# License: BSD_2_clause + file LICENSE
+# Depends: ParamHelpers (>= 1.8), BBmisc (>= 1.6), checkmate (>= 1.1), smoof (>= 1.4)
+# Imports: ggplot2
+# Suggests: testthat
+# ByteCompile: yes
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-12-04 10:20:41 UTC; jboss
+# Author: Jakob Bossek [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2016-12-04 17:21:54
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

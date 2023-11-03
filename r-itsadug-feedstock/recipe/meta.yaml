@@ -1,0 +1,96 @@
+{% set version = '2.4.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-itsadug
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/itsadug_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/itsadug/itsadug_{{ version }}.tar.gz
+  sha256: a1267e77829a08c78cc5eca412b81c007b52d6791d010e474a23779c8ed0b8e9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, xtable, sp, data.table
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mgcv >=1.8
+    - r-plotfunctions >=1.4
+
+  run:
+    - r-base
+    - r-mgcv >=1.8
+    - r-plotfunctions >=1.4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('itsadug')"           # [not win]
+    - "\"%R%\" -e \"library('itsadug')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=itsadug
+  license: GPL-2
+  summary: GAMM (Generalized Additive Mixed Modeling; Lin & Zhang, 1999) as implemented in the
+    R package 'mgcv' (Wood, S.N., 2006; 2011) is a nonlinear regression analysis which
+    is particularly useful for time course data such as EEG, pupil dilation, gaze data
+    (eye tracking), and articulography recordings, but also for behavioral data such
+    as reaction times and response data. As time course measures are sensitive to autocorrelation
+    problems, GAMMs implements methods to reduce the autocorrelation problems. This
+    package includes functions for the evaluation of GAMM models (e.g., model comparisons,
+    determining regions of significance, inspection of autocorrelational structure in
+    residuals) and interpreting of GAMMs (e.g., visualization of complex interactions,
+    and contrasts).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: itsadug
+# Version: 2.4.1
+# Date: 2022-06-17
+# Title: Interpreting Time Series and Autocorrelated Data Using GAMMs
+# Authors@R: c( person("Jacolien", "van Rij", email="vanrij.jacolien@gmail.com", role = c("aut", "cre")), person("Martijn","Wieling", role = "aut"), person("R. Harald","Baayen", role = "aut"), person("Hedderik", "van Rijn", role = "ctb"))
+# Author: Jacolien van Rij [aut, cre], Martijn Wieling [aut], R. Harald Baayen [aut], Hedderik van Rijn [ctb]
+# Maintainer: Jacolien van Rij <vanrij.jacolien@gmail.com>
+# Description: GAMM (Generalized Additive Mixed Modeling; Lin & Zhang, 1999) as implemented in the R package 'mgcv' (Wood, S.N., 2006; 2011) is a nonlinear regression analysis which is particularly useful for time course data such as EEG, pupil dilation, gaze data (eye tracking), and articulography recordings, but also for behavioral data such as reaction times and response data. As time course measures are sensitive to autocorrelation problems, GAMMs implements methods to reduce the autocorrelation problems. This package includes functions for the evaluation of GAMM models (e.g., model comparisons, determining regions of significance, inspection of autocorrelational structure in residuals) and interpreting of GAMMs (e.g., visualization of complex interactions, and contrasts).
+# License: GPL (>= 2)
+# LazyData: true
+# Depends: R (>= 4.0), mgcv (>= 1.8), plotfunctions (>= 1.4)
+# VignetteBuilder: knitr
+# Suggests: knitr, xtable, sp, data.table
+# RoxygenNote: 7.2.0
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2022-06-17 14:55:33 UTC; jacolien
+# Repository: CRAN
+# Date/Publication: 2022-06-17 15:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

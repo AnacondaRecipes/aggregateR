@@ -1,0 +1,95 @@
+{% set version = '2.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-deeplr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/deeplr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/deeplr/deeplr_{{ version }}.tar.gz
+  sha256: 942a4abf92c3e55f32774b167d44341bc0d34d81d8ad3c4f1a20b3d1347333a1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dplyr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+    - r-purrr
+    - r-tibble
+    - r-tokenizers
+    - r-utf8
+
+  run:
+    - r-base
+    - r-httr
+    - r-purrr
+    - r-tibble
+    - r-tokenizers
+    - r-utf8
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('deeplr')"           # [not win]
+    - "\"%R%\" -e \"library('deeplr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.deepl.com/translator
+  license: GPL-2
+  summary: A wrapper for the 'DeepL' Pro API <https://www.deepl.com/docs-api>, a web service
+    for translating texts between different languages. A DeepL API developer account
+    is required to use the service (see <https://www.deepl.com/pro#developer).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: deeplr
+# Type: Package
+# Title: Interface to the 'DeepL' Translation API
+# Version: 2.0.0
+# Authors@R: c( person("David", "Zumbach", role = c("aut", "cre"), email = "david.zumbach@gfzb.ch"), person("Paul C.", "Bauer", role = c("aut"), email = "mail@paulcbauer.eu") )
+# Description: A wrapper for the 'DeepL' Pro API <https://www.deepl.com/docs-api>, a web service for translating texts between different languages. A DeepL API developer account is required to use the service (see <https://www.deepl.com/pro#developer).
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# URL: https://www.deepl.com/translator
+# BugReports: https://github.com/zumbov2/deeplr/issues
+# Imports: utf8, httr, tibble, purrr, tokenizers
+# Suggests: dplyr
+# RoxygenNote: 7.1.1
+# NeedsCompilation: no
+# Packaged: 2021-04-27 19:15:31 UTC; david
+# Author: David Zumbach [aut, cre], Paul C. Bauer [aut]
+# Maintainer: David Zumbach <david.zumbach@gfzb.ch>
+# Repository: CRAN
+# Date/Publication: 2021-04-28 15:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,92 @@
+{% set version = '1.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-landsat
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/landsat_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/landsat/landsat_{{ version }}.tar.gz
+  sha256: 761cb037079c5fa7bc0256c7c1b1971f0164066b89f7d38c6610860613bfb28f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: sf
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-lmodel2
+    - r-mgcv
+    - r-sp >=2.0
+
+  run:
+    - r-base
+    - r-lmodel2
+    - r-mgcv
+    - r-sp >=2.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('landsat')"           # [not win]
+    - "\"%R%\" -e \"library('landsat')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=landsat
+  license: GPL-2
+  summary: Processing of Landsat or other multispectral satellite imagery. Includes relative
+    normalization, image-based radiometric correction, and topographic correction options.
+    The original package description was published as Goslee (2011) <doi:10.18637/jss.v043.i04>,
+    and details of the topographic corrections in Goslee (2012) <doi:10.14358/PERS.78.9.973>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: landsat
+# Type: Package
+# Title: Radiometric and Topographic Correction of Satellite Imagery
+# Version: 1.1.2
+# Date: 2023-08-01
+# Authors@R: c(person("Sarah", "Goslee", role = c("aut", "cre"), email = "sarah.goslee@usda.gov"))
+# Author: Sarah Goslee [aut, cre]
+# Maintainer: Sarah Goslee <sarah.goslee@usda.gov>
+# Depends: R (>= 3.2.0), sp (>= 2.0)
+# Imports: stats, graphics, methods, lmodel2, mgcv
+# Suggests: sf
+# Description: Processing of Landsat or other multispectral satellite imagery. Includes relative normalization, image-based radiometric correction, and topographic correction options. The original package description was published as Goslee (2011) <doi:10.18637/jss.v043.i04>, and details of the topographic corrections in Goslee (2012) <doi:10.14358/PERS.78.9.973>.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# BugReports: https://github.com/phiala/landsat/issues
+# NeedsCompilation: no
+# Packaged: 2023-08-01 20:18:38 UTC; sarahg
+# Repository: CRAN
+# Date/Publication: 2023-08-24 22:20:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

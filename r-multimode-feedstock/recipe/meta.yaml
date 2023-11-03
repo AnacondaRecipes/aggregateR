@@ -1,0 +1,100 @@
+{% set version = '1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-multimode
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/multimode_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/multimode/multimode_{{ version }}.tar.gz
+  sha256: 55f2f0e5da1708f9e8947e2ed820c330565c9ec574f1c8418bf50aadf131ab63
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: nor1mix
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-diptest
+    - r-ks
+    - r-rootsolve
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-diptest
+    - r-ks
+    - r-rootsolve
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('multimode')"           # [not win]
+    - "\"%R%\" -e \"library('multimode')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://doi.org/10.18637/jss.v097.i09
+  license: GPL-3
+  summary: Different examples and methods for testing (including different proposals described
+    in Ameijeiras-Alonso et al., 2019 <DOI:10.1007/s11749-018-0611-5>) and exploring
+    (including the mode tree, mode forest and SiZer) the number of modes using nonparametric
+    techniques <DOI:10.18637/jss.v097.i09>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Encoding: UTF-8
+# Package: multimode
+# Type: Package
+# Title: Mode Testing and Exploring
+# Version: 1.5
+# Date: 2021-03-17
+# Author: Jose Ameijeiras-Alonso [aut,cre], Rosa M. Crujeiras [aut], Alberto Rodriguez-Casal [aut], The R Core Team 1996-2012 [ctb,cph] (C function 'BinDist2' obtained from package 'stats'), The R Foundation 2005 [ctb,cph] (C function 'BinDist2' obtained from package 'stats')
+# Maintainer: Jose Ameijeiras-Alonso <jose.ameijeiras@usc.es>
+# Description: Different examples and methods for testing (including different proposals described in Ameijeiras-Alonso et al., 2019 <DOI:10.1007/s11749-018-0611-5>) and exploring (including the mode tree, mode forest and SiZer) the number of modes using nonparametric techniques <DOI:10.18637/jss.v097.i09>.
+# Depends: R (>= 2.10.0)
+# License: GPL-3
+# NeedsCompilation: yes
+# LazyData: TRUE
+# Imports: diptest, ks, rootSolve
+# Suggests: nor1mix
+# URL: https://doi.org/10.18637/jss.v097.i09
+# Packaged: 2021-03-18 09:52:46 UTC; Jose
+# Repository: CRAN
+# Date/Publication: 2021-03-20 23:20:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

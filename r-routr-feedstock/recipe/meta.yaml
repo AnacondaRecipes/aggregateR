@@ -1,0 +1,99 @@
+{% set version = '0.4.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-routr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/routr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/routr/routr_{{ version }}.tar.gz
+  sha256: 6b426c217fc397f40745ace61a972d0fab13dc7583d942177293e2ce9da2146b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr, fiery
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-assertthat
+    - r-digest
+    - r-reqres
+    - r-stringi
+    - r-uuid
+
+  run:
+    - r-base
+    - r-r6
+    - r-assertthat
+    - r-digest
+    - r-reqres
+    - r-stringi
+    - r-uuid
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('routr')"           # [not win]
+    - "\"%R%\" -e \"library('routr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://routr.data-imaginist.com, https://github.com/thomasp85/routr#routr
+  license: MIT
+  summary: In order to make sure that web request ends up in the correct handler function a router
+    is often used. 'routr' is a package implementing a simple but powerful routing functionality
+    for R based servers. It is a fully functional 'fiery' plugin, but can also be used
+    with other 'httpuv' based servers.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: routr
+# Type: Package
+# Title: A Simple Router for HTTP and WebSocket Requests
+# Version: 0.4.1
+# Authors@R: c(person(given = "Thomas Lin", family = "Pedersen", role = c("cre", "aut"), email = "thomasp85@gmail.com", comment = c(ORCID = "0000-0002-5147-4711")))
+# Maintainer: Thomas Lin Pedersen <thomasp85@gmail.com>
+# Description: In order to make sure that web request ends up in the correct handler function a router is often used. 'routr' is a package implementing a simple but powerful routing functionality for R based servers. It is a fully functional 'fiery' plugin, but can also be used with other 'httpuv' based servers.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Imports: R6, assertthat, uuid, reqres, stringi, tools, digest
+# RoxygenNote: 7.2.1
+# Suggests: testthat, covr, fiery
+# URL: https://routr.data-imaginist.com, https://github.com/thomasp85/routr#routr
+# BugReports: https://github.com/thomasp85/routr/issues
+# NeedsCompilation: no
+# Packaged: 2022-08-19 13:22:22 UTC; thomas
+# Author: Thomas Lin Pedersen [cre, aut] (<https://orcid.org/0000-0002-5147-4711>)
+# Repository: CRAN
+# Date/Publication: 2022-08-19 13:40:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

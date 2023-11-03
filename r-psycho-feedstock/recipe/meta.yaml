@@ -1,0 +1,107 @@
+{% set version = '0.6.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-psycho
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/psycho_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/psycho/psycho_{{ version }}.tar.gz
+  sha256: 0ac44efd2afe83feef040857620bcbcfe334219c93edbcdce42b7399326378a8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, covr, GPArotation
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bayestestr
+    - r-dplyr
+    - r-effectsize
+    - r-ggplot2
+    - r-insight
+    - r-parameters
+    - r-scales
+    - r-stringr
+
+  run:
+    - r-base
+    - r-bayestestr
+    - r-dplyr
+    - r-effectsize
+    - r-ggplot2
+    - r-insight
+    - r-parameters
+    - r-scales
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('psycho')"           # [not win]
+    - "\"%R%\" -e \"library('psycho')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/neuropsychology/psycho.R
+  license: MIT
+  summary: The main goal of the psycho package is to provide tools for psychologists, neuropsychologists
+    and neuroscientists, to facilitate and speed up the time spent on data analysis.
+    It aims at supporting best practices and tools to format the output of statistical
+    methods to directly paste them into a manuscript, ensuring statistical reporting
+    standardization and conformity.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: psycho
+# Type: Package
+# Title: Efficient and Publishing-Oriented Workflow for Psychological Science
+# Version: 0.6.1
+# Authors@R: c( person("Dominique", "Makowski", email = "dom.makowski@gmail.com", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0001-5375-9967")), person("Hugo", "Najberg", role = "ctb"), person("Viliam", "Simko", role = "ctb"), person("Sasha", "Epskamp", role = "rev", comment = "Sasha reviewed the package for JOSS, see https://github.com/openjournals/joss-reviews/issues/470") )
+# Maintainer: Dominique Makowski <dom.makowski@gmail.com>
+# URL: https://github.com/neuropsychology/psycho.R
+# BugReports: https://github.com/neuropsychology/psycho.R/issues
+# Description: The main goal of the psycho package is to provide tools for psychologists, neuropsychologists and neuroscientists, to facilitate and speed up the time spent on data analysis. It aims at supporting best practices and tools to format the output of statistical methods to directly paste them into a manuscript, ensuring statistical reporting standardization and conformity.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.1.1
+# Depends: R (>= 3.5.0)
+# Imports: stats, scales, utils, dplyr, stringr, ggplot2, insight, bayestestR, parameters, effectsize
+# Suggests: knitr, rmarkdown, testthat, covr, GPArotation
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2021-01-19 01:55:59 UTC; domma
+# Author: Dominique Makowski [aut, cre, cph] (<https://orcid.org/0000-0001-5375-9967>), Hugo Najberg [ctb], Viliam Simko [ctb], Sasha Epskamp [rev] (Sasha reviewed the package for JOSS, see https://github.com/openjournals/joss-reviews/issues/470)
+# Repository: CRAN
+# Date/Publication: 2021-01-19 06:40:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

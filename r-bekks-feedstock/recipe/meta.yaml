@@ -1,0 +1,130 @@
+{% set version = '1.4.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bekks
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BEKKs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BEKKs/BEKKs_{{ version }}.tar.gz
+  sha256: 60fec764afa8623f1efe48b29a1a52fef2702c9794adf5246c1aa1c38a57350d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.1.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-gas
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-forecast
+    - r-future
+    - r-future.apply
+    - r-ggfortify
+    - r-ggplot2
+    - r-gridextra
+    - r-ks
+    - r-lubridate
+    - r-mathjaxr
+    - r-moments
+    - r-numderiv
+    - r-pbapply
+    - r-reshape2
+    - r-xts
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-gas
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-forecast
+    - r-future
+    - r-future.apply
+    - r-ggfortify
+    - r-ggplot2
+    - r-gridextra
+    - r-ks
+    - r-lubridate
+    - r-mathjaxr
+    - r-moments
+    - r-numderiv
+    - r-pbapply
+    - r-reshape2
+    - r-xts
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BEKKs')"           # [not win]
+    - "\"%R%\" -e \"library('BEKKs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=BEKKs
+  license: MIT
+  summary: "Methods and tools for estimating, simulating and forecasting of so-called BEKK-models
+    (named after Baba, Engle, Kraft and Kroner) based on the fast Berndt\u2013Hall\u2013Hall\u2013Hausman
+    (BHHH) algorithm described in Hafner and Herwartz (2008) <doi:10.1007/s00184-007-0130-y>."
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: BEKKs
+# Title: Multivariate Conditional Volatility Modelling and Forecasting
+# Version: 1.4.3
+# Author: Markus J. Fulle [aut, cre], Alexander Lange [aut], Christian M. Hafner [aut], Helmut Herwartz [aut]
+# Authors@R: c(person("Markus J.", "Fulle", role = c("aut", "cre"), email = "fuelle@uni-goettingen.de"), person("Alexander", "Lange", role = c("aut"), email = "alexander.lange@uni-goettingen.de"), person("Christian M.", "Hafner", role = c("aut"), email = "christian.hafner@uclouvain.be"), person("Helmut", "Herwartz", role = c("aut"), email = "hherwartz@uni-goettingen.de"))
+# Maintainer: Markus J. Fulle <fuelle@uni-goettingen.de>
+# Description: Methods and tools for estimating, simulating and forecasting of so-called BEKK-models (named after Baba, Engle, Kraft and Kroner) based on the fast BerndtHallHallHausman (BHHH) algorithm described in Hafner and Herwartz (2008) <doi:10.1007/s00184-007-0130-y>.
+# Depends: R (>= 3.5.0)
+# Imports: Rcpp, reshape2, ggplot2, mathjaxr, gridExtra, grid, ggfortify, parallel, xts, stats, future, forecast, future.apply, GAS, ks, lubridate, utils, pbapply, numDeriv, moments
+# LinkingTo: Rcpp, RcppArmadillo
+# NeedsCompilation: yes
+# SystemRequirements: C++17
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# Suggests: testthat (>= 2.1.0)
+# RdMacros: mathjaxr
+# RoxygenNote: 7.1.2
+# Packaged: 2023-03-24 20:10:55 UTC; Markus
+# Repository: CRAN
+# Date/Publication: 2023-03-26 11:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

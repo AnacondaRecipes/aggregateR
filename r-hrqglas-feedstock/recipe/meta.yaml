@@ -1,0 +1,105 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hrqglas
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hrqglas_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hrqglas/hrqglas_{{ version }}.tar.gz
+  sha256: 45250d68c0b8ae675a4c925990c3eb708432b8d74df4061551b39483be6c706c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-rcpp >=1.0.4
+    - r-quantreg
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-matrix
+    - r-rcpp >=1.0.4
+    - r-quantreg
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hrqglas')"           # [not win]
+    - "\"%R%\" -e \"library('hrqglas')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: 'GitHub: https://github.com/shaobo-li/hrqglas'
+  license: GPL-2
+  summary: A program that conducts group variable selection for quantile and robust mean regression
+    (Sherwood and Li, 2022). The group lasso penalty (Yuan and Lin, 2006) is used for
+    group-wise variable selection. Both of the quantile and mean regression models are
+    based on the Huber loss. Specifically, with the tuning parameter in the Huber loss
+    approaching to 0, the quantile check function can be approximated by the Huber loss
+    for the median and the tilted version of Huber loss at other quantiles. Such approximation
+    provides computational efficiency and stability, and has also been shown to be statistical
+    consistent.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: hrqglas
+# Type: Package
+# Title: Group Variable Selection for Quantile and Robust Mean Regression
+# Version: 1.1.0
+# Date: 2023-01-29
+# Authors@R: c(person("Shaobo", "Li", email="shaobo.li@ku.edu", role=c("aut", "cre")), person("Ben", "Sherwood", email="ben.sherwood@ku.edu", role=c("aut")))
+# Maintainer: Shaobo Li <shaobo.li@ku.edu>
+# Description: A program that conducts group variable selection for quantile and robust mean regression (Sherwood and Li, 2022). The group lasso penalty (Yuan and Lin, 2006) is used for group-wise variable selection. Both of the quantile and mean regression models are based on the Huber loss. Specifically, with the tuning parameter in the Huber loss approaching to 0, the quantile check function can be approximated by the Huber loss for the median and the tilted version of Huber loss at other quantiles. Such approximation provides computational efficiency and stability, and has also been shown to be statistical consistent.
+# URL: GitHub: https://github.com/shaobo-li/hrqglas
+# License: GPL (>= 2)
+# Imports: Rcpp (>= 1.0.4), stats, MASS, Matrix, graphics, quantreg
+# LinkingTo: Rcpp
+# RoxygenNote: 7.1.1
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-01-30 03:50:16 UTC; lisha
+# Author: Shaobo Li [aut, cre], Ben Sherwood [aut]
+# Repository: CRAN
+# Date/Publication: 2023-01-30 08:30:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

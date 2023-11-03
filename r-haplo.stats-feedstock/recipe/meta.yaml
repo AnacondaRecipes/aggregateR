@@ -1,0 +1,95 @@
+{% set version = '1.9.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-haplo.stats
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/haplo.stats_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/haplo.stats/haplo.stats_{{ version }}.tar.gz
+  sha256: 3a4efa04a003a65efb131de284db0ad7df7839b1216b12725b0501b047af9ddb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: R.rsp, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-arsenal
+    - r-rms
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-arsenal
+    - r-rms
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('haplo.stats')"           # [not win]
+    - "\"%R%\" -e \"library('haplo.stats')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://analytictools.mayo.edu/research/haplo-stats/
+  license: GPL-2
+  summary: 'Routines for the analysis of indirectly measured haplotypes. The statistical methods
+    assume that all subjects are unrelated and that haplotypes are ambiguous (due to
+    unknown linkage phase of the genetic markers). The main functions are: haplo.em(),
+    haplo.glm(), haplo.score(), and haplo.power(); all of which have detailed examples
+    in the vignette.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: haplo.stats
+# Version: 1.9.3
+# Date: 2023-1-20
+# Title: Statistical Analysis of Haplotypes with Traits and Covariates when Linkage Phase is Ambiguous
+# Author: Sinnwell JP, Schaid DJ
+# Maintainer: Jason P. Sinnwell <sinnwell.jason@mayo.edu>
+# Description: Routines for the analysis of indirectly measured haplotypes. The statistical methods assume that all subjects are unrelated and that haplotypes are ambiguous (due to unknown linkage phase of the genetic markers). The main functions are: haplo.em(), haplo.glm(), haplo.score(), and haplo.power(); all of which have detailed examples in the vignette.
+# License: GPL (>= 2)
+# Depends: R (>= 4.1.0), methods, stats, graphics, arsenal
+# Imports: rms
+# Suggests: R.rsp, testthat
+# VignetteBuilder: R.rsp
+# URL: https://analytictools.mayo.edu/research/haplo-stats/
+# NeedsCompilation: yes
+# Packaged: 2023-01-20 21:30:40 UTC; sinnwell
+# Repository: CRAN
+# Date/Publication: 2023-01-20 22:20:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

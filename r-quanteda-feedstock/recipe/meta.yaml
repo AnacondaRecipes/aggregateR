@@ -1,0 +1,125 @@
+{% set version = '3.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-quanteda
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/quanteda_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/quanteda/quanteda_{{ version }}.tar.gz
+  sha256: 628542307d7ac45d4996fbc993a43ed5efcca73d97735ca74a10ccea401d4166
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rmarkdown, spelling, testthat, formatR, tm (>= 0.6), tokenizers, knitr, lda, lsa, dplyr, purrr, quanteda.textmodels, quanteda.textstats, quanteda.textplots, RColorBrewer, slam, spacyr, stm, text2vec, topicmodels, tibble, tidytext, xtable, ggplot2
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix >=1.5_0
+    - r-rcpp >=0.12.12
+    - r-rcpparmadillo >=0.7.600.1.0
+    - r-rcppparallel
+    - r-snowballc
+    - r-fastmatch
+    - r-jsonlite
+    - r-magrittr
+    - r-stopwords
+    - r-stringi
+    - r-xml2
+    - r-yaml
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix >=1.5_0
+    - r-rcpp >=0.12.12
+    - r-rcpparmadillo >=0.7.600.1.0
+    - r-rcppparallel
+    - r-snowballc
+    - r-fastmatch
+    - r-jsonlite
+    - r-magrittr
+    - r-stopwords
+    - r-stringi
+    - r-xml2
+    - r-yaml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('quanteda')"           # [not win]
+    - "\"%R%\" -e \"library('quanteda')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://quanteda.io
+  license: GPL-3
+  summary: A fast, flexible, and comprehensive framework for quantitative text analysis in R.  Provides
+    functionality for corpus management, creating and manipulating tokens and n-grams,
+    exploring keywords in context, forming and manipulating sparse matrices of documents
+    by features and feature co-occurrences, analyzing keywords, computing feature similarities
+    and distances, applying content dictionaries, applying supervised and unsupervised
+    machine learning, visually representing text and text analyses, and more.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: quanteda
+# Version: 3.3.1
+# Title: Quantitative Analysis of Textual Data
+# Description: A fast, flexible, and comprehensive framework for quantitative text analysis in R.  Provides functionality for corpus management, creating and manipulating tokens and n-grams, exploring keywords in context, forming and manipulating sparse matrices of documents by features and feature co-occurrences, analyzing keywords, computing feature similarities and distances, applying content dictionaries, applying supervised and unsupervised machine learning, visually representing text and text analyses, and more.
+# Authors@R: c( person("Kenneth", "Benoit", email = "kbenoit@lse.ac.uk", role = c("cre", "aut", "cph"), comment = c(ORCID = "0000-0002-0797-564X")), person("Kohei", "Watanabe", email = "watanabe.kohei@gmail.com", role = "aut", comment = c(ORCID = "0000-0001-6519-5265")), person("Haiyan", "Wang", email = "whyinsa@yahoo.com", role = "aut", comment = c(ORCID = "0000-0003-4992-4311")), person("Paul", "Nulty", email = "paul.nulty@gmail.com", role = "aut", comment = c(ORCID = "0000-0002-7214-4666")), person("Adam", "Obeng", email = "quanteda@binaryeagle.com", role = "aut", comment = c(ORCID = "0000-0002-2906-4775")), person("Stefan", "Muller", email = "stefan.mueller@ucd.ie", role = "aut", comment = c(ORCID = "0000-0002-6315-4125")), person("Akitaka", "Matsuo", email = "a.matsuo@essex.ac.uk", role = "aut", comment = c(ORCID = "0000-0002-3323-6330")), person("William", "Lowe", email = "lowe@hertie-school.org", role = "aut", comment = c(ORCID = "0000-0002-1549-6163")), person("Christian", "Muller", email = "C.Mueller@lse.ac.uk", role = "ctb"), person("Olivier", "Delmarcelle", email = "olivier.delmarcelle@ugent.be", role = "ctb", comment = c(ORCID = "0000-0003-4347-070X")), person("European Research Council", role = "fnd", comment = "ERC-2011-StG 283794-QUANTESS") )
+# License: GPL-3
+# Depends: R (>= 3.5.0), methods
+# Imports: fastmatch, jsonlite, magrittr, Matrix (>= 1.5-0), Rcpp (>= 0.12.12), RcppParallel, SnowballC, stopwords, stringi, xml2, yaml
+# LinkingTo: Rcpp, RcppParallel, RcppArmadillo (>= 0.7.600.1.0)
+# Suggests: rmarkdown, spelling, testthat, formatR, tm (>= 0.6), tokenizers, knitr, lda, lsa, dplyr, purrr, quanteda.textmodels, quanteda.textstats, quanteda.textplots, RColorBrewer, slam, spacyr, stm, text2vec, topicmodels, tibble, tidytext, xtable, ggplot2
+# URL: https://quanteda.io
+# Encoding: UTF-8
+# BugReports: https://github.com/quanteda/quanteda/issues
+# LazyData: TRUE
+# VignetteBuilder: knitr
+# Language: en-GB
+# RoxygenNote: 7.2.3
+# Collate: 'RcppExports.R' 'tokenizers.R' 'meta.R' 'quanteda-documentation.R' 'aaa.R' 'bootstrap_dfm.R' 'casechange-functions.R' 'char_select.R' 'convert.R' 'corpus-addsummary-metadata.R' 'corpus-methods.R' 'corpus.R' 'corpus_group.R' 'corpus_reshape.R' 'corpus_sample.R' 'corpus_segment.R' 'corpus_subset.R' 'corpus_trim.R' 'data-documentation.R' 'dfm-classes.R' 'dfm-methods.R' 'dfm-print.R' 'dfm-subsetting.R' 'dfm.R' 'dfm_compress.R' 'dfm_group.R' 'dfm_lookup.R' 'dfm_match.R' 'dfm_replace.R' 'dfm_sample.R' 'dfm_select.R' 'dfm_sort.R' 'dfm_subset.R' 'dfm_trim.R' 'dfm_weight.R' 'dictionaries.R' 'dimnames.R' 'fcm-classes.R' 'docnames.R' 'docvars.R' 'fcm-methods.R' 'fcm-print.R' 'fcm-subsetting.R' 'fcm.R' 'fcm_select.R' 'index.R' 'kwic.R' 'message.R' 'nfunctions.R' 'object-builder.R' 'object2fixed.R' 'pattern2fixed.R' 'phrases.R' 'quanteda_options.R' 'readtext-methods.R' 'spacyr-methods.R' 'stopwords.R' 'summary.R' 'textmodel.R' 'textplot.R' 'texts.R' 'textstat.R' 'tokens-methods.R' 'tokens.R' 'tokens_chunk.R' 'tokens_compound.R' 'tokens_group.R' 'tokens_lookup.R' 'tokens_ngrams.R' 'tokens_replace.R' 'tokens_restore.R' 'tokens_sample.R' 'tokens_segment.R' 'tokens_select.R' 'tokens_split.R' 'tokens_subset.R' 'utils.R' 'validator.R' 'wordstem.R' 'zzz.R'
+# NeedsCompilation: yes
+# Packaged: 2023-05-17 15:53:38 UTC; kbenoit
+# Author: Kenneth Benoit [cre, aut, cph] (<https://orcid.org/0000-0002-0797-564X>), Kohei Watanabe [aut] (<https://orcid.org/0000-0001-6519-5265>), Haiyan Wang [aut] (<https://orcid.org/0000-0003-4992-4311>), Paul Nulty [aut] (<https://orcid.org/0000-0002-7214-4666>), Adam Obeng [aut] (<https://orcid.org/0000-0002-2906-4775>), Stefan Muller [aut] (<https://orcid.org/0000-0002-6315-4125>), Akitaka Matsuo [aut] (<https://orcid.org/0000-0002-3323-6330>), William Lowe [aut] (<https://orcid.org/0000-0002-1549-6163>), Christian Muller [ctb], Olivier Delmarcelle [ctb] (<https://orcid.org/0000-0003-4347-070X>), European Research Council [fnd] (ERC-2011-StG 283794-QUANTESS)
+# Maintainer: Kenneth Benoit <kbenoit@lse.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2023-05-18 09:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

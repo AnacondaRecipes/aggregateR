@@ -1,0 +1,121 @@
+{% set version = '1.5.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-qtools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Qtools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Qtools/Qtools_{{ version }}.tar.gz
+  sha256: f1296c0a1a4b907b0659fe9f24fc2cf87a0eed0b71c93c6a92c445205d45ec98
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, mice, rmarkdown, survey
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-rcpp >=0.12.13
+    - r-rcpparmadillo
+    - r-boot
+    - r-conquer
+    - r-glmx
+    - r-gtools
+    - r-np
+    - r-numderiv >=2016.8_1
+    - r-quantdr
+    - r-quantreg
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-matrix
+    - r-rcpp >=0.12.13
+    - r-rcpparmadillo
+    - r-boot
+    - r-conquer
+    - r-glmx
+    - r-gtools
+    - r-np
+    - r-numderiv >=2016.8_1
+    - r-quantdr
+    - r-quantreg
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Qtools')"           # [not win]
+    - "\"%R%\" -e \"library('Qtools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Qtools
+  license: GPL-2
+  summary: Functions for unconditional and conditional quantiles. These include methods for transformation-based
+    quantile regression, quantile-based measures of location, scale and shape, methods
+    for quantiles of discrete variables, quantile-based multiple imputation, restricted
+    quantile regression, directional quantile classification, and quantile ratio regression.
+    A vignette is given in Geraci (2016, The R Journal) <doi:10.32614/RJ-2016-037> and
+    included in the package.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: Qtools
+# Type: Package
+# Title: Utilities for Quantiles
+# Version: 1.5.9
+# Date: 2023-10-28
+# Authors@R: c( person(given="Marco", family="Geraci", role=c("aut", "cph", "cre"), email="marco.geraci@uniroma1.it", comment = c(ORCID = "0000-0002-6311-8685")), person(given="Alessio", family="Farcomeni", role=c("ctb"), email="alessio.farcomeni@uniroma2.it", comment = c("Contributions to midrq and qrr code", ORCID = "0000-0002-7104-5826")), person(given="Cinzia", family="Viroli", role=c("ctb"), email="cinzia.viroli@unibo.it", comment = c("Contributions to dqc code", ORCID = "0000-0002-3278-5266")) )
+# Maintainer: Marco Geraci <marco.geraci@uniroma1.it>
+# Depends: R (>= 3.5.0)
+# Imports: boot, conquer, glmx, graphics, grDevices, gtools, MASS, Matrix, np, numDeriv (>= 2016.8-1), quantdr, quantreg, Rcpp (>= 0.12.13), stats, utils
+# LinkingTo: Rcpp, RcppArmadillo
+# Suggests: knitr, mice, rmarkdown, survey
+# VignetteBuilder: knitr
+# Description: Functions for unconditional and conditional quantiles. These include methods for transformation-based quantile regression, quantile-based measures of location, scale and shape, methods for quantiles of discrete variables, quantile-based multiple imputation, restricted quantile regression, directional quantile classification, and quantile ratio regression. A vignette is given in Geraci (2016, The R Journal) <doi:10.32614/RJ-2016-037> and included in the package.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# NeedsCompilation: yes
+# Packaged: 2023-10-28 13:08:20 UTC; marco
+# Author: Marco Geraci [aut, cph, cre] (<https://orcid.org/0000-0002-6311-8685>), Alessio Farcomeni [ctb] (Contributions to midrq and qrr code, <https://orcid.org/0000-0002-7104-5826>), Cinzia Viroli [ctb] (Contributions to dqc code, <https://orcid.org/0000-0002-3278-5266>)
+# Repository: CRAN
+# Date/Publication: 2023-10-28 15:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

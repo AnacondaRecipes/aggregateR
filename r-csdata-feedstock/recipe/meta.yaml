@@ -1,0 +1,88 @@
+{% set version = '2023.5.22' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-csdata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/csdata_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/csdata/csdata_{{ version }}.tar.gz
+  sha256: b82d6c07b08b429b9c6c81f9f59a1ccea0b28b4d7342479bd67f69c726611e38
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, broom, crayon, dplyr, forcats, fs, geojsonio, ggplot2, glue, gt, knitr, lubridate, magrittr, mapproj, methods, ncdf4, purrr, readxl, reshape2, rgeos, rmarkdown, rmapshaper, rstudioapi, stringr, sp, sf, tidyr, zoo
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+
+  run:
+    - r-base
+    - r-data.table
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('csdata')"           # [not win]
+    - "\"%R%\" -e \"library('csdata')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.csids.no/csdata/, https://github.com/csids/csdata
+  license: MIT
+  summary: Datasets relating to population in municipalities, municipality/county matching, and
+    how different municipalities have merged/redistricted over time from 2006 to 2020.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: csdata
+# Title: Structural Data for Norway
+# Version: 2023.5.22
+# Authors@R: c( person(c("Richard","Aubrey"), "White", email = "hello@rwhite.no", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-6747-1726") ), person("Chi", "Zhang", email = "andreachizhang@yahoo.com", role = c("aut"), comment = c(ORCID = "0000-0003-0501-5909") ) )
+# Description: Datasets relating to population in municipalities, municipality/county matching, and how different municipalities have merged/redistricted over time from 2006 to 2020.
+# URL: https://www.csids.no/csdata/, https://github.com/csids/csdata
+# BugReports: https://github.com/csids/csdata/issues
+# Depends: R (>= 3.5.0)
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Imports: data.table, stats, utils
+# Suggests: testthat, broom, crayon, dplyr, forcats, fs, geojsonio, ggplot2, glue, gt, knitr, lubridate, magrittr, mapproj, methods, ncdf4, purrr, readxl, reshape2, rgeos, rmarkdown, rmapshaper, rstudioapi, stringr, sp, sf, tidyr, zoo
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# Date/Publication: 2023-05-22 10:10:18 UTC
+# NeedsCompilation: no
+# Packaged: 2023-05-22 08:41:58 UTC; raw996
+# Author: Richard Aubrey White [aut, cre] (<https://orcid.org/0000-0002-6747-1726>), Chi Zhang [aut] (<https://orcid.org/0000-0003-0501-5909>)
+# Maintainer: Richard Aubrey White <hello@rwhite.no>
+# Repository: CRAN
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

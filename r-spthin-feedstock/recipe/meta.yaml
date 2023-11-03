@@ -1,0 +1,91 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spthin
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/spThin_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/spThin/spThin_{{ version }}.tar.gz
+  sha256: 2e997afb79a2a990eded34c71afaac83986669cfa9ac51b15ae3f2b558902048
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-fields
+    - r-knitr
+    - r-spam
+
+  run:
+    - r-base
+    - r-fields
+    - r-knitr
+    - r-spam
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('spThin')"           # [not win]
+    - "\"%R%\" -e \"library('spThin')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=spThin
+  license: GPL-3
+  summary: A set of functions that can be used to spatially thin species occurrence data. The
+    resulting thinned data can be used in ecological modeling, such as ecological niche
+    modeling.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: spThin
+# Type: Package
+# Title: Functions for Spatial Thinning of Species Occurrence Records for Use in Ecological Models
+# Version: 0.2.0
+# Date: 2019-11-14
+# Authors@R: c( person("Matthew E.", "Aiello-Lammens", email = "matt.lammens@gmail.com", role = c("aut", "cre")), person("Robert A.", "Boria", role = "aut"), person("Aleksandar", "Radosavljevic", role = "aut"), person("Bruno", "Vilela", role = "aut"), person("Robert P.", "Anderson", role = "aut"), person("Robert", "Bjornson", role = "ctb"), person("Steve", "Weston", role = "ctb"))
+# Description: A set of functions that can be used to spatially thin species occurrence data. The resulting thinned data can be used in ecological modeling, such as ecological niche modeling.
+# BugReports: https://github.com/mlammens/spThin/issues
+# Depends: spam, grid, fields, knitr
+# Imports: grDevices, graphics, utils
+# LazyData: TRUE
+# License: GPL-3
+# VignetteBuilder: knitr
+# RoxygenNote: 7.0.0
+# NeedsCompilation: no
+# Packaged: 2019-11-15 17:36:53 UTC; maiellolammens
+# Author: Matthew E. Aiello-Lammens [aut, cre], Robert A. Boria [aut], Aleksandar Radosavljevic [aut], Bruno Vilela [aut], Robert P. Anderson [aut], Robert Bjornson [ctb], Steve Weston [ctb]
+# Maintainer: Matthew E. Aiello-Lammens <matt.lammens@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-11-15 18:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

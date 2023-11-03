@@ -1,0 +1,95 @@
+{% set version = '1.0.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-distance
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Distance_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Distance/Distance_{{ version }}.tar.gz
+  sha256: 696850b889097342e87df38a9fce50ca7eef1cc2f46960ee986f47eb57294888
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, progress, parallel, doParallel, doRNG, foreach, activity, testthat, optimx, readxl
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr
+    - r-mrds >=2.2.9
+    - r-rlang
+
+  run:
+    - r-base
+    - r-dplyr
+    - r-mrds >=2.2.9
+    - r-rlang
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Distance')"           # [not win]
+    - "\"%R%\" -e \"library('Distance')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/DistanceDevelopment/Distance/
+  license: GPL-2
+  summary: A simple way of fitting detection functions to distance sampling data for both line
+    and point transects. Adjustment term selection, left and right truncation as well
+    as monotonicity constraints and binning are supported. Abundance and density estimates
+    can also be calculated (via a Horvitz-Thompson-like estimator) if survey area information
+    is provided. See Miller et al. (2019) <doi:10.18637/jss.v089.i01> for more information
+    on methods and <https://examples.distancesampling.org/> for example analyses.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: Distance
+# Maintainer: Laura Marshall <lhm@st-andrews.ac.uk>
+# License: GPL (>= 2)
+# Title: Distance Sampling Detection Function and Abundance Estimation
+# LazyLoad: yes
+# Author: David Lawrence Miller, T.J. Clark-Wolf
+# Description: A simple way of fitting detection functions to distance sampling data for both line and point transects. Adjustment term selection, left and right truncation as well as monotonicity constraints and binning are supported. Abundance and density estimates can also be calculated (via a Horvitz-Thompson-like estimator) if survey area information is provided. See Miller et al. (2019) <doi:10.18637/jss.v089.i01> for more information on methods and <https://examples.distancesampling.org/> for example analyses.
+# Version: 1.0.8
+# URL: https://github.com/DistanceDevelopment/Distance/
+# BugReports: https://github.com/DistanceDevelopment/Distance/issues
+# Language: en-GB
+# Depends: R (>= 3.5.0), mrds (>= 2.2.9)
+# Imports: dplyr, methods, rlang
+# Suggests: covr, progress, parallel, doParallel, doRNG, foreach, activity, testthat, optimx, readxl
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-07-13 09:03:23 UTC; lhm
+# Repository: CRAN
+# Date/Publication: 2023-07-17 11:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

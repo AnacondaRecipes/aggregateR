@@ -1,0 +1,102 @@
+{% set version = '1.6-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-splm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/splm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/splm/splm_{{ version }}.tar.gz
+  sha256: 95f9b1112722170689dab4928d4d8cd1579233f0ed65a15893d13474359b2662
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-bdsmatrix
+    - r-ibdreg
+    - r-maxlik
+    - r-nlme
+    - r-plm
+    - r-spam
+    - r-spatialreg >=1.2_1
+    - r-spdep >=1.2_1
+    - r-stringr
+
+  run:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-bdsmatrix
+    - r-ibdreg
+    - r-maxlik
+    - r-nlme
+    - r-plm
+    - r-spam
+    - r-spatialreg >=1.2_1
+    - r-spdep >=1.2_1
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('splm')"           # [not win]
+    - "\"%R%\" -e \"library('splm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=splm
+  license: GPL-2
+  summary: ML and GM estimation and diagnostic testing of econometric models for spatial panel
+    data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: splm
+# Title: Econometric Models for Spatial Panel Data
+# Version: 1.6-3
+# Date: 2023-07-20
+# Authors@R: c(person(given = "Giovanni", family = "Millo", role = c("aut", "cre"), email = "giovanni.millo@deams.units.it"), person(given = "Gianfranco", family = "Piras", role = c("aut"), email = "gpiras@mac.com"), person("Roger", "Bivand", role = c("ctb"), email = "Roger.Bivand@nhh.no", comment=c(ORCID="0000-0003-2392-6140")))
+# Description: ML and GM estimation and diagnostic testing of econometric models for spatial panel data.
+# Depends: R (>= 2.12.0)
+# Imports: plm, maxLik, MASS, bdsmatrix, ibdreg, nlme, Matrix, spam, methods, spatialreg (>= 1.2-1), spdep (>= 1.2-1), stringr
+# License: GPL-2
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2023-07-20 15:23:32 UTC; gianni
+# Author: Giovanni Millo [aut, cre], Gianfranco Piras [aut], Roger Bivand [ctb] (<https://orcid.org/0000-0003-2392-6140>)
+# Maintainer: Giovanni Millo <giovanni.millo@deams.units.it>
+# Repository: CRAN
+# Date/Publication: 2023-07-20 16:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

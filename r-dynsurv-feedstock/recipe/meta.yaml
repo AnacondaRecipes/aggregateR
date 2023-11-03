@@ -1,0 +1,111 @@
+{% set version = '0.4-5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dynsurv
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dynsurv_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dynsurv/dynsurv_{{ version }}.tar.gz
+  sha256: 567c532cc0ac7c68ef6df48f8926f5a5107cb020307968c08798983170bad4b1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh >=1.54.0_2
+    - r-data.table >=1.9.8
+    - r-ggplot2
+    - r-nleqslv
+    - r-splines2
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.54.0_2
+    - r-data.table >=1.9.8
+    - r-ggplot2
+    - r-nleqslv
+    - r-splines2
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dynsurv')"           # [not win]
+    - "\"%R%\" -e \"library('dynsurv')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/wenjie2wang/dynsurv
+  license: GPL-3
+  summary: Time-varying coefficient models for interval censored and right censored survival
+    data including 1) Bayesian Cox model with time-independent, time-varying or dynamic
+    coefficients for right censored and interval censored data studied by Sinha et al.
+    (1999) <doi:10.1111/j.0006-341X.1999.00585.x> and Wang et al. (2013) <doi:10.1007/s10985-013-9246-8>,
+    2) Spline based time-varying coefficient Cox model for right censored data proposed
+    by Perperoglou et al. (2006) <doi:10.1016/j.cmpb.2005.11.006>, and 3) Transformation
+    model with time-varying coefficients for right censored data using estimating equations
+    proposed by Peng and Huang (2007) <doi:10.1093/biomet/asm058>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: dynsurv
+# Title: Dynamic Models for Survival Data
+# Version: 0.4-5
+# Authors@R: c( person(given = "Wenjie", family = "Wang", email = "wang@wwenjie.org", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0363-3180")), person(given = "Ming-Hui", family = "Chen", role = "aut"), person(given = "Xiaojing", family = "Wang", role = "aut"), person(given = "Jun", family = "Yan", role = "aut", comment = c(ORCID = "0000-0003-4401-7296")) )
+# Description: Time-varying coefficient models for interval censored and right censored survival data including 1) Bayesian Cox model with time-independent, time-varying or dynamic coefficients for right censored and interval censored data studied by Sinha et al. (1999) <doi:10.1111/j.0006-341X.1999.00585.x> and Wang et al. (2013) <doi:10.1007/s10985-013-9246-8>, 2) Spline based time-varying coefficient Cox model for right censored data proposed by Perperoglou et al. (2006) <doi:10.1016/j.cmpb.2005.11.006>, and 3) Transformation model with time-varying coefficients for right censored data using estimating equations proposed by Peng and Huang (2007) <doi:10.1093/biomet/asm058>.
+# Depends: R (>= 3.0.2)
+# Imports: data.table (>= 1.9.8), ggplot2, grDevices, grid, nleqslv, splines2, stats, survival
+# LinkingTo: BH (>= 1.54.0-2)
+# License: GPL (>= 3)
+# LazyLoad: Yes
+# LazyData: Yes
+# NeedsCompilation: yes
+# Encoding: UTF-8
+# URL: https://github.com/wenjie2wang/dynsurv
+# BugReports: https://github.com/wenjie2wang/dynsurv/issues
+# RoxygenNote: 7.2.3
+# Packaged: 2023-08-19 18:31:53 UTC; wenjie
+# Author: Wenjie Wang [aut, cre] (<https://orcid.org/0000-0003-0363-3180>), Ming-Hui Chen [aut], Xiaojing Wang [aut], Jun Yan [aut] (<https://orcid.org/0000-0003-4401-7296>)
+# Maintainer: Wenjie Wang <wang@wwenjie.org>
+# Repository: CRAN
+# Date/Publication: 2023-08-19 18:52:32 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

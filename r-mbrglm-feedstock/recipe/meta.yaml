@@ -1,0 +1,92 @@
+{% set version = '0.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mbrglm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mbrglm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mbrglm/mbrglm_{{ version }}.tar.gz
+  sha256: 04666bb2d3bb078c3382950a49cb6def914bd1d1d9378a71bcb0788c660fb87b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: brglm
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-enrichwith
+    - r-nleqslv
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-enrichwith
+    - r-nleqslv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mbrglm')"           # [not win]
+    - "\"%R%\" -e \"library('mbrglm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mbrglm
+  license: GPL-2
+  summary: Fit generalized linear models with binomial responses using  a median modified score
+    approach (Kenne Pagui et al., 2016, <https://arxiv.org/abs/1604.04768>) to median
+    bias reduction. This method respects equivariance under reparameterizations for
+    each parameter component and also solves the infinite estimates problem (data separation).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: mbrglm
+# Type: Package
+# Title: Median Bias Reduction in Binomial-Response GLMs
+# Version: 0.0.1
+# Date: 2017-02-05
+# Author: Euloge Clovis Kenne Pagui, Nicola Sartori  and Alessandra Salvan
+# Maintainer: Euloge C. Kenne Pagui <kenne@stat.unipd.it>
+# Description: Fit generalized linear models with binomial responses using  a median modified score approach (Kenne Pagui et al., 2016, <https://arxiv.org/abs/1604.04768>) to median bias reduction. This method respects equivariance under reparameterizations for each parameter component and also solves the infinite estimates problem (data separation).
+# License: GPL-2
+# Suggests: brglm
+# Depends: R (>= 2.6.0), nleqslv, enrichwith
+# NeedsCompilation: yes
+# Packaged: 2017-02-05 07:42:35 UTC; nicolasartori
+# Repository: CRAN
+# Date/Publication: 2017-02-05 16:07:53
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

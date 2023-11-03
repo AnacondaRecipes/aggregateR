@@ -1,0 +1,106 @@
+{% set version = '1.0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-factorstochvol
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/factorstochvol_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/factorstochvol/factorstochvol_{{ version }}.tar.gz
+  sha256: 3727995d0341792e3a91804f7565d4ed862d774e681f1653d70f923975c742b8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: LSD (>= 4.0-0), coda (>= 0.19-2), knitr, RColorBrewer, testthat (>= 2.1.0), zoo
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-gigrvg >=0.4
+    - r-rcpp >=1.0.0
+    - r-rcpparmadillo >=0.9.900
+    - r-corrplot
+    - r-stochvol >=3.0.2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-gigrvg >=0.4
+    - r-rcpp >=1.0.0
+    - r-rcpparmadillo >=0.9.900
+    - r-corrplot
+    - r-stochvol >=3.0.2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('factorstochvol')"           # [not win]
+    - "\"%R%\" -e \"library('factorstochvol')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=factorstochvol
+  license: GPL-2
+  summary: Markov chain Monte Carlo (MCMC) sampler for fully Bayesian estimation of latent factor
+    stochastic volatility models with interweaving <doi:10.1080/10618600.2017.1322091>.
+    Sparsity can be achieved through the usage of Normal-Gamma priors on the factor
+    loading matrix <doi:10.1016/j.jeconom.2018.11.007>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Encoding: UTF-8
+# Package: factorstochvol
+# Type: Package
+# Title: Bayesian Estimation of (Sparse) Latent Factor Stochastic Volatility Models
+# Version: 1.0.6
+# Authors@R: c( person("Gregor", "Kastner", role = c("aut", "cre"), email = "gregor.kastner@aau.at", comment = c(ORCID = "0000-0002-8237-8271")), person("Darjus", "Hosszejni", role = c("ctb"), email = "darjus.hosszejni@wu.ac.at", comment = c(ORCID = "0000-0002-3803-691X")), person("Luis", "Gruber", role = c("ctb"), email = "luis.gruber@aau.at", comment = c(ORCID = "0000-0002-2399-738X")))
+# Description: Markov chain Monte Carlo (MCMC) sampler for fully Bayesian estimation of latent factor stochastic volatility models with interweaving <doi:10.1080/10618600.2017.1322091>. Sparsity can be achieved through the usage of Normal-Gamma priors on the factor loading matrix <doi:10.1016/j.jeconom.2018.11.007>.
+# License: GPL (>= 2)
+# Depends: R (>= 3.0.2)
+# Imports: GIGrvg (>= 0.4), Rcpp (>= 1.0.0), corrplot, methods, grDevices, graphics, stats, utils, stochvol (>= 3.0.2)
+# Suggests: LSD (>= 4.0-0), coda (>= 0.19-2), knitr, RColorBrewer, testthat (>= 2.1.0), zoo
+# LinkingTo: Rcpp, RcppArmadillo (>= 0.9.900), stochvol
+# RoxygenNote: 7.2.3
+# BuildResaveData: best
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2023-10-12 12:45:11 UTC; grkastner
+# Author: Gregor Kastner [aut, cre] (<https://orcid.org/0000-0002-8237-8271>), Darjus Hosszejni [ctb] (<https://orcid.org/0000-0002-3803-691X>), Luis Gruber [ctb] (<https://orcid.org/0000-0002-2399-738X>)
+# Maintainer: Gregor Kastner <gregor.kastner@aau.at>
+# Repository: CRAN
+# Date/Publication: 2023-10-12 14:30:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

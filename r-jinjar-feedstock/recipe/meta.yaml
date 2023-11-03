@@ -1,0 +1,108 @@
+{% set version = '0.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-jinjar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/jinjar_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/jinjar/jinjar_{{ version }}.tar.gz
+  sha256: c8f6581f90c3dc1e23ff5ba93ab3b053a2e2b33ead11288881c246750b52c534
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-cli
+    - r-cpp11
+    - r-fs
+    - r-jsonlite
+    - r-rlang >=1.0.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-cli
+    - r-cpp11
+    - r-fs
+    - r-jsonlite
+    - r-rlang >=1.0.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('jinjar')"           # [not win]
+    - "\"%R%\" -e \"library('jinjar')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://davidchall.github.io/jinjar/, https://github.com/davidchall/jinjar
+  license: MIT
+  summary: Template engine powered by the 'inja' C++ library. Users write a template document,
+    using syntax inspired by the 'Jinja' Python package, and then render the final document
+    by passing data from R. The template syntax supports features such as variables,
+    loops, conditions and inheritance.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: jinjar
+# Title: Template Engine Inspired by 'Jinja'
+# Version: 0.3.1
+# Authors@R: c( person("David", "Hall", , "david.hall.physics@gmail.com", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0002-2193-0480")), person("Lars", "Berscheid", role = "cph", comment = "Author of bundled inja library"), person("Niels", "Lohmann", role = "cph", comment = "Author of bundled json library") )
+# Description: Template engine powered by the 'inja' C++ library. Users write a template document, using syntax inspired by the 'Jinja' Python package, and then render the final document by passing data from R. The template syntax supports features such as variables, loops, conditions and inheritance.
+# License: MIT + file LICENSE
+# URL: https://davidchall.github.io/jinjar/, https://github.com/davidchall/jinjar
+# BugReports: https://github.com/davidchall/jinjar/issues
+# Imports: cli, fs, jsonlite, rlang (>= 1.0.0)
+# Suggests: knitr, rmarkdown, testthat
+# LinkingTo: cpp11
+# VignetteBuilder: knitr
+# Config/testthat/edition: 3
+# Encoding: UTF-8
+# Language: en-US
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-11-01 15:37:29 UTC; davidhall
+# Author: David Hall [aut, cre, cph] (<https://orcid.org/0000-0002-2193-0480>), Lars Berscheid [cph] (Author of bundled inja library), Niels Lohmann [cph] (Author of bundled json library)
+# Maintainer: David Hall <david.hall.physics@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-11-01 15:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

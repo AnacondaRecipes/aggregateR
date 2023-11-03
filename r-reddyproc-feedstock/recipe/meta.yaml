@@ -1,0 +1,125 @@
+{% set version = '1.3.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-reddyproc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/REddyProc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/REddyProc/REddyProc_{{ version }}.tar.gz
+  sha256: 774f8b3d10eeca09f85103cd8dda0c6f97862742ada5c585b6e1f29012a42cc7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, minpack.lm, segmented, knitr, rmarkdown, lognorm, ggplot2, tidyr, markdown, mlegp
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-bigleaf >=0.7
+    - r-dplyr
+    - r-magrittr
+    - r-purrr
+    - r-readr
+    - r-rlang
+    - r-solartime
+    - r-tibble
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-bigleaf >=0.7
+    - r-dplyr
+    - r-magrittr
+    - r-purrr
+    - r-readr
+    - r-rlang
+    - r-solartime
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('REddyProc')"           # [not win]
+    - "\"%R%\" -e \"library('REddyProc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.bgc-jena.mpg.de/bgi/index.php/Services/REddyProcWeb, https://github.com/bgctw/REddyProc
+  license: GPL-2
+  summary: Standard and extensible Eddy-Covariance data post-processing (Wutzler et al. (2018)
+    <doi:10.5194/bg-15-5015-2018>) includes uStar-filtering, gap-filling, and flux-partitioning.
+    The Eddy-Covariance (EC)  micrometeorological technique quantifies continuous exchange
+    fluxes of gases, energy, and momentum between an ecosystem and the atmosphere. It
+    is important for understanding ecosystem dynamics and upscaling exchange fluxes.
+    (Aubinet et al. (2012) <doi:10.1007/978-94-007-2351-1>). This package inputs pre-processed
+    (half-)hourly data and supports further processing. First, a quality-check and filtering
+    is performed based on the relationship between measured flux and friction velocity
+    (uStar) to discard biased data (Papale et al. (2006) <doi:10.5194/bg-3-571-2006>).
+    Second, gaps in the data are filled based on information from environmental conditions
+    (Reichstein et al. (2005) <doi:10.1111/j.1365-2486.2005.001002.x>). Third, the net
+    flux of carbon dioxide is partitioned into its gross fluxes in and out of the ecosystem
+    by night-time based and day-time based approaches (Lasslop et al. (2010) <doi:10.1111/j.1365-2486.2009.02041.x>).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: REddyProc
+# Type: Package
+# Version: 1.3.2
+# Title: Post Processing of (Half-)Hourly Eddy-Covariance Measurements
+# Authors@R: c( person( "Department for Biogeochemical Integration at MPI-BGC, Jena, Germany", role=c("cph"), email="REddyProc-help@bgc-jena.mpg.de" ) ,person( "Thomas", "Wutzler", role=c("aut","cre"), email="twutz@bgc-jena.mpg.de" ) ,person( "Markus", "Reichstein", role=c("aut"), email="mreichstein@bgc-jena.mpg.de") ,person( c("Antje","Maria"), "Moffat", role=c("aut","trl"), email="antje.moffat@bgc.mpg.de" ) ,person( "Olaf", "Menzer", role=c("ctb"), email="omenzer@bgc-jena.mpg.de" ) ,person( "Mirco", "Migliavacca", role=c("aut"), email="mmiglia@bgc-jena.mpg.de" ) ,person( "Kerstin", "Sickel", role=c("ctb","trl"), email="ksickel@bgc-jena.mpg.de" ) ,person( "Ladislav", "<U+0160>igut", role=c("ctb"), email="sigut.l@czechglobe.cz" ) )
+# Description: Standard and extensible Eddy-Covariance data post-processing (Wutzler et al. (2018) <doi:10.5194/bg-15-5015-2018>) includes uStar-filtering, gap-filling, and flux-partitioning. The Eddy-Covariance (EC)  micrometeorological technique quantifies continuous exchange fluxes of gases, energy, and momentum between an ecosystem and the atmosphere. It is important for understanding ecosystem dynamics and upscaling exchange fluxes. (Aubinet et al. (2012) <doi:10.1007/978-94-007-2351-1>). This package inputs pre-processed (half-)hourly data and supports further processing. First, a quality-check and filtering is performed based on the relationship between measured flux and friction velocity (uStar) to discard biased data (Papale et al. (2006) <doi:10.5194/bg-3-571-2006>). Second, gaps in the data are filled based on information from environmental conditions (Reichstein et al. (2005) <doi:10.1111/j.1365-2486.2005.001002.x>). Third, the net flux of carbon dioxide is partitioned into its gross fluxes in and out of the ecosystem by night-time based and day-time based approaches (Lasslop et al. (2010) <doi:10.1111/j.1365-2486.2009.02041.x>).
+# URL: https://www.bgc-jena.mpg.de/bgi/index.php/Services/REddyProcWeb, https://github.com/bgctw/REddyProc
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.1.2
+# VignetteBuilder: knitr
+# LinkingTo: Rcpp
+# Depends: R (>= 3.0.0), methods
+# Imports: Rcpp, dplyr, purrr, rlang, readr, tibble, magrittr, solartime, bigleaf (>= 0.7)
+# Suggests: testthat, minpack.lm, segmented, knitr, rmarkdown, lognorm, ggplot2, tidyr, markdown, mlegp
+# Collate: 'CheckVal.R' 'DataFunctions.R' 'aEddy.R' 'EddyGapfilling.R' 'EddyPartitioning.R' 'EddyPlotting.R' 'EddyUStarFilterChangePointDetection.R' 'EddyUStarFilterDP.R' 'Example.R' 'FileHandling.R' 'FileHandlingFormats.R' 'GeoFunctions.R' 'LRC_base.R' 'LRC_logisticSigmoid.R' 'LRC_nonrectangular.R' 'LRC_rectangular.R' 'PartitioningLasslop10.R' 'PartitioningLasslop10Nighttime.R' 'RcppExports.R' 'estimate_vpd_from_dew.R' 'imports.R' 'logitnorm.R' 'variableNames.R' 'zzzDebugCode.R'
+# NeedsCompilation: yes
+# Packaged: 2022-03-09 09:35:00 UTC; twutz
+# Author: Department for Biogeochemical Integration at MPI-BGC, Jena, Germany [cph], Thomas Wutzler [aut, cre], Markus Reichstein [aut], Antje Maria Moffat [aut, trl], Olaf Menzer [ctb], Mirco Migliavacca [aut], Kerstin Sickel [ctb, trl], Ladislav <U+0160>igut [ctb]
+# Maintainer: Thomas Wutzler <twutz@bgc-jena.mpg.de>
+# Repository: CRAN
+# Date/Publication: 2022-03-09 12:00:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

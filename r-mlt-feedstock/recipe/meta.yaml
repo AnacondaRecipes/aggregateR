@@ -1,0 +1,110 @@
+{% set version = '1.4-9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mlt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mlt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mlt/mlt_{{ version }}.tar.gz
+  sha256: e47cd6b7a8db4f184a2e0f0c81bf50549a8ae4a5b320f19f11b4a9795185b628
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, nnet, TH.data, multcomp
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bb
+    - r-matrix
+    - r-alabama
+    - r-basefun >=1.1_2
+    - r-coneproj
+    - r-nloptr
+    - r-numderiv
+    - r-sandwich
+    - r-survival
+    - r-variables >=1.1_0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bb
+    - r-matrix
+    - r-alabama
+    - r-basefun >=1.1_2
+    - r-coneproj
+    - r-nloptr
+    - r-numderiv
+    - r-sandwich
+    - r-survival
+    - r-variables >=1.1_0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mlt')"           # [not win]
+    - "\"%R%\" -e \"library('mlt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://ctm.R-forge.R-project.org
+  license: GPL-2
+  summary: Likelihood-based estimation of conditional transformation models via the most likely
+    transformation approach described in Hothorn et al. (2018) <DOI:10.1111/sjos.12291>
+    and Hothorn (2020) <DOI:10.18637/jss.v092.i01>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: mlt
+# Title: Most Likely Transformations
+# Version: 1.4-9
+# Date: 2023-08-21
+# Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"), email = "Torsten.Hothorn@R-project.org", comment = c(ORCID = "0000-0001-8301-0471"))
+# Description: Likelihood-based estimation of conditional transformation models via the most likely transformation approach described in Hothorn et al. (2018) <DOI:10.1111/sjos.12291> and Hothorn (2020) <DOI:10.18637/jss.v092.i01>.
+# Depends: basefun (>= 1.1-2), variables (>= 1.1-0)
+# Imports: BB, alabama, stats, coneproj, graphics, methods, grDevices, sandwich, numDeriv, survival, Matrix, nloptr
+# Suggests: MASS, nnet, TH.data, multcomp
+# URL: http://ctm.R-forge.R-project.org
+# License: GPL-2
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-08-21 09:18:50 UTC; hothorn
+# Author: Torsten Hothorn [aut, cre] (<https://orcid.org/0000-0001-8301-0471>)
+# Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2023-08-21 10:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

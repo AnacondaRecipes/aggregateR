@@ -1,0 +1,118 @@
+{% set version = '1.4.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gmmat
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GMMAT_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GMMAT/GMMAT_{{ version }}.tar.gz
+  sha256: 84a876776ef52e9222ff35ea4c897c4d0b8555a7c99cc943dd85917920b3dd7f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: doMC, SeqArray, SeqVarTools, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-compquadform
+    - r-matrix
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-data.table
+    - r-foreach
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-compquadform
+    - r-matrix
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-data.table
+    - r-foreach
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GMMAT')"           # [not win]
+    - "\"%R%\" -e \"library('GMMAT')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=GMMAT
+  license: GPL-3
+  summary: Perform association tests using generalized linear mixed models (GLMMs) in genome-wide
+    association studies (GWAS) and sequencing association studies. First, GMMAT fits
+    a GLMM with covariate adjustment and random effects to account for population structure
+    and familial or cryptic relatedness. For GWAS, GMMAT performs score tests for each
+    genetic variant as proposed in Chen et al. (2016) <DOI:10.1016/j.ajhg.2016.02.012>.
+    For candidate gene studies, GMMAT can also perform Wald tests to get the effect
+    size estimate for each genetic variant. For rare variant analysis from sequencing
+    association studies, GMMAT performs the variant Set Mixed Model Association Tests
+    (SMMAT) as proposed in Chen et al. (2019) <DOI:10.1016/j.ajhg.2018.12.012>, including
+    the burden test, the sequence kernel association test (SKAT), SKAT-O and an efficient
+    hybrid test of the burden test and SKAT, based on user-defined variant sets.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: GMMAT
+# Version: 1.4.1
+# Date: 2023-10-05
+# Title: Generalized Linear Mixed Model Association Tests
+# Authors@R: c(person("Han", "Chen", role = c("aut", "cre"), email = "han.chen.2@uth.tmc.edu"), person("Matthew", "Conomos", role = "aut"), person("Duy", "Pham", role = "aut"), person("Arthor", "Gilly", role = "ctb"), person("Robert", "Gentleman", role = c("ctb", "cph"), comment = "Author and copyright holder of the C function Brent_fmin"), person("Ross", "Ihaka", role = c("ctb", "cph"), comment = "Author and copyright holder of the C function Brent_fmin"), person("The R Core Team", role = c("ctb", "cph"), comment = "Author and copyright holder of the C function Brent_fmin"), person("The R Foundation", role = "cph", comment = "Copyright holder of the C function Brent_fmin"), person("Eric", "Biggers", role = c("ctb", "cph"), comment = "Author and copyright holder of included libdeflate library"), person("Tino", "Reichardt", role = c("ctb", "cph"), comment = "Author and copyright holder of threading code used in the included Zstandard (zstd) library"), person("Meta Platforms, Inc. and affiliates", role = "cph", comment = "Copyright holder of included Zstandard (zstd) library"))
+# Description: Perform association tests using generalized linear mixed models (GLMMs) in genome-wide association studies (GWAS) and sequencing association studies. First, GMMAT fits a GLMM with covariate adjustment and random effects to account for population structure and familial or cryptic relatedness. For GWAS, GMMAT performs score tests for each genetic variant as proposed in Chen et al. (2016) <DOI:10.1016/j.ajhg.2016.02.012>. For candidate gene studies, GMMAT can also perform Wald tests to get the effect size estimate for each genetic variant. For rare variant analysis from sequencing association studies, GMMAT performs the variant Set Mixed Model Association Tests (SMMAT) as proposed in Chen et al. (2019) <DOI:10.1016/j.ajhg.2018.12.012>, including the burden test, the sequence kernel association test (SKAT), SKAT-O and an efficient hybrid test of the burden test and SKAT, based on user-defined variant sets.
+# License: GPL (>= 3)
+# Copyright: See COPYRIGHTS for details.
+# Imports: Rcpp, CompQuadForm, foreach, parallel, Matrix, methods, data.table
+# Suggests: doMC, SeqArray, SeqVarTools, testthat
+# LinkingTo: Rcpp, RcppArmadillo
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Depends: R (>= 3.2.0)
+# Author: Han Chen [aut, cre], Matthew Conomos [aut], Duy Pham [aut], Arthor Gilly [ctb], Robert Gentleman [ctb, cph] (Author and copyright holder of the C function Brent_fmin), Ross Ihaka [ctb, cph] (Author and copyright holder of the C function Brent_fmin), The R Core Team [ctb, cph] (Author and copyright holder of the C function Brent_fmin), The R Foundation [cph] (Copyright holder of the C function Brent_fmin), Eric Biggers [ctb, cph] (Author and copyright holder of included libdeflate library), Tino Reichardt [ctb, cph] (Author and copyright holder of threading code used in the included Zstandard (zstd) library), Meta Platforms, Inc. and affiliates [cph] (Copyright holder of included Zstandard (zstd) library)
+# Maintainer: Han Chen <han.chen.2@uth.tmc.edu>
+# Packaged: 2023-10-06 04:42:24 UTC; hchen
+# Repository: CRAN
+# Date/Publication: 2023-10-07 07:10:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

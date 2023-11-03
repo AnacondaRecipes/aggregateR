@@ -1,0 +1,95 @@
+{% set version = '1.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-webfakes
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/webfakes_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/webfakes/webfakes_{{ version }}.tar.gz
+  sha256: 6a42d174023db2e5080a0b9e2f65a464ad373332ee0f2263ebf4859682dcff91
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: brotli, callr, covr, curl, digest, glue, httpuv, httr, jsonlite, testthat (>= 3.0.0), withr, xml2, zip (>= 2.3.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('webfakes')"           # [not win]
+    - "\"%R%\" -e \"library('webfakes')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://webfakes.r-lib.org/, https://github.com/r-lib/webfakes#readme
+  license: MIT
+  summary: Create a web app that makes it easier to test web clients without using the internet.
+    It includes a web app framework with path matching, parameters and templates. Can
+    parse various 'HTTP' request bodies. Can send 'JSON' data or files from the disk.
+    Includes a web app that implements the 'httpbin.org' web service.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: webfakes
+# Title: Fake Web Apps for HTTP Testing
+# Version: 1.2.1
+# Authors@R: c( person("Gabor", "Csardi", , "csardi.gabor@gmail.com", role = c("aut", "cre")), person(, "RStudio, Pbc.", role = c("cph", "fnd")), person(, "Civetweb contributors", role = "ctb", comment = "see inst/credits/ciwetweb.md"), person(, "Redoc contributors", role = "ctb", comment = "see inst/credits/redoc.md"), person("L. Peter", "Deutsch", role = "ctb", comment = "src/md5.h"), person("Martin", "Purschke", role = "ctb", comment = "src/md5.h"), person(, "Aladdin Enterprises", role = "cph", comment = "src/md5.h"), person("Maelle", "Salmon", , "maelle.salmon@yahoo.se", role = "ctb", comment = c(ORCID = "0000-0002-2815-0399")) )
+# Description: Create a web app that makes it easier to test web clients without using the internet. It includes a web app framework with path matching, parameters and templates. Can parse various 'HTTP' request bodies. Can send 'JSON' data or files from the disk. Includes a web app that implements the 'httpbin.org' web service.
+# License: MIT + file LICENSE
+# URL: https://webfakes.r-lib.org/, https://github.com/r-lib/webfakes#readme
+# BugReports: https://github.com/r-lib/webfakes/issues
+# Depends: R (>= 3.5.0)
+# Imports: stats, tools, utils
+# Suggests: brotli, callr, covr, curl, digest, glue, httpuv, httr, jsonlite, testthat (>= 3.0.0), withr, xml2, zip (>= 2.3.0)
+# Config/testthat/edition: 3
+# Config/Needs/website: tidyverse/tidytemplate
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-09-30 18:52:18 UTC; gaborcsardi
+# Author: Gabor Csardi [aut, cre], RStudio, Pbc. [cph, fnd], Civetweb contributors [ctb] (see inst/credits/ciwetweb.md), Redoc contributors [ctb] (see inst/credits/redoc.md), L. Peter Deutsch [ctb] (src/md5.h), Martin Purschke [ctb] (src/md5.h), Aladdin Enterprises [cph] (src/md5.h), Maelle Salmon [ctb] (<https://orcid.org/0000-0002-2815-0399>)
+# Maintainer: Gabor Csardi <csardi.gabor@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-01 06:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

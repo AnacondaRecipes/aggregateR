@@ -1,0 +1,96 @@
+{% set version = '1.26' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sensominer
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SensoMineR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SensoMineR/SensoMineR_{{ version }}.tar.gz
+  sha256: cea7525a07e4fc57478a3a773a1ce08dbca02e82c80dd02b2c104c2b11e64671
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-algdesign
+    - r-factominer >=2.3
+    - r-kernsmooth
+    - r-cluster
+    - r-ggplot2
+    - r-ggrepel
+    - r-gtools
+    - r-reshape2
+
+  run:
+    - r-base
+    - r-algdesign
+    - r-factominer >=2.3
+    - r-kernsmooth
+    - r-cluster
+    - r-ggplot2
+    - r-ggrepel
+    - r-gtools
+    - r-reshape2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SensoMineR')"           # [not win]
+    - "\"%R%\" -e \"library('SensoMineR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://sensominer.free.fr
+  license: GPL-2
+  summary: 'Statistical Methods to Analyse Sensory Data. SensoMineR: A package for sensory data
+    analysis. S. Le and F. Husson (2008) <DOI:10.1111/j.1745-459X.2007.00137.x>.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: SensoMineR
+# Version: 1.26
+# Date: 2020-05-19
+# Title: Sensory Data Analysis
+# Author: Francois Husson, Sebastien Le, Marine Cadoret
+# Maintainer: Francois Husson <husson@agrocampus-ouest.fr>
+# Depends: R (>= 3.0), FactoMineR (>= 2.3)
+# Imports: cluster,KernSmooth,ggplot2,reshape2,AlgDesign,gtools,ggrepel
+# Description: Statistical Methods to Analyse Sensory Data. SensoMineR: A package for sensory data analysis. S. Le and F. Husson (2008) <DOI:10.1111/j.1745-459X.2007.00137.x>.
+# License: GPL (>= 2)
+# URL: http://sensominer.free.fr
+# Encoding: latin1
+# NeedsCompilation: no
+# Packaged: 2020-05-19 14:13:33 UTC; husson
+# Repository: CRAN
+# Date/Publication: 2020-05-19 14:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

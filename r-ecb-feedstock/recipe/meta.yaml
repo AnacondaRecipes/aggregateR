@@ -1,0 +1,91 @@
+{% set version = '0.4.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ecb
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ecb_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ecb/ecb_{{ version }}.tar.gz
+  sha256: 24db2d4491f582d8c8091e66b89d60d1a961965f69e2fe2a48ddf3bfb80739a6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, dplyr, lubridate, ggplot2, testthat, zoo
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-curl
+    - r-httr
+    - r-rsdmx
+    - r-xml2
+
+  run:
+    - r-base
+    - r-curl
+    - r-httr
+    - r-rsdmx
+    - r-xml2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ecb')"           # [not win]
+    - "\"%R%\" -e \"library('ecb')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://sdw.ecb.europa.eu/
+  license: CC0
+  summary: Provides an interface to the 'European Central Bank's Statistical Data Warehouse'
+    API <https://sdw.ecb.europa.eu/>, allowing for programmatic retrieval of a vast
+    quantity of statistical data.
+  license_family: CC
+
+# The original CRAN metadata for this package was:
+
+# Package: ecb
+# Type: Package
+# Title: Programmatic Access to the European Central Bank's Statistical Data Warehouse
+# Version: 0.4.2
+# Date: 2023-04-20
+# Authors@R: person("Eric", "Persson", email = "expersso5@gmail.com", role = c("aut", "cre"))
+# Description: Provides an interface to the 'European Central Bank's Statistical Data Warehouse' API <https://sdw.ecb.europa.eu/>, allowing for programmatic retrieval of a vast quantity of statistical data.
+# License: CC0
+# URL: https://sdw.ecb.europa.eu/
+# Suggests: knitr, rmarkdown, dplyr, lubridate, ggplot2, testthat, zoo
+# Imports: curl, rsdmx, xml2, httr
+# VignetteBuilder: knitr
+# RoxygenNote: 7.1.1
+# NeedsCompilation: no
+# Packaged: 2023-04-20 08:03:43 UTC; persson
+# Author: Eric Persson [aut, cre]
+# Maintainer: Eric Persson <expersso5@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-04-20 16:32:34 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,93 @@
+{% set version = '5.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-difr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/difR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/difR/difR_{{ version }}.tar.gz
+  sha256: 026438bfc836c0f578274e412fd883b737adf0e222ce44835c59d642959aa5b1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-deltaplotr
+    - r-lme4
+    - r-ltm
+    - r-mirt
+
+  run:
+    - r-base
+    - r-deltaplotr
+    - r-lme4
+    - r-ltm
+    - r-mirt
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('difR')"           # [not win]
+    - "\"%R%\" -e \"library('difR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=difR
+  license: GPL-2
+  summary: Provides a collection of standard methods to detect differential item functioning
+    among dichotomously scored items. Methods for uniform and non-uniform DIF, based
+    on test-score or IRT methods, for comparing two or more than two groups of respondents,
+    are available (Magis, Beland, Tuerlinckx and De Boeck,A General Framework and an
+    R Package for the Detection of Dichotomous Differential Item Functioning, Behavior
+    Research Methods, 42, 2010, 847-862 <doi:10.3758/BRM.42.3.847>).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: difR
+# Type: Package
+# Title: Collection of Methods to Detect Dichotomous Differential Item Functioning (DIF)
+# Version: 5.1
+# Date: 2020-05-10
+# Author: David Magis (U Liege), Sebastien Beland (U Montreal) and Gilles Raiche (UQAM)
+# Maintainer: David Magis <david.magis@gmail.com>
+# Depends: R (>= 3.0.0)
+# Imports: mirt, ltm, lme4, deltaPlotR
+# Description: Provides a collection of standard methods to detect differential item functioning among dichotomously scored items. Methods for uniform and non-uniform DIF, based on test-score or IRT methods, for comparing two or more than two groups of respondents, are available (Magis, Beland, Tuerlinckx and De Boeck,A General Framework and an R Package for the Detection of Dichotomous Differential Item Functioning, Behavior Research Methods, 42, 2010, 847-862 <doi:10.3758/BRM.42.3.847>).
+# License: GPL (>= 2)
+# LazyLoad: yes
+# RoxygenNote: 7.1.0
+# NeedsCompilation: no
+# Packaged: 2020-05-11 08:05:58 UTC; Martinkova
+# Repository: CRAN
+# Date/Publication: 2020-05-13 08:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

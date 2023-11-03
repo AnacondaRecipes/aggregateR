@@ -1,0 +1,87 @@
+{% set version = '1.0.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-xlconnect
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/XLConnect_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/XLConnect/XLConnect_{{ version }}.tar.gz
+  sha256: 821dba231c3c3147455e7525119b51e5dc001984c638b7ce519d0974b32de677
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: RUnit, lattice, ggplot2 (>= 0.9.3), zoo
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rjava >=1.0_1
+
+  run:
+    - r-base
+    - r-rjava >=1.0_1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('XLConnect')"           # [not win]
+    - "\"%R%\" -e \"library('XLConnect')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://mirai-solutions.ch https://github.com/miraisolutions/xlconnect
+  license: GPL-3
+  summary: Provides comprehensive functionality to read, write and format Excel data.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: XLConnect
+# Type: Package
+# Title: Excel Connector for R
+# Version: 1.0.7
+# Authors@R: c(person("Mirai Solutions GmbH", role = "aut", email = "xlconnect@mirai-solutions.com"), person("Martin", "Studer", role = "cre", email = "martin.studer@mirai-solutions.com"), person("The Apache Software Foundation", role = c("ctb", "cph"), comment = "Apache POI"), person("Graph Builder", role = c("ctb", "cph"), comment = "Curvesapi Java library"), person("Brett Woolridge", role = c("ctb", "cph"), comment = "SparseBitSet Java library"))
+# URL: https://mirai-solutions.ch https://github.com/miraisolutions/xlconnect
+# BugReports: https://github.com/miraisolutions/xlconnect/issues
+# SystemRequirements: Java (>= 8)
+# Depends: R (>= 3.6.0)
+# Imports: methods, rJava (>= 1.0-1)
+# Suggests: RUnit, lattice, ggplot2 (>= 0.9.3), zoo
+# Description: Provides comprehensive functionality to read, write and format Excel data.
+# License: GPL-3
+# Copyright: See file COPYRIGHTS
+# LazyData: yes
+# NeedsCompilation: no
+# Packaged: 2023-01-24 09:55:38 UTC; runner
+# Author: Mirai Solutions GmbH [aut], Martin Studer [cre], The Apache Software Foundation [ctb, cph] (Apache POI), Graph Builder [ctb, cph] (Curvesapi Java library), Brett Woolridge [ctb, cph] (SparseBitSet Java library)
+# Maintainer: Martin Studer <martin.studer@mirai-solutions.com>
+# Repository: CRAN
+# Date/Publication: 2023-01-24 13:40:16 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

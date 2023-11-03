@@ -1,0 +1,99 @@
+{% set version = '1.1-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bridgesampling
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bridgesampling_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bridgesampling/bridgesampling_{{ version }}.tar.gz
+  sha256: 54ecd39aa2e36d4d521d3d36425f9fe56a3f8547df6048c814c5931d790f3e6b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, Rcpp, RcppEigen, R2jags, rjags, runjags, knitr, rmarkdown, R.rsp, BayesFactor, rstan, rstanarm, nimble, MCMCpack
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-brobdingnag
+    - r-matrix
+    - r-coda
+    - r-mvtnorm
+    - r-scales
+    - r-stringr
+
+  run:
+    - r-base
+    - r-brobdingnag
+    - r-matrix
+    - r-coda
+    - r-mvtnorm
+    - r-scales
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bridgesampling')"           # [not win]
+    - "\"%R%\" -e \"library('bridgesampling')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/quentingronau/bridgesampling
+  license: GPL-2
+  summary: Provides functions for estimating marginal likelihoods, Bayes factors, posterior model
+    probabilities, and normalizing constants in general, via different versions of bridge
+    sampling (Meng & Wong, 1996, <http://www3.stat.sinica.edu.tw/statistica/j6n4/j6n43/j6n43.htm>).
+    Gronau, Singmann, & Wagenmakers (2020) <doi:10.18637/jss.v092.i10>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: bridgesampling
+# Type: Package
+# Title: Bridge Sampling for Marginal Likelihoods and Bayes Factors
+# Version: 1.1-2
+# Authors@R: c(person(given="Quentin F.", family="Gronau", role=c("aut", "cre"), email="Quentin.F.Gronau@gmail.com", comment=c(ORCID="0000-0001-5510-6943")), person(given="Henrik", family="Singmann", role="aut", comment=c(ORCID="0000-0002-4842-3657")), person(given="Jonathan J.", family="Forster", role="ctb"), person(given="Eric-Jan", family="Wagenmakers", role="ths"), person(family="The JASP Team", role="ctb"), person("Jiqiang", "Guo", role = "ctb"), person("Jonah", "Gabry", role = "ctb"), person("Ben", "Goodrich", role = c("ctb")), person("Kees", "Mulder", role = c("ctb")), person("Perry", "de Valpine", role = c("ctb")) )
+# Depends: R (>= 3.0.0)
+# Imports: mvtnorm, Matrix, Brobdingnag, stringr, coda, parallel, scales, utils, methods
+# Suggests: testthat, Rcpp, RcppEigen, R2jags, rjags, runjags, knitr, rmarkdown, R.rsp, BayesFactor, rstan, rstanarm, nimble, MCMCpack
+# Description: Provides functions for estimating marginal likelihoods, Bayes factors, posterior model probabilities, and normalizing constants in general, via different versions of bridge sampling (Meng & Wong, 1996, <http://www3.stat.sinica.edu.tw/statistica/j6n4/j6n43/j6n43.htm>). Gronau, Singmann, & Wagenmakers (2020) <doi:10.18637/jss.v092.i10>.
+# License: GPL (>= 2)
+# LazyData: true
+# RoxygenNote: 7.1.1
+# VignetteBuilder: knitr, R.rsp
+# URL: https://github.com/quentingronau/bridgesampling
+# NeedsCompilation: no
+# Packaged: 2021-04-15 18:55:13 UTC; singm
+# Author: Quentin F. Gronau [aut, cre] (<https://orcid.org/0000-0001-5510-6943>), Henrik Singmann [aut] (<https://orcid.org/0000-0002-4842-3657>), Jonathan J. Forster [ctb], Eric-Jan Wagenmakers [ths], The JASP Team [ctb], Jiqiang Guo [ctb], Jonah Gabry [ctb], Ben Goodrich [ctb], Kees Mulder [ctb], Perry de Valpine [ctb]
+# Maintainer: Quentin F. Gronau <Quentin.F.Gronau@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-04-16 08:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

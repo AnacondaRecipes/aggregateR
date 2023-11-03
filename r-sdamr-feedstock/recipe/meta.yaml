@@ -1,0 +1,95 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sdamr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sdamr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sdamr/sdamr_{{ version }}.tar.gz
+  sha256: 33ed5b60e7fcbaf8fe3c70a1e8f1a8c52cc5af3466f8cac5fcb90aa3b46f8fc1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-car
+    - r-dplyr
+    - r-ggplot2
+
+  run:
+    - r-base
+    - r-car
+    - r-dplyr
+    - r-ggplot2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sdamr')"           # [not win]
+    - "\"%R%\" -e \"library('sdamr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://mspeekenbrink.github.io/sdam-r/
+  license: GPL-3
+  summary: 'Data sets and functions to support the books "Statistics: Data analysis and modelling"
+    by Speekenbrink, M. (2021) <https://mspeekenbrink.github.io/sdam-book/> and "An
+    R companion to Statistics: data analysis and modelling" by Speekenbrink, M. (2021)
+    <https://mspeekenbrink.github.io/sdam-r-companion/>. All datasets analysed in these
+    books are provided in this package. In addition, the package provides functions
+    to compute sample statistics (variance, standard deviation, mode), create raincloud
+    and enhanced Q-Q plots, and expand Anova results into omnibus tests and tests of
+    individual contrasts.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: sdamr
+# Title: Statistics: Data Analysis and Modelling
+# Version: 0.2.0
+# Authors@R: person(given = "Maarten", family = "Speekenbrink", role = c("aut", "cre"), email = "m.speekenbrink@ucl.ac.uk", comment = c(ORCID = "0000-0003-3221-1091"))
+# Description: Data sets and functions to support the books "Statistics: Data analysis and modelling" by Speekenbrink, M. (2021) <https://mspeekenbrink.github.io/sdam-book/> and "An R companion to Statistics: data analysis and modelling" by Speekenbrink, M. (2021) <https://mspeekenbrink.github.io/sdam-r-companion/>. All datasets analysed in these books are provided in this package. In addition, the package provides functions to compute sample statistics (variance, standard deviation, mode), create raincloud and enhanced Q-Q plots, and expand Anova results into omnibus tests and tests of individual contrasts.
+# License: GPL-3
+# Encoding: UTF-8
+# Language: en-GB
+# LazyData: true
+# RoxygenNote: 7.2.1
+# URL: https://mspeekenbrink.github.io/sdam-r/
+# Depends: R (>= 3.5.0)
+# Imports: methods, stats, dplyr, ggplot2, grid, car
+# NeedsCompilation: no
+# Packaged: 2022-11-13 19:29:53 UTC; maarten
+# Author: Maarten Speekenbrink [aut, cre] (<https://orcid.org/0000-0003-3221-1091>)
+# Maintainer: Maarten Speekenbrink <m.speekenbrink@ucl.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2022-11-16 21:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

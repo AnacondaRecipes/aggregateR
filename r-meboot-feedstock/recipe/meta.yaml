@@ -1,0 +1,98 @@
+{% set version = '1.4-9.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-meboot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/meboot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/meboot/meboot_{{ version }}.tar.gz
+  sha256: daa5fe43c9002ae4d51010e3655bf674addd8c8c2635e304dc4e5b43dbb86a2a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: boot, car, ConvergenceConcepts, geepack, lmtest, strucchange, plm, zoo
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dynlm
+    - r-hdrcde
+    - r-nlme
+    - r-tdigest
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-dynlm
+    - r-hdrcde
+    - r-nlme
+    - r-tdigest
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('meboot')"           # [not win]
+    - "\"%R%\" -e \"library('meboot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=meboot
+  license: GPL-2
+  summary: 'Maximum entropy density based dependent data bootstrap. An algorithm is provided
+    to create a population of time series (ensemble) without assuming stationarity.
+    The reference paper (Vinod, H.D., 2004 <DOI: 10.1016/j.jempfin.2003.06.002>) explains
+    how the algorithm satisfies the ergodic theorem and the central limit theorem.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: meboot
+# Version: 1.4-9.4
+# Date: 2023-08-22
+# Title: Maximum Entropy Bootstrap for Time Series
+# Author: Hrishikesh D. Vinod <Vinod@fordham.edu>, Javier Lopez-de-Lacalle <javlacalle@yahoo.es>, and Fred Viole
+# Maintainer: Fred Viole <fviole@fordham.edu>
+# Encoding: UTF-8
+# Depends: R (>= 3.5.0), dynlm, nlme, tdigest, hdrcde
+# Suggests: boot, car, ConvergenceConcepts, geepack, lmtest, strucchange, plm, zoo
+# Description: Maximum entropy density based dependent data bootstrap. An algorithm is provided to create a population of time series (ensemble) without assuming stationarity. The reference paper (Vinod, H.D., 2004 <DOI: 10.1016/j.jempfin.2003.06.002>) explains how the algorithm satisfies the ergodic theorem and the central limit theorem.
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# RoxygenNote: 7.1.1
+# LazyData: true
+# Packaged: 2023-08-22 19:51:55 UTC; fredv
+# Repository: CRAN
+# Date/Publication: 2023-08-22 20:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

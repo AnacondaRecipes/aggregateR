@@ -1,0 +1,103 @@
+{% set version = '2.5.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-vinecopula
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/VineCopula_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/VineCopula/VineCopula_{{ version }}.tar.gz
+  sha256: 51b99e6fe0a1f4c32c860fc24b0164f0ade5d81aee7235e0ef5b5256e2115b68
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: TSP, shiny, testthat, numDeriv, kdecopula (>= 0.8.0), network
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-adgoftest
+    - r-mass
+    - r-lattice
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-adgoftest
+    - r-mass
+    - r-lattice
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('VineCopula')"           # [not win]
+    - "\"%R%\" -e \"library('VineCopula')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/tnagler/VineCopula
+  license: GPL-2
+  summary: Provides tools for the statistical analysis of regular vine copula models, see Aas
+    et al. (2009) <doi:10.1016/j.insmatheco.2007.02.001> and Dissman et al. (2013) <doi:10.1016/j.csda.2012.08.010>.
+    The package includes tools for parameter estimation, model selection, simulation,
+    goodness-of-fit tests, and visualization. Tools for estimation, selection and exploratory
+    data analysis of bivariate copula models are also provided.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: VineCopula
+# Type: Package
+# Title: Statistical Inference of Vine Copulas
+# Version: 2.5.0
+# Description: Provides tools for the statistical analysis of regular vine copula models, see Aas et al. (2009) <doi:10.1016/j.insmatheco.2007.02.001> and Dissman et al. (2013) <doi:10.1016/j.csda.2012.08.010>. The package includes tools for parameter estimation, model selection, simulation, goodness-of-fit tests, and visualization. Tools for estimation, selection and exploratory data analysis of bivariate copula models are also provided.
+# Authors@R: c( person("Thomas", "Nagler",, "mail@tnagler.com", role = c("aut", "cre")), person("Ulf", "Schepsmeier",, "ulf.schepsmeier@tum.de", role = "aut"), person("Jakob", "Stoeber",, role = "aut"), person("Eike Christian", "Brechmann",, role = "aut"), person("Benedikt", "Graeler",, role = "aut"), person("Tobias", "Erhardt",, "tobias.erhardt@tum.de", role = "aut"), person("Carlos", "Almeida",, role = "ctb"), person("Aleksey", "Min",, role = c("ctb", "ths")), person("Claudia", "Czado",, role = c("ctb", "ths")), person("Mathias", "Hofmann",, role = "ctb"), person("Matthias", "Killiches",, role = "ctb"), person("Harry", "Joe",, role = "ctb"), person("Thibault", "Vatter",, role = "ctb") )
+# Depends: R (>= 3.1.0)
+# Imports: graphics, grDevices, stats, utils, MASS, mvtnorm, methods, ADGofTest, lattice, parallel
+# Suggests: TSP, shiny, testthat, numDeriv, kdecopula (>= 0.8.0), network
+# License: GPL (>= 2)
+# LazyLoad: yes
+# BugReports: https://github.com/tnagler/VineCopula/issues
+# URL: https://github.com/tnagler/VineCopula
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-07-08 21:24:37 UTC; n5
+# Author: Thomas Nagler [aut, cre], Ulf Schepsmeier [aut], Jakob Stoeber [aut], Eike Christian Brechmann [aut], Benedikt Graeler [aut], Tobias Erhardt [aut], Carlos Almeida [ctb], Aleksey Min [ctb, ths], Claudia Czado [ctb, ths], Mathias Hofmann [ctb], Matthias Killiches [ctb], Harry Joe [ctb], Thibault Vatter [ctb]
+# Maintainer: Thomas Nagler <mail@tnagler.com>
+# Repository: CRAN
+# Date/Publication: 2023-07-10 19:00:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

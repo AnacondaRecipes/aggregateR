@@ -1,0 +1,97 @@
+{% set version = '1.18.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-network
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/network_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/network/network_{{ version }}.tar.gz
+  sha256: c80d70352967d8480cfa801f2a31bfe130e2ad4dbf2c07b0046e57f3013cd243
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: sna, testthat, covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-magrittr
+    - r-statnet.common >=4.5
+    - r-tibble
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-magrittr
+    - r-statnet.common >=4.5
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('network')"           # [not win]
+    - "\"%R%\" -e \"library('network')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://statnet.org/
+  license: GPL-2
+  summary: Tools to create and modify network objects.  The network class can represent a range
+    of relational data types, and supports arbitrary vertex/edge/graph attributes.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: network
+# Version: 1.18.1
+# Date: 2023-01-24
+# Title: Classes for Relational Data
+# Authors@R: c( person("Carter T.", "Butts", role=c("aut","cre"), email="buttsc@uci.edu"), person("David", "Hunter", role=c("ctb"), email="dhunter@stat.psu.edu"), person("Mark", "Handcock", role=c("ctb"), email="handcock@stat.ucla.edu"), person("Skye", "Bender-deMoll", role=c("ctb"), email="skyebend@uw.edu"), person("Jeffrey", "Horner", role=c("ctb"), email="jeffrey.horner@gmail.com"), person("Li", "Wang", role=c("ctb"), email="lxwang@uw.edu"), person("Pavel N.", "Krivitsky", role=c("ctb"), email="pavel@statnet.org", comment=c(ORCID="0000-0002-9101-3362")), person("Brendan", "Knapp", role=c("ctb"), email="brendan.g.knapp@gmail.com", comment=c(ORCID="0000-0003-3284-4972")), person("Micha", "Bojanowski", role=c("ctb"), email = "michal2992@gmail.com", comment = c(ORCID = "0000-0001-7503-852X")), person("Chad", "Klumb", role=c("ctb"), email="cklumb@gmail.com"))
+# Maintainer: Carter T. Butts <buttsc@uci.edu>
+# Depends: R (>= 2.10), utils
+# Imports: tibble, magrittr, statnet.common (>= 4.5), stats
+# Suggests: sna, testthat, covr
+# Description: Tools to create and modify network objects.  The network class can represent a range of relational data types, and supports arbitrary vertex/edge/graph attributes.
+# License: GPL (>= 2)
+# URL: https://statnet.org/
+# RoxygenNote: 7.2.0
+# Collate: 'access.R' 'as.edgelist.R' 'assignment.R' 'coercion.R' 'constructors.R' 'dataframe.R' 'fileio.R' 'layout.R' 'misc.R' 'network-package.R' 'operators.R' 'plot.R' 'printsum.R' 'zzz.R'
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-01-24 07:28:41 UTC; buttsc
+# Author: Carter T. Butts [aut, cre], David Hunter [ctb], Mark Handcock [ctb], Skye Bender-deMoll [ctb], Jeffrey Horner [ctb], Li Wang [ctb], Pavel N. Krivitsky [ctb] (<https://orcid.org/0000-0002-9101-3362>), Brendan Knapp [ctb] (<https://orcid.org/0000-0003-3284-4972>), Micha Bojanowski [ctb] (<https://orcid.org/0000-0001-7503-852X>), Chad Klumb [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-01-24 08:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

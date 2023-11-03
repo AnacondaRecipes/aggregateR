@@ -1,0 +1,114 @@
+{% set version = '1.15' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mev
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mev_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mev/mev_{{ version }}.tar.gz
+  sha256: d31c3d7059f802191a432b83029be26773b84c8ae38aadf1c76c478e5f30eb46
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: boot, cobs, evd, knitr, MASS, mvPot (>= 0.1.4), mvtnorm, gmm, revdbayes, ismev, tinytest, TruncatedNormal (>= 1.1)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.16
+    - r-rcpparmadillo
+    - r-rsolnp
+    - r-alabama
+    - r-nleqslv
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.16
+    - r-rcpparmadillo
+    - r-rsolnp
+    - r-alabama
+    - r-nleqslv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mev')"           # [not win]
+    - "\"%R%\" -e \"library('mev')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://lbelzile.github.io/mev/, https://github.com/lbelzile/mev/
+  license: GPL-3
+  summary: Various tools for the analysis of univariate, multivariate and functional extremes.
+    Exact simulation from max-stable processes [Dombry, Engelke and Oesting (2016) <doi:10.1093/biomet/asw008>,
+    R-Pareto processes for various parametric models, including Brown-Resnick (Wadsworth
+    and Tawn, 2014, <doi:10.1093/biomet/ast042>) and Extremal Student (Thibaud and Opitz,
+    2015, <doi:10.1093/biomet/asv045>). Threshold selection methods, including Wadsworth
+    (2016) <doi:10.1080/00401706.2014.998345>, and Northrop and Coleman (2014) <doi:10.1007/s10687-014-0183-z>.
+    Multivariate extreme diagnostics. Estimation and likelihoods for univariate extremes,
+    e.g., Coles (2001) <doi:10.1007/978-1-4471-3675-0>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: mev
+# Type: Package
+# Title: Modelling of Extreme Values
+# Version: 1.15
+# Date: 2023-04-18
+# Authors@R: c(person(given="Leo", family="Belzile", role = c("aut", "cre"), email = "belzilel@gmail.com", comment = c(ORCID = "0000-0002-9135-014X")), person(given="Jennifer L.", family="Wadsworth", role=c("aut")), person(given="Paul J.", family="Northrop", role=c("aut")), person(given="Scott D.", family="Grimshaw", role=c("aut")), person(given="Jin", family="Zhang", role=c("ctb")), person(given="Michael A.", family="Stephens", role=c("ctb")), person(given="Art B.", family="Owen", role=c("ctb")), person(given="Raphael", family="Huser", role=c("aut")))
+# Description: Various tools for the analysis of univariate, multivariate and functional extremes. Exact simulation from max-stable processes [Dombry, Engelke and Oesting (2016) <doi:10.1093/biomet/asw008>, R-Pareto processes for various parametric models, including Brown-Resnick (Wadsworth and Tawn, 2014, <doi:10.1093/biomet/ast042>) and Extremal Student (Thibaud and Opitz, 2015, <doi:10.1093/biomet/asv045>). Threshold selection methods, including Wadsworth (2016) <doi:10.1080/00401706.2014.998345>, and Northrop and Coleman (2014) <doi:10.1007/s10687-014-0183-z>. Multivariate extreme diagnostics. Estimation and likelihoods for univariate extremes, e.g., Coles (2001) <doi:10.1007/978-1-4471-3675-0>.
+# License: GPL-3
+# URL: https://lbelzile.github.io/mev/, https://github.com/lbelzile/mev/
+# BugReports: https://github.com/lbelzile/mev/issues/
+# Depends: R (>= 3.4)
+# Imports: alabama, methods, nleqslv, Rcpp (>= 0.12.16), Rsolnp, stats,
+# Suggests: boot, cobs, evd, knitr, MASS, mvPot (>= 0.1.4), mvtnorm, gmm, revdbayes, ismev, tinytest, TruncatedNormal (>= 1.1)
+# LinkingTo: Rcpp, RcppArmadillo
+# LazyData: true
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# ByteCompile: true
+# NeedsCompilation: yes
+# Packaged: 2023-04-19 01:03:01 UTC; lbelzile
+# Author: Leo Belzile [aut, cre] (<https://orcid.org/0000-0002-9135-014X>), Jennifer L. Wadsworth [aut], Paul J. Northrop [aut], Scott D. Grimshaw [aut], Jin Zhang [ctb], Michael A. Stephens [ctb], Art B. Owen [ctb], Raphael Huser [aut]
+# Maintainer: Leo Belzile <belzilel@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-04-20 12:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

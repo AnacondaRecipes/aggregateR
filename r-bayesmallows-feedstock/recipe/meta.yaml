@@ -1,0 +1,130 @@
+{% set version = '1.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bayesmallows
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BayesMallows_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BayesMallows/BayesMallows_{{ version }}.tar.gz
+  sha256: 7f44dcb40fcb13ca1f145688f9f2840d3204b9f8ec82d524d24dbfb7aba237c7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: R.rsp, xml2, knitr, testthat (>= 3.0.0), label.switching (>= 1.7), rmarkdown, covr, parallel (>= 3.5.1)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-hdinterval >=0.2.0
+    - r-rcpp >=1.0.0
+    - r-rcpparmadillo
+    - r-rdpack >=1.0
+    - r-cowplot >=1.0.0
+    - r-ggplot2 >=3.1.0
+    - r-igraph >=1.2.5
+    - r-relations >=0.6_8
+    - r-rlang >=0.3.1
+    - r-sets >=1.0_18
+    - r-testthat
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-hdinterval >=0.2.0
+    - r-rcpp >=1.0.0
+    - r-rcpparmadillo
+    - r-rdpack >=1.0
+    - r-cowplot >=1.0.0
+    - r-ggplot2 >=3.1.0
+    - r-igraph >=1.2.5
+    - r-relations >=0.6_8
+    - r-rlang >=0.3.1
+    - r-sets >=1.0_18
+    - r-testthat
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BayesMallows')"           # [not win]
+    - "\"%R%\" -e \"library('BayesMallows')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ocbe-uio/BayesMallows, https://ocbe-uio.github.io/BayesMallows/
+  license: GPL-3
+  summary: An implementation of the Bayesian version of the Mallows rank model (Vitelli et al.,
+    Journal of Machine Learning Research, 2018 <https://jmlr.org/papers/v18/15-481.html>;
+    Crispino et al., Annals of Applied Statistics, 2019 <doi:10.1214/18-AOAS1203>; Sorensen
+    et al., R Journal, 2020 <doi:10.32614/RJ-2020-026>; Stein, PhD Thesis, 2023 <https://eprints.lancs.ac.uk/id/eprint/195759>).
+    Both Metropolis-Hastings and sequential Monte Carlo algorithms for estimating the
+    models are available. Cayley, footrule, Hamming, Kendall, Spearman, and Ulam distances
+    are supported in the models. The rank data to be analyzed can be in the form of
+    complete rankings, top-k rankings, partially missing rankings, as well as consistent
+    and inconsistent pairwise preferences. Several functions for plotting and studying
+    the posterior distributions of parameters are provided. The package also provides
+    functions for estimating the partition function (normalizing constant) of the Mallows
+    rank model, both with the importance sampling algorithm of Vitelli et al. and asymptotic
+    approximation with the IPFP algorithm (Mukherjee, Annals of Statistics, 2016 <doi:10.1214/15-AOS1389>).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: BayesMallows
+# Type: Package
+# Title: Bayesian Preference Learning with the Mallows Rank Model
+# Version: 1.4.0
+# Authors@R: c(person("Oystein", "Sorensen", email = "oystein.sorensen.1985@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0724-3542")), person("Waldir", "Leoncio", email = "w.l.netto@medisin.uio.no", role = c("ctr")), person("Valeria", "Vitelli", role = c("aut"), email = "valeria.vitelli@medisin.uio.no", comment = c(ORCID = "0000-0002-6746-0453")), person("Marta", "Crispino", email = "crispino.marta8@gmail.com", role = c("aut")), person("Qinghua", "Liu", email = "qinghual@math.uio.no", role = c("aut")), person("Cristina", "Mollica", email = "cristina.mollica@uniroma1.it", role = c("aut")), person("Luca", "Tardella", role = c("aut")), person("Anja", "Stein", role = c("aut")) )
+# Maintainer: Oystein Sorensen <oystein.sorensen.1985@gmail.com>
+# Description: An implementation of the Bayesian version of the Mallows rank model (Vitelli et al., Journal of Machine Learning Research, 2018 <https://jmlr.org/papers/v18/15-481.html>; Crispino et al., Annals of Applied Statistics, 2019 <doi:10.1214/18-AOAS1203>; Sorensen et al., R Journal, 2020 <doi:10.32614/RJ-2020-026>; Stein, PhD Thesis, 2023 <https://eprints.lancs.ac.uk/id/eprint/195759>). Both Metropolis-Hastings and sequential Monte Carlo algorithms for estimating the models are available. Cayley, footrule, Hamming, Kendall, Spearman, and Ulam distances are supported in the models. The rank data to be analyzed can be in the form of complete rankings, top-k rankings, partially missing rankings, as well as consistent and inconsistent pairwise preferences. Several functions for plotting and studying the posterior distributions of parameters are provided. The package also provides functions for estimating the partition function (normalizing constant) of the Mallows rank model, both with the importance sampling algorithm of Vitelli et al. and asymptotic approximation with the IPFP algorithm (Mukherjee, Annals of Statistics, 2016 <doi:10.1214/15-AOS1389>).
+# URL: https://github.com/ocbe-uio/BayesMallows, https://ocbe-uio.github.io/BayesMallows/
+# BugReports: https://github.com/ocbe-uio/BayesMallows/issues
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.3
+# Depends: R (>= 3.5.0)
+# Imports: Rcpp (>= 1.0.0), ggplot2 (>= 3.1.0), Rdpack (>= 1.0), igraph (>= 1.2.5), sets (>= 1.0-18), relations (>= 0.6-8), rlang (>= 0.3.1), HDInterval (>= 0.2.0), cowplot (>= 1.0.0), methods
+# LinkingTo: Rcpp, RcppArmadillo, testthat
+# Suggests: R.rsp, xml2, knitr, testthat (>= 3.0.0), label.switching (>= 1.7), rmarkdown, covr, parallel (>= 3.5.1)
+# VignetteBuilder: R.rsp, knitr
+# RdMacros: Rdpack
+# NeedsCompilation: yes
+# Packaged: 2023-10-04 15:47:00 UTC; oyss
+# Author: Oystein Sorensen [aut, cre] (<https://orcid.org/0000-0003-0724-3542>), Waldir Leoncio [ctr], Valeria Vitelli [aut] (<https://orcid.org/0000-0002-6746-0453>), Marta Crispino [aut], Qinghua Liu [aut], Cristina Mollica [aut], Luca Tardella [aut], Anja Stein [aut]
+# Repository: CRAN
+# Date/Publication: 2023-10-04 17:10:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,112 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-scoringutils
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/scoringutils_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/scoringutils/scoringutils_{{ version }}.tar.gz
+  sha256: 5df02ff701db29360f792cf0a50bf89c1d21cd8134bf36949bdba22e0adb54a8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: kableExtra, knitr, magrittr, rmarkdown, testthat, vdiffr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-ggdist >=3.2.0
+    - r-ggplot2 >=3.4.0
+    - r-lifecycle
+    - r-rlang
+    - r-scoringrules
+
+  run:
+    - r-base
+    - r-data.table
+    - r-ggdist >=3.2.0
+    - r-ggplot2 >=3.4.0
+    - r-lifecycle
+    - r-rlang
+    - r-scoringrules
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('scoringutils')"           # [not win]
+    - "\"%R%\" -e \"library('scoringutils')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://epiforecasts.io/scoringutils/, https://github.com/epiforecasts/scoringutils
+  license: MIT
+  summary: "Provides a collection of metrics and proper scoring rules (Tilmann Gneiting & Adrian
+    E Raftery (2007) <doi:10.1198/016214506000001437>, Jordan, A., Kr\xFCger, F., &
+    Lerch, S. (2019) <doi:10.18637/jss.v090.i12>) within a consistent framework for
+    evaluation, comparison and visualisation of forecasts. In addition to proper scoring
+    rules, functions are provided to assess bias, sharpness and calibration (Sebastian
+    Funk, Anton Camacho, Adam J. Kucharski, Rachel Lowe, Rosalind M. Eggo, W. John Edmunds
+    (2019) <doi:10.1371/journal.pcbi.1006785>) of forecasts. Several types of predictions
+    (e.g. binary, discrete, continuous) which may come in different formats (e.g. forecasts
+    represented by predictive samples or by quantiles of the predictive distribution)
+    can be evaluated. Scoring metrics can be used either through a convenient data.frame
+    format, or can be applied as individual functions in a vector / matrix format. All
+    functionality has been implemented with a focus on performance and is robustly tested."
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: scoringutils
+# Title: Utilities for Scoring and Assessing Predictions
+# Version: 1.1.0
+# Language: en-GB
+# Authors@R: c( person(given = "Nikos", family = "Bosse", role = c("aut", "cre"), email = "nikosbosse@gmail.com", comment = c(ORCID = "https://orcid.org/0000-0002-7750-5280")), person(given = "Sam Abbott", role = c("aut"), email = "contact@samabbott.co.uk", comment = c(ORCID = "0000-0001-8057-8037")), person(given = "Hugo", family = "Gruson", role = c("aut"), email = "hugo.gruson@lshtm.ac.uk", comment = c(ORCID = "https://orcid.org/0000-0002-4094-1476")), person(given = "Johannes Bracher", role = c("ctb"), email = "johannes.bracher@kit.edu", comment = c(ORCID = "0000-0002-3777-1410")), person("Sebastian", "Funk", email = "sebastian.funk@lshtm.ac.uk", role = c("ctb")))
+# Description: Provides a collection of metrics and proper scoring rules (Tilmann Gneiting & Adrian E Raftery (2007) <doi:10.1198/016214506000001437>, Jordan, A., Kruger, F., & Lerch, S. (2019) <doi:10.18637/jss.v090.i12>) within a consistent framework for evaluation, comparison and visualisation of forecasts. In addition to proper scoring rules, functions are provided to assess bias, sharpness and calibration (Sebastian Funk, Anton Camacho, Adam J. Kucharski, Rachel Lowe, Rosalind M. Eggo, W. John Edmunds (2019) <doi:10.1371/journal.pcbi.1006785>) of forecasts. Several types of predictions (e.g. binary, discrete, continuous) which may come in different formats (e.g. forecasts represented by predictive samples or by quantiles of the predictive distribution) can be evaluated. Scoring metrics can be used either through a convenient data.frame format, or can be applied as individual functions in a vector / matrix format. All functionality has been implemented with a focus on performance and is robustly tested.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# Imports: data.table, ggdist (>= 3.2.0), ggplot2 (>= 3.4.0), lifecycle, methods, rlang, scoringRules, stats
+# Suggests: kableExtra, knitr, magrittr, rmarkdown, testthat, vdiffr
+# Config/Needs/website: r-lib/pkgdown, amirmasoudabdol/preferably
+# Config/testthat/edition: 3
+# RoxygenNote: 7.2.3
+# URL: https://epiforecasts.io/scoringutils/, https://github.com/epiforecasts/scoringutils
+# BugReports: https://github.com/epiforecasts/scoringutils/issues
+# VignetteBuilder: knitr
+# Depends: R (>= 3.5)
+# NeedsCompilation: no
+# Packaged: 2023-01-30 16:26:22 UTC; nikos
+# Author: Nikos Bosse [aut, cre] (<https://orcid.org/0000-0002-7750-5280>), Sam Abbott [aut] (<https://orcid.org/0000-0001-8057-8037>), Hugo Gruson [aut] (<https://orcid.org/0000-0002-4094-1476>), Johannes Bracher [ctb] (<https://orcid.org/0000-0002-3777-1410>), Sebastian Funk [ctb]
+# Maintainer: Nikos Bosse <nikosbosse@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-01-30 17:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

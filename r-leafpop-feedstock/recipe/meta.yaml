@@ -1,0 +1,102 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-leafpop
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/leafpop_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/leafpop/leafpop_{{ version }}.tar.gz
+  sha256: 6e546886e1db4ad93a038de6d1e8331c0d686e96a0d3f0694e7575471f7d9db1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lattice, leaflet (>= 2.0.0), sp
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-base64enc
+    - r-brew
+    - r-htmltools
+    - r-htmlwidgets
+    - r-sf
+    - r-svglite
+    - r-uuid
+
+  run:
+    - r-base
+    - r-base64enc
+    - r-brew
+    - r-htmltools
+    - r-htmlwidgets
+    - r-sf
+    - r-svglite
+    - r-uuid
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('leafpop')"           # [not win]
+    - "\"%R%\" -e \"library('leafpop')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/r-spatial/leafpop
+  license: MIT
+  summary: Creates 'HTML' strings to embed tables, images or graphs in pop-ups of interactive
+    maps created with packages like 'leaflet' or 'mapview'. Handles local images located
+    on the file system or via remote URL. Handles graphs created with 'lattice' or 'ggplot2'
+    as well as interactive plots created with 'htmlwidgets'.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: leafpop
+# Type: Package
+# Title: Include Tables, Images and Graphs in Leaflet Pop-Ups
+# Version: 0.1.0
+# Date: 2021-05-22
+# Authors@R: c(person(given = "Tim", family = "Appelhans", role = c("cre", "aut"), email = "tim.appelhans@gmail.com"), person(given = "Florian", family = "Detsch", role = "aut", email = "fdetsch@web.de"))
+# Maintainer: Tim Appelhans <tim.appelhans@gmail.com>
+# Description: Creates 'HTML' strings to embed tables, images or graphs in pop-ups of interactive maps created with packages like 'leaflet' or 'mapview'. Handles local images located on the file system or via remote URL. Handles graphs created with 'lattice' or 'ggplot2' as well as interactive plots created with 'htmlwidgets'.
+# License: MIT + file LICENSE
+# URL: https://github.com/r-spatial/leafpop
+# BugReports: https://github.com/r-spatial/leafpop/issues
+# Encoding: UTF-8
+# Imports: base64enc, brew, htmltools, htmlwidgets, sf, svglite, uuid
+# Suggests: lattice, leaflet (>= 2.0.0), sp
+# RoxygenNote: 7.1.1
+# NeedsCompilation: no
+# Packaged: 2021-05-22 09:14:01 UTC; timpanse
+# Author: Tim Appelhans [cre, aut], Florian Detsch [aut]
+# Repository: CRAN
+# Date/Publication: 2021-05-22 10:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

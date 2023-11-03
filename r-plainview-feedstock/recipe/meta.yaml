@@ -1,0 +1,102 @@
+{% set version = '0.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-plainview
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/plainview_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/plainview/plainview_{{ version }}.tar.gz
+  sha256: e9b3d2f324049eeaa15bb00c1c9aff0818a69b398dccf26f118bbae7e7e26cb2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: shiny, sf, sp
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-htmltools
+    - r-htmlwidgets
+    - r-lattice
+    - r-png
+    - r-raster
+    - r-viridislite
+
+  run:
+    - r-base
+    - r-htmltools
+    - r-htmlwidgets
+    - r-lattice
+    - r-png
+    - r-raster
+    - r-viridislite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('plainview')"           # [not win]
+    - "\"%R%\" -e \"library('plainview')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://r-spatial.github.io/plainview/
+  license: MIT
+  summary: Provides methods for plotting potentially large (raster) images interactively on a
+    plain HTML canvas. In contrast to package 'mapview' data are plotted without background
+    map, but data can be projected to any spatial coordinate reference system. Supports
+    plotting of classes 'RasterLayer', 'RasterStack', 'RasterBrick' (from package 'raster')
+    as well as 'png' files located on disk. Interactivity includes zooming, panning,
+    and mouse location information. In case of multi-layer 'RasterStacks' or 'RasterBricks',
+    RGB image plots are created (similar to 'raster::plotRGB' - but interactive).
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: plainview
+# Title: Plot Raster Images Interactively on a Plain HTML Canvas
+# Version: 0.2.1
+# Authors@R: c(person(given = "Tim", family = "Appelhans", role = c("cre", "aut"), email = "tim.appelhans@gmail.com"), person(given = "Stefan", family = "Woellauer", role = "aut", email = "stephan.woellauer@geo.uni-marburg.de"))
+# Maintainer: Tim Appelhans <tim.appelhans@gmail.com>
+# Description: Provides methods for plotting potentially large (raster) images interactively on a plain HTML canvas. In contrast to package 'mapview' data are plotted without background map, but data can be projected to any spatial coordinate reference system. Supports plotting of classes 'RasterLayer', 'RasterStack', 'RasterBrick' (from package 'raster') as well as 'png' files located on disk. Interactivity includes zooming, panning, and mouse location information. In case of multi-layer 'RasterStacks' or 'RasterBricks', RGB image plots are created (similar to 'raster::plotRGB' - but interactive).
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Depends: R (>= 2.10), methods
+# Imports: htmltools, htmlwidgets, lattice, png, raster, viridisLite
+# Suggests: shiny, sf, sp
+# LazyData: true
+# RoxygenNote: 7.2.3
+# URL: https://r-spatial.github.io/plainview/
+# NeedsCompilation: no
+# Packaged: 2023-07-11 07:04:41 UTC; tim
+# Author: Tim Appelhans [cre, aut], Stefan Woellauer [aut]
+# Repository: CRAN
+# Date/Publication: 2023-07-11 12:00:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

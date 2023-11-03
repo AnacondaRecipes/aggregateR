@@ -1,0 +1,96 @@
+{% set version = '0.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-botor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/botor_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/botor/botor_{{ version }}.tar.gz
+  sha256: 9883fe22f59188a79af0830be287d96810d81e9bc607e58bb5a93651013c7c2b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr, digest
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-checkmate
+    - r-jsonlite
+    - r-logger
+    - r-reticulate
+
+  run:
+    - r-base
+    - r-checkmate
+    - r-jsonlite
+    - r-logger
+    - r-reticulate
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('botor')"           # [not win]
+    - "\"%R%\" -e \"library('botor')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://daroczig.github.io/botor/
+  license: AGPL-3
+  summary: Fork-safe, raw access to the 'Amazon Web Services' ('AWS') 'SDK' via the 'boto3' 'Python'
+    module, and convenient helper functions to query the 'Simple Storage Service' ('S3')
+    and 'Key Management Service' ('KMS'), partial support for 'IAM', the 'Systems Manager
+    Parameter Store' and 'Secrets Manager'.
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: botor
+# Authors@R: c( person("Gergely", "Daroczi", , "daroczig@rapporter.net", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3149-8537")), person("System1", role = c("fnd")) )
+# Title: 'AWS Python SDK' ('boto3') for R
+# Description: Fork-safe, raw access to the 'Amazon Web Services' ('AWS') 'SDK' via the 'boto3' 'Python' module, and convenient helper functions to query the 'Simple Storage Service' ('S3') and 'Key Management Service' ('KMS'), partial support for 'IAM', the 'Systems Manager Parameter Store' and 'Secrets Manager'.
+# SystemRequirements: Python and boto3 (https://aws.amazon.com/sdk-for-python)
+# Version: 0.4.0
+# Date: 2023-03-12
+# URL: https://daroczig.github.io/botor/
+# BugReports: https://github.com/daroczig/botor/issues
+# RoxygenNote: 7.1.1
+# License: AGPL-3
+# Encoding: UTF-8
+# Imports: utils, reticulate, checkmate, logger, jsonlite
+# Suggests: testthat, covr, digest
+# NeedsCompilation: no
+# Packaged: 2023-03-12 14:29:37 UTC; daroczig
+# Author: Gergely Daroczi [aut, cre] (<https://orcid.org/0000-0003-3149-8537>), System1 [fnd]
+# Maintainer: Gergely Daroczi <daroczig@rapporter.net>
+# Repository: CRAN
+# Date/Publication: 2023-03-12 15:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

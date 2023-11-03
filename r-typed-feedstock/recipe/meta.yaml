@@ -1,0 +1,88 @@
+{% set version = '0.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-typed
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/typed_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/typed/typed_{{ version }}.tar.gz
+  sha256: e3c26b06073d6d83894749dcddd916eb678244989d8dd165298ef926bbfed924
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-waldo
+
+  run:
+    - r-base
+    - r-waldo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('typed')"           # [not win]
+    - "\"%R%\" -e \"library('typed')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/moodymudskipper/typed
+  license: GPL-3
+  summary: A type system for R. It supports setting variable types in a script or the body of
+    a function, so variables can't be assigned illegal values. Moreover it supports
+    setting argument and return types for functions.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: typed
+# Title: Support Types for Variables, Arguments, and Return Values
+# Version: 0.0.1
+# Authors@R: person(given = "Antoine", family = "Fabri", role = c("aut", "cre"), email = "antoine.fabri@gmail.com")
+# Description: A type system for R. It supports setting variable types in a script or the body of a function, so variables can't be assigned illegal values. Moreover it supports setting argument and return types for functions.
+# License: GPL-3
+# Encoding: UTF-8
+# Language: en
+# LazyData: true
+# RoxygenNote: 7.1.1
+# URL: https://github.com/moodymudskipper/typed
+# BugReports: https://github.com/moodymudskipper/typed/issues
+# Imports: waldo
+# Suggests: testthat, covr
+# NeedsCompilation: no
+# Packaged: 2021-03-18 14:37:24 UTC; Antoine
+# Author: Antoine Fabri [aut, cre]
+# Maintainer: Antoine Fabri <antoine.fabri@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-03-19 10:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

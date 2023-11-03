@@ -1,0 +1,97 @@
+{% set version = '4.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-biotools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/biotools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/biotools/biotools_{{ version }}.tar.gz
+  sha256: bbaf38006d3ee6ef6a599ab0516ab370e9a90234fe791c1e624b3a25664ddeb7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: soilphysics, tkrplot, tcltk, rpanel, lattice, SpatialEpi, knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-boot
+
+  run:
+    - r-base
+    - r-mass
+    - r-boot
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('biotools')"           # [not win]
+    - "\"%R%\" -e \"library('biotools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://arsilva87.github.io/biotools/
+  license: GPL-2
+  summary: Tools designed to perform and evaluate cluster analysis (including Tocher's algorithm),
+    discriminant analysis and path analysis (standard and under collinearity), as well
+    as some useful miscellaneous tools for dealing with sample size and optimum plot
+    size calculations. A test for seed sample heterogeneity is now available. Mantel's
+    permutation test can be found in this package. A new approach for calculating its
+    power is implemented. biotools also contains tests for genetic covariance components.
+    Heuristic approaches for performing non-parametric spatial predictions of generic
+    response variables and spatial gene diversity are implemented.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: biotools
+# Type: Package
+# Title: Tools for Biometry and Applied Statistics in Agricultural Science
+# Version: 4.2
+# Date: 2021-08-06
+# LazyLoad: yes
+# LazyData: yes
+# Authors@R: c(person(given = c("Anderson", "Rodrigo"), family = "da Silva", role = c("aut", "cre"), email = "anderson.agro@hotmail.com", comment = c(ORCID = "0000-0003-2518-542X")))
+# Author: Anderson Rodrigo da Silva [aut, cre] (<https://orcid.org/0000-0003-2518-542X>)
+# Maintainer: Anderson Rodrigo da Silva <anderson.agro@hotmail.com>
+# Depends: MASS
+# Imports: utils, stats, graphics, boot, grDevices, datasets
+# Suggests: soilphysics, tkrplot, tcltk, rpanel, lattice, SpatialEpi, knitr, rmarkdown
+# Description: Tools designed to perform and evaluate cluster analysis (including Tocher's algorithm), discriminant analysis and path analysis (standard and under collinearity), as well as some useful miscellaneous tools for dealing with sample size and optimum plot size calculations. A test for seed sample heterogeneity is now available. Mantel's permutation test can be found in this package. A new approach for calculating its power is implemented. biotools also contains tests for genetic covariance components. Heuristic approaches for performing non-parametric spatial predictions of generic response variables and spatial gene diversity are implemented.
+# License: GPL (>= 2)
+# VignetteBuilder: knitr
+# URL: https://arsilva87.github.io/biotools/
+# BugReports: https://github.com/arsilva87/biotools/issues
+# NeedsCompilation: no
+# Packaged: 2021-08-06 21:47:06 UTC; ander
+# Repository: CRAN
+# Date/Publication: 2021-08-07 04:40:14 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,101 @@
+{% set version = '0.11.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-artool
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ARTool_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ARTool/ARTool_{{ version }}.tar.gz
+  sha256: 2ee34c69d88487d0fa0dcf6b8c723e031d749ca3bb3d349f073e43cf2ceb5c99
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 0.10.0), knitr, rmarkdown, ggplot2, tidyr, pander, lmerTest, cluster, phia, survival, psych, stringi, DescTools, tibble, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-car >=2.0_24
+    - r-dplyr
+    - r-emmeans
+    - r-lme4
+    - r-magrittr
+    - r-plyr
+
+  run:
+    - r-base
+    - r-car >=2.0_24
+    - r-dplyr
+    - r-emmeans
+    - r-lme4
+    - r-magrittr
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ARTool')"           # [not win]
+    - "\"%R%\" -e \"library('ARTool')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mjskay/ARTool/
+  license: GPL-2
+  summary: The aligned rank transform for nonparametric factorial ANOVAs as described by Wobbrock,
+    Findlater, Gergle, and Higgins (2011) <doi:10.1145/1978942.1978963>. Also supports
+    aligned rank transform contrasts as described by Elkin, Kay, Higgins, and Wobbrock
+    (2021) <doi:10.1145/3472749.3474784>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: ARTool
+# Title: Aligned Rank Transform
+# Version: 0.11.1
+# Date: 2021-10-12
+# Authors@R: c(person("Matthew", "Kay", role = c("aut", "cre"), email = "mjskay@northwestern.edu"), person("Lisa A.", "Elkin", role = "aut", email = "lelkin@cs.washington.edu"), person("James J.", "Higgins", role = "aut", email = "jhiggins@ksu.edu"), person("Jacob O.", "Wobbrock", role = "aut", email = "wobbrock@uw.edu"))
+# Maintainer: Matthew Kay <mjskay@northwestern.edu>
+# Description: The aligned rank transform for nonparametric factorial ANOVAs as described by Wobbrock, Findlater, Gergle, and Higgins (2011) <doi:10.1145/1978942.1978963>. Also supports aligned rank transform contrasts as described by Elkin, Kay, Higgins, and Wobbrock (2021) <doi:10.1145/3472749.3474784>.
+# Depends: R (>= 3.2)
+# Imports: lme4, car (>= 2.0-24), plyr, magrittr, dplyr, emmeans
+# Suggests: testthat (>= 0.10.0), knitr, rmarkdown, ggplot2, tidyr, pander, lmerTest, cluster, phia, survival, psych, stringi, DescTools, tibble, covr
+# License: GPL (>= 2)
+# Language: en-US
+# BugReports: https://github.com/mjskay/ARTool/issues/new
+# URL: https://github.com/mjskay/ARTool/
+# VignetteBuilder: knitr
+# RoxygenNote: 7.1.2
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2021-10-13 04:05:05 UTC; matth
+# Author: Matthew Kay [aut, cre], Lisa A. Elkin [aut], James J. Higgins [aut], Jacob O. Wobbrock [aut]
+# Repository: CRAN
+# Date/Publication: 2021-10-13 11:30:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

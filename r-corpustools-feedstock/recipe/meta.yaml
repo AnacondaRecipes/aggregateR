@@ -1,0 +1,129 @@
+{% set version = '0.5.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-corpustools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/corpustools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/corpustools/corpustools_{{ version }}.tar.gz
+  sha256: 27ce1b282d3840cf52c6f94e88c5446764cd936b05acd535089da5f7fb4b9694
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, tm (>= 0.6), topicmodels, knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix >=1.2
+    - r-r6
+    - r-rnewsflow >=1.2.1
+    - r-rcpp >=0.12.12
+    - r-rcppprogress
+    - r-data.table >=1.10.4
+    - r-digest
+    - r-igraph
+    - r-pbapply >=1.4
+    - r-quanteda >=1.5.1
+    - r-rsyntax >=0.1.1
+    - r-stringi
+    - r-tokenbrowser >=0.1.5
+    - r-udpipe >=0.8.3
+    - r-wordcloud >=2.5
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix >=1.2
+    - r-r6
+    - r-rnewsflow >=1.2.1
+    - r-rcpp >=0.12.12
+    - r-rcppprogress
+    - r-data.table >=1.10.4
+    - r-digest
+    - r-igraph
+    - r-pbapply >=1.4
+    - r-quanteda >=1.5.1
+    - r-rsyntax >=0.1.1
+    - r-stringi
+    - r-tokenbrowser >=0.1.5
+    - r-udpipe >=0.8.3
+    - r-wordcloud >=2.5
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('corpustools')"           # [not win]
+    - "\"%R%\" -e \"library('corpustools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/kasperwelbers/corpustools
+  license: GPL-3
+  summary: Provides text analysis in R, focusing on the use of a tokenized text format. In this
+    format, the positions of tokens are maintained, and each token can be annotated
+    (e.g., part-of-speech tags, dependency relations). Prominent features include advanced
+    Lucene-like querying for specific tokens or contexts (e.g., documents, sentences),
+    similarity statistics for words and documents, exporting to DTM for compatibility
+    with many text analysis packages, and the possibility to reconstruct original text
+    from tokens to facilitate interpretation.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: corpustools
+# Version: 0.5.1
+# Date: 2023-05-07
+# Title: Managing, Querying and Analyzing Tokenized Text
+# Description: Provides text analysis in R, focusing on the use of a tokenized text format. In this format, the positions of tokens are maintained, and each token can be annotated (e.g., part-of-speech tags, dependency relations). Prominent features include advanced Lucene-like querying for specific tokens or contexts (e.g., documents, sentences), similarity statistics for words and documents, exporting to DTM for compatibility with many text analysis packages, and the possibility to reconstruct original text from tokens to facilitate interpretation.
+# Author: Kasper Welbers and Wouter van Atteveldt
+# Maintainer: Kasper Welbers <kasperwelbers@gmail.com>
+# Depends: R (>= 3.5.0)
+# Imports: methods, wordcloud (>= 2.5), stringi, Rcpp (>= 0.12.12), R6, udpipe (>= 0.8.3), digest, data.table (>= 1.10.4), quanteda (>= 1.5.1), igraph, tokenbrowser (>= 0.1.5), RNewsflow (>= 1.2.1), Matrix (>= 1.2), parallel, pbapply (>= 1.4), rsyntax (>= 0.1.1)
+# Suggests: testthat, tm (>= 0.6), topicmodels, knitr, rmarkdown
+# LinkingTo: Rcpp, RcppProgress
+# LazyData: true
+# Encoding: UTF-8
+# License: GPL-3
+# URL: https://github.com/kasperwelbers/corpustools
+# RoxygenNote: 7.2.1
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2023-05-08 07:50:30 UTC; kasper
+# Repository: CRAN
+# Date/Publication: 2023-05-08 09:50:15 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

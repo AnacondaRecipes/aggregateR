@@ -1,0 +1,113 @@
+{% set version = '0.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-brmsmargins
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/brmsmargins_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/brmsmargins/brmsmargins_{{ version }}.tar.gz
+  sha256: d5069642b234b31cf9316a1eeccff550ace525a825253f351b8e15cfc28baee1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 3.0.0), covr, withr, knitr, rmarkdown, margins, betareg
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-bayestestr
+    - r-brms
+    - r-data.table >=1.12.0
+    - r-extraoperators >=0.1.1
+    - r-posterior
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-bayestestr
+    - r-brms
+    - r-data.table >=1.12.0
+    - r-extraoperators >=0.1.1
+    - r-posterior
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('brmsmargins')"           # [not win]
+    - "\"%R%\" -e \"library('brmsmargins')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://joshuawiley.com/brmsmargins/, https://github.com/JWiley/brmsmargins
+  license: GPL-3
+  summary: Calculate Bayesian marginal effects, average marginal effects, and marginal coefficients
+    (also called population averaged coefficients) for models fit using the 'brms' package
+    including fixed effects, mixed effects, and location scale models. These are based
+    on marginal predictions that integrate out random effects if necessary (see for
+    example <doi:10.1186/s12874-015-0046-6> and <doi:10.1111/biom.12707>).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: brmsmargins
+# Title: Bayesian Marginal Effects for 'brms' Models
+# Version: 0.2.0
+# Authors@R: c(person(given = "Joshua F.", family = "Wiley", role = c("aut", "cre"), email = "jwiley.psych@gmail.com", comment = c(ORCID = "0000-0002-0271-6702")), person(given = "Donald", family = "Hedeker", role = c("aut"), email = "hedeker@uchicago.edu", comment = c(ORCID = "0000-0001-8134-6094")))
+# URL: https://joshuawiley.com/brmsmargins/, https://github.com/JWiley/brmsmargins
+# BugReports: https://github.com/JWiley/brmsmargins/issues
+# Description: Calculate Bayesian marginal effects, average marginal effects, and marginal coefficients (also called population averaged coefficients) for models fit using the 'brms' package including fixed effects, mixed effects, and location scale models. These are based on marginal predictions that integrate out random effects if necessary (see for example <doi:10.1186/s12874-015-0046-6> and <doi:10.1111/biom.12707>).
+# License: GPL (>= 3)
+# Encoding: UTF-8
+# RoxygenNote: 7.2.0
+# Depends: R (>= 4.0.0)
+# Imports: methods, stats, data.table (>= 1.12.0), extraoperators (>= 0.1.1), brms, bayestestR, Rcpp, posterior
+# Suggests: testthat (>= 3.0.0), covr, withr, knitr, rmarkdown, margins, betareg
+# Config/testthat/edition: 3
+# Config/testthat/parallel: true
+# LinkingTo: RcppArmadillo, Rcpp
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2022-05-18 19:46:16 UTC; jwile
+# Author: Joshua F. Wiley [aut, cre] (<https://orcid.org/0000-0002-0271-6702>), Donald Hedeker [aut] (<https://orcid.org/0000-0001-8134-6094>)
+# Maintainer: Joshua F. Wiley <jwiley.psych@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-05-18 22:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

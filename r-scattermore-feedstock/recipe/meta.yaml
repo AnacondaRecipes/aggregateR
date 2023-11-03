@@ -1,0 +1,95 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-scattermore
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/scattermore_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/scattermore/scattermore_{{ version }}.tar.gz
+  sha256: 5534a87b0bdd1375f0fbffc1a5c980ad64e33a108435a67469b8324b580602d1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggplot2
+    - r-scales
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-ggplot2
+    - r-scales
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('scattermore')"           # [not win]
+    - "\"%R%\" -e \"library('scattermore')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=scattermore
+  license: GPL-3
+  summary: C-based conversion of large scatterplot data to rasters plus other operations such
+    as data blurring or data alpha blending. Speeds up plotting of data with millions
+    of points.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: scattermore
+# Title: Scatterplots with More Points
+# Version: 1.2
+# Authors@R: c(person(given = "Tereza", family = "Kulichova", role = c("aut"), email = "kulichova.t@gmail.com"), person(given = "Mirek", family = "Kratochvil", role = c("aut", "cre"), email = "exa.exa@gmail.com", comment = c(ORCID = "0000-0001-7356-4075")))
+# Description: C-based conversion of large scatterplot data to rasters plus other operations such as data blurring or data alpha blending. Speeds up plotting of data with millions of points.
+# Imports: ggplot2, scales, grid, grDevices, graphics
+# License: GPL (>= 3)
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Suggests: covr, knitr, rmarkdown, testthat
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2023-06-11 17:47:59 UTC; exa
+# Author: Tereza Kulichova [aut], Mirek Kratochvil [aut, cre] (<https://orcid.org/0000-0001-7356-4075>)
+# Maintainer: Mirek Kratochvil <exa.exa@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-06-12 08:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

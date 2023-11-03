@@ -1,0 +1,100 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ggresidpanel
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ggResidpanel_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ggResidpanel/ggResidpanel_{{ version }}.tar.gz
+  sha256: 2f86b7ae17153a9d6378fd1a3aba032b2d5a66754f871e010866b49b84e052ef
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dplyr, forcats, knitr, lme4, lmerTest, nlme, randomForest, rmarkdown, rpart, testthat, vdiffr, wesanderson
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-cowplot
+    - r-ggplot2
+    - r-plotly
+    - r-qqplotr
+    - r-stringr
+
+  run:
+    - r-base
+    - r-mass
+    - r-cowplot
+    - r-ggplot2
+    - r-plotly
+    - r-qqplotr
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ggResidpanel')"           # [not win]
+    - "\"%R%\" -e \"library('ggResidpanel')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://goodekat.github.io/ggResidpanel/
+  license: MIT
+  summary: An R package for creating panels of diagnostic plots for residuals from a model using
+    ggplot2 and plotly to analyze residuals and model assumptions from a variety of
+    viewpoints. It also allows for the creation of interactive diagnostic plots.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: ggResidpanel
+# Type: Package
+# Title: Panels and Interactive Versions of Diagnostic Plots using 'ggplot2'
+# Version: 0.3.0
+# Authors@R: c(person("Katherine", "Goode", email = "kgoode@iastate.edu", role = c("aut", "cre")), person("Kathleen", "Rey", email = "kprey@iastate.edu", role = c("aut")))
+# Description: An R package for creating panels of diagnostic plots for residuals from a model using ggplot2 and plotly to analyze residuals and model assumptions from a variety of viewpoints. It also allows for the creation of interactive diagnostic plots.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# URL: https://goodekat.github.io/ggResidpanel/
+# Imports: cowplot, ggplot2, grDevices, grid, MASS, plotly, qqplotr, stats, stringr
+# RoxygenNote: 6.1.1
+# Suggests: dplyr, forcats, knitr, lme4, lmerTest, nlme, randomForest, rmarkdown, rpart, testthat, vdiffr, wesanderson
+# VignetteBuilder: knitr
+# Depends: R (>= 3.0.0)
+# NeedsCompilation: no
+# Packaged: 2019-05-31 22:03:46 UTC; kgoode
+# Author: Katherine Goode [aut, cre], Kathleen Rey [aut]
+# Maintainer: Katherine Goode <kgoode@iastate.edu>
+# Repository: CRAN
+# Date/Publication: 2019-05-31 23:20:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

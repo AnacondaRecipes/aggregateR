@@ -1,0 +1,103 @@
+{% set version = '0.3.10' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-explor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/explor_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/explor/explor_{{ version }}.tar.gz
+  sha256: b9c146d8a39efee1a5f02d56de0414be7c9f73a8a8354166d4bd9749a9955980
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: FactoMineR, ade4 (>= 1.7-13), GDAtools (>= 2.0), MASS, quanteda, quanteda.textmodels, testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dt
+    - r-rcolorbrewer
+    - r-dplyr >=1.0
+    - r-formatr
+    - r-ggplot2
+    - r-highr
+    - r-scatterd3 >=1.0.0
+    - r-shiny >=1.0
+    - r-tidyr >=1.0
+
+  run:
+    - r-base
+    - r-dt
+    - r-rcolorbrewer
+    - r-dplyr >=1.0
+    - r-formatr
+    - r-ggplot2
+    - r-highr
+    - r-scatterd3 >=1.0.0
+    - r-shiny >=1.0
+    - r-tidyr >=1.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('explor')"           # [not win]
+    - "\"%R%\" -e \"library('explor')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://juba.github.io/explor/
+  license: GPL-3
+  summary: Shiny interfaces and graphical functions for multivariate analysis results exploration.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: explor
+# Type: Package
+# Title: Interactive Interfaces for Results Exploration
+# Version: 0.3.10
+# Date: 2023-04-29
+# Authors@R: c(person("Julien", "Barnier", email="julien.barnier@cnrs.fr", role=c("aut","cre")))
+# Maintainer: Julien Barnier <julien.barnier@cnrs.fr>
+# Description: Shiny interfaces and graphical functions for multivariate analysis results exploration.
+# License: GPL (>= 3)
+# VignetteBuilder: knitr
+# URL: https://juba.github.io/explor/
+# BugReports: https://github.com/juba/explor/issues
+# Encoding: UTF-8
+# Imports: shiny (>= 1.0), DT, dplyr (>= 1.0), tidyr (>= 1.0), ggplot2, highr, formatR, scatterD3 (>= 1.0.0), RColorBrewer
+# Suggests: FactoMineR, ade4 (>= 1.7-13), GDAtools (>= 2.0), MASS, quanteda, quanteda.textmodels, testthat, knitr, rmarkdown
+# RoxygenNote: 7.1.2
+# NeedsCompilation: no
+# Packaged: 2023-04-29 16:57:22 UTC; julien
+# Author: Julien Barnier [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2023-04-29 17:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

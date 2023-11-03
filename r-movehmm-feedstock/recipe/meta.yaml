@@ -1,0 +1,116 @@
+{% set version = '1.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-movehmm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/moveHMM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/moveHMM/moveHMM_{{ version }}.tar.gz
+  sha256: e2573c24909bdf18bbc5694daf30b07f8bd02360f80f31a8cf0d6c9747b80637
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-circstats
+    - r-mass
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-boot
+    - r-geosphere
+    - r-ggmap
+    - r-ggplot2
+    - r-numderiv
+    - r-sp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-circstats
+    - r-mass
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-boot
+    - r-geosphere
+    - r-ggmap
+    - r-ggplot2
+    - r-numderiv
+    - r-sp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('moveHMM')"           # [not win]
+    - "\"%R%\" -e \"library('moveHMM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/TheoMichelot/moveHMM, https://cran.r-project.org/package=moveHMM
+  license: GPL-3
+  summary: Provides tools for animal movement modelling using hidden Markov models. These include
+    processing of tracking data, fitting hidden Markov models to movement data, visualization
+    of data and fitted model, decoding of the state process, etc. <doi:10.1111/2041-210X.12578>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: moveHMM
+# Type: Package
+# Title: Animal Movement Modelling using Hidden Markov Models
+# Version: 1.9
+# Date: 2023-05-06
+# Author: Theo Michelot (aut, cre), Roland Langrock (aut, cre), Toby Patterson (aut, cre), Brett McClintock (ctb), Eric Rexstad (ctb)
+# Maintainer: Theo Michelot <theo.michelot@dal.ca>
+# Description: Provides tools for animal movement modelling using hidden Markov models. These include processing of tracking data, fitting hidden Markov models to movement data, visualization of data and fitted model, decoding of the state process, etc. <doi:10.1111/2041-210X.12578>.
+# URL: https://github.com/TheoMichelot/moveHMM, https://cran.r-project.org/package=moveHMM
+# License: GPL-3
+# LazyData: TRUE
+# Depends: CircStats
+# Imports: Rcpp, boot, MASS, sp, geosphere, ggplot2, ggmap, numDeriv
+# LinkingTo: Rcpp, RcppArmadillo
+# Suggests: testthat, knitr
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.2
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-05-08 14:06:30 UTC; theo
+# Repository: CRAN
+# Date/Publication: 2023-05-08 18:20:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

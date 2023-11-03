@@ -1,0 +1,93 @@
+{% set version = '0.6.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lavaanplot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/lavaanPlot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/lavaanPlot/lavaanPlot_{{ version }}.tar.gz
+  sha256: e55323071a8347d1d909b8747270fa3465a673d390c9e6da94646b939bf72c0e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, DiagrammeRsvg, rsvg, png
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-diagrammer
+    - r-lavaan
+    - r-magrittr
+    - r-stringr
+
+  run:
+    - r-base
+    - r-diagrammer
+    - r-lavaan
+    - r-magrittr
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('lavaanPlot')"           # [not win]
+    - "\"%R%\" -e \"library('lavaanPlot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/alishinski/lavaanPlot
+  license: GPL-2
+  summary: Plots path diagrams from models in 'lavaan' using the plotting functionality from
+    the 'DiagrammeR' package. 'DiagrammeR' provides nice path diagrams via 'Graphviz',
+    and these functions make it easy to generate these diagrams from a 'lavaan' path
+    model without having to write the DOT language graph specification.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: lavaanPlot
+# Type: Package
+# Title: Path Diagrams for 'Lavaan' Models via 'DiagrammeR'
+# Version: 0.6.2
+# Author: Alex Lishinski
+# Maintainer: Alex Lishinski <alexlishinski@gmail.com>
+# URL: https://github.com/alishinski/lavaanPlot
+# Description: Plots path diagrams from models in 'lavaan' using the plotting functionality from the 'DiagrammeR' package. 'DiagrammeR' provides nice path diagrams via 'Graphviz', and these functions make it easy to generate these diagrams from a 'lavaan' path model without having to write the DOT language graph specification.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# Imports: lavaan, DiagrammeR, stringr, magrittr
+# RoxygenNote: 7.1.1
+# Suggests: knitr, rmarkdown, DiagrammeRsvg, rsvg, png
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2021-08-13 11:25:05 UTC; alishinski
+# Repository: CRAN
+# Date/Publication: 2021-08-13 14:00:12 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

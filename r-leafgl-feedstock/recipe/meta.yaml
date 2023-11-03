@@ -1,0 +1,94 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-leafgl
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/leafgl_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/leafgl/leafgl_{{ version }}.tar.gz
+  sha256: 30fcdca48a284fed6948c1152cb87e069bc5f25beea8146407b913f88dbe5210
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: colourvalues, shiny, testthat (>= 2.1.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-geojsonsf
+    - r-htmltools
+    - r-jsonify
+    - r-leaflet
+    - r-sf
+
+  run:
+    - r-base
+    - r-geojsonsf
+    - r-htmltools
+    - r-jsonify
+    - r-leaflet
+    - r-sf
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('leafgl')"           # [not win]
+    - "\"%R%\" -e \"library('leafgl')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=leafgl
+  license: MIT
+  summary: Provides bindings to the 'Leaflet.glify' JavaScript library which extends the 'leaflet'
+    JavaScript library to render large data in the browser using 'WebGl'.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: leafgl
+# Type: Package
+# Title: High-Performance 'WebGl' Rendering for Package 'leaflet'
+# Version: 0.1.1
+# Authors@R: c(person(given = "Tim", family = "Appelhans", role = c("cre", "aut", "cph"), email = "tim.appelhans@gmail.com"), person(given = "Colin", family = "Fay", role = "ctb", email = "colin@thinkr.fr", comment = structure("0000-0001-7343-1846", .Names = "ORCID")), person(given = "Robert", family = "Plummer", role = "ctb", comment = "Leaflet.glify plugin"), person(given = "Kent", family = "Johnson", role = "ctb", email = "kjohnson@akoyabio.com"), person(given = "Sebastian", family = "Gatscha", role = "ctb", email = "sebastian_gatscha@gmx.at"))
+# Maintainer: Tim Appelhans <tim.appelhans@gmail.com>
+# Description: Provides bindings to the 'Leaflet.glify' JavaScript library which extends the 'leaflet' JavaScript library to render large data in the browser using 'WebGl'.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.0.2
+# Imports: geojsonsf, htmltools, jsonify, leaflet, sf, grDevices
+# Suggests: colourvalues, shiny, testthat (>= 2.1.0)
+# NeedsCompilation: no
+# Packaged: 2020-06-25 19:03:04 UTC; timpanse
+# Author: Tim Appelhans [cre, aut, cph], Colin Fay [ctb] (<https://orcid.org/0000-0001-7343-1846>), Robert Plummer [ctb] (Leaflet.glify plugin), Kent Johnson [ctb], Sebastian Gatscha [ctb]
+# Repository: CRAN
+# Date/Publication: 2020-06-28 10:30:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

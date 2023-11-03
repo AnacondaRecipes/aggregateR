@@ -1,0 +1,101 @@
+{% set version = '0.4.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-openai
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/openai_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/openai/openai_{{ version }}.tar.gz
+  sha256: 3f2db065d166d1100ff63c1394e6d7fd8d9c7658d7c5b2cc8bd6cdc312b321ba
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 3.0.0), purrr (>= 0.3.4), covr (>= 3.5.1)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-assertthat >=0.2.1
+    - r-glue >=1.6.2
+    - r-httr >=1.4.3
+    - r-jsonlite >=1.8.0
+    - r-lifecycle >=1.0.1
+    - r-magrittr >=2.0.3
+
+  run:
+    - r-base
+    - r-assertthat >=0.2.1
+    - r-glue >=1.6.2
+    - r-httr >=1.4.3
+    - r-jsonlite >=1.8.0
+    - r-lifecycle >=1.0.1
+    - r-magrittr >=2.0.3
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('openai')"           # [not win]
+    - "\"%R%\" -e \"library('openai')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/irudnyts/openai, https://irudnyts.github.io/openai/
+  license: MIT
+  summary: An R wrapper of OpenAI API endpoints (see <https://platform.openai.com/docs/introduction>
+    for details). This package covers Models, Completions, Chat, Edits, Images, Embeddings,
+    Audio, Files, Fine-tunes, Moderations, and legacy Engines endpoints.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: openai
+# Type: Package
+# Title: R Wrapper for OpenAI API
+# Version: 0.4.1
+# Date: 2023-03-14
+# Authors@R: person("Iegor", "Rudnytskyi", , "iegor.rudnytskyi@gmail.com", c("aut", "cre"))
+# Description: An R wrapper of OpenAI API endpoints (see <https://platform.openai.com/docs/introduction> for details). This package covers Models, Completions, Chat, Edits, Images, Embeddings, Audio, Files, Fine-tunes, Moderations, and legacy Engines endpoints.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# RoxygenNote: 7.2.1
+# URL: https://github.com/irudnyts/openai, https://irudnyts.github.io/openai/
+# BugReports: https://github.com/irudnyts/openai/issues
+# Depends: R (>= 3.5)
+# Imports: assertthat (>= 0.2.1), glue (>= 1.6.2), httr (>= 1.4.3), jsonlite (>= 1.8.0), lifecycle (>= 1.0.1), magrittr (>= 2.0.3)
+# Suggests: testthat (>= 3.0.0), purrr (>= 0.3.4), covr (>= 3.5.1)
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2023-03-15 00:08:52 UTC; irudnyts
+# Author: Iegor Rudnytskyi [aut, cre]
+# Maintainer: Iegor Rudnytskyi <iegor.rudnytskyi@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-03-15 00:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

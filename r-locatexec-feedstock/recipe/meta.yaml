@@ -1,0 +1,87 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-locatexec
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/locatexec_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/locatexec/locatexec_{{ version }}.tar.gz
+  sha256: bd9e397c95cc5ade0b560d683620c0aa50dc19644d916f2ee69fd94104d37a0f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('locatexec')"           # [not win]
+    - "\"%R%\" -e \"library('locatexec')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=locatexec
+  license: MIT
+  summary: A set of functions to locate some programs available on the user machine. The package
+    provides functions to locate 'Node.js', 'npm', 'LibreOffice', 'Microsoft Word',
+    'Microsoft PowerPoint', 'Microsoft Excel', 'Python', 'pip', 'Mozilla Firefox' and
+    'Google Chrome'. User can test the availability of a program with eventually a version
+    and call it with function system2() or system(). This allows the use of a single
+    function to retrieve the path to a program regardless of the operating system and
+    its configuration.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: locatexec
+# Type: Package
+# Title: Detection and Localization of Executable Files
+# Version: 0.1.1
+# Authors@R: c( person("David", "Gohel", role = c("aut", "cre"), email = "david.gohel@ardata.fr"), person(given = "ArData", role = "cph") )
+# Description: A set of functions to locate some programs available on the user machine. The package provides functions to locate 'Node.js', 'npm', 'LibreOffice', 'Microsoft Word', 'Microsoft PowerPoint', 'Microsoft Excel', 'Python', 'pip', 'Mozilla Firefox' and 'Google Chrome'. User can test the availability of a program with eventually a version and call it with function system2() or system(). This allows the use of a single function to retrieve the path to a program regardless of the operating system and its configuration.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# RoxygenNote: 7.1.1
+# Imports: utils
+# BugReports: https://github.com/ardata-fr/locatexec/issues
+# NeedsCompilation: no
+# Packaged: 2021-05-18 23:01:16 UTC; davidgohel
+# Author: David Gohel [aut, cre], ArData [cph]
+# Maintainer: David Gohel <david.gohel@ardata.fr>
+# Repository: CRAN
+# Date/Publication: 2021-05-19 09:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

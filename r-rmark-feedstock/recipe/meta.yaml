@@ -1,0 +1,91 @@
+{% set version = '3.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rmark
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RMark_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RMark/RMark_{{ version }}.tar.gz
+  sha256: 08a20f4246dcfe6a8bfe8acd673346b79dc1b9b42a4354d865364f577329305b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lattice, splines, nlme, plotrix
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-coda
+    - r-matrixcalc
+    - r-msm
+
+  run:
+    - r-base
+    - r-coda
+    - r-matrixcalc
+    - r-msm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RMark')"           # [not win]
+    - "\"%R%\" -e \"library('RMark')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RMark
+  license: GPL-2
+  summary: An interface to the software package MARK that constructs input files for MARK and
+    extracts the output. MARK was developed by Gary White and is freely available at
+    <http://www.phidot.org/software/mark/downloads/> but is not open source.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: RMark
+# Version: 3.0.0
+# Date: 2022-08-12
+# Title: R Code for Mark Analysis
+# Author: Jeff Laake <jefflaake@gmail.com> with code contributions from Eldar Rakhimberdiev, Ben Augustine, Daniel Turek, Brett McClintock, and Jim Hines and example data and analysis from Bret Collier, Jay Rotella, David Pavlacky, Andrew Paul, Luke Eberhart- Phillips, Jake Ivan, and Connor Wood.
+# Description: An interface to the software package MARK that constructs input files for MARK and extracts the output. MARK was developed by Gary White and is freely available at <http://www.phidot.org/software/mark/downloads/> but is not open source.
+# SystemRequirements: notepad.exe, mark.exe (>= 8.0) (or mark32.exe and mark64.exe) and rel_32.exe (see README.txt)
+# Depends: R (>= 2.13.0),
+# Imports: parallel, matrixcalc, msm, coda
+# Suggests: lattice, splines, nlme, plotrix
+# LazyLoad: yes
+# License: GPL (>= 2)
+# Maintainer: Jeff Laake <jefflaake@gmail.com>
+# Encoding: UTF-8
+# RoxygenNote: 7.2.1
+# NeedsCompilation: no
+# Packaged: 2022-08-13 23:09:13 UTC; jefflaake
+# Repository: CRAN
+# Date/Publication: 2022-08-13 23:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

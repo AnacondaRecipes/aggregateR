@@ -1,0 +1,87 @@
+{% set version = '0.6-18' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-micecon
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/micEcon_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/micEcon/micEcon_{{ version }}.tar.gz
+  sha256: 149f589bd7828f6ee92332ab1daf932af9ecf8b4d7e7efbab9ee3ad346a2bded
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Ecdat (>= 0.1-5), systemfit (>= 1.0-0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-misctools >=0.6_1
+    - r-plm >=1.1_0
+
+  run:
+    - r-base
+    - r-misctools >=0.6_1
+    - r-plm >=1.1_0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('micEcon')"           # [not win]
+    - "\"%R%\" -e \"library('micEcon')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.micEcon.org
+  license: GPL-2
+  summary: Various tools for microeconomic analysis and microeconomic modelling, e.g. estimating
+    quadratic, Cobb-Douglas and Translog functions, calculating partial derivatives
+    and elasticities of these functions, and calculating Hessian matrices, checking
+    curvature and preparing restrictions for imposing monotonicity of Translog functions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: micEcon
+# Version: 0.6-18
+# Date: 2022-09-03
+# Title: Microeconomic Analysis and Modelling
+# Author: Arne Henningsen
+# Maintainer: Arne Henningsen <arne.henningsen@gmail.com>
+# Depends: R (>= 3.5.0)
+# Imports: miscTools (>= 0.6-1), plm (>= 1.1-0)
+# Suggests: Ecdat (>= 0.1-5), systemfit (>= 1.0-0)
+# Description: Various tools for microeconomic analysis and microeconomic modelling, e.g. estimating quadratic, Cobb-Douglas and Translog functions, calculating partial derivatives and elasticities of these functions, and calculating Hessian matrices, checking curvature and preparing restrictions for imposing monotonicity of Translog functions.
+# License: GPL (>= 2)
+# URL: http://www.micEcon.org
+# NeedsCompilation: no
+# Packaged: 2022-09-03 20:03:18 UTC; gsl324
+# Repository: CRAN
+# Date/Publication: 2022-09-03 21:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

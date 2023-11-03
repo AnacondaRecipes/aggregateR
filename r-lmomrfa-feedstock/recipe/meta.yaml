@@ -1,0 +1,87 @@
+{% set version = '3.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lmomrfa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/lmomRFA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/lmomRFA/lmomRFA_{{ version }}.tar.gz
+  sha256: 17d7a6cfb2abb7a7cb05a68cbd0a17a4abe508258c74f18cd823b9d8df0861ab
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-lmom >=2.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-lmom >=2.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('lmomRFA')"           # [not win]
+    - "\"%R%\" -e \"library('lmomRFA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=lmomRFA
+  license: Common Public License Version 1.0
+  summary: 'Functions for regional frequency analysis using the methods of J. R. M. Hosking and
+    J. R. Wallis (1997), "Regional frequency analysis: an approach based on L-moments".'
+  license_family: OTHER
+
+# The original CRAN metadata for this package was:
+
+# Package: lmomRFA
+# Version: 3.6
+# Date: 2023-08-29
+# Title: Regional Frequency Analysis using L-Moments
+# Author: J. R. M. Hosking
+# Maintainer: J. R. M. Hosking <jrmhosking@gmail.com>
+# Description: Functions for regional frequency analysis using the methods of J. R. M. Hosking and J. R. Wallis (1997), "Regional frequency analysis: an approach based on L-moments".
+# Depends: R (>= 3.0.0), lmom (>= 2.0)
+# Imports: stats, graphics
+# License: Common Public License Version 1.0
+# LazyData: yes
+# NeedsCompilation: yes
+# Packaged: 2023-08-29 02:42:49 UTC; J
+# Repository: CRAN
+# Date/Publication: 2023-08-29 04:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

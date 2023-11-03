@@ -1,0 +1,100 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-geomtextpath
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/geomtextpath_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/geomtextpath/geomtextpath_{{ version }}.tar.gz
+  sha256: e42fdf46128dfef128b6a31365916ffcf2b2e7d8021405cfcd73085bd10eb544
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 3.0.0), covr, knitr, rmarkdown, ragg, roxygen2, sf, xml2, markdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggplot2
+    - r-rlang
+    - r-scales
+    - r-systemfonts
+    - r-textshaping
+
+  run:
+    - r-base
+    - r-ggplot2
+    - r-rlang
+    - r-scales
+    - r-systemfonts
+    - r-textshaping
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('geomtextpath')"           # [not win]
+    - "\"%R%\" -e \"library('geomtextpath')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://allancameron.github.io/geomtextpath/
+  license: MIT
+  summary: A 'ggplot2' extension that allows text to follow curved paths. Curved text makes it
+    easier to directly label paths or neatly annotate in polar co-ordinates.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: geomtextpath
+# Type: Package
+# Title: Curved Text in 'ggplot2'
+# Version: 0.1.1
+# Authors@R: c( person(given = "Allan", family = "Cameron", role = c("aut", "cre"), email = "Allan.Cameron@nhs.scot"), person(given = "Teun", family = "van den Brand", role = c("aut"), email = "tahvdbrand@gmail.com", comment = c(ORCID = "0000-0002-9335-7468")))
+# Description: A 'ggplot2' extension that allows text to follow curved paths. Curved text makes it easier to directly label paths or neatly annotate in polar co-ordinates.
+# License: MIT + file LICENSE
+# LazyData: true
+# URL: https://allancameron.github.io/geomtextpath/
+# BugReports: https://github.com/AllanCameron/geomtextpath/issues
+# Encoding: UTF-8
+# Depends: ggplot2, R (>= 3.6.0)
+# Imports: grid, scales, systemfonts, rlang, textshaping
+# RoxygenNote: 7.2.1
+# Suggests: testthat (>= 3.0.0), covr, knitr, rmarkdown, ragg, roxygen2, sf, xml2, markdown
+# Config/testthat/edition: 3
+# VignetteBuilder: knitr
+# Collate: 'borrowed_gridtext.R' 'coord_curvedpolar.R' 'data.R' 'text_params.R' 'geom_textpath.R' 'geom_labelpath.R' 'geom_textsegment.R' 'geom_textabline.R' 'geom_textcontour.R' 'geom_textcurve.R' 'geom_textdensity.R' 'utils.R' 'geom_textdensity2d.R' 'geom_texthline.R' 'geom_textsf.R' 'geom_textsmooth.R' 'geom_textvline.R' 'geomtextpath-package.R' 'grob_labelpath.R' 'grob_textpath.R' 'onload.R' 'path_handling.R' 'scales.R' 'sf_helpers.R' 'smoothing.R' 'text_helpers.R' 'text_placement.R' 'trig_helpers.R'
+# NeedsCompilation: no
+# Packaged: 2022-08-30 13:53:29 UTC; Administrator
+# Author: Allan Cameron [aut, cre], Teun van den Brand [aut] (<https://orcid.org/0000-0002-9335-7468>)
+# Maintainer: Allan Cameron <Allan.Cameron@nhs.scot>
+# Repository: CRAN
+# Date/Publication: 2022-08-30 17:00:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

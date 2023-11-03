@@ -1,0 +1,104 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-details
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/details_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/details/details_{{ version }}.tar.gz
+  sha256: 87f1a92f79f43aa075369a32f248447bf04ca0ff24148a1f146a5c575d9dcf57
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, rmarkdown, sessioninfo, testthat, tibble
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-clipr
+    - r-desc
+    - r-htmltools
+    - r-httr
+    - r-knitr
+    - r-magrittr
+    - r-png
+    - r-withr
+    - r-xml2
+
+  run:
+    - r-base
+    - r-clipr
+    - r-desc
+    - r-htmltools
+    - r-httr
+    - r-knitr
+    - r-magrittr
+    - r-png
+    - r-withr
+    - r-xml2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('details')"           # [not win]
+    - "\"%R%\" -e \"library('details')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/yonicd/details
+  license: MIT
+  summary: Create a details HTML tag around R objects to place in a Markdown, 'Rmarkdown' and
+    'roxygen2' documentation.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: details
+# Title: Create Details HTML Tag for Markdown and Package Documentation
+# Version: 0.3.0
+# Authors@R: person(given = "Jonathan", family = "Sidi", role = c("aut", "cre"), email = "yonicd@gmail.com")
+# Description: Create a details HTML tag around R objects to place in a Markdown, 'Rmarkdown' and 'roxygen2' documentation.
+# License: MIT + file LICENSE
+# URL: https://github.com/yonicd/details
+# BugReports: https://github.com/yonicd/details/issues
+# Depends: R (>= 3.2.0)
+# Imports: clipr, desc, grid, httr, htmltools, knitr, magrittr, png, stats, utils, withr, xml2
+# Suggests: covr, rmarkdown, sessioninfo, testthat, tibble
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# RoxygenNote: 7.1.1
+# NeedsCompilation: no
+# Packaged: 2022-03-27 20:56:24 UTC; yonis
+# Author: Jonathan Sidi [aut, cre]
+# Maintainer: Jonathan Sidi <yonicd@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-03-27 21:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,92 @@
+{% set version = '0.1.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-biostat3
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/biostat3_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/biostat3/biostat3_{{ version }}.tar.gz
+  sha256: 97aaceaa67a273281dc6b5fd99a1d770c2af871202cc34d3372e5002fbe108df
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: car, bshazard, rstpm2, Epi, dplyr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-muhaz
+    - r-survival
+
+  run:
+    - r-base
+    - r-mass
+    - r-muhaz
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('biostat3')"           # [not win]
+    - "\"%R%\" -e \"library('biostat3')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=biostat3
+  license: GPL-2
+  summary: Utility functions, datasets and extended examples for survival analysis. This extends
+    a range of other packages, some simple wrappers for time-to-event analyses, datasets,
+    and extensive examples in HTML with R scripts. The package also supports the course
+    Biostatistics III entitled "Survival analysis for epidemiologists in R".
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: biostat3
+# Type: Package
+# Title: Utility Functions, Datasets and Extended Examples for Survival Analysis
+# Version: 0.1.9
+# Date: 2023-10-27
+# Authors@R: c(person("Annika","Tillander", role="ctb"), person("Andreas","Karlsson", role="aut"), person("Johan","Zetterqvist", role="ctb"), person("Peter","Strom", role="ctb"), person("Benedicte","Delcoigne", role="ctb"), person("Mark","Clements", role=c("aut","cre"), email="mark.clements@ki.se") )
+# Description: Utility functions, datasets and extended examples for survival analysis. This extends a range of other packages, some simple wrappers for time-to-event analyses, datasets, and extensive examples in HTML with R scripts. The package also supports the course Biostatistics III entitled "Survival analysis for epidemiologists in R".
+# Depends: survival, R (>= 3.5), MASS, methods
+# Imports: muhaz, graphics, stats
+# Suggests: car, bshazard, rstpm2, Epi, dplyr
+# License: GPL (>= 2)
+# LazyData: yes
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2023-10-27 09:21:58 UTC; marcle
+# Author: Annika Tillander [ctb], Andreas Karlsson [aut], Johan Zetterqvist [ctb], Peter Strom [ctb], Benedicte Delcoigne [ctb], Mark Clements [aut, cre]
+# Maintainer: Mark Clements <mark.clements@ki.se>
+# Repository: CRAN
+# Date/Publication: 2023-10-27 10:10:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

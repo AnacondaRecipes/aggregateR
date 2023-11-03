@@ -1,0 +1,102 @@
+{% set version = '9.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-funtimes
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/funtimes_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/funtimes/funtimes_{{ version }}.tar.gz
+  sha256: 9f3d860320e961ecd441779396f284ffc3660185e95dddb9208d8c426533e23f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covid19us, Ecdat, ggplot2, gridExtra, knitr, patchwork, randomcoloR, readxl, reshape2, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-kendall
+    - r-rdpack
+    - r-dbscan
+    - r-lmtest
+    - r-mlvar
+    - r-sandwich
+    - r-vars
+
+  run:
+    - r-base
+    - r-kendall
+    - r-rdpack
+    - r-dbscan
+    - r-lmtest
+    - r-mlvar
+    - r-sandwich
+    - r-vars
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('funtimes')"           # [not win]
+    - "\"%R%\" -e \"library('funtimes')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=funtimes
+  license: GPL-2
+  summary: Nonparametric estimators and tests for time series analysis. The functions use bootstrap
+    techniques and robust nonparametric difference-based estimators to test for the
+    presence of possibly non-monotonic trends and for synchronicity of trends in multiple
+    time series.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: funtimes
+# Type: Package
+# Title: Functions for Time Series Analysis
+# Version: 9.1
+# Date: 2023-03-21
+# Authors@R: c(person("Vyacheslav", "Lyubchich", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7936-4285"), email="lyubchich@umces.edu"), person("Yulia R.", "Gel", role = "aut"), person("Alexander", "Brenning", role = "ctb"), person("Calvin", "Chu", role = "ctb"), person("Xin", "Huang", role = "ctb"), person("Umar", "Islambekov", role = "ctb"), person("Palina", "Niamkova", role = "ctb"), person("Dorcas", "Ofori-Boateng", role = "ctb"), person("Ethan D.", "Schaeffer", role = "ctb"), person("Srishti", "Vishwakarma", role = "aut"), person("Xingyu", "Wang", role = "ctb"))
+# Depends: R (>= 3.5.0)
+# License: GPL (>= 2)
+# Imports: dbscan, Kendall, lmtest, mlVAR, parallel, Rdpack, sandwich, vars
+# Suggests: covid19us, Ecdat, ggplot2, gridExtra, knitr, patchwork, randomcoloR, readxl, reshape2, rmarkdown
+# Description: Nonparametric estimators and tests for time series analysis. The functions use bootstrap techniques and robust nonparametric difference-based estimators to test for the presence of possibly non-monotonic trends and for synchronicity of trends in multiple time series.
+# RdMacros: Rdpack
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# VignetteBuilder: knitr, rmarkdown
+# NeedsCompilation: no
+# Packaged: 2023-03-21 22:53:01 UTC; Slava
+# Author: Vyacheslav Lyubchich [aut, cre] (<https://orcid.org/0000-0001-7936-4285>), Yulia R. Gel [aut], Alexander Brenning [ctb], Calvin Chu [ctb], Xin Huang [ctb], Umar Islambekov [ctb], Palina Niamkova [ctb], Dorcas Ofori-Boateng [ctb], Ethan D. Schaeffer [ctb], Srishti Vishwakarma [aut], Xingyu Wang [ctb]
+# Maintainer: Vyacheslav Lyubchich <lyubchich@umces.edu>
+# Repository: CRAN
+# Date/Publication: 2023-03-21 23:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,127 @@
+{% set version = '0.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mmrm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mmrm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mmrm/mmrm_{{ version }}.tar.gz
+  sha256: 343f60224e2b3cc65d5e238ce0dd191c0986af504c4ae80173cc0992e8fbd9cd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: emmeans (>= 1.6), estimability, knitr, parallelly (>= 1.32.0), rmarkdown, testthat (>= 3.0.0), xml2
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcppeigen
+    - r-rdpack
+    - r-tmb >=1.9.1
+    - r-checkmate >=2.0
+    - r-lifecycle
+    - r-nlme
+    - r-numderiv
+    - r-stringr
+    - r-testthat
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcppeigen
+    - r-rdpack
+    - r-tmb >=1.9.1
+    - r-checkmate >=2.0
+    - r-lifecycle
+    - r-nlme
+    - r-numderiv
+    - r-stringr
+    - r-testthat
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mmrm')"           # [not win]
+    - "\"%R%\" -e \"library('mmrm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://openpharma.github.io/mmrm/
+  license: Apache License 2.0
+  summary: Mixed models for repeated measures (MMRM) are a popular choice for analyzing longitudinal
+    continuous outcomes in randomized clinical trials and beyond; see Cnaan, Laird and
+    Slasor (1997) <doi:10.1002/(SICI)1097-0258(19971030)16:20%3C2349::AID-SIM667%3E3.0.CO;2-E>
+    for a tutorial and Mallinckrodt, Lane and Schnell (2008) <doi:10.1177/009286150804200402>
+    for a review. This package implements MMRM based on the marginal linear model without
+    random effects using Template Model Builder ('TMB') which enables fast and robust
+    model fitting. Users can specify a variety of covariance matrices, weight observations,
+    fit models with restricted or standard maximum likelihood inference, perform hypothesis
+    testing with Satterthwaite or Kenward-Roger adjustment, and extract least square
+    means estimates by using 'emmeans'.
+  license_family: APACHE
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: mmrm
+# Title: Mixed Models for Repeated Measures
+# Version: 0.2.2
+# Authors@R: c( person("Daniel", "Sabanes Bove", , "daniel.sabanes_bove@roche.com", role = c("aut", "cre")), person("Julia", "Dedic", , "julia.dedic@roche.com", role = "aut"), person("Doug", "Kelkhoff", , "kelkhoff.douglas@gene.com", role = "aut"), person("Kevin", "Kunzmann", , "kevin.kunzmann@boehringer-ingelheim.com", role = "aut"), person("Brian Matthew", "Lang", , "brian.lang@msd.com", role = "aut"), person("Liming", "Li", , "liming.li@roche.com", role = "aut"), person("Ya", "Wang", , "ya.wang10@gilead.com", role = "aut"), person("Craig", "Gower-Page", , "craig.gower-page@roche.com", role = "ctb"), person("Boehringer Ingelheim Ltd.", role = c("cph", "fnd")), person("Gilead Sciences, Inc.", role = c("cph", "fnd")), person("F. Hoffmann-La Roche AG", role = c("cph", "fnd")), person("Merck Sharp & Dohme, Inc.", role = c("cph", "fnd")) )
+# Description: Mixed models for repeated measures (MMRM) are a popular choice for analyzing longitudinal continuous outcomes in randomized clinical trials and beyond; see Cnaan, Laird and Slasor (1997) <doi:10.1002/(SICI)1097-0258(19971030)16:20%3C2349::AID-SIM667%3E3.0.CO;2-E> for a tutorial and Mallinckrodt, Lane and Schnell (2008) <doi:10.1177/009286150804200402> for a review. This package implements MMRM based on the marginal linear model without random effects using Template Model Builder ('TMB') which enables fast and robust model fitting. Users can specify a variety of covariance matrices, weight observations, fit models with restricted or standard maximum likelihood inference, perform hypothesis testing with Satterthwaite or Kenward-Roger adjustment, and extract least square means estimates by using 'emmeans'.
+# License: Apache License 2.0
+# URL: https://openpharma.github.io/mmrm/
+# BugReports: https://github.com/openpharma/mmrm/issues
+# Depends: R (>= 4.0)
+# Imports: checkmate (>= 2.0), lifecycle, methods, nlme, numDeriv, parallel, Rcpp, Rdpack, stats, stringr, TMB (>= 1.9.1), utils
+# Suggests: emmeans (>= 1.6), estimability, knitr, parallelly (>= 1.32.0), rmarkdown, testthat (>= 3.0.0), xml2
+# LinkingTo: Rcpp, RcppEigen, testthat, TMB (>= 1.9.1)
+# VignetteBuilder: knitr
+# RdMacros: Rdpack
+# biocViews:
+# Config/testthat/edition: 3
+# Encoding: UTF-8
+# Language: en-US
+# LazyData: true
+# NeedsCompilation: yes
+# RoxygenNote: 7.2.1
+# Collate: 'catch-routine-registration.R' 'component.R' 'data.R' 'emmeans.R' 'fit.R' 'kenwardroger.R' 'mmrm-methods.R' 'mmrm-package.R' 'utils.R' 'satterthwaite.R' 'testing.R' 'tmb-methods.R' 'tmb.R'
+# Packaged: 2022-12-19 19:50:43 UTC; sabanesd
+# Author: Daniel Sabanes Bove [aut, cre], Julia Dedic [aut], Doug Kelkhoff [aut], Kevin Kunzmann [aut], Brian Matthew Lang [aut], Liming Li [aut], Ya Wang [aut], Craig Gower-Page [ctb], Boehringer Ingelheim Ltd. [cph, fnd], Gilead Sciences, Inc. [cph, fnd], F. Hoffmann-La Roche AG [cph, fnd], Merck Sharp & Dohme, Inc. [cph, fnd]
+# Maintainer: Daniel Sabanes Bove <daniel.sabanes_bove@roche.com>
+# Repository: CRAN
+# Date/Publication: 2022-12-20 09:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

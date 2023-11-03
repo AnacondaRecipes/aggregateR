@@ -1,0 +1,89 @@
+{% set version = '2.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rddensity
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rddensity_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rddensity/rddensity_{{ version }}.tar.gz
+  sha256: ab95e5fa046e3b28d67bf658661d3184c36ac20cee5c75eb5e0fdc4787eae27d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggplot2
+    - r-lpdensity >=2.2
+
+  run:
+    - r-base
+    - r-ggplot2
+    - r-lpdensity >=2.2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rddensity')"           # [not win]
+    - "\"%R%\" -e \"library('rddensity')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rddensity
+  license: GPL-2
+  summary: 'Density discontinuity testing (a.k.a. manipulation testing) is commonly employed
+    in regression discontinuity designs and other program evaluation settings to detect
+    perfect self-selection (manipulation) around a cutoff where treatment/policy assignment
+    changes. This package implements manipulation testing procedures using the local
+    polynomial density estimators: rddensity() to construct test statistics and p-values
+    given a prespecified cutoff, rdbwdensity() to perform data-driven bandwidth selection,
+    and rdplotdensity() to construct density plots.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: rddensity
+# Type: Package
+# Title: Manipulation Testing Based on Density Discontinuity
+# Description: Density discontinuity testing (a.k.a. manipulation testing) is commonly employed in regression discontinuity designs and other program evaluation settings to detect perfect self-selection (manipulation) around a cutoff where treatment/policy assignment changes. This package implements manipulation testing procedures using the local polynomial density estimators: rddensity() to construct test statistics and p-values given a prespecified cutoff, rdbwdensity() to perform data-driven bandwidth selection, and rdplotdensity() to construct density plots.
+# Version: 2.4
+# Author: Matias D. Cattaneo, Michael Jansson, Xinwei Ma
+# Maintainer: Xinwei Ma <x1ma@ucsd.edu>
+# Imports: ggplot2, lpdensity (>= 2.2)
+# Depends: R (>= 3.1.0)
+# License: GPL-2
+# Encoding: UTF-8
+# RoxygenNote: 7.2.2
+# NeedsCompilation: no
+# Packaged: 2023-01-21 22:32:13 UTC; xinweima
+# Repository: CRAN
+# Date/Publication: 2023-01-22 01:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

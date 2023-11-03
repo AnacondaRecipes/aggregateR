@@ -1,0 +1,85 @@
+{% set version = '1.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rcmdrplugin.factominer
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RcmdrPlugin.FactoMineR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RcmdrPlugin.FactoMineR/RcmdrPlugin.FactoMineR_{{ version }}.tar.gz
+  sha256: fea3ebc4a7b82245561b96417572a523601881eae52d2101d529080cffcd8584
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-factominer
+    - r-rcmdr >=2.0_0
+
+  run:
+    - r-base
+    - r-factominer
+    - r-rcmdr >=2.0_0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RcmdrPlugin.FactoMineR')"           # [not win]
+    - "\"%R%\" -e \"library('RcmdrPlugin.FactoMineR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://factominer.free.fr/graphs/RcmdrPlugin.html
+  license: GPL-2
+  summary: Rcmdr Plugin for the 'FactoMineR' package.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: RcmdrPlugin.FactoMineR
+# Type: Package
+# Version: 1.7
+# Date: 2020-02-02
+# Title: Graphical User Interface for FactoMineR
+# Author: Francois Husson, Julie Josse, Sebastien Le
+# Maintainer: Francois Husson <francois.husson@agrocampus-ouest.fr>
+# Imports: Rcmdr (>= 2.0-0), tcltk
+# Depends: FactoMineR
+# Description: Rcmdr Plugin for the 'FactoMineR' package.
+# License: GPL (>= 2)
+# URL: http://factominer.free.fr/graphs/RcmdrPlugin.html
+# LazyLoad: no
+# Encoding: latin1
+# NeedsCompilation: no
+# Packaged: 2020-02-03 07:33:31 UTC; husson
+# Repository: CRAN
+# Date/Publication: 2020-02-03 08:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

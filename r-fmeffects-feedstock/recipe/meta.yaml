@@ -1,0 +1,104 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fmeffects
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fmeffects_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fmeffects/fmeffects_{{ version }}.tar.gz
+  sha256: 10de085462fcaf61da581646c89ee69256b3dc89b587226372c8aac470a612cb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: caret, knitr, mlr3verse, ranger, rmarkdown, rpart
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-checkmate
+    - r-cowplot
+    - r-data.table
+    - r-ggparty
+    - r-ggplot2
+    - r-partykit
+    - r-testthat
+
+  run:
+    - r-base
+    - r-r6
+    - r-checkmate
+    - r-cowplot
+    - r-data.table
+    - r-ggparty
+    - r-ggplot2
+    - r-partykit
+    - r-testthat
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fmeffects')"           # [not win]
+    - "\"%R%\" -e \"library('fmeffects')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/holgstr/fmeffects
+  license: LGPL-3
+  summary: 'Create local, regional, and global explanations for any machine learning model with
+    forward marginal effects. You provide a model and data, and ''fmeffects'' computes
+    feature effects. The package is based on the theory in: C. A. Scholbeck, G. Casalicchio,
+    C. Molnar, B. Bischl, and C. Heumann (2022) <arXiv:2201.08837>.'
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: fmeffects
+# Title: Model-Agnostic Interpretations with Forward Marginal Effects
+# Version: 0.1.1
+# Authors@R: c( person("Holger", "Lowe", , "hbj.loewe@gmail.com", role = c("cre", "aut")), person("Christian", "Scholbeck", , "christian.scholbeck@stat.uni-muenchen.de", role = "aut"), person("Christian", "Heumann", , "christian.heumann@stat.uni-muenchen.de", role = "rev"), person("Bernd", "Bischl", , "bernd.bischl@stat.uni-muenchen.de", role = "rev"), person("Giuseppe", "Casalicchio", , "giuseppe.casalicchio@stat.uni-muenchen.de", role = "rev") )
+# Description: Create local, regional, and global explanations for any machine learning model with forward marginal effects. You provide a model and data, and 'fmeffects' computes feature effects. The package is based on the theory in: C. A. Scholbeck, G. Casalicchio, C. Molnar, B. Bischl, and C. Heumann (2022) <arXiv:2201.08837>.
+# License: LGPL-3
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Suggests: caret, knitr, mlr3verse, ranger, rmarkdown, rpart
+# Imports: checkmate, data.table, partykit, ggparty, ggplot2, cowplot, R6, testthat
+# Collate: 'ExtrapolationDetector.R' 'FME.R' 'FMEPlot.R' 'NonLinearityMeasure.R' 'Partitioning.R' 'PartitioningCtree.R' 'PartitioningPlot.R' 'PartitioningRpart.R' 'Predictor.R' 'PredictorCaret.R' 'PredictorMLR3.R' 'PredictorParsnip.R' 'Pruner.R' 'S3.R' 'ame.R' 'bikes.R' 'misc.R' 'zzz.R'
+# URL: https://github.com/holgstr/fmeffects
+# BugReports: https://github.com/holgstr/fmeffects/issues
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2023-09-26 14:48:55 UTC; christian
+# Author: Holger Lowe [cre, aut], Christian Scholbeck [aut], Christian Heumann [rev], Bernd Bischl [rev], Giuseppe Casalicchio [rev]
+# Maintainer: Holger Lowe <hbj.loewe@gmail.com>
+# Depends: R (>= 3.5.0)
+# Repository: CRAN
+# Date/Publication: 2023-09-26 15:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

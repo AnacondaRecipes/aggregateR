@@ -1,0 +1,104 @@
+{% set version = '2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-boral
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/boral_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/boral/boral_{{ version }}.tar.gz
+  sha256: e247b4f0237e2acc902dd0ec7620fd20092b81e45d4426d2ee009556576414c5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: mvabund (>= 4.0.1), corrplot
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-r2jags
+    - r-abind
+    - r-coda
+    - r-corpcor
+    - r-fishmod
+    - r-lifecycle
+    - r-mvtnorm
+    - r-reshape2
+
+  run:
+    - r-base
+    - r-mass
+    - r-r2jags
+    - r-abind
+    - r-coda
+    - r-corpcor
+    - r-fishmod
+    - r-lifecycle
+    - r-mvtnorm
+    - r-reshape2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('boral')"           # [not win]
+    - "\"%R%\" -e \"library('boral')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=boral
+  license: GPL-2
+  summary: 'Bayesian approaches for analyzing multivariate data in ecology. Estimation is performed
+    using Markov Chain Monte Carlo (MCMC) methods via Three. JAGS types of models may
+    be fitted: 1) With explanatory variables only, boral fits independent column Generalized
+    Linear Models (GLMs) to each column of the response matrix; 2) With latent variables
+    only, boral fits a purely latent variable model for model-based unconstrained ordination;
+    3) With explanatory and latent variables, boral fits correlated column GLMs with
+    latent variables to account for any residual correlation between the columns of
+    the response matrix.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: boral
+# Title: Bayesian Ordination and Regression AnaLysis
+# Version: 2.0
+# Date: 2021-04-01
+# Author: Francis K.C. Hui [aut, cre], Wade Blanchard [aut]
+# Maintainer: Francis K.C. Hui <fhui28@gmail.com>
+# Description: Bayesian approaches for analyzing multivariate data in ecology. Estimation is performed using Markov Chain Monte Carlo (MCMC) methods via Three. JAGS types of models may be fitted: 1) With explanatory variables only, boral fits independent column Generalized Linear Models (GLMs) to each column of the response matrix; 2) With latent variables only, boral fits a purely latent variable model for model-based unconstrained ordination; 3) With explanatory and latent variables, boral fits correlated column GLMs with latent variables to account for any residual correlation between the columns of the response matrix.
+# License: GPL-2
+# Depends: coda
+# Imports: abind, corpcor, fishMod, graphics, grDevices, lifecycle, MASS, mvtnorm, R2jags, reshape2, stats
+# Suggests: mvabund (>= 4.0.1), corrplot
+# NeedsCompilation: no
+# Packaged: 2021-03-12 08:18:18 UTC; fh
+# Repository: CRAN
+# Date/Publication: 2021-03-12 09:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

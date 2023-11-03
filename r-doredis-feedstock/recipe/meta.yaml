@@ -1,0 +1,94 @@
+{% set version = '3.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-doredis
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/doRedis_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/doRedis/doRedis_{{ version }}.tar.gz
+  sha256: c5799ec7df371d3a220324d0bebae88bb9ee96e6a70e81b4edea6a953c0c886e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-foreach >=1.3.0
+    - r-iterators >=1.0.0
+    - r-redux
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-foreach >=1.3.0
+    - r-iterators >=1.0.0
+    - r-redux
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('doRedis')"           # [not win]
+    - "\"%R%\" -e \"library('doRedis')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=doRedis
+  license: GPL-2
+  summary: Create and manage fault-tolerant task queues for the 'foreach' package using the 'Redis'
+    key/value database.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: doRedis
+# Type: Package
+# Title: 'Foreach' Parallel Adapter Using the 'Redis' Database
+# Version: 3.0.2
+# Date: 2023-5-1
+# Author: B. W. Lewis <blewis@illposed.net>
+# Maintainer: B. W. Lewis <blewis@illposed.net>
+# Description: Create and manage fault-tolerant task queues for the 'foreach' package using the 'Redis' key/value database.
+# BugReports: https://github.com/bwlewis/doRedis/issues
+# Depends: R (>= 3.0), foreach(>= 1.3.0), iterators(>= 1.0.0), utils
+# Imports: redux, stats
+# License: GPL-2
+# LazyLoad: yes
+# RoxygenNote: 7.1.1
+# NeedsCompilation: yes
+# Packaged: 2023-05-02 01:25:00 UTC; blewis
+# Repository: CRAN
+# Date/Publication: 2023-05-02 11:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

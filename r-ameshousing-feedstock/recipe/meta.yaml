@@ -1,0 +1,90 @@
+{% set version = '0.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ameshousing
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/AmesHousing_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/AmesHousing/AmesHousing_{{ version }}.tar.gz
+  sha256: 13e2d24a129904f9edc92692f24330fea256a765eab7baf893b9695ca7031920
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr
+    - r-magrittr
+
+  run:
+    - r-base
+    - r-dplyr
+    - r-magrittr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('AmesHousing')"           # [not win]
+    - "\"%R%\" -e \"library('AmesHousing')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/topepo/AmesHousing
+  license: GPL-2
+  summary: Raw and processed versions of the data from De Cock (2011) <http://ww2.amstat.org/publications/jse>
+    are included in the package.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: AmesHousing
+# Version: 0.0.4
+# Title: The Ames Iowa Housing Data
+# URL: https://github.com/topepo/AmesHousing
+# BugReports: https://github.com/topepo/AmesHousing/issues
+# Description: Raw and processed versions of the data from De Cock (2011) <http://ww2.amstat.org/publications/jse> are included in the package.
+# Authors@R: c( person(given = "Max", family = "Kuhn", email = "max@rstudio.com", role = c("aut", "cre")), person(given = "Dmytro", family = "Perepolkin", email = "dperepolkin@gmail.com", role = c ("ctb")), person("RStudio", role = "cph"))
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# ByteCompile: true
+# Depends: R (>= 2.10)
+# Imports: dplyr, magrittr
+# RoxygenNote: 7.1.0.9000
+# Suggests: covr
+# NeedsCompilation: no
+# Packaged: 2020-06-23 19:56:43 UTC; max
+# Author: Max Kuhn [aut, cre], Dmytro Perepolkin [ctb], RStudio [cph]
+# Maintainer: Max Kuhn <max@rstudio.com>
+# Repository: CRAN
+# Date/Publication: 2020-06-23 20:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

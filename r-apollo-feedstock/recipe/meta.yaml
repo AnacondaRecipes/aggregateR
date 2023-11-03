@@ -1,0 +1,142 @@
+{% set version = '0.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-apollo
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/apollo_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/apollo/apollo_{{ version }}.tar.gz
+  sha256: aaab81d146125fe237f79f70ca8cf9ba4eb509647ebbd4dc0f26dfe11468c046
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-deriv
+    - r-rsghb
+    - r-rcpp >=1.0.0
+    - r-rcpparmadillo
+    - r-rcppeigen
+    - r-rsolnp
+    - r-bgw >=0.1.2
+    - r-cli
+    - r-coda
+    - r-matrixstats
+    - r-maxlik
+    - r-mnormt
+    - r-mvtnorm
+    - r-numderiv
+    - r-randtoolbox
+    - r-stringr
+    - r-tibble
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-deriv
+    - r-rsghb
+    - r-rcpp >=1.0.0
+    - r-rcpparmadillo
+    - r-rcppeigen
+    - r-rsolnp
+    - r-bgw >=0.1.2
+    - r-cli
+    - r-coda
+    - r-matrixstats
+    - r-maxlik
+    - r-mnormt
+    - r-mvtnorm
+    - r-numderiv
+    - r-randtoolbox
+    - r-stringr
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('apollo')"           # [not win]
+    - "\"%R%\" -e \"library('apollo')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.apolloChoiceModelling.com
+  license: GPL-2
+  summary: Choice models are a widely used technique across numerous scientific disciplines.
+    The Apollo package is a very flexible tool for the estimation and application of
+    choice models in R. Users are able to write their own model functions or use a mix
+    of already available ones. Random heterogeneity, both continuous and discrete and
+    at the level of individuals and choices, can be incorporated for all models. There
+    is support for both standalone models and hybrid model structures.  Both classical
+    and Bayesian estimation is available, and multiple discrete continuous models are
+    covered in addition to discrete choice. Multi-threading processing is supported
+    for estimation and a large number of pre and post-estimation routines, including
+    for computing posterior (individual-level) distributions are available. For examples,
+    a manual, and a support forum, visit <http://www.ApolloChoiceModelling.com>. For
+    more information on choice models see Train, K. (2009) <isbn:978-0-521-74738-7>
+    and Hess, S. & Daly, A.J. (2014) <isbn:978-1-781-00314-5> for an overview of the
+    field.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: apollo
+# Type: Package
+# Title: Tools for Choice Model Estimation and Application
+# Version: 0.3.1
+# Authors@R: c( person("Stephane", "Hess", email="S.Hess@leeds.ac.uk", role=c("aut","cre")), person("David", "Palma", email="D.Palma@leeds.ac.uk", role="aut"), person("Thomas", "Hancock", email="T.O.Hancock@leeds.ac.uk", role="ctb"))
+# Description: Choice models are a widely used technique across numerous scientific disciplines. The Apollo package is a very flexible tool for the estimation and application of choice models in R. Users are able to write their own model functions or use a mix of already available ones. Random heterogeneity, both continuous and discrete and at the level of individuals and choices, can be incorporated for all models. There is support for both standalone models and hybrid model structures.  Both classical and Bayesian estimation is available, and multiple discrete continuous models are covered in addition to discrete choice. Multi-threading processing is supported for estimation and a large number of pre and post-estimation routines, including for computing posterior (individual-level) distributions are available. For examples, a manual, and a support forum, visit <http://www.ApolloChoiceModelling.com>. For more information on choice models see Train, K. (2009) <isbn:978-0-521-74738-7> and Hess, S. & Daly, A.J. (2014) <isbn:978-1-781-00314-5> for an overview of the field.
+# License: GPL-2
+# URL: http://www.apolloChoiceModelling.com
+# BugReports: http://www.apolloChoiceModelling.com/forum/
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 4.0.0), stats, utils
+# Imports: Rcpp (>= 1.0.0), maxLik, mnormt, mvtnorm, graphics, randtoolbox, numDeriv, parallel, Deriv, matrixStats, RSGHB, coda, tibble, stringr, bgw (>= 0.1.2), cli, Rsolnp
+# LinkingTo: Rcpp, RcppArmadillo, RcppEigen
+# Suggests: knitr, rmarkdown, testthat
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-10-12 15:25:40 UTC; stephane.hess
+# Author: Stephane Hess [aut, cre], David Palma [aut], Thomas Hancock [ctb]
+# Maintainer: Stephane Hess <S.Hess@leeds.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2023-10-12 21:10:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

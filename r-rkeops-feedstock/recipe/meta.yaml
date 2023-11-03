@@ -1,0 +1,114 @@
+{% set version = '1.4.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rkeops
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rkeops_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rkeops/rkeops_{{ version }}.tar.gz
+  sha256: c37ac4c42950e8da93a75463b911463d69154c61af07578b1821abd0e16a5aac
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  skip: True  # [not unix]
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.1.0), knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.1
+    - r-rcppeigen >=0.3.3.5
+    - r-rhpcblasctl
+    - r-openssl >=1.3
+    - r-stringr >=1.4.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.1
+    - r-rcppeigen >=0.3.3.5
+    - r-rhpcblasctl
+    - r-openssl >=1.3
+    - r-stringr >=1.4.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rkeops')"           # [not win]
+    - "\"%R%\" -e \"library('rkeops')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.kernel-operations.io/, https://github.com/getkeops/keops/
+  license: MIT
+  summary: The 'KeOps' library lets you compute generic reductions of very large arrays whose
+    entries are given by a mathematical formula with CPU and GPU computing support.
+    It combines a tiled reduction scheme with an automatic differentiation engine. It
+    is perfectly suited to the efficient computation of Kernel dot products and the
+    associated gradients, even when the full kernel matrix does not fit into the GPU
+    memory.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: rkeops
+# Type: Package
+# Title: Kernel Operations on GPU or CPU, with Autodiff, without Memory Overflows
+# Version: 1.4.2.2
+# Date: 2021-02-17
+# Authors@R: c( person(given="Benjamin", family="Charlier", comment="<http://imag.umontpellier.fr/~charlier/>", role="aut"), person(given="Jean", family="Feydy", comment="<https://www.math.ens.fr/~feydy/>", role="aut"), person(given="Joan A.", family="Glaunes", comment="<https://www.mi.parisdescartes.fr/~glaunes/>", role="aut"), person(given="Ghislain", family="Durif", comment="<https://gdurif.perso.math.cnrs.fr/>", email="gd.dev@libertymail.net", role=c("aut", "cre")), person(given="Francois-David", family="Collin", comment="Development-related consulting and support", role="ctb"), person(given="Daniel", family="Frey", comment="Author of the included C++ library 'sequences'", role="ctb"))
+# Description: The 'KeOps' library lets you compute generic reductions of very large arrays whose entries are given by a mathematical formula with CPU and GPU computing support. It combines a tiled reduction scheme with an automatic differentiation engine. It is perfectly suited to the efficient computation of Kernel dot products and the associated gradients, even when the full kernel matrix does not fit into the GPU memory.
+# License: MIT + file LICENSE
+# Depends: R (>= 3.1.0)
+# LinkingTo: Rcpp (>= 1.0.1), RcppEigen (>= 0.3.3.5)
+# Imports: Rcpp (>= 1.0.1), RhpcBLASctl, openssl (>= 1.3), stringr (>= 1.4.0)
+# Suggests: testthat (>= 2.1.0), knitr, rmarkdown
+# OS_type: unix
+# SystemRequirements: C++11, cmake (>= 3.10), clang (optional), CUDA (optional but recommended)
+# URL: https://www.kernel-operations.io/, https://github.com/getkeops/keops/
+# BugReports: https://github.com/getkeops/keops/issues
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.1.1
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2021-02-17 09:05:44 UTC; drg
+# Author: Benjamin Charlier [aut] (<http://imag.umontpellier.fr/~charlier/>), Jean Feydy [aut] (<https://www.math.ens.fr/~feydy/>), Joan A. Glaunes [aut] (<https://www.mi.parisdescartes.fr/~glaunes/>), Ghislain Durif [aut, cre] (<https://gdurif.perso.math.cnrs.fr/>), Francois-David Collin [ctb] (Development-related consulting and support), Daniel Frey [ctb] (Author of the included C++ library 'sequences')
+# Maintainer: Ghislain Durif <gd.dev@libertymail.net>
+# Repository: CRAN
+# Date/Publication: 2021-02-17 15:50:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

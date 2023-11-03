@@ -1,0 +1,86 @@
+{% set version = '1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rcmdrplugin.depthtools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RcmdrPlugin.depthTools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RcmdrPlugin.depthTools/RcmdrPlugin.depthTools_{{ version }}.tar.gz
+  sha256: 7b08184f064ded44418ac6ff22bc1f6556003554348d745081f6a45ebd07c69b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcmdr >=1.4_0
+    - r-depthtools
+
+  run:
+    - r-base
+    - r-rcmdr >=1.4_0
+    - r-depthtools
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RcmdrPlugin.depthTools')"           # [not win]
+    - "\"%R%\" -e \"library('RcmdrPlugin.depthTools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RcmdrPlugin.depthTools
+  license: GPL-2
+  summary: We provide an Rcmdr plug-in based on the depthTools package, which implements different
+    robust statistical tools for the description and analysis of gene expression data
+    based on the Modified Band Depth, namely, the scale curves for visualizing the dispersion
+    of one or various groups of samples (e.g. types of tumors), a rank test to decide
+    whether two groups of samples come from a single distribution and two methods of
+    supervised classification techniques, the DS and TAD methods.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: RcmdrPlugin.depthTools
+# Type: Package
+# Title: R Commander Depth Tools Plug-in
+# Version: 1.4
+# Date: 2020-10-15
+# Author: Sara Lopez-Pintado <sl2929@columbia.edu> and Aurora Torrente <etorrent@est-econ.uc3m.es>.
+# Maintainer: Aurora Torrente <etorrent@est-econ.uc3m.es>
+# Depends: Rcmdr (>= 1.4-0), tcltk, depthTools
+# Description: We provide an Rcmdr plug-in based on the depthTools package, which implements different robust statistical tools for the description and analysis of gene expression data based on the Modified Band Depth, namely, the scale curves for visualizing the dispersion of one or various groups of samples (e.g. types of tumors), a rank test to decide whether two groups of samples come from a single distribution and two methods of supervised classification techniques, the DS and TAD methods.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2020-10-15 11:59:15 UTC; mtl
+# Repository: CRAN
+# Date/Publication: 2020-10-16 04:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

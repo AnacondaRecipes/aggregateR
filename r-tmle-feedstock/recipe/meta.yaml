@@ -1,0 +1,100 @@
+{% set version = '2.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tmle
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tmle_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tmle/tmle_{{ version }}.tar.gz
+  sha256: 8693cab745d426260227d522d9113078d720b1ac0eb0931a47fa8f74aab82fa7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dbarts (>= 0.9-18), gam (>= 1.15), ROCR (>= 1.0-7), WeightedROC
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-superlearner >=2.0
+    - r-glmnet
+
+  run:
+    - r-base
+    - r-superlearner >=2.0
+    - r-glmnet
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tmle')"           # [not win]
+    - "\"%R%\" -e \"library('tmle')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=tmle
+  license: BSD_3_clause | GPL-2
+  summary: Targeted maximum likelihood estimation of point treatment effects (Targeted Maximum
+    Likelihood Learning, The International Journal of Biostatistics, 2(1), 2006.  This
+    version automatically estimates the additive treatment effect among the treated
+    (ATT) and among the controls (ATC).  The tmle() function calculates the adjusted
+    marginal difference in mean outcome associated with a binary point treatment, for
+    continuous or binary outcomes.  Relative risk and odds ratio estimates are also
+    reported for binary outcomes. Missingness in the outcome is allowed, but not in
+    treatment assignment or baseline covariate values.  The population mean is calculated
+    when there is missingness, and no variation in the treatment assignment. The tmleMSM()
+    function estimates the parameters of a marginal structural model for a binary point
+    treatment effect. Effect estimation stratified by a binary mediating variable is
+    also available. An ID argument can be used to identify repeated measures. Default
+    settings call 'SuperLearner' to estimate the Q and g portions of the likelihood,
+    unless values or a user-supplied regression function are passed in as arguments.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_3_clause'
+    - LICENSE
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: tmle
+# Version: 2.0.0
+# Date: 2023-08-05
+# Title: Targeted Maximum Likelihood Estimation
+# Authors@R: c(person("Susan", "Gruber", role = c("aut", "cre"), email = "sgruber@cal.berkeley.edu"), person("Mark", "van der Laan", role = "aut", email = "laan@berkeley.edu"), person("Chris", "Kennedy", role = "ctr", email = "ck37@berkeley.edu"))
+# Author: Susan Gruber [aut, cre], Mark van der Laan [aut], Chris Kennedy [ctr]
+# Maintainer: Susan Gruber <sgruber@cal.berkeley.edu>
+# Copyright: Copyright 2012. The Regents of the University of California (Regents). All Rights Reserved.
+# Depends: glmnet, SuperLearner (>= 2.0)
+# Suggests: dbarts (>= 0.9-18), gam (>= 1.15), ROCR (>= 1.0-7), WeightedROC
+# Description: Targeted maximum likelihood estimation of point treatment effects (Targeted Maximum Likelihood Learning, The International Journal of Biostatistics, 2(1), 2006.  This version automatically estimates the additive treatment effect among the treated (ATT) and among the controls (ATC).  The tmle() function calculates the adjusted marginal difference in mean outcome associated with a binary point treatment, for continuous or binary outcomes.  Relative risk and odds ratio estimates are also reported for binary outcomes. Missingness in the outcome is allowed, but not in treatment assignment or baseline covariate values.  The population mean is calculated when there is missingness, and no variation in the treatment assignment. The tmleMSM() function estimates the parameters of a marginal structural model for a binary point treatment effect. Effect estimation stratified by a binary mediating variable is also available. An ID argument can be used to identify repeated measures. Default settings call 'SuperLearner' to estimate the Q and g portions of the likelihood, unless values or a user-supplied regression function are passed in as arguments.
+# License: BSD_3_clause + file LICENSE | GPL-2
+# URL: https://CRAN.R-project.org/package=tmle
+# NeedsCompilation: no
+# Packaged: 2023-08-22 15:04:40 UTC; susan
+# Repository: CRAN
+# Date/Publication: 2023-08-22 21:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

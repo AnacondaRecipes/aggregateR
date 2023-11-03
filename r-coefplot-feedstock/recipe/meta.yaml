@@ -1,0 +1,106 @@
+{% set version = '1.2.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-coefplot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/coefplot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/coefplot/coefplot_{{ version }}.tar.gz
+  sha256: 7677cc1eb43e3231a3992c14ab5dd1c29231e16161a95e49abccc252f529aa63
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.0.0), covr, glmnet, maxLik, xgboost, workflows, parsnip, knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr >=0.6.0
+    - r-dygraphs
+    - r-ggplot2 >=2.0.0
+    - r-magrittr
+    - r-plotly
+    - r-plyr
+    - r-purrr
+    - r-reshape2
+    - r-tibble
+    - r-useful
+
+  run:
+    - r-base
+    - r-dplyr >=0.6.0
+    - r-dygraphs
+    - r-ggplot2 >=2.0.0
+    - r-magrittr
+    - r-plotly
+    - r-plyr
+    - r-purrr
+    - r-reshape2
+    - r-tibble
+    - r-useful
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('coefplot')"           # [not win]
+    - "\"%R%\" -e \"library('coefplot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=coefplot
+  license: BSD_3_clause
+  summary: Plots the coefficients from model objects. This very quickly shows the user the point
+    estimates and confidence intervals for fitted models.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_3_clause'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: coefplot
+# Type: Package
+# Title: Plots Coefficients from Fitted Models
+# Version: 1.2.8
+# Date: 2022-01-12
+# Author: Jared P. Lander
+# Maintainer: Jared P. Lander <packages@jaredlander.com>
+# Description: Plots the coefficients from model objects. This very quickly shows the user the point estimates and confidence intervals for fitted models.
+# License: BSD_3_clause + file LICENSE
+# LazyLoad: yes
+# Depends: ggplot2 (>= 2.0.0)
+# Imports: plyr, reshape2, useful, stats, dplyr (>= 0.6.0), dygraphs, tibble, magrittr, purrr, plotly
+# ByteCompile: TRUE
+# Packaged: 2022-01-13 17:09:13 UTC; jared
+# Suggests: testthat (>= 2.0.0), covr, glmnet, maxLik, xgboost, workflows, parsnip, knitr, rmarkdown
+# Encoding: UTF-8
+# RoxygenNote: 7.1.2
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2022-01-14 09:42:47 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

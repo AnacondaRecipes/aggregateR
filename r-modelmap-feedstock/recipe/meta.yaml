@@ -1,0 +1,100 @@
+{% set version = '3.4.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-modelmap
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ModelMap_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ModelMap/ModelMap_{{ version }}.tar.gz
+  sha256: 4abd517d472c8fcd67cb2b04f09a0ea17e3b7dc51c405a78a5cbe5ed1ad65108
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: party, quantregForest
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-handtill2001
+    - r-presenceabsence
+    - r-corrplot
+    - r-fields
+    - r-mgcv
+    - r-randomforest
+    - r-raster
+
+  run:
+    - r-base
+    - r-handtill2001
+    - r-presenceabsence
+    - r-corrplot
+    - r-fields
+    - r-mgcv
+    - r-randomforest
+    - r-raster
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ModelMap')"           # [not win]
+    - "\"%R%\" -e \"library('ModelMap')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ModelMap
+  license: Unlimited
+  summary: Creates sophisticated models of training data and validates the models with an independent
+    test set, cross validation, or Out Of Bag (OOB) predictions on the training data.
+    Create graphs and tables of the model validation results. Applies these models to
+    GIS .img files of predictors to create detailed prediction surfaces. Handles large
+    predictor files for map making, by reading in the .img files in chunks, and output
+    to the .txt file the prediction for each data chunk, before reading the next chunk
+    of data.
+  license_family: MIT
+
+# The original CRAN metadata for this package was:
+
+# Package: ModelMap
+# Type: Package
+# Title: Modeling and Map Production using Random Forest and Related Stochastic Models
+# Version: 3.4.0.4
+# Date: 2023-04-04
+# Depends: R (>= 2.13.0), randomForest, raster
+# Suggests: party, quantregForest
+# Imports: graphics,grDevices,stats,utils,mgcv,corrplot,fields,HandTill2001,PresenceAbsence
+# Author: Elizabeth Freeman, Tracey Frescino
+# Maintainer: Elizabeth Freeman <elizabeth.a.freeman@usda.gov>
+# Description: Creates sophisticated models of training data and validates the models with an independent test set, cross validation, or Out Of Bag (OOB) predictions on the training data. Create graphs and tables of the model validation results. Applies these models to GIS .img files of predictors to create detailed prediction surfaces. Handles large predictor files for map making, by reading in the .img files in chunks, and output to the .txt file the prediction for each data chunk, before reading the next chunk of data.
+# License: Unlimited
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-04-24 17:22:16 UTC; eafreeman
+# Repository: CRAN
+# Date/Publication: 2023-04-24 20:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

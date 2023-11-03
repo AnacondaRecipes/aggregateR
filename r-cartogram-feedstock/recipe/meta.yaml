@@ -1,0 +1,86 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cartogram
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cartogram_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cartogram/cartogram_{{ version }}.tar.gz
+  sha256: 747e1ec41d4f52561582a170d0fe00e598b9c962193b7149a8364b9526ba6cee
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests:
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-packcircles
+    - r-sf
+
+  run:
+    - r-base
+    - r-packcircles
+    - r-sf
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cartogram')"           # [not win]
+    - "\"%R%\" -e \"library('cartogram')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/sjewo/cartogram
+  license: GPL-3
+  summary: Construct continuous and non-contiguous area cartograms.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: cartogram
+# Title: Create Cartograms with R
+# Version: 0.3.0
+# Authors@R: c( person("Sebastian", "Jeworutzki", email = "sebastian.jeworutzki@ruhr-uni-bochum.de", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-2671-5253")), person("Timothee", "Giraud", role = "ctb"), person("Nicolas", "Lambert", role = "ctb"), person("Roger", "Bivand", role = c("cph"), email = "Roger.Bivand@nhh.no"), person("Edzer", "Pebesma", role = "cph"), person("Jakub", "Nowosad", email = "nowosad.jakub@gmail.com", role = "ctb", comment = c(ORCID = "0000-0002-1057-3721")) )
+# Description: Construct continuous and non-contiguous area cartograms.
+# URL: https://github.com/sjewo/cartogram
+# BugReports: https://github.com/sjewo/cartogram/issues
+# Imports: methods, sf, packcircles
+# Suggests:
+# License: GPL-3
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-05-26 11:05:17 UTC; sj
+# Author: Sebastian Jeworutzki [aut, cre] (<https://orcid.org/0000-0002-2671-5253>), Timothee Giraud [ctb], Nicolas Lambert [ctb], Roger Bivand [cph], Edzer Pebesma [cph], Jakub Nowosad [ctb] (<https://orcid.org/0000-0002-1057-3721>)
+# Maintainer: Sebastian Jeworutzki <sebastian.jeworutzki@ruhr-uni-bochum.de>
+# Repository: CRAN
+# Date/Publication: 2023-05-26 11:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,108 @@
+{% set version = '3.4-15' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bifiesurvey
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BIFIEsurvey_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BIFIEsurvey/BIFIEsurvey_{{ version }}.tar.gz
+  sha256: 32089dccdc912ebdc0e252664dbf7ae2584dcc6e88881c5ad533de5a05f6a236
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: graphics, grDevices, lavaan, lavaan.survey, mitools, survey, TAM
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-miceadds
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-miceadds
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BIFIEsurvey')"           # [not win]
+    - "\"%R%\" -e \"library('BIFIEsurvey')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/alexanderrobitzsch/BIFIEsurvey, https://sites.google.com/site/alexanderrobitzsch2/software
+  license: GPL-2
+  summary: Contains tools for survey statistics (especially in educational assessment) for datasets
+    with replication designs (jackknife, bootstrap, replicate weights; see Kolenikov,
+    2010; Pfefferman & Rao, 2009a, 2009b, <doi:10.1016/S0169-7161(09)70003-3>, <doi:10.1016/S0169-7161(09)70037-9>);
+    Shao, 1996, <doi:10.1080/02331889708802523>). Descriptive statistics, linear and
+    logistic regression, path models for manifest variables with measurement error correction
+    and two-level hierarchical regressions for weighted samples are included. Statistical
+    inference can be conducted for multiply imputed datasets and nested multiply imputed
+    datasets and is in particularly suited for the analysis of plausible values (for
+    details see George, Oberwimmer & Itzlinger-Bruneforth, 2016; Bruneforth, Oberwimmer
+    & Robitzsch, 2016; Robitzsch, Pham & Yanagida, 2016). The package development was
+    supported by BIFIE (Federal Institute for Educational Research, Innovation and Development
+    of the Austrian School System; Salzburg, Austria).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: BIFIEsurvey
+# Type: Package
+# Title: Tools for Survey Statistics in Educational Assessment
+# Version: 3.4-15
+# Date: 2022-04-04 10:33:42
+# Author: BIFIE [aut], Alexander Robitzsch [aut, cre], Konrad Oberwimmer [aut]
+# Maintainer: Alexander Robitzsch <robitzsch@ipn.uni-kiel.de>
+# Description: Contains tools for survey statistics (especially in educational assessment) for datasets with replication designs (jackknife, bootstrap, replicate weights; see Kolenikov, 2010; Pfefferman & Rao, 2009a, 2009b, <doi:10.1016/S0169-7161(09)70003-3>, <doi:10.1016/S0169-7161(09)70037-9>); Shao, 1996, <doi:10.1080/02331889708802523>). Descriptive statistics, linear and logistic regression, path models for manifest variables with measurement error correction and two-level hierarchical regressions for weighted samples are included. Statistical inference can be conducted for multiply imputed datasets and nested multiply imputed datasets and is in particularly suited for the analysis of plausible values (for details see George, Oberwimmer & Itzlinger-Bruneforth, 2016; Bruneforth, Oberwimmer & Robitzsch, 2016; Robitzsch, Pham & Yanagida, 2016). The package development was supported by BIFIE (Federal Institute for Educational Research, Innovation and Development of the Austrian School System; Salzburg, Austria).
+# Depends: R (>= 3.1)
+# Imports: methods, miceadds, Rcpp, stats, utils
+# Suggests: graphics, grDevices, lavaan, lavaan.survey, mitools, survey, TAM
+# Enhances: Hmisc, intsvy, LSAmitR
+# LinkingTo: Rcpp, RcppArmadillo
+# License: GPL (>= 2)
+# URL: https://github.com/alexanderrobitzsch/BIFIEsurvey, https://sites.google.com/site/alexanderrobitzsch2/software
+# NeedsCompilation: yes
+# Packaged: 2022-04-04 08:36:11 UTC; sunpn563
+# Repository: CRAN
+# Date/Publication: 2022-04-04 22:30:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

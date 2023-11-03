@@ -1,0 +1,107 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sgd
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sgd_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sgd/sgd_{{ version }}.tar.gz
+  sha256: 8bc7dcb0c0d843ea75c0e09d3d296318cc57040ef85f391445799e2c0787b314
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: bigmemory, glmnet, gridExtra, R.rsp, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh
+    - r-mass
+    - r-rcpp >=0.11.3
+    - r-rcpparmadillo
+    - r-bigmemory
+    - r-ggplot2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-mass
+    - r-rcpp >=0.11.3
+    - r-rcpparmadillo
+    - r-bigmemory
+    - r-ggplot2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sgd')"           # [not win]
+    - "\"%R%\" -e \"library('sgd')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/airoldilab/sgd
+  license: GPL-2
+  summary: A fast and flexible set of tools for large scale estimation. It features many stochastic
+    gradient methods, built-in models, visualization tools, automated hyperparameter
+    tuning, model checking, interval estimation, and convergence diagnostics.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: sgd
+# Type: Package
+# Title: Stochastic Gradient Descent for Scalable Estimation
+# Version: 1.1.1
+# Authors@R: c( person("Junhyung Lyle", "Kim", email = "lylejkim@gmail.com", role = c("cre", "aut")), person("Dustin", "Tran", role = "aut"), person("Panos", "Toulis", role = "aut"), person("Tian", "Lian", role = "ctb"), person("Ye", "Kuang", role = "ctb"), person("Edoardo", "Airoldi", role = "ctb") )
+# Maintainer: Junhyung Lyle Kim <lylejkim@gmail.com>
+# Description: A fast and flexible set of tools for large scale estimation. It features many stochastic gradient methods, built-in models, visualization tools, automated hyperparameter tuning, model checking, interval estimation, and convergence diagnostics.
+# URL: https://github.com/airoldilab/sgd
+# BugReports: https://github.com/airoldilab/sgd/issues
+# License: GPL-2
+# Imports: ggplot2, MASS, methods, Rcpp (>= 0.11.3), stats
+# Suggests: bigmemory, glmnet, gridExtra, R.rsp, testthat
+# LinkingTo: BH, bigmemory, Rcpp, RcppArmadillo
+# LazyData: yes
+# VignetteBuilder: R.rsp
+# RoxygenNote: 6.1.1
+# NeedsCompilation: yes
+# Packaged: 2019-07-12 21:17:49 UTC; lylekim
+# Author: Junhyung Lyle Kim [cre, aut], Dustin Tran [aut], Panos Toulis [aut], Tian Lian [ctb], Ye Kuang [ctb], Edoardo Airoldi [ctb]
+# Repository: CRAN
+# Date/Publication: 2019-07-12 22:11:28 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

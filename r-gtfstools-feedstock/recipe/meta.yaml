@@ -1,0 +1,116 @@
+{% set version = '1.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gtfstools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gtfstools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gtfstools/gtfstools_{{ version }}.tar.gz
+  sha256: 7c24b49ca50722b5d699afd80802b45403358d490c33072a7a7beadd083aec0d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, ggplot2, jsonlite, knitr, rmarkdown, testthat,
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-checkmate
+    - r-cpp11
+    - r-curl
+    - r-data.table
+    - r-gtfsio >=1.0.0
+    - r-processx
+    - r-sf
+    - r-sfheaders
+    - r-units
+    - r-zip
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-checkmate
+    - r-cpp11
+    - r-curl
+    - r-data.table
+    - r-gtfsio >=1.0.0
+    - r-processx
+    - r-sf
+    - r-sfheaders
+    - r-units
+    - r-zip
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gtfstools')"           # [not win]
+    - "\"%R%\" -e \"library('gtfstools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://ipeagit.github.io/gtfstools/, https://github.com/ipeaGIT/gtfstools
+  license: MIT
+  summary: Utility functions to read, manipulate, analyse and write transit feeds in the General
+    Transit Feed Specification (GTFS) data format.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: gtfstools
+# Title: General Transit Feed Specification (GTFS) Editing and Analysing Tools
+# Version: 1.2.0
+# Authors@R: c(person(given = "Daniel", family = "Herszenhut", role = c("aut", "cre"), email = "dhersz@gmail.com", comment = c(ORCID = "0000-0001-8066-1105")), person(given = "Rafael H. M.", family = "Pereira", role = "aut", comment = c(ORCID = "0000-0003-2125-7465")), person(given = "Pedro R.", family = "Andrade", role = "aut", comment = c(ORCID = "0000-0001-8675-4046")), person(given = "Joao", family = "Bazzo", role = "aut", comment = c(ORCID = "0000-0003-4536-5006")), person(given = "Mark", family = "Padgham", role = "ctb"), person(given = "Marcus", family = "Saraiva", role = "ctb", comment = c(ORCID = "0000-0001-6218-2338")), person(given = "Ipea - Institute for Applied Economic Research", role = c("cph", "fnd")))
+# Description: Utility functions to read, manipulate, analyse and write transit feeds in the General Transit Feed Specification (GTFS) data format.
+# License: MIT + file LICENSE
+# URL: https://ipeagit.github.io/gtfstools/, https://github.com/ipeaGIT/gtfstools
+# BugReports: https://github.com/ipeaGIT/gtfstools/issues
+# Depends: R (>= 2.10)
+# Imports: checkmate, curl, data.table, gtfsio (>= 1.0.0), processx, sf, sfheaders, units, utils, zip
+# Suggests: covr, ggplot2, jsonlite, knitr, rmarkdown, testthat,
+# LinkingTo: cpp11
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# RoxygenNote: 7.2.1
+# Packaged: 2022-11-24 12:47:53 UTC; dhersz
+# Author: Daniel Herszenhut [aut, cre] (<https://orcid.org/0000-0001-8066-1105>), Rafael H. M. Pereira [aut] (<https://orcid.org/0000-0003-2125-7465>), Pedro R. Andrade [aut] (<https://orcid.org/0000-0001-8675-4046>), Joao Bazzo [aut] (<https://orcid.org/0000-0003-4536-5006>), Mark Padgham [ctb], Marcus Saraiva [ctb] (<https://orcid.org/0000-0001-6218-2338>), Ipea - Institute for Applied Economic Research [cph, fnd]
+# Maintainer: Daniel Herszenhut <dhersz@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-11-24 13:10:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

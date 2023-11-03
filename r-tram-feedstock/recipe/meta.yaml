@@ -1,0 +1,116 @@
+{% set version = '1.0-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tram
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tram_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tram/tram_{{ version }}.tar.gz
+  sha256: 75e7dae262b58de59e98f342f6f25522ee9835b0bc40552b3258a958bfc9f9af
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, TH.data, trtf (>= 0.3-3), mlbench, knitr, quantreg, colorspace, ATR, lme4, merDeriv, SparseGrid, alabama, numDeriv, gridExtra, lattice, latticeExtra, HSAUR3, ordinalCont, coxme, mlt.docreg, ordinal, coin, asht, gamlss
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+    - r-matrix
+    - r-basefun >=1.1_2
+    - r-mlt >=1.4_9
+    - r-multcomp
+    - r-mvtnorm >=1.2_0
+    - r-sandwich
+    - r-survival
+    - r-variables >=1.0_4
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-formula
+    - r-matrix
+    - r-basefun >=1.1_2
+    - r-mlt >=1.4_9
+    - r-multcomp
+    - r-mvtnorm >=1.2_0
+    - r-sandwich
+    - r-survival
+    - r-variables >=1.0_4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tram')"           # [not win]
+    - "\"%R%\" -e \"library('tram')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://ctm.R-forge.R-project.org
+  license: GPL-2
+  summary: Formula-based user-interfaces to specific transformation models implemented in package
+    'mlt'. Available models include Cox models, some parametric survival models (Weibull,
+    etc.), models for ordered categorical variables, normal and non-normal (Box-Cox
+    type) linear models, and continuous outcome logistic regression (Lohse et al., 2017,
+    <DOI:10.12688/f1000research.12934.1>). The underlying theory is described in Hothorn
+    et al. (2018) <DOI:10.1111/sjos.12291>. An extension to transformation models for
+    clustered data is provided (Barbanti and Hothorn, 2022, <DOI:10.1093/biostatistics/kxac048>).
+    Multivariate conditional transformation models (Klein et al, 2022, <DOI:10.1111/sjos.12501>)
+    and shift-scale transformation models (Siegfried et al, 2023, <DOI:10.1080/00031305.2023.2203177>)
+    can be fitted as well.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: tram
+# Title: Transformation Models
+# Version: 1.0-0
+# Date: 2023-08-25
+# Authors@R: c(person("Torsten", "Hothorn", role = c("aut", "cre"), email = "Torsten.Hothorn@R-project.org", comment = c(ORCID = "0000-0001-8301-0471")), person("Luisa", "Barbanti", role = "aut", comment = c(ORCID = "0000-0001-5352-5802")), person("Sandra", "Siegfried", role = "aut", comment = c(ORCID = "0000-0002-7312-1001")), person("Brian", "Ripley", role = "ctb"), person("Bill", "Venables", role = "ctb"), person(c("Douglas", "M."), "Bates", role = "ctb"), person("Nadja", "Klein", role = "ctb"))
+# Description: Formula-based user-interfaces to specific transformation models implemented in package 'mlt'. Available models include Cox models, some parametric survival models (Weibull, etc.), models for ordered categorical variables, normal and non-normal (Box-Cox type) linear models, and continuous outcome logistic regression (Lohse et al., 2017, <DOI:10.12688/f1000research.12934.1>). The underlying theory is described in Hothorn et al. (2018) <DOI:10.1111/sjos.12291>. An extension to transformation models for clustered data is provided (Barbanti and Hothorn, 2022, <DOI:10.1093/biostatistics/kxac048>). Multivariate conditional transformation models (Klein et al, 2022, <DOI:10.1111/sjos.12501>) and shift-scale transformation models (Siegfried et al, 2023, <DOI:10.1080/00031305.2023.2203177>) can be fitted as well.
+# Depends: R (>= 3.5.0), mlt (>= 1.4-9), mvtnorm (>= 1.2-0)
+# Imports: Formula, multcomp, variables (>= 1.0-4), basefun (>= 1.1-2), sandwich, stats, survival, graphics, Matrix, methods
+# Suggests: MASS, TH.data, trtf (>= 0.3-3), mlbench, knitr, quantreg, colorspace, ATR, lme4, merDeriv, SparseGrid, alabama, numDeriv, gridExtra, lattice, latticeExtra, HSAUR3, ordinalCont, coxme, mlt.docreg, ordinal, coin, asht, gamlss
+# VignetteBuilder: knitr
+# URL: http://ctm.R-forge.R-project.org
+# Encoding: UTF-8
+# License: GPL-2
+# NeedsCompilation: yes
+# Packaged: 2023-08-25 10:41:18 UTC; hothorn
+# Author: Torsten Hothorn [aut, cre] (<https://orcid.org/0000-0001-8301-0471>), Luisa Barbanti [aut] (<https://orcid.org/0000-0001-5352-5802>), Sandra Siegfried [aut] (<https://orcid.org/0000-0002-7312-1001>), Brian Ripley [ctb], Bill Venables [ctb], Douglas M. Bates [ctb], Nadja Klein [ctb]
+# Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2023-08-25 15:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,92 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bsicons
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bsicons_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bsicons/bsicons_{{ version }}.tar.gz
+  sha256: 2978c7c883fc6efe369765f2df992d6ffa6aa292990b222dfccfcd4ae7e5198d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, withr, processx, webshot2, bslib
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-cli
+    - r-htmltools
+    - r-rlang
+
+  run:
+    - r-base
+    - r-cli
+    - r-htmltools
+    - r-rlang
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bsicons')"           # [not win]
+    - "\"%R%\" -e \"library('bsicons')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/rstudio/bsicons
+  license: MIT
+  summary: Easily use 'Bootstrap' icons inside 'Shiny' apps and 'R Markdown' documents. More
+    generally, icons can be inserted in any 'htmltools' document through inline 'SVG'.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: bsicons
+# Title: Easily Work with 'Bootstrap' Icons
+# Version: 0.1.1
+# Authors@R: c( person("Carson", "Sievert", role = c("cre", "aut"), email = "carson@posit.co", comment = c(ORCID = "0000-0002-4958-2844")), person("Posit Software, PBC", role = c("cph", "fnd")), person("Mark", "Otto", role = "cph", comment = "Bootstrap icons maintainer"))
+# Description: Easily use 'Bootstrap' icons inside 'Shiny' apps and 'R Markdown' documents. More generally, icons can be inserted in any 'htmltools' document through inline 'SVG'.
+# License: MIT + file LICENSE
+# URL: https://github.com/rstudio/bsicons
+# BugReports: https://github.com/rstudio/bsicons/issues
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Depends: R (>= 2.10)
+# Imports: utils, cli, rlang, htmltools
+# Suggests: testthat, withr, processx, webshot2, bslib
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2023-08-11 19:25:08 UTC; cpsievert
+# Author: Carson Sievert [cre, aut] (<https://orcid.org/0000-0002-4958-2844>), Posit Software, PBC [cph, fnd], Mark Otto [cph] (Bootstrap icons maintainer)
+# Maintainer: Carson Sievert <carson@posit.co>
+# Repository: CRAN
+# Date/Publication: 2023-08-11 21:33:46 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

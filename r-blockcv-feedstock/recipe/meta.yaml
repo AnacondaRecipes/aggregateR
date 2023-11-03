@@ -1,0 +1,104 @@
+{% set version = '3.1-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-blockcv
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/blockCV_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/blockCV/blockCV_{{ version }}.tar.gz
+  sha256: 90051f4d57bb68aca345816710496c1476015e5892e4787e96a43eeeafe7d06e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: terra (>= 1.6-41), ggplot2 (>= 3.3.6), cowplot, automap (>= 1.0-16), shiny (>= 1.7), tmap (>= 2.0), biomod2, gstat, methods, knitr, rmarkdown, testthat (>= 3.0.0), covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.2
+    - r-sf >=1.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.2
+    - r-sf >=1.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('blockCV')"           # [not win]
+    - "\"%R%\" -e \"library('blockCV')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/rvalavi/blockCV
+  license: GPL-3
+  summary: Creating spatially or environmentally separated folds for cross-validation to provide
+    a robust error estimation in spatially structured environments; Investigating and
+    visualising the effective range of spatial autocorrelation in continuous raster
+    covariates and point samples to find an initial realistic distance band to separate
+    training and testing datasets spatially described in Valavi, R. et al. (2019) <doi:10.1111/2041-210X.13107>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: blockCV
+# Type: Package
+# Title: Spatial and Environmental Blocking for K-Fold and LOO Cross-Validation
+# Version: 3.1-3
+# Date: 2023-06-04
+# Authors@R: c(person("Roozbeh", "Valavi", role = c("aut", "cre"), email = "valavi.r@gmail.com", comment = c(ORCID = "0000-0003-2495-5277")), person("Jane", "Elith", role = "aut", email = "j.elith@unimelb.edu.au"), person("Jose", "Lahoz-Monfort", role = "aut", email = "jose.lahoz@unimelb.edu.au"), person("Ian", "Flint", role = "aut", email = "ian.flint@unimelb.edu.au"), person("Gurutzeta", "Guillera-Arroita", role = "aut", email = "gurutzeta.guillera@unimelb.edu.au"))
+# URL: https://github.com/rvalavi/blockCV
+# BugReports: https://github.com/rvalavi/blockCV/issues
+# Maintainer: Roozbeh Valavi <valavi.r@gmail.com>
+# Description: Creating spatially or environmentally separated folds for cross-validation to provide a robust error estimation in spatially structured environments; Investigating and visualising the effective range of spatial autocorrelation in continuous raster covariates and point samples to find an initial realistic distance band to separate training and testing datasets spatially described in Valavi, R. et al. (2019) <doi:10.1111/2041-210X.13107>.
+# License: GPL (>= 3)
+# Encoding: UTF-8
+# Depends: R (>= 3.5.0)
+# Imports: sf (>= 1.0), Rcpp (>= 1.0.2)
+# Suggests: terra (>= 1.6-41), ggplot2 (>= 3.3.6), cowplot, automap (>= 1.0-16), shiny (>= 1.7), tmap (>= 2.0), biomod2, gstat, methods, knitr, rmarkdown, testthat (>= 3.0.0), covr
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# Config/testthat/edition: 3
+# LinkingTo: Rcpp
+# NeedsCompilation: yes
+# Packaged: 2023-06-04 12:40:55 UTC; rvalavi
+# Author: Roozbeh Valavi [aut, cre] (<https://orcid.org/0000-0003-2495-5277>), Jane Elith [aut], Jose Lahoz-Monfort [aut], Ian Flint [aut], Gurutzeta Guillera-Arroita [aut]
+# Repository: CRAN
+# Date/Publication: 2023-06-04 13:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

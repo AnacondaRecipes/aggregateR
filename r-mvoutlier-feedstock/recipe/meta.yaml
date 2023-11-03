@@ -1,0 +1,86 @@
+{% set version = '2.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mvoutlier
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mvoutlier_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mvoutlier/mvoutlier_{{ version }}.tar.gz
+  sha256: 3a2b48bc6f07c5bf77d35555c0934c21d9b7ee171f5c60e0589a6d8dbcfe86d2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-robustbase
+    - r-sgeostat
+
+  run:
+    - r-base
+    - r-robustbase
+    - r-sgeostat
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mvoutlier')"           # [not win]
+    - "\"%R%\" -e \"library('mvoutlier')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://cstat.tuwien.ac.at/filz/
+  license: GPL-3
+  summary: 'Various methods for multivariate outlier detection: arw, a Mahalanobis-type method
+    with an adaptive outlier cutoff value; locout, a method incorporating local neighborhood;
+    pcout, a method for high-dimensional data; mvoutlier.CoDa, a method for compositional
+    data. References are provided in the corresponding help files.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: mvoutlier
+# Version: 2.1.1
+# Date: 2021-07-29
+# Title: Multivariate Outlier Detection Based on Robust Methods
+# Author: Peter Filzmoser <P.Filzmoser@tuwien.ac.at> and Moritz Gschwandtner <e0125439@student.tuwien.ac.at>
+# Maintainer: P. Filzmoser <P.Filzmoser@tuwien.ac.at>
+# Depends: sgeostat, R (>= 3.1)
+# Imports: robustbase
+# Description: Various methods for multivariate outlier detection: arw, a Mahalanobis-type method with an adaptive outlier cutoff value; locout, a method incorporating local neighborhood; pcout, a method for high-dimensional data; mvoutlier.CoDa, a method for compositional data. References are provided in the corresponding help files.
+# LazyData: TRUE
+# License: GPL (>= 3)
+# URL: http://cstat.tuwien.ac.at/filz/
+# Packaged: 2021-07-29 17:14:43 UTC; filz
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2021-07-30 08:10:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

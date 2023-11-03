@@ -1,0 +1,93 @@
+{% set version = '0.4.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mldr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mldr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mldr/mldr_{{ version }}.tar.gz
+  sha256: 9877d89694e0bce713f803b63648b743df05270b74d01582f20e9ddffced8b1e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: pROC, knitr, mldr.datasets, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-xml
+    - r-circlize
+    - r-shiny >=0.11
+
+  run:
+    - r-base
+    - r-xml
+    - r-circlize
+    - r-shiny >=0.11
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mldr')"           # [not win]
+    - "\"%R%\" -e \"library('mldr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/fcharte/mldr
+  license: LGPL-3
+  summary: Exploratory data analysis and manipulation functions for multi- label data sets along
+    with an interactive Shiny application to ease their use.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: mldr
+# Title: Exploratory Data Analysis and Manipulation of Multi-Label Data Sets
+# Version: 0.4.3
+# Date: 2019-12-19
+# Authors@R: c( person("David", "Charte", email = "fdavidcl@ugr.es", role = "cre", comment = c(ORCID = "0000-0002-4830-9512")), person("Francisco", "Charte", email = "francisco@fcharte.com", role = "aut", comment = c(ORCID = "0000-0002-3083-8942")), person("Antonio J.", "Rivera", email = "arivera@ujaen.es", role = "aut"))
+# Description: Exploratory data analysis and manipulation functions for multi- label data sets along with an interactive Shiny application to ease their use.
+# URL: https://github.com/fcharte/mldr
+# Depends: R (>= 3.0.0)
+# Imports: shiny (>= 0.11), XML, circlize, graphics, grDevices, stats, methods
+# Suggests: pROC, knitr, mldr.datasets, testthat
+# License: LGPL (>= 3) | file LICENSE
+# LazyData: true
+# VignetteBuilder: knitr
+# RoxygenNote: 6.1.1
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2019-12-19 15:49:26 UTC; fdavidcl
+# Author: David Charte [cre] (<https://orcid.org/0000-0002-4830-9512>), Francisco Charte [aut] (<https://orcid.org/0000-0002-3083-8942>), Antonio J. Rivera [aut]
+# Maintainer: David Charte <fdavidcl@ugr.es>
+# Repository: CRAN
+# Date/Publication: 2019-12-19 17:50:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

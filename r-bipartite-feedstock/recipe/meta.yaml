@@ -1,0 +1,111 @@
+{% set version = '2.18' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bipartite
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bipartite_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bipartite/bipartite_{{ version }}.tar.gz
+  sha256: 9bc0ef99af38412ba7260633a7c2d96782aa966351f6a0bdca2ae0fb93de25d8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-fields
+    - r-igraph
+    - r-permute
+    - r-sna
+    - r-vegan
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-fields
+    - r-igraph
+    - r-permute
+    - r-sna
+    - r-vegan
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bipartite')"           # [not win]
+    - "\"%R%\" -e \"library('bipartite')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/biometry/bipartite
+  license: GPL-3
+  summary: Functions to visualise webs and calculate a series of indices commonly used to describe
+    pattern in (ecological) webs. It focuses on webs consisting of only two levels (bipartite),
+    e.g. pollination webs or predator-prey-webs. Visualisation is important to get an
+    idea of what we are actually looking at, while the indices summarise different aspects
+    of the web's topology.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: bipartite
+# Type: Package
+# Title: Visualising Bipartite Networks and Calculating Some (Ecological) Indices
+# Version: 2.18
+# Date: 2022-10-20
+# Authors@R: c(person(given = "Carsten F.", family = "Dormann", role = c("aut", "cre"), email = "carsten.dormann@biom.uni-freiburg.de", comment = c(ORCID = "0000-0002-9835-1794")), person(given = "Jochen", family = "Fruend", role = c("aut"), comment = c(ORCID = "0000-0002-7079-3478")), person(given = "Bernd", family = "Gruber", role = c("aut"), comment = c(ORCID = "0000-0003-0078-8179")), person(given = "Stephen", family = "Beckett", role = c("ctb"), comment = c(ORCID = "0000-0002-4410-2960")), person(given = "Mariano", family = "Devoto", role = c("ctb"), comment = c(ORCID = "0000-0003-3098-236X")), person(given = "Gabriel M.F.", family = "Felix", role = c("ctb"), comment = c(ORCID = "0000-0002-3901-4333")), person(given = "Jos<e9> M.", family = "Iriondo", role = c("ctb"), comment = c(ORCID = "0000-0003-2710-3889")), person(given = "Tore", family = "Opsahl", role = c("ctb"), comment = c(ORCID = "0000-0003-0346-8082")), person(given = "Rafael B.P.", family = "Pinheiro", role = c("ctb"), comment = c(ORCID = "0000-0003-2342-8483")), person(given = "Rouven", family = "Strauss", role = c("ctb")), person(given = "Diego P.", family = "V<e1>zquez", role = c("ctb"), comment = c(ORCID = "0000-0002-3449-5748")) )
+# Author: Carsten F. Dormann [aut, cre] (<https://orcid.org/0000-0002-9835-1794>), Jochen Fruend [aut] (<https://orcid.org/0000-0002-7079-3478>), Bernd Gruber [aut] (<https://orcid.org/0000-0003-0078-8179>), Stephen Beckett [ctb] (<https://orcid.org/0000-0002-4410-2960>), Mariano Devoto [ctb] (<https://orcid.org/0000-0003-3098-236X>), Gabriel M.F. Felix [ctb] (<https://orcid.org/0000-0002-3901-4333>), Jos<e9> M. Iriondo [ctb] (<https://orcid.org/0000-0003-2710-3889>), Tore Opsahl [ctb] (<https://orcid.org/0000-0003-0346-8082>), Rafael B.P. Pinheiro [ctb] (<https://orcid.org/0000-0003-2342-8483>), Rouven Strauss [ctb], Diego P. V<e1>zquez [ctb] (<https://orcid.org/0000-0002-3449-5748>)
+# Maintainer: Carsten F. Dormann <carsten.dormann@biom.uni-freiburg.de>
+# Depends: R(>= 3.5.0), vegan, sna
+# Imports: fields, igraph, MASS, methods, permute
+# Suggests: knitr
+# LazyData: TRUE
+# ByteCompile: TRUE
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# VignetteBuilder: knitr, utils
+# URL: https://github.com/biometry/bipartite
+# Description: Functions to visualise webs and calculate a series of indices commonly used to describe pattern in (ecological) webs. It focuses on webs consisting of only two levels (bipartite), e.g. pollination webs or predator-prey-webs. Visualisation is important to get an idea of what we are actually looking at, while the indices summarise different aspects of the web's topology.
+# License: GPL
+# Packaged: 2022-10-18 14:48:16 UTC; carsten
+# RoxygenNote: 7.1.1
+# Repository: CRAN
+# Date/Publication: 2022-10-18 23:35:14 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

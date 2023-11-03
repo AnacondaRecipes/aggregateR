@@ -1,0 +1,102 @@
+{% set version = '2.0.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-edgar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/edgar_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/edgar/edgar_{{ version }}.tar.gz
+  sha256: 43574b1e92f5a6b331b61e7537cb513b86abc28dfe5b1b548ee433cbd0d1ecd3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r.utils
+    - r-xml
+    - r-httr
+    - r-qdapregex
+    - r-stringi
+    - r-stringr
+    - r-tm
+
+  run:
+    - r-base
+    - r-r.utils
+    - r-xml
+    - r-httr
+    - r-qdapregex
+    - r-stringi
+    - r-stringr
+    - r-tm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('edgar')"           # [not win]
+    - "\"%R%\" -e \"library('edgar')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=edgar
+  license: GPL-2
+  summary: 'In the USA, companies file different forms with the U.S. Securities and Exchange
+    Commission (SEC) through EDGAR (Electronic Data Gathering, Analysis, and Retrieval
+    system). The EDGAR database automated system collects all the different necessary
+    filings and makes it publicly available. This package facilitates retrieving, storing,
+    searching, and parsing of all the available filings on the EDGAR server. It downloads
+    filings from SEC server in bulk with a single query. Additionally, it provides various
+    useful functions: extracts 8-K triggering events, extract "Business (Item 1)" and
+    "Management''s Discussion and Analysis(Item 7)" sections of annual statements, searches
+    filings for desired keywords, provides sentiment measures, parses filing header
+    information, and provides HTML view of SEC filings.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: edgar
+# Type: Package
+# Title: Tool for the U.S. SEC EDGAR Retrieval and Parsing of Corporate Filings
+# Version: 2.0.7
+# Date: 2023-10-14
+# Author: Gunratan Lonare <lonare.gunratan@gmail.com>, Bharat Patil <bharatspatil@gmail.com>
+# Maintainer: Gunratan Lonare <lonare.gunratan@gmail.com>
+# Depends: R (>= 3.5.0)
+# Imports: R.utils, tm, XML, stringr, stringi, qdapRegex, httr
+# Description: In the USA, companies file different forms with the U.S. Securities and Exchange Commission (SEC) through EDGAR (Electronic Data Gathering, Analysis, and Retrieval system). The EDGAR database automated system collects all the different necessary filings and makes it publicly available. This package facilitates retrieving, storing, searching, and parsing of all the available filings on the EDGAR server. It downloads filings from SEC server in bulk with a single query. Additionally, it provides various useful functions: extracts 8-K triggering events, extract "Business (Item 1)" and "Management's Discussion and Analysis(Item 7)" sections of annual statements, searches filings for desired keywords, provides sentiment measures, parses filing header information, and provides HTML view of SEC filings.
+# License: GPL-2
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-10-14 11:58:01 UTC; lonar
+# Repository: CRAN
+# Date/Publication: 2023-10-14 12:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

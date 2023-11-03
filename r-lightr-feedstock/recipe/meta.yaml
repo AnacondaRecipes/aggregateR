@@ -1,0 +1,95 @@
+{% set version = '1.7.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lightr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/lightr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/lightr/lightr_{{ version }}.tar.gz
+  sha256: e6e6f48d6df10a3a53c73a0d8dee2e5e88a228750e81580c757151cb6d69134b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: digest, knitr, pavo, rmarkdown, spelling, testthat (>= 3.0.0), withr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-future.apply
+    - r-progressr
+    - r-xml2 >=1.0.0
+
+  run:
+    - r-base
+    - r-future.apply
+    - r-progressr
+    - r-xml2 >=1.0.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('lightr')"           # [not win]
+    - "\"%R%\" -e \"library('lightr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://docs.ropensci.org/lightr/, https://github.com/ropensci/lightr
+  license: GPL-2
+  summary: Parse various reflectance/transmittance/absorbance spectra file formats to extract
+    spectral data and metadata, as described in Gruson, White & Maia (2019) <doi:10.21105/joss.01857>.
+    Among other formats, it can import files from 'Avantes' <https://www.avantes.com/>,
+    'CRAIC' <https://www.microspectra.com/>, and 'OceanInsight' (formerly 'OceanOptics')
+    <https://www.oceaninsight.com/> brands.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: lightr
+# Title: Read Spectrometric Data and Metadata
+# Version: 1.7.0
+# Authors@R: c( person("Hugo", "Gruson", role = c("cre", "aut", "cph"), email = "hugo.gruson+R@normalesup.org", comment = c(ORCID = "0000-0002-4094-1476")), person("Rafael", "Maia", role = c("aut", "cph"), comment = c(ORCID = "0000-0002-7563-9795")), person("Thomas", "White", role = c("aut", "cph"), comment = c(ORCID = "0000-0002-3976-1734")), person("Kotya", "Karapetyan", role = c("ctb", "cph"), comment = "Author of the MATLAB script to read AvaSoft7 binary files (CC-BY)") )
+# Description: Parse various reflectance/transmittance/absorbance spectra file formats to extract spectral data and metadata, as described in Gruson, White & Maia (2019) <doi:10.21105/joss.01857>. Among other formats, it can import files from 'Avantes' <https://www.avantes.com/>, 'CRAIC' <https://www.microspectra.com/>, and 'OceanInsight' (formerly 'OceanOptics') <https://www.oceaninsight.com/> brands.
+# Depends: R (>= 3.5.0)
+# Imports: future.apply, progressr, xml2 (>= 1.0.0)
+# Suggests: digest, knitr, pavo, rmarkdown, spelling, testthat (>= 3.0.0), withr
+# URL: https://docs.ropensci.org/lightr/, https://github.com/ropensci/lightr
+# BugReports: https://github.com/ropensci/lightr/issues
+# License: GPL (>= 2)
+# RoxygenNote: 7.1.2.9000
+# Language: en-GB
+# VignetteBuilder: knitr
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2022-05-14 13:08:22 UTC; hugo
+# Author: Hugo Gruson [cre, aut, cph] (<https://orcid.org/0000-0002-4094-1476>), Rafael Maia [aut, cph] (<https://orcid.org/0000-0002-7563-9795>), Thomas White [aut, cph] (<https://orcid.org/0000-0002-3976-1734>), Kotya Karapetyan [ctb, cph] (Author of the MATLAB script to read AvaSoft7 binary files (CC-BY))
+# Maintainer: Hugo Gruson <hugo.gruson+R@normalesup.org>
+# Repository: CRAN
+# Date/Publication: 2022-05-14 13:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

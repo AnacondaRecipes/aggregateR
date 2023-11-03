@@ -1,0 +1,108 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-staggered
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/staggered_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/staggered/staggered_{{ version }}.tar.gz
+  sha256: e8c6d2f5e4ac06c36edf450c5a104f71d3ec2dc91c971f913cc3d8b7302a237d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-rcpp
+    - r-rcppeigen
+    - r-coop
+    - r-dplyr
+    - r-magrittr
+    - r-purrr
+    - r-reshape2
+    - r-tidyr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-rcpp
+    - r-rcppeigen
+    - r-coop
+    - r-dplyr
+    - r-magrittr
+    - r-purrr
+    - r-reshape2
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('staggered')"           # [not win]
+    - "\"%R%\" -e \"library('staggered')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=staggered
+  license: GPL-2
+  summary: Efficiently estimates treatment effects in settings with randomized staggered rollouts,
+    using tools proposed by Roth and Sant'Anna (2021) <arXiv:2102.01291>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: staggered
+# Title: Efficient Estimation Under Staggered Treatment Timing
+# Version: 1.1
+# Authors@R: c(person("Jonathan", "Roth", email = "jonathan_roth@brown.edu", role = c("aut")), person("Pedro H.C.", "Sant'Anna", email = "pedrohcgs@gmail.com", role = c("aut","cre")))
+# Description: Efficiently estimates treatment effects in settings with randomized staggered rollouts, using tools proposed by Roth and Sant'Anna (2021) <arXiv:2102.01291>.
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.1.2
+# Imports: dplyr, reshape2, purrr, Rcpp, magrittr, MASS, stats, tidyr, coop
+# LinkingTo: Rcpp, RcppEigen
+# Depends: R (>= 3.5.0)
+# NeedsCompilation: yes
+# Packaged: 2021-09-14 22:37:46 UTC; psantanna
+# Author: Jonathan Roth [aut], Pedro H.C. Sant'Anna [aut, cre]
+# Maintainer: Pedro H.C. Sant'Anna <pedrohcgs@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-09-15 18:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

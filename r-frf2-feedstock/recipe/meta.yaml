@@ -1,0 +1,94 @@
+{% set version = '2.3-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-frf2
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/FrF2_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/FrF2/FrF2_{{ version }}.tar.gz
+  sha256: bd77912e478adece8b9aa31c17e1f9683e4f2e098d6f183fd34e15ab3a7e9286
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: FrF2.catlg128, BsMD, DoE.wrapper
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-doe.base >=0.25
+    - r-igraph >=0.7
+    - r-scatterplot3d
+    - r-sfsmisc >=1.0_26
+
+  run:
+    - r-base
+    - r-doe.base >=0.25
+    - r-igraph >=0.7
+    - r-scatterplot3d
+    - r-sfsmisc >=1.0_26
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('FrF2')"           # [not win]
+    - "\"%R%\" -e \"library('FrF2')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://prof.bht-berlin.de/groemping/DoE/, https://prof.bht-berlin.de/groemping/
+  license: GPL-2
+  summary: Regular and non-regular Fractional Factorial 2-level designs can be created. Furthermore,
+    analysis tools for Fractional Factorial designs with 2-level factors are offered
+    (main effects and interaction plots for all factors simultaneously, cube plot for
+    looking at the simultaneous effects of three factors, full or half normal plot,
+    alias structure in a more readable format than with the built-in function alias).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: FrF2
+# Title: Fractional Factorial Designs with 2-Level Factors
+# Version: 2.3-3
+# Depends: R(>= 2.13.0), DoE.base(>= 0.25)
+# Imports: sfsmisc(>= 1.0-26), utils, scatterplot3d, igraph(>= 0.7), methods
+# Suggests: FrF2.catlg128, BsMD, DoE.wrapper
+# Date: 2023-09-11
+# Author: Ulrike Groemping
+# Maintainer: Ulrike Groemping <ulrike.groemping@bht-berlin.de>
+# Description: Regular and non-regular Fractional Factorial 2-level designs can be created. Furthermore, analysis tools for Fractional Factorial designs with 2-level factors are offered (main effects and interaction plots for all factors simultaneously, cube plot for looking at the simultaneous effects of three factors, full or half normal plot, alias structure in a more readable format than with the built-in function alias).
+# License: GPL (>= 2)
+# LazyLoad: yes
+# Encoding: UTF-8
+# URL: https://prof.bht-berlin.de/groemping/DoE/, https://prof.bht-berlin.de/groemping/
+# NeedsCompilation: no
+# Packaged: 2023-09-11 22:30:15 UTC; groemping
+# Repository: CRAN
+# Date/Publication: 2023-09-20 09:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

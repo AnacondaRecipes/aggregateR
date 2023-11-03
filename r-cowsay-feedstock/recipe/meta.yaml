@@ -1,0 +1,92 @@
+{% set version = '0.9.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cowsay
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cowsay_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cowsay/cowsay_{{ version }}.tar.gz
+  sha256: 0d32b1c641f023e257942daf11afed01c3cfdf9b83323a7bdc7c6fc2c04659a2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: curl, jsonlite, knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-crayon
+    - r-fortunes
+    - r-rmsfact
+
+  run:
+    - r-base
+    - r-crayon
+    - r-fortunes
+    - r-rmsfact
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cowsay')"           # [not win]
+    - "\"%R%\" -e \"library('cowsay')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/sckott/cowsay
+  license: MIT
+  summary: Allows printing of character strings as messages/warnings/etc. with ASCII animals,
+    including cats, cows, frogs, chickens, ghosts, and more.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: cowsay
+# Title: Messages, Warnings, Strings with Ascii Animals
+# Description: Allows printing of character strings as messages/warnings/etc. with ASCII animals, including cats, cows, frogs, chickens, ghosts, and more.
+# Version: 0.9.0
+# License: MIT + file LICENSE
+# Authors@R: c( person("Scott", "Chamberlain", role = c("aut", "cre"), email = "myrmecocystus@gmail.com"), person("Amanda", "Dobbyn", role = c("aut"), email = "amanda.e.dobbyn@gmail.com"), person("Tyler", "Rinker", role = "ctb"), person("Thomas", "Leeper", role = "ctb"), person("Noam", "Ross", role = "ctb"), person("Rich", "FitzJohn", role = "ctb"), person("Carson", "Sievert", role = "ctb"), person("Kiyoko", "Gotanda", role = "ctb"), person("Andy", "Teucher", role = "ctb"), person("Karl", "Broman", role = "ctb"), person("Franz-Sebastian", "Krah", role = "ctb"), person("Lucy", "D'Agostino McGowan", role = "ctb"), person("Guangchuang", "Yu", role = "ctb"), person("Philipp", "Boersch-Supan", role = "ctb"), person("Andreas", "Brandmaier", role="ctb"), person("Marion", "Louveaux", role="ctb") )
+# URL: https://github.com/sckott/cowsay
+# BugReports: https://github.com/sckott/cowsay/issues
+# Encoding: UTF-8
+# Language: en-US
+# VignetteBuilder: knitr
+# Imports: crayon, fortunes, rmsfact
+# Suggests: curl, jsonlite, knitr, rmarkdown, testthat
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-11-02 15:56:19 UTC; sckott
+# Author: Scott Chamberlain [aut, cre], Amanda Dobbyn [aut], Tyler Rinker [ctb], Thomas Leeper [ctb], Noam Ross [ctb], Rich FitzJohn [ctb], Carson Sievert [ctb], Kiyoko Gotanda [ctb], Andy Teucher [ctb], Karl Broman [ctb], Franz-Sebastian Krah [ctb], Lucy D'Agostino McGowan [ctb], Guangchuang Yu [ctb], Philipp Boersch-Supan [ctb], Andreas Brandmaier [ctb], Marion Louveaux [ctb]
+# Maintainer: Scott Chamberlain <myrmecocystus@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-11-02 17:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

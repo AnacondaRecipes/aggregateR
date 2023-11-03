@@ -1,0 +1,101 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-matchthem
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MatchThem_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MatchThem/MatchThem_{{ version }}.tar.gz
+  sha256: 71535b0d50df35eccf53bc95e55b16df029d5ca6670cf9ea7c6a96ceb7fb7161
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Amelia, cobalt (>= 4.0.0), R.rsp
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matchit >=4.0.0
+    - r-weightit
+    - r-mice
+    - r-rlang
+    - r-survey
+
+  run:
+    - r-base
+    - r-matchit >=4.0.0
+    - r-weightit
+    - r-mice
+    - r-rlang
+    - r-survey
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MatchThem')"           # [not win]
+    - "\"%R%\" -e \"library('MatchThem')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/FarhadPishgar/MatchThem
+  license: GPL-2
+  summary: Provides essential tools for the pre-processing techniques of matching and weighting
+    multiply imputed datasets. The package includes functions for matching within and
+    across multiply imputed datasets using various methods, estimating weights for units
+    in the imputed datasets using multiple weighting methods, calculating causal effect
+    estimates in each matched or weighted dataset using parametric or non-parametric
+    statistical models, and pooling the resulting estimates according to Rubin's rules
+    (please see <https://journal.r-project.org/archive/2021/RJ-2021-073/> for more details).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: MatchThem
+# Title: Matching and Weighting Multiply Imputed Datasets
+# Description: Provides essential tools for the pre-processing techniques of matching and weighting multiply imputed datasets. The package includes functions for matching within and across multiply imputed datasets using various methods, estimating weights for units in the imputed datasets using multiple weighting methods, calculating causal effect estimates in each matched or weighted dataset using parametric or non-parametric statistical models, and pooling the resulting estimates according to Rubin's rules (please see <https://journal.r-project.org/archive/2021/RJ-2021-073/> for more details).
+# Version: 1.1.0
+# Authors@R: c(person("Farhad", "Pishgar", role = c("aut", "cre"), email = "Farhad.Pishgar@Gmail.com"), person("Noah", "Greifer", role = "aut", email = "Noah.Greifer@Gmail.com"), person("Clemence", "Leyrat", role = "ctb", email = "Clemence.Leyrat@lshtm.ac.uk"), person("Elizabeth", "Stuart", role = "ctb", email = "EStuart@jhu.edu"))
+# Maintainer: Farhad Pishgar <Farhad.Pishgar@Gmail.com>
+# Depends: R (>= 3.6.0)
+# Imports: MatchIt (>= 4.0.0), mice, rlang, survey, WeightIt
+# Suggests: Amelia, cobalt (>= 4.0.0), R.rsp
+# URL: https://github.com/FarhadPishgar/MatchThem
+# BugReports: https://github.com/FarhadPishgar/MatchThem/issues
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# VignetteBuilder: R.rsp
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Author: Farhad Pishgar [aut, cre], Noah Greifer [aut], Clemence Leyrat [ctb], Elizabeth Stuart [ctb]
+# Packaged: 2023-06-14 23:34:29 UTC; farhadpishgar
+# Repository: CRAN
+# Date/Publication: 2023-06-14 23:52:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

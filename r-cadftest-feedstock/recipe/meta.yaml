@@ -1,0 +1,91 @@
+{% set version = '0.3-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cadftest
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CADFtest_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CADFtest/CADFtest_{{ version }}.tar.gz
+  sha256: 15535be14b088f4a0c88201ef448458113a15874dfc6d757fc544d86c4d97c19
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dynlm
+    - r-sandwich
+    - r-tseries
+    - r-urca
+
+  run:
+    - r-base
+    - r-dynlm
+    - r-sandwich
+    - r-tseries
+    - r-urca
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CADFtest')"           # [not win]
+    - "\"%R%\" -e \"library('CADFtest')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.jstatsoft.org/v32/i02
+  license: GPL-2
+  summary: Hansen's (1995) Covariate-Augmented Dickey-Fuller (CADF) test. The only required argument
+    is y, the Tx1 time series to be tested. If no stationary covariate X is passed to
+    the procedure, then an ordinary ADF test is performed. The p-values of the test
+    are computed using the procedure illustrated in Lupi (2009).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: CADFtest
+# Type: Package
+# Title: A Package to Perform Covariate Augmented Dickey-Fuller Unit Root Tests
+# Version: 0.3-3
+# Date: 2017-05-31
+# Author: Claudio Lupi
+# Maintainer: Claudio Lupi <lupi@unimol.it>
+# Depends: dynlm, sandwich, tseries, urca
+# Description: Hansen's (1995) Covariate-Augmented Dickey-Fuller (CADF) test. The only required argument is y, the Tx1 time series to be tested. If no stationary covariate X is passed to the procedure, then an ordinary ADF test is performed. The p-values of the test are computed using the procedure illustrated in Lupi (2009).
+# License: GPL (>= 2)
+# URL: http://www.jstatsoft.org/v32/i02
+# LazyLoad: yes
+# LazyData: yes
+# Packaged: 2017-05-31 15:43:01 UTC; claudio
+# Repository: CRAN
+# Date/Publication: 2017-06-02 17:10:31 UTC
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

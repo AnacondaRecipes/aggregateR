@@ -1,0 +1,112 @@
+{% set version = '2.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-crqa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/crqa_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/crqa/crqa_{{ version }}.tar.gz
+  sha256: 1d90e3150225963488b83d111dafccccf6b45b33c5d68596452c20ef544121eb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-gplots
+    - r-plot3d
+    - r-pracma
+    - r-rdist
+    - r-tserieschaos
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-gplots
+    - r-plot3d
+    - r-pracma
+    - r-rdist
+    - r-tserieschaos
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('crqa')"           # [not win]
+    - "\"%R%\" -e \"library('crqa')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=crqa
+  license: GPL-2
+  summary: 'Auto, Cross and Multi-dimensional recurrence quantification analysis. Different methods
+    for computing recurrence, cross vs. multidimensional or profile iti.e., only looking
+    at the diagonal recurrent points, as well as functions for optimization and plotting
+    are proposed. in-depth measures of the whole cross-recurrence plot, Please refer
+    to Coco and others (2021) <doi:10.32614/RJ-2021-062>, Coco and Dale (2014) <doi:10.3389/fpsyg.2014.00510>
+    and Wallot (2018) <doi: 10.1080/00273171.2018.1512846> for further details about
+    the method.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: crqa
+# Type: Package
+# Title: Unidimensional and Multidimensional Methods for Recurrence Quantification Analysis
+# Version: 2.0.4
+# Date: 2023-09-23
+# Authors@R: c( person("Moreno  I.", "Coco", role = c("cre","aut"), email="moreno.cocoi@gmail.com"), person("Dan"," Monster", role = "aut", email = "danm@econ.au.dk"), person("Giuseppe","Leonardi", role = "aut", email = "g.leonardi@vizja.pl"), person("Rick"," Dale", role = "aut", email = "rdale@ucla.edu"), person("Sebastian","Wallot", role = "aut", email = "sebastian.wallot@ae.mpg.de"), person("James D.","Dixon", role = "ctb", email = "james.dixon@uconn.edu"), person("John  C.","Nash", role = "ctb", email = "nashjc@uottawa.ca"), person("Alexandra","Paxton", role = "ctb", email = "alexandra.paxton@uconn.edu") )
+# Maintainer: Moreno I. Coco <moreno.cocoi@gmail.com>
+# Description: Auto, Cross and Multi-dimensional recurrence quantification analysis. Different methods for computing recurrence, cross vs. multidimensional or profile iti.e., only looking at the diagonal recurrent points, as well as functions for optimization and plotting are proposed. in-depth measures of the whole cross-recurrence plot, Please refer to Coco and others (2021) <doi:10.32614/RJ-2021-062>, Coco and Dale (2014) <doi:10.3389/fpsyg.2014.00510> and Wallot (2018) <doi: 10.1080/00273171.2018.1512846> for further details about the method.
+# Depends: R (>= 3.5.0)
+# Imports: Matrix, pracma, tseriesChaos, gplots, plot3D, rdist
+# License: GPL (>= 2)
+# Collate: 'crqa.R' 'crqa_helpers.R' 'drpfromts.R' 'lorenzattractor.R' 'mdDelay.R' 'mdFnn.R' 'optimizeParam.R' 'piecewiseRQA.R' 'plotRP.R' 'simts.R' 'spdiags.R' 'wincrqa.R' 'windowdrp.R'
+# RoxygenNote: 7.2.3
+# LazyData: true
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# Suggests: knitr, rmarkdown
+# NeedsCompilation: yes
+# Packaged: 2023-10-02 10:12:23 UTC; moreno
+# Author: Moreno I. Coco [cre, aut], Dan Monster [aut], Giuseppe Leonardi [aut], Rick Dale [aut], Sebastian Wallot [aut], James D. Dixon [ctb], John C. Nash [ctb], Alexandra Paxton [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-10-02 14:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

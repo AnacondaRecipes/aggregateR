@@ -1,0 +1,112 @@
+{% set version = '0.9.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-worldmet
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/worldmet_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/worldmet/worldmet_{{ version }}.tar.gz
+  sha256: 049fd0ae7700a61bddab79a8ca821ef25303210fbdac1a0edafc75daeef3df90
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-doparallel
+    - r-dplyr
+    - r-foreach
+    - r-leaflet
+    - r-magrittr
+    - r-openair
+    - r-purrr >=1.0.0
+    - r-readr
+    - r-tibble
+    - r-tidyr
+
+  run:
+    - r-base
+    - r-doparallel
+    - r-dplyr
+    - r-foreach
+    - r-leaflet
+    - r-magrittr
+    - r-openair
+    - r-purrr >=1.0.0
+    - r-readr
+    - r-tibble
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('worldmet')"           # [not win]
+    - "\"%R%\" -e \"library('worldmet')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://davidcarslaw.github.io/worldmet/index.html, http://davidcarslaw.github.io/worldmet/
+  license: GPL-2
+  summary: Functions to import data from more than 30,000 surface meteorological sites around
+    the world managed by the National Oceanic and Atmospheric Administration (NOAA)
+    Integrated Surface Database (ISD).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: worldmet
+# Type: Package
+# Title: Import Surface Meteorological Data from NOAA Integrated Surface Database (ISD)
+# Version: 0.9.8
+# Date: 2023-06-05
+# Authors@R: c(person("David", "Carslaw", role = c("aut", "cre"), email = "david.carslaw@york.ac.uk"))
+# ByteCompile: true
+# Depends: R (>= 3.2.0)
+# Imports: openair, doParallel, parallel, foreach, purrr (>= 1.0.0), dplyr, leaflet, tidyr, readr, magrittr, tibble
+# Maintainer: David Carslaw <david.carslaw@york.ac.uk>
+# Description: Functions to import data from more than 30,000 surface meteorological sites around the world managed by the National Oceanic and Atmospheric Administration (NOAA) Integrated Surface Database (ISD).
+# License: GPL (>= 2)
+# URL: https://davidcarslaw.github.io/worldmet/index.html, http://davidcarslaw.github.io/worldmet/
+# BugReports: https://github.com/davidcarslaw/worldmet/issues
+# Suggests: knitr, rmarkdown
+# Language: en-GB
+# LazyLoad: true
+# LazyData: true
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2023-06-05 14:45:54 UTC; davidcarslaw
+# Author: David Carslaw [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2023-06-05 18:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

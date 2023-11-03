@@ -1,0 +1,104 @@
+{% set version = '0.7.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mapsf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mapsf_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mapsf/mapsf_{{ version }}.tar.gz
+  sha256: 8635ba5fc721b7870545c6bb897b90bae9dd19866446a8c1539fe7536db07f52
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: terra, png, jpeg, lwgeom, knitr, rmarkdown, tinytest, covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-classint
+    - r-sf
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-classint
+    - r-sf
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mapsf')"           # [not win]
+    - "\"%R%\" -e \"library('mapsf')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://riatelab.github.io/mapsf/
+  license: GPL-3
+  summary: Create and integrate thematic maps in your workflow. This package helps to design
+    various cartographic representations such as proportional symbols, choropleth or
+    typology maps. It also offers several functions to display layout elements that
+    improve the graphic presentation of maps (e.g. scale bar, north arrow, title, labels).
+    'mapsf' maps 'sf' objects on 'base' graphics.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: mapsf
+# Title: Thematic Cartography
+# Version: 0.7.1
+# Authors@R: c( person("Timothee", "Giraud", email = "timothee.giraud@cnrs.fr", role = c("cre","aut"), comment = c(ORCID = "0000-0002-1932-3323")), person("Diego", "Hernangomez", role = "ctb", comment=c(ORCID="0000-0001-8457-4658")), person("Hugues", "Pecout", role = "ctb"), person("Ronan", "Ysebaert", role = "ctb"), person("Ian", "Fellows", role = "cph", comment = "No overlap algorithm for labels, from wordcloud package"), person("Jim", "Lemon", role = "cph", comment = "Arc drawing algorithm for annotations, from plotrix package"), person("Florian",  "Zenoni", role = "cph", comment = "Orthographic projection visualisation") )
+# Description: Create and integrate thematic maps in your workflow. This package helps to design various cartographic representations such as proportional symbols, choropleth or typology maps. It also offers several functions to display layout elements that improve the graphic presentation of maps (e.g. scale bar, north arrow, title, labels). 'mapsf' maps 'sf' objects on 'base' graphics.
+# License: GPL-3
+# URL: https://riatelab.github.io/mapsf/
+# BugReports: https://github.com/riatelab/mapsf/issues/
+# Depends: R (>= 3.6.0)
+# Imports: classInt, graphics, Rcpp, sf, stats, utils, grDevices
+# Suggests: terra, png, jpeg, lwgeom, knitr, rmarkdown, tinytest, covr
+# LinkingTo: Rcpp
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# Language: en-US
+# NeedsCompilation: yes
+# Packaged: 2023-09-05 08:54:28 UTC; tim
+# Author: Timothee Giraud [cre, aut] (<https://orcid.org/0000-0002-1932-3323>), Diego Hernangomez [ctb] (<https://orcid.org/0000-0001-8457-4658>), Hugues Pecout [ctb], Ronan Ysebaert [ctb], Ian Fellows [cph] (No overlap algorithm for labels, from wordcloud package), Jim Lemon [cph] (Arc drawing algorithm for annotations, from plotrix package), Florian Zenoni [cph] (Orthographic projection visualisation)
+# Maintainer: Timothee Giraud <timothee.giraud@cnrs.fr>
+# Repository: CRAN
+# Date/Publication: 2023-09-05 12:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

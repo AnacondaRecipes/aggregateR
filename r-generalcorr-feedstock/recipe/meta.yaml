@@ -1,0 +1,113 @@
+{% set version = '1.2.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-generalcorr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/generalCorr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/generalCorr/generalCorr_{{ version }}.tar.gz
+  sha256: aa40c289c3b288ee3b2a074274158fe0c73d5d2541c8dba33aebdd3efe87d8a7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: R.rsp
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-lattice
+    - r-meboot >=1.4
+    - r-np >=0.60
+    - r-psych
+    - r-xtable >=1.8
+
+  run:
+    - r-base
+    - r-lattice
+    - r-meboot >=1.4
+    - r-np >=0.60
+    - r-psych
+    - r-xtable >=1.8
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('generalCorr')"           # [not win]
+    - "\"%R%\" -e \"library('generalCorr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=generalCorr
+  license: GPL-2
+  summary: 'Function gmcmtx0() computes a more reliable (general) correlation matrix. Since causal
+    paths from data are important for all sciences, the package provides many sophisticated
+    functions. causeSummBlk() and causeSum2Blk() give easy-to-interpret causal paths.  Let
+    Z denote control variables and compare two flipped kernel regressions: X=f(Y, Z)+e1
+    and Y=g(X, Z)+e2. Our criterion Cr1 says that if |e1*Y|>|e2*X| then variation in
+    X is more "exogenous or independent" than in Y, and the causal path is X to Y. Criterion
+    Cr2 requires |e2|<|e1|. These inequalities between many absolute values are quantified
+    by four orders of stochastic dominance. Our third criterion Cr3, for the causal
+    path X to Y, requires new generalized partial correlations to satisfy |r*(x|y,z)|<
+    |r*(y|x,z)|. The function parcorVec() reports generalized partials between the first
+    variable and all others.  The package provides several R functions including get0outliers()
+    for outlier detection, bigfp() for numerical integration by the trapezoidal rule,
+    stochdom2() for stochastic dominance, pillar3D() for 3D charts, canonRho() for generalized
+    canonical correlations, depMeas() measures nonlinear dependence, and causeSummary(mtx)
+    reports summary of causal paths among matrix columns. Portfolio selection: decileVote(),
+    momentVote(), dif4mtx(), exactSdMtx() can rank several stocks. Functions whose names
+    begin with ''boot'' provide bootstrap statistical inference, including a new bootGcRsq()
+    test for "Granger-causality" allowing nonlinear relations. A new tool for evaluation
+    of out-of-sample portfolio performance is outOFsamp(). Panel data implementation
+    is now included. See eight vignettes of the package for theory, examples, and usage
+    tips. See Vinod (2019) \doi{10.1080/03610918.2015.1122048}.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: generalCorr
+# Type: Package
+# Title: Generalized Correlations, Causal Paths and Portfolio Selection
+# Version: 1.2.6
+# Date: 2023-10-09
+# Author: Prof. H. D. Vinod, Fordham University, NY.
+# Maintainer: H. D. Vinod <vinod@fordham.edu>
+# Encoding: UTF-8
+# Depends: R (>= 3.0.0), np (>= 0.60), xtable (>= 1.8), meboot (>= 1.4), psych, lattice
+# Suggests: R.rsp
+# VignetteBuilder: R.rsp
+# Description: Function gmcmtx0() computes a more reliable (general) correlation matrix. Since causal paths from data are important for all sciences, the package provides many sophisticated functions. causeSummBlk() and causeSum2Blk() give easy-to-interpret causal paths.  Let Z denote control variables and compare two flipped kernel regressions: X=f(Y, Z)+e1 and Y=g(X, Z)+e2. Our criterion Cr1 says that if |e1*Y|>|e2*X| then variation in X is more "exogenous or independent" than in Y, and the causal path is X to Y. Criterion Cr2 requires |e2|<|e1|. These inequalities between many absolute values are quantified by four orders of stochastic dominance. Our third criterion Cr3, for the causal path X to Y, requires new generalized partial correlations to satisfy |r*(x|y,z)|< |r*(y|x,z)|. The function parcorVec() reports generalized partials between the first variable and all others.  The package provides several R functions including get0outliers() for outlier detection, bigfp() for numerical integration by the trapezoidal rule, stochdom2() for stochastic dominance, pillar3D() for 3D charts, canonRho() for generalized canonical correlations, depMeas() measures nonlinear dependence, and causeSummary(mtx) reports summary of causal paths among matrix columns. Portfolio selection: decileVote(), momentVote(), dif4mtx(), exactSdMtx() can rank several stocks. Functions whose names begin with 'boot' provide bootstrap statistical inference, including a new bootGcRsq() test for "Granger-causality" allowing nonlinear relations. A new tool for evaluation of out-of-sample portfolio performance is outOFsamp(). Panel data implementation is now included. See eight vignettes of the package for theory, examples, and usage tips. See Vinod (2019) \doi{10.1080/03610918.2015.1122048}.
+# License: GPL (>= 2)
+# LazyData: true
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-10-09 15:22:42 UTC; vinod
+# Repository: CRAN
+# Date/Publication: 2023-10-09 18:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,99 @@
+{% set version = '2.1-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spatialextremes
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SpatialExtremes_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SpatialExtremes/SpatialExtremes_{{ version }}.tar.gz
+  sha256: 438694a02f4354ccd740675936cb409d9fd634e95d66357583e87b1d6ee73a7c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-fields
+    - r-maps
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-fields
+    - r-maps
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SpatialExtremes')"           # [not win]
+    - "\"%R%\" -e \"library('SpatialExtremes')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://spatialextremes.r-forge.r-project.org/
+  license: GPL-2
+  summary: 'Tools for the statistical modelling of spatial extremes using max-stable processes,
+    copula or Bayesian hierarchical models. More precisely, this package allows (conditional)
+    simulations from various parametric max-stable models, analysis of the extremal
+    spatial dependence, the fitting of such processes using composite likelihoods or
+    least square (simple max-stable processes only), model checking and selection and
+    prediction. Other approaches (although not completely in agreement with the extreme
+    value theory) are available such as the use of (spatial) copula and Bayesian hierarchical
+    models assuming the so-called conditional assumptions. The latter approaches is
+    handled through an (efficient) Gibbs sampler. Some key references: Davison et al.
+    (2012) <doi:10.1214/11-STS376>, Padoan et al. (2010) <doi:10.1198/jasa.2009.tm08577>,
+    Dombry et al. (2013) <doi:10.1093/biomet/ass067>.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: SpatialExtremes
+# Version: 2.1-0
+# Date: 2022-04-19
+# Title: Modelling Spatial Extremes
+# Authors@R: c(person("Mathieu", "Ribatet", role = c("aut", "cre"), email = "mathieu.ribatet@ec-nantes.fr"), person("Richard", "Singleton", role = "ctb"), person("R Core team", role = "ctb"))
+# Depends: R (>= 1.8.0)
+# Imports: maps, fields
+# Description: Tools for the statistical modelling of spatial extremes using max-stable processes, copula or Bayesian hierarchical models. More precisely, this package allows (conditional) simulations from various parametric max-stable models, analysis of the extremal spatial dependence, the fitting of such processes using composite likelihoods or least square (simple max-stable processes only), model checking and selection and prediction. Other approaches (although not completely in agreement with the extreme value theory) are available such as the use of (spatial) copula and Bayesian hierarchical models assuming the so-called conditional assumptions. The latter approaches is handled through an (efficient) Gibbs sampler. Some key references: Davison et al. (2012) <doi:10.1214/11-STS376>, Padoan et al. (2010) <doi:10.1198/jasa.2009.tm08577>, Dombry et al. (2013) <doi:10.1093/biomet/ass067>.
+# License: GPL (>= 2)
+# URL: http://spatialextremes.r-forge.r-project.org/
+# NeedsCompilation: yes
+# Packaged: 2022-04-19 07:58:44 UTC; mathieu
+# Author: Mathieu Ribatet [aut, cre], Richard Singleton [ctb], R Core team [ctb]
+# Maintainer: Mathieu Ribatet <mathieu.ribatet@ec-nantes.fr>
+# Repository: CRAN
+# Date/Publication: 2022-04-19 10:22:42 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

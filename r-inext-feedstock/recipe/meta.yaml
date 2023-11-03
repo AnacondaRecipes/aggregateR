@@ -1,0 +1,105 @@
+{% set version = '3.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-inext
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/iNEXT_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/iNEXT/iNEXT_{{ version }}.tar.gz
+  sha256: 505721e266b2a5bdca13cd581745b419c25327973ac9ad0f017e3dde7653dbf9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, gridExtra, ggthemes
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-ggplot2
+    - r-reshape2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-ggplot2
+    - r-reshape2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('iNEXT')"           # [not win]
+    - "\"%R%\" -e \"library('iNEXT')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://chao.stat.nthu.edu.tw/wordpress/software_download/
+  license: GPL-3
+  summary: Provides simple functions to compute and plot two types (sample-size- and coverage-based)
+    rarefaction and extrapolation curves for species diversity (Hill numbers) based
+    on individual-based abundance data or sampling-unit- based incidence data; see Chao
+    and others (2014, Ecological Monographs) for pertinent theory and methodologies,
+    and Hsieh, Ma and Chao (2016, Methods in Ecology and Evolution) for an introduction
+    of the R package.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: iNEXT
+# Type: Package
+# Title: Interpolation and Extrapolation for Species Diversity
+# Version: 3.0.0
+# Author: T. C. Hsieh, K. H. Ma and Anne Chao
+# Description: Provides simple functions to compute and plot two types (sample-size- and coverage-based) rarefaction and extrapolation curves for species diversity (Hill numbers) based on individual-based abundance data or sampling-unit- based incidence data; see Chao and others (2014, Ecological Monographs) for pertinent theory and methodologies, and Hsieh, Ma and Chao (2016, Methods in Ecology and Evolution) for an introduction of the R package.
+# License: GPL (>= 3)
+# URL: http://chao.stat.nthu.edu.tw/wordpress/software_download/
+# Maintainer: T. C. Hsieh <euler96@gmail.com>
+# Depends: R (>= 3.4)
+# Imports: stats, graphics, ggplot2, reshape2, Rcpp
+# BugReports: https://github.com/JohnsonHsieh/iNEXT/issues
+# LazyLoad: yes
+# RoxygenNote: 7.2.0
+# Suggests: testthat, knitr, rmarkdown, gridExtra, ggthemes
+# VignetteBuilder: knitr
+# ByteCompile: true
+# LinkingTo: Rcpp
+# NeedsCompilation: yes
+# Packaged: 2022-08-29 10:58:11 UTC; johnson
+# Repository: CRAN
+# Date/Publication: 2022-08-29 11:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

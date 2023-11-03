@@ -1,0 +1,94 @@
+{% set version = '0.3.27' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-adehabitatlt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/adehabitatLT_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/adehabitatLT/adehabitatLT_{{ version }}.tar.gz
+  sha256: fd0bf996f7deacf62f40520e3a3ddccc5d46cf2477a56deb3559f99760922a6a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tkrplot, MASS
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-circstats
+    - r-ade4
+    - r-adehabitatma
+    - r-sp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-circstats
+    - r-ade4
+    - r-adehabitatma
+    - r-sp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('adehabitatLT')"           # [not win]
+    - "\"%R%\" -e \"library('adehabitatLT')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=adehabitatLT
+  license: GPL-2
+  summary: A collection of tools for the analysis of animal movements.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: adehabitatLT
+# Version: 0.3.27
+# Date: 2023-04-06
+# Depends: R (>= 2.10.0), sp, methods, ade4, adehabitatMA, CircStats, stats
+# Suggests: tkrplot, MASS
+# Imports: graphics, grDevices, utils
+# Title: Analysis of Animal Movements
+# Author: Clement Calenge, contributions from Stephane Dray and Manuela Royer
+# Maintainer: Clement Calenge <clement.calenge@ofb.gouv.fr>
+# Description: A collection of tools for the analysis of animal movements.
+# VignetteBuilder: utils
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2023-04-06 11:29:06 UTC; calenge
+# Repository: CRAN
+# Date/Publication: 2023-04-06 12:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

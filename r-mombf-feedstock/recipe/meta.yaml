@@ -1,0 +1,119 @@
+{% set version = '3.4.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mombf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mombf_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mombf/mombf_{{ version }}.tar.gz
+  sha256: 62a33ee9324a86ea0917ddc6001364707e29f1853dc683b5a1e0fe7bb3c83f8b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: parallel, testthat, patrick
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.16
+    - r-rcpparmadillo
+    - r-dplyr
+    - r-glmnet
+    - r-intervals
+    - r-mclust
+    - r-mgcv
+    - r-mvtnorm
+    - r-ncvreg
+    - r-pracma
+    - r-sgd
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.16
+    - r-rcpparmadillo
+    - r-dplyr
+    - r-glmnet
+    - r-intervals
+    - r-mclust
+    - r-mgcv
+    - r-mvtnorm
+    - r-ncvreg
+    - r-pracma
+    - r-sgd
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mombf')"           # [not win]
+    - "\"%R%\" -e \"library('mombf')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/davidrusi/mombf
+  license: GPL-2
+  summary: Model selection and averaging for regression and mixtures, inclusing Bayesian model
+    selection and information criteria (BIC, EBIC, AIC, GIC).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: mombf
+# Type: Package
+# Version: 3.4.2
+# Date: 2023-09-27
+# Title: Model Selection with Bayesian Methods and Information Criteria
+# Author: David Rossell, John D. Cook, Donatello Telesca, P. Roebuck, Oriol Abril, Miquel Torrens
+# Maintainer: David Rossell <rosselldavid@gmail.com>
+# Depends: R (>= 2.14.0), methods, mvtnorm, ncvreg, mgcv
+# Suggests: parallel, testthat, patrick
+# Imports: Rcpp (>= 0.12.16), dplyr, intervals, glmnet, mclust, sgd, survival, pracma
+# LinkingTo: Rcpp, RcppArmadillo
+# Description: Model selection and averaging for regression and mixtures, inclusing Bayesian model selection and information criteria (BIC, EBIC, AIC, GIC).
+# License: GPL (>= 2) | file LICENSE
+# URL: https://github.com/davidrusi/mombf
+# BugReports: https://github.com/davidrusi/mombf/issues
+# LazyLoad: yes
+# Collate: AllClasses.R AllGenerics.R alapl.R bms_ortho.R cil.R cox.R derivatives_nlps.R distribs.R dmom.R gam.R greedyGLM.R infocriteria.R initParameters.R localnulltest.R msPriorSpec.R modelsearch.R modelSelection.R modelSelectionGLM.R mombf.R normaliwish.R normmix.R nlpMarginal.R postMode.R rmom.R RcppExports.R testfunction.R
+# NeedsCompilation: yes
+# Packaged: 2023-09-27 09:59:13 UTC; david
+# Repository: CRAN
+# Date/Publication: 2023-09-28 16:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

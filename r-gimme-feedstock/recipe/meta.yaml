@@ -1,0 +1,108 @@
+{% set version = '0.7-15' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gimme
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gimme_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gimme/gimme_{{ version }}.tar.gz
+  sha256: 564a3da3b2816b28ea995c59169276671a4aec17ec34bce67cf88a33e3fce661
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-miivsem >=0.5.4
+    - r-atsa
+    - r-data.tree
+    - r-igraph >=1.0_0
+    - r-imputets >=3.0
+    - r-lavaan >=0.6_9
+    - r-nloptr
+    - r-qgraph
+
+  run:
+    - r-base
+    - r-mass
+    - r-miivsem >=0.5.4
+    - r-atsa
+    - r-data.tree
+    - r-igraph >=1.0_0
+    - r-imputets >=3.0
+    - r-lavaan >=0.6_9
+    - r-nloptr
+    - r-qgraph
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gimme')"           # [not win]
+    - "\"%R%\" -e \"library('gimme')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/GatesLab/gimme/, https://tarheels.live/gimme/tutorials/
+  license: GPL-2
+  summary: Data-driven approach for arriving at person-specific time series models. The method
+    first identifies which relations replicate across the majority of individuals to
+    detect signal from noise. These group-level relations are then used as a foundation
+    for starting the search for person-specific (or individual-level) relations. See
+    Gates & Molenaar (2012) <doi:10.1016/j.neuroimage.2012.06.026>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: gimme
+# Title: Group Iterative Multiple Model Estimation
+# Version: 0.7-15
+# Date: 2023-08-29
+# Author: Stephanie Lane [aut, trl], Kathleen Gates [aut, cre, ccp], Zachary Fisher [aut], Cara Arizmendi [aut], Peter Molenaar [aut, ccp], Edgar Merkle [ctb], Michael Hallquist [ctb], Hallie Pike [ctb], Teague Henry [ctb], Kelly Duffy [ctb], Lan Luo [ctb], Adriene Beltz [csp], Aidan Wright [csp], Jonathan Park [ctb], Sebastian Castro Alvarez [ctb]
+# Maintainer: Kathleen M Gates <gateskm@email.unc.edu>
+# Depends: R (>= 3.5.0)
+# Imports: lavaan (>= 0.6-9), igraph (>= 1.0-0), qgraph, data.tree, MIIVsem(>= 0.5.4), imputeTS(>= 3.0), nloptr, graphics, stats, MASS, aTSA
+# Description: Data-driven approach for arriving at person-specific time series models. The method first identifies which relations replicate across the majority of individuals to detect signal from noise. These group-level relations are then used as a foundation for starting the search for person-specific (or individual-level) relations. See Gates & Molenaar (2012) <doi:10.1016/j.neuroimage.2012.06.026>.
+# License: GPL-2
+# LazyData: true
+# URL: https://github.com/GatesLab/gimme/, https://tarheels.live/gimme/tutorials/
+# BugReports: https://github.com/GatesLab/gimme/issues
+# ByteCompile: true
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# Packaged: 2023-08-29 17:29:10 UTC; kgates
+# Repository: CRAN
+# Date/Publication: 2023-08-29 17:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

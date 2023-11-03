@@ -1,0 +1,96 @@
+{% set version = '0.9.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tsutils
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tsutils_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tsutils/tsutils_{{ version }}.tar.gz
+  sha256: f8cd500adc052242e2584cb96db2e63a5e05bd2a6aafc184361734bd4790e7e4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: thief
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mapa
+    - r-rcolorbrewer
+    - r-forecast
+    - r-plotrix
+
+  run:
+    - r-base
+    - r-mapa
+    - r-rcolorbrewer
+    - r-forecast
+    - r-plotrix
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tsutils')"           # [not win]
+    - "\"%R%\" -e \"library('tsutils')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/trnnick/tsutils/
+  license: GPL-3
+  summary: 'Includes: (i) tests and visualisations that can help the modeller explore time series
+    components and perform decomposition; (ii) modelling shortcuts, such as functions
+    to construct lagmatrices and seasonal dummy variables of various forms; (iii) an
+    implementation of the Theta method; (iv) tools to facilitate the design of the forecasting
+    process, such as ABC-XYZ analyses; and (v) "quality of life" functions, such as
+    treating time series for trailing and leading values.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: tsutils
+# Type: Package
+# Title: Time Series Exploration, Modelling and Forecasting
+# Version: 0.9.3
+# Authors@R: c( person("Nikolaos", "Kourentzes",, "nikolaos@kourentzes.com", c("aut", "cre")), person("Ivan", "Svetunkov",, "ivan@svetunkov.ru", c("ctb")), person("Oliver", "Schaer",, "info@oliverschaer.ch", c("ctb")))
+# Description: Includes: (i) tests and visualisations that can help the modeller explore time series components and perform decomposition; (ii) modelling shortcuts, such as functions to construct lagmatrices and seasonal dummy variables of various forms; (iii) an implementation of the Theta method; (iv) tools to facilitate the design of the forecasting process, such as ABC-XYZ analyses; and (v) "quality of life" functions, such as treating time series for trailing and leading values.
+# Imports: RColorBrewer, forecast, MAPA, plotrix
+# Suggests: thief
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# URL: https://github.com/trnnick/tsutils/
+# RoxygenNote: 7.2.0
+# NeedsCompilation: no
+# Packaged: 2022-07-05 09:15:42 UTC; Nikos
+# Author: Nikolaos Kourentzes [aut, cre], Ivan Svetunkov [ctb], Oliver Schaer [ctb]
+# Maintainer: Nikolaos Kourentzes <nikolaos@kourentzes.com>
+# Repository: CRAN
+# Date/Publication: 2022-07-05 12:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,106 @@
+{% set version = '0.11-5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rtdists
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rtdists_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rtdists/rtdists_{{ version }}.tar.gz
+  sha256: 97cf2ea758aa02b1dfaeef5032c6e50570777552aa771ed9a86df048b7871eed
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, glba, knitr, rmarkdown, dplyr, tidyr, purrr, lattice, latticeExtra, binom, RWiener
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-evd
+    - r-gsl
+    - r-msm
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-evd
+    - r-gsl
+    - r-msm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rtdists')"           # [not win]
+    - "\"%R%\" -e \"library('rtdists')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/rtdists/rtdists/
+  license: GPL-3
+  summary: 'Provides response time distributions (density/PDF, distribution function/CDF, quantile
+    function, and random generation): (a) Ratcliff diffusion model (Ratcliff & McKoon,
+    2008, <doi:10.1162/neco.2008.12-06-420>) based on C code by Andreas and Jochen Voss
+    and (b) linear ballistic accumulator (LBA; Brown & Heathcote, 2008, <doi:10.1016/j.cogpsych.2007.12.002>)
+    with different distributions underlying the drift rate.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: rtdists
+# Type: Package
+# Title: Response Time Distributions
+# Depends: R (>= 3.0.0)
+# Suggests: testthat, glba, knitr, rmarkdown, dplyr, tidyr, purrr, lattice, latticeExtra, binom, RWiener
+# Imports: evd, msm, gsl, stats, Rcpp
+# LinkingTo: Rcpp
+# Description: Provides response time distributions (density/PDF, distribution function/CDF, quantile function, and random generation): (a) Ratcliff diffusion model (Ratcliff & McKoon, 2008, <doi:10.1162/neco.2008.12-06-420>) based on C code by Andreas and Jochen Voss and (b) linear ballistic accumulator (LBA; Brown & Heathcote, 2008, <doi:10.1016/j.cogpsych.2007.12.002>) with different distributions underlying the drift rate.
+# URL: https://github.com/rtdists/rtdists/
+# License: GPL (>= 3)
+# BugReports: https://github.com/rtdists/rtdists/issues
+# VignetteBuilder: knitr
+# Authors@R: c( person(given="Henrik", family="Singmann", email="singmann@gmail.com", role=c("aut", "cre"), comment=c(ORCID="0000-0002-4842-3657")), person(given="Scott", family="Brown", role=c("aut")), person(given="Matthew", family="Gretton", role=c("aut")), person(given="Andrew", family="Heathcote", role=c("aut")), person(given="Andreas", family="Voss", role=c("ctb")), person(given="Jochen", family="Voss", role=c("ctb")), person(given="Andrew", family="Terry", role=c("ctb")) )
+# LazyData: true
+# Version: 0.11-5
+# RoxygenNote: 6.1.1
+# NeedsCompilation: yes
+# Packaged: 2022-01-03 19:06:08 UTC; singm
+# Author: Henrik Singmann [aut, cre] (<https://orcid.org/0000-0002-4842-3657>), Scott Brown [aut], Matthew Gretton [aut], Andrew Heathcote [aut], Andreas Voss [ctb], Jochen Voss [ctb], Andrew Terry [ctb]
+# Maintainer: Henrik Singmann <singmann@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-01-07 14:02:42 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

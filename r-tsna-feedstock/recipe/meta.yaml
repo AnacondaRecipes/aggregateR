@@ -1,0 +1,93 @@
+{% set version = '0.3.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tsna
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tsna_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tsna/tsna_{{ version }}.tar.gz
+  sha256: 4ee2f773d573f0f4bd93131156fdccf01d7f1a3f725eff3e885021098c6bff65
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: networkDynamicData, testthat, sna, knitr, rmarkdown, relevent, ergm (>= 3.10)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-network >=1.13
+    - r-networkdynamic >=0.9
+    - r-statnet.common
+
+  run:
+    - r-base
+    - r-network >=1.13
+    - r-networkdynamic >=0.9
+    - r-statnet.common
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tsna')"           # [not win]
+    - "\"%R%\" -e \"library('tsna')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://statnet.org/
+  license: GPL-3
+  summary: Temporal SNA tools for continuous- and discrete-time longitudinal networks having
+    vertex, edge, and attribute dynamics stored in the 'networkDynamic' format. This
+    work was supported by grant R01HD68395 from the National Institute of Health.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: tsna
+# Version: 0.3.5
+# Date: 2021-10-31
+# Title: Tools for Temporal Social Network Analysis
+# Type: Package
+# Authors@R: c( person("Skye", "Bender-deMoll", role=c("aut","cre"), email="skyebend@uw.edu"), person("Martina", "Morris", role=c("aut"), email="morrism@u.washington.edu"), person("James", "Moody", role=c("ctb"), email="jmoody77@soc.duke.edu") )
+# Depends: network (>= 1.13), networkDynamic (>= 0.9), R (>= 3.0)
+# Imports: statnet.common
+# Suggests: networkDynamicData, testthat, sna, knitr, rmarkdown, relevent, ergm (>= 3.10)
+# Description: Temporal SNA tools for continuous- and discrete-time longitudinal networks having vertex, edge, and attribute dynamics stored in the 'networkDynamic' format. This work was supported by grant R01HD68395 from the National Institute of Health.
+# License: GPL-3
+# LazyLoad: yes
+# URL: http://statnet.org/
+# BugReports: https://github.com/statnet/tsna/issues
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2021-10-31 15:32:46 UTC; skyebend
+# Author: Skye Bender-deMoll [aut, cre], Martina Morris [aut], James Moody [ctb]
+# Maintainer: Skye Bender-deMoll <skyebend@uw.edu>
+# Repository: CRAN
+# Date/Publication: 2021-11-01 16:10:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

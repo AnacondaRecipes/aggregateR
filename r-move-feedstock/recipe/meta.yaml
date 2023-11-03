@@ -1,0 +1,115 @@
+{% set version = '4.2.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-move
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/move_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/move/move_{{ version }}.tar.gz
+  sha256: e763a76c669448629c71d0dcedef685cd48054941c0a86e279626d1449f7d8c4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: adehabitatHR, adehabitatLT, markdown, rmarkdown, circular, ggmap, mapproj, testthat, knitr, ggplot2, leaflet, lubridate, ctmm, amt, bcpa, EMbC, solartime
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-geosphere >=1.4_3
+    - r-httr
+    - r-memoise
+    - r-raster >=3.6_14
+    - r-sp
+    - r-terra
+    - r-xml2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-geosphere >=1.4_3
+    - r-httr
+    - r-memoise
+    - r-raster >=3.6_14
+    - r-sp
+    - r-terra
+    - r-xml2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('move')"           # [not win]
+    - "\"%R%\" -e \"library('move')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://bartk.gitlab.io/move/
+  license: GPL-3
+  summary: Contains functions to access movement data stored in 'movebank.org' as well as tools
+    to visualize and statistically analyze animal movement data, among others functions
+    to calculate dynamic Brownian Bridge Movement Models. Move helps addressing movement
+    ecology questions.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: move
+# Type: Package
+# Title: Visualizing and Analyzing Animal Track Data
+# Version: 4.2.4
+# Authors@R: c(person("Bart", "Kranstauber", role = c("aut", "cre"), email = "b.kranstauber@uva.nl"), person("Marco", "Smolla", role = "aut"), person(family= "Scharf",given='Anne K', role = "aut") )
+# Description: Contains functions to access movement data stored in 'movebank.org' as well as tools to visualize and statistically analyze animal movement data, among others functions to calculate dynamic Brownian Bridge Movement Models. Move helps addressing movement ecology questions.
+# License: GPL (>= 3)
+# URL: https://bartk.gitlab.io/move/
+# BugReports: https://gitlab.com/bartk/move/-/issues
+# LazyLoad: yes
+# LazyData: yes
+# LazyDataCompression: xz
+# Depends: geosphere (>= 1.4-3), methods, sp, raster (>= 3.6-14), R (>= 3.5.0)
+# Suggests: adehabitatHR, adehabitatLT, markdown, rmarkdown, circular, ggmap, mapproj, testthat, knitr, ggplot2, leaflet, lubridate, ctmm, amt, bcpa, EMbC, solartime
+# Imports: httr, memoise, terra, xml2, Rcpp
+# LinkingTo: Rcpp
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2023-07-06 09:35:54 UTC; bart
+# Author: Bart Kranstauber [aut, cre], Marco Smolla [aut], Anne K Scharf [aut]
+# Maintainer: Bart Kranstauber <b.kranstauber@uva.nl>
+# Repository: CRAN
+# Date/Publication: 2023-07-06 23:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

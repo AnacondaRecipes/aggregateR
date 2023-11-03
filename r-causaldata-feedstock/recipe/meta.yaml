@@ -1,0 +1,89 @@
+{% set version = '0.1.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-causaldata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/causaldata_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/causaldata/causaldata_{{ version }}.tar.gz
+  sha256: 8cba9a41a87bd7d238947310e6f3411d2b6936122ddce1669005805461bcaaec
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-tibble
+
+  run:
+    - r-base
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('causaldata')"           # [not win]
+    - "\"%R%\" -e \"library('causaldata')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/NickCH-K/causaldata
+  license: MIT
+  summary: "Example data sets to run the example problems from causal inference textbooks. Currently,
+    contains data sets for Huntington-Klein, Nick (2021) \"The Effect\" <https://theeffectbook.net>,
+    Cunningham, Scott (2021, ISBN-13: 978-0-300-25168-5) \"Causal Inference: The Mixtape\",
+    and Hern\xE1n, Miguel and James Robins (2020) \"Causal Inference: What If\" <https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/>."
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: causaldata
+# Title: Example Data Sets for Causal Inference Textbooks
+# Version: 0.1.3
+# Authors@R: c(person(given = "Nick", family = "Huntington-Klein", role = c("aut", "cre"), email = "nhuntington-klein@seattleu.edu", comment = c(ORCID = "0000-0002-7352-3991")), person(given = "Malcolm", family = "Barrett", role = "aut", email = "malcolmbarrett@gmail.com", comment = c(ORCID = "0000-0003-0299-5825")))
+# Description: Example data sets to run the example problems from causal inference textbooks. Currently, contains data sets for Huntington-Klein, Nick (2021) "The Effect" <https://theeffectbook.net>, Cunningham, Scott (2021, ISBN-13: 978-0-300-25168-5) "Causal Inference: The Mixtape", and Hernan, Miguel and James Robins (2020) "Causal Inference: What If" <https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/>.
+# License: MIT + file LICENSE
+# Depends: R (>= 2.10)
+# Imports: tibble
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.1.2
+# URL: https://github.com/NickCH-K/causaldata
+# BugReports: https://github.com/NickCH-K/causaldata/issues
+# NeedsCompilation: no
+# Packaged: 2021-12-01 19:53:17 UTC; nhuntington-klein
+# Author: Nick Huntington-Klein [aut, cre] (<https://orcid.org/0000-0002-7352-3991>), Malcolm Barrett [aut] (<https://orcid.org/0000-0003-0299-5825>)
+# Maintainer: Nick Huntington-Klein <nhuntington-klein@seattleu.edu>
+# Repository: CRAN
+# Date/Publication: 2021-12-01 20:20:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

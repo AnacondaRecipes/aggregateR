@@ -1,0 +1,108 @@
+{% set version = '0.10.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-casebase
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/casebase_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/casebase/casebase_{{ version }}.tar.gz
+  sha256: c3c86bfc79ded92f12933605046820bf464a270cb406b446c3c8929aa3dec457
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: colorspace, covr, eha, glmnet, knitr, progress, rmarkdown, splines, testthat (>= 3.0.0), visreg
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-vgam
+    - r-data.table
+    - r-ggplot2
+    - r-mgcv
+    - r-survival
+
+  run:
+    - r-base
+    - r-vgam
+    - r-data.table
+    - r-ggplot2
+    - r-mgcv
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('casebase')"           # [not win]
+    - "\"%R%\" -e \"library('casebase')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://sahirbhatnagar.com/casebase/
+  license: MIT
+  summary: Fit flexible and fully parametric hazard regression models to survival data with single
+    event type or multiple competing causes via logistic and multinomial regression.
+    Our formulation allows for arbitrary functional forms of time and its interactions
+    with other predictors for time-dependent hazards and hazard ratios. From the fitted
+    hazard model, we provide functions to readily calculate and plot cumulative incidence
+    and survival curves for a given covariate profile. This approach accommodates any
+    log-linear hazard function of prognostic time, treatment, and covariates, and readily
+    allows for non-proportionality. We also provide a plot method for visualizing incidence
+    density via population time plots. Based on the case-base sampling approach of Hanley
+    and Miettinen (2009) <DOI:10.2202/1557-4679.1125>, Saarela and Arjas (2015) <DOI:10.1111/sjos.12125>,
+    and Saarela (2015) <DOI:10.1007/s10985-015-9352-x>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: casebase
+# Type: Package
+# Title: Fitting Flexible Smooth-in-Time Hazards and Risk Functions via Logistic and Multinomial Regression
+# Version: 0.10.3
+# Date: 2022-11-09
+# Authors@R: c(person(given = "Sahir", family = "Bhatnagar", role = c("aut", "cre"), email = "sahir.bhatnagar@gmail.com", comment = "http://sahirbhatnagar.com/"), person(given = "Maxime", family = "Turgeon", role = "aut", email = "max.turgeon@umanitoba.ca", comment = c(ORCID = "0000-0003-4863-6035")), person(given = "Jesse", family = "Islam", role = "aut", email = "jesse.islam@mail.mcgill.ca", comment = "https://www.jesseislam.com/"), person(given = "Olli", family = "Saarela", role = "aut", email = "olli.saarela@utoronto.ca", comment = "http://individual.utoronto.ca/osaarela/"), person(given = "James", family = "Hanley", role = "aut", email = "james.hanley@mcgill.ca", comment = "http://www.medicine.mcgill.ca/epidemiology/hanley/"))
+# Description: Fit flexible and fully parametric hazard regression models to survival data with single event type or multiple competing causes via logistic and multinomial regression. Our formulation allows for arbitrary functional forms of time and its interactions with other predictors for time-dependent hazards and hazard ratios. From the fitted hazard model, we provide functions to readily calculate and plot cumulative incidence and survival curves for a given covariate profile. This approach accommodates any log-linear hazard function of prognostic time, treatment, and covariates, and readily allows for non-proportionality. We also provide a plot method for visualizing incidence density via population time plots. Based on the case-base sampling approach of Hanley and Miettinen (2009) <DOI:10.2202/1557-4679.1125>, Saarela and Arjas (2015) <DOI:10.1111/sjos.12125>, and Saarela (2015) <DOI:10.1007/s10985-015-9352-x>.
+# Depends: R (>= 3.5.0)
+# Imports: data.table, ggplot2, methods, mgcv, stats, survival, VGAM
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Suggests: colorspace, covr, eha, glmnet, knitr, progress, rmarkdown, splines, testthat (>= 3.0.0), visreg
+# VignetteBuilder: knitr
+# URL: https://sahirbhatnagar.com/casebase/
+# BugReports: https://github.com/sahirbhatnagar/casebase/issues
+# RoxygenNote: 7.2.1
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2022-11-13 17:55:05 UTC; sahirbhatnagar
+# Author: Sahir Bhatnagar [aut, cre] (http://sahirbhatnagar.com/), Maxime Turgeon [aut] (<https://orcid.org/0000-0003-4863-6035>), Jesse Islam [aut] (https://www.jesseislam.com/), Olli Saarela [aut] (http://individual.utoronto.ca/osaarela/), James Hanley [aut] (http://www.medicine.mcgill.ca/epidemiology/hanley/)
+# Maintainer: Sahir Bhatnagar <sahir.bhatnagar@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-11-16 14:30:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

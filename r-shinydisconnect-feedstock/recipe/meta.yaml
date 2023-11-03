@@ -1,0 +1,98 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-shinydisconnect
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/shinydisconnect_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/shinydisconnect/shinydisconnect_{{ version }}.tar.gz
+  sha256: 4c7ec442b965b4645b2e9fc0eab2c45b0009316735dace23227f5f89babb17fa
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: colourpicker
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-checkmate
+    - r-glue
+    - r-htmltools
+    - r-shiny >=1.0
+
+  run:
+    - r-base
+    - r-checkmate
+    - r-glue
+    - r-htmltools
+    - r-shiny >=1.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('shinydisconnect')"           # [not win]
+    - "\"%R%\" -e \"library('shinydisconnect')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/daattali/shinydisconnect, https://daattali.com/shiny/shinydisconnect-demo/
+  license: MIT
+  summary: 'A ''Shiny'' app can disconnect for a variety of reasons: an unrecoverable error occurred
+    in the app, the server went down, the user lost internet connection, or any other
+    reason that might cause the ''Shiny'' app to lose connection to its server. With
+    ''shinydisconnect'', you can call disonnectMessage() anywhere in a Shiny app''s
+    UI to add a nice message when this happens. Works locally (running Shiny apps within
+    ''RStudio'') and on Shiny servers (such as shinyapps.io, ''RStudio Connect'', ''Shiny
+    Server Open Source'', ''Shiny Server Pro''). See demo online at <https://daattali.com/shiny/shinydisconnect-demo/>.'
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: shinydisconnect
+# Title: Show a Nice Message When a 'Shiny' App Disconnects or Errors
+# Version: 0.1.1
+# Authors@R: person(given = "Dean", family = "Attali", email = "daattali@gmail.com", role = c("aut", "cre", "cph"), comment = c(ORCID="0000-0002-5645-3493"))
+# Description: A 'Shiny' app can disconnect for a variety of reasons: an unrecoverable error occurred in the app, the server went down, the user lost internet connection, or any other reason that might cause the 'Shiny' app to lose connection to its server. With 'shinydisconnect', you can call disonnectMessage() anywhere in a Shiny app's UI to add a nice message when this happens. Works locally (running Shiny apps within 'RStudio') and on Shiny servers (such as shinyapps.io, 'RStudio Connect', 'Shiny Server Open Source', 'Shiny Server Pro'). See demo online at <https://daattali.com/shiny/shinydisconnect-demo/>.
+# URL: https://github.com/daattali/shinydisconnect, https://daattali.com/shiny/shinydisconnect-demo/
+# BugReports: https://github.com/daattali/shinydisconnect/issues
+# Imports: checkmate, glue, htmltools, shiny (>= 1.0)
+# Suggests: colourpicker
+# Depends: R (>= 3.0.0)
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-08-20 04:01:54 UTC; Dean-X1C
+# Author: Dean Attali [aut, cre, cph] (<https://orcid.org/0000-0002-5645-3493>)
+# Maintainer: Dean Attali <daattali@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-08-21 08:30:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,95 @@
+{% set version = '2.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-phaser
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/phaseR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/phaseR/phaseR_{{ version }}.tar.gz
+  sha256: 6d06a51edce615071b4908490adb7d1a90d23f81b2e2513b70084f49b24008bf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-desolve
+
+  run:
+    - r-base
+    - r-desolve
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('phaseR')"           # [not win]
+    - "\"%R%\" -e \"library('phaseR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mjg211/phaseR
+  license: MIT
+  summary: Performs a qualitative analysis of one- and two-dimensional autonomous ordinary differential
+    equation systems, using phase plane methods. Programs are available to identify
+    and classify equilibrium points, plot the direction field, and plot trajectories
+    for multiple initial conditions. In the one-dimensional case, a program is also
+    available to plot the phase portrait. Whilst in the two-dimensional case, programs
+    are additionally available to plot nullclines and stable/unstable manifolds of saddle
+    points. Many example systems are provided for the user. For further details can
+    be found in Grayling (2014) <doi:10.32614/RJ-2014-023>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: phaseR
+# Type: Package
+# Title: Phase Plane Analysis of One- And Two-Dimensional Autonomous ODE Systems
+# Version: 2.2.1
+# Authors@R: c(person(given   = "Michael J", family  = "Grayling", email   = "michael.grayling@newcastle.ac.uk", role    = c("aut", "cre"), comment = c(ORCID = "0000-0002-0680-6668")), person(given   = "Gerhard", family  = "Burger", email   = "burger.ga@gmail.com", role    = "ctb", comment = c(ORCID = "0000-0003-1062-5576")), person(given   = "Tomas", family  = "Capretto", role    = "ctb"), person(given   = "Stephen P", family  = "Ellner", role    = "ctb"), person(given   = "John M", family  = "Guckenheimer", role    = "ctb"))
+# Imports: deSolve, graphics, grDevices, utils
+# Description: Performs a qualitative analysis of one- and two-dimensional autonomous ordinary differential equation systems, using phase plane methods. Programs are available to identify and classify equilibrium points, plot the direction field, and plot trajectories for multiple initial conditions. In the one-dimensional case, a program is also available to plot the phase portrait. Whilst in the two-dimensional case, programs are additionally available to plot nullclines and stable/unstable manifolds of saddle points. Many example systems are provided for the user. For further details can be found in Grayling (2014) <doi:10.32614/RJ-2014-023>.
+# License: MIT + file LICENSE
+# Suggests: knitr, rmarkdown, testthat
+# Date: 2022-08-30
+# URL: https://github.com/mjg211/phaseR
+# BugReports: https://github.com/mjg211/phaseR/issues
+# RoxygenNote: 7.1.2
+# Encoding: UTF-8
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2022-09-02 09:02:51 UTC; michaelgrayling
+# Author: Michael J Grayling [aut, cre] (<https://orcid.org/0000-0002-0680-6668>), Gerhard Burger [ctb] (<https://orcid.org/0000-0003-1062-5576>), Tomas Capretto [ctb], Stephen P Ellner [ctb], John M Guckenheimer [ctb]
+# Maintainer: Michael J Grayling <michael.grayling@newcastle.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2022-09-02 09:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

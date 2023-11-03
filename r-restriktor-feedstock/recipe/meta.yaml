@@ -1,0 +1,99 @@
+{% set version = '0.5-30' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-restriktor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/restriktor_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/restriktor/restriktor_{{ version }}.tar.gz
+  sha256: 2f91995e1248280a4068017fa418431211a480a8add0166915248a9e45428be2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, bain, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-boot
+    - r-ggplot2
+    - r-ic.infer
+    - r-lavaan >=0.6_10
+    - r-mvtnorm
+    - r-norm
+    - r-quadprog
+
+  run:
+    - r-base
+    - r-mass
+    - r-boot
+    - r-ggplot2
+    - r-ic.infer
+    - r-lavaan >=0.6_10
+    - r-mvtnorm
+    - r-norm
+    - r-quadprog
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('restriktor')"           # [not win]
+    - "\"%R%\" -e \"library('restriktor')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://restriktor.org
+  license: GPL-2
+  summary: Allow for easy-to-use testing or evaluating of linear equality and inequality restrictions
+    about parameters and effects in (generalized) linear statistical models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: restriktor
+# Title: Restricted Statistical Estimation and Inference for Linear Models
+# Version: 0.5-30
+# Authors@R: c(person(given = "Leonard", family = "Vanbrabant", role =  c("aut","cre"), email = "info@restriktor.org"), person(given = "Rebecca", family = "Kuiper", role  = c("aut"), email = "r.m.kuiper@uu.nl"), person(given = "Yves", family = "Rosseel", role  = c("ctb"), email = "Yves.Rosseel@UGent.be"), person(given = "Aleksandra", family = "Dacko", role  = c("ctb"), email = "a.dacko@uu.nl") )
+# Description: Allow for easy-to-use testing or evaluating of linear equality and inequality restrictions about parameters and effects in (generalized) linear statistical models.
+# Depends: R(>= 4.0.0)
+# Imports: boot, ic.infer, lavaan(>= 0.6-10), MASS, mvtnorm, quadprog, norm, ggplot2
+# License: GPL (>= 2)
+# LazyData: yes
+# URL: https://restriktor.org
+# NeedsCompilation: no
+# Packaged: 2023-10-03 15:03:24 UTC; l.vanbrabant
+# Author: Leonard Vanbrabant [aut, cre], Rebecca Kuiper [aut], Yves Rosseel [ctb], Aleksandra Dacko [ctb]
+# Maintainer: Leonard Vanbrabant <info@restriktor.org>
+# Suggests: knitr, bain, rmarkdown
+# VignetteBuilder: knitr
+# Repository: CRAN
+# Date/Publication: 2023-10-04 07:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

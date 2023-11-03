@@ -1,0 +1,94 @@
+{% set version = '0.4.21' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-adehabitathr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/adehabitatHR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/adehabitatHR/adehabitatHR_{{ version }}.tar.gz
+  sha256: 16bc1b5be8c16a1bf5fd7ccd6ad60a68a60753453f75fa6f4751e3f28f50244a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tkrplot, MASS, sf, deldir
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ade4
+    - r-adehabitatlt
+    - r-adehabitatma
+    - r-sp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-ade4
+    - r-adehabitatlt
+    - r-adehabitatma
+    - r-sp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('adehabitatHR')"           # [not win]
+    - "\"%R%\" -e \"library('adehabitatHR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=adehabitatHR
+  license: GPL-2
+  summary: A collection of tools for the estimation of animals home range.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: adehabitatHR
+# Version: 0.4.21
+# Date: 2023-04-06
+# Depends: R (>= 3.0.1), sp, methods, ade4, adehabitatMA, adehabitatLT
+# Suggests: tkrplot, MASS, sf, deldir
+# Imports: graphics, grDevices, stats
+# Title: Home Range Estimation
+# Author: Clement Calenge, contributions from Scott Fortmann-Roe
+# Maintainer: Clement Calenge <clement.calenge@ofb.gouv.fr>
+# Description: A collection of tools for the estimation of animals home range.
+# VignetteBuilder: utils
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2023-04-06 11:30:04 UTC; calenge
+# Repository: CRAN
+# Date/Publication: 2023-04-06 12:30:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,93 @@
+{% set version = '0.4.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tsibbledata
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tsibbledata_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tsibbledata/tsibbledata_{{ version }}.tar.gz
+  sha256: d0f2dd4d2588eaf600fbd7a181dbe3e6a921f58254f6876172e4b252738900f2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggplot2
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rappdirs
+    - r-tsibble >=0.9.0
+    - r-vctrs
+
+  run:
+    - r-base
+    - r-rappdirs
+    - r-tsibble >=0.9.0
+    - r-vctrs
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tsibbledata')"           # [not win]
+    - "\"%R%\" -e \"library('tsibbledata')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://tsibbledata.tidyverts.org/, https://github.com/tidyverts/tsibbledata/
+  license: GPL-3
+  summary: Provides diverse datasets in the 'tsibble' data structure. These datasets are useful
+    for learning and demonstrating how tidy temporal data can tidied, visualised, and
+    forecasted.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: tsibbledata
+# Version: 0.4.1
+# Title: Diverse Datasets for 'tsibble'
+# Description: Provides diverse datasets in the 'tsibble' data structure. These datasets are useful for learning and demonstrating how tidy temporal data can tidied, visualised, and forecasted.
+# Authors@R: c( person("Mitchell", "O'Hara-Wild", email = "mail@mitchelloharawild.com", role = c("aut", "cre")), person("Rob", "Hyndman", role = "aut"), person("Earo", "Wang", role = "aut"), person("Rakshitha", "Godahewa", role = "aut"), person("Christoph", "Bergmeir", role = "ctb") )
+# Depends: R (>= 3.1.3)
+# Imports: tsibble (>= 0.9.0), vctrs, rappdirs, utils
+# Suggests: ggplot2
+# ByteCompile: true
+# License: GPL-3
+# URL: https://tsibbledata.tidyverts.org/, https://github.com/tidyverts/tsibbledata/
+# BugReports: https://github.com/tidyverts/tsibbledata/issues
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.1
+# NeedsCompilation: no
+# Packaged: 2022-09-01 15:51:28 UTC; mitchell
+# Author: Mitchell O'Hara-Wild [aut, cre], Rob Hyndman [aut], Earo Wang [aut], Rakshitha Godahewa [aut], Christoph Bergmeir [ctb]
+# Maintainer: Mitchell O'Hara-Wild <mail@mitchelloharawild.com>
+# Repository: CRAN
+# Date/Publication: 2022-09-01 16:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,95 @@
+{% set version = '1.1-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-basefun
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/basefun_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/basefun/basefun_{{ version }}.tar.gz
+  sha256: ee102834d1bc84e15436dd8b3fe4e26b3c373e04537ebc6feba226d6994745d4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: coneproj
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-orthopolynom
+    - r-polynom
+    - r-variables >=1.1_0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-orthopolynom
+    - r-polynom
+    - r-variables >=1.1_0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('basefun')"           # [not win]
+    - "\"%R%\" -e \"library('basefun')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://ctm.R-forge.R-project.org
+  license: GPL-2
+  summary: Some very simple infrastructure for basis functions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: basefun
+# Title: Infrastructure for Computing with Basis Functions
+# Version: 1.1-4
+# Date: 2023-05-15
+# Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"), email = "Torsten.Hothorn@R-project.org", comment = c(ORCID = "0000-0001-8301-0471"))
+# Description: Some very simple infrastructure for basis functions.
+# Depends: variables (>= 1.1-0), R (>= 3.2.0)
+# Imports: stats, polynom, Matrix, orthopolynom, methods
+# Suggests: coneproj
+# URL: http://ctm.R-forge.R-project.org
+# License: GPL-2
+# NeedsCompilation: yes
+# Packaged: 2023-05-16 14:30:57 UTC; hothorn
+# Author: Torsten Hothorn [aut, cre] (<https://orcid.org/0000-0001-8301-0471>)
+# Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2023-05-16 15:30:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

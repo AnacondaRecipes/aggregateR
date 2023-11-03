@@ -1,0 +1,91 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-domir
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/domir_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/domir/domir_{{ version }}.tar.gz
+  sha256: a6127fe78e9fb5d771f1792a18de30adb37f762fcdc4539099eb4d6fbb301607
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dplyr, forcats, Formula, ggplot2, knitr, lme4, parameters, performance, pscl, purrr, relaimpo, rlang, rmarkdown, stringr, systemfit, testthat (>= 3.0.0), tidyr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('domir')"           # [not win]
+    - "\"%R%\" -e \"library('domir')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jluchman/domir
+  license: GPL-3
+  summary: "Methods to apply decomposition-based relative importance analysis for R functions.
+    This package supports the application of decomposition methods by providing 'lapply'-
+    or 'Map'-like meta-functions that compute dominance analysis (Azen, R., & Budescu,
+    D. V. (2003) <doi:10.1037/1082-989X.8.2.129>; Gr\xF6mping, U. (2007) <doi:10.1198/000313007X188252>)
+    or Shapley value regression (Lipovetsky, S., & Conklin, M. (2001) <doi:10.1002/asmb.446>)
+    based on the values returned from other functions."
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: domir
+# Title: Tools to Support Relative Importance Analysis
+# Version: 1.1.1
+# Date: 2023-10-1
+# Authors@R: person(given = "Joseph", family = "Luchman", role = c("aut", "cre"), email = "jluchman@gmail.com", comment = c(ORCID = "0000-0002-8886-9717"))
+# Description: Methods to apply decomposition-based relative importance analysis for R functions. This package supports the application of decomposition methods by providing 'lapply'- or 'Map'-like meta-functions that compute dominance analysis (Azen, R., & Budescu, D. V. (2003) <doi:10.1037/1082-989X.8.2.129>; Gromping, U. (2007) <doi:10.1198/000313007X188252>) or Shapley value regression (Lipovetsky, S., & Conklin, M. (2001) <doi:10.1002/asmb.446>) based on the values returned from other functions.
+# Imports: stats, utils
+# Suggests: dplyr, forcats, Formula, ggplot2, knitr, lme4, parameters, performance, pscl, purrr, relaimpo, rlang, rmarkdown, stringr, systemfit, testthat (>= 3.0.0), tidyr
+# License: GPL (>= 3)
+# URL: https://github.com/jluchman/domir
+# BugReports: https://github.com/jluchman/domir/issues
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Config/testthat/edition: 3
+# VignetteBuilder: knitr
+# Language: en-US
+# NeedsCompilation: no
+# Packaged: 2023-10-01 20:48:12 UTC; josephluchman
+# Author: Joseph Luchman [aut, cre] (<https://orcid.org/0000-0002-8886-9717>)
+# Maintainer: Joseph Luchman <jluchman@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-01 21:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

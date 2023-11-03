@@ -1,0 +1,96 @@
+{% set version = '2.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-alphahull
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/alphahull_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/alphahull/alphahull_{{ version }}.tar.gz
+  sha256: 82104b049b945b62b5b62f1520ff789a77638ab7e91650e50d6eb191373a8012
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r.utils
+    - r-ggplot2
+    - r-interp
+    - r-sgeostat
+    - r-spatstat.geom
+    - r-spatstat.random
+    - r-splancs
+
+  run:
+    - r-base
+    - r-r.utils
+    - r-ggplot2
+    - r-interp
+    - r-sgeostat
+    - r-spatstat.geom
+    - r-spatstat.random
+    - r-splancs
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('alphahull')"           # [not win]
+    - "\"%R%\" -e \"library('alphahull')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=alphahull
+  license: GPL-2 | GPL-3
+  summary: Computation of the alpha-shape and alpha-convex hull of a given sample of points in
+    the plane. The concepts of alpha-shape and alpha-convex hull generalize the definition
+    of the convex hull of a finite set of points. The programming is based on the duality
+    between the Voronoi diagram and Delaunay triangulation. The package also includes
+    a function that returns the Delaunay mesh of a given sample of points and its dual
+    Voronoi diagram in one single object.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: alphahull
+# Version: 2.5
+# Date: 2022-06-16
+# Title: Generalization of the Convex Hull of a Sample of Points in the Plane
+# Author: Beatriz Pateiro-Lopez [aut, cre], Alberto Rodriguez-Casal, [aut].
+# Maintainer: Beatriz Pateiro-Lopez <beatriz.pateiro@usc.es>
+# Imports: ggplot2, interp, R.utils, sgeostat, spatstat.geom, spatstat.random, splancs
+# Description: Computation of the alpha-shape and alpha-convex hull of a given sample of points in the plane. The concepts of alpha-shape and alpha-convex hull generalize the definition of the convex hull of a finite set of points. The programming is based on the duality between the Voronoi diagram and Delaunay triangulation. The package also includes a function that returns the Delaunay mesh of a given sample of points and its dual Voronoi diagram in one single object.
+# License: GPL-2 | GPL-3
+# NeedsCompilation: no
+# Packaged: 2022-06-16 16:31:03 UTC; beatriz
+# Repository: CRAN
+# Date/Publication: 2022-06-16 17:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

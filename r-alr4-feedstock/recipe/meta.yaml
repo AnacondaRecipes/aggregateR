@@ -1,0 +1,85 @@
+{% set version = '1.0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-alr4
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/alr4_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/alr4/alr4_{{ version }}.tar.gz
+  sha256: 22533956657ca1bff14ad62a409372365504030005703015c05d3207e2f7286d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-car
+    - r-effects
+
+  run:
+    - r-base
+    - r-car
+    - r-effects
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('alr4')"           # [not win]
+    - "\"%R%\" -e \"library('alr4')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.z.umn.edu/alr4ed
+  license: GPL-2
+  summary: 'Datasets to Accompany S. Weisberg (2014, ISBN: 978-1-118-38608-8), "Applied Linear
+    Regression," 4th edition.  Many data files in this package are included in the `alr3`
+    package as well, so only one of them should be used.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: alr4
+# Version: 1.0.6
+# Date: 2018-04-20
+# Title: Data to Accompany Applied Linear Regression 4th Edition
+# Author: Sanford Weisberg <sandy@umn.edu>
+# Maintainer: Sanford Weisberg <sandy@umn.edu>
+# Depends: R (>= 3.0), car, effects
+# LazyLoad: yes
+# LazyData: yes
+# Description: Datasets to Accompany S. Weisberg (2014, ISBN: 978-1-118-38608-8), "Applied Linear Regression," 4th edition.  Many data files in this package are included in the `alr3` package as well, so only one of them should be used.
+# License: GPL (>= 2)
+# URL: http://www.z.umn.edu/alr4ed
+# NeedsCompilation: no
+# Packaged: 2018-04-20 12:57:29 UTC; sandy
+# Repository: CRAN
+# Date/Publication: 2018-04-20 14:25:58 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

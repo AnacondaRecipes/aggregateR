@@ -1,0 +1,91 @@
+{% set version = '1.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-flexsurvcure
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/flexsurvcure_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/flexsurvcure/flexsurvcure_{{ version }}.tar.gz
+  sha256: 0bf14623e3a5cde38f8a898876fcd6d988b711311e1753aa7027ea8e33fb1756
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-boot
+    - r-flexsurv
+    - r-survival
+
+  run:
+    - r-base
+    - r-boot
+    - r-flexsurv
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('flexsurvcure')"           # [not win]
+    - "\"%R%\" -e \"library('flexsurvcure')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jrdnmdhl/flexsurvcure
+  license: GPL-2
+  summary: Flexible parametric mixture and non-mixture cure models for time-to-event data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: flexsurvcure
+# Title: Flexible Parametric Cure Models
+# Version: 1.3.1
+# Date: 2022-11-1
+# Authors@R: person("Jordan", "Amdahl", email = "jrdnmdhl@gmail.com", role = c("aut", "cre"))
+# Maintainer: Jordan Amdahl <jrdnmdhl@gmail.com>
+# Description: Flexible parametric mixture and non-mixture cure models for time-to-event data.
+# Depends: survival , flexsurv
+# Suggests: testthat, knitr, rmarkdown, covr
+# URL: https://github.com/jrdnmdhl/flexsurvcure
+# BugReports: https://github.com/jrdnmdhl/flexsurvcure/issues
+# Imports: boot
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# RoxygenNote: 7.2.0
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2022-11-01 21:06:53 UTC; jamdahl
+# Author: Jordan Amdahl [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2022-11-01 21:30:14 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

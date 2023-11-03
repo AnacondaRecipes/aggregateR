@@ -1,0 +1,97 @@
+{% set version = '3.0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-imputetestbench
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/imputeTestbench_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/imputeTestbench/imputeTestbench_{{ version }}.tar.gz
+  sha256: a2d676013b9c2e5264bbc75a192711792fbd6744409a48fdbba29f77f2a08179
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, magrittr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr
+    - r-forecast
+    - r-ggplot2
+    - r-imputets
+    - r-reshape2
+    - r-tidyr
+    - r-zoo
+
+  run:
+    - r-base
+    - r-dplyr
+    - r-forecast
+    - r-ggplot2
+    - r-imputets
+    - r-reshape2
+    - r-tidyr
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('imputeTestbench')"           # [not win]
+    - "\"%R%\" -e \"library('imputeTestbench')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=imputeTestbench
+  license: CC0
+  summary: Provides a test bench for the comparison of missing data imputation methods in uni-variate
+    time series. Imputation methods are compared using different error metrics. Proposed
+    imputation methods and alternative error metrics can be used.
+  license_family: CC
+
+# The original CRAN metadata for this package was:
+
+# Package: imputeTestbench
+# Type: Package
+# Title: Test Bench for the Comparison of Imputation Methods
+# Date: 2019-07-05
+# Maintainer: Marcus W. Beck <mbafs2012@gmail.com>
+# Version: 3.0.3
+# Description: Provides a test bench for the comparison of missing data imputation methods in uni-variate time series. Imputation methods are compared using different error metrics. Proposed imputation methods and alternative error metrics can be used.
+# Imports: dplyr, forecast, ggplot2, imputeTS, reshape2, stats, tidyr, zoo
+# BugReports: https://github.com/neerajdhanraj/imputeTestbench/issues
+# License: CC0
+# Authors@R: c( person(given = "Neeraj", family = "Bokde", role = c("aut"), email = "neerajdhanraj@gmail.com" ), person(given = "Marcus W.", family = "Beck", role = c("cre", "aut"), email = "mbafs2012@gmail.com" ) )
+# LazyData: TRUE
+# RoxygenNote: 6.1.1
+# Suggests: knitr, rmarkdown, magrittr
+# NeedsCompilation: no
+# Packaged: 2019-07-05 17:48:51 UTC; Marcus
+# Author: Neeraj Bokde [aut], Marcus W. Beck [cre, aut]
+# Repository: CRAN
+# Date/Publication: 2019-07-05 18:10:14 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

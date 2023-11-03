@@ -1,0 +1,89 @@
+{% set version = '1.2-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mfx
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mfx_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mfx/mfx_{{ version }}.tar.gz
+  sha256: 123af95bf618796792d5a523db3daf2c6fee2236fedd9388cbc46a128fb9fc12
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-betareg
+    - r-lmtest
+    - r-sandwich
+
+  run:
+    - r-base
+    - r-mass
+    - r-betareg
+    - r-lmtest
+    - r-sandwich
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mfx')"           # [not win]
+    - "\"%R%\" -e \"library('mfx')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mfx
+  license: GPL-2 | GPL-3
+  summary: Estimates probit, logit, Poisson, negative binomial, and beta regression models, returning
+    their marginal effects, odds ratios, or incidence rate ratios as an output. Greene
+    (2008, pp. 780-7) provides a textbook introduction to this topic.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: mfx
+# Type: Package
+# Title: Marginal Effects, Odds Ratios and Incidence Rate Ratios for GLMs
+# Version: 1.2-2
+# Date: 2019-02-06
+# Authors@R: c( person( "Alan", "Fernihough", role = c("aut", "cre"), email = "alan.fernihough@gmail.com" ), person( "Arne", "Henningsen", role = "ctb", email = "arne.henningsen@gmail.com" ) )
+# Description: Estimates probit, logit, Poisson, negative binomial, and beta regression models, returning their marginal effects, odds ratios, or incidence rate ratios as an output. Greene (2008, pp. 780-7) provides a textbook introduction to this topic.
+# License: GPL-2 | GPL-3
+# Depends: stats, sandwich, lmtest, MASS, betareg
+# NeedsCompilation: no
+# Packaged: 2019-02-06 07:08:01 UTC; gsl324
+# Author: Alan Fernihough [aut, cre], Arne Henningsen [ctb]
+# Maintainer: Alan Fernihough <alan.fernihough@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2019-02-06 11:20:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

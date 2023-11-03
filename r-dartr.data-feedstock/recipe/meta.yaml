@@ -1,0 +1,87 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dartr.data
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dartR.data_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dartR.data/dartR.data_{{ version }}.tar.gz
+  sha256: 25da91762f85ae5c008782c725f48b38ece7481632d6ed80b930c0edf683263e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-adegenet >=2.0.0
+
+  run:
+    - r-base
+    - r-adegenet >=2.0.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dartR.data')"           # [not win]
+    - "\"%R%\" -e \"library('dartR.data')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/green-striped-gecko/dartR.data
+  license: GPL-3
+  summary: Data package for 'dartR'. Provides data sets to run examples in 'dartR'. This was
+    necessary due to the size limit imposed by 'CRAN'. The data in 'dartR.data' is needed
+    to run the examples provided in the 'dartR' functions. All available data sets are
+    either based on actual data (but reduced in size) and/or simulated data sets to
+    allow the fast execution of examples and demonstration of the functions.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: dartR.data
+# Title: Auxiliary Data Package for Our Main Package 'dartR'
+# Version: 1.0.2
+# Authors@R: c( person("Bernd", "Gruber", email="bernd.gruber@canberra.edu.au", role=c("aut","cre")), person("Arthur", "Georges", email="georges@aerg.edu.au", role="aut"), person("Jose L.", "Mijangos", email="Luis.MijangosAraujo@canberra.edu.au", role="aut"), person("Carlo", "Pacioni",email="carlo.pacioni@delwp.vic.gov.au",role="aut"), person("Oliver", "Berry", email="oliver.berry@csiro.au", role="ctb" ) )
+# Description: Data package for 'dartR'. Provides data sets to run examples in 'dartR'. This was necessary due to the size limit imposed by 'CRAN'. The data in 'dartR.data' is needed to run the examples provided in the 'dartR' functions. All available data sets are either based on actual data (but reduced in size) and/or simulated data sets to allow the fast execution of examples and demonstration of the functions.
+# Depends: R (>= 3.5), adegenet (>= 2.0.0)
+# License: GPL (>= 3)
+# LazyData: true
+# Encoding: UTF-8
+# NeedsCompilation: no
+# RoxygenNote: 7.2.1
+# URL: https://github.com/green-striped-gecko/dartR.data
+# BugReports: https://groups.google.com/g/dartr?pli=1
+# Packaged: 2022-11-16 02:42:11 UTC; s425824
+# Author: Bernd Gruber [aut, cre], Arthur Georges [aut], Jose L. Mijangos [aut], Carlo Pacioni [aut], Oliver Berry [ctb]
+# Maintainer: Bernd Gruber <bernd.gruber@canberra.edu.au>
+# Repository: CRAN
+# Date/Publication: 2022-11-16 14:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

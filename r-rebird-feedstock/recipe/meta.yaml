@@ -1,0 +1,99 @@
+{% set version = '1.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rebird
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rebird_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rebird/rebird_{{ version }}.tar.gz
+  sha256: b238d3f246aa0249145894e1f3a90f46902f6615fc2f23b24c99bb5feecc55d3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-assertthat
+    - r-dplyr
+    - r-httr >=1.0.0
+    - r-jsonlite
+
+  run:
+    - r-base
+    - r-assertthat
+    - r-dplyr
+    - r-httr >=1.0.0
+    - r-jsonlite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rebird')"           # [not win]
+    - "\"%R%\" -e \"library('rebird')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://docs.ropensci.org/rebird/, https://github.com/ropensci/rebird
+  license: MIT
+  summary: A programmatic client for the eBird database (<https://ebird.org/home>), including
+    functions for searching for bird observations by geographic location (latitude,
+    longitude), eBird hotspots, location identifiers, by notable sightings, by region,
+    and by taxonomic name.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: rebird
+# Version: 1.3.0
+# Title: R Client for the eBird Database of Bird Observations
+# Description: A programmatic client for the eBird database (<https://ebird.org/home>), including functions for searching for bird observations by geographic location (latitude, longitude), eBird hotspots, location identifiers, by notable sightings, by region, and by taxonomic name.
+# Depends: R (>= 2.10)
+# License: MIT + file LICENSE
+# Authors@R: c( person("Rafael", "Maia", role = "aut", email = "rm72@zips.uakron.edu"), person("Scott", "Chamberlain", role = "aut", email = "myrmecocystus@gmail.com", comment = c(ORCID = "0000-0003-1444-9135")), person("Andy", "Teucher", role = "aut", email = "andy.teucher@gmail.com"), person("Guy", "Babineau", role = "ctb", email = "guy.babineau@gmail.com"), person("Marianna", "Foos", role = "ctb", email = "marianna.foos@gmail.com"), person("David", "Bradnum", role = "ctb", email = "david.bradnum@gmail.com"), person("Sebastian", "Pardo", role = c("aut", "cre"), email = "sebpardo@gmail.com", comment = c(ORCID = "0000-0002-4147-5796")) )
+# URL: https://docs.ropensci.org/rebird/, https://github.com/ropensci/rebird
+# BugReports: https://github.com/ropensci/rebird/issues
+# VignetteBuilder: knitr
+# Imports: methods, utils, stats, httr (>= 1.0.0), jsonlite, dplyr, assertthat
+# Suggests: knitr, rmarkdown, testthat, covr
+# RoxygenNote: 7.1.1
+# X-schema.org-applicationCategory: Data Access
+# X-schema.org-keywords: birds, birding, ebird, database, data, biology, observations, sightings, ornithology
+# X-schema.org-isPartOf: https://ropensci.org
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2021-09-19 17:35:16 UTC; mavzz
+# Author: Rafael Maia [aut], Scott Chamberlain [aut] (<https://orcid.org/0000-0003-1444-9135>), Andy Teucher [aut], Guy Babineau [ctb], Marianna Foos [ctb], David Bradnum [ctb], Sebastian Pardo [aut, cre] (<https://orcid.org/0000-0002-4147-5796>)
+# Maintainer: Sebastian Pardo <sebpardo@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-09-20 07:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

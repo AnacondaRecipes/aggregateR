@@ -1,0 +1,96 @@
+{% set version = '1.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-openalexr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/openalexR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/openalexR/openalexR_{{ version }}.tar.gz
+  sha256: 866f40fa3a2ec55718ba214c4b3fae08707589dfe059f6b2e1190952046f1339
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 3.0.0), dplyr, knitr, rmarkdown, tidyr, purrr, ggplot2, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr
+    - r-jsonlite
+    - r-progress
+    - r-tibble
+
+  run:
+    - r-base
+    - r-httr
+    - r-jsonlite
+    - r-progress
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('openalexR')"           # [not win]
+    - "\"%R%\" -e \"library('openalexR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ropensci/openalexR, https://docs.ropensci.org/openalexR/
+  license: MIT
+  summary: A set of tools to extract bibliographic content from 'OpenAlex' database using API
+    <https://docs.openalex.org>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: openalexR
+# Title: Getting Bibliographic Records from 'OpenAlex' Database Using 'DSL' API
+# Version: 1.2.2
+# Authors@R: c( person(given = "Massimo", family = "Aria", role = c("aut", "cre", "cph"), email = "aria@unina.it", comment = c(ORCID = "0000-0002-8517-9411")), person(given = "Corrado", family = "Cuccurullo", role = c("ctb"), email = "cuccurullocorrado@gmail.com", comment = c(ORCID = "0000-0002-7401-8575")), person(given = "Trang", family = "Le", role = "aut", email = "grixor@gmail.com", comment = c(ORCID = "0000-0003-3737-6565")), person(given = "June", family = "Choe", role = c("ctb"), email = "jchoe001@gmail.com", comment = c(ORCID = "0000-0002-0701-921X")) )
+# Description: A set of tools to extract bibliographic content from 'OpenAlex' database using API <https://docs.openalex.org>.
+# License: MIT + file LICENSE
+# URL: https://github.com/ropensci/openalexR, https://docs.ropensci.org/openalexR/
+# BugReports: https://github.com/ropensci/openalexR/issues
+# Imports: httr, jsonlite, progress, tibble
+# Suggests: testthat (>= 3.0.0), dplyr, knitr, rmarkdown, tidyr, purrr, ggplot2, covr
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.3
+# Config/testthat/edition: 3
+# Depends: R (>= 2.10)
+# NeedsCompilation: no
+# Packaged: 2023-09-24 15:13:17 UTC; massimoaria
+# Author: Massimo Aria [aut, cre, cph] (<https://orcid.org/0000-0002-8517-9411>), Corrado Cuccurullo [ctb] (<https://orcid.org/0000-0002-7401-8575>), Trang Le [aut] (<https://orcid.org/0000-0003-3737-6565>), June Choe [ctb] (<https://orcid.org/0000-0002-0701-921X>)
+# Maintainer: Massimo Aria <aria@unina.it>
+# Repository: CRAN
+# Date/Publication: 2023-09-24 21:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

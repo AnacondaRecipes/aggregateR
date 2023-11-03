@@ -1,0 +1,97 @@
+{% set version = '0.2-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rcmdrplugin.eacspir
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RcmdrPlugin.EACSPIR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RcmdrPlugin.EACSPIR/RcmdrPlugin.EACSPIR_{{ version }}.tar.gz
+  sha256: 9c33f61d69eaf4531f8828138d527c315c92fe5812ad436a9bf676862ae0f76c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r2html
+    - r-rcmdr >=2.8_0
+    - r-rcmdrmisc
+    - r-abind
+    - r-ez
+    - r-nortest
+    - r-reshape
+
+  run:
+    - r-base
+    - r-r2html
+    - r-rcmdr >=2.8_0
+    - r-rcmdrmisc
+    - r-abind
+    - r-ez
+    - r-nortest
+    - r-reshape
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RcmdrPlugin.EACSPIR')"           # [not win]
+    - "\"%R%\" -e \"library('RcmdrPlugin.EACSPIR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RcmdrPlugin.EACSPIR
+  license: GPL-2
+  summary: Este paquete proporciona una interfaz grafica de usuario (GUI) para algunos de los
+    procedimientos estadisticos detallados en un curso de 'Estadistica aplicada a las
+    Ciencias Sociales mediante el programa informatico R' (EACSPIR). LA GUI se ha desarrollado
+    como un Plugin del programa R-Commander.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: RcmdrPlugin.EACSPIR
+# Type: Package
+# Title: Plugin de R-Commander para el Manual 'EACSPIR'
+# Version: 0.2-3
+# Date: 2022-11-01
+# Author: Maribel Pero <mpero@ub.edu>, David Leiva <dleivaur@ub.edu>, Joan Guardia <jguardia@ub.edu>, Antonio Solanas <antonio.solanas@ub.edu>
+# Maintainer: David Leiva <dleivaur@ub.edu>
+# Depends: R2HTML, abind, ez, nortest, reshape
+# Imports: Rcmdr (>= 2.8-0), RcmdrMisc
+# Language: es
+# LazyData: true
+# Description: Este paquete proporciona una interfaz grafica de usuario (GUI) para algunos de los procedimientos estadisticos detallados en un curso de 'Estadistica aplicada a las Ciencias Sociales mediante el programa informatico R' (EACSPIR). LA GUI se ha desarrollado como un Plugin del programa R-Commander.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2022-11-01 21:47:36 UTC; david
+# Repository: CRAN
+# Date/Publication: 2022-11-02 11:12:51 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

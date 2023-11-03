@@ -1,0 +1,95 @@
+{% set version = '0.0.91' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-strawr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/strawr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/strawr/strawr_{{ version }}.tar.gz
+  sha256: 55e06f35613b8cef8405498393e15591c06281004332ad532f6eb8f180b06cd9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('strawr')"           # [not win]
+    - "\"%R%\" -e \"library('strawr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/aidenlab/straw/tree/master/R
+  license: MIT
+  summary: API for fast data extraction for .hic files that provides programmatic access to the
+    matrices. It doesn't store the pointer data for all the matrices, only the one queried,
+    and currently we are only supporting matrices (not vectors).
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: strawr
+# Title: Fast Implementation of Reading/Dump for .hic Files
+# Version: 0.0.91
+# Authors@R: c(person("Neva", c("Cherniavsky", "Durand"), email = "neva@broadinstitute.org", role = c("aut", "cre")), person(c("Muhammad", "Saad"), "Shamim", email = "sa501428@gmail.com", role = "aut"), person("Aiden Lab", role = "cph"))
+# Description: API for fast data extraction for .hic files that provides programmatic access to the matrices. It doesn't store the pointer data for all the matrices, only the one queried, and currently we are only supporting matrices (not vectors).
+# Depends: R (>= 3.4.0)
+# License: MIT + file LICENSE
+# URL: https://github.com/aidenlab/straw/tree/master/R
+# SystemRequirements: libcurl: libcurl-devel (rpm) or libcurl4-openssl-dev (deb)
+# Encoding: UTF-8
+# Imports: Rcpp
+# LinkingTo: Rcpp
+# NeedsCompilation: yes
+# RoxygenNote: 7.2.0
+# Packaged: 2023-03-29 19:28:34 UTC; Mahdi
+# Author: Neva Cherniavsky Durand [aut, cre], Muhammad Saad Shamim [aut], Aiden Lab [cph]
+# Maintainer: Neva Cherniavsky Durand <neva@broadinstitute.org>
+# Repository: CRAN
+# Date/Publication: 2023-03-29 20:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,94 @@
+{% set version = '2.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-animation
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/animation_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/animation/animation_{{ version }}.tar.gz
+  sha256: 88418f1b04ec785963bad492f30eb48b05914e9e5d88c7eef705d949cbd7e469
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, class, testit
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-magick
+
+  run:
+    - r-base
+    - r-magick
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('animation')"           # [not win]
+    - "\"%R%\" -e \"library('animation')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://yihui.org/animation/
+  license: GPL-3
+  summary: Provides functions for animations in statistics, covering topics in probability theory,
+    mathematical statistics, multivariate statistics, non-parametric statistics, sampling
+    survey, linear models, time series, computational statistics, data mining and machine
+    learning. These functions may be helpful in teaching statistics and data analysis.
+    Also provided in this package are a series of functions to save animations to various
+    formats, e.g. Flash, 'GIF', HTML pages, 'PDF' and videos. 'PDF' animations can be
+    inserted into 'Sweave' / 'knitr' easily.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: animation
+# Type: Package
+# Title: A Gallery of Animations in Statistics and Utilities to Create Animations
+# Version: 2.7
+# Authors@R: c( person("Yihui","Xie", role=c("aut", "cre"), email="xie@yihui.name"), person("Christian", "Mueller",role="ctb"), person("Lijia", "Yu", role=c("ctb"), email="yulj2010@gmail.com"), person("Weicheng","Zhu",role="ctb") )
+# Description: Provides functions for animations in statistics, covering topics in probability theory, mathematical statistics, multivariate statistics, non-parametric statistics, sampling survey, linear models, time series, computational statistics, data mining and machine learning. These functions may be helpful in teaching statistics and data analysis. Also provided in this package are a series of functions to save animations to various formats, e.g. Flash, 'GIF', HTML pages, 'PDF' and videos. 'PDF' animations can be inserted into 'Sweave' / 'knitr' easily.
+# SystemRequirements: ImageMagick (http://imagemagick.org) or GraphicsMagick (http://www.graphicsmagick.org) or LyX (http://www.lyx.org) for saveGIF(); (PDF)LaTeX for saveLatex(); SWF Tools (http://swftools.org) for saveSWF(); FFmpeg (http://ffmpeg.org) or avconv (https://libav.org/avconv.html) for saveVideo()
+# Depends: R (>= 2.14.0)
+# Imports: magick
+# Suggests: MASS, class, testit
+# License: GPL
+# URL: https://yihui.org/animation/
+# BugReports: https://github.com/yihui/animation/issues
+# LazyData: yes
+# Encoding: UTF-8
+# RoxygenNote: 7.1.2
+# NeedsCompilation: no
+# Packaged: 2021-10-06 16:17:28 UTC; yihui
+# Author: Yihui Xie [aut, cre], Christian Mueller [ctb], Lijia Yu [ctb], Weicheng Zhu [ctb]
+# Maintainer: Yihui Xie <xie@yihui.name>
+# Repository: CRAN
+# Date/Publication: 2021-10-07 07:40:28 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

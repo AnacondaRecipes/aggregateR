@@ -1,0 +1,94 @@
+{% set version = '2.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pgirmess
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pgirmess_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pgirmess/pgirmess_{{ version }}.tar.gz
+  sha256: 75d11eb10d7492892da1cc7f10576d7cf594a29507078b14d6e6246de2f2aef1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS (>= 7.3-1), nlme (>= 3.1-120)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-boot >=1.3_4
+    - r-sf >=1.0_4
+    - r-sp >=0.9_97
+    - r-spdep >=1.1_7
+
+  run:
+    - r-base
+    - r-boot >=1.3_4
+    - r-sf >=1.0_4
+    - r-sp >=0.9_97
+    - r-spdep >=1.1_7
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pgirmess')"           # [not win]
+    - "\"%R%\" -e \"library('pgirmess')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://giraudoux.pagesperso-orange.fr, https://github.com/pgiraudoux/pgirmess
+  license: GPL-2
+  summary: Set of tools for reading, writing and transforming spatial and seasonal data, model
+    selection and specific statistical tests for ecologists. It includes functions to
+    interpolate regular positions of points between landmarks, to discretize polylines
+    into regular point positions, link distant observations to points and convert a
+    bounding box in a spatial object. It also provides miscellaneous functions for field
+    ecologists such as spatial statistics and inference on diversity indexes, writing
+    data.frame with Chinese characters.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: pgirmess
+# Title: Spatial Analysis and Data Mining for Field Ecologists
+# Version: 2.0.2
+# Date: 2023-04-02
+# Imports: boot (>= 1.3-4), sf (>= 1.0-4), sp (>= 0.9-97), spdep (>= 1.1-7)
+# Suggests: MASS (>= 7.3-1), nlme (>= 3.1-120)
+# Description: Set of tools for reading, writing and transforming spatial and seasonal data, model selection and specific statistical tests for ecologists. It includes functions to interpolate regular positions of points between landmarks, to discretize polylines into regular point positions, link distant observations to points and convert a bounding box in a spatial object. It also provides miscellaneous functions for field ecologists such as spatial statistics and inference on diversity indexes, writing data.frame with Chinese characters.
+# Authors@R: c( person("Patrick", "Giraudoux", role = c("aut", "cre"), email = "patrick.giraudoux@univ-fcomte.fr", comment=c(ORCID="0000-0003-2376-0136")), person("Jean-Philippe", "Antonietti", role = c("ctb"), email = "Jean-Philippe.Antonietti@unil.ch"), person("Colin", "Beale", role = c("ctb"), email = "c.beale@macaulay.ac.uk"), person("Ulrike", "Groemping", role = c("ctb"), email = "ulrike.groemping@bht-berlin.de"), person("Renaud", "Lancelot", role = c("ctb"), email = "renaud.lancelot@cirad.fr"), person("David", "Pleydell", role = c("ctb"), email = "david.pleydell@inrae.fr"), person("Mike", "Treglia", role = c("ctb"), email = "mike-treglia@utulsa.edu"))
+# License: GPL (>= 2)
+# URL: https://giraudoux.pagesperso-orange.fr, https://github.com/pgiraudoux/pgirmess
+# Author: Patrick Giraudoux [aut, cre] (<https://orcid.org/0000-0003-2376-0136>), Jean-Philippe Antonietti [ctb], Colin Beale [ctb], Ulrike Groemping [ctb], Renaud Lancelot [ctb], David Pleydell [ctb], Mike Treglia [ctb]
+# Maintainer: Patrick Giraudoux <patrick.giraudoux@univ-fcomte.fr>
+# NeedsCompilation: no
+# Packaged: 2023-04-02 09:11:59 UTC; pgiraudo2
+# Repository: CRAN
+# Date/Publication: 2023-04-07 18:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

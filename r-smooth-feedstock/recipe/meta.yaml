@@ -1,0 +1,123 @@
+{% set version = '4.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-smooth
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/smooth_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/smooth/smooth_{{ version }}.tar.gz
+  sha256: 12fbfe6713a78e3bab6c04173846439245080f835bd84a92b1fc751e0e1c2264
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: legion, numDeriv, testthat, knitr, rmarkdown, doMC, doParallel, foreach
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-rcpp >=0.12.3
+    - r-rcpparmadillo >=0.8.100.0.0
+    - r-generics >=0.1.2
+    - r-greybox >=1.0.8
+    - r-nloptr
+    - r-pracma
+    - r-statmod
+    - r-xtable
+    - r-zoo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-rcpp >=0.12.3
+    - r-rcpparmadillo >=0.8.100.0.0
+    - r-generics >=0.1.2
+    - r-greybox >=1.0.8
+    - r-nloptr
+    - r-pracma
+    - r-statmod
+    - r-xtable
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('smooth')"           # [not win]
+    - "\"%R%\" -e \"library('smooth')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/config-i1/smooth
+  license: LGPL-2.1
+  summary: 'Functions implementing Single Source of Error state space models for purposes of
+    time series analysis and forecasting. The package includes ADAM (Svetunkov, 2023,
+    <https://openforecast.org/adam/>), Exponential Smoothing (Hyndman et al., 2008,
+    <doi: 10.1007/978-3-540-71918-2>), SARIMA (Svetunkov & Boylan, 2019 <doi: 10.1080/00207543.2019.1600764>),
+    Complex Exponential Smoothing (Svetunkov & Kourentzes, 2018, <doi: 10.13140/RG.2.2.24986.29123>),
+    Simple Moving Average (Svetunkov & Petropoulos, 2018 <doi: 10.1080/00207543.2017.1380326>)
+    and several simulation functions. It also allows dealing with intermittent demand
+    based on the iETS framework (Svetunkov & Boylan, 2019, <doi: 10.13140/RG.2.2.35897.06242>).'
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-2.1'
+
+# The original CRAN metadata for this package was:
+
+# Package: smooth
+# Type: Package
+# Title: Forecasting Using State Space Models
+# Version: 4.0.0
+# Date: 2023-09-15
+# Authors@R: person("Ivan", "Svetunkov", email = "ivan@svetunkov.ru", role = c("aut", "cre"), comment="Lecturer at Centre for Marketing Analytics and Forecasting, Lancaster University, UK")
+# URL: https://github.com/config-i1/smooth
+# BugReports: https://github.com/config-i1/smooth/issues
+# Language: en-GB
+# Description: Functions implementing Single Source of Error state space models for purposes of time series analysis and forecasting. The package includes ADAM (Svetunkov, 2023, <https://openforecast.org/adam/>), Exponential Smoothing (Hyndman et al., 2008, <doi: 10.1007/978-3-540-71918-2>), SARIMA (Svetunkov & Boylan, 2019 <doi: 10.1080/00207543.2019.1600764>), Complex Exponential Smoothing (Svetunkov & Kourentzes, 2018, <doi: 10.13140/RG.2.2.24986.29123>), Simple Moving Average (Svetunkov & Petropoulos, 2018 <doi: 10.1080/00207543.2017.1380326>) and several simulation functions. It also allows dealing with intermittent demand based on the iETS framework (Svetunkov & Boylan, 2019, <doi: 10.13140/RG.2.2.35897.06242>).
+# License: LGPL-2.1
+# Depends: R (>= 3.0.2), greybox (>= 1.0.8)
+# Imports: Rcpp (>= 0.12.3), stats, generics (>= 0.1.2), graphics, grDevices, pracma, statmod, MASS, nloptr, utils, xtable, zoo
+# LinkingTo: Rcpp, RcppArmadillo (>= 0.8.100.0.0)
+# Suggests: legion, numDeriv, testthat, knitr, rmarkdown, doMC, doParallel, foreach
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-09-16 10:17:15 UTC; config
+# Author: Ivan Svetunkov [aut, cre] (Lecturer at Centre for Marketing Analytics and Forecasting, Lancaster University, UK)
+# Maintainer: Ivan Svetunkov <ivan@svetunkov.ru>
+# Repository: CRAN
+# Date/Publication: 2023-09-17 04:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

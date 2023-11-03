@@ -1,0 +1,98 @@
+{% set version = '2.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-incidence2
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/incidence2_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/incidence2/incidence2_{{ version }}.tar.gz
+  sha256: fa06348cafe5dee6c20aaef82504bef4326b06ca656a28993336466d481da1f1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: outbreaks, dplyr, ggplot2, scales, knitr, rmarkdown, rlang, clock, testthat (>= 3.0.0), tibble
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-grates >=1.0.0
+    - r-pillar
+
+  run:
+    - r-base
+    - r-data.table
+    - r-grates >=1.0.0
+    - r-pillar
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('incidence2')"           # [not win]
+    - "\"%R%\" -e \"library('incidence2')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/reconverse/incidence2
+  license: MIT
+  summary: Provides functions and classes to compute, handle and visualise incidence from dated
+    events for a defined time interval. Dates can be provided in various standard formats.
+    The class 'incidence2' is used to store computed incidence and can be easily manipulated,
+    subsetted, and plotted. This package is part of the RECON (<https://www.repidemicsconsortium.org/>)
+    toolkit for outbreak analysis (<https://www.reconverse.org>).
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: incidence2
+# Type: Package
+# Title: Compute, Handle and Plot Incidence of Dated Events
+# Version: 2.2.1
+# Authors@R: c( person("Tim", "Taylor", role = c("aut", "cre"), email = "tim.taylor@hiddenelephants.co.uk", comment = c(ORCID = "0000-0002-8587-7113")), person("Thibaut", "Jombart", role = "ctb", email = "thibautjombart@gmail.com") )
+# Description: Provides functions and classes to compute, handle and visualise incidence from dated events for a defined time interval. Dates can be provided in various standard formats. The class 'incidence2' is used to store computed incidence and can be easily manipulated, subsetted, and plotted. This package is part of the RECON (<https://www.repidemicsconsortium.org/>) toolkit for outbreak analysis (<https://www.reconverse.org>).
+# Encoding: UTF-8
+# License: MIT + file LICENSE
+# URL: https://github.com/reconverse/incidence2
+# BugReports: https://github.com/reconverse/incidence2/issues
+# Depends: grates (>= 1.0.0), R (>= 3.5.0)
+# Imports: grDevices, data.table, pillar, utils
+# RoxygenNote: 7.2.3
+# Suggests: outbreaks, dplyr, ggplot2, scales, knitr, rmarkdown, rlang, clock, testthat (>= 3.0.0), tibble
+# VignetteBuilder: knitr
+# Config/testthat/edition: 3
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2023-06-13 08:30:02 UTC; tim
+# Author: Tim Taylor [aut, cre] (<https://orcid.org/0000-0002-8587-7113>), Thibaut Jombart [ctb]
+# Maintainer: Tim Taylor <tim.taylor@hiddenelephants.co.uk>
+# Repository: CRAN
+# Date/Publication: 2023-06-13 08:50:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,101 @@
+{% set version = '2.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-factoshiny
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Factoshiny_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Factoshiny/Factoshiny_{{ version }}.tar.gz
+  sha256: 9d6d80e243cc7ce9a9d054035092812d8188387f7426367a932e63055fbbed6b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dt
+    - r-factoinvestigate >=1.5
+    - r-factominer >=2.3
+    - r-colourpicker
+    - r-ggplot2
+    - r-ggrepel
+    - r-missmda
+    - r-shiny
+    - r-shinydashboard
+    - r-shinyjqui
+
+  run:
+    - r-base
+    - r-dt
+    - r-factoinvestigate >=1.5
+    - r-factominer >=2.3
+    - r-colourpicker
+    - r-ggplot2
+    - r-ggrepel
+    - r-missmda
+    - r-shiny
+    - r-shinydashboard
+    - r-shinyjqui
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Factoshiny')"           # [not win]
+    - "\"%R%\" -e \"library('Factoshiny')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://factominer.free.fr/graphs/factoshiny.html
+  license: GPL-2
+  summary: Perform factorial analysis with a menu and draw graphs interactively thanks to 'FactoMineR'
+    and a Shiny application.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: Factoshiny
+# Type: Package
+# Title: Perform Factorial Analysis from 'FactoMineR' with a Shiny Application
+# Version: 2.4
+# Date: 2021-02-03
+# Author: Pauline Vaissie, Astrid Monge, Francois Husson
+# Maintainer: Francois Husson <husson@agrocampus-ouest.fr>
+# Depends: FactoMineR (>= 2.3),shiny,FactoInvestigate (>= 1.5),ggplot2
+# Imports: DT,colourpicker,grDevices,tcltk,ggrepel,shinydashboard,shinyjqui,missMDA
+# Description: Perform factorial analysis with a menu and draw graphs interactively thanks to 'FactoMineR' and a Shiny application.
+# URL: http://factominer.free.fr/graphs/factoshiny.html
+# License: GPL (>= 2)
+# Encoding: latin1
+# NeedsCompilation: no
+# Packaged: 2021-02-03 10:59:59 UTC; husson
+# Repository: CRAN
+# Date/Publication: 2021-02-03 12:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

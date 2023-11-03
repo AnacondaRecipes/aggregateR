@@ -1,0 +1,91 @@
+{% set version = '1.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rbayesianoptimization
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rBayesianOptimization_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rBayesianOptimization/rBayesianOptimization_{{ version }}.tar.gz
+  sha256: 6a33846458c2d71966e17cc7ade34e53a4a00194d00f012f20c912cac9fe8d3f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: xgboost
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-gpfit
+    - r-data.table >=1.9.6
+    - r-foreach
+    - r-magrittr
+
+  run:
+    - r-base
+    - r-gpfit
+    - r-data.table >=1.9.6
+    - r-foreach
+    - r-magrittr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rBayesianOptimization')"           # [not win]
+    - "\"%R%\" -e \"library('rBayesianOptimization')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/yanyachen/rBayesianOptimization
+  license: GPL-2
+  summary: A Pure R implementation of Bayesian Global Optimization with Gaussian Processes.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: rBayesianOptimization
+# Type: Package
+# Title: Bayesian Optimization of Hyperparameters
+# Version: 1.2.0
+# Authors@R: person("Yachen", "Yan", email = "yanyachen21@gmail.com", role = c("aut", "cre"))
+# Description: A Pure R implementation of Bayesian Global Optimization with Gaussian Processes.
+# URL: https://github.com/yanyachen/rBayesianOptimization
+# BugReports: https://github.com/yanyachen/rBayesianOptimization/issues
+# Depends: R (>= 2.10)
+# Imports: stats, utils, data.table (>= 1.9.6), magrittr, foreach, GPfit
+# Suggests: xgboost
+# License: GPL-2
+# RoxygenNote: 7.1.1
+# NeedsCompilation: no
+# Packaged: 2021-06-17 07:27:20 UTC; deadshot
+# Author: Yachen Yan [aut, cre]
+# Maintainer: Yachen Yan <yanyachen21@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-06-17 08:00:01 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

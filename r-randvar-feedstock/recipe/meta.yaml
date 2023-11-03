@@ -1,0 +1,91 @@
+{% set version = '1.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-randvar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RandVar_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RandVar/RandVar_{{ version }}.tar.gz
+  sha256: 281cc68efbe7425f1c2b844684d8d9a9bd3cc70f9dd7f7ee27c058424c5f869d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-distr >=2.8.0
+    - r-distrex >=2.8.0
+    - r-startupmsg
+
+  run:
+    - r-base
+    - r-distr >=2.8.0
+    - r-distrex >=2.8.0
+    - r-startupmsg
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RandVar')"           # [not win]
+    - "\"%R%\" -e \"library('RandVar')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://robast.r-forge.r-project.org/
+  license: LGPL-3
+  summary: Implements random variables by means of S4 classes and methods.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: RandVar
+# Version: 1.2.1
+# Date: 2020-01-18
+# Title: Implementation of Random Variables
+# Description: Implements random variables by means of S4 classes and methods.
+# Depends: R(>= 3.4), methods, distr(>= 2.8.0), distrEx(>= 2.8.0)
+# Imports: startupmsg
+# Authors@R: c(person("Matthias", "Kohl", role=c("cre", "cph", "aut"), email="Matthias.Kohl@stamats.de"), person("Peter", "Ruckdeschel", role=c("aut","cph")))
+# ByteCompile: yes
+# LazyLoad: yes
+# License: LGPL-3
+# Encoding: latin1
+# URL: http://robast.r-forge.r-project.org/
+# LastChangedDate: {$LastChangedDate: 2020-01-18 02:19:06 +0100 (Sa, 18. Jan 2020) $}
+# LastChangedRevision: {$LastChangedRevision: 1229 $}
+# VCS/SVNRevision: 1228
+# NeedsCompilation: no
+# Packaged: 2020-01-19 18:16:50 UTC; kohlm
+# Author: Matthias Kohl [cre, cph, aut], Peter Ruckdeschel [aut, cph]
+# Maintainer: Matthias Kohl <Matthias.Kohl@stamats.de>
+# Repository: CRAN
+# Date/Publication: 2020-01-19 20:00:37 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,105 @@
+{% set version = '2.1-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-snpassoc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SNPassoc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SNPassoc/SNPassoc_{{ version }}.tar.gz
+  sha256: 6a76414bb7362541dcfecd96c2eb2b10f25dfa36fb4b59b6d2e7b4db36edda39
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, biomaRt, VariantAnnotation, GenomicRanges, IRanges, S4Vectors, org.Hs.eg.db, TxDb.Hsapiens.UCSC.hg19.knownGene, BiocStyle
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggplot2
+    - r-haplo.stats
+    - r-mvtnorm
+    - r-plyr
+    - r-poisbinom
+    - r-survival
+    - r-tidyr
+
+  run:
+    - r-base
+    - r-ggplot2
+    - r-haplo.stats
+    - r-mvtnorm
+    - r-plyr
+    - r-poisbinom
+    - r-survival
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SNPassoc')"           # [not win]
+    - "\"%R%\" -e \"library('SNPassoc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/isglobal-brge/SNPassoc
+  license: GPL-2
+  summary: 'Functions to perform most of the common analysis in genome association studies are
+    implemented. These analyses include descriptive statistics and exploratory analysis
+    of missing values, calculation of Hardy-Weinberg equilibrium, analysis of association
+    based on generalized linear models (either for quantitative or binary traits), and
+    analysis of multiple SNPs (haplotype and epistasis analysis). Permutation test and
+    related tests (sum statistic and truncated product) are also implemented. Max-statistic
+    and genetic risk-allele score exact distributions are also possible to be estimated.
+    The methods are described in Gonzalez JR et al., 2007 <doi: 10.1093/bioinformatics/btm025>.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: SNPassoc
+# Version: 2.1-0
+# Date: 2022-12-13
+# Depends: R (>= 4.0.0)
+# Imports: haplo.stats, mvtnorm, parallel, survival, tidyr, plyr, ggplot2, poisbinom
+# Suggests: testthat, knitr, rmarkdown, biomaRt, VariantAnnotation, GenomicRanges, IRanges, S4Vectors, org.Hs.eg.db, TxDb.Hsapiens.UCSC.hg19.knownGene, BiocStyle
+# Title: SNPs-Based Whole Genome Association Studies
+# Authors@R: c( person(given = "Victor", family = "Moreno", role = "aut"), person(given = "Juan R", family = "Gonzalez", email = "juanr.gonzalez@isglobal.org", role = c("aut"), comment = c(ORCID = "0000-0003-3267-2146")), person(given = "Dolors", family = "Pelegri", email = "dolors.pelegri@isglobal.org", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-5993-3003")))
+# Description: Functions to perform most of the common analysis in genome association studies are implemented. These analyses include descriptive statistics and exploratory analysis of missing values, calculation of Hardy-Weinberg equilibrium, analysis of association based on generalized linear models (either for quantitative or binary traits), and analysis of multiple SNPs (haplotype and epistasis analysis). Permutation test and related tests (sum statistic and truncated product) are also implemented. Max-statistic and genetic risk-allele score exact distributions are also possible to be estimated. The methods are described in Gonzalez JR et al., 2007 <doi: 10.1093/bioinformatics/btm025>.
+# URL: https://github.com/isglobal-brge/SNPassoc
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.2
+# NeedsCompilation: no
+# Packaged: 2022-12-14 19:53:28 UTC; mailos
+# Author: Victor Moreno [aut], Juan R Gonzalez [aut] (<https://orcid.org/0000-0003-3267-2146>), Dolors Pelegri [aut, cre] (<https://orcid.org/0000-0002-5993-3003>)
+# Maintainer: Dolors Pelegri <dolors.pelegri@isglobal.org>
+# Repository: CRAN
+# Date/Publication: 2022-12-14 20:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

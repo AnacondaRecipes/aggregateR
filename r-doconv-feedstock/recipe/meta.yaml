@@ -1,0 +1,100 @@
+{% set version = '0.3.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-doconv
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/doconv_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/doconv/doconv_{{ version }}.tar.gz
+  sha256: f02ac404214e54e19e0152db88ba2e9d1fc98c77dff1269649bbec199acfffde
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tinytest, testthat, webshot2
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-locatexec
+    - r-magick
+    - r-pdftools
+    - r-processx
+
+  run:
+    - r-base
+    - r-locatexec
+    - r-magick
+    - r-pdftools
+    - r-processx
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('doconv')"           # [not win]
+    - "\"%R%\" -e \"library('doconv')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=doconv
+  license: MIT
+  summary: 'It provides the ability to generate images from documents of different types. Three
+    main features are provided: functions for generating document thumbnails, functions
+    for performing visual tests of documents and a function for updating fields and
+    table of contents of a ''Microsoft Word'' or ''RTF'' document. In order to work,
+    ''LibreOffice'' must be installed on the machine and or ''Microsoft Word''. If the
+    latter is available, it can be used to produce PDF documents or images identical
+    to the originals; otherwise, ''LibreOffice'' is used and the rendering can be sometimes
+    different from the original documents.'
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: doconv
+# Type: Package
+# Title: Document Conversion to 'PDF' or 'PNG'
+# Version: 0.3.2
+# Authors@R: c( person("David", "Gohel", role = c("aut", "cre"), email = "david.gohel@ardata.fr"), person(given = "ArData", role = "cph"), person("David", "Hajage", role = "ctb", comment = "initial powershell code") )
+# Description: It provides the ability to generate images from documents of different types. Three main features are provided: functions for generating document thumbnails, functions for performing visual tests of documents and a function for updating fields and table of contents of a 'Microsoft Word' or 'RTF' document. In order to work, 'LibreOffice' must be installed on the machine and or 'Microsoft Word'. If the latter is available, it can be used to produce PDF documents or images identical to the originals; otherwise, 'LibreOffice' is used and the rendering can be sometimes different from the original documents.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Imports: magick, pdftools, locatexec, processx, tools
+# Depends: R (>= 4.0.0)
+# Suggests: tinytest, testthat, webshot2
+# BugReports: https://github.com/ardata-fr/doconv/issues
+# SystemRequirements: LibreOffice, Microsoft Word
+# NeedsCompilation: no
+# Packaged: 2023-02-09 23:13:22 UTC; davidgohel
+# Author: David Gohel [aut, cre], ArData [cph], David Hajage [ctb] (initial powershell code)
+# Maintainer: David Gohel <david.gohel@ardata.fr>
+# Repository: CRAN
+# Date/Publication: 2023-02-09 23:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

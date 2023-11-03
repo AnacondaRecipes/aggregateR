@@ -1,0 +1,98 @@
+{% set version = '1.1-16' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-adephylo
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/adephylo_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/adephylo/adephylo_{{ version }}.tar.gz
+  sha256: b5ce5de26bbe6e40ca0650650acac3f613e5170d0b14dc5d6e6bbe83c416ce58
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ade4 >=1.7_10
+    - r-adegenet
+    - r-ape
+    - r-phylobase
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-ade4 >=1.7_10
+    - r-adegenet
+    - r-ape
+    - r-phylobase
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('adephylo')"           # [not win]
+    - "\"%R%\" -e \"library('adephylo')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=adephylo
+  license: GPL-2
+  summary: Multivariate tools to analyze comparative data, i.e. a phylogeny and some traits measured
+    for each taxa. The package contains functions to represent comparative data, compute
+    phylogenetic proximities, perform multivariate analysis with phylogenetic constraints
+    and test for the presence of phylogenetic autocorrelation. The package is described
+    in Jombart et al (2010) <doi:10.1093/bioinformatics/btq292>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: adephylo
+# Version: 1.1-16
+# Title: Exploratory Analyses for the Phylogenetic Comparative Method
+# Authors@R: c( person("Stephane", "Dray", email = "stephane.dray@univ-lyon1.fr", role = "aut", comment = c(ORCID = "0000-0003-0153-1105")), person("Thibaut", "Jombart", role = "aut", email = "t.jombart@imperial.ac.uk"), person("Anders Ellern", "Bilgrau", role = "ctb", email = "abilgrau@math.aau.dk"), person("Aurelie", "Siberchicot", role = c("ctb", "cre"), email = "aurelie.siberchicot@univ-lyon1.fr", comment = c(ORCID = "0000-0002-7638-8318")) )
+# Depends: methods, ade4 (>= 1.7-10)
+# Imports: phylobase, ape, adegenet
+# Description: Multivariate tools to analyze comparative data, i.e. a phylogeny and some traits measured for each taxa. The package contains functions to represent comparative data, compute phylogenetic proximities, perform multivariate analysis with phylogenetic constraints and test for the presence of phylogenetic autocorrelation. The package is described in Jombart et al (2010) <doi:10.1093/bioinformatics/btq292>.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-10-05 08:51:41 UTC; siberchicot
+# Author: Stephane Dray [aut] (<https://orcid.org/0000-0003-0153-1105>), Thibaut Jombart [aut], Anders Ellern Bilgrau [ctb], Aurelie Siberchicot [ctb, cre] (<https://orcid.org/0000-0002-7638-8318>)
+# Maintainer: Aurelie Siberchicot <aurelie.siberchicot@univ-lyon1.fr>
+# Repository: CRAN
+# Date/Publication: 2023-10-06 16:20:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

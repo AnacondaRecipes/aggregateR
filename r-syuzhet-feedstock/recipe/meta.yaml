@@ -1,0 +1,106 @@
+{% set version = '1.0.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-syuzhet
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/syuzhet_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/syuzhet/syuzhet_{{ version }}.tar.gz
+  sha256: af4f2b4c4580a94c0a07e37db9e9e29c072e314990dcdee420c8580e4d78f232
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: devtools, knitr, pander, parallel, readxl, rmarkdown, stringr, testthat (>= 0.9.1)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-nlp
+    - r-dplyr
+    - r-dtt
+    - r-rlang
+    - r-textshape >=1.3.0
+    - r-tidyr
+    - r-zoo
+
+  run:
+    - r-base
+    - r-nlp
+    - r-dplyr
+    - r-dtt
+    - r-rlang
+    - r-textshape >=1.3.0
+    - r-tidyr
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('syuzhet')"           # [not win]
+    - "\"%R%\" -e \"library('syuzhet')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mjockers/syuzhet
+  license: GPL-3
+  summary: "Extracts sentiment and sentiment-derived plot arcs from text using a variety of sentiment
+    dictionaries conveniently packaged for consumption by R users.  Implemented dictionaries
+    include \"syuzhet\" (default) developed in the Nebraska Literary Lab \"afinn\" developed
+    by Finn \xC5rup Nielsen, \"bing\" developed by Minqing Hu and Bing Liu, and \"nrc\"
+    developed by Mohammad, Saif M. and Turney, Peter D. Applicable references are available
+    in README.md and in the documentation for the \"get_sentiment\" function.  The package
+    also provides a hack for implementing Stanford's coreNLP sentiment parser. The package
+    provides several methods for plot arc normalization."
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: syuzhet
+# Type: Package
+# Title: Extracts Sentiment and Sentiment-Derived Plot Arcs from Text
+# Version: 1.0.7
+# Date: 2023-8-11
+# Authors@R: person("Matthew", "Jockers", email = "mjockers@gmail.com", role = c("aut", "cre"))
+# Maintainer: Matthew Jockers <mjockers@gmail.com>
+# Description: Extracts sentiment and sentiment-derived plot arcs from text using a variety of sentiment dictionaries conveniently packaged for consumption by R users.  Implemented dictionaries include "syuzhet" (default) developed in the Nebraska Literary Lab "afinn" developed by Finn Arup Nielsen, "bing" developed by Minqing Hu and Bing Liu, and "nrc" developed by Mohammad, Saif M. and Turney, Peter D. Applicable references are available in README.md and in the documentation for the "get_sentiment" function.  The package also provides a hack for implementing Stanford's coreNLP sentiment parser. The package provides several methods for plot arc normalization.
+# URL: https://github.com/mjockers/syuzhet
+# License: GPL-3
+# Depends: R (>= 3.5.0)
+# Imports: textshape (>= 1.3.0), NLP, zoo, dtt, stats, graphics, dplyr, tidyr, rlang
+# Suggests: devtools, knitr, pander, parallel, readxl, rmarkdown, stringr, testthat (>= 0.9.1)
+# NeedsCompilation: no
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# Packaged: 2023-08-11 21:24:23 UTC; matthewjockers
+# Author: Matthew Jockers [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2023-08-11 22:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

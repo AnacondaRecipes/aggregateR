@@ -1,0 +1,110 @@
+{% set version = '1.3.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mixl
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mixl_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mixl/mixl_{{ version }}.tar.gz
+  sha256: ead972d9981cae1f0beb6583e79d228efa102e4c8153747c83324ebba9d1bb6f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, mlogit, rmarkdown, testthat, texreg, xtable
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.19
+    - r-maxlik
+    - r-numderiv
+    - r-randtoolbox
+    - r-readr
+    - r-sandwich
+    - r-stringr >=1.3.1
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.19
+    - r-maxlik
+    - r-numderiv
+    - r-randtoolbox
+    - r-readr
+    - r-sandwich
+    - r-stringr >=1.3.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mixl')"           # [not win]
+    - "\"%R%\" -e \"library('mixl')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/joemolloy/fast-mixed-mnl
+  license: GPL-2
+  summary: Specification and estimation of multinomial logit models.  Large datasets and complex
+    models are supported, with an intuitive syntax.  Multinomial Logit Models, Mixed
+    models, random coefficients and Hybrid Choice are all supported.  For more information,
+    see Molloy et al. (2019) <doi:10.3929/ethz-b-000334289>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: mixl
+# Title: Simulated Maximum Likelihood Estimation of Mixed Logit Models for Large Datasets
+# Version: 1.3.3
+# Date: 2021-12-07
+# Authors@R: person(given = "Joseph", family = "Molloy", role = c("aut", "cre"), email = "joseph.molloy@ivt.baug.ethz.ch")
+# Description: Specification and estimation of multinomial logit models.  Large datasets and complex models are supported, with an intuitive syntax.  Multinomial Logit Models, Mixed models, random coefficients and Hybrid Choice are all supported.  For more information, see Molloy et al. (2019) <doi:10.3929/ethz-b-000334289>.
+# License: GPL (>= 2)
+# URL: https://github.com/joemolloy/fast-mixed-mnl
+# BugReports: https://github.com/joemolloy/fast-mixed-mnl/issues
+# Imports: maxLik, numDeriv, randtoolbox, Rcpp (>= 0.12.19), readr, sandwich, stats, stringr (>= 1.3.1)
+# Suggests: knitr, mlogit, rmarkdown, testthat, texreg, xtable
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# RoxygenNote: 7.1.1
+# NeedsCompilation: yes
+# Packaged: 2021-12-08 12:44:38 UTC; molloyj
+# Author: Joseph Molloy [aut, cre]
+# Maintainer: Joseph Molloy <joseph.molloy@ivt.baug.ethz.ch>
+# Repository: CRAN
+# Date/Publication: 2021-12-08 13:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

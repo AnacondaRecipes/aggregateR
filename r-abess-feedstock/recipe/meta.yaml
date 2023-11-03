@@ -1,0 +1,120 @@
+{% set version = '0.4.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-abess
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/abess_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/abess/abess_{{ version }}.tar.gz
+  sha256: daad67842f2ca7e749de70d0ad3de3289882683da6ba97870d23a1a11a0d4608
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-rcpp
+    - r-rcppeigen
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-matrix
+    - r-rcpp
+    - r-rcppeigen
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('abess')"           # [not win]
+    - "\"%R%\" -e \"library('abess')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/abess-team/abess, https://abess-team.github.io/abess/, https://abess.readthedocs.io
+  license: GPL-3
+  summary: Extremely efficient toolkit for solving the best subset selection problem <https://www.jmlr.org/papers/v23/21-1060.html>.
+    This package is its R interface. The package implements and generalizes algorithms
+    designed in <doi:10.1073/pnas.2014241117> that exploits a novel sequencing-and-splicing
+    technique to guarantee exact support recovery and globally optimal solution in polynomial
+    times for linear model. It also supports best subset selection for logistic regression,
+    Poisson regression, Cox proportional hazard model, Gamma regression, multiple-response
+    regression, multinomial logistic regression, ordinal regression, (sequential) principal
+    component analysis, and robust principal component analysis. The other valuable
+    features such as the best subset of group selection <doi:10.1287/ijoc.2022.1241>
+    and sure independence screening <doi:10.1111/j.1467-9868.2008.00674.x> are also
+    provided.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: abess
+# Type: Package
+# Title: Fast Best Subset Selection
+# Version: 0.4.8
+# Date: 2023-09-19
+# Authors@R: c( person(given = "Jin", family = "Zhu", email = "zhuj37@mail2.sysu.edu.cn", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8550-5822")), person(given = "Zezhi", family = "Wang", email = "homura@mail.ustc.edu.cn", role = c("aut")), person(given = "Liyuan", family = "Hu", email = "huly5@mail2.sysu.edu.cn", role = c("aut")), person(given = "Junhao", family = "Huang", email = "huangjh256@mail2.sysu.edu.cn", role = c("aut")), person(given = "Kangkang", family = "Jiang", email = "jiangkk3@mail2.sysu.edu.cn", role = c("aut")), person(given = "Yanhang", family = "Zhang", email = "zhangyh98@ruc.edu.cn", role = c("aut")), person(given = "Borui", family = "Tang", email = "tangborui@mail.ustc.edu.cn", role = c("aut")), person(given = "Shiyun", family = "Lin", email = "shiyunlin@stu.pku.edu.cn", role = c("aut")), person(given = "Junxian", family = "Zhu", email = "adaizjx@163.com", role = c("aut")), person(given = "Canhong", family = "Wen", email = "wencanhong@gmail.com", role = c("aut")), person(given = "Heping", family = "Zhang", email = "heping.zhang@yale.edu", role = c("aut"), comment = c(ORCID = "0000-0002-0688-4076")), person(given = "Xueqin", family = "Wang", email = "wangxq20@ustc.edu.cn", role = c("aut"), comment = c(ORCID = "0000-0001-5205-9950")), person("spectra contributors", role = c("cph"), comment = "Spectra implementation") )
+# Maintainer: Jin Zhu <zhuj37@mail2.sysu.edu.cn>
+# Description: Extremely efficient toolkit for solving the best subset selection problem <https://www.jmlr.org/papers/v23/21-1060.html>. This package is its R interface. The package implements and generalizes algorithms designed in <doi:10.1073/pnas.2014241117> that exploits a novel sequencing-and-splicing technique to guarantee exact support recovery and globally optimal solution in polynomial times for linear model. It also supports best subset selection for logistic regression, Poisson regression, Cox proportional hazard model, Gamma regression, multiple-response regression, multinomial logistic regression, ordinal regression, (sequential) principal component analysis, and robust principal component analysis. The other valuable features such as the best subset of group selection <doi:10.1287/ijoc.2022.1241> and sure independence screening <doi:10.1111/j.1467-9868.2008.00674.x> are also provided.
+# License: GPL (>= 3) | file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 3.1.0)
+# Imports: Rcpp, MASS, methods, Matrix
+# LinkingTo: Rcpp, RcppEigen
+# RoxygenNote: 7.2.3
+# Suggests: testthat, knitr, rmarkdown
+# VignetteBuilder: knitr
+# URL: https://github.com/abess-team/abess, https://abess-team.github.io/abess/, https://abess.readthedocs.io
+# BugReports: https://github.com/abess-team/abess/issues
+# NeedsCompilation: yes
+# Packaged: 2023-09-19 11:07:36 UTC; wang
+# Author: Jin Zhu [aut, cre] (<https://orcid.org/0000-0001-8550-5822>), Zezhi Wang [aut], Liyuan Hu [aut], Junhao Huang [aut], Kangkang Jiang [aut], Yanhang Zhang [aut], Borui Tang [aut], Shiyun Lin [aut], Junxian Zhu [aut], Canhong Wen [aut], Heping Zhang [aut] (<https://orcid.org/0000-0002-0688-4076>), Xueqin Wang [aut] (<https://orcid.org/0000-0001-5205-9950>), spectra contributors [cph] (Spectra implementation)
+# Repository: CRAN
+# Date/Publication: 2023-09-19 13:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

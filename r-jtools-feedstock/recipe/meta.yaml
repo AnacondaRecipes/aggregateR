@@ -1,0 +1,106 @@
+{% set version = '2.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-jtools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/jtools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/jtools/jtools_{{ version }}.tar.gz
+  sha256: 79a36ab47a0b57d606a32d0f8989395fb7980158c99ba5fab303e53613d497b9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: boot, broom, broom.mixed, huxtable (>= 3.0.0), kableExtra, lme4, lmerTest, MASS, methods, pbkrtest, RColorBrewer, sandwich, scales, survey, weights, knitr, rmarkdown, testthat, vdiffr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-crayon
+    - r-generics
+    - r-ggplot2 >=3.4.0
+    - r-magrittr
+    - r-pander
+    - r-pkgconfig
+    - r-rlang >=0.3.0
+    - r-tibble
+
+  run:
+    - r-base
+    - r-crayon
+    - r-generics
+    - r-ggplot2 >=3.4.0
+    - r-magrittr
+    - r-pander
+    - r-pkgconfig
+    - r-rlang >=0.3.0
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('jtools')"           # [not win]
+    - "\"%R%\" -e \"library('jtools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://jtools.jacob-long.com
+  license: GPL-3
+  summary: This is a collection of tools for more efficiently understanding and sharing the results
+    of (primarily) regression analyses. There are also a number of miscellaneous functions
+    for statistical and programming purposes. Support for models produced by the survey
+    and lme4 packages are points of emphasis.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: jtools
+# Type: Package
+# Title: Analysis and Presentation of Social Scientific Data
+# Version: 2.2.2
+# Authors@R: person(c("Jacob","A."), "Long", email = "jacob.long@sc.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1582-6214"))
+# Description: This is a collection of tools for more efficiently understanding and sharing the results of (primarily) regression analyses. There are also a number of miscellaneous functions for statistical and programming purposes. Support for models produced by the survey and lme4 packages are points of emphasis.
+# URL: https://jtools.jacob-long.com
+# BugReports: https://github.com/jacob-long/jtools/issues
+# License: GPL (>= 3)
+# Encoding: UTF-8
+# LazyData: true
+# Imports: crayon, generics, ggplot2 (>= 3.4.0), magrittr, pander, pkgconfig, rlang (>= 0.3.0), tibble
+# Suggests: boot, broom, broom.mixed, huxtable (>= 3.0.0), kableExtra, lme4, lmerTest, MASS, methods, pbkrtest, RColorBrewer, sandwich, scales, survey, weights, knitr, rmarkdown, testthat, vdiffr
+# Enhances: brms, quantreg, rstanarm
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# Depends: R (>= 3.5.0)
+# NeedsCompilation: no
+# Packaged: 2023-07-10 15:02:36 UTC; jacoblong
+# Author: Jacob A. Long [aut, cre] (<https://orcid.org/0000-0002-1582-6214>)
+# Maintainer: Jacob A. Long <jacob.long@sc.edu>
+# Repository: CRAN
+# Date/Publication: 2023-07-11 08:40:29 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

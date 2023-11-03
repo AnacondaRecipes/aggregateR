@@ -1,0 +1,119 @@
+{% set version = '0.3.15' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cansim
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cansim_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cansim/cansim_{{ version }}.tar.gz
+  sha256: c3b326492e04a18fc8b9feb414c7396af45be10596cd1d9009d90c7367f4218c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, scales, tidyr, ggplot2, dbplyr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dbi
+    - r-rsqlite
+    - r-digest >=0.1
+    - r-dplyr >=0.7
+    - r-httr >=1.0.0
+    - r-jsonlite >=1.0
+    - r-purrr
+    - r-readr
+    - r-rlang
+    - r-rvest
+    - r-stringr
+    - r-tibble
+    - r-xml2
+
+  run:
+    - r-base
+    - r-dbi
+    - r-rsqlite
+    - r-digest >=0.1
+    - r-dplyr >=0.7
+    - r-httr >=1.0.0
+    - r-jsonlite >=1.0
+    - r-purrr
+    - r-readr
+    - r-rlang
+    - r-rvest
+    - r-stringr
+    - r-tibble
+    - r-xml2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cansim')"           # [not win]
+    - "\"%R%\" -e \"library('cansim')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mountainMath/cansim, https://mountainmath.github.io/cansim/, https://www.statcan.gc.ca/
+  license: MIT
+  summary: Searches for, accesses, and retrieves new-format and old-format Statistics Canada
+    data tables, as well as individual vectors, as tidy data frames. This package deals
+    with encoding issues, allows for bilingual English or French language data retrieval,
+    and bundles convenience functions to make it easier to work with retrieved table
+    data. Optional caching features are provided.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: cansim
+# Type: Package
+# Title: Accessing Statistics Canada Data Table and Vectors
+# Version: 0.3.15
+# Authors@R: c( person("Jens", "von Bergmann", email = "jens@mountainmath.ca", role = c("cre")), person("Dmitry", "Shkolnik", email = "shkolnikd@gmail.com", role = c("aut")))
+# Maintainer: Jens von Bergmann <jens@mountainmath.ca>
+# Description: Searches for, accesses, and retrieves new-format and old-format Statistics Canada data tables, as well as individual vectors, as tidy data frames. This package deals with encoding issues, allows for bilingual English or French language data retrieval, and bundles convenience functions to make it easier to work with retrieved table data. Optional caching features are provided.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# ByteCompile: yes
+# NeedsCompilation: no
+# LazyData: true
+# Depends: R (>= 2.10)
+# Imports: digest (>= 0.1), dplyr (>= 0.7), httr (>= 1.0.0), jsonlite (>= 1.0), readr, rlang, xml2, rvest, stringr, purrr, tibble, utils, DBI, RSQLite
+# RoxygenNote: 7.2.3
+# Suggests: knitr, rmarkdown, scales, tidyr, ggplot2, dbplyr
+# URL: https://github.com/mountainMath/cansim, https://mountainmath.github.io/cansim/, https://www.statcan.gc.ca/
+# BugReports: https://github.com/mountainMath/cansim/issues
+# VignetteBuilder: knitr
+# Language: en-CA
+# Packaged: 2023-10-10 23:29:46 UTC; jens
+# Author: Jens von Bergmann [cre], Dmitry Shkolnik [aut]
+# Repository: CRAN
+# Date/Publication: 2023-10-10 23:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

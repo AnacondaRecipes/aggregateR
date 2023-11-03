@@ -1,0 +1,85 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-grates
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/grates_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/grates/grates_{{ version }}.tar.gz
+  sha256: 5bae175748c6f87f607db9fac73629c151422475cd2041c95c2e777e009336ad
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, ggplot2, scales, vctrs, rlang, rmarkdown, outbreaks, testthat (>= 3.0.0), dplyr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('grates')"           # [not win]
+    - "\"%R%\" -e \"library('grates')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.reconverse.org/grates/, https://github.com/reconverse/grates
+  license: MIT
+  summary: Provides a coherent interface and implementation for creating grouped date classes.
+    This package is part of the RECON (<https://www.repidemicsconsortium.org/>) toolkit
+    for outbreak analysis.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: grates
+# Title: Grouped Date Classes
+# Version: 1.1.0
+# Authors@R: c( person( given = "Tim", family = "Taylor", role = c("aut", "cre"), email = "tim.taylor@hiddenelephants.co.uk", comment = c(ORCID = "0000-0002-8587-7113") ) )
+# Description: Provides a coherent interface and implementation for creating grouped date classes. This package is part of the RECON (<https://www.repidemicsconsortium.org/>) toolkit for outbreak analysis.
+# URL: https://www.reconverse.org/grates/, https://github.com/reconverse/grates
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Suggests: knitr, ggplot2, scales, vctrs, rlang, rmarkdown, outbreaks, testthat (>= 3.0.0), dplyr
+# VignetteBuilder: knitr
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2023-06-08 22:53:12 UTC; tim
+# Author: Tim Taylor [aut, cre] (<https://orcid.org/0000-0002-8587-7113>)
+# Maintainer: Tim Taylor <tim.taylor@hiddenelephants.co.uk>
+# Repository: CRAN
+# Date/Publication: 2023-06-08 23:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

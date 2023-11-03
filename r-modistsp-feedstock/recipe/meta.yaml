@@ -1,0 +1,124 @@
+{% set version = '2.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-modistsp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MODIStsp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MODIStsp/MODIStsp_{{ version }}.tar.gz
+  sha256: 9416bf2a32faf4ae7159f50ba56ac7924852af59f932223b2268aedfa1769fda
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dplyr, DT, formatR, ggplot2, grid, httptest, knitr, leafem (>= 0.1.3), leaflet, magrittr, mapedit (>= 0.6.0), png, rappdirs, rmarkdown, shiny, shinyalert (>= 3.0.0), shinydashboard, shinyFiles (>= 0.9.0), shinyjs, spelling, testthat, tibble, tibbletime, tidyr, qpdf, webshot, xtable
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-assertthat
+    - r-bitops >=1.0_6
+    - r-data.table >=1.9.6
+    - r-gdalutilities
+    - r-geojsonio
+    - r-httr >=1.4.2
+    - r-jsonlite
+    - r-raster >=3.3.13
+    - r-sf >=0.9.3
+    - r-stringr >=1.0.0
+    - r-xml2 >=1.2.0
+    - r-xts >=0.9_7
+
+  run:
+    - r-base
+    - r-assertthat
+    - r-bitops >=1.0_6
+    - r-data.table >=1.9.6
+    - r-gdalutilities
+    - r-geojsonio
+    - r-httr >=1.4.2
+    - r-jsonlite
+    - r-raster >=3.3.13
+    - r-sf >=0.9.3
+    - r-stringr >=1.0.0
+    - r-xml2 >=1.2.0
+    - r-xts >=0.9_7
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MODIStsp')"           # [not win]
+    - "\"%R%\" -e \"library('MODIStsp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ropensci/MODIStsp/, https://docs.ropensci.org/MODIStsp/
+  license: GPL-3
+  summary: 'Allows automating the creation of time series of rasters derived from MODIS satellite
+    land products data. It performs several typical preprocessing steps such as download,
+    mosaicking, reprojecting and resizing data acquired on a specified time period.
+    All processing parameters can be set using a user-friendly GUI. Users can select
+    which layers of the original MODIS HDF files they want to process, which additional
+    quality indicators should be extracted from aggregated MODIS quality assurance layers
+    and, in the case of surface reflectance products, which spectral indexes should
+    be computed from the original reflectance bands. For each output layer, outputs
+    are saved as single-band raster files corresponding to each available acquisition
+    date. Virtual files allowing access to the entire time series as a single file are
+    also created. Command-line execution exploiting a previously saved processing options
+    file is also possible, allowing users to automatically update time series related
+    to a MODIS product whenever a new image is available. For additional documentation
+    refer to the following article: Busetto and Ranghetti (2016) <doi:10.1016/j.cageo.2016.08.020>.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: MODIStsp
+# Title: Find, Download and Process MODIS Land Products Data
+# Type: Package
+# Version: 2.1.0
+# Authors@R: c(person("Lorenzo", "Busetto", role = c("aut"), comment = c(ORCID = '0000-0001-9634-6038')), person("Luigi", "Ranghetti", email = "rpackages.ranghetti@gmail.com", role = c("aut", "cre"), comment = c(ORCID = '0000-0001-6207-5188')), person("Leah", "Wasser", role = "rev", comment = "Leah Wasser reviewed the package for rOpenSci, see https://github.com/ropensci/software-review/issues/184"), person("Jeff", "Hanson", role = "rev", comment = "Jeff Hanson reviewed the package for rOpenSci, see https://github.com/ropensci/software-review/issues/184"), person("Babak", "Naimi", role = "ctb", comment = "Babak Naimi wrote the function ModisDownload(), on which some MODIStsp internal functions are based"))
+# Description: Allows automating the creation of time series of rasters derived from MODIS satellite land products data. It performs several typical preprocessing steps such as download, mosaicking, reprojecting and resizing data acquired on a specified time period. All processing parameters can be set using a user-friendly GUI. Users can select which layers of the original MODIS HDF files they want to process, which additional quality indicators should be extracted from aggregated MODIS quality assurance layers and, in the case of surface reflectance products, which spectral indexes should be computed from the original reflectance bands. For each output layer, outputs are saved as single-band raster files corresponding to each available acquisition date. Virtual files allowing access to the entire time series as a single file are also created. Command-line execution exploiting a previously saved processing options file is also possible, allowing users to automatically update time series related to a MODIS product whenever a new image is available. For additional documentation refer to the following article: Busetto and Ranghetti (2016) <doi:10.1016/j.cageo.2016.08.020>.
+# License: GPL-3
+# Depends: R (>= 3.5.0)
+# Imports: assertthat, bitops (>= 1.0-6), data.table (>= 1.9.6), gdalUtilities, geojsonio, httr (>= 1.4.2), jsonlite, parallel, raster (>= 3.3.13), sf (>= 0.9.3), stringr (>= 1.0.0), xml2 (>= 1.2.0), xts (>= 0.9-7)
+# Suggests: dplyr, DT, formatR, ggplot2, grid, httptest, knitr, leafem (>= 0.1.3), leaflet, magrittr, mapedit (>= 0.6.0), png, rappdirs, rmarkdown, shiny, shinyalert (>= 3.0.0), shinydashboard, shinyFiles (>= 0.9.0), shinyjs, spelling, testthat, tibble, tibbletime, tidyr, qpdf, webshot, xtable
+# SystemRequirements: GDAL (>= 2.1.2) with support for HDF4 format, PROJ (>= 4.9.1).
+# URL: https://github.com/ropensci/MODIStsp/, https://docs.ropensci.org/MODIStsp/
+# BugReports: https://github.com/ropensci/MODIStsp/issues
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# Language: en-US
+# NeedsCompilation: no
+# Packaged: 2023-10-13 14:10:22 UTC; lranghetti
+# Author: Lorenzo Busetto [aut] (<https://orcid.org/0000-0001-9634-6038>), Luigi Ranghetti [aut, cre] (<https://orcid.org/0000-0001-6207-5188>), Leah Wasser [rev] (Leah Wasser reviewed the package for rOpenSci, see https://github.com/ropensci/software-review/issues/184), Jeff Hanson [rev] (Jeff Hanson reviewed the package for rOpenSci, see https://github.com/ropensci/software-review/issues/184), Babak Naimi [ctb] (Babak Naimi wrote the function ModisDownload(), on which some MODIStsp internal functions are based)
+# Maintainer: Luigi Ranghetti <rpackages.ranghetti@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-13 14:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

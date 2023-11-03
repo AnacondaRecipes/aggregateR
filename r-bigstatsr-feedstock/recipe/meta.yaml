@@ -1,0 +1,122 @@
+{% set version = '1.5.12' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bigstatsr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bigstatsr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bigstatsr/bigstatsr_{{ version }}.tar.gz
+  sha256: a8a77e0717d8c59e4762db7d0adda10284b8f3c100f9df445854fa90643241f2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: bigmemory (>= 4.5.33), bigreadr (>= 0.2), covr, data.table, dplyr, glmnet, hexbin, memuse, ModelMetrics, plotly, ppcor, RhpcBLASctl, spelling (>= 1.2), testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rspectra
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-bigassertr >=0.1.1
+    - r-bigparallelr >=0.2.3
+    - r-cowplot
+    - r-foreach
+    - r-ggplot2 >=3.0
+    - r-ps >=1.4
+    - r-rmio >=0.4
+    - r-tibble
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rspectra
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-bigassertr >=0.1.1
+    - r-bigparallelr >=0.2.3
+    - r-cowplot
+    - r-foreach
+    - r-ggplot2 >=3.0
+    - r-ps >=1.4
+    - r-rmio >=0.4
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bigstatsr')"           # [not win]
+    - "\"%R%\" -e \"library('bigstatsr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://privefl.github.io/bigstatsr/
+  license: GPL-3
+  summary: Easy-to-use, efficient, flexible and scalable statistical tools. Package bigstatsr
+    provides and uses Filebacked Big Matrices via memory-mapping. It provides for instance
+    matrix operations, Principal Component Analysis, sparse linear supervised models,
+    utility functions and more <doi:10.1093/bioinformatics/bty185>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Encoding: UTF-8
+# Package: bigstatsr
+# Type: Package
+# Title: Statistical Tools for Filebacked Big Matrices
+# Version: 1.5.12
+# Date: 2022-10-11
+# Authors@R: c( person("Florian", "Prive", email = "florian.prive.21@gmail.com", role = c("aut", "cre")), person("Michael", "Blum", role = "ths"), person("Hugues", "Aschard", email = "hugues.aschard@pasteur.fr", role = "ths"))
+# Description: Easy-to-use, efficient, flexible and scalable statistical tools. Package bigstatsr provides and uses Filebacked Big Matrices via memory-mapping. It provides for instance matrix operations, Principal Component Analysis, sparse linear supervised models, utility functions and more <doi:10.1093/bioinformatics/bty185>.
+# License: GPL-3
+# Language: en-US
+# ByteCompile: TRUE
+# Depends: R (>= 3.4)
+# Imports: bigassertr (>= 0.1.1), bigparallelr (>= 0.2.3), cowplot, foreach, ggplot2 (>= 3.0), graphics, methods, ps (>= 1.4), Rcpp, rmio (>= 0.4), RSpectra, stats, tibble, utils
+# LinkingTo: Rcpp, RcppArmadillo, rmio
+# Suggests: bigmemory (>= 4.5.33), bigreadr (>= 0.2), covr, data.table, dplyr, glmnet, hexbin, memuse, ModelMetrics, plotly, ppcor, RhpcBLASctl, spelling (>= 1.2), testthat
+# RoxygenNote: 7.1.1
+# URL: https://privefl.github.io/bigstatsr/
+# BugReports: https://github.com/privefl/bigstatsr/issues
+# Collate: 'AUC.R' 'FBM-attach.R' 'crochet.R' 'FBM.R' 'FBM-code256.R' 'FBM-copy.R' 'RcppExports.R' 'SVD.R' 'apply-parallelize.R' 'biglasso.R' 'bigstatsr-package.R' 'colstats.R' 'crossprodSelf.R' 'mult-mat.R' 'mult-vec.R' 'pcor.R' 'plot.R' 'predict.R' 'randomSVD.R' 'read-write.R' 'scaling.R' 'summary.R' 'tcrossprodSelf.R' 'transpose.R' 'univLinReg.R' 'univLogReg.R' 'utils-assert.R' 'utils.R' 'zzz.R'
+# NeedsCompilation: yes
+# Packaged: 2022-10-14 07:29:56 UTC; au639593
+# Author: Florian Prive [aut, cre], Michael Blum [ths], Hugues Aschard [ths]
+# Maintainer: Florian Prive <florian.prive.21@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-10-14 08:32:38 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

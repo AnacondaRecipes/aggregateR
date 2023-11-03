@@ -1,0 +1,122 @@
+{% set version = '5.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ddd
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DDD_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DDD/DDD_{{ version }}.tar.gz
+  sha256: 76620bd587b309fbe2be8b7b4f868c8e08c8b04afd15a28578c3ee7d8c240b9d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 3.0.0), testit, igraph
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh >=1.81.0_1
+    - r-deoptim
+    - r-matrix
+    - r-rcpp >=1.0.10
+    - r-rcppeigen
+    - r-sparsem
+    - r-ape
+    - r-desolve
+    - r-expm
+    - r-phytools
+    - r-subplex
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.81.0_1
+    - r-deoptim
+    - r-matrix
+    - r-rcpp >=1.0.10
+    - r-rcppeigen
+    - r-sparsem
+    - r-ape
+    - r-desolve
+    - r-expm
+    - r-phytools
+    - r-subplex
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DDD')"           # [not win]
+    - "\"%R%\" -e \"library('DDD')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=DDD
+  license: GPL-3
+  summary: "Implements maximum likelihood and bootstrap methods based on the diversity-dependent
+    birth-death process to test whether speciation or extinction are diversity-dependent,
+    under various models including various types of key innovations. See Etienne et
+    al. 2012, Proc. Roy. Soc. B 279: 1300-1309, <DOI:10.1098/rspb.2011.1439>, Etienne
+    & Haegeman 2012, Am. Nat. 180: E75-E89, <DOI:10.1086/667574>, Etienne et al. 2016.
+    Meth. Ecol. Evol. 7: 1092-1099, <DOI:10.1111/2041-210X.12565> and Laudanno et al.
+    2021. Syst. Biol. 70: 389\u2013407, <DOI:10.1093/sysbio/syaa048>. Also contains
+    functions to simulate the diversity-dependent process."
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: DDD
+# Type: Package
+# Title: Diversity-Dependent Diversification
+# Version: 5.2.2
+# Date: 2023-07-10
+# Depends: R (>= 3.5.0)
+# Imports: deSolve, ape, phytools, subplex, DEoptim, Matrix, expm, SparseM, Rcpp (>= 1.0.10)
+# LinkingTo: Rcpp (>= 1.0.10), RcppEigen, BH (>= 1.81.0-1)
+# Suggests: testthat (>= 3.0.0), testit, igraph
+# Authors@R: c( person(given = "Rampal S.", family = "Etienne", email = "r.s.etienne@rug.nl", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-2142-7612")), person(given = "Bart", family = "Haegeman", email = "bart.haegeman@sete.cnrs.fr", role = c("aut"), comment = c(ORCID = "0000-0003-2325-4727")), person(given = "Hanno", family = "Hildenbrandt", email = "h.hildenbrandt@rug.nl", role = c("ctb"), comment = c(ORCID = "0000-0002-6784-1037")), person(given = "Giovanni", family = "Laudanno", email = "glaudanno@gmail.com", role = c("ctb"), comment = c(ORCID = "0000-0002-2952-3345")) )
+# License: GPL-3
+# Encoding: UTF-8
+# Description: Implements maximum likelihood and bootstrap methods based on the diversity-dependent birth-death process to test whether speciation or extinction are diversity-dependent, under various models including various types of key innovations. See Etienne et al. 2012, Proc. Roy. Soc. B 279: 1300-1309, <DOI:10.1098/rspb.2011.1439>, Etienne & Haegeman 2012, Am. Nat. 180: E75-E89, <DOI:10.1086/667574>, Etienne et al. 2016. Meth. Ecol. Evol. 7: 1092-1099, <DOI:10.1111/2041-210X.12565> and Laudanno et al. 2021. Syst. Biol. 70: 389407, <DOI:10.1093/sysbio/syaa048>. Also contains functions to simulate the diversity-dependent process.
+# RoxygenNote: 7.2.3
+# Config/testthat/edition: 3
+# NeedsCompilation: yes
+# Packaged: 2023-07-10 11:00:23 UTC; rampa
+# Author: Rampal S. Etienne [aut, cre] (<https://orcid.org/0000-0003-2142-7612>), Bart Haegeman [aut] (<https://orcid.org/0000-0003-2325-4727>), Hanno Hildenbrandt [ctb] (<https://orcid.org/0000-0002-6784-1037>), Giovanni Laudanno [ctb] (<https://orcid.org/0000-0002-2952-3345>)
+# Maintainer: Rampal S. Etienne <r.s.etienne@rug.nl>
+# Repository: CRAN
+# Date/Publication: 2023-07-10 23:40:47 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

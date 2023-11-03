@@ -1,0 +1,82 @@
+{% set version = '1.0-8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-textcat
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/textcat_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/textcat/textcat_{{ version }}.tar.gz
+  sha256: cb650147576bae9c78381524831c9fcc85c76177274672098aac1860aa39749e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-slam
+    - r-tau >=0.0_11
+
+  run:
+    - r-base
+    - r-slam
+    - r-tau >=0.0_11
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('textcat')"           # [not win]
+    - "\"%R%\" -e \"library('textcat')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=textcat
+  license: GPL-2
+  summary: Text categorization based on n-grams.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: textcat
+# Version: 1.0-8
+# Title: N-Gram Based Text Categorization
+# Authors@R: c(person("Kurt", "Hornik", role = c("aut", "cre"), email = "Kurt.Hornik@R-project.org", comment = c(ORCID = "0000-0003-4198-9911")), person("Johannes", "Rauch", role = "aut"), person("Christian", "Buchta", role = "aut", email = "christian.buchta@wu.ac.at"), person("Ingo", "Feinerer", role = "aut", email = "feinerer@logic.at", comment = c(ORCID = "0000-0001-7656-8338")))
+# Description: Text categorization based on n-grams.
+# Depends: R (>= 3.2.0)
+# Imports: tau (>= 0.0-11), slam
+# License: GPL-2
+# LazyData: yes
+# NeedsCompilation: no
+# Packaged: 2023-01-31 13:29:56 UTC; hornik
+# Author: Kurt Hornik [aut, cre] (<https://orcid.org/0000-0003-4198-9911>), Johannes Rauch [aut], Christian Buchta [aut], Ingo Feinerer [aut] (<https://orcid.org/0000-0001-7656-8338>)
+# Maintainer: Kurt Hornik <Kurt.Hornik@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2023-01-31 15:26:54 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

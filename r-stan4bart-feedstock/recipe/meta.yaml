@@ -1,0 +1,114 @@
+{% set version = '0.0-6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stan4bart
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/stan4bart_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/stan4bart/stan4bart_{{ version }}.tar.gz
+  sha256: ba343ad44bb19246dfe59b6a3684ce02805564c0c28bb664f71840e7aa79b584
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.0-0), lme4
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh >=1.72.0.3
+    - r-matrix
+    - r-rcpp >=1.0.5
+    - r-rcppeigen >=0.3.3.7.0
+    - r-rcppparallel >=5.1.1
+    - r-dbarts >=0.9_21
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.72.0.3
+    - r-matrix
+    - r-rcpp >=1.0.5
+    - r-rcppeigen >=0.3.3.7.0
+    - r-rcppparallel >=5.1.1
+    - r-dbarts >=0.9_21
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('stan4bart')"           # [not win]
+    - "\"%R%\" -e \"library('stan4bart')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/vdorie/stan4bart
+  license: GPL-3
+  summary: Fits semiparametric linear and multilevel models with non-parametric additive Bayesian
+    additive regression tree (BART; Chipman, George, and McCulloch (2010) <doi:10.1214/09-AOAS285>)
+    components and Stan (Stan Development Team (2021) <https://mc-stan.org/>) sampled
+    parametric ones. Multilevel models can be expressed using 'lme4' syntax (Bates,
+    Maechler, Bolker, and Walker (2015) <doi:10.18637/jss.v067.i01>).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: stan4bart
+# Version: 0.0-6
+# Date: 2023-02-01
+# Title: Bayesian Additive Regression Trees with Stan-Sampled Parametric Extensions
+# Authors@R: c( person("Vincent", "Dorie", role = c("aut", "cre"), email = "vdorie@gmail.com", comment = c(ORCID = "0000-0002-9576-3064")), person("Ben", "Goodrich", role = "ctb", email = "benjamin.goodrich@columbia.edu", comment = "rstanarm_functions.R, StanHeaders"), person("Jonah", "Gabry", role = "ctb", email = "jsg2201@columbia.edu", comment = "rstanarm_functions.R, StanHeaders"), person("Imad", "Ali", role = "ctb", comment = "rstanarm_functions.R"), person("Sam", "Brilleman", role = "ctb", comment = "rstanarm_functions.R"), person("Paul-Christian", "Burkner", role = "ctb", email = "paul.buerkner@gmail.com", comment = c("rstanarm_functions.R", ORCID = "0000-0001-5765-8995")), person("Joshua", "Pritikin", role = "ctb", comment = c("StanHeaders", ORCID = "0000-0002-9862-5484")), person("Andrew", "Gelman", role = "ctb", comment = c("StanHeaders", ORCID = "0000-0002-6975-2601")), person("Bob", "Carpenter", role = "ctb", comment = "StanHeaders"), person("Matt", "Hoffman", role = "ctb", comment = "StanHeaders"), person("Daniel", "Lee", role = "ctb", comment = "StanHeaders"), person("Michael", "Betancourt", role = "ctb", comment = c("StanHeaders", ORCID = "0000-0002-2900-0931")), person("Marcus", "Brubaker", role = "ctb", comment = c("StanHeaders", ORCID = "0000-0002-7892-9026")), person("Jiqiang", "Guo", role = "ctb", comment = "StanHeaders"), person("Peter", "Li", role = "ctb", comment = "StanHeaders"), person("Allen", "Riddell", role = "ctb", comment = "StanHeaders"), person("Marco", "Inacio", role = "ctb", comment = c("StanHeaders", ORCID = "0000-0002-6865-5404")), person("Mitzi", "Morris", role = "ctb", comment = "StanHeaders"), person("Jeffrey", "Arnold", role = "ctb", comment = c("StanHeaders", ORCID = "0000-0001-9953-3904")), person("Rob", "Goedman", role = "ctb", comment = "StanHeaders"), person("Brian", "Lau", role = "ctb", comment = "StanHeaders"), person("Rob", "Trangucci", role = "ctb", comment = "StanHeaders"), person("Alp", "Kucukelbir", role = "ctb", comment = "StanHeaders"), person("Robert", "Grant", role = "ctb", comment = "StanHeaders"), person("Dustin", "Tran", role = "ctb", comment = "StanHeaders"), person("Michael", "Malecki", role = "ctb", comment = "StanHeaders"), person("Yuanjun", "Gao", role = "ctb", comment = "StanHeaders"), person("Trustees of", "Columbia University", role = "cph", comment = "rstanarm_functions.R, StanHeaders"), person("Lawrence Livermore", "National Security", role = "cph", comment = "CVODES"), person("The Regents of the", "University of California", role = "cph", comment = "CVODES"), person("Southern Methodist", "University", role = "cph", comment = "CVODES"), person("Douglas", "Bates", role = "ctb", comment = c("lme4_functions.R", ORCID = "0000-0001-8316-9503")), person("Martin", "Maechler", role = "ctb", comment = c("lme4_functions.R", ORCID = "0000-0002-8685-9910")), person("Ben", "Bolker", role = "ctb", comment = c("lme4_functions.R", ORCID = "0000-0002-2127-0443")), person("Steve", "Walker", role = "ctb", comment = c("lme4_functions.R", ORCID = "0000-0002-4394-9078")), person("Armon", "Dadgar", role = "ctb", comment = "adaptive radix tree"), person("Bothner", "Per", role = "ctb", comment = "config.guess"), person("Elliston", "Ben", role = "ctb", comment = "config.guess"), person("Free Software", "Foundation", role = "cph", comment = "config.sub"), person("Guido U", "Draheim", role = "ctb", comment = "ax_check_compile_flag.m4"), person("Maarten", "Bosmans", role = "ctb", comment = "ax_check_compile_flag.m4"), person("Christophe", "Tournayre", role = "ctb", comment = "ax_ext.m4"), person("Michael", "Petch", role = "ctb", comment = "ax_ext.m4, ax_gcc_x86_avx_xgetbv.m4, ax_gcc_x86_cpuid.m4"), person("Rafael", "de Lucena Valle", role = "ctb", comment = "ax_ext.m4"), person("Steven G.", "Johnson", role = "ctb", comment = c("ax_gcc_x86_cpuid.m4", ORCID = "0000-0001-7327-4967")), person("Matteo", "Frigo", role = "ctb", comment = "ax_gcc_x86_cpuid.m4"), person("Scott", "Pakin", role = "ctb", comment = c("ax_func_posix_memalign.m4", ORCID = "0000-0002-5220-1985")))
+# Depends: R (>= 3.5-0), methods, dbarts (>= 0.9-21)
+# Imports: stats, Matrix, parallel, RcppParallel (>= 5.1.1)
+# LinkingTo: BH (>= 1.72.0.3), Rcpp (>= 1.0.5), RcppEigen (>= 0.3.3.7.0), RcppParallel (>= 5.1.1), dbarts (>= 0.9-20)
+# Suggests: testthat (>= 2.0-0), lme4
+# Description: Fits semiparametric linear and multilevel models with non-parametric additive Bayesian additive regression tree (BART; Chipman, George, and McCulloch (2010) <doi:10.1214/09-AOAS285>) components and Stan (Stan Development Team (2021) <https://mc-stan.org/>) sampled parametric ones. Multilevel models can be expressed using 'lme4' syntax (Bates, Maechler, Bolker, and Walker (2015) <doi:10.18637/jss.v067.i01>).
+# License: GPL (>= 3)
+# NeedsCompilation: yes
+# Biarch: true
+# UseLTO: true
+# URL: https://github.com/vdorie/stan4bart
+# BugReports: https://github.com/vdorie/stan4bart/issues
+# Packaged: 2023-02-01 20:30:32 UTC; vdorie
+# Author: Vincent Dorie [aut, cre] (<https://orcid.org/0000-0002-9576-3064>), Ben Goodrich [ctb] (rstanarm_functions.R, StanHeaders), Jonah Gabry [ctb] (rstanarm_functions.R, StanHeaders), Imad Ali [ctb] (rstanarm_functions.R), Sam Brilleman [ctb] (rstanarm_functions.R), Paul-Christian Burkner [ctb] (rstanarm_functions.R, <https://orcid.org/0000-0001-5765-8995>), Joshua Pritikin [ctb] (StanHeaders, <https://orcid.org/0000-0002-9862-5484>), Andrew Gelman [ctb] (StanHeaders, <https://orcid.org/0000-0002-6975-2601>), Bob Carpenter [ctb] (StanHeaders), Matt Hoffman [ctb] (StanHeaders), Daniel Lee [ctb] (StanHeaders), Michael Betancourt [ctb] (StanHeaders, <https://orcid.org/0000-0002-2900-0931>), Marcus Brubaker [ctb] (StanHeaders, <https://orcid.org/0000-0002-7892-9026>), Jiqiang Guo [ctb] (StanHeaders), Peter Li [ctb] (StanHeaders), Allen Riddell [ctb] (StanHeaders), Marco Inacio [ctb] (StanHeaders, <https://orcid.org/0000-0002-6865-5404>), Mitzi Morris [ctb] (StanHeaders), Jeffrey Arnold [ctb] (StanHeaders, <https://orcid.org/0000-0001-9953-3904>), Rob Goedman [ctb] (StanHeaders), Brian Lau [ctb] (StanHeaders), Rob Trangucci [ctb] (StanHeaders), Alp Kucukelbir [ctb] (StanHeaders), Robert Grant [ctb] (StanHeaders), Dustin Tran [ctb] (StanHeaders), Michael Malecki [ctb] (StanHeaders), Yuanjun Gao [ctb] (StanHeaders), Trustees of Columbia University [cph] (rstanarm_functions.R, StanHeaders), Lawrence Livermore National Security [cph] (CVODES), The Regents of the University of California [cph] (CVODES), Southern Methodist University [cph] (CVODES), Douglas Bates [ctb] (lme4_functions.R, <https://orcid.org/0000-0001-8316-9503>), Martin Maechler [ctb] (lme4_functions.R, <https://orcid.org/0000-0002-8685-9910>), Ben Bolker [ctb] (lme4_functions.R, <https://orcid.org/0000-0002-2127-0443>), Steve Walker [ctb] (lme4_functions.R, <https://orcid.org/0000-0002-4394-9078>), Armon Dadgar [ctb] (adaptive radix tree), Bothner Per [ctb] (config.guess), Elliston Ben [ctb] (config.guess), Free Software Foundation [cph] (config.sub), Guido U Draheim [ctb] (ax_check_compile_flag.m4), Maarten Bosmans [ctb] (ax_check_compile_flag.m4), Christophe Tournayre [ctb] (ax_ext.m4), Michael Petch [ctb] (ax_ext.m4, ax_gcc_x86_avx_xgetbv.m4, ax_gcc_x86_cpuid.m4), Rafael de Lucena Valle [ctb] (ax_ext.m4), Steven G. Johnson [ctb] (ax_gcc_x86_cpuid.m4, <https://orcid.org/0000-0001-7327-4967>), Matteo Frigo [ctb] (ax_gcc_x86_cpuid.m4), Scott Pakin [ctb] (ax_func_posix_memalign.m4, <https://orcid.org/0000-0002-5220-1985>)
+# Maintainer: Vincent Dorie <vdorie@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-02-03 13:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

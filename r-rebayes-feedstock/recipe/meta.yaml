@@ -1,0 +1,92 @@
+{% set version = '2.54' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rebayes
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/REBayes_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/REBayes/REBayes_{{ version }}.tar.gz
+  sha256: 2401657c75d0ecb40718066295befd3389683e9d8ec9bc61ec121e666501e1cd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Rmosek, knitr, digest
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-lattice
+
+  run:
+    - r-base
+    - r-matrix
+    - r-lattice
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('REBayes')"           # [not win]
+    - "\"%R%\" -e \"library('REBayes')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.r-project.org
+  license: GPL-2
+  summary: 'Kiefer-Wolfowitz maximum likelihood estimation for mixture models and some other
+    density estimation and regression methods based on convex optimization.  See Koenker
+    and Gu (2017) REBayes: An R Package for Empirical Bayes Mixture Methods, Journal
+    of Statistical Software, 82, 1--26, <DOI:10.18637/jss.v082.i08>.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: REBayes
+# Title: Empirical Bayes Estimation and Inference
+# Description: Kiefer-Wolfowitz maximum likelihood estimation for mixture models and some other density estimation and regression methods based on convex optimization.  See Koenker and Gu (2017) REBayes: An R Package for Empirical Bayes Mixture Methods, Journal of Statistical Software, 82, 1--26, <DOI:10.18637/jss.v082.i08>.
+# Version: 2.54
+# Authors@R: c( person( "Roger", "Koenker", email=  "rkoenker@uiuc.edu", role =  c("aut", "cre")), person("Jiaying", "Gu", email =  "gu17@illinois.edu", role = "ctb"), person("Ivan", "Mizera", email = "mizera@ualberta.ca", role =  "ctb") )
+# Maintainer: Roger Koenker <rkoenker@uiuc.edu>
+# Depends: R (>= 2.10), Matrix
+# Imports: methods, utils, lattice
+# Suggests: Rmosek, knitr, digest
+# LazyData: TRUE
+# Encoding: UTF-8
+# VignetteBuilder: knitr
+# SystemRequirements: MOSEK (http://www.mosek.com) and MOSEK license.
+# License: GPL (>= 2)
+# URL: https://www.r-project.org
+# NeedsCompilation: no
+# RoxygenNote: 7.1.2
+# Packaged: 2023-08-19 14:51:58 UTC; roger
+# Author: Roger Koenker [aut, cre], Jiaying Gu [ctb], Ivan Mizera [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-08-19 15:32:36 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

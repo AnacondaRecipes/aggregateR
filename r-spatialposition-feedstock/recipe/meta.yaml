@@ -1,0 +1,95 @@
+{% set version = '2.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spatialposition
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SpatialPosition_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SpatialPosition/SpatialPosition_{{ version }}.tar.gz
+  sha256: f1860d55640dd279692d57c420559cd9bed1328baf88d1a0760d57c233a6af8b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lwgeom, parallel, doParallel, foreach, cartography, knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-isoband
+    - r-raster
+    - r-sf
+    - r-sp
+
+  run:
+    - r-base
+    - r-isoband
+    - r-raster
+    - r-sf
+    - r-sp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SpatialPosition')"           # [not win]
+    - "\"%R%\" -e \"library('SpatialPosition')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/riatelab/SpatialPosition
+  license: GPL-3
+  summary: 'Computes spatial position models: the potential model as defined by Stewart (1941)
+    <doi:10.1126/science.93.2404.89> and catchment areas as defined by Reilly (1931)
+    or Huff (1964) <doi:10.2307/1249154>.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: SpatialPosition
+# Title: Spatial Position Models
+# Version: 2.1.2
+# Authors@R: c( person("Timothee", "Giraud", email = "timothee.giraud@cnrs.fr", role = c("cre","aut"), comment = c(ORCID = "0000-0002-1932-3323")), person("Hadrien", "Commenges", role = c("aut")), person("Joel", "Boulier", role = c("ctb")))
+# Description: Computes spatial position models: the potential model as defined by Stewart (1941) <doi:10.1126/science.93.2404.89> and catchment areas as defined by Reilly (1931) or Huff (1964) <doi:10.2307/1249154>.
+# Depends: R (>= 3.5.0)
+# License: GPL-3
+# LazyData: true
+# Imports: sf, sp, grDevices, graphics, methods, isoband, raster
+# Suggests: lwgeom, parallel, doParallel, foreach, cartography, knitr, rmarkdown
+# URL: https://github.com/riatelab/SpatialPosition
+# BugReports: https://github.com/riatelab/SpatialPosition/issues
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-09-14 09:10:18 UTC; tim
+# Author: Timothee Giraud [cre, aut] (<https://orcid.org/0000-0002-1932-3323>), Hadrien Commenges [aut], Joel Boulier [ctb]
+# Maintainer: Timothee Giraud <timothee.giraud@cnrs.fr>
+# Repository: CRAN
+# Date/Publication: 2023-09-14 09:40:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

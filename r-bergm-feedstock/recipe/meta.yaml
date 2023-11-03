@@ -1,0 +1,105 @@
+{% set version = '5.0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bergm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Bergm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Bergm/Bergm_{{ version }}.tar.gz
+  sha256: 5e5f6d8456bd14c4abfd22f03fcad2bccc0f36bae6b2256687c739abe6d46b45
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: spelling
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mcmcpack
+    - r-matrix
+    - r-rglpk
+    - r-coda
+    - r-ergm
+    - r-matrixcalc
+    - r-mvtnorm
+    - r-network
+    - r-statnet.common
+
+  run:
+    - r-base
+    - r-mcmcpack
+    - r-matrix
+    - r-rglpk
+    - r-coda
+    - r-ergm
+    - r-matrixcalc
+    - r-mvtnorm
+    - r-network
+    - r-statnet.common
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Bergm')"           # [not win]
+    - "\"%R%\" -e \"library('Bergm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://acaimo.github.io/Bergm/
+  license: GPL-2
+  summary: 'Bayesian analysis for exponential random graph models using advanced computational
+    algorithms. More information can be found at: <https://acaimo.github.io/Bergm/>.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: Bergm
+# Title: Bayesian Exponential Random Graph Models
+# Version: 5.0.6
+# Date: 2023-09-12
+# Author: Alberto Caimo [aut, cre], Lampros Bouranis [aut], Robert Krause [aut] Nial Friel [ctb]
+# Maintainer: Alberto Caimo <alberto.caimo1@ucd.ie>
+# Description: Bayesian analysis for exponential random graph models using advanced computational algorithms. More information can be found at: <https://acaimo.github.io/Bergm/>.
+# License: GPL (>= 2)
+# URL: https://acaimo.github.io/Bergm/
+# Depends: ergm, R (>= 4.1)
+# Imports: coda, graphics, grDevices, Matrix, matrixcalc, MCMCpack, mvtnorm, network, Rglpk, statnet.common, stats, utils
+# Config/testthat/edition: 3
+# Encoding: UTF-8
+# Language: en-US
+# LazyData: true
+# RoxygenNote: 7.2.3
+# Suggests: spelling
+# NeedsCompilation: no
+# Packaged: 2023-09-12 16:21:42 UTC; albertocaimo
+# Repository: CRAN
+# Date/Publication: 2023-09-13 07:12:37 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

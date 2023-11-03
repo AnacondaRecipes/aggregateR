@@ -1,0 +1,98 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rr2
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rr2_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rr2/rr2_{{ version }}.tar.gz
+  sha256: e3e476fb5eab01c7158efa48617f6f02a3ec7adc018ddb7773a4398f11fd0031
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, mvtnorm
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-ape
+    - r-lme4
+    - r-nlme
+    - r-phylolm >=2.6.2
+    - r-phyr >=1.0.3
+
+  run:
+    - r-base
+    - r-matrix
+    - r-ape
+    - r-lme4
+    - r-nlme
+    - r-phylolm >=2.6.2
+    - r-phyr >=1.0.3
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rr2')"           # [not win]
+    - "\"%R%\" -e \"library('rr2')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/arives/rr2
+  license: GPL-3
+  summary: Three methods to calculate R2 for models with correlated errors, including Phylogenetic
+    GLS, Phylogenetic Logistic Regression, Linear Mixed Models (LMMs), and Generalized
+    Linear Mixed Models (GLMMs). See details in Ives 2018 <doi:10.1093/sysbio/syy060>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: rr2
+# Type: Package
+# Title: R2s for Regression Models
+# Version: 1.1.1
+# Authors@R: c( person("Anthony", "Ives", , "arives@wisc.edu", c("aut", "cre")), person("Daijiang", "Li", , "daijianglee@gmail.com", role = "ctb"))
+# Description: Three methods to calculate R2 for models with correlated errors, including Phylogenetic GLS, Phylogenetic Logistic Regression, Linear Mixed Models (LMMs), and Generalized Linear Mixed Models (GLMMs). See details in Ives 2018 <doi:10.1093/sysbio/syy060>.
+# License: GPL-3
+# Depends: R (>= 3.0), stats
+# Encoding: UTF-8
+# Imports: lme4, phylolm (>= 2.6.2), ape, utils, Matrix, nlme, phyr (>= 1.0.3)
+# RoxygenNote: 7.2.3
+# Suggests: testthat, mvtnorm
+# URL: https://github.com/arives/rr2
+# BugReports: https://github.com/arives/rr2/issues
+# NeedsCompilation: no
+# Packaged: 2023-08-21 13:34:14 UTC; arives
+# Author: Anthony Ives [aut, cre], Daijiang Li [ctb]
+# Maintainer: Anthony Ives <arives@wisc.edu>
+# Repository: CRAN
+# Date/Publication: 2023-08-21 14:20:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

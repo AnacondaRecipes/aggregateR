@@ -1,0 +1,103 @@
+{% set version = '1.0.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tidyxl
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tidyxl_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tidyxl/tidyxl_{{ version }}.tar.gz
+  sha256: 5632546e4819700ab6613cc939568fed8dd754c1ef08e64b200dbed7b12941f2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, here, knitr, rmarkdown, readxl, dplyr, tidyr, purrr, tibble, ggplot2, cellranger, openxlsx, rlang
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-piton >=1.0.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-piton >=1.0.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tidyxl')"           # [not win]
+    - "\"%R%\" -e \"library('tidyxl')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/nacnudus/tidyxl, https://nacnudus.github.io/tidyxl/
+  license: MIT
+  summary: Imports non-tabular from Excel files into R.  Exposes cell content, position and formatting
+    in a tidy structure for further manipulation. Tokenizes Excel formulas.  Supports
+    '.xlsx' and '.xlsm' via the embedded 'RapidXML' C++ library <https://rapidxml.sourceforge.net>.  Does
+    not support '.xlsb' or '.xls'.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: tidyxl
+# Title: Read Untidy Excel Files
+# Version: 1.0.9
+# Authors@R: c( person("Duncan", "Garmonsway", email = "nacnudus@gmail.com", role = c("aut", "cre")), person("Hadley", "Wickham", role = c("ctb"), comment = "Author of included readxl fragments"), person("Jenny", "Bryan", role = c("ctb"), comment = "Author of included readxl fragments"), person("RStudio", role = "cph", comment = "Copyright holder of included readxl fragments"), person("Marcin", "Kalicinski", role = c("ctb", "cph"), comment = "Author of included RapidXML code") )
+# Description: Imports non-tabular from Excel files into R.  Exposes cell content, position and formatting in a tidy structure for further manipulation. Tokenizes Excel formulas.  Supports '.xlsx' and '.xlsm' via the embedded 'RapidXML' C++ library <https://rapidxml.sourceforge.net>.  Does not support '.xlsb' or '.xls'.
+# Depends: R (>= 3.2.0)
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# LinkingTo: Rcpp, piton (>= 1.0.0)
+# Imports: Rcpp
+# URL: https://github.com/nacnudus/tidyxl, https://nacnudus.github.io/tidyxl/
+# BugReports: https://github.com/nacnudus/tidyxl/issues
+# RoxygenNote: 7.2.3
+# Suggests: testthat, here, knitr, rmarkdown, readxl, dplyr, tidyr, purrr, tibble, ggplot2, cellranger, openxlsx, rlang
+# VignetteBuilder: knitr
+# Config/Needs/website: tidyverse/tidytemplate
+# NeedsCompilation: yes
+# Packaged: 2023-10-30 10:38:28 UTC; nacnudus
+# Author: Duncan Garmonsway [aut, cre], Hadley Wickham [ctb] (Author of included readxl fragments), Jenny Bryan [ctb] (Author of included readxl fragments), RStudio [cph] (Copyright holder of included readxl fragments), Marcin Kalicinski [ctb, cph] (Author of included RapidXML code)
+# Maintainer: Duncan Garmonsway <nacnudus@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-30 11:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

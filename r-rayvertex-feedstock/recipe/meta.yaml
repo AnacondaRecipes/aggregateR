@@ -1,0 +1,113 @@
+{% set version = '0.7.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rayvertex
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rayvertex_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rayvertex/rayvertex_{{ version }}.tar.gz
+  sha256: 4a76115c224f51e6cdd5eb6d9854bb7230e361ee392f883e2664f2eb3aeaabde
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Rvcg, magick, raster
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.6
+    - r-rcppthread
+    - r-digest
+    - r-png
+    - r-rayimage >=0.6.2
+    - r-spacefillr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.6
+    - r-rcppthread
+    - r-digest
+    - r-png
+    - r-rayimage >=0.6.2
+    - r-spacefillr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rayvertex')"           # [not win]
+    - "\"%R%\" -e \"library('rayvertex')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.rayvertex.com, https://github.com/tylermorganwall/rayvertex
+  license: GPL-3
+  summary: Rasterize images using a 3D software renderer. 3D scenes are created either by importing
+    external files, building scenes out of the included objects, or by constructing
+    meshes manually. Supports point and directional lights, anti-aliased lines, shadow
+    mapping, transparent objects, translucent objects, multiple materials types, reflection,
+    refraction, environment maps, multicore rendering, bloom, tone-mapping, and screen-space
+    ambient occlusion.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: rayvertex
+# Type: Package
+# Title: 3D Software Rasterizer
+# Version: 0.7.9
+# Date: 2023-06-08
+# Authors@R: c(person("Tyler", "Morgan-Wall", email = "tylermw@gmail.com", role = c("aut", "cph", "cre"), comment = c(ORCID = "0000-0002-3131-3814")), person("Syoyo", "Fujita", role=c("ctb", "cph")), person("Vilya", "Harvey", role = c("ctb", "cph")), person("G-Truc Creation", role = c("ctb", "cph")), person("Sean", "Barrett", role = c("ctb", "cph")))
+# Maintainer: Tyler Morgan-Wall <tylermw@gmail.com>
+# Description: Rasterize images using a 3D software renderer. 3D scenes are created either by importing external files, building scenes out of the included objects, or by constructing meshes manually. Supports point and directional lights, anti-aliased lines, shadow mapping, transparent objects, translucent objects, multiple materials types, reflection, refraction, environment maps, multicore rendering, bloom, tone-mapping, and screen-space ambient occlusion.
+# License: GPL (>= 3)
+# Copyright: file inst/COPYRIGHTS
+# Depends: R (>= 4.1)
+# Imports: Rcpp (>= 1.0.6), grDevices, rayimage (>= 0.6.2), png, digest
+# Suggests: Rvcg, magick, raster
+# LinkingTo: Rcpp, spacefillr, RcppThread, rayimage
+# RoxygenNote: 7.2.3
+# URL: https://www.rayvertex.com, https://github.com/tylermorganwall/rayvertex
+# BugReports: https://github.com/tylermorganwall/rayvertex/issues
+# Encoding: UTF-8
+# SystemRequirements: C++17
+# NeedsCompilation: yes
+# Packaged: 2023-06-08 13:14:22 UTC; tyler
+# Author: Tyler Morgan-Wall [aut, cph, cre] (<https://orcid.org/0000-0002-3131-3814>), Syoyo Fujita [ctb, cph], Vilya Harvey [ctb, cph], G-Truc Creation [ctb, cph], Sean Barrett [ctb, cph]
+# Repository: CRAN
+# Date/Publication: 2023-06-08 13:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

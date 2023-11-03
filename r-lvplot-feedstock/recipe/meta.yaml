@@ -1,0 +1,91 @@
+{% set version = '0.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lvplot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/lvplot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/lvplot/lvplot_{{ version }}.tar.gz
+  sha256: b1157dae621fe7f2a46429210b7cfdf940978903d94c487eeb784f6310207e7d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: depth
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcolorbrewer
+    - r-ggplot2 >=3.3.0
+    - r-tibble
+
+  run:
+    - r-base
+    - r-rcolorbrewer
+    - r-ggplot2 >=3.3.0
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('lvplot')"           # [not win]
+    - "\"%R%\" -e \"library('lvplot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=lvplot
+  license: GPL-2
+  summary: Implements the letter value 'boxplot' which extends the standard 'boxplot' to deal
+    with both larger and smaller number of data points by dynamically selecting the
+    appropriate number of letter values to display.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: lvplot
+# Title: Letter Value 'Boxplots'
+# Version: 0.2.1
+# Authors@R: c( person("Hadley", "Wickham", , "hadley@rstudio.com", role = c("aut", "cre")), person("Heike", "Hofmann", , "hofmann@iastate.edu", role = "aut") )
+# Description: Implements the letter value 'boxplot' which extends the standard 'boxplot' to deal with both larger and smaller number of data points by dynamically selecting the appropriate number of letter values to display.
+# License: GPL (>= 2)
+# Depends: R (>= 2.14)
+# Imports: ggplot2 (>= 3.3.0), grid, RColorBrewer, tibble
+# Suggests: depth
+# Encoding: UTF-8
+# LazyData: true
+# LazyDataCompression: xz
+# RoxygenNote: 7.2.1
+# NeedsCompilation: no
+# Packaged: 2022-09-25 15:17:17 UTC; hadleywickham
+# Author: Hadley Wickham [aut, cre], Heike Hofmann [aut]
+# Maintainer: Hadley Wickham <hadley@rstudio.com>
+# Repository: CRAN
+# Date/Publication: 2022-09-25 17:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

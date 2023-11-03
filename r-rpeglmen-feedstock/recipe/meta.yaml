@@ -1,0 +1,107 @@
+{% set version = '1.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rpeglmen
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RPEGLMEN_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RPEGLMEN/RPEGLMEN_{{ version }}.tar.gz
+  sha256: 5c76b41932521d185e089d93a8a7b263bacb557d18d36bb1e96e8b2260eb7c65
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: R.rsp, testthat, PerformanceAnalytics
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rpeif
+    - r-rcpp >=1.0.3
+    - r-rcppeigen
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rpeif
+    - r-rcpp >=1.0.3
+    - r-rcppeigen
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RPEGLMEN')"           # [not win]
+    - "\"%R%\" -e \"library('RPEGLMEN')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=RPEGLMEN
+  license: GPL-2
+  summary: Implements the fast iterative shrinkage-thresholding algorithm (FISTA) algorithm to
+    fit a Gamma distribution with an elastic net penalty as described in Chen, Arakvin
+    and Martin (2018) <arxiv:1804.07780>. An implementation for the case of the exponential
+    distribution is also available, with details available in Chen and Martin (2018)
+    <https://papers.ssrn.com/abstract_id=3085672>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: RPEGLMEN
+# Type: Package
+# Title: Gamma and Exponential Generalized Linear Models with Elastic Net Penalty
+# Version: 1.1.2
+# Date: 2023-01-28
+# Author: Anthony Christidis <anthony.christidis@stat.ubc.ca>, Xin Chen <chenx26@uw.edu>, Daniel Hanson <hansondj@uw.edu>
+# Maintainer: Anthony Christidis <anthony.christidis@stat.ubc.ca>
+# Description: Implements the fast iterative shrinkage-thresholding algorithm (FISTA) algorithm to fit a Gamma distribution with an elastic net penalty as described in Chen, Arakvin and Martin (2018) <arxiv:1804.07780>. An implementation for the case of the exponential distribution is also available, with details available in Chen and Martin (2018) <https://papers.ssrn.com/abstract_id=3085672>.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# Imports: Rcpp (>= 1.0.3), RPEIF
+# LinkingTo: Rcpp, RcppEigen
+# RoxygenNote: 7.0.2
+# Suggests: R.rsp, testthat, PerformanceAnalytics
+# NeedsCompilation: yes
+# Biarch: true
+# VignetteBuilder: R.rsp
+# Packaged: 2023-01-29 00:49:33 UTC; antho
+# Repository: CRAN
+# Date/Publication: 2023-01-29 03:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

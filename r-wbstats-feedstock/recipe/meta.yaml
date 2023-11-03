@@ -1,0 +1,109 @@
+{% set version = '1.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-wbstats
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/wbstats_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/wbstats/wbstats_{{ version }}.tar.gz
+  sha256: 7f1b58770ed0db4fc0659defec76baec23674e806bf724ce24ef97ac67a643ed
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggplot2, knitr, markdown, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr
+    - r-httr
+    - r-jsonlite
+    - r-lifecycle
+    - r-lubridate
+    - r-magrittr
+    - r-readr
+    - r-rlang
+    - r-stringr
+    - r-tibble
+    - r-tidyr
+
+  run:
+    - r-base
+    - r-dplyr
+    - r-httr
+    - r-jsonlite
+    - r-lifecycle
+    - r-lubridate
+    - r-magrittr
+    - r-readr
+    - r-rlang
+    - r-stringr
+    - r-tibble
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('wbstats')"           # [not win]
+    - "\"%R%\" -e \"library('wbstats')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/nset-ornl/wbstats
+  license: MIT
+  summary: Search and download data from the World Bank Data API.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: wbstats
+# Title: Programmatic Access to Data and Statistics from the World Bank API
+# Version: 1.0.4
+# Authors@R: c(person(given = "Jesse", family = "Piburn", role = c("aut", "cre"), email = "piburnjo@ornl.gov", comment = c(ORCID = "0000-0003-4967-7912")), person(given = "UT-Battelle, LLC", role = "cph"))
+# Maintainer: Jesse Piburn <piburnjo@ornl.gov>
+# Description: Search and download data from the World Bank Data API.
+# License: MIT + file LICENSE
+# URL: https://github.com/nset-ornl/wbstats
+# BugReports: https://github.com/nset-ornl/wbstats/issues
+# Depends: R (>= 3.2)
+# Imports: dplyr, httr, jsonlite, lifecycle, lubridate, readr, rlang, stringr, tibble, tidyr, magrittr
+# Suggests: ggplot2, knitr, markdown, rmarkdown
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# LazyData: TRUE
+# RoxygenNote: 7.0.1
+# NeedsCompilation: no
+# Packaged: 2020-12-04 16:55:08 UTC; pij
+# Author: Jesse Piburn [aut, cre] (<https://orcid.org/0000-0003-4967-7912>), UT-Battelle, LLC [cph]
+# Repository: CRAN
+# Date/Publication: 2020-12-05 01:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

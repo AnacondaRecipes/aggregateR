@@ -1,0 +1,99 @@
+{% set version = '2.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gdatools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GDAtools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GDAtools/GDAtools_{{ version }}.tar.gz
+  sha256: d1ea19f24741a74d65018fbcb9998d751308d45a011e413678f31c2a558a8776
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: R.rsp, rmarkdown, knitr, rmdformats, TraMineR, sf, shiny, miniUI, esquisse, rclipboard, factoextra, ade4
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-factominer
+    - r-descriptio >=1.2
+    - r-ggplot2
+    - r-ggrepel
+    - r-rlang
+
+  run:
+    - r-base
+    - r-factominer
+    - r-descriptio >=1.2
+    - r-ggplot2
+    - r-ggrepel
+    - r-rlang
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GDAtools')"           # [not win]
+    - "\"%R%\" -e \"library('GDAtools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/nicolas-robette/GDAtools, https://nicolas-robette.github.io/GDAtools/
+  license: GPL-2
+  summary: Many tools for Geometric Data Analysis (Le Roux & Rouanet (2005) <doi:10.1007/1-4020-2236-0>),
+    such as MCA variants (Specific Multiple Correspondence Analysis, Class Specific
+    Analysis), many graphical and statistical aids to interpretation (structuring factors,
+    concentration ellipses, inductive tests, bootstrap validation, etc.) and multiple-table
+    analysis (Multiple Factor Analysis, between- and inter-class analysis, Principal
+    Component Analysis and Correspondence Analysis with Instrumental Variables, etc.).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: GDAtools
+# Type: Package
+# Title: Geometric Data Analysis
+# Version: 2.0.1
+# Authors@R: c(person("Nicolas", "Robette", role = c("aut", "cre"), email = "nicolas.robette@uvsq.fr"))
+# Imports: descriptio (>= 1.2), FactoMineR, ggplot2, ggrepel, rlang
+# Suggests: R.rsp, rmarkdown, knitr, rmdformats, TraMineR, sf, shiny, miniUI, esquisse, rclipboard, factoextra, ade4
+# Description: Many tools for Geometric Data Analysis (Le Roux & Rouanet (2005) <doi:10.1007/1-4020-2236-0>), such as MCA variants (Specific Multiple Correspondence Analysis, Class Specific Analysis), many graphical and statistical aids to interpretation (structuring factors, concentration ellipses, inductive tests, bootstrap validation, etc.) and multiple-table analysis (Multiple Factor Analysis, between- and inter-class analysis, Principal Component Analysis and Correspondence Analysis with Instrumental Variables, etc.).
+# VignetteBuilder: R.rsp
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# URL: https://github.com/nicolas-robette/GDAtools, https://nicolas-robette.github.io/GDAtools/
+# BugReports: https://github.com/nicolas-robette/GDAtools/issues
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2023-10-06 08:53:01 UTC; nicolas
+# Author: Nicolas Robette [aut, cre]
+# Maintainer: Nicolas Robette <nicolas.robette@uvsq.fr>
+# Repository: CRAN
+# Date/Publication: 2023-10-06 09:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

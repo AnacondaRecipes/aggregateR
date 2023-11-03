@@ -1,0 +1,98 @@
+{% set version = '0.4-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-trtf
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/trtf_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/trtf/trtf_{{ version }}.tar.gz
+  sha256: 9617512ef2cfbf14a63a79499e0cc2c8b36ad9c4b89931691e82bf28d0a54a95
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: survival, TH.data, coin
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+    - r-libcoin
+    - r-mlt >=1.4_1
+    - r-partykit >=1.2_1
+    - r-sandwich
+    - r-tram
+    - r-variables
+
+  run:
+    - r-base
+    - r-formula
+    - r-libcoin
+    - r-mlt >=1.4_1
+    - r-partykit >=1.2_1
+    - r-sandwich
+    - r-tram
+    - r-variables
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('trtf')"           # [not win]
+    - "\"%R%\" -e \"library('trtf')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://ctm.R-forge.R-project.org
+  license: GPL-2
+  summary: Recursive partytioning of transformation models with corresponding random forest for
+    conditional transformation models as described in 'Transformation Forests' (Hothorn
+    and Zeileis, 2021, <doi:10.1080/10618600.2021.1872581>) and 'Top-Down Transformation
+    Choice' (Hothorn, 2018, <DOI:10.1177/1471082X17748081>).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: trtf
+# Title: Transformation Trees and Forests
+# Version: 0.4-2
+# Date: 2023-02-10
+# Authors@R: person("Torsten", "Hothorn", role = c("aut", "cre"), email = "Torsten.Hothorn@R-project.org", comment = c(ORCID = "0000-0001-8301-0471"))
+# Description: Recursive partytioning of transformation models with corresponding random forest for conditional transformation models as described in 'Transformation Forests' (Hothorn and Zeileis, 2021, <doi:10.1080/10618600.2021.1872581>) and 'Top-Down Transformation Choice' (Hothorn, 2018, <DOI:10.1177/1471082X17748081>).
+# Depends: mlt (>= 1.4-1), partykit (>= 1.2-1), tram
+# Imports: Formula, sandwich, grid, stats, variables, libcoin, utils, grDevices
+# Suggests: survival, TH.data, coin
+# URL: http://ctm.R-forge.R-project.org
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2023-02-10 12:27:51 UTC; hothorn
+# Author: Torsten Hothorn [aut, cre] (<https://orcid.org/0000-0001-8301-0471>)
+# Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2023-02-10 12:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

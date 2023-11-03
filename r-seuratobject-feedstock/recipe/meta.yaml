@@ -1,0 +1,128 @@
+{% set version = '5.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-seuratobject
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SeuratObject_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SeuratObject/SeuratObject_{{ version }}.tar.gz
+  sha256: 2dd95f3b2698ca598c582381ef94683977e2a3402eceffff3fea60aed9289972
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: DelayedArray, fs (>= 1.5.2), ggplot2, HDF5Array, rmarkdown, testthat, BPCells, sf (>= 1.0.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix >=1.6.1
+    - r-rcpp >=1.0.5
+    - r-rcppeigen
+    - r-future
+    - r-future.apply
+    - r-generics
+    - r-lifecycle
+    - r-progressr
+    - r-rlang >=0.4.7
+    - r-sp >=1.5.0
+    - r-spam
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix >=1.6.1
+    - r-rcpp >=1.0.5
+    - r-rcppeigen
+    - r-future
+    - r-future.apply
+    - r-generics
+    - r-lifecycle
+    - r-progressr
+    - r-rlang >=0.4.7
+    - r-sp >=1.5.0
+    - r-spam
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SeuratObject')"           # [not win]
+    - "\"%R%\" -e \"library('SeuratObject')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://mojaveazure.github.io/seurat-object/, https://github.com/mojaveazure/seurat-object
+  license: MIT
+  summary: Defines S4 classes for single-cell genomic data and associated information, such as
+    dimensionality reduction embeddings, nearest-neighbor graphs, and spatially-resolved
+    coordinates. Provides data access methods and R-native hooks to ensure the Seurat
+    object is familiar to other R users. See Satija R, Farrell J, Gennert D, et al (2015)
+    <doi:10.1038/nbt.3192>, Macosko E, Basu A, Satija R, et al (2015) <doi:10.1016/j.cell.2015.05.002>,
+    and Stuart T, Butler A, et al (2019) <doi:10.1016/j.cell.2019.05.031>, Hao Y, Hao
+    S, et al (2021) <doi:10.1016/j.cell.2021.04.048> and Hao Y, et al (2023) <doi:10.1101/2022.02.24.481684>
+    for more details.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: SeuratObject
+# Type: Package
+# Title: Data Structures for Single Cell Data
+# Version: 5.0.0
+# Authors@R: c( person(given = 'Rahul', family = 'Satija', email = 'rsatija@nygenome.org', role = 'aut', comment = c(ORCID = '0000-0001-9448-8833')), person(given = 'Paul', family = 'Hoffman', email = 'seurat@nygenome.org', role = c('aut', 'cre'), comment = c(ORCID = '0000-0002-7693-8957')), person(given = "Yuhan", family = "Hao", email = 'yhao@nygenome.org', role = 'aut', comment = c(ORCID = '0000-0002-1810-0822')), person(given = "Austin", family = "Hartman", email = 'ahartman@nygenome.org', role = 'aut', comment = c(ORCID = '0000-0001-7278-1852')), person(given = "Gesmira", family = "Molla", email = 'gmolla@nygenome.org', role = 'aut', comment = c(ORCID = '0000-0002-8628-5056')), person(given = 'Andrew', family = 'Butler', email = 'abutler@nygenome.org', role = 'aut', comment = c(ORCID = '0000-0003-3608-0463')), person(given = 'Tim', family = 'Stuart', email = 'tstuart@nygenome.org', role = 'aut', comment = c(ORCID = '0000-0002-3044-0897')), person(given = "Madeline", family = "Kowalski", email = "mkowalski@nygenome.org", role = "ctb", comment = c(ORCID = "0000-0002-5655-7620")), person(given = "Saket", family = "Choudhary", email = "schoudhary@nygenome.org", role = "ctb", comment = c(ORCID = "0000-0001-5202-7633")), person(given = "Skylar", family = "Li", email = "sli@nygenome.org", role = "ctb"), person(given = "Longda", family = "Jiang", email = "ljiang@nygenome.org", role = "ctb", comment = c(ORCID = "0000-0003-4964-6497")), person(given = 'Jeff', family = 'Farrell', email = 'jfarrell@g.harvard.edu', role = 'ctb'), person(given = 'Shiwei', family = 'Zheng', email = 'szheng@nygenome.org', role = 'ctb', comment = c(ORCID = '0000-0001-6682-6743')), person(given = 'Christoph', family = 'Hafemeister', email = 'chafemeister@nygenome.org', role = 'ctb', comment = c(ORCID = '0000-0001-6365-8254')), person(given = 'Patrick', family = 'Roelli', email = 'proelli@nygenome.org', role = 'ctb') )
+# Description: Defines S4 classes for single-cell genomic data and associated information, such as dimensionality reduction embeddings, nearest-neighbor graphs, and spatially-resolved coordinates. Provides data access methods and R-native hooks to ensure the Seurat object is familiar to other R users. See Satija R, Farrell J, Gennert D, et al (2015) <doi:10.1038/nbt.3192>, Macosko E, Basu A, Satija R, et al (2015) <doi:10.1016/j.cell.2015.05.002>, and Stuart T, Butler A, et al (2019) <doi:10.1016/j.cell.2019.05.031>, Hao Y, Hao S, et al (2021) <doi:10.1016/j.cell.2021.04.048> and Hao Y, et al (2023) <doi:10.1101/2022.02.24.481684> for more details.
+# URL: https://mojaveazure.github.io/seurat-object/, https://github.com/mojaveazure/seurat-object
+# BugReports: https://github.com/mojaveazure/seurat-object/issues
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.3
+# Additional_repositories: https://bnprks.r-universe.dev
+# Depends: R (>= 4.0.0), sp (>= 1.5.0)
+# Imports: future, future.apply, grDevices, grid, Matrix (>= 1.6.1), methods, progressr, Rcpp (>= 1.0.5), rlang (>= 0.4.7), stats, tools, utils, spam, lifecycle, generics
+# Suggests: DelayedArray, fs (>= 1.5.2), ggplot2, HDF5Array, rmarkdown, testthat, BPCells, sf (>= 1.0.0)
+# Collate: 'RcppExports.R' 'zzz.R' 'generics.R' 'keymixin.R' 'graph.R' 'default.R' 'assay.R' 'logmap.R' 'layers.R' 'assay5.R' 'centroids.R' 'command.R' 'compliance.R' 'data.R' 'jackstraw.R' 'dimreduc.R' 'segmentation.R' 'molecules.R' 'spatial.R' 'fov.R' 'neighbor.R' 'seurat.R' 'sparse.R' 'utils.R'
+# LinkingTo: Rcpp, RcppEigen
+# Enhances: Seurat
+# Config/Needs/website: pkgdown
+# NeedsCompilation: yes
+# Packaged: 2023-10-24 18:55:33 UTC; paul
+# Author: Rahul Satija [aut] (<https://orcid.org/0000-0001-9448-8833>), Paul Hoffman [aut, cre] (<https://orcid.org/0000-0002-7693-8957>), Yuhan Hao [aut] (<https://orcid.org/0000-0002-1810-0822>), Austin Hartman [aut] (<https://orcid.org/0000-0001-7278-1852>), Gesmira Molla [aut] (<https://orcid.org/0000-0002-8628-5056>), Andrew Butler [aut] (<https://orcid.org/0000-0003-3608-0463>), Tim Stuart [aut] (<https://orcid.org/0000-0002-3044-0897>), Madeline Kowalski [ctb] (<https://orcid.org/0000-0002-5655-7620>), Saket Choudhary [ctb] (<https://orcid.org/0000-0001-5202-7633>), Skylar Li [ctb], Longda Jiang [ctb] (<https://orcid.org/0000-0003-4964-6497>), Jeff Farrell [ctb], Shiwei Zheng [ctb] (<https://orcid.org/0000-0001-6682-6743>), Christoph Hafemeister [ctb] (<https://orcid.org/0000-0001-6365-8254>), Patrick Roelli [ctb]
+# Maintainer: Paul Hoffman <seurat@nygenome.org>
+# Repository: CRAN
+# Date/Publication: 2023-10-26 20:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

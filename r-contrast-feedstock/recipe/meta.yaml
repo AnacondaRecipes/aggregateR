@@ -1,0 +1,93 @@
+{% set version = '0.24.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-contrast
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/contrast_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/contrast/contrast_{{ version }}.tar.gz
+  sha256: 4541acae0f18906c960141b6aafa3eaaa2451efdf7a50952cd83ebf7ab6cefcc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, kableExtra, dplyr, ggplot2, tidyr, rmarkdown, testthat, covr, geepack, splines
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-nlme
+    - r-rms
+    - r-sandwich
+
+  run:
+    - r-base
+    - r-nlme
+    - r-rms
+    - r-sandwich
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('contrast')"           # [not win]
+    - "\"%R%\" -e \"library('contrast')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/Alanocallaghan/contrast
+  license: GPL-2
+  summary: One degree of freedom contrasts for 'lm', 'glm', 'gls', and 'geese' objects.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: contrast
+# Title: A Collection of Contrast Methods
+# Version: 0.24.2
+# Date: 2022-10-05
+# Authors@R: c( person(given = "Alan",  family = "O'Callaghan", email = "alan.ocallaghan@outlook.com", role = c("cre")), person(given = "Max",   family = "Kuhn", role = "aut"), person(given = "Steve", family = "Weston", role = "aut"), person(given = "Jed",   family = "Wing", role = "aut"), person(given = "James", family = "Forester", role = "aut"), person(given = "Thorn", family = "Thaler", role = "aut"))
+# Description: One degree of freedom contrasts for 'lm', 'glm', 'gls', and 'geese' objects.
+# License: GPL-2
+# URL: https://github.com/Alanocallaghan/contrast
+# BugReports: https://github.com/Alanocallaghan/contrast/issues
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 2.10)
+# Imports: nlme, sandwich, rms
+# Suggests: knitr, kableExtra, dplyr, ggplot2, tidyr, rmarkdown, testthat, covr, geepack, splines
+# RoxygenNote: 7.2.1
+# VignetteBuilder: knitr
+# Language: en-US
+# NeedsCompilation: no
+# Packaged: 2022-10-05 16:51:48 UTC; alan
+# Author: Alan O'Callaghan [cre], Max Kuhn [aut], Steve Weston [aut], Jed Wing [aut], James Forester [aut], Thorn Thaler [aut]
+# Maintainer: Alan O'Callaghan <alan.ocallaghan@outlook.com>
+# Repository: CRAN
+# Date/Publication: 2022-10-05 17:20:09 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,97 @@
+{% set version = '1.2.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gmedian
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Gmedian_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Gmedian/Gmedian_{{ version }}.tar.gz
+  sha256: 5378666a91de7a7bed078626869362ed5f0d0587dd5e78b1ec3d54e249b92e55
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rspectra
+    - r-rcpp >=0.12.6
+    - r-rcpparmadillo
+    - r-robustbase
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rspectra
+    - r-rcpp >=0.12.6
+    - r-rcpparmadillo
+    - r-robustbase
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Gmedian')"           # [not win]
+    - "\"%R%\" -e \"library('Gmedian')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Gmedian
+  license: GPL-2
+  summary: Fast algorithms for robust estimation with large samples of multivariate observations.
+    Estimation of the geometric median, robust k-Gmedian clustering, and robust PCA
+    based on the Gmedian covariation matrix.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: Gmedian
+# Type: Package
+# Title: Geometric Median, k-Medians Clustering and Robust Median PCA
+# Version: 1.2.7
+# Date: 2022-08-06
+# Author: Herve Cardot
+# Maintainer: Herve Cardot <herve.cardot@u-bourgogne.fr>
+# Description: Fast algorithms for robust estimation with large samples of multivariate observations. Estimation of the geometric median, robust k-Gmedian clustering, and robust PCA based on the Gmedian covariation matrix.
+# License: GPL (>= 2)
+# Depends: R (>= 3.0.0)
+# Imports: Rcpp (>= 0.12.6), RSpectra, robustbase
+# LinkingTo: Rcpp, RcppArmadillo, RSpectra
+# NeedsCompilation: yes
+# Packaged: 2022-06-08 13:22:37 UTC; hcardot
+# Repository: CRAN
+# Date/Publication: 2022-06-08 14:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

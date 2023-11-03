@@ -1,0 +1,112 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-seededlda
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/seededlda_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/seededlda/seededlda_{{ version }}.tar.gz
+  sha256: 90d5d73b6ee678dffd63e8550ed1e7db7da30538406043caaf9046b4fd4ac399
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, topicmodels, keyATM
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-rcpp
+    - r-rcpparmadillo >=0.7.600.1.0
+    - r-rcppparallel
+    - r-proxyc >=0.3.1
+    - r-quanteda >=3.3.0
+    - r-testthat
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-rcpp
+    - r-rcpparmadillo >=0.7.600.1.0
+    - r-rcppparallel
+    - r-proxyc >=0.3.1
+    - r-quanteda >=3.3.0
+    - r-testthat
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('seededlda')"           # [not win]
+    - "\"%R%\" -e \"library('seededlda')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/koheiw/seededlda, https://koheiw.github.io/seededlda/
+  license: GPL-3
+  summary: Seeded Sequential LDA can classify sentences of texts into pre-define topics with
+    a small number of seed words (Watanabe & Baturo, 2023) <doi:10.1177/08944393231178605>.
+    Implements Seeded LDA (Lu et al., 2010) <doi:10.1109/ICDMW.2011.125> and Sequential
+    LDA (Du et al., 2012) <doi:10.1007/s10115-011-0425-1> with the distributed LDA algorithm
+    (Newman, et al., 2009) for parallel computing.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: seededlda
+# Type: Package
+# Title: Seeded Sequential LDA for Topic Modeling
+# Version: 1.1.0
+# Authors@R: c(person("Kohei", "Watanabe", email = "watanabe.kohei@gmail.com", role = c("aut", "cre", "cph")), person("Phan", "Xuan-Hieu", email = "pxhieu@gmail.com", role = c("aut", "cph"), comment = "GibbsLDA++"))
+# Description: Seeded Sequential LDA can classify sentences of texts into pre-define topics with a small number of seed words (Watanabe & Baturo, 2023) <doi:10.1177/08944393231178605>. Implements Seeded LDA (Lu et al., 2010) <doi:10.1109/ICDMW.2011.125> and Sequential LDA (Du et al., 2012) <doi:10.1007/s10115-011-0425-1> with the distributed LDA algorithm (Newman, et al., 2009) for parallel computing.
+# License: GPL-3
+# LazyData: TRUE
+# URL: https://github.com/koheiw/seededlda, https://koheiw.github.io/seededlda/
+# BugReports: https://github.com/koheiw/seededlda/issues
+# Encoding: UTF-8
+# Depends: R (>= 3.5.0), quanteda (>= 3.3.0), methods, proxyC (>= 0.3.1)
+# Imports: Matrix
+# LinkingTo: Rcpp, RcppParallel, RcppArmadillo (>= 0.7.600.1.0), quanteda, testthat
+# Suggests: testthat, topicmodels, keyATM
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-06-30 23:55:16 UTC; watan
+# Author: Kohei Watanabe [aut, cre, cph], Phan Xuan-Hieu [aut, cph] (GibbsLDA++)
+# Maintainer: Kohei Watanabe <watanabe.kohei@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-07-01 04:00:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

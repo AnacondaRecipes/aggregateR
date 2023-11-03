@@ -1,0 +1,95 @@
+{% set version = '0.6.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-maptiles
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/maptiles_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/maptiles/maptiles_{{ version }}.tar.gz
+  sha256: 43a1c53102f011a40002a8f9e318dc1fac98c4d354d245817dfc7f8557e495df
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, tinytest
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-curl
+    - r-png
+    - r-sf >=0.9_5
+    - r-slippymath
+    - r-terra
+
+  run:
+    - r-base
+    - r-curl
+    - r-png
+    - r-sf >=0.9_5
+    - r-slippymath
+    - r-terra
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('maptiles')"           # [not win]
+    - "\"%R%\" -e \"library('maptiles')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/riatelab/maptiles/
+  license: GPL-3
+  summary: To create maps from tiles, 'maptiles' downloads, composes and displays tiles from
+    a large number of providers (e.g. 'OpenStreetMap', 'Stamen', 'Esri', 'CARTO', or
+    'Thunderforest').
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: maptiles
+# Title: Download and Display Map Tiles
+# Version: 0.6.1
+# Authors@R: c(person(given = "Timothee", family = "Giraud", email = "timothee.giraud@cnrs.fr", role = c("cre","aut"), comment = c(ORCID = "0000-0002-1932-3323")), person(given = "Diego", family = "Hernangomez", role = c("ctb"), comment = c(ORCID = "0000-0001-8457-4658")), person(given = "Robert J.", family = "Hijmans", role = c("ctb"), comment = c(ORCID = "0000-0001-5872-2872")), person(given = "Hugh A.", family = "Graham", role = c("ctb")))
+# Description: To create maps from tiles, 'maptiles' downloads, composes and displays tiles from a large number of providers (e.g. 'OpenStreetMap', 'Stamen', 'Esri', 'CARTO', or 'Thunderforest').
+# URL: https://github.com/riatelab/maptiles/
+# BugReports: https://github.com/riatelab/maptiles/issues/
+# License: GPL-3
+# Depends: R (>= 3.5.0)
+# Imports: sf (>= 0.9-5), curl, graphics, grDevices, png, terra, tools, slippymath
+# Suggests: covr, tinytest
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-09-13 13:37:31 UTC; tim
+# Author: Timothee Giraud [cre, aut] (<https://orcid.org/0000-0002-1932-3323>), Diego Hernangomez [ctb] (<https://orcid.org/0000-0001-8457-4658>), Robert J. Hijmans [ctb] (<https://orcid.org/0000-0001-5872-2872>), Hugh A. Graham [ctb]
+# Maintainer: Timothee Giraud <timothee.giraud@cnrs.fr>
+# Repository: CRAN
+# Date/Publication: 2023-09-13 21:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,101 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ggdensity
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ggdensity_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ggdensity/ggdensity_{{ version }}.tar.gz
+  sha256: d9747e294d83bedc45854092d4e4a5e05542f9449ad602bb793f0d6e9c0ad507
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: vdiffr, testthat (>= 3.0.0), knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-ggplot2
+    - r-isoband
+    - r-scales
+    - r-tibble
+    - r-vctrs
+
+  run:
+    - r-base
+    - r-mass
+    - r-ggplot2
+    - r-isoband
+    - r-scales
+    - r-tibble
+    - r-vctrs
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ggdensity')"           # [not win]
+    - "\"%R%\" -e \"library('ggdensity')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://jamesotto852.github.io/ggdensity/, https://github.com/jamesotto852/ggdensity/
+  license: MIT
+  summary: The 'ggplot2' package provides simple functions for visualizing contours of 2-d kernel
+    density estimates. 'ggdensity' implements several additional density estimators
+    as well as more interpretable visualizations based on highest density regions instead
+    of the traditional height of the estimated density surface.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: ggdensity
+# Title: Interpretable Bivariate Density Visualization with 'ggplot2'
+# Version: 1.0.0
+# Authors@R: c(person(given = "James", family = "Otto", role = c("aut", "cre"), email = "jamesotto852@gmail.com", comment = c(ORCID = "0000-0002-0665-2515")), person(given = "David", family = "Kahle", role = c("aut"), email = "david@kahle.io", comment = c(ORCID = "0000-0002-9999-1558")))
+# Description: The 'ggplot2' package provides simple functions for visualizing contours of 2-d kernel density estimates. 'ggdensity' implements several additional density estimators as well as more interpretable visualizations based on highest density regions instead of the traditional height of the estimated density surface.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Depends: ggplot2
+# Imports: isoband, vctrs, tibble, MASS, stats, scales
+# URL: https://jamesotto852.github.io/ggdensity/, https://github.com/jamesotto852/ggdensity/
+# BugReports: https://github.com/jamesotto852/ggdensity/issues/
+# Suggests: vdiffr, testthat (>= 3.0.0), knitr, rmarkdown
+# Config/testthat/edition: 3
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2023-02-09 22:57:26 UTC; ubuntu
+# Author: James Otto [aut, cre] (<https://orcid.org/0000-0002-0665-2515>), David Kahle [aut] (<https://orcid.org/0000-0002-9999-1558>)
+# Maintainer: James Otto <jamesotto852@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-02-09 23:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

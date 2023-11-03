@@ -1,0 +1,116 @@
+{% set version = '1.6.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bfast
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bfast_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bfast/bfast_{{ version }}.tar.gz
+  sha256: aaf479af1924691cbec8c67c68005c00d97cead51b2b44863c18acd4cea453ee
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, sfsmisc, stlplus, raster
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.7
+    - r-rdpack >=0.7
+    - r-forecast
+    - r-strucchangercpp
+    - r-zoo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.7
+    - r-rdpack >=0.7
+    - r-forecast
+    - r-strucchangercpp
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bfast')"           # [not win]
+    - "\"%R%\" -e \"library('bfast')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://bfast2.github.io/
+  license: GPL-2
+  summary: Decomposition of time series into trend, seasonal, and remainder components with methods
+    for detecting and characterizing abrupt changes within the trend and seasonal components.
+    'BFAST' can be used to analyze different types of satellite image time series and
+    can be applied to other disciplines dealing with seasonal or non-seasonal time series,
+    such as hydrology, climatology, and econometrics. The algorithm can be extended
+    to label detected changes with information on the parameters of the fitted piecewise
+    linear models. 'BFAST' monitoring functionality is described in Verbesselt et al.
+    (2010) <doi:10.1016/j.rse.2009.08.014>. 'BFAST monitor' provides functionality to
+    detect disturbance in near real-time based on 'BFAST'- type models, and is described
+    in Verbesselt et al. (2012) <doi:10.1016/j.rse.2012.02.022>. 'BFAST Lite' approach
+    is a flexible approach that handles missing data without interpolation, and will
+    be described in an upcoming paper. Furthermore, different models can now be used
+    to fit the time series data and detect structural changes (breaks).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: bfast
+# Version: 1.6.1
+# Title: Breaks for Additive Season and Trend
+# Authors@R: c(person(given = "Jan", family = "Verbesselt", role = c("aut"), email = "Jan.Verbesselt@wur.nl"), person(given = "Dainius", family = "Masiliunas", role = c("aut", "cre"), email = "pastas4@gmail.com", comment = c(ORCID = "0000-0001-5654-1277")), person(given = "Achim", family = "Zeileis", role = "aut", email = "Achim.Zeileis@R-project.org"), person(given = "Rob", family = "Hyndman", role = "ctb", email = "Rob.Hyndman@buseco.monash.edu.au"), person(given = "Marius", family = "Appel", role = "aut", email = "marius.appel@uni-muenster.de"), person(given = "Martin", family = "Jung", role = "ctb", email = "m.jung@sussex.ac.uk"), person(given = "Andrei", family = "Mirt", role = "ctb", email = "andrei.mirt@wur.nl", comment = c(ORCID = "0000-0003-3654-2090")), person(given = c("Paulo", "Negri"), family = "Bernardino", role = "ctb", email = "paulo.negribernardino@wur.nl"), person(given = "Dongdong", family = "Kong", role = "ctb", email = "kongdd@mail2.sysu.edu.cn", comment = c(ORCID = "0000-0003-1836-8172")) )
+# Description: Decomposition of time series into trend, seasonal, and remainder components with methods for detecting and characterizing abrupt changes within the trend and seasonal components. 'BFAST' can be used to analyze different types of satellite image time series and can be applied to other disciplines dealing with seasonal or non-seasonal time series, such as hydrology, climatology, and econometrics. The algorithm can be extended to label detected changes with information on the parameters of the fitted piecewise linear models. 'BFAST' monitoring functionality is described in Verbesselt et al. (2010) <doi:10.1016/j.rse.2009.08.014>. 'BFAST monitor' provides functionality to detect disturbance in near real-time based on 'BFAST'- type models, and is described in Verbesselt et al. (2012) <doi:10.1016/j.rse.2012.02.022>. 'BFAST Lite' approach is a flexible approach that handles missing data without interpolation, and will be described in an upcoming paper. Furthermore, different models can now be used to fit the time series data and detect structural changes (breaks).
+# Depends: R (>= 3.0.0), strucchangeRcpp
+# Imports: graphics, stats, zoo, forecast, Rcpp (>= 0.12.7), Rdpack (>= 0.7)
+# Suggests: MASS, sfsmisc, stlplus, raster
+# License: GPL (>= 2)
+# URL: https://bfast2.github.io/
+# BugReports: https://github.com/bfast2/bfast/issues
+# LazyLoad: yes
+# LazyData: yes
+# LinkingTo: Rcpp
+# RoxygenNote: 7.1.1
+# RdMacros: Rdpack
+# NeedsCompilation: yes
+# Packaged: 2021-05-06 16:18:40 UTC; dainius
+# Author: Jan Verbesselt [aut], Dainius Masiliunas [aut, cre] (<https://orcid.org/0000-0001-5654-1277>), Achim Zeileis [aut], Rob Hyndman [ctb], Marius Appel [aut], Martin Jung [ctb], Andrei Mirt [ctb] (<https://orcid.org/0000-0003-3654-2090>), Paulo Negri Bernardino [ctb], Dongdong Kong [ctb] (<https://orcid.org/0000-0003-1836-8172>)
+# Maintainer: Dainius Masiliunas <pastas4@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-05-10 14:12:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

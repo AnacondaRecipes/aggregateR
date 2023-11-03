@@ -1,0 +1,109 @@
+{% set version = '1.5-3-1.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-strucchangercpp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/strucchangeRcpp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/strucchangeRcpp/strucchangeRcpp_{{ version }}.tar.gz
+  sha256: f506fcb593ce4bacf1892de25154257d0fe02260ef956a75438c6330195cd86d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: stats4, car, dynlm, e1071, foreach, lmtest, mvtnorm, tseries, bfast
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.7
+    - r-rcpparmadillo
+    - r-sandwich
+    - r-zoo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.7
+    - r-rcpparmadillo
+    - r-sandwich
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('strucchangeRcpp')"           # [not win]
+    - "\"%R%\" -e \"library('strucchangeRcpp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/bfast2/strucchangeRcpp/
+  license: GPL-2 | GPL-3
+  summary: A fast implementation with additional experimental features for testing, monitoring
+    and dating structural changes in (linear) regression models. 'strucchangeRcpp' features
+    tests/methods from the generalized fluctuation test framework as well as from the
+    F test (Chow test) framework. This includes methods to fit, plot and test fluctuation
+    processes (e.g. cumulative/moving sum, recursive/moving estimates) and F statistics,
+    respectively. These methods are described in Zeileis et al. (2002) <doi:10.18637/jss.v007.i02>.
+    Finally, the breakpoints in regression models with structural changes can be estimated
+    together with confidence intervals, and their magnitude as well as the model fit
+    can be evaluated using a variety of statistical measures.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: strucchangeRcpp
+# Version: 1.5-3-1.0.4
+# Title: Testing, Monitoring, and Dating Structural Changes: C++ Version
+# Authors@R: c(person(given = "Dainius", family = "Masiliunas", role = c("aut", "cre"), email = "pastas4@gmail.com", comment = c(ORCID = "0000-0001-5654-1277")), person(given = "Achim", family = "Zeileis", role = c("aut"), email = "Achim.Zeileis@R-project.org", comment = c(ORCID = "0000-0003-0918-3766")), person(given = "Marius", family = "Appel", role = "aut", email = "marius.appel@uni-muenster.de"), person(given = "Friedrich", family = "Leisch", role = "aut", email = "Friedrich.Leisch@R-project.org"), person(given = "Kurt", family = "Hornik", role = "aut", email = "Kurt.Hornik@R-project.org"), person(given = "Christian", family = "Kleiber", role = "aut", email = "Christian.Kleiber@unibas.ch"), person(given = "Andrei", family = "Mirt", role = "ctb", email = "andrei.mirt@wur.nl", comment = c(ORCID = "0000-0003-3654-2090")), person(given = "Bruce", family = "Hansen", role = "ctb"), person(given = c("Edgar", "C."), family = "Merkle", role = "ctb"))
+# Description: A fast implementation with additional experimental features for testing, monitoring and dating structural changes in (linear) regression models. 'strucchangeRcpp' features tests/methods from the generalized fluctuation test framework as well as from the F test (Chow test) framework. This includes methods to fit, plot and test fluctuation processes (e.g. cumulative/moving sum, recursive/moving estimates) and F statistics, respectively. These methods are described in Zeileis et al. (2002) <doi:10.18637/jss.v007.i02>. Finally, the breakpoints in regression models with structural changes can be estimated together with confidence intervals, and their magnitude as well as the model fit can be evaluated using a variety of statistical measures.
+# LazyData: yes
+# LinkingTo: Rcpp, RcppArmadillo
+# Depends: R (>= 2.10.0), zoo, sandwich
+# Suggests: stats4, car, dynlm, e1071, foreach, lmtest, mvtnorm, tseries, bfast
+# Imports: graphics, stats, Rcpp (>= 0.12.7), utils
+# License: GPL-2 | GPL-3
+# URL: https://github.com/bfast2/strucchangeRcpp/
+# BugReports: https://github.com/bfast2/strucchangeRcpp/issues
+# RoxygenNote: 7.1.1
+# NeedsCompilation: yes
+# Packaged: 2021-11-25 15:45:25 UTC; dainius
+# Author: Dainius Masiliunas [aut, cre] (<https://orcid.org/0000-0001-5654-1277>), Achim Zeileis [aut] (<https://orcid.org/0000-0003-0918-3766>), Marius Appel [aut], Friedrich Leisch [aut], Kurt Hornik [aut], Christian Kleiber [aut], Andrei Mirt [ctb] (<https://orcid.org/0000-0003-3654-2090>), Bruce Hansen [ctb], Edgar C. Merkle [ctb]
+# Maintainer: Dainius Masiliunas <pastas4@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-11-26 16:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

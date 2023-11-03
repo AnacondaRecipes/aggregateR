@@ -1,0 +1,97 @@
+{% set version = '4.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-osrm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/osrm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/osrm/osrm_{{ version }}.tar.gz
+  sha256: cbbbaa52f887cd5ef8ef7a94a5975af428540e13b90f55d920013d975fd5fb17
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: mapsf, tinytest, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcppsimdjson
+    - r-curl
+    - r-googlepolylines
+    - r-mapiso
+    - r-sf
+
+  run:
+    - r-base
+    - r-rcppsimdjson
+    - r-curl
+    - r-googlepolylines
+    - r-mapiso
+    - r-sf
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('osrm')"           # [not win]
+    - "\"%R%\" -e \"library('osrm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/riatelab/osrm
+  license: GPL-3
+  summary: An interface between R and the 'OSRM' API. 'OSRM' is a routing service based on 'OpenStreetMap'
+    data. See <http://project-osrm.org/> for more information. This package enables
+    the computation of routes, trips, isochrones and travel distances matrices (travel
+    time and kilometric distance).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: osrm
+# Type: Package
+# Title: Interface Between R and the OpenStreetMap-Based Routing Service OSRM
+# Version: 4.1.1
+# Authors@R: c(person("Timothee", "Giraud", email = "timothee.giraud@cnrs.fr", role = c("cre","aut"),  comment = c(ORCID = "0000-0002-1932-3323")), person("Robin", "Cura", role = c("ctb")), person("Matthieu", "Viry", role = c("ctb")), person("Robin", "Lovelace", role = c("ctb"), comment = c(ORCID = "0000-0001-5679-6536")) )
+# Description: An interface between R and the 'OSRM' API. 'OSRM' is a routing service based on 'OpenStreetMap' data. See <http://project-osrm.org/> for more information. This package enables the computation of routes, trips, isochrones and travel distances matrices (travel time and kilometric distance).
+# License: GPL (>= 3)
+# Imports: RcppSimdJson, curl, utils, mapiso, googlePolylines, sf
+# Depends: R (>= 3.5.0)
+# Suggests: mapsf, tinytest, covr
+# URL: https://github.com/riatelab/osrm
+# BugReports: https://github.com/riatelab/osrm/issues
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-03-30 14:03:31 UTC; tim
+# Author: Timothee Giraud [cre, aut] (<https://orcid.org/0000-0002-1932-3323>), Robin Cura [ctb], Matthieu Viry [ctb], Robin Lovelace [ctb] (<https://orcid.org/0000-0001-5679-6536>)
+# Maintainer: Timothee Giraud <timothee.giraud@cnrs.fr>
+# Repository: CRAN
+# Date/Publication: 2023-03-30 14:20:16 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

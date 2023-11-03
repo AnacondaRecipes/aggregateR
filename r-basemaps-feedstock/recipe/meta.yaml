@@ -1,0 +1,99 @@
+{% set version = '0.0.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-basemaps
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/basemaps_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/basemaps/basemaps_{{ version }}.tar.gz
+  sha256: 33732ad059eda59f656f8a7381048e8daa42af0cf2cd52610a29d8a54630330b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rgdal, ggplot2, png, mapview, mapedit, raster, stars, testthat, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-curl
+    - r-httr
+    - r-magick
+    - r-pbapply
+    - r-sf
+    - r-slippymath
+    - r-terra
+
+  run:
+    - r-base
+    - r-curl
+    - r-httr
+    - r-magick
+    - r-pbapply
+    - r-sf
+    - r-slippymath
+    - r-terra
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('basemaps')"           # [not win]
+    - "\"%R%\" -e \"library('basemaps')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=basemaps
+  license: GPL-3
+  summary: A lightweight package to access spatial basemaps from open sources such as 'OpenStreetMap',
+    'Carto', 'Mapbox' and others in R.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: basemaps
+# Type: Package
+# Title: Accessing Spatial Basemaps in R
+# Version: 0.0.5
+# Depends: R (>= 3.5.0)
+# Date: 2022-09-26
+# Authors@R: person("Jakob", "Schwalb-Willmann", email = "dev@schwalb-willmann.de", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-2665-1509"))
+# Description: A lightweight package to access spatial basemaps from open sources such as 'OpenStreetMap', 'Carto', 'Mapbox' and others in R.
+# License: GPL-3
+# Encoding: UTF-8
+# Imports: sf, slippymath, httr, curl, terra, pbapply, magick, utils, grDevices
+# Suggests: rgdal, ggplot2, png, mapview, mapedit, raster, stars, testthat, covr
+# BugReports: https://github.com/16eagle/basemaps/issues
+# RoxygenNote: 7.2.1
+# NeedsCompilation: no
+# Packaged: 2022-09-26 18:55:17 UTC; jas24ny
+# Author: Jakob Schwalb-Willmann [aut, cre] (<https://orcid.org/0000-0003-2665-1509>)
+# Maintainer: Jakob Schwalb-Willmann <dev@schwalb-willmann.de>
+# Repository: CRAN
+# Date/Publication: 2022-09-26 19:40:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

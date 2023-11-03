@@ -1,0 +1,97 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-shiny.react
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/shiny.react_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/shiny.react/shiny.react_{{ version }}.tar.gz
+  sha256: 507477cd7ff35f06df6c433d48320100c03f1fcc8311b2b4bc0c13d0c1149b68
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, leaflet, lintr (>= 3.0.0), mockery (>= 0.4.2), rcmdcheck, rmarkdown, styler, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-glue
+    - r-htmltools
+    - r-jsonlite
+    - r-logger
+    - r-purrr
+    - r-rlang
+    - r-shiny
+
+  run:
+    - r-base
+    - r-glue
+    - r-htmltools
+    - r-jsonlite
+    - r-logger
+    - r-purrr
+    - r-rlang
+    - r-shiny
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('shiny.react')"           # [not win]
+    - "\"%R%\" -e \"library('shiny.react')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://appsilon.github.io/shiny.react/, https://github.com/Appsilon/shiny.react
+  license: LGPL-3
+  summary: A toolbox for defining React component wrappers which can be used seamlessly in Shiny
+    apps.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: shiny.react
+# Title: Tools for Using React in Shiny
+# Version: 0.3.0
+# Authors@R: c( person("Kamil", "Zya", role = c("aut", "cre"), email = "opensource+kamil@appsilon.com"), person("Jakub", "Sobolewski", role = "aut", email = "jakub.sobolewski@appsilon.com"), person("Marek", "Rogala", role = "aut", email = "marek@appsilon.com"), person("Appsilon Sp. z o.o.", role = "cph", email = "opensource@appsilon.com") )
+# URL: https://appsilon.github.io/shiny.react/, https://github.com/Appsilon/shiny.react
+# Description: A toolbox for defining React component wrappers which can be used seamlessly in Shiny apps.
+# License: LGPL (>= 3)
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# Imports: glue, htmltools, jsonlite, logger, purrr, rlang, shiny
+# Suggests: knitr, leaflet, lintr (>= 3.0.0), mockery (>= 0.4.2), rcmdcheck, rmarkdown, styler, testthat
+# NeedsCompilation: no
+# Packaged: 2022-12-22 15:22:15 UTC; kamil
+# Author: Kamil Zya [aut, cre], Jakub Sobolewski [aut], Marek Rogala [aut], Appsilon Sp. z o.o. [cph]
+# Maintainer: Kamil Zya <opensource+kamil@appsilon.com>
+# Repository: CRAN
+# Date/Publication: 2022-12-25 07:20:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

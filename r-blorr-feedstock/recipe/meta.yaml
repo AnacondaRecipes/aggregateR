@@ -1,0 +1,111 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-blorr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/blorr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/blorr/blorr_{{ version }}.tar.gz
+  sha256: 7685c581e01dff7de801a2ebc177b840cffe88ff2ce1224400f7b0939579dbfa
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, grid, ineq, knitr, magrittr, rmarkdown, testthat, vdiffr, xplorerr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-car
+    - r-data.table
+    - r-ggplot2
+    - r-gridextra
+    - r-lest
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-car
+    - r-data.table
+    - r-ggplot2
+    - r-gridextra
+    - r-lest
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('blorr')"           # [not win]
+    - "\"%R%\" -e \"library('blorr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: 'URL: https://blorr.rsquaredacademy.com/, https://github.com/rsquaredacademy/blorr'
+  license: MIT
+  summary: Tools designed to make it easier for beginner and intermediate users to build and
+    validate binary logistic regression models. Includes bivariate analysis, comprehensive
+    regression output, model fit statistics, variable selection procedures, model validation
+    techniques and a 'shiny' app for interactive model building.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: blorr
+# Type: Package
+# Title: Tools for Developing Binary Logistic Regression Models
+# Version: 0.3.0
+# Authors@R: person("Aravind", "Hebbali", email = "hebbali.aravind@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9220-9669"))
+# Description: Tools designed to make it easier for beginner and intermediate users to build and validate binary logistic regression models. Includes bivariate analysis, comprehensive regression output, model fit statistics, variable selection procedures, model validation techniques and a 'shiny' app for interactive model building.
+# Depends: R(>= 3.5)
+# Imports: car, data.table, ggplot2, gridExtra, lest, Rcpp, stats, utils
+# Suggests: covr, grid, ineq, knitr, magrittr, rmarkdown, testthat, vdiffr, xplorerr
+# License: MIT + file LICENSE
+# URL: URL: https://blorr.rsquaredacademy.com/, https://github.com/rsquaredacademy/blorr
+# BugReports: https://github.com/rsquaredacademy/blorr/issues
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.1.0
+# LinkingTo: Rcpp
+# NeedsCompilation: yes
+# Packaged: 2020-05-28 11:13:12 UTC; HP
+# Author: Aravind Hebbali [aut, cre] (<https://orcid.org/0000-0001-9220-9669>)
+# Maintainer: Aravind Hebbali <hebbali.aravind@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2020-05-28 12:20:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

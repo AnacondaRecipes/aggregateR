@@ -1,0 +1,89 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rapportools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rapportools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rapportools/rapportools_{{ version }}.tar.gz
+  sha256: b5fab34bed484d20bb6cf27028f3d9009c482b079298d31a344f84675b342863
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-pander
+    - r-plyr
+    - r-reshape2
+
+  run:
+    - r-base
+    - r-mass
+    - r-pander
+    - r-plyr
+    - r-reshape2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rapportools')"           # [not win]
+    - "\"%R%\" -e \"library('rapportools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rapportools
+  license: AGPL-3
+  summary: Helper functions that act as wrappers to more advanced statistical methods with the
+    advantage of having sane defaults for quick reporting.
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: rapportools
+# Maintainer: Gergely Daroczi <daroczig@rapporter.net>
+# Title: Miscellaneous (Stats) Helper Functions with Sane Defaults for Reporting
+# Type: Package
+# Encoding: UTF-8
+# Description: Helper functions that act as wrappers to more advanced statistical methods with the advantage of having sane defaults for quick reporting.
+# Author: Aleksandar Blagotic <alex@rapporter.net> and Gergely Daroczi <daroczig@rapporter.net>
+# Version: 1.1
+# Date: 2022-03-22
+# BugReports: https://github.com/rapporter/rapportools/issues
+# License: AGPL-3
+# Imports: plyr, pander, reshape2, MASS
+# RoxygenNote: 7.1.1
+# NeedsCompilation: no
+# Packaged: 2022-03-21 23:20:46 UTC; daroczig
+# Repository: CRAN
+# Date/Publication: 2022-03-22 00:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

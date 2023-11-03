@@ -1,0 +1,100 @@
+{% set version = '0.0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-qqplotr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/qqplotr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/qqplotr/qqplotr_{{ version }}.tar.gz
+  sha256: aedb29f07824ce2d0f13df33c0b66805f32f8092fb0861d668291502eaa9414e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: shiny, devtools, lattice, shinyBS, knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-dplyr
+    - r-ggplot2 >=2.2
+    - r-opdisdownsampling
+    - r-qqconf >=1.3.1
+    - r-robustbase
+
+  run:
+    - r-base
+    - r-mass
+    - r-dplyr
+    - r-ggplot2 >=2.2
+    - r-opdisdownsampling
+    - r-qqconf >=1.3.1
+    - r-robustbase
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('qqplotr')"           # [not win]
+    - "\"%R%\" -e \"library('qqplotr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/aloy/qqplotr
+  license: GPL-3
+  summary: Extensions of 'ggplot2' Q-Q plot functionalities.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: qqplotr
+# Type: Package
+# Version: 0.0.6
+# Title: Quantile-Quantile Plot Extensions for 'ggplot2'
+# Description: Extensions of 'ggplot2' Q-Q plot functionalities.
+# Authors@R: c(person("Alexandre", "Almeida", email = "almeida.xan@gmail.com", role = c("aut")), person("Adam", "Loy", email = "loyad01@gmail.com", role = c("aut", "cre")), person("Heike", "Hofmann", role = "aut"))
+# URL: https://github.com/aloy/qqplotr
+# BugReports: https://github.com/aloy/qqplotr/issues
+# License: GPL-3 | file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.2
+# Collate: 'data.R' 'geom_qq_band.R' 'qqplotr.R' 'runShinyExample.R' 'stat_pp_band.R' 'stat_pp_line.R' 'stat_pp_point.R' 'stat_qq_line.R' 'stat_qq_band.R' 'stat_qq_point.R'
+# VignetteBuilder: knitr
+# Depends: R (>= 3.1), ggplot2 (>= 2.2)
+# Imports: dplyr, robustbase, MASS, opdisDownsampling, qqconf (>= 1.3.1)
+# Suggests: shiny, devtools, lattice, shinyBS, knitr, rmarkdown
+# NeedsCompilation: no
+# Packaged: 2023-01-25 19:43:38 UTC; aloy
+# Author: Alexandre Almeida [aut], Adam Loy [aut, cre], Heike Hofmann [aut]
+# Maintainer: Adam Loy <loyad01@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-01-25 21:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

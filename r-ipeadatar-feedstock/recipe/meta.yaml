@@ -1,0 +1,107 @@
+{% set version = '0.1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ipeadatar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ipeadatar_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ipeadatar/ipeadatar_{{ version }}.tar.gz
+  sha256: c01025726217a30d5248faf32559b8b192dd30372ba20e93cf4300bf6105c0c8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rmarkdown, knitr, testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-curl
+    - r-dplyr
+    - r-jsonlite
+    - r-lubridate
+    - r-magrittr
+    - r-purrr
+    - r-rlang
+    - r-sjlabelled
+    - r-stringr
+
+  run:
+    - r-base
+    - r-curl
+    - r-dplyr
+    - r-jsonlite
+    - r-lubridate
+    - r-magrittr
+    - r-purrr
+    - r-rlang
+    - r-sjlabelled
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ipeadatar')"           # [not win]
+    - "\"%R%\" -e \"library('ipeadatar')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/gomesleduardo/ipeadatar
+  license: MIT
+  summary: Allows direct access to the macroeconomic, financial and regional database maintained
+    by Brazilian Institute for Applied Economic Research ('Ipea'). This R package uses
+    the 'Ipeadata' API. For more information, see <http://www.ipeadata.gov.br/>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: ipeadatar
+# Type: Package
+# Title: API Wrapper for 'Ipeadata'
+# Version: 0.1.6
+# Authors@R: c( person("Luiz Eduardo S.","Gomes", role=c("aut","cre"), email="gomes.leduardo@gmail.com"), person("Jessyka A. P.","Goltara", role=c("ctb"), email="jessykagoltara@gmail.com") )
+# Author: Luiz Eduardo S. Gomes [aut, cre], Jessyka A. P. Goltara [ctb]
+# Maintainer: Luiz Eduardo S. Gomes <gomes.leduardo@gmail.com>
+# Description: Allows direct access to the macroeconomic, financial and regional database maintained by Brazilian Institute for Applied Economic Research ('Ipea'). This R package uses the 'Ipeadata' API. For more information, see <http://www.ipeadata.gov.br/>.
+# Depends: R (>= 3.5.0)
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# URL: https://github.com/gomesleduardo/ipeadatar
+# BugReports: https://github.com/gomesleduardo/ipeadatar/issues
+# Imports: stringr, curl, rlang, jsonlite, magrittr, dplyr, lubridate, purrr, sjlabelled
+# NeedsCompilation: no
+# RoxygenNote: 7.1.2
+# Suggests: rmarkdown, knitr, testthat (>= 3.0.0)
+# Config/testthat/edition: 3
+# VignetteBuilder: knitr
+# Packaged: 2022-02-01 01:56:19 UTC; Eduardo
+# Repository: CRAN
+# Date/Publication: 2022-02-03 07:50:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

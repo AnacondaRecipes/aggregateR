@@ -1,0 +1,129 @@
+{% set version = '0.5.1.216' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-simmr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/simmr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/simmr/simmr_{{ version }}.tar.gz
+  sha256: a58788c84280db07c62de50da64d7a213f74c54928c9cfc27d3b46d3c1326e67
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, readxl, testthat, covr, vdiffr, tibble, ggnewscale
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggally
+    - r-r2jags
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-rcppdist
+    - r-bayesplot
+    - r-boot
+    - r-checkmate
+    - r-compositions
+    - r-ggplot2
+    - r-reshape2
+    - r-viridis
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-ggally
+    - r-r2jags
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-rcppdist
+    - r-bayesplot
+    - r-boot
+    - r-checkmate
+    - r-compositions
+    - r-ggplot2
+    - r-reshape2
+    - r-viridis
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('simmr')"           # [not win]
+    - "\"%R%\" -e \"library('simmr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/andrewcparnell/simmr, https://andrewcparnell.github.io/simmr/
+  license: GPL-2
+  summary: Fits Stable Isotope Mixing Models (SIMMs) and is meant as a longer term replacement
+    to the previous widely-used package SIAR. SIMMs are used to infer dietary proportions
+    of organisms consuming various food sources from observations on the stable isotope
+    values taken from the organisms' tissue samples. However SIMMs can also be used
+    in other scenarios, such as in sediment mixing or the composition of fatty acids.
+    The main functions are simmr_load() and simmr_mcmc(). The two vignettes contain
+    a quick start and a full listing of all the features. The methods used are detailed
+    in the papers Parnell et al 2010 <doi:10.1371/journal.pone.0009672>, and Parnell
+    et al 2013 <doi:10.1002/env.2221>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: simmr
+# Type: Package
+# Title: A Stable Isotope Mixing Model
+# Version: 0.5.1.216
+# Date: 2023-10-02
+# Authors@R: c( person("Emma", "Govan", email = "emma.govan.2021@mumail.ie", role = c("cre", "aut")), person("Andrew", "Parnell", role = "aut") )
+# URL: https://github.com/andrewcparnell/simmr, https://andrewcparnell.github.io/simmr/
+# BugReports: https://github.com/andrewcparnell/simmr/issues
+# Language: en-US
+# Description: Fits Stable Isotope Mixing Models (SIMMs) and is meant as a longer term replacement to the previous widely-used package SIAR. SIMMs are used to infer dietary proportions of organisms consuming various food sources from observations on the stable isotope values taken from the organisms' tissue samples. However SIMMs can also be used in other scenarios, such as in sediment mixing or the composition of fatty acids. The main functions are simmr_load() and simmr_mcmc(). The two vignettes contain a quick start and a full listing of all the features. The methods used are detailed in the papers Parnell et al 2010 <doi:10.1371/journal.pone.0009672>, and Parnell et al 2013 <doi:10.1002/env.2221>.
+# Depends: R (>= 3.5.0), R2jags, ggplot2
+# Imports: compositions, boot, reshape2, graphics, stats, viridis, bayesplot, checkmate, Rcpp, GGally
+# Encoding: UTF-8
+# License: GPL (>= 2)
+# LazyData: TRUE
+# Suggests: knitr, rmarkdown, readxl, testthat, covr, vdiffr, tibble, ggnewscale
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2023-10-27 13:53:10 UTC; emmagovan
+# RoxygenNote: 7.2.3
+# Repository: CRAN
+# Date/Publication: 2023-10-27 14:20:02 UTC
+# LinkingTo: Rcpp, RcppArmadillo, RcppDist,
+# Author: Emma Govan [cre, aut], Andrew Parnell [aut]
+# Maintainer: Emma Govan <emma.govan.2021@mumail.ie>
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

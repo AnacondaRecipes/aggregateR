@@ -1,0 +1,126 @@
+{% set version = '0.1.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tibbletime
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tibbletime_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tibbletime/tibbletime_{{ version }}.tar.gz
+  sha256: d6f1c21cc4f6e01f9b806c9543ce4ee5a94ed45020917cc6f4257176e31e46a1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: broom, covr, gapminder, knitr, rmarkdown, testthat, tidyr (>= 1.0.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.9
+    - r-assertthat >=0.2.1
+    - r-dplyr >=1.0.10
+    - r-glue >=1.6.2
+    - r-hms >=1.1.2
+    - r-lifecycle >=1.0.3
+    - r-lubridate >=1.9.1
+    - r-pillar >=1.8.1
+    - r-purrr >=0.3.5
+    - r-rlang >=1.0.6
+    - r-tibble >=3.1.8
+    - r-vctrs >=0.5.0
+    - r-zoo >=1.8_11
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.9
+    - r-assertthat >=0.2.1
+    - r-dplyr >=1.0.10
+    - r-glue >=1.6.2
+    - r-hms >=1.1.2
+    - r-lifecycle >=1.0.3
+    - r-lubridate >=1.9.1
+    - r-pillar >=1.8.1
+    - r-purrr >=0.3.5
+    - r-rlang >=1.0.6
+    - r-tibble >=3.1.8
+    - r-vctrs >=0.5.0
+    - r-zoo >=1.8_11
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tibbletime')"           # [not win]
+    - "\"%R%\" -e \"library('tibbletime')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/business-science/tibbletime
+  license: MIT
+  summary: 'Built on top of the ''tibble'' package, ''tibbletime'' is an extension that allows
+    for the creation of time aware tibbles. Some immediate advantages of this include:
+    the ability to perform time-based subsetting on tibbles, quickly summarising and
+    aggregating results by time periods, and creating columns that can be used as ''dplyr''
+    time-based groups.'
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: tibbletime
+# Type: Package
+# Title: Time Aware Tibbles
+# Version: 0.1.8
+# Authors@R: c( person("Davis", "Vaughan", email = "davis@rstudio.com", role = c("aut", "cre")), person("Matt", "Dancho", email = "mdancho@business-science.io", role = c("aut")) )
+# Maintainer: Davis Vaughan <davis@rstudio.com>
+# Description: Built on top of the 'tibble' package, 'tibbletime' is an extension that allows for the creation of time aware tibbles. Some immediate advantages of this include: the ability to perform time-based subsetting on tibbles, quickly summarising and aggregating results by time periods, and creating columns that can be used as 'dplyr' time-based groups.
+# URL: https://github.com/business-science/tibbletime
+# BugReports: https://github.com/business-science/tibbletime/issues
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Depends: R (>= 3.4.0)
+# Imports: assertthat (>= 0.2.1), dplyr (>= 1.0.10), glue (>= 1.6.2), hms (>= 1.1.2), lubridate (>= 1.9.1), pillar (>= 1.8.1), purrr (>= 0.3.5), Rcpp (>= 1.0.9), rlang (>= 1.0.6), tibble (>= 3.1.8), vctrs (>= 0.5.0), zoo (>= 1.8-11), lifecycle (>= 1.0.3)
+# Suggests: broom, covr, gapminder, knitr, rmarkdown, testthat, tidyr (>= 1.0.0)
+# VignetteBuilder: knitr
+# LinkingTo: Rcpp (>= 1.0.10)
+# LazyData: true
+# NeedsCompilation: yes
+# Packaged: 2023-01-24 18:23:24 UTC; davis
+# Author: Davis Vaughan [aut, cre], Matt Dancho [aut]
+# Repository: CRAN
+# Date/Publication: 2023-01-24 19:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,107 @@
+{% set version = '0.2.16' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bayestools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BayesTools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BayesTools/BayesTools_{{ version }}.tar.gz
+  sha256: 75d05cd6ccaa81655202c47959ffb01d8b90489c1c85078d0d281211a15fa7d6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: scales, testthat, vdiffr, covr, knitr, rstan, rjags, runjags, BayesFactor, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rdpack
+    - r-bridgesampling
+    - r-coda
+    - r-extradistr
+    - r-ggplot2
+    - r-mvtnorm
+    - r-rlang
+
+  run:
+    - r-base
+    - r-rdpack
+    - r-bridgesampling
+    - r-coda
+    - r-extradistr
+    - r-ggplot2
+    - r-mvtnorm
+    - r-rlang
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BayesTools')"           # [not win]
+    - "\"%R%\" -e \"library('BayesTools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://fbartos.github.io/BayesTools/
+  license: GPL-3
+  summary: Provides tools for conducting Bayesian analyses and Bayesian model averaging (Kass
+    and Raftery, 1995, <doi:10.1080/01621459.1995.10476572>, Hoeting et al., 1999, <doi:10.1214/ss/1009212519>).
+    The package contains functions for creating a wide range of prior distribution objects,
+    mixing posterior samples from 'JAGS' and 'Stan' models, plotting posterior distributions,
+    and etc... The tools for working with prior distribution span from visualization,
+    generating 'JAGS' and 'bridgesampling' syntax to basic functions such as rng, quantile,
+    and distribution functions.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: BayesTools
+# Title: Tools for Bayesian Analyses
+# Version: 0.2.16
+# Description: Provides tools for conducting Bayesian analyses and Bayesian model averaging (Kass and Raftery, 1995, <doi:10.1080/01621459.1995.10476572>, Hoeting et al., 1999, <doi:10.1214/ss/1009212519>). The package contains functions for creating a wide range of prior distribution objects, mixing posterior samples from 'JAGS' and 'Stan' models, plotting posterior distributions, and etc... The tools for working with prior distribution span from visualization, generating 'JAGS' and 'bridgesampling' syntax to basic functions such as rng, quantile, and distribution functions.
+# Maintainer: Frantisek Bartos <f.bartos96@gmail.com>
+# Authors@R: c( person("Frantisek", "Bartos",     role = c("aut", "cre"), email   = "f.bartos96@gmail.com", comment = c(ORCID = "0000-0002-0018-5573")) )
+# URL: https://fbartos.github.io/BayesTools/
+# BugReports: https://github.com/FBartos/BayesTools/issues
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.3
+# SystemRequirements: JAGS >= 4.3.0 (https://mcmc-jags.sourceforge.io/)
+# Depends: stats
+# Imports: graphics, extraDistr, mvtnorm, coda, bridgesampling, parallel, ggplot2, Rdpack, rlang
+# Suggests: scales, testthat, vdiffr, covr, knitr, rstan, rjags, runjags, BayesFactor, rmarkdown
+# RdMacros: Rdpack
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2023-07-09 07:28:04 UTC; fbart
+# Author: Frantisek Bartos [aut, cre] (<https://orcid.org/0000-0002-0018-5573>)
+# Repository: CRAN
+# Date/Publication: 2023-07-10 19:00:22 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

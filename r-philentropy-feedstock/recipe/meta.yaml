@@ -1,0 +1,106 @@
+{% set version = '0.7.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-philentropy
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/philentropy_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/philentropy/philentropy_{{ version }}.tar.gz
+  sha256: ce72e2327aee80aeeb630caa33be6a35e4f2b8a7491842d8c21099b9c43584b7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, microbenchmark
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-kernsmooth
+    - r-rcpp
+    - r-poorman
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-kernsmooth
+    - r-rcpp
+    - r-poorman
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('philentropy')"           # [not win]
+    - "\"%R%\" -e \"library('philentropy')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/drostlab/philentropy
+  license: GPL-2
+  summary: Computes 46 optimized distance and similarity measures for comparing probability functions
+    (Drost (2018) <doi:10.21105/joss.00765>). These comparisons between probability
+    functions have their foundations in a broad range of scientific disciplines from
+    mathematics to ecology. The aim of this package is to provide a core framework for
+    clustering, classification, statistical inference, goodness-of-fit, non-parametric
+    statistics, information theory, and machine learning tasks that are based on comparing
+    univariate or multivariate probability functions.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: philentropy
+# Type: Package
+# Title: Similarity and Distance Quantification Between Probability Functions
+# Version: 0.7.0
+# Date: 2022-11-04
+# Authors@R: c(person("Hajk-Georg", "Drost", role = c("aut", "cre"), email = "hajk-georg.drost@tuebingen.mpg.de", comment = c(ORCID = "http://orcid.org/0000-0002-1567-306X")), person("Jakub", "Nowosad", role = c("ctb"), email="nowosad.jakub@gmail.com", comment = c(ORCID = "0000-0002-1057-3721")) )
+# Maintainer: Hajk-Georg Drost <hajk-georg.drost@tuebingen.mpg.de>
+# Description: Computes 46 optimized distance and similarity measures for comparing probability functions (Drost (2018) <doi:10.21105/joss.00765>). These comparisons between probability functions have their foundations in a broad range of scientific disciplines from mathematics to ecology. The aim of this package is to provide a core framework for clustering, classification, statistical inference, goodness-of-fit, non-parametric statistics, information theory, and machine learning tasks that are based on comparing univariate or multivariate probability functions.
+# Depends: R (>= 3.1.2)
+# Imports: Rcpp, KernSmooth, poorman
+# License: GPL-2
+# LinkingTo: Rcpp
+# URL: https://github.com/drostlab/philentropy
+# Suggests: testthat, knitr, rmarkdown, microbenchmark
+# VignetteBuilder: knitr
+# BugReports: https://github.com/drostlab/philentropy/issues
+# RoxygenNote: 7.2.1
+# NeedsCompilation: yes
+# Packaged: 2022-11-04 15:55:50 UTC; hdrost
+# Author: Hajk-Georg Drost [aut, cre] (<https://orcid.org/0000-0002-1567-306X>), Jakub Nowosad [ctb] (<https://orcid.org/0000-0002-1057-3721>)
+# Repository: CRAN
+# Date/Publication: 2022-11-05 08:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

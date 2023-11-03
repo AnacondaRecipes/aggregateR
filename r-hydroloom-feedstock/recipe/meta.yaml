@@ -1,0 +1,105 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hydroloom
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hydroloom_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hydroloom/hydroloom_{{ version }}.tar.gz
+  sha256: 6458b1381cadfeb58c61c176cd4f8f00e57995e616d10ee324268ab2d8b5817a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, nhdplusTools, future, lwgeom, future.apply, knitr, gifski, mapview
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rann
+    - r-data.table
+    - r-dplyr
+    - r-fastmap
+    - r-pbapply
+    - r-rlang
+    - r-sf
+    - r-tidyr
+    - r-units
+
+  run:
+    - r-base
+    - r-rann
+    - r-data.table
+    - r-dplyr
+    - r-fastmap
+    - r-pbapply
+    - r-rlang
+    - r-sf
+    - r-tidyr
+    - r-units
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hydroloom')"           # [not win]
+    - "\"%R%\" -e \"library('hydroloom')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/DOI-USGS/hydroloom
+  license: CC0
+  summary: A collection of utilities that support creation of network attributes for hydrologic
+    networks. Methods and algorithms implemented are documented in Moore et al. (2019)
+    <doi:10.3133/ofr20191096>), Cormen and Leiserson (2022) <ISBN:9780262046305> and
+    Verdin and Verdin (1999) <doi:10.1016/S0022-1694(99)00011-6>.
+  license_family: CC
+
+# The original CRAN metadata for this package was:
+
+# Package: hydroloom
+# Title: Utilities to Weave Hydrologic Fabrics
+# Version: 1.0.0
+# Authors@R: person(given = "David", family = "Blodgett", role = c("aut", "cre"), email = "dblodgett@usgs.gov", comment = c(ORCID = "0000-0001-9489-1710"))
+# Description: A collection of utilities that support creation of network attributes for hydrologic networks. Methods and algorithms implemented are documented in Moore et al. (2019) <doi:10.3133/ofr20191096>), Cormen and Leiserson (2022) <ISBN:9780262046305> and Verdin and Verdin (1999) <doi:10.1016/S0022-1694(99)00011-6>.
+# Depends: R (>= 4.0)
+# Imports: dplyr, data.table, sf, units, stats, methods, utils, pbapply, tidyr, RANN, rlang, fastmap
+# Suggests: testthat, nhdplusTools, future, lwgeom, future.apply, knitr, gifski, mapview
+# License: CC0
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Config/testthat/parallel: true
+# Config/testthat/edition: 3
+# VignetteBuilder: knitr
+# Language: en-US
+# URL: https://github.com/DOI-USGS/hydroloom
+# NeedsCompilation: no
+# Packaged: 2023-09-28 13:20:07 UTC; dblodgett
+# Author: David Blodgett [aut, cre] (<https://orcid.org/0000-0001-9489-1710>)
+# Maintainer: David Blodgett <dblodgett@usgs.gov>
+# Repository: CRAN
+# Date/Publication: 2023-09-29 13:20:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

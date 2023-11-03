@@ -1,0 +1,91 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-forestploter
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/forestploter_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/forestploter/forestploter_{{ version }}.tar.gz
+  sha256: fc0ae52da88d8f938acff10f0472c27996b486428b982c86fda221ab0abf2950
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: gridtext, rmarkdown, knitr, vdiffr, testthat (>= 3.0.0), covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-gridextra
+    - r-gtable
+
+  run:
+    - r-base
+    - r-gridextra
+    - r-gtable
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('forestploter')"           # [not win]
+    - "\"%R%\" -e \"library('forestploter')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/adayim/forestploter
+  license: MIT
+  summary: Create forest plot based on the layout of the data. Confidence interval in multiple
+    columns by groups can be done easily. Editing plot, inserting/adding text, applying
+    theme to the plot and much more.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: forestploter
+# Title: Create Flexible Forest Plot
+# Version: 1.1.1
+# Authors@R: person(given="Alimu", family = "Dayimu", email = "ad938@cam.ac.uk", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9998-7463"))
+# Description: Create forest plot based on the layout of the data. Confidence interval in multiple columns by groups can be done easily. Editing plot, inserting/adding text, applying theme to the plot and much more.
+# License: MIT + file LICENSE
+# URL: https://github.com/adayim/forestploter
+# BugReports: https://github.com/adayim/forestploter/issues
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Imports: grid, gridExtra, gtable
+# Suggests: gridtext, rmarkdown, knitr, vdiffr, testthat (>= 3.0.0), covr
+# VignetteBuilder: knitr
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2023-09-23 17:51:45 UTC; alimd
+# Author: Alimu Dayimu [aut, cre] (<https://orcid.org/0000-0001-9998-7463>)
+# Maintainer: Alimu Dayimu <ad938@cam.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2023-09-23 19:40:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

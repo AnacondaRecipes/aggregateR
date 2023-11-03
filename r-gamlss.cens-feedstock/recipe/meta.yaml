@@ -1,0 +1,87 @@
+{% set version = '5.0-7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gamlss.cens
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gamlss.cens_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gamlss.cens/gamlss.cens_{{ version }}.tar.gz
+  sha256: 545a4ae39ba3e38e00038e4d15a6368e6302110dd3c1bbbbf45e9274ec034fd0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-gamlss
+    - r-gamlss.dist
+    - r-survival
+
+  run:
+    - r-base
+    - r-gamlss
+    - r-gamlss.dist
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gamlss.cens')"           # [not win]
+    - "\"%R%\" -e \"library('gamlss.cens')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.gamlss.com/
+  license: GPL-2 | GPL-3
+  summary: This is an add-on package to GAMLSS. The purpose of this package is to allow users
+    to fit interval response variables in GAMLSS models. The main function gen.cens()
+    generates a censored version of an existing GAMLSS family distribution.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: gamlss.cens
+# Type: Package
+# Title: Fitting an Interval Response Variable Using `gamlss.family' Distributions
+# Version: 5.0-7
+# Date: 2023-10-08
+# Depends: R (>= 2.2.1), gamlss.dist, gamlss, survival, methods
+# Author: Mikis Stasinopoulos <d.stasinopoulos@gre.ac.uk>, Bob Rigby, Nicoleta Mortan, Alexander Seipp
+# Maintainer: Mikis Stasinopoulos <d.stasinopoulos@gre.ac.uk>
+# Description: This is an add-on package to GAMLSS. The purpose of this package is to allow users to fit interval response variables in GAMLSS models. The main function gen.cens() generates a censored version of an existing GAMLSS family distribution.
+# License: GPL-2 | GPL-3
+# URL: https://www.gamlss.com/
+# NeedsCompilation: no
+# Packaged: 2023-10-07 13:47:50 UTC; dimitriosstasinopoulos
+# Repository: CRAN
+# Date/Publication: 2023-10-07 14:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

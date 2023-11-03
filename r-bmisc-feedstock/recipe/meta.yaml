@@ -1,0 +1,110 @@
+{% set version = '1.4.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bmisc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BMisc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BMisc/BMisc_{{ version }}.tar.gz
+  sha256: a1950ac042765bda389756efa432d78cf6f126a378e67e2ff49521892d43b75d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 3.0.0), plm, tibble
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-data.table
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-data.table
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BMisc')"           # [not win]
+    - "\"%R%\" -e \"library('BMisc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://bcallaway11.github.io/BMisc/, https://github.com/bcallaway11/BMisc
+  license: GPL-2
+  summary: These are miscellaneous functions for working with panel data, quantiles, and printing
+    results.  For panel data, the package includes functions for making a panel data
+    balanced (that is, dropping missing individuals that have missing observations in
+    any time period), converting id numbers to row numbers, and to treat repeated cross
+    sections as panel data under the assumption of rank invariance.  For quantiles,
+    there are functions to make distribution functions from a set of data points (this
+    is particularly useful when a distribution function is created in several steps),
+    to combine distribution functions based on some external weights, and to invert
+    distribution functions.  Finally, there are several other miscellaneous functions
+    for obtaining weighted means, weighted distribution functions, and weighted quantiles;
+    to generate summary statistics and their differences for two groups; and to add
+    or drop covariates from formulas.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: BMisc
+# Title: Miscellaneous Functions for Panel Data, Quantiles, and Printing Results
+# Version: 1.4.5
+# Authors@R: person("Brantly", "Callaway", email = "brantly.callaway@uga.edu", role = c("aut", "cre"))
+# Description: These are miscellaneous functions for working with panel data, quantiles, and printing results.  For panel data, the package includes functions for making a panel data balanced (that is, dropping missing individuals that have missing observations in any time period), converting id numbers to row numbers, and to treat repeated cross sections as panel data under the assumption of rank invariance.  For quantiles, there are functions to make distribution functions from a set of data points (this is particularly useful when a distribution function is created in several steps), to combine distribution functions based on some external weights, and to invert distribution functions.  Finally, there are several other miscellaneous functions for obtaining weighted means, weighted distribution functions, and weighted quantiles; to generate summary statistics and their differences for two groups; and to add or drop covariates from formulas.
+# Depends: R (>= 3.1.0)
+# Imports: data.table, Rcpp
+# License: GPL-2
+# Suggests: testthat (>= 3.0.0), plm, tibble
+# Encoding: UTF-8
+# RoxygenNote: 7.1.2
+# Config/testthat/edition: 3
+# LinkingTo: Rcpp, RcppArmadillo
+# URL: https://bcallaway11.github.io/BMisc/, https://github.com/bcallaway11/BMisc
+# BugReports: https://github.com/bcallaway11/BMisc/issues
+# NeedsCompilation: yes
+# Packaged: 2022-07-11 13:33:20 UTC; brant
+# Author: Brantly Callaway [aut, cre]
+# Maintainer: Brantly Callaway <brantly.callaway@uga.edu>
+# Repository: CRAN
+# Date/Publication: 2022-07-11 18:30:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

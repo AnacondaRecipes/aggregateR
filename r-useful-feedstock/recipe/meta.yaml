@@ -1,0 +1,106 @@
+{% set version = '1.2.6.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-useful
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/useful_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/useful/useful_{{ version }}.tar.gz
+  sha256: 6cfb27227db7a2a064bb1255ed5e56fd58458df84f53ec9a29f99aba368669bd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, tibble, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-assertthat
+    - r-dplyr >=0.5.0
+    - r-ggplot2
+    - r-magrittr
+    - r-plyr
+    - r-purrr >=0.1.0
+    - r-scales
+
+  run:
+    - r-base
+    - r-matrix
+    - r-assertthat
+    - r-dplyr >=0.5.0
+    - r-ggplot2
+    - r-magrittr
+    - r-plyr
+    - r-purrr >=0.1.0
+    - r-scales
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('useful')"           # [not win]
+    - "\"%R%\" -e \"library('useful')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jaredlander/useful
+  license: BSD_3_clause
+  summary: A set of little functions that have been found useful to do little odds and ends such
+    as plotting the results of K-means clustering, substituting special text characters,
+    viewing parts of a data.frame, constructing formulas from text and building design
+    and response matrices.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_3_clause'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: useful
+# Type: Package
+# Title: A Collection of Handy, Useful Functions
+# Version: 1.2.6.1
+# Date: 2018-10-07
+# Authors@R: c( person(c("Jared", "P."), "Lander", email = "packages@jaredlander.com", role = c("cre", "aut")), person("Nicholas", "Galasinao", email = "nicholas.galasinao@gmail.com", role = "ctb"), person("Joshua", "Kraut", email = "joshua.kraut@gmail.com", role = "ctb"), person("Daniel", "Chen", email = "dan dcheny@gmail.com", role = "ctb"))
+# Description: A set of little functions that have been found useful to do little odds and ends such as plotting the results of K-means clustering, substituting special text characters, viewing parts of a data.frame, constructing formulas from text and building design and response matrices.
+# License: BSD_3_clause + file LICENSE
+# Depends: ggplot2
+# Imports: plyr, dplyr (>= 0.5.0), magrittr, purrr (>= 0.1.0), stats, scales, utils, Matrix, assertthat
+# LazyLoad: yes
+# ByteCompile: TRUE
+# Suggests: testthat, tibble, covr
+# URL: https://github.com/jaredlander/useful
+# BugReports: https://github.com/jaredlander/useful/issues
+# RoxygenNote: 6.1.0
+# NeedsCompilation: no
+# Packaged: 2023-10-24 06:42:58 UTC; hornik
+# Author: Jared P. Lander [cre, aut], Nicholas Galasinao [ctb], Joshua Kraut [ctb], Daniel Chen [ctb]
+# Maintainer: Jared P. Lander <packages@jaredlander.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-24 06:54:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

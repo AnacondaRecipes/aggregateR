@@ -1,0 +1,104 @@
+{% set version = '1.0.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-webdriver
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/webdriver_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/webdriver/webdriver_{{ version }}.tar.gz
+  sha256: 54289a8ab13212bfccc0ed5f74f8c0faeb9e474ec8f32fee3163ef9cbc55074d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, pingr, rprojroot, servr, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-base64enc
+    - r-callr >=3.4.0
+    - r-curl >=2.0
+    - r-debugme
+    - r-httr
+    - r-jsonlite
+    - r-showimage
+    - r-withr
+
+  run:
+    - r-base
+    - r-r6
+    - r-base64enc
+    - r-callr >=3.4.0
+    - r-curl >=2.0
+    - r-debugme
+    - r-httr
+    - r-jsonlite
+    - r-showimage
+    - r-withr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('webdriver')"           # [not win]
+    - "\"%R%\" -e \"library('webdriver')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/rstudio/webdriver
+  license: MIT
+  summary: A client for the 'WebDriver' 'API'. It allows driving a (probably headless) web browser,
+    and can be used to test web applications, including 'Shiny' apps. In theory it works
+    with any 'WebDriver' implementation, but it was only tested with 'PhantomJS'.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: webdriver
+# Title: 'WebDriver' Client for 'PhantomJS'
+# Version: 1.0.6
+# Author: Ariya Hidayat, Gabor Csardi, Gabor Torok, Ivan De Marino, Robert Gieseke, Steven Masala, Winston Chang, Zack Weinberg
+# Maintainer: Gabor Csardi <csardi.gabor@gmail.com>
+# Description: A client for the 'WebDriver' 'API'. It allows driving a (probably headless) web browser, and can be used to test web applications, including 'Shiny' apps. In theory it works with any 'WebDriver' implementation, but it was only tested with 'PhantomJS'.
+# License: MIT + file LICENSE
+# LazyData: true
+# URL: https://github.com/rstudio/webdriver
+# BugReports: https://github.com/rstudio/webdriver/issues
+# RoxygenNote: 6.0.1
+# Imports: callr (>= 3.4.0), base64enc, curl (>= 2.0), debugme, httr, jsonlite, R6, showimage, utils, withr
+# Suggests: covr, pingr, rprojroot, servr, testthat
+# Encoding: UTF-8
+# SystemRequirements: PhantomJS (http://phantomjs.org/)
+# NeedsCompilation: no
+# Packaged: 2021-01-12 18:40:09 UTC; winston
+# Repository: CRAN
+# Date/Publication: 2021-01-12 19:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

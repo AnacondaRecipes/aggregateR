@@ -1,0 +1,95 @@
+{% set version = '0.2-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cstab
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cstab_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cstab/cstab_{{ version }}.tar.gz
+  sha256: 92480b90b4d1106572f83766ca1077cc565f52cf8b4089b6240ea1b85d0024d3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.4
+    - r-cluster
+    - r-fastcluster
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.4
+    - r-cluster
+    - r-fastcluster
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cstab')"           # [not win]
+    - "\"%R%\" -e \"library('cstab')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cstab
+  license: GPL-2
+  summary: Selection of the number of clusters in cluster analysis using stability methods.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: cstab
+# Type: Package
+# Title: Selection of Number of Clusters via Normalized Clustering Instability
+# Version: 0.2-2
+# Date: 2018-06-19
+# Author: Jonas M. B. Haslbeck, Dirk U. Wulff
+# Maintainer: Jonas M. B. Haslbeck <jonas.haslbeck@gmail.com>
+# Description: Selection of the number of clusters in cluster analysis using stability methods.
+# BugReports: https://github.com/jmbh/cstab/issues
+# License: GPL (>= 2)
+# Depends: R (>= 3.1.0), Rcpp (>= 0.11.4)
+# Imports: cluster, fastcluster,
+# LinkingTo: Rcpp
+# RoxygenNote: 6.0.1
+# NeedsCompilation: yes
+# Packaged: 2018-06-19 16:35:53 UTC; jmb
+# Repository: CRAN
+# Date/Publication: 2018-06-19 16:59:43 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

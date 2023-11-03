@@ -1,0 +1,137 @@
+{% set version = '0.5.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hlmdiag
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/HLMdiag_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/HLMdiag/HLMdiag_{{ version }}.tar.gz
+  sha256: 5bd025f5751b581947a72a3a04dc39e0bebd773ec9d44a3720f9151e93c3c07b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: mlmRev, WWGbook, lme4 (>= 1.0), nlme, testthat, knitr, rmarkdown, car, gridExtra, qqplotr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-diagonals
+    - r-dplyr
+    - r-ggplot2 >=0.9.2
+    - r-ggrepel
+    - r-janitor
+    - r-magrittr
+    - r-mgcv
+    - r-plyr
+    - r-purrr
+    - r-reshape2
+    - r-rlang
+    - r-stringr
+    - r-tibble
+    - r-tidyselect
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-matrix
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-diagonals
+    - r-dplyr
+    - r-ggplot2 >=0.9.2
+    - r-ggrepel
+    - r-janitor
+    - r-magrittr
+    - r-mgcv
+    - r-plyr
+    - r-purrr
+    - r-reshape2
+    - r-rlang
+    - r-stringr
+    - r-tibble
+    - r-tidyselect
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('HLMdiag')"           # [not win]
+    - "\"%R%\" -e \"library('HLMdiag')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/aloy/HLMdiag
+  license: GPL-2
+  summary: A suite of diagnostic tools for hierarchical (multilevel) linear models. The tools
+    include not only leverage and traditional deletion diagnostics (Cook's distance,
+    covratio, covtrace, and MDFFITS) but also convenience functions and graphics for
+    residual analysis. Models can be fit using either lmer in the 'lme4' package or
+    lme in the 'nlme' package.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: HLMdiag
+# Type: Package
+# Title: Diagnostic Tools for Hierarchical (Multilevel) Linear Models
+# Version: 0.5.0
+# Authors@R: c(person("Adam", "Loy", email = "loyad01@gmail.com", role = c("cre", "aut")), person("Jaylin", "Lowe", role = "aut"), person("Jack", "Moran", role = "aut"))
+# Maintainer: Adam Loy <loyad01@gmail.com>
+# Description: A suite of diagnostic tools for hierarchical (multilevel) linear models. The tools include not only leverage and traditional deletion diagnostics (Cook's distance, covratio, covtrace, and MDFFITS) but also convenience functions and graphics for residual analysis. Models can be fit using either lmer in the 'lme4' package or lme in the 'nlme' package.
+# Depends: R (>= 3.5.0)
+# Imports: ggplot2 (>= 0.9.2), stats, methods, plyr, reshape2, MASS, Matrix, mgcv, dplyr, magrittr, stringr, purrr, tibble, tidyselect, janitor, Rcpp, rlang, ggrepel, diagonals
+# LinkingTo: Rcpp, RcppArmadillo
+# Suggests: mlmRev, WWGbook, lme4 (>= 1.0), nlme, testthat, knitr, rmarkdown, car, gridExtra, qqplotr
+# License: GPL-2
+# LazyLoad: yes
+# LazyData: yes
+# Collate: 'diagnostic_functions.R' 'group_level_residual_functions.R' 'identification.R' 'plot_functions.R' 'adjust_formula_lmList.R' 'case_delete.R' 'LSresids.R' 'HLMdiag-deprecated.R' 'HLMdiag-package.R' 'hlm_augment.R' 'hlm_influence.R' 'hlm_resid.R' 'help.R' 'influence_functions.R' 'utility_functions.R' 'rotate_ranefs.R' 'autism.R' 'ahd.R' 'radon.R' 'pull_resid.R' 'residual_functions.R' 'HLMdiag-defunct.R'
+# Encoding: UTF-8
+# URL: https://github.com/aloy/HLMdiag
+# BugReports: https://github.com/aloy/HLMdiag/issues
+# RoxygenNote: 7.1.1
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2021-05-01 14:27:35 UTC; aloy
+# Author: Adam Loy [cre, aut], Jaylin Lowe [aut], Jack Moran [aut]
+# Repository: CRAN
+# Date/Publication: 2021-05-02 04:30:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

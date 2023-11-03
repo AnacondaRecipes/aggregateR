@@ -1,0 +1,94 @@
+{% set version = '3.11.1-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-libgeos
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/libgeos_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/libgeos/libgeos_{{ version }}.tar.gz
+  sha256: 1703bff2ac170f1fe2ca19bdb2b6ae3b12025ae7d7f4e951416fb3f22bb7fc1f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('libgeos')"           # [not win]
+    - "\"%R%\" -e \"library('libgeos')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://paleolimbot.github.io/libgeos/, https://github.com/paleolimbot/libgeos
+  license: LGPL-2.1
+  summary: Provides the Open Source Geometry Engine ('GEOS') as a C API that can be used to write
+    high-performance C and C++ geometry operations using R as an interface. Headers
+    are provided to make linking to and using these functions from C++ code as easy
+    and as safe as possible. This package contains an internal copy of the 'GEOS' library
+    to guarantee the best possible consistency on multiple platforms.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-2.1'
+
+# The original CRAN metadata for this package was:
+
+# Package: libgeos
+# Title: Open Source Geometry Engine ('GEOS') C API
+# Version: 3.11.1-1
+# Authors@R: c( person(given = "Dewey", family = "Dunnington", role = c("aut", "cre"), email = "dewey@fishandwhistle.net", comment = c(ORCID = "0000-0002-9415-4582")), person("GEOS authors", role = "aut"), person("Martin", "Davis", role = c("ctb", "cph")), person("Benjamin", "Campbell", role = c("ctb", "cph")), person("Tomasz", "Sowa", role = c("ctb", "cph")), person("Christian", "Kaiser", role = c("ctb", "cph")), person("David", "Skea", role = c("ctb", "cph")), person("Daniel", "Baston", role = c("ctb", "cph")), person("Sandro", "Santilli", role = c("ctb", "cph")), person("Mateusz", "Loskot", role = c("ctb", "cph")), person("Paul", "Ramsey", role = c("ctb", "cph")), person("Olivier", "Devillers", role = c("ctb", "cph")), person("Sean", "Gillies", role = c("ctb", "cph")), person("Mika", "Heiskanen", role = c("ctb", "cph")), person("Safe Software Inc.", role = "cph"), person("Refractions Research Inc.", role = "cph"), person("Vivid Solutions Inc.", role = "cph") )
+# Description: Provides the Open Source Geometry Engine ('GEOS') as a C API that can be used to write high-performance C and C++ geometry operations using R as an interface. Headers are provided to make linking to and using these functions from C++ code as easy and as safe as possible. This package contains an internal copy of the 'GEOS' library to guarantee the best possible consistency on multiple platforms.
+# License: LGPL (>= 2.1)
+# Copyright: file COPYRIGHTS
+# Encoding: UTF-8
+# RoxygenNote: 7.2.1
+# URL: https://paleolimbot.github.io/libgeos/, https://github.com/paleolimbot/libgeos
+# BugReports: https://github.com/paleolimbot/libgeos/issues
+# Suggests: testthat
+# NeedsCompilation: yes
+# Packaged: 2023-01-17 02:57:53 UTC; deweydunnington
+# Author: Dewey Dunnington [aut, cre] (<https://orcid.org/0000-0002-9415-4582>), GEOS authors [aut], Martin Davis [ctb, cph], Benjamin Campbell [ctb, cph], Tomasz Sowa [ctb, cph], Christian Kaiser [ctb, cph], David Skea [ctb, cph], Daniel Baston [ctb, cph], Sandro Santilli [ctb, cph], Mateusz Loskot [ctb, cph], Paul Ramsey [ctb, cph], Olivier Devillers [ctb, cph], Sean Gillies [ctb, cph], Mika Heiskanen [ctb, cph], Safe Software Inc. [cph], Refractions Research Inc. [cph], Vivid Solutions Inc. [cph]
+# Maintainer: Dewey Dunnington <dewey@fishandwhistle.net>
+# Repository: CRAN
+# Date/Publication: 2023-01-19 17:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

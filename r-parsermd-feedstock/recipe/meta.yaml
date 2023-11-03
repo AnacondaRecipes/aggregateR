@@ -1,0 +1,132 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-parsermd
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/parsermd_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/parsermd/parsermd_{{ version }}.tar.gz
+  sha256: afe98acdafe55e38642d590da00d749bcb576cc0a0bd45a40fb8e7f5df2ede95
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 3.0.0), knitr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh
+    - r-rcpp
+    - r-checkmate
+    - r-cli >=2.5.0
+    - r-dplyr
+    - r-lifecycle
+    - r-magrittr
+    - r-pillar
+    - r-purrr
+    - r-readr
+    - r-rlang
+    - r-rmarkdown
+    - r-tibble
+    - r-tidyr
+    - r-tidyselect
+    - r-withr
+    - r-yaml
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-rcpp
+    - r-checkmate
+    - r-cli >=2.5.0
+    - r-dplyr
+    - r-lifecycle
+    - r-magrittr
+    - r-pillar
+    - r-purrr
+    - r-readr
+    - r-rlang
+    - r-rmarkdown
+    - r-tibble
+    - r-tidyr
+    - r-tidyselect
+    - r-withr
+    - r-yaml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('parsermd')"           # [not win]
+    - "\"%R%\" -e \"library('parsermd')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://rundel.github.io/parsermd/, https://github.com/rundel/parsermd
+  license: MIT
+  summary: An implementation of a formal grammar and parser for R Markdown documents using the
+    Boost Spirit X3 library. It also includes a collection of high level functions for
+    working with the resulting abstract syntax tree.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: parsermd
+# Title: Formal Parser and Related Tools for R Markdown Documents
+# Version: 0.1.2
+# Authors@R: person(given = "Colin", family = "Rundel", role = c("aut", "cre"), email = "rundel@gmail.com")
+# Description: An implementation of a formal grammar and parser for R Markdown documents using the Boost Spirit X3 library. It also includes a collection of high level functions for working with the resulting abstract syntax tree.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Depends: R (>= 3.5.0)
+# Imports: purrr, Rcpp, cli (>= 2.5.0), checkmate, readr, tidyr, dplyr, tibble, yaml, withr, rmarkdown, pillar, rlang, magrittr, tidyselect, lifecycle
+# RoxygenNote: 7.1.1
+# SystemRequirements: C++14
+# LinkingTo: Rcpp, BH
+# Suggests: testthat (>= 3.0.0), knitr
+# Config/testthat/edition: 3
+# VignetteBuilder: knitr
+# URL: https://rundel.github.io/parsermd/, https://github.com/rundel/parsermd
+# BugReports: https://github.com/rundel/parsermd/issues
+# NeedsCompilation: yes
+# Packaged: 2021-05-20 10:31:20 UTC; rundel
+# Author: Colin Rundel [aut, cre]
+# Maintainer: Colin Rundel <rundel@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-05-20 15:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

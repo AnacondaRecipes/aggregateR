@@ -1,0 +1,89 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gapminder
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gapminder_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gapminder/gapminder_{{ version }}.tar.gz
+  sha256: 90e82fb90f795be8121b05ec24db749d5767289fd6b00b5d38f27c12656b97c2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dplyr, ggplot2, knitr, rmarkdown, testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-tibble
+
+  run:
+    - r-base
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gapminder')"           # [not win]
+    - "\"%R%\" -e \"library('gapminder')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jennybc/gapminder, https://www.gapminder.org/data/, https://doi.org/10.5281/zenodo.594018,
+    https://jennybc.github.io/gapminder/
+  license: CC0
+  summary: An excerpt of the data available at Gapminder.org. For each of 142 countries, the
+    package provides values for life expectancy, GDP per capita, and population, every
+    five years, from 1952 to 2007.
+  license_family: CC
+
+# The original CRAN metadata for this package was:
+
+# Package: gapminder
+# Title: Data from Gapminder
+# Version: 1.0.0
+# Authors@R: person("Jennifer", "Bryan", , "jenny@posit.co", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-6983-2759"))
+# Description: An excerpt of the data available at Gapminder.org. For each of 142 countries, the package provides values for life expectancy, GDP per capita, and population, every five years, from 1952 to 2007.
+# License: CC0
+# URL: https://github.com/jennybc/gapminder, https://www.gapminder.org/data/, https://doi.org/10.5281/zenodo.594018, https://jennybc.github.io/gapminder/
+# BugReports: https://github.com/jennybc/gapminder/issues
+# Depends: R (>= 3.1.0)
+# Imports: tibble
+# Suggests: dplyr, ggplot2, knitr, rmarkdown, testthat (>= 3.0.0)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.3
+# Config/testthat/edition: 3
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2023-03-09 18:35:33 UTC; jenny
+# Author: Jennifer Bryan [aut, cre] (<https://orcid.org/0000-0002-6983-2759>)
+# Maintainer: Jennifer Bryan <jenny@posit.co>
+# Repository: CRAN
+# Date/Publication: 2023-03-10 09:50:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

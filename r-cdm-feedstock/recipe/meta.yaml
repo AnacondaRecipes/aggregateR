@@ -1,0 +1,114 @@
+{% set version = '8.2-6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cdm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CDM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CDM/CDM_{{ version }}.tar.gz
+  sha256: 144a85e36c120e9f8a5bd35c1db50cf089ea4807721ac14460137b9a4b1c98d1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: BIFIEsurvey, lattice, MASS, miceadds, ROI, sfsmisc
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-mvtnorm
+    - r-polycor
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-mvtnorm
+    - r-polycor
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CDM')"           # [not win]
+    - "\"%R%\" -e \"library('CDM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/alexanderrobitzsch/CDM, https://sites.google.com/site/alexanderrobitzsch2/software
+  license: GPL-2
+  summary: Functions for cognitive diagnosis modeling and multidimensional item response modeling
+    for dichotomous and polytomous item responses. This package enables the estimation
+    of the DINA and DINO model (Junker & Sijtsma, 2001, <doi:10.1177/01466210122032064>),
+    the multiple group (polytomous) GDINA model (de la Torre, 2011, <doi:10.1007/s11336-011-9207-7>),
+    the multiple choice DINA model (de la Torre, 2009, <doi:10.1177/0146621608320523>),
+    the general diagnostic model (GDM; von Davier, 2008, <doi:10.1348/000711007X193957>),
+    the structured latent class model (SLCA; Formann, 1992, <doi:10.1080/01621459.1992.10475229>)
+    and regularized latent class analysis (Chen, Li, Liu, & Ying, 2017, <doi:10.1007/s11336-016-9545-6>).
+    See George, Robitzsch, Kiefer, Gross, and Uenlue (2017) <doi:10.18637/jss.v074.i02>
+    or Robitzsch and George (2019, <doi:10.1007/978-3-030-05584-4_26>) for further details
+    on estimation and the package structure. For tutorials on how to use the CDM package
+    see George and Robitzsch (2015, <doi:10.20982/tqmp.11.3.p189>) as well as Ravand
+    and Robitzsch (2015).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: CDM
+# Type: Package
+# Title: Cognitive Diagnosis Modeling
+# Version: 8.2-6
+# Date: 2022-08-25 15:43:23
+# Author: Alexander Robitzsch [aut, cre], Thomas Kiefer [aut], Ann Cathrice George [aut], Ali Uenlue [aut]
+# Maintainer: Alexander Robitzsch <robitzsch@ipn.uni-kiel.de>
+# Description: Functions for cognitive diagnosis modeling and multidimensional item response modeling for dichotomous and polytomous item responses. This package enables the estimation of the DINA and DINO model (Junker & Sijtsma, 2001, <doi:10.1177/01466210122032064>), the multiple group (polytomous) GDINA model (de la Torre, 2011, <doi:10.1007/s11336-011-9207-7>), the multiple choice DINA model (de la Torre, 2009, <doi:10.1177/0146621608320523>), the general diagnostic model (GDM; von Davier, 2008, <doi:10.1348/000711007X193957>), the structured latent class model (SLCA; Formann, 1992, <doi:10.1080/01621459.1992.10475229>) and regularized latent class analysis (Chen, Li, Liu, & Ying, 2017, <doi:10.1007/s11336-016-9545-6>). See George, Robitzsch, Kiefer, Gross, and Uenlue (2017) <doi:10.18637/jss.v074.i02> or Robitzsch and George (2019, <doi:10.1007/978-3-030-05584-4_26>) for further details on estimation and the package structure. For tutorials on how to use the CDM package see George and Robitzsch (2015, <doi:10.20982/tqmp.11.3.p189>) as well as Ravand and Robitzsch (2015).
+# Depends: R (>= 3.1), mvtnorm
+# Imports: graphics, grDevices, methods, polycor, Rcpp, stats, utils
+# Suggests: BIFIEsurvey, lattice, MASS, miceadds, ROI, sfsmisc
+# LinkingTo: Rcpp, RcppArmadillo
+# Enhances: dina, GDINA, mirt, rrum
+# LazyLoad: yes
+# LazyData: yes
+# URL: https://github.com/alexanderrobitzsch/CDM, https://sites.google.com/site/alexanderrobitzsch2/software
+# License: GPL (>= 2)
+# BugReports: https://github.com/alexanderrobitzsch/CDM/issues?state=open
+# NeedsCompilation: yes
+# Packaged: 2022-08-25 13:46:46 UTC; sunpn563
+# Repository: CRAN
+# Date/Publication: 2022-08-25 15:12:43 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

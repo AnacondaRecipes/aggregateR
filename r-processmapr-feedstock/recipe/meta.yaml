@@ -1,0 +1,143 @@
+{% set version = '0.5.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-processmapr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/processmapR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/processmapR/processmapR_{{ version }}.tar.gz
+  sha256: 1088821e8b40c8795426b202ce730a734bf583b5ca4bcf9b57785728e2bd7fe0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, eventdataR, testthat (>= 3.0.0), rsvg, DiagrammeRsvg, covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh
+    - r-diagrammer >=1.0.0
+    - r-rcpp
+    - r-bupar >=0.5.1
+    - r-cli >=3.2.0
+    - r-data.table
+    - r-dplyr
+    - r-edear >=0.9.0
+    - r-forcats
+    - r-ggplot2
+    - r-glue
+    - r-hms
+    - r-htmltools
+    - r-lifecycle
+    - r-miniui
+    - r-plotly
+    - r-purrr
+    - r-rlang >=1.0.0
+    - r-scales
+    - r-shiny
+    - r-stringr
+    - r-tidyr
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-diagrammer >=1.0.0
+    - r-rcpp
+    - r-bupar >=0.5.1
+    - r-cli >=3.2.0
+    - r-data.table
+    - r-dplyr
+    - r-edear >=0.9.0
+    - r-forcats
+    - r-ggplot2
+    - r-glue
+    - r-hms
+    - r-htmltools
+    - r-lifecycle
+    - r-miniui
+    - r-plotly
+    - r-purrr
+    - r-rlang >=1.0.0
+    - r-scales
+    - r-shiny
+    - r-stringr
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('processmapR')"           # [not win]
+    - "\"%R%\" -e \"library('processmapR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://bupar.net/, https://github.com/bupaverse/processmapr/, https://bupaverse.github.io/processmapR/
+  license: MIT
+  summary: Visualize event logs using directed graphs, i.e. process maps. Part of the 'bupaR'
+    framework.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: processmapR
+# Type: Package
+# Title: Construct Process Maps Using Event Data
+# Version: 0.5.3
+# Authors@R: c(person("Gert","Janssenswillen",email = "gert.janssenswillen@uhasselt.be", role = c("aut","cre")), person("Gerard","van Hulzen", email = "gerard.vanhulzen@uhasselt.be", role = c("ctb")), person("Benoit","Depaire",email = "benoit.depaire@uhasselt.be", role = c("ctb")), person("Felix","Mannhardt",email = "Felix.Mannhardt@sintef.no", role = c("ctb")), person("Thijs","Beuving", email = "thijs.beuving@kpn.com", role = c("ctb")), person("urvikalia", role = c("ctb"), person("Hasselt University", role = c("cph"))))
+# Description: Visualize event logs using directed graphs, i.e. process maps. Part of the 'bupaR' framework.
+# License: MIT + file LICENSE
+# LinkingTo: Rcpp, BH
+# SystemRequirements: C++
+# Depends: R (>= 3.5.0)
+# Imports: dplyr, bupaR (>= 0.5.1), edeaR (>= 0.9.0), DiagrammeR (>= 1.0.0), ggplot2, stringr, purrr, data.table, shiny, miniUI, glue, forcats, hms, plotly, rlang (>= 1.0.0), cli (>= 3.2.0), scales, tidyr, htmltools, Rcpp, lifecycle
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Suggests: knitr, rmarkdown, eventdataR, testthat (>= 3.0.0), rsvg, DiagrammeRsvg, covr
+# VignetteBuilder: knitr
+# URL: https://bupar.net/, https://github.com/bupaverse/processmapr/, https://bupaverse.github.io/processmapR/
+# BugReports: https://github.com/bupaverse/processmapr/issues/
+# Config/testthat/edition: 3
+# Collate: 'RcppExports.R' 'create_base_precedence.R' 'custom.R' 'deprecated.R' 'dotted_chart.R' 'dotted_char_plotly_i.R' 'dotted_chart_helpers.R' 'export_graph.R' 'export_map.R' 'frequency.R' 'get_meta_data.R' 'layout.R' 'lined_chart.R' 'lined_chart_helpers.R' 'lined_chart_plotly_i.R' 'performance.R' 'precedence_matrix.R' 'precedence_matrix.plot.R' 'processMapOutput.R' 'process_map.R' 'process_matrix.R' 'processmapR.R' 'renderProcessMap.R' 'render_map.R' 'resource_map.R' 'resource_matrix.R' 'trace_explorer.R' 'utils.R'
+# NeedsCompilation: yes
+# Packaged: 2023-04-06 12:12:35 UTC; lucp8407
+# Author: Gert Janssenswillen [aut, cre], Gerard van Hulzen [ctb], Benoit Depaire [ctb], Felix Mannhardt [ctb], Thijs Beuving [ctb], urvikalia Hasselt University [cph] [ctb]
+# Maintainer: Gert Janssenswillen <gert.janssenswillen@uhasselt.be>
+# Repository: CRAN
+# Date/Publication: 2023-04-06 12:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

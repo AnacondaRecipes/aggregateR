@@ -1,0 +1,117 @@
+{% set version = '2.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dire
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Dire_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Dire/Dire_{{ version }}.tar.gz
+  sha256: 9b5545fda0b9653b84247218f083e941481b4ad7a838f7eb061cc30deec51890
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, withr, doParallel, parallel, EdSurvey
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-rcpp >=1.0.8.3
+    - r-rcpparmadillo
+    - r-foreach
+    - r-haven
+    - r-iterators
+    - r-lbfgs
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-matrix
+    - r-rcpp >=1.0.8.3
+    - r-rcpparmadillo
+    - r-foreach
+    - r-haven
+    - r-iterators
+    - r-lbfgs
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Dire')"           # [not win]
+    - "\"%R%\" -e \"library('Dire')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://american-institutes-for-research.github.io/Dire/
+  license: GPL-2
+  summary: Fit latent variable linear models, estimating score distributions for groups of people,
+    following Cohen and Jiang (1999) <doi:10.2307/2669917>. In this model, a latent
+    distribution is conditional on students item response, item characteristics, and
+    conditioning variables the user includes. This latent trait is then integrated out.
+    This software is intended to fit the same models as the existing software 'AM' <https://am.air.org/>.
+    As of version 2, also allows the user to draw plausible values.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: Dire
+# Version: 2.2.0
+# Date: 2023-10-24
+# Title: Linear Regressions with a Latent Outcome Variable
+# Authors@R: c(person("Emmanuel", "Sikali", role="pdr", email = "Emmanuel.Sikali@ed.gov"), person("Paul", "Bailey", role=c("aut", "cre"), email="pbailey@air.org"), person("Eric", "Buehler", role="aut"), person("Sun-joo", "Lee", role="aut"), person("Harold", "Doran", role="aut"), person("Blue", "Webb", role="ctb"), person("Claire", "Kelley", role="ctb"))
+# Maintainer: Paul Bailey <pbailey@air.org>
+# Depends: R (>= 4.0.0)
+# Imports: foreach, iterators, methods, Matrix, haven, Rcpp (>= 1.0.8.3), lbfgs, MASS
+# Description: Fit latent variable linear models, estimating score distributions for groups of people, following Cohen and Jiang (1999) <doi:10.2307/2669917>. In this model, a latent distribution is conditional on students item response, item characteristics, and conditioning variables the user includes. This latent trait is then integrated out. This software is intended to fit the same models as the existing software 'AM' <https://am.air.org/>. As of version 2, also allows the user to draw plausible values.
+# License: GPL-2
+# VignetteBuilder: knitr
+# Suggests: knitr, rmarkdown, testthat, withr, doParallel, parallel, EdSurvey
+# URL: https://american-institutes-for-research.github.io/Dire/
+# BugReports: https://github.com/American-Institutes-for-Research/Dire/issues
+# ByteCompile: true
+# Note: This publication was prepared for NCES under Contract No. ED-IES-12-D-0002/0004 with the American Institutes for Research. Mention of trade names, commercial products, or organizations does not imply endorsement by the U.S. Government.
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# LinkingTo: Rcpp, RcppArmadillo
+# NeedsCompilation: yes
+# Packaged: 2023-10-26 21:50:30 UTC; pbailey
+# Author: Emmanuel Sikali [pdr], Paul Bailey [aut, cre], Eric Buehler [aut], Sun-joo Lee [aut], Harold Doran [aut], Blue Webb [ctb], Claire Kelley [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-10-26 22:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

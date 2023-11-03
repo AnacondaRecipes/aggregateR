@@ -1,0 +1,91 @@
+{% set version = '1.0.19' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pubmed.miner
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pubmed.mineR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pubmed.mineR/pubmed.mineR_{{ version }}.tar.gz
+  sha256: ec4db3b3322b41d6dd1aebadffd4d2aa4efd6ef9c22b3d07dc85db03a17c047a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r2html
+    - r-rcurl
+    - r-rjsonio
+    - r-xml
+    - r-boot
+
+  run:
+    - r-base
+    - r-r2html
+    - r-rcurl
+    - r-rjsonio
+    - r-xml
+    - r-boot
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pubmed.mineR')"           # [not win]
+    - "\"%R%\" -e \"library('pubmed.mineR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=pubmed.mineR
+  license: GPL-3
+  summary: Text mining of PubMed Abstracts (text and XML) from <https://pubmed.ncbi.nlm.nih.gov/>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: pubmed.mineR
+# Type: Package
+# Title: Text Mining of PubMed Abstracts
+# Version: 1.0.19
+# Date: 2021-11-26
+# Author: Jyoti Rani, S.Ramachandran, Ab Rauf Shah
+# Maintainer: S. Ramachandran <ramuigib@gmail.com>
+# Description: Text mining of PubMed Abstracts (text and XML) from <https://pubmed.ncbi.nlm.nih.gov/>.
+# Depends: R (>= 3.5.0), methods
+# Imports: RCurl, XML, boot, R2HTML, RJSONIO
+# Collate: 'Abstracts-class.R' 'HGNC-class.R' 'Yearwise.R' 'Genewise.R' 'combineabs.R' 'gene_atomization.R' 'Find_conclusion.R' 'getabs.R' 'getabsT.R' 'gethgnc.R' 'ready.R' 'readabs.R' 'removeabs.R' 'searchabsL.R' 'searchabsT.R' 'sendabs.R' 'subabs.R' 'cleanabs.R' 'word_atomizations.R' 'SentenceToken.R' 'contextSearch.R' 'uniprotfun.R' 'local_uniprotfun.R' 'tdm_for_lsa.R' 'printabs.R' 'pubtator_function.R' 'cos_sim_calc.R' 'cos_sim_calc_boot.R' 'wordscluster.R' 'whichcluster.R' 'wordsclusterview.R' 'find_intro_conc_html.R' 'cluster_words.R' 'get_original_term.R' 'get_original_term2.R' 'input_for_find_intro_conc_html.R' 'xmlreadabs.R' 'xmlword_atomizations.R' 'xmlgene_atomizations.R' 'pubtator_result_list_to_table.R' 'genes_BWI.R' 'BWI.R' 'currentabs_fn.R' 'previousabs_fn.R' 'altnamesfun.R' 'subsetabs.R' 'prevsymbol_fn.R' 'alias_fn.R' 'get_NMids.R' 'get_PMCIDS.R' 'get_PMCtable.R' 'get_Sequences.R' 'Give_Sentences_PMC.R' 'head_abbrev.R' 'names_fn.R' 'official_fn.R' 'pmids_to_abstracts.R' 'get_gene_sentences.R' 'Give_Sentences.R' 'get_MedlinePlus.R' 'co_occurrence_fn.R' 'space_quasher.R' 'readabsnew.R' 'word_associations.R' 'get_DOIs.R' 'additional_info.R' 'new_xmlreadabs.R' 'pubtator_function_JSON.R' 'xmlgene_atomizations_new.R' 'co_occurrence_advance.R'
+# License: GPL-3
+# LazyLoad: yes
+# LazyData: yes
+# NeedsCompilation: no
+# Packaged: 2021-11-26 06:49:45 UTC; sramachandran
+# Repository: CRAN
+# Date/Publication: 2021-11-26 15:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

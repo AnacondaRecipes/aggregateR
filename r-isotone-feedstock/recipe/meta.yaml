@@ -1,0 +1,87 @@
+{% set version = '1.1-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-isotone
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/isotone_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/isotone/isotone_{{ version }}.tar.gz
+  sha256: f669059ddbbc2a29c680e03dbd0cbee8f01a724aec7f9d09dfd90fa6ba63ff4e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-nnls
+
+  run:
+    - r-base
+    - r-nnls
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('isotone')"           # [not win]
+    - "\"%R%\" -e \"library('isotone')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://r-forge.r-project.org/projects/psychor/
+  license: GPL-2
+  summary: 'Contains two main functions: one for solving general isotone regression problems
+    using the pool-adjacent-violators algorithm (PAVA); another one provides a framework
+    for active set methods for isotone optimization problems with arbitrary order restrictions.
+    Various types of loss functions are prespecified.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: isotone
+# Type: Package
+# Title: Active Set and Generalized PAVA for Isotone Optimization
+# Version: 1.1-1
+# Date: 2023-02-21
+# Authors@R: c(person("Patrick", "Mair", role = c("aut", "cre"), email = "mair@fas.harvard.edu"), person("Jan", "De Leeuw", role = "aut"), person("Kurt", "Hornik", role = "aut"))
+# Author: Patrick Mair [aut, cre], Jan De Leeuw [aut], Kurt Hornik [aut]
+# Maintainer: Patrick Mair <mair@fas.harvard.edu>
+# Description: Contains two main functions: one for solving general isotone regression problems using the pool-adjacent-violators algorithm (PAVA); another one provides a framework for active set methods for isotone optimization problems with arbitrary order restrictions. Various types of loss functions are prespecified.
+# Imports: graphics, stats, nnls
+# Depends: R (>= 3.0.2)
+# License: GPL-2
+# URL: https://r-forge.r-project.org/projects/psychor/
+# LazyData: yes
+# LazyLoad: yes
+# ByteCompile: yes
+# NeedsCompilation: yes
+# Packaged: 2023-02-21 22:39:38 UTC; patrick
+# Repository: CRAN
+# Date/Publication: 2023-02-22 07:33:36 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

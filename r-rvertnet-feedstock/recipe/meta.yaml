@@ -1,0 +1,101 @@
+{% set version = '0.8.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rvertnet
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rvertnet_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rvertnet/rvertnet_{{ version }}.tar.gz
+  sha256: 2de9a3ec33a213c7592b49cca1d510a25aef0625369376d9b1b4e5d0da519226
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, vcr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-crul >=0.5.2
+    - r-dplyr >=0.5.0
+    - r-ggplot2
+    - r-jsonlite >=1.5
+    - r-maps
+    - r-tibble
+
+  run:
+    - r-base
+    - r-crul >=0.5.2
+    - r-dplyr >=0.5.0
+    - r-ggplot2
+    - r-jsonlite >=1.5
+    - r-maps
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rvertnet')"           # [not win]
+    - "\"%R%\" -e \"library('rvertnet')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ropensci/rvertnet (devel) https://docs.ropensci.org/rvertnet/ (documentation)
+  license: MIT
+  summary: Retrieve, map and summarize data from the 'VertNet.org' archives (<http://vertnet.org/>).  Functions
+    allow searching by many parameters, including 'taxonomic' names, places, and dates.
+    In addition, there is an interface for conducting spatially delimited searches,
+    and another for requesting large 'datasets' via email.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: rvertnet
+# Title: Search 'Vertnet', a 'Database' of Vertebrate Specimen Records
+# Description: Retrieve, map and summarize data from the 'VertNet.org' archives (<http://vertnet.org/>).  Functions allow searching by many parameters, including 'taxonomic' names, places, and dates. In addition, there is an interface for conducting spatially delimited searches, and another for requesting large 'datasets' via email.
+# Version: 0.8.2
+# Authors@R: c( person("Scott", "Chamberlain", role = c("aut", "cre"), email = "myrmecocystus@gmail.com", comment = c("0000-0003-1444-9135")), person("Chris", "Ray", role = "ctb"), person("Vijay", "Barve", role = "ctb") )
+# License: MIT + file LICENSE
+# URL: https://github.com/ropensci/rvertnet (devel) https://docs.ropensci.org/rvertnet/ (documentation)
+# BugReports: https://github.com/ropensci/rvertnet/issues
+# Encoding: UTF-8
+# Imports: jsonlite (>= 1.5), crul (>= 0.5.2), dplyr (>= 0.5.0), tibble, ggplot2, maps
+# Suggests: testthat, vcr
+# RoxygenNote: 7.1.1
+# X-schema.org-applicationCategory: Data Access
+# X-schema.org-keywords: species, occurrences, biodiversity, maps, vertnet, mammals, mammalia, specimens
+# X-schema.org-isPartOf: "https://ropensci.org"
+# NeedsCompilation: no
+# Packaged: 2021-05-13 18:37:04 UTC; sckott
+# Author: Scott Chamberlain [aut, cre] (0000-0003-1444-9135), Chris Ray [ctb], Vijay Barve [ctb]
+# Maintainer: Scott Chamberlain <myrmecocystus@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-05-13 19:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

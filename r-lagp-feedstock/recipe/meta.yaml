@@ -1,0 +1,96 @@
+{% set version = '1.5-9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lagp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/laGP_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/laGP/laGP_{{ version }}.tar.gz
+  sha256: 2bf4f75d170f779301b8c15dd8571e6bdb9a5e5558ad351cbc2ede2a8cf195f3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: mvtnorm, MASS, interp, lhs, crs, DiceOptim
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-tgp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-tgp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('laGP')"           # [not win]
+    - "\"%R%\" -e \"library('laGP')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://bobby.gramacy.com/r_packages/laGP/
+  license: LGPL-3
+  summary: Performs approximate GP regression for large computer experiments and spatial datasets.  The
+    approximation is based on finding small local designs for prediction (independently)
+    at particular inputs. OpenMP and SNOW parallelization are supported for prediction
+    over a vast out-of-sample testing set; GPU acceleration is also supported for an
+    important subroutine.  OpenMP and GPU features may require special compilation.  An
+    interface to lower-level (full) GP inference and prediction is provided. Wrapper
+    routines for blackbox optimization under mixed equality and inequality constraints
+    via an augmented Lagrangian scheme, and for large scale computer model calibration,
+    are also provided.  For details and tutorial, see Gramacy (2016 <doi:10.18637/jss.v072.i01>.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: laGP
+# Title: Local Approximate Gaussian Process Regression
+# Version: 1.5-9
+# Date: 2023-03-13
+# Author: Robert B. Gramacy <rbg@vt.edu>, Furong Sun <furongs@vt.edu>
+# Depends: R (>= 2.14)
+# Imports: tgp, parallel
+# Suggests: mvtnorm, MASS, interp, lhs, crs, DiceOptim
+# Description: Performs approximate GP regression for large computer experiments and spatial datasets.  The approximation is based on finding small local designs for prediction (independently) at particular inputs. OpenMP and SNOW parallelization are supported for prediction over a vast out-of-sample testing set; GPU acceleration is also supported for an important subroutine.  OpenMP and GPU features may require special compilation.  An interface to lower-level (full) GP inference and prediction is provided. Wrapper routines for blackbox optimization under mixed equality and inequality constraints via an augmented Lagrangian scheme, and for large scale computer model calibration, are also provided.  For details and tutorial, see Gramacy (2016 <doi:10.18637/jss.v072.i01>.
+# Maintainer: Robert B. Gramacy  <rbg@vt.edu>
+# License: LGPL
+# URL: https://bobby.gramacy.com/r_packages/laGP/
+# NeedsCompilation: yes
+# Packaged: 2023-03-13 16:57:56 UTC; bobby
+# Repository: CRAN
+# Date/Publication: 2023-03-14 08:30:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

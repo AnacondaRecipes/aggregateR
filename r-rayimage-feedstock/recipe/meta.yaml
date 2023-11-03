@@ -1,0 +1,109 @@
+{% set version = '0.9.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rayimage
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rayimage_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rayimage/rayimage_{{ version }}.tar.gz
+  sha256: b48fef1cbb697c1045a4ae9af7af9fe732bf9cd11b1fde7ef113c1dad63f44ef
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: magick
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-gridextra
+    - r-jpeg
+    - r-png
+    - r-progress
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-gridextra
+    - r-jpeg
+    - r-png
+    - r-progress
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rayimage')"           # [not win]
+    - "\"%R%\" -e \"library('rayimage')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.rayimage.dev, https://github.com/tylermorganwall/rayimage
+  license: GPL-3
+  summary: Uses convolution-based techniques to generate simulated camera bokeh, depth of field,
+    and other camera effects, using an image and an optional depth map. Accepts both
+    filename inputs and in-memory array representations of images and matrices. Includes
+    functions to perform 2D convolutions, reorient and resize images/matrices, add image
+    overlays, generate camera vignette effects, and add titles to images.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: rayimage
+# Type: Package
+# Title: Image Processing for Simulated Cameras
+# Version: 0.9.1
+# Authors@R: c(person("Tyler", "Morgan-Wall", email = "tylermw@gmail.com", role = c("aut", "cph", "cre"), comment = c(ORCID = "0000-0002-3131-3814")), person("Sean", "Barrett", role = c("ctb", "cph")))
+# Maintainer: Tyler Morgan-Wall <tylermw@gmail.com>
+# Description: Uses convolution-based techniques to generate simulated camera bokeh, depth of field, and other camera effects, using an image and an optional depth map. Accepts both filename inputs and in-memory array representations of images and matrices. Includes functions to perform 2D convolutions, reorient and resize images/matrices, add image overlays, generate camera vignette effects, and add titles to images.
+# License: GPL-3
+# LazyData: true
+# Depends: R (>= 4.1.0)
+# Imports: Rcpp, png, jpeg, grDevices, grid, gridExtra
+# Suggests: magick
+# LinkingTo: Rcpp, RcppArmadillo, progress
+# RoxygenNote: 7.2.3
+# URL: https://www.rayimage.dev, https://github.com/tylermorganwall/rayimage
+# BugReports: https://github.com/tylermorganwall/rayimage/issues
+# NeedsCompilation: yes
+# Packaged: 2023-01-17 02:30:02 UTC; tyler
+# Author: Tyler Morgan-Wall [aut, cph, cre] (<https://orcid.org/0000-0002-3131-3814>), Sean Barrett [ctb, cph]
+# Repository: CRAN
+# Date/Publication: 2023-01-17 04:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,95 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-proreg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/PROreg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/PROreg/PROreg_{{ version }}.tar.gz
+  sha256: ab12907d96d17a4881272f2496acb182d20138ab6e9b964b3864da191f6daacf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-rcolorbrewer
+    - r-car
+    - r-fmsb
+    - r-matrixcalc
+    - r-numderiv
+    - r-rootsolve
+
+  run:
+    - r-base
+    - r-matrix
+    - r-rcolorbrewer
+    - r-car
+    - r-fmsb
+    - r-matrixcalc
+    - r-numderiv
+    - r-rootsolve
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('PROreg')"           # [not win]
+    - "\"%R%\" -e \"library('PROreg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=PROreg
+  license: GPL-3
+  summary: Offers a variety of tools, such as specific plots and regression model approaches,
+    for analyzing different patient reported questionnaires. Specially, mixed-effects
+    models based on the beta-binomial distribution are implemented to deal with binomial
+    data with over-dispersion  (see Najera-Zuloaga J., Lee D.-J. and Arostegui I. (2018)
+    <doi:10.1177/0962280217690413>).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: PROreg
+# Type: Package
+# Title: Patient Reported Outcomes Regression Analysis
+# Version: 1.2
+# Author: Josu Najera-Zuloaga <josunajera@gmail.com>, Dae-Jin Lee <dlee@bcamath.org>, Inmaculada Arostegui <inmaculada.arostegui@ehu.eus>
+# Maintainer: Josu Najera-Zuloaga <josunajera@gmail.com>
+# Description: Offers a variety of tools, such as specific plots and regression model approaches, for analyzing different patient reported questionnaires. Specially, mixed-effects models based on the beta-binomial distribution are implemented to deal with binomial data with over-dispersion  (see Najera-Zuloaga J., Lee D.-J. and Arostegui I. (2018) <doi:10.1177/0962280217690413>).
+# License: GPL
+# Imports: fmsb, car, RColorBrewer, matrixcalc, rootSolve, numDeriv, Matrix
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2022-07-12 14:13:25 UTC; jnajera
+# Repository: CRAN
+# Date/Publication: 2022-07-12 15:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,90 @@
+{% set version = '4031.84' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fmultivar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fMultivar_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fMultivar/fMultivar_{{ version }}.tar.gz
+  sha256: ec451354618a34ca51acb28ac0993979e57c3b413f832c6767c4807ae866a4b8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: RUnit, tcltk
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-cubature
+    - r-fbasics
+    - r-mvtnorm
+    - r-sn
+
+  run:
+    - r-base
+    - r-cubature
+    - r-fbasics
+    - r-mvtnorm
+    - r-sn
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fMultivar')"           # [not win]
+    - "\"%R%\" -e \"library('fMultivar')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.rmetrics.org
+  license: GPL-2
+  summary: A collection of functions inspired by Venables and Ripley (2002) <doi:10.1007/978-0-387-21706-2>
+    and Azzalini and Capitanio (1999) <arXiv:0911.2093> to manage, investigate and analyze
+    bivariate and multivariate data sets of financial returns.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: fMultivar
+# Title: Rmetrics - Modeling of Multivariate Financial Return Distributions
+# Date: 2023-07-07
+# Version: 4031.84
+# Authors@R: c( person("Diethelm", "Wuertz", role = "aut"), person("Tobias", "Setz", role = "aut"), person("Stefan", "Theussl", role = c("aut", "cre"), email = "Stefan.Theussl@R-Project.org"), person("Yohan", "Chalabi", role = "ctb"), person("Martin", "Maechler", role = "ctb"), person("CRAN", "team", role = "ctb") )
+# Description: A collection of functions inspired by Venables and Ripley (2002) <doi:10.1007/978-0-387-21706-2> and Azzalini and Capitanio (1999) <arXiv:0911.2093> to manage, investigate and analyze bivariate and multivariate data sets of financial returns.
+# Imports: fBasics, cubature, mvtnorm, sn, methods, grDevices, graphics, stats
+# Suggests: RUnit, tcltk
+# License: GPL (>= 2)
+# URL: https://www.rmetrics.org
+# NeedsCompilation: no
+# Packaged: 2023-07-07 17:26:47 UTC; theussl
+# Author: Diethelm Wuertz [aut], Tobias Setz [aut], Stefan Theussl [aut, cre], Yohan Chalabi [ctb], Martin Maechler [ctb], CRAN team [ctb]
+# Maintainer: Stefan Theussl <Stefan.Theussl@R-Project.org>
+# Repository: CRAN
+# Date/Publication: 2023-07-11 08:40:35 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

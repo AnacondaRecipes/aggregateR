@@ -1,0 +1,107 @@
+{% set version = '0.1.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rsyntax
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rsyntax_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rsyntax/rsyntax_{{ version }}.tar.gz
+  sha256: cabb3bbe0185d15bca4dc995345be2d617bf5eb45da7dcf26f4c97511806b12e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-base64enc
+    - r-data.table >=1.11.8
+    - r-digest
+    - r-igraph
+    - r-magrittr
+    - r-png
+    - r-rlang
+    - r-stringi
+    - r-tidyselect
+    - r-tokenbrowser
+
+  run:
+    - r-base
+    - r-base64enc
+    - r-data.table >=1.11.8
+    - r-digest
+    - r-igraph
+    - r-magrittr
+    - r-png
+    - r-rlang
+    - r-stringi
+    - r-tidyselect
+    - r-tokenbrowser
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rsyntax')"           # [not win]
+    - "\"%R%\" -e \"library('rsyntax')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rsyntax
+  license: GPL-3
+  summary: Various functions for querying and reshaping dependency trees, as for instance created
+    with the 'spacyr' or 'udpipe' packages. This enables the automatic extraction of
+    useful semantic relations from texts, such as quotes (who said what) and clauses
+    (who did what). Method proposed in Van Atteveldt et al. (2017) <doi:10.1017/pan.2016.12>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: rsyntax
+# Type: Package
+# Title: Extract Semantic Relations from Text by Querying and Reshaping Syntax
+# Version: 0.1.4
+# Date: 2022-06-06
+# Author: Kasper Welbers and Wouter van Atteveldt
+# Maintainer: Kasper Welbers <kasperwelbers@gmail.com>
+# Depends: R (>= 3.2.0)
+# Imports: igraph, tidyselect, methods, stringi, digest, rlang, magrittr, tokenbrowser, base64enc, png, data.table (>= 1.11.8)
+# Enhances: spacyr
+# LazyData: true
+# Encoding: UTF-8
+# Description: Various functions for querying and reshaping dependency trees, as for instance created with the 'spacyr' or 'udpipe' packages. This enables the automatic extraction of useful semantic relations from texts, such as quotes (who said what) and clauses (who did what). Method proposed in Van Atteveldt et al. (2017) <doi:10.1017/pan.2016.12>.
+# License: GPL-3
+# RoxygenNote: 7.1.2
+# Suggests: testthat
+# NeedsCompilation: no
+# Packaged: 2022-06-06 13:19:12 UTC; kasper
+# Repository: CRAN
+# Date/Publication: 2022-06-07 04:30:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

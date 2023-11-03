@@ -1,0 +1,107 @@
+{% set version = '0.1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-filearray
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/filearray_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/filearray/filearray_{{ version }}.tar.gz
+  sha256: fbe1e2e0543cd1026cb7097d6be36a938e526a1106692a5f814983e39e43c4f5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rmarkdown, knitr, testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh
+    - r-rcpp
+    - r-digest
+    - r-fastmap >=1.1.1
+    - r-uuid >=1.1.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-rcpp
+    - r-digest
+    - r-fastmap >=1.1.1
+    - r-uuid >=1.1.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('filearray')"           # [not win]
+    - "\"%R%\" -e \"library('filearray')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://dipterix.org/filearray/, https://github.com/dipterix/filearray
+  license: LGPL-3
+  summary: Stores large arrays in files to avoid occupying large memories. Implemented with super
+    fast gigabyte-level multi-threaded reading/writing via 'OpenMP'. Supports multiple
+    non-character data types (double, float, complex, integer, logical, and raw).
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: filearray
+# Type: Package
+# Title: File-Backed Array for Out-of-Memory Computation
+# Version: 0.1.6
+# Language: en-US
+# Encoding: UTF-8
+# License: LGPL-3
+# URL: https://dipterix.org/filearray/, https://github.com/dipterix/filearray
+# BugReports: https://github.com/dipterix/filearray/issues
+# Authors@R: c( person( "Zhengjia", "Wang", role = c("aut", "cre", "cph"), email = "dipterix.wang@gmail.com" ))
+# Description: Stores large arrays in files to avoid occupying large memories. Implemented with super fast gigabyte-level multi-threaded reading/writing via 'OpenMP'. Supports multiple non-character data types (double, float, complex, integer, logical, and raw).
+# Imports: digest, fastmap (>= 1.1.1), methods, Rcpp, uuid (>= 1.1.0)
+# Suggests: rmarkdown, knitr, testthat (>= 3.0.0)
+# RoxygenNote: 7.2.3
+# LinkingTo: BH, Rcpp
+# Config/testthat/edition: 3
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2023-06-23 04:31:10 UTC; dipterix
+# Author: Zhengjia Wang [aut, cre, cph]
+# Maintainer: Zhengjia Wang <dipterix.wang@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-06-23 05:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,106 @@
+{% set version = '0.1-10' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-highs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/highs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/highs/highs_{{ version }}.tar.gz
+  sha256: 4ce0034f9eea27e5ba3562c57b09d6c656d898e37cd6a01c19a4d2e6ddfa55ee
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tinytest
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.7
+    - r-checkmate
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.7
+    - r-checkmate
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('highs')"           # [not win]
+    - "\"%R%\" -e \"library('highs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://gitlab.com/roigrp/solver/highs
+  license: GPL-2
+  summary: R interface to 'HiGHS', an optimization solver for solving mixed integer optimization
+    problems with quadratic or linear objective and linear constraints.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: highs
+# Type: Package
+# Title: 'HiGHS' Optimization Solver
+# Version: 0.1-10
+# Authors@R: c(person("Florian", "Schwendinger", email = "FlorianSchwendinger@gmx.at", role = c("aut", "cre")), person("Dirk", "Schumacher", role = "aut"), person("Julian", "Hall", role = "cph"), person("Ivet", "Galabova", role = "cph"), person("Leona", "Gottwald", role = "cph"), person("Michael", "Feldmeier", role = "cph"))
+# Description: R interface to 'HiGHS', an optimization solver for solving mixed integer optimization problems with quadratic or linear objective and linear constraints.
+# License: GPL (>= 2)
+# Imports: Rcpp (>= 1.0.7), checkmate
+# SystemRequirements: Bash, PkgConfig, CMAKE (>=3.16), C++11
+# URL: https://gitlab.com/roigrp/solver/highs
+# BugReports: https://gitlab.com/roigrp/solver/highs/-/issues
+# Suggests: tinytest
+# Biarch: FALSE
+# LinkingTo: Rcpp
+# RoxygenNote: 7.2.1
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-05-16 14:24:58 UTC; f
+# Author: Florian Schwendinger [aut, cre], Dirk Schumacher [aut], Julian Hall [cph], Ivet Galabova [cph], Leona Gottwald [cph], Michael Feldmeier [cph]
+# Maintainer: Florian Schwendinger <FlorianSchwendinger@gmx.at>
+# Repository: CRAN
+# Date/Publication: 2023-05-16 15:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

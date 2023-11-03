@@ -1,0 +1,100 @@
+{% set version = '0.0.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-information
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Information_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Information/Information_{{ version }}.tar.gz
+  sha256: 769256fd669b61522b2acb8ce7f512fedcfe4bfa38f0e475db6d9f3ce4e75f5f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, reshape2, ClustOfVar, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-doparallel
+    - r-foreach
+    - r-ggplot2
+    - r-iterators
+    - r-plyr
+
+  run:
+    - r-base
+    - r-data.table
+    - r-doparallel
+    - r-foreach
+    - r-ggplot2
+    - r-iterators
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Information')"           # [not win]
+    - "\"%R%\" -e \"library('Information')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=Information
+  license: GPL-3
+  summary: Performs exploratory data analysis and variable screening for binary classification
+    models using weight-of-evidence (WOE) and information value (IV). In order to make
+    the package as efficient as possible, aggregations are done in data.table and creation
+    of WOE vectors can be distributed across multiple cores. The package also supports
+    exploration for uplift models (NWOE and NIV).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: Information
+# Type: Package
+# Title: Data Exploration with Information Theory (Weight-of-Evidence and Information Value)
+# Version: 0.0.9
+# Date: 2016-04-08
+# Authors@R: person("Larsen", "Kim", email = "kblarsen4@gmail.com", role = c("aut", "cre"))
+# Description: Performs exploratory data analysis and variable screening for binary classification models using weight-of-evidence (WOE) and information value (IV). In order to make the package as efficient as possible, aggregations are done in data.table and creation of WOE vectors can be distributed across multiple cores. The package also supports exploration for uplift models (NWOE and NIV).
+# Depends: R (>= 3.1.2)
+# License: GPL (>= 3)
+# Imports: data.table, ggplot2, grid, plyr, utils, iterators, doParallel, parallel, foreach
+# LazyData: true
+# VignetteBuilder: knitr
+# Suggests: knitr, reshape2, ClustOfVar, rmarkdown
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-04-08 17:19:11 UTC; kimlarsen
+# Author: Larsen Kim [aut, cre]
+# Maintainer: Larsen Kim <kblarsen4@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2016-04-09 00:24:08
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

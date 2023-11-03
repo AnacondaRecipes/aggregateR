@@ -1,0 +1,96 @@
+{% set version = '0.1-5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stablelearner
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/stablelearner_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/stablelearner/stablelearner_{{ version }}.tar.gz
+  sha256: 757ab941f76f44bb9fc6df874425b4fadb19b5a35435729d0f6c180793d72e28
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: utils, Formula, nnet, rpart, evtree, rchallenge, knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-e1071
+    - r-party
+    - r-partykit
+    - r-randomforest
+    - r-ranger
+
+  run:
+    - r-base
+    - r-mass
+    - r-e1071
+    - r-party
+    - r-partykit
+    - r-randomforest
+    - r-ranger
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('stablelearner')"           # [not win]
+    - "\"%R%\" -e \"library('stablelearner')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=stablelearner
+  license: GPL-2 | GPL-3
+  summary: Graphical and computational methods that can be used to assess the stability of results
+    from supervised statistical learning.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: stablelearner
+# Version: 0.1-5
+# Date: 2023-04-11
+# Title: Stability Assessment of Statistical Learning Methods
+# Authors@R: c(person(given = "Michel",  family = "Philipp",     role = "aut",           email = "michel.philipp.mp@gmail.com"), person(given = "Carolin", family = "Strobl",      role = "aut",           email = "Carolin.Strobl@psychologie.uzh.ch"), person(given = "Achim",   family = "Zeileis",     role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org", comment = c(ORCID = "0000-0003-0918-3766")), person(given = "Thomas",  family = "Rusch",       role = "aut",           email = "Thomas.Rusch@wu.ac.at"), person(given = "Kurt",    family = "Hornik",      role = "aut",           email = "Kurt.Hornik@wu.ac.at", comment = c(ORCID = "0000-0003-4198-9911")), person(given = "Lennart", family = "Schneider",   role = "aut",           email = "Lennart.Sch@web.de", comment = c(ORCID = "0000-0003-4152-5308")))
+# Description: Graphical and computational methods that can be used to assess the stability of results from supervised statistical learning.
+# Depends: R (>= 3.0.0)
+# Imports: graphics, methods, MASS, e1071, partykit, party, randomForest, ranger
+# Suggests: utils, Formula, nnet, rpart, evtree, rchallenge, knitr, rmarkdown
+# VignetteBuilder: knitr
+# License: GPL-2 | GPL-3
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2023-04-12 23:53:11 UTC; zeileis
+# Author: Michel Philipp [aut], Carolin Strobl [aut], Achim Zeileis [aut, cre] (<https://orcid.org/0000-0003-0918-3766>), Thomas Rusch [aut], Kurt Hornik [aut] (<https://orcid.org/0000-0003-4198-9911>), Lennart Schneider [aut] (<https://orcid.org/0000-0003-4152-5308>)
+# Maintainer: Achim Zeileis <Achim.Zeileis@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2023-04-13 12:22:20 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

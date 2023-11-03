@@ -1,0 +1,96 @@
+{% set version = '0.2-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-eipack
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/eiPack_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/eiPack/eiPack_{{ version }}.tar.gz
+  sha256: 2203ad910934cf233af44c09114fa845b1b3e573e4f37f55cddbb37066b767c9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lattice
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-coda
+    - r-msm
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-coda
+    - r-msm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('eiPack')"           # [not win]
+    - "\"%R%\" -e \"library('eiPack')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.olivialau.org/software/
+  license: GPL-2
+  summary: Provides methods for analyzing R by C ecological contingency tables using the extreme
+    case analysis, ecological regression, and Multinomial-Dirichlet ecological inference
+    models.  Also provides tools for manipulating higher-dimension data objects.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: eiPack
+# Type: Package
+# Version: 0.2-2
+# Date: 2023-02-18
+# Title: Ecological Inference and Higher-Dimension Data Management
+# Author: Olivia Lau <olivia.lau@post.harvard.edu>, Ryan T. Moore <rtm@american.edu>, Michael Kellermann <mrkellermann@gmail.com>
+# Maintainer: Michael Kellermann <mrkellermann@gmail.com>
+# Depends: R (>= 2.0.0)
+# Imports: MASS, coda, msm
+# Suggests: lattice
+# Description: Provides methods for analyzing R by C ecological contingency tables using the extreme case analysis, ecological regression, and Multinomial-Dirichlet ecological inference models.  Also provides tools for manipulating higher-dimension data objects.
+# License: GPL (>= 2) | file LICENSE
+# URL: http://www.olivialau.org/software/
+# NeedsCompilation: yes
+# Packaged: 2023-02-18 22:43:58 UTC; Mike Kellermann
+# Repository: CRAN
+# Date/Publication: 2023-02-18 23:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

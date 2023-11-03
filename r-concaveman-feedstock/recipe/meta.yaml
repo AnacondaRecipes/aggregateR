@@ -1,0 +1,98 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-concaveman
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/concaveman_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/concaveman/concaveman_{{ version }}.tar.gz
+  sha256: 9fd1d6aeee3d9bfff7f8ab3ba9b020c2201bb00ca9948eef386b4560fce86e2c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-v8
+    - r-dplyr
+    - r-jsonlite
+    - r-magrittr
+    - r-sf
+
+  run:
+    - r-base
+    - r-v8
+    - r-dplyr
+    - r-jsonlite
+    - r-magrittr
+    - r-sf
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('concaveman')"           # [not win]
+    - "\"%R%\" -e \"library('concaveman')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://joelgombin.github.io/concaveman/, http://www.github.com/joelgombin/concaveman/
+  license: GPL-3
+  summary: The concaveman function ports the 'concaveman' (<https://github.com/mapbox/concaveman>)
+    library from 'mapbox'. It computes the concave polygon(s) for one or several set
+    of points.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: concaveman
+# Type: Package
+# Title: A Very Fast 2D Concave Hull Algorithm
+# Version: 1.1.0
+# Authors@R: c( person("Joel", "Gombin", email="joel.gombin@gmail.com", role = c("cre", "aut")), person("Ramnath", "Vaidyanathan", role = "aut"), person("Vladimir", "Agafonkin", role = "aut"), person("Mapbox", role = "cph") )
+# Description: The concaveman function ports the 'concaveman' (<https://github.com/mapbox/concaveman>) library from 'mapbox'. It computes the concave polygon(s) for one or several set of points.
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 2.10)
+# Imports: V8, sf, magrittr, jsonlite, dplyr
+# RoxygenNote: 7.1.0
+# Suggests: testthat
+# URL: https://joelgombin.github.io/concaveman/, http://www.github.com/joelgombin/concaveman/
+# BugReports: http://www.github.com/joelgombin/concaveman/issues
+# SystemRequirements: GDAL (>= 2.0.0), GEOS (>= 3.3.0), PROJ.4 (>= 4.8.0)
+# NeedsCompilation: no
+# Packaged: 2020-05-10 21:54:54 UTC; joel
+# Author: Joel Gombin [cre, aut], Ramnath Vaidyanathan [aut], Vladimir Agafonkin [aut], Mapbox [cph]
+# Maintainer: Joel Gombin <joel.gombin@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2020-05-11 10:50:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

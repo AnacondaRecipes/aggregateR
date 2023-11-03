@@ -1,0 +1,121 @@
+{% set version = '0.8.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-anticlust
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/anticlust_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/anticlust/anticlust_{{ version }}.tar.gz
+  sha256: bdfafff3349c1bc7621973fad7b40313551f1baab6b5d86fee0f9db7f64a4bb7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, palmerpenguins, Rglpk, rmarkdown, Rsymphony, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-rann >=2.6.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-rann >=2.6.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('anticlust')"           # [not win]
+    - "\"%R%\" -e \"library('anticlust')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/m-Py/anticlust
+  license: MIT
+  summary: The method of anticlustering partitions a pool of elements into groups (i.e., anticlusters)
+    with the goal of maximizing between-group similarity or within-group heterogeneity.  The
+    anticlustering approach thereby reverses the logic of cluster analysis that strives
+    for high within-group homogeneity and clear separation between groups.  Computationally,
+    anticlustering is accomplished by maximizing instead of minimizing a clustering
+    objective function, such as the intra-cluster variance (used in k-means clustering)
+    or the sum of pairwise distances within clusters. The main function anticlustering()
+    gives access to exact and heuristic anticlustering methods described in Papenberg
+    and Klau (2021; <doi:10.1037/met0000301>), Brusco et al. (2020; <doi:10.1111/bmsp.12186>),
+    and Papenberg (2023; <doi:10.1111/bmsp.12315>). The exact algorithms require that
+    an integer linear programming solver is installed, either the GNU linear programming
+    kit (<https://www.gnu.org/software/glpk/glpk.html>) together with the interface
+    package 'Rglpk' (<https://cran.R-project.org/package=Rglpk>), or the SYMPHONY ILP
+    solver (<https://github.com/coin-or/SYMPHONY>) together with the interface package
+    'Rsymphony' (<https://cran.r-project.org/package=Rsymphony>). Full access to the
+    bicriterion anticlustering method proposed by Brusco et al. (2020) is given via
+    the function bicriterion_anticlustering(), while kplus_anticlustering() implements
+    the full functionality of the k-plus anticlustering approach proposed by Papenberg
+    (2023). Some other functions are available to solve classical clustering problems.
+    The function balanced_clustering() applies a cluster analysis under size constraints,
+    i.e., creates equal-sized clusters. The function matching() can be used for (unrestricted,
+    bipartite, or K-partite) matching. The function wce() can be used optimally solve
+    the (weighted) cluster editing problem, also known as correlation clustering, clique
+    partitioning problem or transitivity clustering.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: anticlust
+# Title: Subset Partitioning via Anticlustering
+# Version: 0.8.1
+# Authors@R: c( person("Martin", "Papenberg", , "martin.papenberg@hhu.de", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9900-4268")), person("Meik", "Michalke", role = "ctb", comment = "centroid based clustering algorithm"), person(c("Gunnar", "W."), "Klau", role = "ths"), person(c("Juliane", "V."), "Nagel", role = "ctb", comment = "package logo"), person("Martin", "Breuer", role = "ctb", comment = "Bicriterion algorithm by Brusco et al."), person("Marie L.", "Schaper", role = "ctb", comment = "Example data set"), person("Max", "Diekhoff", role = "ctb", comment = "Optimal maximum dispersion algorithm") )
+# Author: Martin Papenberg [aut, cre] (<https://orcid.org/0000-0002-9900-4268>), Meik Michalke [ctb] (centroid based clustering algorithm), Gunnar W. Klau [ths], Juliane V. Nagel [ctb] (package logo), Martin Breuer [ctb] (Bicriterion algorithm by Brusco et al.), Marie L. Schaper [ctb] (Example data set), Max Diekhoff [ctb] (Optimal maximum dispersion algorithm)
+# Maintainer: Martin Papenberg <martin.papenberg@hhu.de>
+# Description: The method of anticlustering partitions a pool of elements into groups (i.e., anticlusters) with the goal of maximizing between-group similarity or within-group heterogeneity.  The anticlustering approach thereby reverses the logic of cluster analysis that strives for high within-group homogeneity and clear separation between groups.  Computationally, anticlustering is accomplished by maximizing instead of minimizing a clustering objective function, such as the intra-cluster variance (used in k-means clustering) or the sum of pairwise distances within clusters. The main function anticlustering() gives access to exact and heuristic anticlustering methods described in Papenberg and Klau (2021; <doi:10.1037/met0000301>), Brusco et al. (2020; <doi:10.1111/bmsp.12186>), and Papenberg (2023; <doi:10.1111/bmsp.12315>). The exact algorithms require that an integer linear programming solver is installed, either the GNU linear programming kit (<https://www.gnu.org/software/glpk/glpk.html>) together with the interface package 'Rglpk' (<https://cran.R-project.org/package=Rglpk>), or the SYMPHONY ILP solver (<https://github.com/coin-or/SYMPHONY>) together with the interface package 'Rsymphony' (<https://cran.r-project.org/package=Rsymphony>). Full access to the bicriterion anticlustering method proposed by Brusco et al. (2020) is given via the function bicriterion_anticlustering(), while kplus_anticlustering() implements the full functionality of the k-plus anticlustering approach proposed by Papenberg (2023). Some other functions are available to solve classical clustering problems. The function balanced_clustering() applies a cluster analysis under size constraints, i.e., creates equal-sized clusters. The function matching() can be used for (unrestricted, bipartite, or K-partite) matching. The function wce() can be used optimally solve the (weighted) cluster editing problem, also known as correlation clustering, clique partitioning problem or transitivity clustering.
+# License: MIT + file LICENSE
+# URL: https://github.com/m-Py/anticlust
+# BugReports: https://github.com/m-Py/anticlust/issues
+# Depends: R (>= 3.6.0)
+# Imports: Matrix, RANN (>= 2.6.0)
+# Suggests: knitr, palmerpenguins, Rglpk, rmarkdown, Rsymphony, testthat
+# VignetteBuilder: knitr, rmarkdown
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: yes
+# RoxygenNote: 7.2.3
+# SystemRequirements: The exact (anti)clustering algorithms require that either the GNU linear programming kit (GLPK library) is installed (<http://www.gnu.org/software/glpk/>) or the SYMPHONY open source MILP solver (<https://github.com/coin-or/SYMPHONY>). Rendering the vignette requires pandoc (<https://pandoc.org/>).
+# Packaged: 2023-10-26 07:19:38 UTC; martin
+# Repository: CRAN
+# Date/Publication: 2023-10-26 20:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

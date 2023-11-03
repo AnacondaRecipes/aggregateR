@@ -1,0 +1,91 @@
+{% set version = '1.10.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-beastjar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BeastJar_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BeastJar/BeastJar_{{ version }}.tar.gz
+  sha256: a753f8a2dc9476d01cd96a4fac852e1b73637718a2d12d420bc82c7a6ac20115
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rjava
+
+  run:
+    - r-base
+    - r-rjava
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BeastJar')"           # [not win]
+    - "\"%R%\" -e \"library('BeastJar')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/beast-dev/BeastJar
+  license: Apache License 2.0
+  summary: Provides JAR to perform Markov chain Monte Carlo (MCMC) inference using the popular
+    Bayesian Evolutionary Analysis by Sampling Trees 'BEAST' software library of Suchard
+    et al (2018) <doi:10.1093/ve/vey016>. 'BEAST' supports auto-tuning Metropolis-Hastings,
+    slice, Hamiltonian Monte Carlo and Sequential Monte Carlo sampling for a large variety
+    of composable standard and phylogenetic statistical models using high performance
+    computing.  By placing the 'BEAST' JAR in this package, we offer an efficient distribution
+    system for 'BEAST' use by other R packages using CRAN.
+  license_family: APACHE
+
+# The original CRAN metadata for this package was:
+
+# Package: BeastJar
+# Type: Package
+# Title: JAR Dependency for MCMC Using 'BEAST'
+# Version: 1.10.6
+# Authors@R: c( person("Marc A.", "Suchard", email = "msuchard@ucla.edu", role = c("aut","cre","cph")), person("Andrew", "Rambaut", role = "cph"), person("Alexei J.", "Drummond", role = "cph") )
+# Description: Provides JAR to perform Markov chain Monte Carlo (MCMC) inference using the popular Bayesian Evolutionary Analysis by Sampling Trees 'BEAST' software library of Suchard et al (2018) <doi:10.1093/ve/vey016>. 'BEAST' supports auto-tuning Metropolis-Hastings, slice, Hamiltonian Monte Carlo and Sequential Monte Carlo sampling for a large variety of composable standard and phylogenetic statistical models using high performance computing.  By placing the 'BEAST' JAR in this package, we offer an efficient distribution system for 'BEAST' use by other R packages using CRAN.
+# License: Apache License 2.0
+# Encoding: UTF-8
+# LazyData: true
+# Imports: rJava
+# URL: https://github.com/beast-dev/BeastJar
+# Copyright: See file COPYRIGHTS
+# RoxygenNote: 7.1.1
+# SystemRequirements: Java (>= 1.8)
+# Suggests: testthat
+# NeedsCompilation: no
+# Packaged: 2020-10-25 12:25:34 UTC; msuchard
+# Author: Marc A. Suchard [aut, cre, cph], Andrew Rambaut [cph], Alexei J. Drummond [cph]
+# Maintainer: Marc A. Suchard <msuchard@ucla.edu>
+# Repository: CRAN
+# Date/Publication: 2020-10-26 14:20:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

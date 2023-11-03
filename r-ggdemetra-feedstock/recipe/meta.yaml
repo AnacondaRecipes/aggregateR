@@ -1,0 +1,96 @@
+{% set version = '0.2.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ggdemetra
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ggdemetra_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ggdemetra/ggdemetra_{{ version }}.tar.gz
+  sha256: 17c05882c689032fc7dc2417e09d18037a89a55923db206c3960505ec05a5d39
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rjdemetra >=0.1.2
+    - r-ggplot2 >=2.0.0
+    - r-ggrepel
+    - r-gridextra
+
+  run:
+    - r-base
+    - r-rjdemetra >=0.1.2
+    - r-ggplot2 >=2.0.0
+    - r-ggrepel
+    - r-gridextra
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ggdemetra')"           # [not win]
+    - "\"%R%\" -e \"library('ggdemetra')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/AQLT/ggdemetra
+  license: EUPL
+  summary: Provides 'ggplot2' functions to return the results of seasonal and trading day adjustment
+    made by 'RJDemetra'. 'RJDemetra' is an 'R' interface around 'JDemetra+' (<https://github.com/jdemetra/jdemetra-app>),
+    the seasonal adjustment software officially recommended to the members of the European
+    Statistical System and the European System of Central Banks.
+  license_family: OTHER
+
+# The original CRAN metadata for this package was:
+
+# Package: ggdemetra
+# Type: Package
+# Title: 'ggplot2' Extension for Seasonal and Trading Day Adjustment with 'RJDemetra'
+# Version: 0.2.6
+# Authors@R: c(person("Alain", "Quartier-la-Tente", role = c("aut", "cre"), email = "alain.quartier@yahoo.fr", comment = c(ORCID = "0000-0001-7890-3857")))
+# Description: Provides 'ggplot2' functions to return the results of seasonal and trading day adjustment made by 'RJDemetra'. 'RJDemetra' is an 'R' interface around 'JDemetra+' (<https://github.com/jdemetra/jdemetra-app>), the seasonal adjustment software officially recommended to the members of the European Statistical System and the European System of Central Banks.
+# Depends: R (>= 3.1.2), ggplot2 (>= 2.0.0), RJDemetra (>= 0.1.2),
+# Imports: ggrepel, gridExtra
+# Suggests: knitr, rmarkdown
+# SystemRequirements: Java (>= 8)
+# License: EUPL
+# URL: https://github.com/AQLT/ggdemetra
+# BugReports: https://github.com/AQLT/ggdemetra/issues
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2023-10-04 14:58:10 UTC; alainquartierlatente
+# Author: Alain Quartier-la-Tente [aut, cre] (<https://orcid.org/0000-0001-7890-3857>)
+# Maintainer: Alain Quartier-la-Tente <alain.quartier@yahoo.fr>
+# Repository: CRAN
+# Date/Publication: 2023-10-04 15:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

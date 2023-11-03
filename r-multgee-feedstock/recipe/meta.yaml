@@ -1,0 +1,105 @@
+{% set version = '1.9.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-multgee
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/multgee_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/multgee/multgee_{{ version }}.tar.gz
+  sha256: b60722a9ce6af4252a77760881a2c3ea1b2ad8467e88cce8128ea1606db55442
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, rticles
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-vgam
+    - r-gnm
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-vgam
+    - r-gnm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('multgee')"           # [not win]
+    - "\"%R%\" -e \"library('multgee')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/AnestisTouloumis/multgee
+  license: GPL-2 | GPL-3
+  summary: GEE solver for correlated nominal or ordinal multinomial responses using a local odds
+    ratios parameterization.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: multgee
+# Type: Package
+# Title: GEE Solver for Correlated Nominal or Ordinal Multinomial Responses
+# Version: 1.9.0
+# Authors@R: person(given = "Anestis", family = "Touloumis", role = c("aut", "cre"), email = "A.Touloumis@brighton.ac.uk", comment = c(ORCID = "0000-0002-5965-1639") )
+# Depends: R (>= 2.15.0), gnm
+# Imports: stats, utils, VGAM, Rcpp
+# Suggests: knitr, rmarkdown, rticles
+# Description: GEE solver for correlated nominal or ordinal multinomial responses using a local odds ratios parameterization.
+# License: GPL-2 | GPL-3
+# LazyData: true
+# VignetteBuilder: knitr
+# URL: https://github.com/AnestisTouloumis/multgee
+# BugReports: https://github.com/AnestisTouloumis/multgee/issues
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# LinkingTo: Rcpp, RcppArmadillo
+# NeedsCompilation: yes
+# Packaged: 2023-09-01 23:43:13 UTC; anestis
+# Author: Anestis Touloumis [aut, cre] (<https://orcid.org/0000-0002-5965-1639>)
+# Maintainer: Anestis Touloumis <A.Touloumis@brighton.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2023-09-02 05:10:26 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

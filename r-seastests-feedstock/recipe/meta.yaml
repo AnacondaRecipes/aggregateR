@@ -1,0 +1,88 @@
+{% set version = '0.15.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-seastests
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/seastests_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/seastests/seastests_{{ version }}.tar.gz
+  sha256: ecbe754bd3ff63939b16d5784952ca3c9cb80e55c442ab8b2f679fd29882c2f7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-forecast
+    - r-xts
+    - r-zoo
+
+  run:
+    - r-base
+    - r-forecast
+    - r-xts
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('seastests')"           # [not win]
+    - "\"%R%\" -e \"library('seastests')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=seastests
+  license: GPL-3
+  summary: 'An overall test for seasonality of a given time series in addition to a set of individual
+    seasonality tests as described by Ollech and Webel (forthcoming): An overall seasonality
+    test. Bundesbank Discussion Paper.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: seastests
+# Title: Seasonality Tests
+# Version: 0.15.4
+# Authors@R: person(given = "Daniel", family = "Ollech", role = c("aut", "cre"), email = "daniel.ollech@bundesbank.de")
+# Maintainer: Daniel Ollech <daniel.ollech@bundesbank.de>
+# Description: An overall test for seasonality of a given time series in addition to a set of individual seasonality tests as described by Ollech and Webel (forthcoming): An overall seasonality test. Bundesbank Discussion Paper.
+# License: GPL-3
+# Depends: R (>= 3.1.0)
+# Encoding: UTF-8
+# LazyData: false
+# RoxygenNote: 7.1.1
+# Imports: xts, zoo, forecast, stats, graphics, utils
+# NeedsCompilation: no
+# Packaged: 2021-09-18 12:24:04 UTC; s3504do
+# Author: Daniel Ollech [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2021-09-18 12:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,105 @@
+{% set version = '0.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tidypredict
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tidypredict_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tidypredict/tidypredict_{{ version }}.tar.gz
+  sha256: fee172aef92f75b0aac70380094a3b1001e0a88e4ba68871da064aee4c7d05c0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, Cubist, DBI, dbplyr, earth (>= 5.1.2), methods, mlbench, modeldata, nycflights13, parsnip, partykit, randomForest, ranger, rmarkdown, RSQLite, testthat (>= 3.0.0), xgboost, yaml
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr >=0.7
+    - r-generics
+    - r-knitr
+    - r-purrr
+    - r-rlang
+    - r-tibble
+    - r-tidyr
+
+  run:
+    - r-base
+    - r-dplyr >=0.7
+    - r-generics
+    - r-knitr
+    - r-purrr
+    - r-rlang
+    - r-tibble
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tidypredict')"           # [not win]
+    - "\"%R%\" -e \"library('tidypredict')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://tidypredict.tidymodels.org, https://github.com/tidymodels/tidypredict
+  license: MIT
+  summary: It parses a fitted 'R' model object, and returns a formula in 'Tidy Eval' code that
+    calculates the predictions.  It works with several databases back-ends because it
+    leverages 'dplyr' and 'dbplyr' for the final 'SQL' translation of the algorithm.
+    It currently supports lm(), glm(), randomForest(), ranger(), earth(), xgb.Booster.complete(),
+    cubist(), and ctree() models.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: tidypredict
+# Title: Run Predictions Inside the Database
+# Version: 0.5
+# Authors@R: c( person("Edgar", "Ruiz", email = "edgar@posit.co", role = c("aut", "cre")), person("Max", "Kuhn", email = "max@posit.co", role = c("aut")) )
+# Description: It parses a fitted 'R' model object, and returns a formula in 'Tidy Eval' code that calculates the predictions.  It works with several databases back-ends because it leverages 'dplyr' and 'dbplyr' for the final 'SQL' translation of the algorithm. It currently supports lm(), glm(), randomForest(), ranger(), earth(), xgb.Booster.complete(), cubist(), and ctree() models.
+# License: MIT + file LICENSE
+# URL: https://tidypredict.tidymodels.org, https://github.com/tidymodels/tidypredict
+# BugReports: https://github.com/tidymodels/tidypredict/issues
+# Depends: R (>= 3.1)
+# Imports: dplyr (>= 0.7), generics, knitr, purrr, rlang, tibble, tidyr
+# Suggests: covr, Cubist, DBI, dbplyr, earth (>= 5.1.2), methods, mlbench, modeldata, nycflights13, parsnip, partykit, randomForest, ranger, rmarkdown, RSQLite, testthat (>= 3.0.0), xgboost, yaml
+# VignetteBuilder: knitr
+# Config/Needs/website: tidyverse/tidytemplate
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2023-01-17 21:53:58 UTC; edgar
+# Author: Edgar Ruiz [aut, cre], Max Kuhn [aut]
+# Maintainer: Edgar Ruiz <edgar@posit.co>
+# Repository: CRAN
+# Date/Publication: 2023-01-18 08:40:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

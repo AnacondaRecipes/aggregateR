@@ -1,0 +1,105 @@
+{% set version = '0.3.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lexisnexistools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LexisNexisTools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LexisNexisTools/LexisNexisTools_{{ version }}.tar.gz
+  sha256: 214206892296db0966d9c81e6202af32277dae35b6d860e55a156da7022657b1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: corpustools, covr, diffobj, dplyr, RSQLite, testthat, tidytext, tm, kableExtra, knitr, pdftools, rmarkdown, spelling, striprtf, xml2
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table >=1.10.0
+    - r-pbapply >=1.3.4
+    - r-quanteda >=1.1.0
+    - r-quanteda.textstats
+    - r-stringdist >=0.9.4.0
+    - r-stringi >=1.1.7
+    - r-tibble >=1.4.0
+
+  run:
+    - r-base
+    - r-data.table >=1.10.0
+    - r-pbapply >=1.3.4
+    - r-quanteda >=1.1.0
+    - r-quanteda.textstats
+    - r-stringdist >=0.9.4.0
+    - r-stringi >=1.1.7
+    - r-tibble >=1.4.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LexisNexisTools')"           # [not win]
+    - "\"%R%\" -e \"library('LexisNexisTools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/JBGruber/LexisNexisTools
+  license: GPL-3
+  summary: My PhD supervisor once told me that everyone doing newspaper analysis starts by writing
+    code to read in files from the 'LexisNexis' newspaper archive (retrieved e.g., from
+    <https://www.lexisnexis.com/> or any of the partner sites). However, while this
+    is a nice exercise I do recommend, not everyone has the time. This package takes
+    files downloaded from the newspaper archive of 'LexisNexis', reads them into R and
+    offers functions for further processing.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: LexisNexisTools
+# Title: Working with Files from 'LexisNexis'
+# Version: 0.3.7
+# Date: 2023-07-05
+# Authors@R: person("Johannes", "Gruber", email = "JohannesB.Gruber@gmail.com", role = c("aut", "cre"))
+# Description: My PhD supervisor once told me that everyone doing newspaper analysis starts by writing code to read in files from the 'LexisNexis' newspaper archive (retrieved e.g., from <https://www.lexisnexis.com/> or any of the partner sites). However, while this is a nice exercise I do recommend, not everyone has the time. This package takes files downloaded from the newspaper archive of 'LexisNexis', reads them into R and offers functions for further processing.
+# Depends: R (>= 3.5.0)
+# License: GPL-3
+# Imports: data.table (>= 1.10.0), methods (>= 3.3.0), parallel (>= 3.3.0), pbapply (>= 1.3.4), quanteda (>= 1.1.0), quanteda.textstats, stats (>= 3.3.0), stringdist (>= 0.9.4.0), stringi (>= 1.1.7), tibble (>= 1.4.0), utils (>= 3.3.0)
+# Suggests: corpustools, covr, diffobj, dplyr, RSQLite, testthat, tidytext, tm, kableExtra, knitr, pdftools, rmarkdown, spelling, striprtf, xml2
+# Encoding: UTF-8
+# URL: https://github.com/JBGruber/LexisNexisTools
+# BugReports: https://github.com/JBGruber/LexisNexisTools/issues
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# Language: en-GB
+# NeedsCompilation: no
+# Packaged: 2023-07-05 13:17:14 UTC; johannes
+# Author: Johannes Gruber [aut, cre]
+# Maintainer: Johannes Gruber <JohannesB.Gruber@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-07-05 13:33:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,93 @@
+{% set version = '2.1.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-logcondens
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/logcondens_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/logcondens/logcondens_{{ version }}.tar.gz
+  sha256: f139206e47d1077ffcb39248450c1d7ce2ac892cb9264dd0e1ace92532162a00
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ks
+
+  run:
+    - r-base
+    - r-ks
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('logcondens')"           # [not win]
+    - "\"%R%\" -e \"library('logcondens')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.kasparrufibach.ch , https://www.imsv.unibe.ch/about_us/staff/prof_dr_duembgen_lutz/index_eng.html
+  license: GPL-2
+  summary: Given independent and identically distributed observations X(1), ..., X(n), compute
+    the maximum likelihood estimator (MLE) of a density as well as a smoothed version
+    of it under the assumption that the density is log-concave, see Rufibach (2007)
+    and Duembgen and Rufibach (2009). The main function of the package is 'logConDens'
+    that allows computation of the log-concave MLE and its smoothed version. In addition,
+    we provide functions to compute (1) the value of the density and distribution function
+    estimates (MLE and smoothed) at a given point (2) the characterizing functions of
+    the estimator, (3) to sample from the estimated distribution, (5) to compute a two-sample
+    permutation test based on log-concave densities, (6) the ROC curve based on log-concave
+    estimates within cases and controls, including confidence intervals for given values
+    of false positive fractions (7) computation of a confidence interval for the value
+    of the true density at a fixed point. Finally, three datasets that have been used
+    to illustrate log-concave density estimation are made available.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: logcondens
+# Type: Package
+# Title: Estimate a Log-Concave Probability Density from Iid Observations
+# Version: 2.1.8
+# Date: 2023-08-21
+# Author: Kaspar Rufibach <kaspar.rufibach@gmail.com> and Lutz Duembgen <duembgen@stat.unibe.ch>
+# Maintainer: Kaspar Rufibach <kaspar.rufibach@gmail.com>
+# Depends: R (>= 2.10)
+# Imports: ks, graphics, stats
+# Description: Given independent and identically distributed observations X(1), ..., X(n), compute the maximum likelihood estimator (MLE) of a density as well as a smoothed version of it under the assumption that the density is log-concave, see Rufibach (2007) and Duembgen and Rufibach (2009). The main function of the package is 'logConDens' that allows computation of the log-concave MLE and its smoothed version. In addition, we provide functions to compute (1) the value of the density and distribution function estimates (MLE and smoothed) at a given point (2) the characterizing functions of the estimator, (3) to sample from the estimated distribution, (5) to compute a two-sample permutation test based on log-concave densities, (6) the ROC curve based on log-concave estimates within cases and controls, including confidence intervals for given values of false positive fractions (7) computation of a confidence interval for the value of the true density at a fixed point. Finally, three datasets that have been used to illustrate log-concave density estimation are made available.
+# License: GPL (>= 2)
+# URL: http://www.kasparrufibach.ch , https://www.imsv.unibe.ch/about_us/staff/prof_dr_duembgen_lutz/index_eng.html
+# NeedsCompilation: no
+# Packaged: 2023-08-22 11:58:12 UTC; rufiback
+# Repository: CRAN
+# Date/Publication: 2023-08-22 13:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

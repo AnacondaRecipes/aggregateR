@@ -1,0 +1,95 @@
+{% set version = '1.0-6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rioja
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rioja_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rioja/rioja_{{ version }}.tar.gz
+  sha256: a3093b5b3478a1af8d6bd4e02ad5ecc14f67b1cdc0ccdca5cdb7c0381a383709
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: foreach
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mgcv
+    - r-vegan
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mgcv
+    - r-vegan
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rioja')"           # [not win]
+    - "\"%R%\" -e \"library('rioja')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.staff.ncl.ac.uk/stephen.juggins/, https://github.com/nsj3/rioja
+  license: GPL-2
+  summary: Constrained clustering, transfer functions, and other methods for analysing Quaternary
+    science data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: rioja
+# Type: Package
+# Title: Analysis of Quaternary Science Data
+# Version: 1.0-6
+# Date: 2023-10-18
+# Author: Steve Juggins
+# Maintainer: Steve Juggins <Stephen.Juggins@ncl.ac.uk>
+# Depends: R (>= 3.5)
+# Imports: vegan, mgcv, grDevices, methods
+# Suggests: foreach
+# Description: Constrained clustering, transfer functions, and other methods for analysing Quaternary science data.
+# License: GPL-2
+# URL: http://www.staff.ncl.ac.uk/stephen.juggins/, https://github.com/nsj3/rioja
+# NeedsCompilation: yes
+# Repository: CRAN
+# LazyData: true
+# Packaged: 2023-10-19 11:51:09 UTC; Steph
+# Date/Publication: 2023-10-19 12:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

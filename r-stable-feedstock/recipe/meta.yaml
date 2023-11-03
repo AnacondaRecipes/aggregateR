@@ -1,0 +1,95 @@
+{% set version = '1.1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stable
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/stable_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/stable/stable_{{ version }}.tar.gz
+  sha256: 2238788a35b5aa9e175ad7b92348640c3dcad68b6ab0a0bc04aeec9084d29da4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rmutil
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rmutil
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('stable')"           # [not win]
+    - "\"%R%\" -e \"library('stable')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.commanster.eu/rcode.html
+  license: GPL-2
+  summary: Density, distribution, quantile and hazard functions of a stable variate; generalized
+    regression models for the parameters of a stable distribution. See the README for
+    how to make equivalent calls to those of 'stabledist' (i.e., Nolan's 0-parameterization
+    and 1-parameterization as detailed in Nolan (2020)). See github for Lambert and
+    Lindsey 1999 JRSS-C journal article, which details the parameterization of the Buck
+    (1995) stable. See the Details section of the `?dstable` help file for context and
+    references.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: stable
+# Version: 1.1.6
+# Title: Probability Functions and Generalized Regression Models for Stable Distributions
+# Authors@R: c( person("Bruce", "Swihart", email="bruce.swihart@gmail.com", role=c("cre", "aut")), person("Jim"  , "Lindsey", email="jlindsey@gen.unimaas.nl", role="aut", comment="Jim created this package, Bruce is maintaining the CRAN version"), person("Philippe", "Lambert", email="phlambert@stat.ucl.ac.be", role="aut") )
+# Depends: R (>= 1.4), rmutil
+# Description: Density, distribution, quantile and hazard functions of a stable variate; generalized regression models for the parameters of a stable distribution. See the README for how to make equivalent calls to those of 'stabledist' (i.e., Nolan's 0-parameterization and 1-parameterization as detailed in Nolan (2020)). See github for Lambert and Lindsey 1999 JRSS-C journal article, which details the parameterization of the Buck (1995) stable. See the Details section of the `?dstable` help file for context and references.
+# License: GPL (>= 2)
+# URL: https://www.commanster.eu/rcode.html
+# BugReports: https://github.com/swihart/stable/issues
+# Encoding: UTF-8
+# LazyLoad: true
+# RoxygenNote: 7.1.2
+# NeedsCompilation: yes
+# Packaged: 2022-03-01 18:54:52 UTC; swihartbj
+# Author: Bruce Swihart [cre, aut], Jim Lindsey [aut] (Jim created this package, Bruce is maintaining the CRAN version), Philippe Lambert [aut]
+# Maintainer: Bruce Swihart <bruce.swihart@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-03-02 00:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

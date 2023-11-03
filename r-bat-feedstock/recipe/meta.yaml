@@ -1,0 +1,101 @@
+{% set version = '2.9.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bat
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BAT_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BAT/BAT_{{ version }}.tar.gz
+  sha256: 2e3b7f24f704577d6bfe850594018a7b8961dba96f270f4e55965e5e9768314b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-ape
+    - r-geometry
+    - r-hypervolume
+    - r-nls2
+    - r-phytools
+    - r-terra
+    - r-vegan
+
+  run:
+    - r-base
+    - r-mass
+    - r-ape
+    - r-geometry
+    - r-hypervolume
+    - r-nls2
+    - r-phytools
+    - r-terra
+    - r-vegan
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BAT')"           # [not win]
+    - "\"%R%\" -e \"library('BAT')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=BAT
+  license: GPL-3
+  summary: Includes algorithms to assess alpha and beta diversity in all their dimensions (taxonomic,
+    phylogenetic and functional). It allows performing a number of analyses based on
+    species identities/abundances, phylogenetic/functional distances, trees, convex-hulls
+    or kernel density n-dimensional hypervolumes depicting species relationships. Cardoso
+    et al. (2015) <doi:10.1111/2041-210X.12310>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: BAT
+# Title: Biodiversity Assessment Tools
+# Version: 2.9.4
+# Date: 2023-09-27
+# Authors@R: c( person("Pedro", "Cardoso", email = "pmcardoso@fc.ul.pt", role = c("aut", "cre")), person("Stefano", "Mammola", role = c("aut")), person("Francois", "Rigal", role = c("aut")), person("Jose", "Carvalho", role = c("aut")))
+# Description: Includes algorithms to assess alpha and beta diversity in all their dimensions (taxonomic, phylogenetic and functional). It allows performing a number of analyses based on species identities/abundances, phylogenetic/functional distances, trees, convex-hulls or kernel density n-dimensional hypervolumes depicting species relationships. Cardoso et al. (2015) <doi:10.1111/2041-210X.12310>.
+# Depends: R (>= 3.0.0)
+# Imports: ape, geometry, graphics, hypervolume, MASS, methods, nls2, parallel, phytools, stats, terra, utils, vegan
+# Encoding: UTF-8
+# License: GPL-3
+# LazyData: true
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-09-27 19:16:46 UTC; ungol
+# Author: Pedro Cardoso [aut, cre], Stefano Mammola [aut], Francois Rigal [aut], Jose Carvalho [aut]
+# Maintainer: Pedro Cardoso <pmcardoso@fc.ul.pt>
+# Repository: CRAN
+# Date/Publication: 2023-10-11 00:40:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

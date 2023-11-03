@@ -1,0 +1,95 @@
+{% set version = '2.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ibreakdown
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/iBreakDown_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/iBreakDown/iBreakDown_{{ version }}.tar.gz
+  sha256: 70e62b50eb37ec44b38d6d0f5409498c252bc6d1fb8a0ba3d91aaab19acd5f02
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: DALEX, knitr, rmarkdown, randomForest, e1071, ranger, nnet, testthat, r2d3, jsonlite, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggplot2
+
+  run:
+    - r-base
+    - r-ggplot2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('iBreakDown')"           # [not win]
+    - "\"%R%\" -e \"library('iBreakDown')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://ModelOriented.github.io/iBreakDown/, https://github.com/ModelOriented/iBreakDown
+  license: GPL-3
+  summary: Model agnostic tool for decomposition of predictions from black boxes. Supports additive
+    attributions and attributions with interactions. The Break Down Table shows contributions
+    of every variable to a final prediction. The Break Down Plot presents variable contributions
+    in a concise graphical way. This package works for classification and regression
+    models. It is an extension of the 'breakDown' package (Staniak and Biecek 2018)
+    <doi:10.32614/RJ-2018-072>, with new and faster strategies for orderings. It supports
+    interactions in explanations and has interactive visuals (implemented with 'D3.js'
+    library). The methodology behind is described in the 'iBreakDown' article (Gosiewska
+    and Biecek 2019) <arXiv:1903.11420> This package is a part of the 'DrWhy.AI' universe
+    (Biecek 2018) <arXiv:1806.08915>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: iBreakDown
+# Title: Model Agnostic Instance Level Variable Attributions
+# Version: 2.0.1
+# Authors@R: c(person("Przemyslaw", "Biecek", email = "przemyslaw.biecek@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8423-1823")), person("Alicja", "Gosiewska", role = "aut", comment = c(ORCID = "0000-0001-6563-5742")), person("Hubert", "Baniecki", role = "aut", comment = c(ORCID = "0000-0001-6661-5364")), person("Adam", "Izdebski", role = "aut"), person("Dariusz", "Komosinski", role = "ctb"))
+# Description: Model agnostic tool for decomposition of predictions from black boxes. Supports additive attributions and attributions with interactions. The Break Down Table shows contributions of every variable to a final prediction. The Break Down Plot presents variable contributions in a concise graphical way. This package works for classification and regression models. It is an extension of the 'breakDown' package (Staniak and Biecek 2018) <doi:10.32614/RJ-2018-072>, with new and faster strategies for orderings. It supports interactions in explanations and has interactive visuals (implemented with 'D3.js' library). The methodology behind is described in the 'iBreakDown' article (Gosiewska and Biecek 2019) <arXiv:1903.11420> This package is a part of the 'DrWhy.AI' universe (Biecek 2018) <arXiv:1806.08915>.
+# Depends: R (>= 3.5)
+# License: GPL-3
+# Encoding: UTF-8
+# RoxygenNote: 7.1.1
+# Imports: ggplot2
+# Suggests: DALEX, knitr, rmarkdown, randomForest, e1071, ranger, nnet, testthat, r2d3, jsonlite, covr
+# VignetteBuilder: knitr
+# URL: https://ModelOriented.github.io/iBreakDown/, https://github.com/ModelOriented/iBreakDown
+# BugReports: https://github.com/ModelOriented/iBreakDown/issues
+# NeedsCompilation: no
+# Packaged: 2021-05-07 12:34:05 UTC; pbiecek
+# Author: Przemyslaw Biecek [aut, cre] (<https://orcid.org/0000-0001-8423-1823>), Alicja Gosiewska [aut] (<https://orcid.org/0000-0001-6563-5742>), Hubert Baniecki [aut] (<https://orcid.org/0000-0001-6661-5364>), Adam Izdebski [aut], Dariusz Komosinski [ctb]
+# Maintainer: Przemyslaw Biecek <przemyslaw.biecek@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-05-07 13:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

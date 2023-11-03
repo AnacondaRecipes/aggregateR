@@ -1,0 +1,96 @@
+{% set version = '1.7.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tidyfst
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tidyfst_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tidyfst/tidyfst_{{ version }}.tar.gz
+  sha256: 2aa71ca0d4d216e33292845a6a6c9d73f2c60efa7dec190e7d02cf21ad5eb4ee
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, nycflights13, pryr, tidyr, ggplot2, dplyr, bench, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table >=1.13.0
+    - r-fst >=0.9.0
+    - r-stringr >=1.5.0
+
+  run:
+    - r-base
+    - r-data.table >=1.13.0
+    - r-fst >=0.9.0
+    - r-stringr >=1.5.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tidyfst')"           # [not win]
+    - "\"%R%\" -e \"library('tidyfst')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/hope-data-science/tidyfst, https://hope-data-science.github.io/tidyfst/
+  license: MIT
+  summary: A toolkit of tidy data manipulation verbs with 'data.table' as the backend. Combining
+    the merits of syntax elegance from 'dplyr' and computing performance from 'data.table',
+    'tidyfst' intends to provide users with state-of-the-art data manipulation tools
+    with least pain. This package is an extension of 'data.table'. While enjoying a
+    tidy syntax, it also wraps combinations of efficient functions to facilitate frequently-used
+    data operations.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: tidyfst
+# Title: Tidy Verbs for Fast Data Manipulation
+# Version: 1.7.7
+# Depends: R (>= 3.3.0)
+# Authors@R: person(given = "Tian-Yuan", family = "Huang", role = c("aut", "cre"), email = "huang.tian-yuan@qq.com", comment = c(ORCID = "0000-0002-4151-3764"))
+# Description: A toolkit of tidy data manipulation verbs with 'data.table' as the backend. Combining the merits of syntax elegance from 'dplyr' and computing performance from 'data.table', 'tidyfst' intends to provide users with state-of-the-art data manipulation tools with least pain. This package is an extension of 'data.table'. While enjoying a tidy syntax, it also wraps combinations of efficient functions to facilitate frequently-used data operations.
+# URL: https://github.com/hope-data-science/tidyfst, https://hope-data-science.github.io/tidyfst/
+# BugReports: https://github.com/hope-data-science/tidyfst/issues
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Imports: data.table (>= 1.13.0), fst (>= 0.9.0), stringr (>= 1.5.0)
+# Suggests: knitr, rmarkdown, nycflights13, pryr, tidyr, ggplot2, dplyr, bench, testthat
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2023-07-18 02:01:33 UTC; DELL
+# Author: Tian-Yuan Huang [aut, cre] (<https://orcid.org/0000-0002-4151-3764>)
+# Maintainer: Tian-Yuan Huang <huang.tian-yuan@qq.com>
+# Repository: CRAN
+# Date/Publication: 2023-07-18 02:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

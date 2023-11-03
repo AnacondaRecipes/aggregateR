@@ -1,0 +1,94 @@
+{% set version = '0.6.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-airgriwrm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/airGRiwrm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/airGRiwrm/airGRiwrm_{{ version }}.tar.gz
+  sha256: 5d35bfb11f4b68e2ea759ba25bb12bacc92d1a8e1cdb9f559bbe0e0d71d10c26
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: htmltools, knitr, rmarkdown, spelling, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-diagrammer
+    - r-airgr >=1.7.0
+    - r-dplyr
+
+  run:
+    - r-base
+    - r-diagrammer
+    - r-airgr >=1.7.0
+    - r-dplyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('airGRiwrm')"           # [not win]
+    - "\"%R%\" -e \"library('airGRiwrm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://airgriwrm.g-eau.fr/, https://github.com/inrae/airGRiwrm#readme
+  license: AGPL-3
+  summary: Semi-distributed Precipitation-Runoff Modelling based on 'airGR' package models integrating
+    human infrastructures and their managements.
+  license_family: AGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/AGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: airGRiwrm
+# Title: 'airGR' Integrated Water Resource Management
+# Version: 0.6.2
+# Date: 2023-10-24
+# Authors@R: c( person("David", "Dorchies", , "david.dorchies@inrae.fr", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-6595-7984")), person("Olivier", "Delaigue", , "airGR@inrae.fr", role = "ctb", comment = c(ORCID = "0000-0002-7668-8468")), person("Guillaume", "Thirel", role = "ctb", comment = c(ORCID = "0000-0002-1444-1830")) )
+# Description: Semi-distributed Precipitation-Runoff Modelling based on 'airGR' package models integrating human infrastructures and their managements.
+# License: AGPL-3
+# URL: https://airgriwrm.g-eau.fr/, https://github.com/inrae/airGRiwrm#readme
+# BugReports: https://github.com/inrae/airGRiwrm/issues
+# Depends: airGR (>= 1.7.0), R (>= 2.10)
+# Imports: DiagrammeR, dplyr, graphics, grDevices, utils
+# Suggests: htmltools, knitr, rmarkdown, spelling, testthat
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# Language: en-US
+# LazyData: true
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-10-24 15:30:21 UTC; ddorchies
+# Author: David Dorchies [aut, cre] (<https://orcid.org/0000-0002-6595-7984>), Olivier Delaigue [ctb] (<https://orcid.org/0000-0002-7668-8468>), Guillaume Thirel [ctb] (<https://orcid.org/0000-0002-1444-1830>)
+# Maintainer: David Dorchies <david.dorchies@inrae.fr>
+# Repository: CRAN
+# Date/Publication: 2023-10-24 16:00:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

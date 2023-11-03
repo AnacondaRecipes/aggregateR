@@ -1,0 +1,100 @@
+{% set version = '2.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-whitebox
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/whitebox_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/whitebox/whitebox_{{ version }}.tar.gz
+  sha256: 5d2ecdc9be6aec0354cc2d0554741054100ee831c59e41f82bc2707fd655662d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, terra, sf, raster
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('whitebox')"           # [not win]
+    - "\"%R%\" -e \"library('whitebox')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/opengeos/whiteboxR
+  license: MIT
+  summary: 'An R frontend for the ''WhiteboxTools'' library, which is an advanced geospatial
+    data analysis platform developed by Prof. John Lindsay at the University of Guelph''s
+    Geomorphometry and Hydrogeomatics Research Group. ''WhiteboxTools'' can be used
+    to perform common geographical information systems (GIS) analysis operations, such
+    as cost-distance analysis, distance buffering, and raster reclassification. Remote
+    sensing and image processing tasks include image enhancement (e.g. panchromatic
+    sharpening, contrast adjustments), image mosaicing, numerous filtering operations,
+    simple classification (k-means), and common image transformations. ''WhiteboxTools''
+    also contains advanced tooling for spatial hydrological analysis (e.g. flow-accumulation,
+    watershed delineation, stream network analysis, sink removal), terrain analysis
+    (e.g. common terrain indices such as slope, curvatures, wetness index, hillshading;
+    hypsometric analysis; multi-scale topographic position analysis), and LiDAR data
+    processing. Suggested citation: Lindsay (2016) <doi:10.1016/j.cageo.2016.07.003>.'
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: whitebox
+# Type: Package
+# Title: 'WhiteboxTools' R Frontend
+# Version: 2.3.1
+# Description: An R frontend for the 'WhiteboxTools' library, which is an advanced geospatial data analysis platform developed by Prof. John Lindsay at the University of Guelph's Geomorphometry and Hydrogeomatics Research Group. 'WhiteboxTools' can be used to perform common geographical information systems (GIS) analysis operations, such as cost-distance analysis, distance buffering, and raster reclassification. Remote sensing and image processing tasks include image enhancement (e.g. panchromatic sharpening, contrast adjustments), image mosaicing, numerous filtering operations, simple classification (k-means), and common image transformations. 'WhiteboxTools' also contains advanced tooling for spatial hydrological analysis (e.g. flow-accumulation, watershed delineation, stream network analysis, sink removal), terrain analysis (e.g. common terrain indices such as slope, curvatures, wetness index, hillshading; hypsometric analysis; multi-scale topographic position analysis), and LiDAR data processing. Suggested citation: Lindsay (2016) <doi:10.1016/j.cageo.2016.07.003>.
+# Authors@R: c(person("Qiusheng", "Wu", email = "giswqs@gmail.com", role = c("aut")), person("Andrew", "Brown", email = "brown.andrewg@gmail.com", role = c("ctb", "cre")))
+# Maintainer: Andrew Brown <brown.andrewg@gmail.com>
+# License: MIT + file LICENSE
+# SystemRequirements: WhiteboxTools (https://github.com/jblindsay/whitebox-tools/releases/latest)
+# Encoding: UTF-8
+# Language: en-US
+# RoxygenNote: 7.2.3
+# URL: https://github.com/opengeos/whiteboxR
+# BugReports: https://github.com/opengeos/whiteboxR/issues
+# Suggests: knitr, rmarkdown, testthat, terra, sf, raster
+# VignetteBuilder: knitr
+# Depends: R (>= 3.0.0)
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2023-06-07 14:27:43 UTC; andrew
+# Author: Qiusheng Wu [aut], Andrew Brown [ctb, cre]
+# Repository: CRAN
+# Date/Publication: 2023-06-07 15:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

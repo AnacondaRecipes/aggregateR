@@ -1,0 +1,118 @@
+{% set version = '0.4-2.23' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mpath
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mpath_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mpath/mpath_{{ version }}.tar.gz
+  sha256: 1608215dd7826dde0cb7c8890375568d286270024d52f01cb12c9402c817ed99
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: zic, R.rsp, knitr, rmarkdown, gdata, e1071, SparseM, slam
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-weightsvm
+    - r-bst
+    - r-doparallel
+    - r-foreach
+    - r-glmnet
+    - r-numderiv
+    - r-pamr
+    - r-pscl
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-weightsvm
+    - r-bst
+    - r-doparallel
+    - r-foreach
+    - r-glmnet
+    - r-numderiv
+    - r-pamr
+    - r-pscl
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mpath')"           # [not win]
+    - "\"%R%\" -e \"library('mpath')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/zhuwang46/mpath
+  license: GPL-2
+  summary: Algorithms compute robust estimators for loss functions in the concave convex (CC)
+    family by the iteratively reweighted convex optimization (IRCO), an extension of
+    the iteratively reweighted least squares (IRLS). The IRCO reduces the weight of
+    the observation that leads to a large loss; it also provides weights to help identify
+    outliers. Applications include robust (penalized) generalized linear models and
+    robust support vector machines. The package also contains penalized Poisson, negative
+    binomial, zero-inflated Poisson, zero-inflated negative binomial regression models
+    and robust models with non-convex loss functions. Wang et al. (2014) <doi:10.1002/sim.6314>,
+    Wang et al. (2015) <doi:10.1002/bimj.201400143>, Wang et al. (2016) <doi:10.1177/0962280214530608>,
+    Wang (2021) <doi:10.1007/s11749-021-00770-2>, Wang (2020) <arXiv:2010.02848>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: mpath
+# Title: Regularized Linear Models
+# Version: 0.4-2.23
+# Date: 2022-12-21
+# Author: Zhu Wang, with contributions from Achim Zeileis, Simon Jackman, Brian Ripley, and Patrick Breheny
+# Maintainer: Zhu Wang <zwang145@uthsc.edu>
+# Description: Algorithms compute robust estimators for loss functions in the concave convex (CC) family by the iteratively reweighted convex optimization (IRCO), an extension of the iteratively reweighted least squares (IRLS). The IRCO reduces the weight of the observation that leads to a large loss; it also provides weights to help identify outliers. Applications include robust (penalized) generalized linear models and robust support vector machines. The package also contains penalized Poisson, negative binomial, zero-inflated Poisson, zero-inflated negative binomial regression models and robust models with non-convex loss functions. Wang et al. (2014) <doi:10.1002/sim.6314>, Wang et al. (2015) <doi:10.1002/bimj.201400143>, Wang et al. (2016) <doi:10.1177/0962280214530608>, Wang (2021) <doi:10.1007/s11749-021-00770-2>, Wang (2020) <arXiv:2010.02848>.
+# Depends: R (>= 3.5.0), methods, glmnet, pamr
+# Imports: MASS, pscl, numDeriv, foreach, doParallel, bst, WeightSVM
+# Suggests: zic, R.rsp, knitr, rmarkdown, gdata, e1071, SparseM, slam
+# VignetteBuilder: R.rsp, knitr
+# License: GPL-2
+# URL: https://github.com/zhuwang46/mpath
+# BugReports: https://github.com/zhuwang46/mpath
+# Packaged: 2022-12-22 17:16:41 UTC; zhu
+# NeedsCompilation: yes
+# RoxygenNote: 7.1.1
+# Repository: CRAN
+# Date/Publication: 2023-01-06 18:50:38 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

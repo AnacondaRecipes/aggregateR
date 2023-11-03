@@ -1,0 +1,99 @@
+{% set version = '0.9.2-5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rstac
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rstac_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rstac/rstac_{{ version }}.tar.gz
+  sha256: 82a82484eb2b3e324e13d6a3b034fa09ca8f2d32898048a5798ec4942613981b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, sf, knitr, rmarkdown, png, jpeg, tibble, dplyr, purrr, slider, leaflet, tmap, stars, ggplot2, geojsonsf
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-crayon
+    - r-httr
+    - r-jsonlite
+    - r-lifecycle
+    - r-magrittr
+
+  run:
+    - r-base
+    - r-crayon
+    - r-httr
+    - r-jsonlite
+    - r-lifecycle
+    - r-magrittr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rstac')"           # [not win]
+    - "\"%R%\" -e \"library('rstac')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://brazil-data-cube.github.io/rstac/
+  license: MIT
+  summary: Provides functions to access, search and download spacetime earth observation data
+    via SpatioTemporal Asset Catalog (STAC). This package supports the version 1.0.0
+    (and older) of the STAC specification (<https://github.com/radiantearth/stac-spec>).
+    For further details see Simoes et al. (2021) <doi:10.1109/IGARSS47720.2021.9553518>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: rstac
+# Title: Client Library for SpatioTemporal Asset Catalog
+# Version: 0.9.2-5
+# Authors@R: c(person("Rolf", "Simoes", email = "rolfsimoes@gmail.com", role = c("aut")), person("Felipe", "Carvalho", email = "lipecaso@gmail.com", role = c("aut", "cre")), person("Brazil Data Cube Team", email = "brazildatacube@inpe.br", role = c("aut")), person(given = "National Institute for Space Research (INPE)", role = c("cph")))
+# Description: Provides functions to access, search and download spacetime earth observation data via SpatioTemporal Asset Catalog (STAC). This package supports the version 1.0.0 (and older) of the STAC specification (<https://github.com/radiantearth/stac-spec>). For further details see Simoes et al. (2021) <doi:10.1109/IGARSS47720.2021.9553518>.
+# License: MIT + file LICENSE
+# URL: https://brazil-data-cube.github.io/rstac/
+# BugReports: https://github.com/brazil-data-cube/rstac/issues
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Depends: R (>= 3.5)
+# Imports: httr, crayon, utils, jsonlite, lifecycle, magrittr
+# Suggests: testthat, sf, knitr, rmarkdown, png, jpeg, tibble, dplyr, purrr, slider, leaflet, tmap, stars, ggplot2, geojsonsf
+# Collate: 'cql2-expr-funs.R' 'cql2-types.R' 'parse-utils.R' 'cql2-core.R' 'cql2-json.R' 'cql2-text.R' 'cql2-adv_comp.R' 'cql2-funs.R' 'cql2-env.R' 'cql2-utils.R' 'assets-utils.R' 'assets-funs.R' 'check-utils.R' 'conformance-query.R' 'collections-query.R' 'deprec-funs.R' 'document-funs.R' 'ext_filter.R' 'ext_query.R' 'extensions.R' 'items-funs.R' 'items-utils.R' 'items-query.R' 'message-utils.R' 'preview-utils.R' 'print.R' 'query-funs.R' 'queryables-query.R' 'request.R' 'signatures.R' 'stac-query.R' 'stac_search.R' 'stac_version.R' 'url-utils.R' 'utils.R' 'rstac.R'
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2023-10-17 21:40:07 UTC; sits
+# Author: Rolf Simoes [aut], Felipe Carvalho [aut, cre], Brazil Data Cube Team [aut], National Institute for Space Research (INPE) [cph]
+# Maintainer: Felipe Carvalho <lipecaso@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-17 22:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

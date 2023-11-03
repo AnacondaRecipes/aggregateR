@@ -1,0 +1,100 @@
+{% set version = '0.0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rcppint64
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RcppInt64_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RcppInt64/RcppInt64_{{ version }}.tar.gz
+  sha256: 69bd4001de658e4edf8c1a297b7e9be5541778cd7e4b46c80b8929259fb62e37
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tinytest, bit64, nanotime
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.8
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.8
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RcppInt64')"           # [not win]
+    - "\"%R%\" -e \"library('RcppInt64')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/eddelbuettel/rcppint64
+  license: GPL-2
+  summary: '''Int64'' values can be created and accessed via the ''bit64'' package and its ''integer64''
+    class which package the ''int64'' representation cleverly into a ''double''. The
+    ''nanotime'' packages builds on this to support nanosecond-resolution timestamps.
+    This packages helps conversions between ''R'' and ''C++'' via several helper functions
+    provided via a single header file.  A complete example client package is included
+    as an illustration.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: RcppInt64
+# Type: Package
+# Title: 'Rcpp'-Based Helper Functions to Pass 'Int64' and 'nanotime' Values Between 'R' and 'C++'
+# Version: 0.0.3
+# Date: 2023-09-19
+# Authors@R: c(person(given = "Dirk", family = "Eddelbuettel", role = c("aut", "cre"), email = "edd@debian.org", comment = c(ORCID = "0000-0001-6419-907X")))
+# Description: 'Int64' values can be created and accessed via the 'bit64' package and its 'integer64' class which package the 'int64' representation cleverly into a 'double'. The 'nanotime' packages builds on this to support nanosecond-resolution timestamps. This packages helps conversions between 'R' and 'C++' via several helper functions provided via a single header file.  A complete example client package is included as an illustration.
+# URL: https://github.com/eddelbuettel/rcppint64
+# BugReports: https://github.com/eddelbuettel/rcppint64/issues
+# License: GPL (>= 2)
+# Imports: Rcpp (>= 1.0.8)
+# LinkingTo: Rcpp
+# Suggests: tinytest, bit64, nanotime
+# RoxygenNote: 6.0.1
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-09-19 12:18:32 UTC; edd
+# Author: Dirk Eddelbuettel [aut, cre] (<https://orcid.org/0000-0001-6419-907X>)
+# Maintainer: Dirk Eddelbuettel <edd@debian.org>
+# Repository: CRAN
+# Date/Publication: 2023-09-19 14:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '1.3.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sda
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sda_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sda/sda_{{ version }}.tar.gz
+  sha256: 9bc514e6c9a49d81aab6971ab3e5ce1a18e32c3c3a31c43c6f55a924ffa19791
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: crossval
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-corpcor >=1.6.10
+    - r-entropy >=1.3.1
+    - r-fdrtool >=1.2.17
+
+  run:
+    - r-base
+    - r-corpcor >=1.6.10
+    - r-entropy >=1.3.1
+    - r-fdrtool >=1.2.17
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sda')"           # [not win]
+    - "\"%R%\" -e \"library('sda')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://strimmerlab.github.io/software/sda/
+  license: GPL-3
+  summary: Provides an efficient framework for high-dimensional linear and diagonal discriminant
+    analysis with variable selection.  The classifier is trained using James-Stein-type
+    shrinkage estimators and predictor variables are ranked using correlation-adjusted
+    t-scores (CAT scores).  Variable selection error is controlled using false non-discovery
+    rates or higher criticism.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: sda
+# Version: 1.3.8
+# Date: 2021-11-21
+# Title: Shrinkage Discriminant Analysis and CAT Score Variable Selection
+# Author: Miika Ahdesmaki, Verena Zuber, Sebastian Gibb, and Korbinian Strimmer
+# Maintainer: Korbinian Strimmer <strimmerlab@gmail.com>
+# Depends: R (>= 3.0.2), entropy (>= 1.3.1), corpcor (>= 1.6.10), fdrtool (>= 1.2.17)
+# Suggests: crossval
+# Imports: graphics, stats, utils
+# Enhances: care
+# Description: Provides an efficient framework for high-dimensional linear and diagonal discriminant analysis with variable selection.  The classifier is trained using James-Stein-type shrinkage estimators and predictor variables are ranked using correlation-adjusted t-scores (CAT scores).  Variable selection error is controlled using false non-discovery rates or higher criticism.
+# License: GPL (>= 3)
+# URL: https://strimmerlab.github.io/software/sda/
+# NeedsCompilation: no
+# Packaged: 2021-11-21 17:07:03 UTC; strimmer
+# Repository: CRAN
+# Date/Publication: 2021-11-21 17:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

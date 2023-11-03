@@ -1,0 +1,99 @@
+{% set version = '0.1.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-glmtoolbox
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/glmtoolbox_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/glmtoolbox/glmtoolbox_{{ version }}.tar.gz
+  sha256: a88c1c3cbfca71ec642929fdbd9569bb5e190f17acc04bdbd1737ec7607dbe84
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: aplore3, ISLR, pscl, GLMsData
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+    - r-mass
+    - r-rfast
+    - r-numderiv
+    - r-statmod
+
+  run:
+    - r-base
+    - r-formula
+    - r-mass
+    - r-rfast
+    - r-numderiv
+    - r-statmod
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('glmtoolbox')"           # [not win]
+    - "\"%R%\" -e \"library('glmtoolbox')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=glmtoolbox
+  license: GPL-2 | GPL-3
+  summary: 'Set of tools to the statistical analysis of data using: (1) normal linear models;
+    (2) generalized linear models; (3) negative binomial regression models as alternative
+    to the Poisson regression models under the presence of overdispersion; (4) beta-binomial
+    and random-clumped binomial regression models as alternative to the binomial regression
+    models under the presence of overdispersion; (5) Zero-inflated and zero-altered
+    regression models to deal with zero-excess in count data; (6) generalized estimating
+    equations for cluster correlated data.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: glmtoolbox
+# Type: Package
+# Title: Set of Tools to Data Analysis using Generalized Linear Models
+# Version: 0.1.9
+# Authors@R: c(person("Luis Hernando","Vanegas",role=c("aut","cre"),email="lhvanegasp@unal.edu.co"), person("Luz Marina","Rondon",role="aut",email="lmrondonp@unal.edu.co"), person("Gilberto A.","Paula",role="aut",email="giapaula@ime.usp.br"))
+# Description: Set of tools to the statistical analysis of data using: (1) normal linear models; (2) generalized linear models; (3) negative binomial regression models as alternative to the Poisson regression models under the presence of overdispersion; (4) beta-binomial and random-clumped binomial regression models as alternative to the binomial regression models under the presence of overdispersion; (5) Zero-inflated and zero-altered regression models to deal with zero-excess in count data; (6) generalized estimating equations for cluster correlated data.
+# License: GPL-2 | GPL-3
+# Imports: methods, stats, utils, graphics, numDeriv, Rfast, splines, Formula, MASS, statmod
+# Suggests: aplore3, ISLR, pscl, GLMsData
+# Encoding: UTF-8
+# LazyData: false
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-10-10 01:38:51 UTC; Luis Hernando
+# Author: Luis Hernando Vanegas [aut, cre], Luz Marina Rondon [aut], Gilberto A. Paula [aut]
+# Maintainer: Luis Hernando Vanegas <lhvanegasp@unal.edu.co>
+# Repository: CRAN
+# Date/Publication: 2023-10-10 02:50:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

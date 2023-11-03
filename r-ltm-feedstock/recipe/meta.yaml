@@ -1,0 +1,88 @@
+{% set version = '1.2-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ltm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ltm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ltm/ltm_{{ version }}.tar.gz
+  sha256: e12aea694b5a5663de0b4e12596454117261dd9d72ca95758d747c20cd5c0f6e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-msm
+    - r-polycor
+
+  run:
+    - r-base
+    - r-mass
+    - r-msm
+    - r-polycor
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ltm')"           # [not win]
+    - "\"%R%\" -e \"library('ltm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/drizopoulos/ltm
+  license: GPL-2
+  summary: Analysis of multivariate dichotomous and polytomous data using latent trait models
+    under the Item Response Theory approach. It includes the Rasch, the Two-Parameter
+    Logistic, the Birnbaum's Three-Parameter, the Graded Response, and the Generalized
+    Partial Credit Models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: ltm
+# Title: Latent Trait Models under IRT
+# Version: 1.2-0
+# Date: 2022-02-18
+# Author: Dimitris Rizopoulos <d.rizopoulos@erasmusmc.nl>
+# Maintainer: Dimitris Rizopoulos <d.rizopoulos@erasmusmc.nl>
+# Description: Analysis of multivariate dichotomous and polytomous data using latent trait models under the Item Response Theory approach. It includes the Rasch, the Two-Parameter Logistic, the Birnbaum's Three-Parameter, the Graded Response, and the Generalized Partial Credit Models.
+# Depends: R (>= 3.0.0), MASS, msm, polycor
+# LazyLoad: yes
+# LazyData: yes
+# License: GPL (>= 2)
+# URL: https://github.com/drizopoulos/ltm
+# NeedsCompilation: no
+# Packaged: 2022-02-18 09:10:55 UTC; drizo
+# Repository: CRAN
+# Date/Publication: 2022-02-18 09:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

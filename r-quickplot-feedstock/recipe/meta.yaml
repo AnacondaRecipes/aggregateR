@@ -1,0 +1,103 @@
+{% set version = '1.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-quickplot
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/quickPlot_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/quickPlot/quickPlot_{{ version }}.tar.gz
+  sha256: 78b19e03f9925ea3a5b47c12fef58a154dc0d3598dbdda3fe4e47c6636ab4808
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, fastshp, ggplot2, knitr, raster, RColorBrewer, rmarkdown, sf, sp, testthat (>= 1.0.2), withr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table >=1.10.4
+    - r-fpcompare
+    - r-terra
+
+  run:
+    - r-base
+    - r-data.table >=1.10.4
+    - r-fpcompare
+    - r-terra
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('quickPlot')"           # [not win]
+    - "\"%R%\" -e \"library('quickPlot')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://quickplot.predictiveecology.org, https://github.com/PredictiveEcology/quickPlot
+  license: GPL-3
+  summary: A high-level plotting system, compatible with `ggplot2` objects, maps from `sf`, `terra`,
+    `raster`, `sp`. It is built primarily on the 'grid' package. The objective of the
+    package is to provide a plotting system that is built for speed and modularity.
+    This is useful for quick visualizations when testing code and for plotting multiple
+    figures to the same device from independent sources that may be independent of one
+    another (i.e., different function or modules the create the visualizations).  The
+    suggested package 'fastshp' can be installed from the repository (<https://PredictiveEcology.r-universe.dev>).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: quickPlot
+# Type: Package
+# Title: A System of Plotting Optimized for Speed and Modularity
+# Description: A high-level plotting system, compatible with `ggplot2` objects, maps from `sf`, `terra`, `raster`, `sp`. It is built primarily on the 'grid' package. The objective of the package is to provide a plotting system that is built for speed and modularity. This is useful for quick visualizations when testing code and for plotting multiple figures to the same device from independent sources that may be independent of one another (i.e., different function or modules the create the visualizations).  The suggested package 'fastshp' can be installed from the repository (<https://PredictiveEcology.r-universe.dev>).
+# URL: https://quickplot.predictiveecology.org, https://github.com/PredictiveEcology/quickPlot
+# Version: 1.0.2
+# Date: 2023-07-01
+# Authors@R: c( person("Eliot J B", "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre"), comment=c(ORCID = "https://orcid.org/0000-0002-6914-8316")), person("Alex M", "Chubaty", email = "achubaty@for-cast.ca", role = c("aut"), comment = c(ORCID = "https://orcid.org/0000-0001-7146-8135")), person("His Majesty the King in Right of Canada, as represented by the Minister of Natural Resources Canada", role = "cph") )
+# Depends: R (>= 4.1)
+# Imports: data.table (>= 1.10.4), fpCompare, grDevices, grid, methods, stats, terra, utils
+# Suggests: covr, fastshp, ggplot2, knitr, raster, RColorBrewer, rmarkdown, sf, sp, testthat (>= 1.0.2), withr
+# Additional_repositories: https://predictiveecology.r-universe.dev/
+# Encoding: UTF-8
+# Language: en-CA
+# License: GPL-3
+# VignetteBuilder: knitr, rmarkdown
+# BugReports: https://github.com/PredictiveEcology/quickPlot/issues
+# ByteCompile: yes
+# RoxygenNote: 7.2.3
+# Collate: 'environment.R' 'plotting-classes.R' 'plotting-colours.R' 'plotting-helpers.R' 'plotting-other.R' 'plotting.R' 'quickPlot-classes.R' 'quickPlot-package.R' 'testing-helpers.R' 'zzz.R'
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2023-07-01 22:42:50 UTC; emcintir
+# Author: Eliot J B McIntire [aut, cre] (<https://orcid.org/0000-0002-6914-8316>), Alex M Chubaty [aut] (<https://orcid.org/0000-0001-7146-8135>), His Majesty the King in Right of Canada, as represented by the Minister of Natural Resources Canada [cph]
+# Maintainer: Eliot J B McIntire <eliot.mcintire@canada.ca>
+# Repository: CRAN
+# Date/Publication: 2023-07-02 05:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

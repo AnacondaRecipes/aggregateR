@@ -1,0 +1,101 @@
+{% set version = '2.6-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-vegan
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/vegan_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/vegan/vegan_{{ version }}.tar.gz
+  sha256: 5d8ad4bebe79ae2bbd840a34100cf54c62f089c66ea484a542a201afcba21d06
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: parallel, tcltk, knitr, markdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-cluster
+    - r-lattice
+    - r-mgcv
+    - r-permute >=0.9_0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-cluster
+    - r-lattice
+    - r-mgcv
+    - r-permute >=0.9_0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('vegan')"           # [not win]
+    - "\"%R%\" -e \"library('vegan')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/vegandevs/vegan
+  license: GPL-2
+  summary: Ordination methods, diversity analysis and other functions for community and vegetation
+    ecologists.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: vegan
+# Title: Community Ecology Package
+# Version: 2.6-4
+# Authors@R: c(person("Jari", "Oksanen", role=c("aut","cre"), email="jhoksane@gmail.com"), person("Gavin L.", "Simpson", role="aut", email="ucfagls@gmail.com"), person("F. Guillaume", "Blanchet", role="aut"), person("Roeland", "Kindt", role="aut"), person("Pierre", "Legendre", role="aut"), person("Peter R.", "Minchin", role="aut"), person("R.B.", "O'Hara", role="aut"), person("Peter", "Solymos", role="aut"), person("M. Henry H.", "Stevens", role="aut"), person("Eduard", "Szoecs", role="aut"), person("Helene", "Wagner", role="aut"), person("Matt", "Barbour", role="aut"), person("Michael", "Bedward", role="aut"), person("Ben", "Bolker", role="aut"), person("Daniel", "Borcard", role="aut"), person("Gustavo", "Carvalho", role="aut"), person("Michael", "Chirico", role="aut"), person("Miquel", "De Caceres", role="aut"), person("Sebastien", "Durand", role="aut"), person("Heloisa Beatriz Antoniazi", "Evangelista", role="aut"), person("Rich", "FitzJohn", role="aut"), person("Michael", "Friendly", role="aut"), person("Brendan","Furneaux", role="aut"), person("Geoffrey", "Hannigan", role="aut"), person("Mark O.", "Hill", role="aut"), person("Leo", "Lahti", role="aut"), person("Dan", "McGlinn", role="aut"), person("Marie-Helene", "Ouellette", role="aut"), person("Eduardo", "Ribeiro Cunha", role="aut"), person("Tyler", "Smith", role="aut"), person("Adrian", "Stier", role="aut"), person("Cajo J.F.", "Ter Braak", role="aut"), person("James", "Weedon", role="aut"))
+# Depends: permute (>= 0.9-0), lattice, R (>= 3.4.0)
+# Suggests: parallel, tcltk, knitr, markdown
+# Imports: MASS, cluster, mgcv
+# VignetteBuilder: utils, knitr
+# Description: Ordination methods, diversity analysis and other functions for community and vegetation ecologists.
+# License: GPL-2
+# BugReports: https://github.com/vegandevs/vegan/issues
+# URL: https://github.com/vegandevs/vegan
+# NeedsCompilation: yes
+# Packaged: 2022-10-11 08:36:07 UTC; jarioksa
+# Author: Jari Oksanen [aut, cre], Gavin L. Simpson [aut], F. Guillaume Blanchet [aut], Roeland Kindt [aut], Pierre Legendre [aut], Peter R. Minchin [aut], R.B. O'Hara [aut], Peter Solymos [aut], M. Henry H. Stevens [aut], Eduard Szoecs [aut], Helene Wagner [aut], Matt Barbour [aut], Michael Bedward [aut], Ben Bolker [aut], Daniel Borcard [aut], Gustavo Carvalho [aut], Michael Chirico [aut], Miquel De Caceres [aut], Sebastien Durand [aut], Heloisa Beatriz Antoniazi Evangelista [aut], Rich FitzJohn [aut], Michael Friendly [aut], Brendan Furneaux [aut], Geoffrey Hannigan [aut], Mark O. Hill [aut], Leo Lahti [aut], Dan McGlinn [aut], Marie-Helene Ouellette [aut], Eduardo Ribeiro Cunha [aut], Tyler Smith [aut], Adrian Stier [aut], Cajo J.F. Ter Braak [aut], James Weedon [aut]
+# Maintainer: Jari Oksanen <jhoksane@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-10-11 12:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

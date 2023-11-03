@@ -1,0 +1,111 @@
+{% set version = '0.1.25' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-leidenbase
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/leidenbase_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/leidenbase/leidenbase_{{ version }}.tar.gz
+  sha256: 9eaeb33597fb2926b0ec1723dec44a17e1a08919eac873fa48a6cd697036d5d3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rmarkdown, knitr, testthat (>= 3.1.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-igraph >=0.9.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-igraph >=0.9.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('leidenbase')"           # [not win]
+    - "\"%R%\" -e \"library('leidenbase')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/cole-trapnell-lab/leidenbase
+  license: GPL-3
+  summary: 'An R to C/C++ interface that runs the Leiden community detection algorithm to find
+    a basic partition (). It runs the equivalent of the ''leidenalg'' find_partition()
+    function, which is given in the ''leidenalg'' distribution file ''leiden/src/functions.py''.
+    This package includes the required source code files from the official ''leidenalg''
+    distribution and functions from the R ''igraph'' package.  The ''leidenalg'' distribution
+    is available from <https://github.com/vtraag/leidenalg/> and the R ''igraph'' package
+    is available from <https://igraph.org/r/>. The Leiden algorithm is described in
+    the article by Traag et al. (2019) <doi:10.1038/s41598-019-41695-z>. Leidenbase
+    includes code from the packages: igraph version 0.9.8 with license GPL (>= 2), leidenalg
+    version 0.8.10 with license GPL 3.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: leidenbase
+# Type: Package
+# Title: R and C/C++ Wrappers to Run the Leiden find_partition() Function
+# Authors@R: c( person('Brent', 'Ewing', email = 'bge@uw.edu', role = c('aut', 'cre')), person('Vincent', 'Traag', role = 'ctb'), person('Gabor', 'Csardi', role = 'ctb'), person('Tamas', 'Nepusz', role = 'ctb'), person('Szabolcs', 'Horvat', role = 'ctb'), person('Fabio', 'Zanini', role = 'ctb'))
+# Version: 0.1.25
+# Description: An R to C/C++ interface that runs the Leiden community detection algorithm to find a basic partition (). It runs the equivalent of the 'leidenalg' find_partition() function, which is given in the 'leidenalg' distribution file 'leiden/src/functions.py'. This package includes the required source code files from the official 'leidenalg' distribution and functions from the R 'igraph' package.  The 'leidenalg' distribution is available from <https://github.com/vtraag/leidenalg/> and the R 'igraph' package is available from <https://igraph.org/r/>. The Leiden algorithm is described in the article by Traag et al. (2019) <doi:10.1038/s41598-019-41695-z>. Leidenbase includes code from the packages: igraph version 0.9.8 with license GPL (>= 2), leidenalg version 0.8.10 with license GPL 3.
+# Imports: igraph (>= 0.9.0)
+# License: GPL-3
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Depends: R (>= 3.5.0)
+# Suggests: rmarkdown, knitr, testthat (>= 3.1.0)
+# URL: https://github.com/cole-trapnell-lab/leidenbase
+# BugReports: https://github.com/cole-trapnell-lab/leidenbase/issues
+# NeedsCompilation: yes
+# Maintainer: Brent Ewing <bge@uw.edu>
+# VignetteBuilder: knitr
+# Packaged: 2023-07-18 21:18:28 UTC; brent
+# Author: Brent Ewing [aut, cre], Vincent Traag [ctb], Gabor Csardi [ctb], Tamas Nepusz [ctb], Szabolcs Horvat [ctb], Fabio Zanini [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-07-19 09:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

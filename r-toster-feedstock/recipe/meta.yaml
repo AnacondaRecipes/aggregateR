@@ -1,0 +1,105 @@
+{% set version = '0.8.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-toster
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/TOSTER_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/TOSTER/TOSTER_{{ version }}.tar.gz
+  sha256: d6bcb4eb2af29c705a489b09d04fb3daf4238184acdacee0e010025a87c34af8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, broom, car, afex, testthat (>= 3.0.0), spelling
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-cowplot
+    - r-distributional
+    - r-ggdist
+    - r-ggplot2
+    - r-jmvcore >=0.9.6.4
+    - r-lifecycle
+    - r-tidyr
+
+  run:
+    - r-base
+    - r-r6
+    - r-cowplot
+    - r-distributional
+    - r-ggdist
+    - r-ggplot2
+    - r-jmvcore >=0.9.6.4
+    - r-lifecycle
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('TOSTER')"           # [not win]
+    - "\"%R%\" -e \"library('TOSTER')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://aaroncaldwell.us/TOSTERpkg/
+  license: GPL-3
+  summary: 'Two one-sided tests (TOST) procedure to test equivalence for t-tests, correlations,
+    differences between proportions, and meta-analyses, including power analysis for
+    t-tests and correlations. Allows you to specify equivalence bounds in raw scale
+    units or in terms of effect sizes. See: Lakens (2017) <doi:10.1177/1948550617697177>.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: TOSTER
+# Version: 0.8.0
+# Title: Two One-Sided Tests (TOST) Equivalence Testing
+# Description: Two one-sided tests (TOST) procedure to test equivalence for t-tests, correlations, differences between proportions, and meta-analyses, including power analysis for t-tests and correlations. Allows you to specify equivalence bounds in raw scale units or in terms of effect sizes. See: Lakens (2017) <doi:10.1177/1948550617697177>.
+# Authors@R: c( person(given = "Daniel",family = "Lakens", role = c("aut"), email = "D.Lakens@tue.nl"), person(given = "Aaron", family = "Caldwell", role = c("aut", "cre"), email = "arcaldwell49@gmail.com"))
+# Maintainer: Aaron Caldwell <arcaldwell49@gmail.com>
+# URL: https://aaroncaldwell.us/TOSTERpkg/
+# License: GPL-3
+# Imports: stats, graphics, jmvcore (>= 0.9.6.4), ggplot2, ggdist, distributional, cowplot, tidyr, utils, R6, lifecycle
+# Suggests: knitr, rmarkdown, broom, car, afex, testthat (>= 3.0.0), spelling
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# LazyData: true
+# Config/testthat/edition: 3
+# Depends: R (>= 3.5)
+# RoxygenNote: 7.2.3
+# Language: en-US
+# NeedsCompilation: no
+# Packaged: 2023-09-14 17:10:30 UTC; aaroncaldwell
+# Author: Daniel Lakens [aut], Aaron Caldwell [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2023-09-14 20:40:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

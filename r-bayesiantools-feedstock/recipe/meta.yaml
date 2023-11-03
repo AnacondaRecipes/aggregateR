@@ -1,0 +1,126 @@
+{% set version = '0.1.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bayesiantools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BayesianTools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BayesianTools/BayesianTools_{{ version }}.tar.gz
+  sha256: f543bdd6b61ec7fd31a7e4040bd7835341d9079243fa4eb0cd5e684e5e39bdd1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: DEoptim, lhs, sensitivity, knitr, rmarkdown, roxygen2, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dharma
+    - r-idpmisc
+    - r-mass
+    - r-matrix
+    - r-rcpp >=0.12.12
+    - r-bridgesampling
+    - r-coda
+    - r-ellipse
+    - r-emulator
+    - r-gap
+    - r-msm
+    - r-mvtnorm
+    - r-numderiv
+    - r-tmvtnorm
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-dharma
+    - r-idpmisc
+    - r-mass
+    - r-matrix
+    - r-rcpp >=0.12.12
+    - r-bridgesampling
+    - r-coda
+    - r-ellipse
+    - r-emulator
+    - r-gap
+    - r-msm
+    - r-mvtnorm
+    - r-numderiv
+    - r-tmvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BayesianTools')"           # [not win]
+    - "\"%R%\" -e \"library('BayesianTools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/florianhartig/BayesianTools
+  license: GPL-3
+  summary: General-purpose MCMC and SMC samplers, as well as plot and diagnostic functions for
+    Bayesian statistics, with a particular focus on calibrating complex system models.
+    Implemented samplers include various Metropolis MCMC variants (including adaptive
+    and/or delayed rejection MH), the T-walk, two differential evolution MCMCs, two
+    DREAM MCMCs, and a sequential Monte Carlo (SMC) particle filter.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: BayesianTools
+# Title: General-Purpose MCMC and SMC Samplers and Tools for Bayesian Statistics
+# Version: 0.1.8
+# Date: 2023-01-30
+# Authors@R: c(person("Florian", "Hartig", email = "florian.hartig@biologie.uni-regensburg.de", role = c("aut", "cre"), comment=c(ORCID="0000-0002-6255-9059")), person("Francesco", "Minunno", role = c("aut")), person("Stefan", " Paul", role = c("aut") ),  person("David", "Cameron", role = "ctb"), person("Tankred", "Ott", role = "ctb"), person("Maximilian", "Pichler", role = "ctb"))
+# Description: General-purpose MCMC and SMC samplers, as well as plot and diagnostic functions for Bayesian statistics, with a particular focus on calibrating complex system models. Implemented samplers include various Metropolis MCMC variants (including adaptive and/or delayed rejection MH), the T-walk, two differential evolution MCMCs, two DREAM MCMCs, and a sequential Monte Carlo (SMC) particle filter.
+# Depends: R (>= 3.1.2)
+# License: GPL-3
+# Imports: coda, emulator, mvtnorm, tmvtnorm, IDPmisc, Rcpp (>= 0.12.12), ellipse, numDeriv, msm, MASS, Matrix, stats, utils, graphics, DHARMa, gap, bridgesampling
+# Suggests: DEoptim, lhs, sensitivity, knitr, rmarkdown, roxygen2, testthat
+# LinkingTo: Rcpp
+# RoxygenNote: 7.2.1
+# URL: https://github.com/florianhartig/BayesianTools
+# BugReports: https://github.com/florianhartig/BayesianTools/issues
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-01-30 09:56:37 UTC; florian
+# Author: Florian Hartig [aut, cre] (<https://orcid.org/0000-0002-6255-9059>), Francesco Minunno [aut], Stefan Paul [aut], David Cameron [ctb], Tankred Ott [ctb], Maximilian Pichler [ctb]
+# Maintainer: Florian Hartig <florian.hartig@biologie.uni-regensburg.de>
+# Repository: CRAN
+# Date/Publication: 2023-01-30 19:40:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

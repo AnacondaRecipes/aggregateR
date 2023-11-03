@@ -1,0 +1,100 @@
+{% set version = '0.3.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rnaturalearth
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rnaturalearth_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rnaturalearth/rnaturalearth_{{ version }}.tar.gz
+  sha256: c52cd3afe5ae25a9471643492c718fa2714988e900f2d6731ff74971b6d80fd3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggrepel, knitr (>= 1.12.3), testthat (>= 0.9.1), devtools (>= 1.10.0), rnaturalearthdata (>= 0.1.0), rnaturalearthhires (>= 0.1.0), pbapply, ggplot2, dplyr, purrr, rmarkdown, tmap, lifecycle (>= 1.0.3), rlang
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-httr >=1.1.0
+    - r-jsonlite
+    - r-sf >=0.3_4
+    - r-sp >=1.0.15
+    - r-terra
+
+  run:
+    - r-base
+    - r-httr >=1.1.0
+    - r-jsonlite
+    - r-sf >=0.3_4
+    - r-sp >=1.0.15
+    - r-terra
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rnaturalearth')"           # [not win]
+    - "\"%R%\" -e \"library('rnaturalearth')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://docs.ropensci.org/rnaturalearth/, https://github.com/ropensci/rnaturalearth
+  license: MIT
+  summary: Facilitates mapping by making natural earth map data from <https://www.naturalearthdata.com/>
+    more easily available to R users.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: rnaturalearth
+# Title: World Map Data from Natural Earth
+# Version: 0.3.4
+# Authors@R: c( person( family = "Massicotte", given = "Philippe", email = "pmassicotte@hotmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-5919-4116") ), person( family = "South", given = "Andy", email = "southandy@gmail.com", role = c("aut") ), person( family = "Hufkens", given = "Koen", email = "koen.hufkens@gmail.com", role = c("ctb"), comment = c(ORCID = "0000-0002-5070-8109") ))
+# Description: Facilitates mapping by making natural earth map data from <https://www.naturalearthdata.com/> more easily available to R users.
+# License: MIT + file LICENSE
+# LazyData: true
+# LazyDataCompression: xz
+# Encoding: UTF-8
+# URL: https://docs.ropensci.org/rnaturalearth/, https://github.com/ropensci/rnaturalearth
+# BugReports: https://github.com/ropensci/rnaturalearth/issues
+# Additional_repositories: http://packages.ropensci.org
+# Depends: R (>= 3.1.1)
+# Imports: sp (>= 1.0.15), utils (>= 3.2.3), sf (>= 0.3-4), httr (>= 1.1.0), jsonlite, terra
+# Suggests: ggrepel, knitr (>= 1.12.3), testthat (>= 0.9.1), devtools (>= 1.10.0), rnaturalearthdata (>= 0.1.0), rnaturalearthhires (>= 0.1.0), pbapply, ggplot2, dplyr, purrr, rmarkdown, tmap, lifecycle (>= 1.0.3), rlang
+# Config/Needs/website: ropensci/rnaturalearthhires
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-08-20 13:13:04 UTC; filoche
+# Author: Philippe Massicotte [aut, cre] (<https://orcid.org/0000-0002-5919-4116>), Andy South [aut], Koen Hufkens [ctb] (<https://orcid.org/0000-0002-5070-8109>)
+# Maintainer: Philippe Massicotte <pmassicotte@hotmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-08-21 09:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

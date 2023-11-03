@@ -1,0 +1,136 @@
+{% set version = '4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-carbayesst
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CARBayesST_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CARBayesST/CARBayesST_{{ version }}.tar.gz
+  sha256: c5fd23d5d4439ef8db98d51a35c6506150e1ed3239f348cef5cdd2fc49bf3d73
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-carbayesdata
+    - r-ggally
+    - r-mass
+    - r-mcmcpack
+    - r-rcpp >=0.11.5
+    - r-coda
+    - r-dplyr
+    - r-ggplot2
+    - r-gridextra
+    - r-gtools
+    - r-leaflet
+    - r-matrixstats
+    - r-sf
+    - r-spam
+    - r-spdep
+    - r-truncdist
+    - r-truncnorm
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-carbayesdata
+    - r-ggally
+    - r-mass
+    - r-mcmcpack
+    - r-rcpp >=0.11.5
+    - r-coda
+    - r-dplyr
+    - r-ggplot2
+    - r-gridextra
+    - r-gtools
+    - r-leaflet
+    - r-matrixstats
+    - r-sf
+    - r-spam
+    - r-spdep
+    - r-truncdist
+    - r-truncnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CARBayesST')"           # [not win]
+    - "\"%R%\" -e \"library('CARBayesST')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/duncanplee/CARBayesST
+  license: GPL-2
+  summary: Implements a class of univariate and multivariate spatio-temporal generalised linear
+    mixed models for areal unit data, with inference in a Bayesian setting using Markov
+    chain Monte Carlo (MCMC) simulation. The response variable can be binomial, Gaussian,
+    or Poisson, but for some models only the binomial and Poisson data likelihoods are
+    available. The spatio-temporal autocorrelation is modelled by  random effects, which
+    are assigned conditional autoregressive (CAR) style prior distributions. A number
+    of different random effects structures are available, including models similar to
+    Rushworth et al. (2014) <doi:10.1016/j.sste.2014.05.001>. Full details are given
+    in the vignette accompanying this package. The creation and development of this
+    package was supported by the Engineering and Physical Sciences Research Council  (EPSRC)
+    grants EP/J017442/1 and EP/T004878/1 and the Medical Research Council (MRC) grant
+    MR/L022184/1.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: CARBayesST
+# Type: Package
+# Title: Spatio-Temporal Generalised Linear Mixed Models for Areal Unit Data
+# Version: 4.0
+# Date: 2023-10-31
+# Author: Duncan Lee, Alastair Rushworth, Gary Napier and William Pettersson
+# Maintainer: Duncan Lee <Duncan.Lee@glasgow.ac.uk>
+# Description: Implements a class of univariate and multivariate spatio-temporal generalised linear mixed models for areal unit data, with inference in a Bayesian setting using Markov chain Monte Carlo (MCMC) simulation. The response variable can be binomial, Gaussian, or Poisson, but for some models only the binomial and Poisson data likelihoods are available. The spatio-temporal autocorrelation is modelled by  random effects, which are assigned conditional autoregressive (CAR) style prior distributions. A number of different random effects structures are available, including models similar to Rushworth et al. (2014) <doi:10.1016/j.sste.2014.05.001>. Full details are given in the vignette accompanying this package. The creation and development of this package was supported by the Engineering and Physical Sciences Research Council  (EPSRC) grants EP/J017442/1 and EP/T004878/1 and the Medical Research Council (MRC) grant MR/L022184/1.
+# License: GPL (>= 2)
+# Depends: MASS, R (>= 3.5.0), Rcpp (>= 0.11.5)
+# Imports: CARBayesdata, coda, dplyr, GGally, ggplot2, gridExtra, gtools, leaflet, matrixStats, MCMCpack, parallel, sf, spam, spdep, stats, truncdist, truncnorm, utils
+# LinkingTo: Rcpp
+# LazyLoad: yes
+# ByteCompile: yes
+# URL: https://github.com/duncanplee/CARBayesST
+# BugReports: https://github.com/duncanplee/CARBayesST/issues
+# NeedsCompilation: yes
+# Packaged: 2023-10-30 15:43:55 UTC; duncanlee
+# Repository: CRAN
+# Date/Publication: 2023-10-30 16:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

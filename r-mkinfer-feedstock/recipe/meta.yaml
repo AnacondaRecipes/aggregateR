@@ -1,0 +1,104 @@
+{% set version = '1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mkinfer
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MKinfer_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MKinfer/MKinfer_{{ version }}.tar.gz
+  sha256: afacd9b3af5c599e60191b7a76a211a2bf3361cb7f7dfd0198ba731c06a49b72
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, Amelia, mice
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mkdescr
+    - r-arrangements
+    - r-boot
+    - r-exactranktests
+    - r-ggplot2
+    - r-miceadds
+    - r-nlme
+
+  run:
+    - r-base
+    - r-mkdescr
+    - r-arrangements
+    - r-boot
+    - r-exactranktests
+    - r-ggplot2
+    - r-miceadds
+    - r-nlme
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MKinfer')"           # [not win]
+    - "\"%R%\" -e \"library('MKinfer')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/stamats/MKinfer
+  license: LGPL-3
+  summary: Computation of various confidence intervals (Altman et al. (2000), ISBN:978-0-727-91375-3;
+    Hedderich and Sachs (2018), ISBN:978-3-662-56657-2) including bootstrapped versions
+    (Davison and Hinkley (1997), ISBN:978-0-511-80284-3) as well as Hsu (Hedderich and
+    Sachs (2018), ISBN:978-3-662-56657-2), permutation (Janssen (1997), <doi:10.1016/S0167-7152(97)00043-6>),
+    bootstrap (Davison and Hinkley (1997), ISBN:978-0-511-80284-3) and multiple imputation
+    (Barnard and Rubin (1999), <doi:10.1093/biomet/86.4.948>) t-test and Wilcoxon tests.
+    Graphical visualization by volcano and Bland-Altman plots (Bland and Altman (1986),
+    <doi:10.1016/S0140-6736(86)90837-8>; Shieh (2018), <doi:10.1186/s12874-018-0505-y>).
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: MKinfer
+# Version: 1.1
+# Date: 2023-04-17
+# Title: Inferential Statistics
+# Authors@R: person("Matthias", "Kohl", role = c("aut", "cre"), email = "Matthias.Kohl@stamats.de", comment = c(ORCID = "0000-0001-9514-8910"))
+# Author: Matthias Kohl [aut, cre] (<https://orcid.org/0000-0001-9514-8910>)
+# Maintainer: Matthias Kohl <Matthias.Kohl@stamats.de>
+# Depends: R(>= 4.0.0)
+# Imports: stats, MKdescr, boot, arrangements, nlme, ggplot2, exactRankTests, miceadds
+# Suggests: knitr, rmarkdown, Amelia, mice
+# LazyData: yes
+# VignetteBuilder: knitr
+# Description: Computation of various confidence intervals (Altman et al. (2000), ISBN:978-0-727-91375-3; Hedderich and Sachs (2018), ISBN:978-3-662-56657-2) including bootstrapped versions (Davison and Hinkley (1997), ISBN:978-0-511-80284-3) as well as Hsu (Hedderich and Sachs (2018), ISBN:978-3-662-56657-2), permutation (Janssen (1997), <doi:10.1016/S0167-7152(97)00043-6>), bootstrap (Davison and Hinkley (1997), ISBN:978-0-511-80284-3) and multiple imputation (Barnard and Rubin (1999), <doi:10.1093/biomet/86.4.948>) t-test and Wilcoxon tests. Graphical visualization by volcano and Bland-Altman plots (Bland and Altman (1986), <doi:10.1016/S0140-6736(86)90837-8>; Shieh (2018), <doi:10.1186/s12874-018-0505-y>).
+# License: LGPL-3
+# URL: https://github.com/stamats/MKinfer
+# NeedsCompilation: no
+# Packaged: 2023-04-17 06:41:36 UTC; kohlm
+# Repository: CRAN
+# Date/Publication: 2023-04-17 08:20:15 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

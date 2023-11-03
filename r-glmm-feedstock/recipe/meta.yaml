@@ -1,0 +1,104 @@
+{% set version = '1.4.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-glmm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/glmm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/glmm/glmm_{{ version }}.tar.gz
+  sha256: b147b20884c32432dea6f8461450fa0f1a0d0530ad4b3eba8f778032288d116d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-doparallel
+    - r-foreach
+    - r-itertools
+    - r-mvtnorm
+    - r-trust
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-doparallel
+    - r-foreach
+    - r-itertools
+    - r-mvtnorm
+    - r-trust
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('glmm')"           # [not win]
+    - "\"%R%\" -e \"library('glmm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=glmm
+  license: GPL-2
+  summary: Approximates the likelihood of a generalized linear mixed model using Monte Carlo
+    likelihood approximation. Then maximizes the likelihood approximation to return
+    maximum likelihood estimates, observed Fisher information, and other model information.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: glmm
+# Type: Package
+# Title: Generalized Linear Mixed Models via Monte Carlo Likelihood Approximation
+# Version: 1.4.4
+# Date: 2022-10-6
+# Authors@R: c(person("Christina", "Knudson", role = c("aut", "cre"), email = "drchristinaknudson@gmail.com"), person("Charles J.", "Geyer", role = "ctb", email = "geyer@umn.edu"), person("Sydney", "Benson", role = "ctb", email = "bens0643@umn.edu"))
+# Maintainer: Christina Knudson <drchristinaknudson@gmail.com>
+# Description: Approximates the likelihood of a generalized linear mixed model using Monte Carlo likelihood approximation. Then maximizes the likelihood approximation to return maximum likelihood estimates, observed Fisher information, and other model information.
+# License: GPL-2
+# Depends: R (>= 4.0), trust, mvtnorm, Matrix, parallel, doParallel
+# Imports: stats, foreach, itertools, utils
+# ByteCompile: TRUE
+# NeedsCompilation: yes
+# Suggests: knitr
+# RoxygenNote: 7.0.2
+# VignetteBuilder: knitr
+# Packaged: 2022-10-07 19:54:20 UTC; christina.knudson
+# Author: Christina Knudson [aut, cre], Charles J. Geyer [ctb], Sydney Benson [ctb]
+# Repository: CRAN
+# Date/Publication: 2022-10-09 20:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

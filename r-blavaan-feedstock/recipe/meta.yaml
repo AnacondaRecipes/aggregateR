@@ -1,0 +1,131 @@
+{% set version = '0.5-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-blavaan
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/blavaan_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/blavaan/blavaan_{{ version }}.tar.gz
+  sha256: f3523ab082a0db524719c32ddc3397a7798ba146766356ac134c3973acc40758
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: runjags(>= 2.0.4-3), modeest(>= 2.3.3), rjags, cmdstanr, semTools, tinytest
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh >=1.69.0
+    - r-matrix
+    - r-rcpp >=0.12.15
+    - r-rcppeigen >=0.3.3.4.0
+    - r-rcppparallel >=5.0.1
+    - r-stanheaders >=2.26.0
+    - r-bayesplot
+    - r-coda
+    - r-future.apply
+    - r-lavaan >=0.6_16
+    - r-loo >=2.0
+    - r-mnormt
+    - r-nonnest2 >=0.5_5
+    - r-rstan >=2.26.0
+    - r-rstantools >=1.5.0
+    - r-tmvnsim
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.69.0
+    - r-matrix
+    - r-rcpp >=0.12.15
+    - r-rcppeigen >=0.3.3.4.0
+    - r-rcppparallel >=5.0.1
+    - r-stanheaders >=2.26.0
+    - r-bayesplot
+    - r-coda
+    - r-future.apply
+    - r-lavaan >=0.6_16
+    - r-loo >=2.0
+    - r-mnormt
+    - r-nonnest2 >=0.5_5
+    - r-rstan >=2.26.0
+    - r-rstantools >=1.5.0
+    - r-tmvnsim
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('blavaan')"           # [not win]
+    - "\"%R%\" -e \"library('blavaan')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=blavaan
+  license: GPL-3
+  summary: 'Fit a variety of Bayesian latent variable models, including confirmatory factor analysis,
+    structural equation models, and latent growth curve models. References: Merkle &
+    Rosseel (2018) <doi:10.18637/jss.v085.i04>; Merkle et al. (2021) <doi:10.18637/jss.v100.i06>.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: blavaan
+# Title: Bayesian Latent Variable Analysis
+# Version: 0.5-2
+# Authors@R: c(person(given = "Edgar", family = "Merkle", role = c("aut", "cre"), email = "merklee@missouri.edu", comment = c(ORCID = "0000-0001-7158-0653")), person(given = "Yves", family = "Rosseel", role  = "aut", email = "Yves.Rosseel@UGent.be"), person(given = "Ben", family = "Goodrich", role = "aut", email = "benjamin.goodrich@columbia.edu"), person(given = "Mauricio", family = "Garnier-Villarreal", role = "ctb", email = "mgv@pm.me", comment = c(ORCID = "0000-0002-2951-6647", "R/blav_compare.R", "R/ctr_bayes_fit.R", "vignettes")), person(given = c("Terrence", "D."), family = "Jorgensen", role = "ctb", email = "TJorgensen314@gmail.com", comment = c(ORCID = "0000-0001-5111-6773", "R/ctr_bayes_fit.R", "R/ctr_ppmc.R", "R/blav_predict.R")), person(given = "Huub", family="Hoofs", role = "ctb", comment = "R/ctr_bayes_fit.R"), person(given = "Rens", family="van de Schoot", role = "ctb", comment = "R/ctr_bayes_fit.R"), person(given = "Andrew", family="Johnson", role="ctb", comment = "Makevars"), person(given = "Matthew", family="Emery", role="ctb", comment = "loo moment_match") )
+# Description: Fit a variety of Bayesian latent variable models, including confirmatory factor analysis, structural equation models, and latent growth curve models. References: Merkle & Rosseel (2018) <doi:10.18637/jss.v085.i04>; Merkle et al. (2021) <doi:10.18637/jss.v100.i06>.
+# License: GPL (>= 3)
+# ByteCompile: true
+# Depends: R(>= 3.5.0), methods, Rcpp(>= 0.12.15)
+# Imports: stats, utils, graphics, lavaan(>= 0.6-16), coda, mnormt, nonnest2(>= 0.5-5), loo(>= 2.0), rstan(>= 2.26.0), rstantools(>= 1.5.0), RcppParallel (>= 5.0.1), bayesplot, Matrix, future.apply, tmvnsim
+# LinkingTo: StanHeaders (>= 2.26.0), rstan (>= 2.26.0), BH (>= 1.69.0), Rcpp (>= 0.12.15), RcppEigen (>= 0.3.3.4.0), RcppParallel (>= 5.0.1)
+# Suggests: runjags(>= 2.0.4-3), modeest(>= 2.3.3), rjags, cmdstanr, semTools, tinytest
+# SystemRequirements: GNU make
+# NeedsCompilation: yes
+# Additional_repositories: https://mc-stan.org/r-packages/
+# Config/Needs/website: brms
+# Packaged: 2023-09-25 20:26:15 UTC; merkle
+# Author: Edgar Merkle [aut, cre] (<https://orcid.org/0000-0001-7158-0653>), Yves Rosseel [aut], Ben Goodrich [aut], Mauricio Garnier-Villarreal [ctb] (<https://orcid.org/0000-0002-2951-6647>, R/blav_compare.R, R/ctr_bayes_fit.R, vignettes), Terrence D. Jorgensen [ctb] (<https://orcid.org/0000-0001-5111-6773>, R/ctr_bayes_fit.R, R/ctr_ppmc.R, R/blav_predict.R), Huub Hoofs [ctb] (R/ctr_bayes_fit.R), Rens van de Schoot [ctb] (R/ctr_bayes_fit.R), Andrew Johnson [ctb] (Makevars), Matthew Emery [ctb] (loo moment_match)
+# Maintainer: Edgar Merkle <merklee@missouri.edu>
+# Repository: CRAN
+# Date/Publication: 2023-09-25 22:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

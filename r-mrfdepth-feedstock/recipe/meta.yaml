@@ -1,0 +1,112 @@
+{% set version = '1.0.15' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mrfdepth
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mrfDepth_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mrfDepth/mrfDepth_{{ version }}.tar.gz
+  sha256: 54e330ba6624127e1566c0ceeb6cc0d4e9c363a3bc62e7cbfa615f3d702fac21
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: robustbase
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.6
+    - r-rcpparmadillo >=0.7.600.1.0
+    - r-rcppeigen >=0.3.2.9.0
+    - r-abind
+    - r-geometry
+    - r-ggplot2
+    - r-matrixstats
+    - r-reshape2
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.6
+    - r-rcpparmadillo >=0.7.600.1.0
+    - r-rcppeigen >=0.3.2.9.0
+    - r-abind
+    - r-geometry
+    - r-ggplot2
+    - r-matrixstats
+    - r-reshape2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mrfDepth')"           # [not win]
+    - "\"%R%\" -e \"library('mrfDepth')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=mrfDepth
+  license: GPL-2
+  summary: Tools to compute depth measures and implementations of related tasks such as outlier
+    detection, data exploration and classification of multivariate, regression and functional
+    data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: mrfDepth
+# Type: Package
+# Version: 1.0.15
+# Date: 2023-10-05
+# Title: Depth Measures in Multivariate, Regression and Functional Settings
+# Description: Tools to compute depth measures and implementations of related tasks such as outlier detection, data exploration and classification of multivariate, regression and functional data.
+# Authors@R: c( person(given="Pieter",family="Segaert", role = c("aut")), person(given="Mia",family="Hubert", role = c("aut")), person(given="Peter",family="Rousseeuw", role = c("aut")), person(given="Jakob",family="Raymaekers", role = c("aut", "cre"), email = "jakob.raymaekers@kuleuven.be"), person(given="Kaveh",family="Vakili", role = c("ctb")) )
+# Depends: R (>= 3.6.0), ggplot2
+# Imports: abind, geometry, grid, matrixStats, reshape2, Rcpp (>= 0.12.6)
+# Suggests: robustbase
+# LinkingTo: RcppEigen (>= 0.3.2.9.0), Rcpp (>= 0.12.6), RcppArmadillo (>= 0.7.600.1.0)
+# License: GPL (>= 2)
+# LazyLoad: yes
+# RoxygenNote: 7.1.2
+# NeedsCompilation: yes
+# Packaged: 2023-10-06 08:40:54 UTC; u0105404
+# Author: Pieter Segaert [aut], Mia Hubert [aut], Peter Rousseeuw [aut], Jakob Raymaekers [aut, cre], Kaveh Vakili [ctb]
+# Maintainer: Jakob Raymaekers <jakob.raymaekers@kuleuven.be>
+# Repository: CRAN
+# Date/Publication: 2023-10-06 10:00:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

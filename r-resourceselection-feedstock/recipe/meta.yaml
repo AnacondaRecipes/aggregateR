@@ -1,0 +1,91 @@
+{% set version = '0.3-6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-resourceselection
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ResourceSelection_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ResourceSelection/ResourceSelection_{{ version }}.tar.gz
+  sha256: 0e83ea4aaa57304b99cd5cbf5c5fe306e291129bf86476c024835a0999a5710f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-pbapply
+
+  run:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-pbapply
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ResourceSelection')"           # [not win]
+    - "\"%R%\" -e \"library('ResourceSelection')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/psolymos/ResourceSelection
+  license: GPL-2
+  summary: Resource Selection (Probability) Functions for use-availability wildlife data based
+    on weighted distributions as described in Lele and Keim (2006) <doi:10.1890/0012-9658(2006)87%5B3021:WDAEOR%5D2.0.CO;2>,
+    Lele (2009) <doi:10.2193/2007-535>, and Solymos & Lele (2016) <doi:10.1111/2041-210X.12432>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: ResourceSelection
+# Type: Package
+# Title: Resource Selection (Probability) Functions for Use-Availability Data
+# Version: 0.3-6
+# Date: 2023-06-27
+# Authors@R: c( person(given = c("Subhash", "R."), family = "Lele", role = c("aut")), person(given = c("Jonah", "L."), family = "Keim", role = c("aut")), person(given = "Peter", family = "Solymos", email = "psolymos@gmail.com", comment = c(ORCID = "0000-0001-7337-1740"), role = c("aut", "cre")))
+# Maintainer: Peter Solymos <psolymos@gmail.com>
+# Description: Resource Selection (Probability) Functions for use-availability wildlife data based on weighted distributions as described in Lele and Keim (2006) <doi:10.1890/0012-9658(2006)87%5B3021:WDAEOR%5D2.0.CO;2>, Lele (2009) <doi:10.2193/2007-535>, and Solymos & Lele (2016) <doi:10.1111/2041-210X.12432>.
+# Depends: R (>= 2.13.0)
+# Imports: MASS, pbapply, Matrix
+# URL: https://github.com/psolymos/ResourceSelection
+# BugReports: https://github.com/psolymos/ResourceSelection/issues
+# License: GPL-2
+# LazyLoad: yes
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2023-06-27 20:35:28 UTC; Peter
+# Author: Subhash R. Lele [aut], Jonah L. Keim [aut], Peter Solymos [aut, cre] (<https://orcid.org/0000-0001-7337-1740>)
+# Repository: CRAN
+# Date/Publication: 2023-07-08 22:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

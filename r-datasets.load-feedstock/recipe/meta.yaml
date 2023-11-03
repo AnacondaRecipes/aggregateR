@@ -1,0 +1,89 @@
+{% set version = '2.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-datasets.load
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/datasets.load_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/datasets.load/datasets.load_{{ version }}.tar.gz
+  sha256: 1987fa0b1233cb70f0829638b00fa1867b503b23e9aa90e676457349c10feaa0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 3.0.0), covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dt
+    - r-miniui
+    - r-shiny
+
+  run:
+    - r-base
+    - r-dt
+    - r-miniui
+    - r-shiny
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('datasets.load')"           # [not win]
+    - "\"%R%\" -e \"library('datasets.load')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=datasets.load
+  license: GPL-3
+  summary: Graphical interface for loading datasets in RStudio from all installed (including
+    unloaded) packages, also includes command line interfaces.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: datasets.load
+# Title: Graphical Interface for Loading Datasets
+# Version: 2.2.0
+# Authors@R: person("Bastiaan", "quast", email = "bquast@gmail.com", role = c("aut", "cre"), comment=c(ORCID="0000-0002-2951-3577") )
+# Description: Graphical interface for loading datasets in RStudio from all installed (including unloaded) packages, also includes command line interfaces.
+# Depends: R (>= 3.0.0)
+# Imports: shiny, miniUI, DT
+# License: GPL-3
+# Encoding: UTF-8
+# RoxygenNote: 7.2.1
+# Suggests: testthat (>= 3.0.0), covr
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2023-04-21 15:51:45 UTC; bquast
+# Author: Bastiaan quast [aut, cre] (<https://orcid.org/0000-0002-2951-3577>)
+# Maintainer: Bastiaan quast <bquast@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-04-21 23:32:35 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

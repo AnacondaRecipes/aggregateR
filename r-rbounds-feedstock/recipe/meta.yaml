@@ -1,0 +1,80 @@
+{% set version = '2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rbounds
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rbounds_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rbounds/rbounds_{{ version }}.tar.gz
+  sha256: d1897cf5b616a1956fb15fa2697c0f1d4524415afee67b6814c66d079026e266
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rbounds')"           # [not win]
+    - "\"%R%\" -e \"library('rbounds')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rbounds
+  license: GPL-2
+  summary: Takes matched and unmatched data and calculates Rosenbaum bounds for the treatment
+    effect.  Calculates bounds for binary outcome data, Hodges-Lehmann point estimates,
+    Wilcoxon signed-rank test for matched data and matched IV estimators, Wilcoxon sum
+    rank test, and for data with multiple matched controls. The sensitivity analysis
+    methods in this package are documented in Rosenbaum (2002) Observational Studies,
+    <doi:10.1007/978-1-4757-3692-2>, Springer-Verlag.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: rbounds
+# Version: 2.2
+# Title: Perform Rosenbaum Bounds Sensitivity Tests for Matched and Unmatched Data
+# Date: 2022-04-15
+# Author: Luke J. Keele
+# Maintainer: Luke J. Keele <luke.keele@gmail.com>
+# Description: Takes matched and unmatched data and calculates Rosenbaum bounds for the treatment effect.  Calculates bounds for binary outcome data, Hodges-Lehmann point estimates, Wilcoxon signed-rank test for matched data and matched IV estimators, Wilcoxon sum rank test, and for data with multiple matched controls. The sensitivity analysis methods in this package are documented in Rosenbaum (2002) Observational Studies, <doi:10.1007/978-1-4757-3692-2>, Springer-Verlag.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2022-04-28 18:22:22 UTC; ljk20
+# Repository: CRAN
+# Date/Publication: 2022-04-29 23:20:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

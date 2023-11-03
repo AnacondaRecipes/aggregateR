@@ -1,0 +1,92 @@
+{% set version = '0.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fuzzr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fuzzr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fuzzr/fuzzr_{{ version }}.tar.gz
+  sha256: e7f0727b32f48fc14eb47e00f7e60c302394ae721a0eded2a7f953238b3a98b3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-assertthat
+    - r-progress
+    - r-purrr
+
+  run:
+    - r-base
+    - r-assertthat
+    - r-progress
+    - r-purrr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fuzzr')"           # [not win]
+    - "\"%R%\" -e \"library('fuzzr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mdlincoln/fuzzr
+  license: MIT
+  summary: Test function arguments with a wide array of inputs, and produce reports summarizing
+    messages, warnings, errors, and returned values.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: fuzzr
+# Title: Fuzz-Test R Functions
+# Version: 0.2.2
+# Authors@R: person("Matthew", "Lincoln", email = "matthew.d.lincoln@gmail.com", role = c("aut", "cre"))
+# Description: Test function arguments with a wide array of inputs, and produce reports summarizing messages, warnings, errors, and returned values.
+# License: MIT + file LICENSE
+# URL: https://github.com/mdlincoln/fuzzr
+# BugReports: https://github.com/mdlincoln/fuzzr/issues
+# Imports: assertthat, progress, purrr
+# Suggests: knitr, rmarkdown, testthat
+# VignetteBuilder: knitr
+# LazyData: TRUE
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-05-08 16:35:17 UTC; MLincoln
+# Author: Matthew Lincoln [aut, cre]
+# Maintainer: Matthew Lincoln <matthew.d.lincoln@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-05-08 16:45:18 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

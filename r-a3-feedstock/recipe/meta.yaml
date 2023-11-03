@@ -1,0 +1,85 @@
+{% set version = '1.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-a3
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/A3_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/A3/A3_{{ version }}.tar.gz
+  sha256: 9c99d5ee74122d38a5c9bbe90629d4a468754477ac4ccc4e4c306c2d6fc2f004
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: randomForest, e1071
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-pbapply
+    - r-xtable
+
+  run:
+    - r-base
+    - r-pbapply
+    - r-xtable
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('A3')"           # [not win]
+    - "\"%R%\" -e \"library('A3')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=A3
+  license: GPL-2
+  summary: Supplies tools for tabulating and analyzing the results of predictive models. The
+    methods employed are applicable to virtually any predictive model and make comparisons
+    between different methodologies straightforward.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: A3
+# Type: Package
+# Title: Accurate, Adaptable, and Accessible Error Metrics for Predictive Models
+# Version: 1.0.0
+# Date: 2015-08-15
+# Author: Scott Fortmann-Roe
+# Maintainer: Scott Fortmann-Roe <scottfr@berkeley.edu>
+# Description: Supplies tools for tabulating and analyzing the results of predictive models. The methods employed are applicable to virtually any predictive model and make comparisons between different methodologies straightforward.
+# License: GPL (>= 2)
+# Depends: R (>= 2.15.0), xtable, pbapply
+# Suggests: randomForest, e1071
+# NeedsCompilation: no
+# Packaged: 2015-08-16 14:17:33 UTC; scott
+# Repository: CRAN
+# Date/Publication: 2015-08-16 23:05:52
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

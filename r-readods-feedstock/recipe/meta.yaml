@@ -1,0 +1,110 @@
+{% set version = '2.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-readods
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/readODS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/readODS/readODS_{{ version }}.tar.gz
+  sha256: 3f3e557ac7cadeda4759c51f866ce9a942cb21a2b3dd24e55a082fc7d300d7fe
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: spelling, testthat, datasets, covr, knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-cellranger
+    - r-cpp11
+    - r-readr >=1.2.1
+    - r-stringi
+    - r-tibble
+    - r-vctrs >=0.4.2
+    - r-zip
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-cellranger
+    - r-cpp11
+    - r-readr >=1.2.1
+    - r-stringi
+    - r-tibble
+    - r-vctrs >=0.4.2
+    - r-zip
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('readODS')"           # [not win]
+    - "\"%R%\" -e \"library('readODS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ropensci/readODS
+  license: GPL-3
+  summary: Read ODS (OpenDocument Spreadsheet) into R as data frame. Also support writing data
+    frame into ODS file.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: readODS
+# Type: Package
+# Title: Read and Write ODS Files
+# Version: 2.1.0
+# Authors@R: c(person("Gerrit-Jan", "Schutten", role = c("aut"), email = "phonixor@gmail.com"), person("Chung-hong", "Chan", role = c("aut", "cre"), email = "chainsawtiney@gmail.com", comment = c(ORCID = "0000-0002-6232-7530")), person("Peter", "Brohan", role = c("aut"), email = "peter.brohan@gmail.com"), person("Detlef", "Steuer", role = c("aut"), email = "steuer@hsu-hh.de", comment = c(ORCID = "0000-0003-2676-5290")), person("Thomas J.", "Leeper", role = c("aut"), email = "thosjleeper@gmail.com", comment = c(ORCID = "0000-0003-4097-6326")), person("John", "Foster", role = c("ctb"), email = "john.x.foster@nab.com.au"), person("Sergio", "Oller", role = c("ctb")), person("Jim", "Hester", role = c("ctb"), email = "jim.hester@rstudio.com", comment = c(ORCID = "0000-0002-2739-7082")), person("Stephen", "Watts", role = c("ctb")), person("Arthur", "Katossky", role = c("ctb")), person("Stas", "Malavin", role = c("ctb")), person("Duncan", "Garmonsway", role = c("ctb")), person("Mehrad", "Mahmoudian", role = c("ctb")), person("Matt", "Kerlogue", role = c("ctb")), person("Michal", "Lauer", role = c("ctb"), email = "michal.lauer.25@gmail.com"), person("Till", "Straube", role = c("ctb"), email = "straube@geo.uni-frankfurt.de"), person("Marcin", "Kalicinski", role = c("ctb", "cph"), comment = "Author of included RapidXML code"))
+# Description: Read ODS (OpenDocument Spreadsheet) into R as data frame. Also support writing data frame into ODS file.
+# URL: https://github.com/ropensci/readODS
+# BugReports: https://github.com/ropensci/readODS/issues
+# Imports: cellranger, readr (>= 1.2.1), stringi, tibble, vctrs (>= 0.4.2), zip
+# LinkingTo: cpp11
+# Suggests: spelling, testthat, datasets, covr, knitr, rmarkdown
+# License: GPL-3
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# VignetteBuilder: knitr
+# Depends: R (>= 3.6)
+# Language: en-GB
+# NeedsCompilation: yes
+# Packaged: 2023-09-10 17:11:50 UTC; chainsawriot
+# Author: Gerrit-Jan Schutten [aut], Chung-hong Chan [aut, cre] (<https://orcid.org/0000-0002-6232-7530>), Peter Brohan [aut], Detlef Steuer [aut] (<https://orcid.org/0000-0003-2676-5290>), Thomas J. Leeper [aut] (<https://orcid.org/0000-0003-4097-6326>), John Foster [ctb], Sergio Oller [ctb], Jim Hester [ctb] (<https://orcid.org/0000-0002-2739-7082>), Stephen Watts [ctb], Arthur Katossky [ctb], Stas Malavin [ctb], Duncan Garmonsway [ctb], Mehrad Mahmoudian [ctb], Matt Kerlogue [ctb], Michal Lauer [ctb], Till Straube [ctb], Marcin Kalicinski [ctb, cph] (Author of included RapidXML code)
+# Maintainer: Chung-hong Chan <chainsawtiney@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-09-10 17:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

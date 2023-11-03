@@ -1,0 +1,104 @@
+{% set version = '0.4.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-stmomo
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/StMoMo_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/StMoMo/StMoMo_{{ version }}.tar.gz
+  sha256: 84f802b5734d2cdcd0634a265841a04b0056baf81b2fc332233ee01be5139bb0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: demography, knitr, xtable, MTS
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-rcolorbrewer
+    - r-fanplot >=3.4
+    - r-fields >=8.2
+    - r-forecast >=6.1
+    - r-gnm >=1.0
+    - r-reshape2 >=1.4.1
+    - r-rootsolve >=1.6.5.1
+
+  run:
+    - r-base
+    - r-mass
+    - r-rcolorbrewer
+    - r-fanplot >=3.4
+    - r-fields >=8.2
+    - r-forecast >=6.1
+    - r-gnm >=1.0
+    - r-reshape2 >=1.4.1
+    - r-rootsolve >=1.6.5.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('StMoMo')"           # [not win]
+    - "\"%R%\" -e \"library('StMoMo')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://github.com/amvillegas/StMoMo
+  license: GPL-2
+  summary: Implementation of the family of generalised age-period-cohort stochastic mortality
+    models. This family of models encompasses many models proposed in the actuarial
+    and demographic literature including the Lee-Carter (1992) <doi:10.2307/2290201>
+    and the Cairns-Blake-Dowd (2006) <doi:10.1111/j.1539-6975.2006.00195.x> models.
+    It includes functions for fitting mortality models, analysing their goodness-of-fit
+    and performing mortality projections and simulations.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: StMoMo
+# Title: Stochastic Mortality Modelling
+# Version: 0.4.1
+# Author: Andres Villegas <andresmauriciovillegas@gmail.com>, Pietro Millossovich <Pietro.Millossovich.1@city.ac.uk>, Vladimir Kaishev <Vladimir.Kaishev.1@city.ac.uk>
+# Maintainer: Andres Villegas <andresmauriciovillegas@gmail.com>
+# Description: Implementation of the family of generalised age-period-cohort stochastic mortality models. This family of models encompasses many models proposed in the actuarial and demographic literature including the Lee-Carter (1992) <doi:10.2307/2290201> and the Cairns-Blake-Dowd (2006) <doi:10.1111/j.1539-6975.2006.00195.x> models. It includes functions for fitting mortality models, analysing their goodness-of-fit and performing mortality projections and simulations.
+# URL: http://github.com/amvillegas/StMoMo
+# BugReports: http://github.com/amvillegas/StMoMo/issues
+# Imports: MASS, rootSolve (>= 1.6.5.1), fanplot (>= 3.4), reshape2 (>= 1.4.1), fields (>= 8.2), RColorBrewer
+# Depends: R (>= 3.2.0), gnm (>= 1.0), forecast(>= 6.1)
+# License: GPL (>= 2)
+# LazyData: true
+# Suggests: demography, knitr, xtable, MTS
+# VignetteBuilder: knitr, utils
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-04-13 09:18:10 UTC; z3509687
+# Repository: CRAN
+# Date/Publication: 2018-04-13 11:12:44 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

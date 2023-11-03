@@ -1,0 +1,92 @@
+{% set version = '2.5.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-treemapify
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/treemapify_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/treemapify/treemapify_{{ version }}.tar.gz
+  sha256: 0fa766f3afaaed889fb62f272ed2b4bb82a8a172a40f0779795fdc2c08f225f0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, vdiffr, spelling
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-cli >=3.6.1
+    - r-ggfittext >=0.5.0
+    - r-ggplot2 >=2.2.1
+
+  run:
+    - r-base
+    - r-cli >=3.6.1
+    - r-ggfittext >=0.5.0
+    - r-ggplot2 >=2.2.1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('treemapify')"           # [not win]
+    - "\"%R%\" -e \"library('treemapify')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://wilkox.org/treemapify/
+  license: GPL-3
+  summary: Provides 'ggplot2' geoms for drawing treemaps.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: treemapify
+# Title: Draw Treemaps in 'ggplot2'
+# Version: 2.5.6
+# Authors@R: c( person("David", "Wilkins", , "david@wilkox.org", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-3385-8981")), person("Bob", "Rudis", , "bob@rud.is", role = c("ctb"), comment = c(ORCID = "0000-0001-5670-2640")) )
+# URL: https://wilkox.org/treemapify/
+# BugReports: https://github.com/wilkox/treemapify/issues/
+# Description: Provides 'ggplot2' geoms for drawing treemaps.
+# Depends: R (>= 3.6)
+# Imports: ggplot2 (>= 2.2.1), ggfittext (>= 0.5.0), grid (>= 3.1), cli (>= 3.6.1)
+# Suggests: knitr, rmarkdown, testthat, vdiffr, spelling
+# License: GPL (>= 3)
+# LazyData: true
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# Language: en-GB
+# NeedsCompilation: no
+# Packaged: 2023-09-30 07:12:19 UTC; wilkox
+# Author: David Wilkins [aut, cre] (<https://orcid.org/0000-0002-3385-8981>), Bob Rudis [ctb] (<https://orcid.org/0000-0001-5670-2640>)
+# Maintainer: David Wilkins <david@wilkox.org>
+# Repository: CRAN
+# Date/Publication: 2023-09-30 07:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

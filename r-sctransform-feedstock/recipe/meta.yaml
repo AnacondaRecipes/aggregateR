@@ -1,0 +1,129 @@
+{% set version = '0.4.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sctransform
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sctransform_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sctransform/sctransform_{{ version }}.tar.gz
+  sha256: 5f6be7f8be543e4c32c8007207b603a750881459370b7bb5afd63e8c8fabf171
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: irlba, testthat, knitr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix >=1.5_0
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo
+    - r-dplyr
+    - r-future
+    - r-future.apply
+    - r-ggplot2
+    - r-gridextra
+    - r-magrittr
+    - r-matrixstats
+    - r-reshape2
+    - r-rlang
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-matrix >=1.5_0
+    - r-rcpp >=0.11.0
+    - r-rcpparmadillo
+    - r-dplyr
+    - r-future
+    - r-future.apply
+    - r-ggplot2
+    - r-gridextra
+    - r-magrittr
+    - r-matrixstats
+    - r-reshape2
+    - r-rlang
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sctransform')"           # [not win]
+    - "\"%R%\" -e \"library('sctransform')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/satijalab/sctransform
+  license: GPL-3
+  summary: A normalization method for single-cell UMI count data using a variance stabilizing
+    transformation. The transformation is based on a negative binomial regression model
+    with regularized parameters. As part of the same regression framework, this package
+    also provides functions for batch correction, and data correction. See Hafemeister
+    and Satija (2019) <doi:10.1186/s13059-019-1874-1>, and Choudhary and Satija (2022)
+    <doi:10.1186/s13059-021-02584-9> for more details.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: sctransform
+# Type: Package
+# Title: Variance Stabilizing Transformations for Single Cell UMI Data
+# Version: 0.4.1
+# Date: 2023-10-18
+# Authors@R: c( person(given = "Christoph", family = "Hafemeister", email = "christoph.hafemeister@nyu.edu", role = "aut", comment = c(ORCID = "0000-0001-6365-8254")), person(given = "Saket", family = "Choudhary", email = "schoudhary@nygenome.org", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5202-7633")), person(given = "Rahul", family = "Satija", email = "rsatija@nygenome.org", role = "ctb", comment = c(ORCID = "0000-0001-9448-8833")) )
+# Description: A normalization method for single-cell UMI count data using a variance stabilizing transformation. The transformation is based on a negative binomial regression model with regularized parameters. As part of the same regression framework, this package also provides functions for batch correction, and data correction. See Hafemeister and Satija (2019) <doi:10.1186/s13059-019-1874-1>, and Choudhary and Satija (2022) <doi:10.1186/s13059-021-02584-9> for more details.
+# URL: https://github.com/satijalab/sctransform
+# BugReports: https://github.com/satijalab/sctransform/issues
+# License: GPL-3 | file LICENSE
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 3.6.0)
+# LinkingTo: RcppArmadillo, Rcpp (>= 0.11.0)
+# SystemRequirements: C++17
+# Imports: dplyr, magrittr, MASS, Matrix (>= 1.5-0), methods, future.apply, future, ggplot2, reshape2, rlang, gridExtra, matrixStats
+# Suggests: irlba, testthat, knitr
+# Enhances: glmGamPoi
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-10-19 00:10:57 UTC; choudharys
+# Author: Christoph Hafemeister [aut] (<https://orcid.org/0000-0001-6365-8254>), Saket Choudhary [aut, cre] (<https://orcid.org/0000-0001-5202-7633>), Rahul Satija [ctb] (<https://orcid.org/0000-0001-9448-8833>)
+# Maintainer: Saket Choudhary <schoudhary@nygenome.org>
+# Repository: CRAN
+# Date/Publication: 2023-10-19 04:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

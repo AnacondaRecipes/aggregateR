@@ -1,0 +1,100 @@
+{% set version = '2.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-kalmanfilter
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/kalmanfilter_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/kalmanfilter/kalmanfilter_{{ version }}.tar.gz
+  sha256: f8426333055b214942311806cd24de58f6be16afeea9197bc0c5aa26394dac4f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: data.table (>= 1.14.2), maxLik (>= 1.5-2), ggplot2 (>= 3.3.6), gridExtra (>= 2.3), knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.9
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.9
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('kalmanfilter')"           # [not win]
+    - "\"%R%\" -e \"library('kalmanfilter')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=kalmanfilter
+  license: GPL-2
+  summary: '''Rcpp'' implementation of the multivariate Kalman filter for state space models
+    that can handle missing values and exogenous data in the observation and state equations.
+    Kim, Chang-Jin and Charles R. Nelson (1999) "State-Space Models with Regime Switching:
+    Classical and Gibbs-Sampling Approaches with Applications" <doi:10.7551/mitpress/6444.001.0001><http://econ.korea.ac.kr/~cjkim/>.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: kalmanfilter
+# Type: Package
+# Title: Kalman Filter
+# Version: 2.0.2
+# Date: 2023-10-01
+# Authors@R: c(person(given = "Alex", family = "Hubbard", role = c("aut", "cre"), email = "hubbard.alex@gmail.com"))
+# Description: 'Rcpp' implementation of the multivariate Kalman filter for state space models that can handle missing values and exogenous data in the observation and state equations. Kim, Chang-Jin and Charles R. Nelson (1999) "State-Space Models with Regime Switching: Classical and Gibbs-Sampling Approaches with Applications" <doi:10.7551/mitpress/6444.001.0001><http://econ.korea.ac.kr/~cjkim/>.
+# License: GPL (>= 2)
+# Imports: Rcpp (>= 1.0.9)
+# LinkingTo: Rcpp, RcppArmadillo
+# RoxygenNote: 7.2.3
+# Suggests: data.table (>= 1.14.2), maxLik (>= 1.5-2), ggplot2 (>= 3.3.6), gridExtra (>= 2.3), knitr, rmarkdown, testthat
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-09-25 21:00:56 UTC; alex.hubbard
+# Author: Alex Hubbard [aut, cre]
+# Maintainer: Alex Hubbard <hubbard.alex@gmail.com>
+# Depends: R (>= 3.5.0)
+# Repository: CRAN
+# Date/Publication: 2023-09-25 21:20:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

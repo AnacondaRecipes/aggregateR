@@ -1,0 +1,97 @@
+{% set version = '0.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-require
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Require_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Require/Require_{{ version }}.tar.gz
+  sha256: 18873aebb7a7f95672707da35f2225e9342ff765b3c042a7c49c8a1efbdf07b5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, parallel, remotes, testit
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table >=1.10.4
+
+  run:
+    - r-base
+    - r-data.table >=1.10.4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Require')"           # [not win]
+    - "\"%R%\" -e \"library('Require')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://Require.predictiveecology.org, https://github.com/PredictiveEcology/Require
+  license: GPL-3
+  summary: A single key function, 'Require' that makes rerun-tolerant versions of 'install.packages'
+    and `require` for CRAN packages, packages no longer on CRAN (i.e., archived), specific
+    versions of packages, and GitHub packages. This approach is developed to create
+    reproducible workflows that are flexible and fast enough to use while in development
+    stages, while able to build snapshots once a stable package collection is found.
+    As with other functions in a reproducible workflow, this package emphasizes functions
+    that return the same result whether it is the first or subsequent times running
+    the function, with subsequent times being sufficiently fast that they can be run
+    every time without undue waiting burden on the user or developer.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: Require
+# Type: Package
+# Title: Installing and Loading R Packages for Reproducible Workflows
+# Description: A single key function, 'Require' that makes rerun-tolerant versions of 'install.packages' and `require` for CRAN packages, packages no longer on CRAN (i.e., archived), specific versions of packages, and GitHub packages. This approach is developed to create reproducible workflows that are flexible and fast enough to use while in development stages, while able to build snapshots once a stable package collection is found. As with other functions in a reproducible workflow, this package emphasizes functions that return the same result whether it is the first or subsequent times running the function, with subsequent times being sufficiently fast that they can be run every time without undue waiting burden on the user or developer.
+# URL: https://Require.predictiveecology.org, https://github.com/PredictiveEcology/Require
+# Date: 2023-05-22
+# Version: 0.3.1
+# Authors@R: c( person(given = "Eliot J B", family = "McIntire", role = c("aut", "cre"), email = "eliot.mcintire@canada.ca", comment = c(ORCID = "0000-0002-6914-8316")), person(given = "Alex M", family = "Chubaty", role = "ctb", email = "achubaty@for-cast.ca", comment = c(ORCID = "0000-0001-7146-8135")), person(paste("Her Majesty the Queen in Right of Canada,", "as represented by the Minister of Natural Resources Canada"), role = "cph") )
+# Depends: R (>= 4.0)
+# Imports: data.table (>= 1.10.4), methods, tools, utils
+# Suggests: covr, parallel, remotes, testit
+# Encoding: UTF-8
+# Language: en-CA
+# License: GPL-3
+# BugReports: https://github.com/PredictiveEcology/Require/issues
+# ByteCompile: yes
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-05-22 18:46:22 UTC; emcintir
+# Author: Eliot J B McIntire [aut, cre] (<https://orcid.org/0000-0002-6914-8316>), Alex M Chubaty [ctb] (<https://orcid.org/0000-0001-7146-8135>), Her Majesty the Queen in Right of Canada, as represented by the Minister of Natural Resources Canada [cph]
+# Maintainer: Eliot J B McIntire <eliot.mcintire@canada.ca>
+# Repository: CRAN
+# Date/Publication: 2023-05-22 21:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,91 @@
+{% set version = '0.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dineq
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dineq_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dineq/dineq_{{ version }}.tar.gz
+  sha256: 54a7cc18213ddfbf94b7f50dcb12fab55aa86b3f3f3ddb5385c7819358cb30f7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-hmisc >=4.0_3
+    - r-boot >=1.3_20
+
+  run:
+    - r-base
+    - r-hmisc >=4.0_3
+    - r-boot >=1.3_20
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dineq')"           # [not win]
+    - "\"%R%\" -e \"library('dineq')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=dineq
+  license: GPL-3
+  summary: Decomposition of (income) inequality by population sub groups. For a decomposition
+    on a single variable the mean log deviation can be used (see Mookherjee Shorrocks
+    (1982) <DOI:10.2307/2232673>). For a decomposition on multiple variables a regression
+    based technique can be used (see Fields (2003) <DOI:10.1016/s0147-9121(03)22001-x>).
+    Recentered influence function regression for marginal effects of the (income or
+    wealth) distribution  (see Firpo et al. (2009) <DOI:10.3982/ECTA6822>). Some extensions
+    to inequality functions to handle weights and/or missings.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: dineq
+# Type: Package
+# Title: Decomposition of (Income) Inequality
+# Version: 0.1.0
+# Date: 2018-06-19
+# Author: Rene Schulenberg
+# Maintainer: Rene Schulenberg <reneschulenberg@gmail.com>
+# Description: Decomposition of (income) inequality by population sub groups. For a decomposition on a single variable the mean log deviation can be used (see Mookherjee Shorrocks (1982) <DOI:10.2307/2232673>). For a decomposition on multiple variables a regression based technique can be used (see Fields (2003) <DOI:10.1016/s0147-9121(03)22001-x>). Recentered influence function regression for marginal effects of the (income or wealth) distribution  (see Firpo et al. (2009) <DOI:10.3982/ECTA6822>). Some extensions to inequality functions to handle weights and/or missings.
+# Depends: R (>= 2.10)
+# Imports: boot (>= 1.3-20), Hmisc (>= 4.0-3)
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-06-24 20:27:26 UTC; Tall
+# Repository: CRAN
+# Date/Publication: 2018-06-27 15:30:30 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,85 @@
+{% set version = '0.11-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-zyp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/zyp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/zyp/zyp_{{ version }}.tar.gz
+  sha256: 898e35df98742398c30657d9ad412035945b89d345760bce2151af1d07d10d3f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests:
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-kendall
+
+  run:
+    - r-base
+    - r-kendall
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('zyp')"           # [not win]
+    - "\"%R%\" -e \"library('zyp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.r-project.org
+  license: LGPL-2.1
+  summary: An efficient implementation of the slope method described by Sen (1968) <doi:10.1080/01621459.1968.10480934>
+    plus implementation of prewhitening approaches to determining trends in climate
+    data described by Zhang, Vincent, Hogg, and Niitsoo (2000) <doi:10.1080/07055900.2000.9649654>
+    and Yue, Pilon, Phinney, and Cavadias (2002) <doi:10.1002/hyp.1095>.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-2.1'
+
+# The original CRAN metadata for this package was:
+
+# Package: zyp
+# Version: 0.11-1
+# Date: 2023-03-22
+# Title: Zhang + Yue-Pilon Trends Package
+# Authors@R: c(person("David", "Bronaugh", email="bronaugh@uvic.ca", role="aut"), person("Arelia", "Schoeneberg", email="wernera@uvic.ca", role="aut"), person("Lee", "Zeman", email="lzeman@uvic.ca", role="cre"))
+# Depends: R (>= 2.4.0), Kendall
+# Suggests:
+# Description: An efficient implementation of the slope method described by Sen (1968) <doi:10.1080/01621459.1968.10480934> plus implementation of prewhitening approaches to determining trends in climate data described by Zhang, Vincent, Hogg, and Niitsoo (2000) <doi:10.1080/07055900.2000.9649654> and Yue, Pilon, Phinney, and Cavadias (2002) <doi:10.1002/hyp.1095>.
+# License: LGPL-2.1
+# URL: https://www.r-project.org
+# NeedsCompilation: no
+# Packaged: 2023-03-22 18:35:56 UTC; lzeman
+# Author: David Bronaugh [aut], Arelia Schoeneberg [aut], Lee Zeman [cre]
+# Maintainer: Lee Zeman <lzeman@uvic.ca>
+# Repository: CRAN
+# Date/Publication: 2023-03-22 19:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

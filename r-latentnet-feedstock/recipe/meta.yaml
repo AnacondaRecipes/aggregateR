@@ -1,0 +1,110 @@
+{% set version = '2.10.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-latentnet
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/latentnet_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/latentnet/latentnet_{{ version }}.tar.gz
+  sha256: 2654acc70ee65491b39fe134e6a2fe5d52bdb93811fb9f97ebf946bd5939707e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: KernSmooth, snowFT, rgl, heplots, rlecuyer, ergm.userterms, covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-abind
+    - r-coda >=0.17.1
+    - r-ergm >=4.2.0
+    - r-mvtnorm
+    - r-network
+    - r-sna
+    - r-statnet.common >=4.1.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-abind
+    - r-coda >=0.17.1
+    - r-ergm >=4.2.0
+    - r-mvtnorm
+    - r-network
+    - r-sna
+    - r-statnet.common >=4.1.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('latentnet')"           # [not win]
+    - "\"%R%\" -e \"library('latentnet')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://statnet.org
+  license: GPL-3
+  summary: Fit and simulate latent position and cluster models for statistical networks. See
+    Krivitsky and Handcock (2008) <doi:10.18637/jss.v024.i05> and Krivitsky, Handcock,
+    Raftery, and Hoff (2009) <doi:10.1016/j.socnet.2009.04.001>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: latentnet
+# Version: 2.10.6
+# Date: 2022-05-11
+# Title: Latent Position and Cluster Models for Statistical Networks
+# Authors@R: c( person("Pavel N.", "Krivitsky", role=c("aut","cre"), email="pavel@statnet.org", comment=c(ORCID="0000-0002-9101-3362")), person("Mark S.", "Handcock", role=c("aut"), email="handcock@stat.ucla.edu"), person("Susan M.", "Shortreed", role=c("ctb")), person("Jeremy", "Tantrum", role=c("ctb")), person("Peter D.", "Hoff", role=c("ctb")), person("Li","Wang",role=c("ctb"),email="lxwang@gmail.com"), person("Kirk","Li",role=c("ctb"),email="kirkli@uw.edu"), person("Jake","Fisher",role=c("ctb"),email="jcf26@duke.edu"), person("Jordan T.", "Bates", role=c("ctb"),email="jtbates@gmail.com") )
+# Description: Fit and simulate latent position and cluster models for statistical networks. See Krivitsky and Handcock (2008) <doi:10.18637/jss.v024.i05> and Krivitsky, Handcock, Raftery, and Hoff (2009) <doi:10.1016/j.socnet.2009.04.001>.
+# Depends: R (>= 3.6.0), network, ergm (>= 4.2.0)
+# Imports: sna, mvtnorm, abind, coda (>= 0.17.1), tools, MASS, statnet.common (>= 4.1.0)
+# SystemRequirements: GNU make
+# Suggests: KernSmooth, snowFT, rgl, heplots, rlecuyer, ergm.userterms, covr
+# BugReports: https://github.com/statnet/latentnet/issues
+# License: GPL-3 + file LICENSE
+# URL: https://statnet.org
+# Encoding: UTF-8
+# RoxygenNote: 7.1.2
+# NeedsCompilation: yes
+# Packaged: 2022-05-10 22:37:05 UTC; pavel
+# Author: Pavel N. Krivitsky [aut, cre] (<https://orcid.org/0000-0002-9101-3362>), Mark S. Handcock [aut], Susan M. Shortreed [ctb], Jeremy Tantrum [ctb], Peter D. Hoff [ctb], Li Wang [ctb], Kirk Li [ctb], Jake Fisher [ctb], Jordan T. Bates [ctb]
+# Maintainer: Pavel N. Krivitsky <pavel@statnet.org>
+# Repository: CRAN
+# Date/Publication: 2022-05-11 12:30:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

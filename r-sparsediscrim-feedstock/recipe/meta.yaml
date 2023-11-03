@@ -1,0 +1,101 @@
+{% set version = '0.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sparsediscrim
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sparsediscrim_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sparsediscrim/sparsediscrim_{{ version }}.tar.gz
+  sha256: 5949d8c80ef8d2462bee478b87f03bc1fe25e1d8cfd3d3cc5fc587af469cfbbb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, MASS, covr, modeldata, spelling
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bdsmatrix
+    - r-corpcor
+    - r-dplyr
+    - r-ggplot2
+    - r-mvtnorm
+    - r-rlang
+
+  run:
+    - r-base
+    - r-bdsmatrix
+    - r-corpcor
+    - r-dplyr
+    - r-ggplot2
+    - r-mvtnorm
+    - r-rlang
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sparsediscrim')"           # [not win]
+    - "\"%R%\" -e \"library('sparsediscrim')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/topepo/sparsediscrim, https://topepo.github.io/sparsediscrim/
+  license: MIT
+  summary: A collection of sparse and regularized discriminant analysis methods intended for
+    small-sample, high-dimensional data sets. The package features the High-Dimensional
+    Regularized Discriminant Analysis classifier from Ramey et al. (2017) <arXiv:1602.01182>.
+    Other classifiers include those from Dudoit et al. (2002) <doi:10.1198/016214502753479248>,
+    Pang et al. (2009) <doi:10.1111/j.1541-0420.2009.01200.x>, and Tong et al. (2012)
+    <doi:10.1093/bioinformatics/btr690>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: sparsediscrim
+# Title: Sparse and Regularized Discriminant Analysis
+# Version: 0.3.0
+# Authors@R: c( person(given = "Max", family = "Kuhn", role = c("aut", "cre"), email = "mxkuhn@gmail.com", comment = c(ORCID = "0000-0003-2402-136X")), person(given = "John", family = "Ramey", role = c("aut"), email = "johnramey@gmail.com", comment = "original author") )
+# Description: A collection of sparse and regularized discriminant analysis methods intended for small-sample, high-dimensional data sets. The package features the High-Dimensional Regularized Discriminant Analysis classifier from Ramey et al. (2017) <arXiv:1602.01182>. Other classifiers include those from Dudoit et al. (2002) <doi:10.1198/016214502753479248>, Pang et al. (2009) <doi:10.1111/j.1541-0420.2009.01200.x>, and Tong et al. (2012) <doi:10.1093/bioinformatics/btr690>.
+# Imports: bdsmatrix, corpcor, dplyr, ggplot2, mvtnorm, rlang
+# Suggests: testthat, MASS, covr, modeldata, spelling
+# License: MIT + file LICENSE
+# URL: https://github.com/topepo/sparsediscrim, https://topepo.github.io/sparsediscrim/
+# RoxygenNote: 7.1.1.9001
+# Depends: R (>= 2.10)
+# Encoding: UTF-8
+# Language: en-US
+# NeedsCompilation: no
+# Packaged: 2021-06-30 16:01:38 UTC; max
+# Author: Max Kuhn [aut, cre] (<https://orcid.org/0000-0003-2402-136X>), John Ramey [aut] (original author)
+# Maintainer: Max Kuhn <mxkuhn@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-07-01 07:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

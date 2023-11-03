@@ -1,0 +1,98 @@
+{% set version = '0.6-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ivreg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ivreg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ivreg/ivreg_{{ version }}.tar.gz
+  sha256: b4a7fa876efedf951e9ace1ef3d6d997481dc4d806226ef7f230acfa33923896
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: AER, effects (>= 4.2.0), knitr, insight, parallel, rmarkdown, sandwich, testthat, modelsummary, ggplot2
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+    - r-mass
+    - r-car >=3.0_9
+    - r-lmtest
+
+  run:
+    - r-base
+    - r-formula
+    - r-mass
+    - r-car >=3.0_9
+    - r-lmtest
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ivreg')"           # [not win]
+    - "\"%R%\" -e \"library('ivreg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://zeileis.github.io/ivreg/
+  license: GPL-2
+  summary: Instrumental variable estimation for linear models by two-stage least-squares (2SLS)
+    regression or by robust-regression via M-estimation (2SM) or MM-estimation (2SMM).
+    The main ivreg() model-fitting function is designed to provide a workflow as similar
+    as possible to standard lm() regression. A wide range of methods is provided for
+    fitted ivreg model objects, including extensive functionality for computing and
+    graphing regression diagnostics in addition to other standard model tools.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: ivreg
+# Title: Instrumental-Variables Regression by '2SLS', '2SM', or '2SMM', with Diagnostics
+# Version: 0.6-2
+# Authors@R: c(person(given = "John", family = "Fox", role = "aut", email = "jfox@mcmaster.ca", comment = c(ORCID = "0000-0002-1196-8012")), person(given = "Christian", family = "Kleiber", role = "aut", email = "Christian.Kleiber@unibas.ch", comment = c(ORCID = "0000-0002-6781-4733")), person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org", comment = c(ORCID = "0000-0003-0918-3766")), person(given = "Nikolas", family = "Kuschnig", role = "ctb", email = "nikolas.kuschnig@wu.ac.at", comment = c(ORCID = "0000-0002-6642-2543")))
+# Description: Instrumental variable estimation for linear models by two-stage least-squares (2SLS) regression or by robust-regression via M-estimation (2SM) or MM-estimation (2SMM). The main ivreg() model-fitting function is designed to provide a workflow as similar as possible to standard lm() regression. A wide range of methods is provided for fitted ivreg model objects, including extensive functionality for computing and graphing regression diagnostics in addition to other standard model tools.
+# License: GPL (>= 2)
+# Depends: R (>= 3.6.0)
+# Imports: car (>= 3.0-9), Formula, lmtest, MASS, stats
+# Suggests: AER, effects (>= 4.2.0), knitr, insight, parallel, rmarkdown, sandwich, testthat, modelsummary, ggplot2
+# Encoding: UTF-8
+# LazyData: true
+# VignetteBuilder: knitr
+# BugReports: https://github.com/zeileis/ivreg/issues/
+# URL: https://zeileis.github.io/ivreg/
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-03-16 17:27:26 UTC; zeileis
+# Author: John Fox [aut] (<https://orcid.org/0000-0002-1196-8012>), Christian Kleiber [aut] (<https://orcid.org/0000-0002-6781-4733>), Achim Zeileis [aut, cre] (<https://orcid.org/0000-0003-0918-3766>), Nikolas Kuschnig [ctb] (<https://orcid.org/0000-0002-6642-2543>)
+# Maintainer: Achim Zeileis <Achim.Zeileis@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2023-03-17 09:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

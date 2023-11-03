@@ -1,0 +1,102 @@
+{% set version = '0.15.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-subselect
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/subselect_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/subselect/subselect_{{ version }}.tar.gz
+  sha256: fc8ed96262627683355c64f03e0ab7bbeb45e258e6a49b8fdd67053c91f288f7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-iswr
+    - r-mass
+    - r-corpcor
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-iswr
+    - r-mass
+    - r-corpcor
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('subselect')"           # [not win]
+    - "\"%R%\" -e \"library('subselect')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=subselect
+  license: GPL-2
+  summary: A collection of functions which (i) assess the quality of variable subsets as surrogates
+    for a full data set, in either an exploratory data analysis or in the context of
+    a multivariate linear model, and (ii) search for subsets which are optimal under
+    various criteria. Theoretical support for the heuristic search methods and exploratory
+    data analysis criteria is in Cadima, Cerdeira, Minhoto (2003, <doi:10.1016/j.csda.2003.11.001>).
+    Theoretical support for the leap and bounds algorithm and the criteria for the general
+    multivariate linear model is in Duarte Silva (2001, <doi:10.1006/jmva.2000.1920>).
+    There is a package vignette "subselect", which includes additional references.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: subselect
+# Version: 0.15.5
+# Date: 2023-07-10
+# Title: Selecting Variable Subsets
+# Authors@R: c(person("Jorge" ,"Orestes Cerdeira", role="aut", email="jo.cerdeira@fct.unl.pt"), person("Pedro", "Duarte Silva", role="aut", email="psilva@porto.ucp.pt"), person("Jorge", "Cadima", role=c("aut","cre"),  email="jcadima@isa.ulisboa.pt"), person("Manuel",  "Minhoto", role="aut", email="minhoto@uevora.pt"))
+# Author: Jorge Orestes Cerdeira [aut], Pedro Duarte Silva [aut], Jorge Cadima [aut, cre], Manuel Minhoto [aut]
+# Maintainer: Jorge Cadima <jcadima@isa.ulisboa.pt>
+# Description: A collection of functions which (i) assess the quality of variable subsets as surrogates for a full data set, in either an exploratory data analysis or in the context of a multivariate linear model, and (ii) search for subsets which are optimal under various criteria. Theoretical support for the heuristic search methods and exploratory data analysis criteria is in Cadima, Cerdeira, Minhoto (2003, <doi:10.1016/j.csda.2003.11.001>). Theoretical support for the leap and bounds algorithm and the criteria for the general multivariate linear model is in Duarte Silva (2001, <doi:10.1006/jmva.2000.1920>). There is a package vignette "subselect", which includes additional references.
+# Depends: R (>= 3.5.0)
+# Imports: MASS, ISwR, corpcor
+# License: GPL (>= 2)
+# Repository: CRAN
+# LazyData: TRUE
+# NeedsCompilation: yes
+# Packaged: 2023-07-10 09:41:40 UTC; jcadima
+# Date/Publication: 2023-07-10 22:30:12 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

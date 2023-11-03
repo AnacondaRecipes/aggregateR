@@ -1,0 +1,104 @@
+{% set version = '1.1-8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-frontier
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/frontier_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/frontier/frontier_{{ version }}.tar.gz
+  sha256: 228607bb0f614bf40754337fdb89ebe10bacab38fc34b26085d10f51add70ae2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MCMCpack (>= 1.0-8), fdrtool (>= 1.2.6)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula >=0.2_0
+    - r-lmtest >=0.9_24
+    - r-micecon >=0.6_14
+    - r-misctools >=0.6_1
+    - r-moments >=0.11
+    - r-plm >=1.0_1
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-formula >=0.2_0
+    - r-lmtest >=0.9_24
+    - r-micecon >=0.6_14
+    - r-misctools >=0.6_1
+    - r-moments >=0.11
+    - r-plm >=1.0_1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('frontier')"           # [not win]
+    - "\"%R%\" -e \"library('frontier')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://frontier.r-forge.r-project.org/
+  license: GPL-2
+  summary: 'Maximum Likelihood Estimation of Stochastic Frontier Production and Cost Functions.
+    Two specifications are available: the error components specification with time-varying
+    efficiencies (Battese and Coelli, 1992, <doi:10.1007/BF00158774>) and a model specification
+    in which the firm effects are directly influenced by a number of variables (Battese
+    and Coelli, 1995, <doi:10.1007/BF01205442>).'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: frontier
+# Version: 1.1-8
+# Date: 2020-04-15
+# Title: Stochastic Frontier Analysis
+# Author: Tim Coelli, Arne Henningsen
+# Maintainer: Arne Henningsen <arne.henningsen@gmail.com>
+# Depends: R (>= 2.15.0), micEcon (>= 0.6-14), lmtest (>= 0.9-24)
+# Suggests: MCMCpack (>= 1.0-8), fdrtool (>= 1.2.6)
+# Imports: moments (>= 0.11), stats (>= 2.15.0), Formula (>= 0.2-0), miscTools (>= 0.6-1), plm (>= 1.0-1)
+# Description: Maximum Likelihood Estimation of Stochastic Frontier Production and Cost Functions. Two specifications are available: the error components specification with time-varying efficiencies (Battese and Coelli, 1992, <doi:10.1007/BF00158774>) and a model specification in which the firm effects are directly influenced by a number of variables (Battese and Coelli, 1995, <doi:10.1007/BF01205442>).
+# License: GPL (>= 2)
+# URL: http://frontier.r-forge.r-project.org/
+# NeedsCompilation: yes
+# Packaged: 2020-04-15 07:29:45 UTC; gsl324
+# Repository: CRAN
+# Date/Publication: 2020-04-17 16:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,102 @@
+{% set version = '0.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-irtoys
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/irtoys_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/irtoys/irtoys_{{ version }}.tar.gz
+  sha256: 4b200d11d884e2ad7c70d35d1bf3cc5cea5ef6e73a7683eb28ee4dff99f950e3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ltm
+    - r-sm
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-ltm
+    - r-sm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('irtoys')"           # [not win]
+    - "\"%R%\" -e \"library('irtoys')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=irtoys
+  license: GPL-2
+  summary: A collection of functions useful in learning and practicing IRT, which can be combined
+    into larger programs. Provides basic CTT analysis, a simple common interface to
+    the estimation of item parameters in IRT models for binary responses with three
+    different programs (ICL, BILOG-MG, and ltm), ability estimation (MLE, BME, EAP,
+    WLE, plausible values), item and person fit statistics, scaling methods (MM, MS,
+    Stocking-Lord, and the complete Hebaera method), and a rich array of parametric
+    and non-parametric (kernel) plots. Estimates and plots Haberman's interaction model
+    when all items are dichotomously scored.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: irtoys
+# Type: Package
+# Title: A Collection of Functions Related to Item Response Theory (IRT)
+# Version: 0.2.2
+# Date: 2022-05-11
+# Authors@R: c(person("Ivailo", "Partchev", email = "partchev@gmail.com", role = c("aut","cre")), person("Gunter", "Maris", email = "Gunter.Maris@act.org", role = "aut"), person("Tamaki", "Hattori", role = "ctb"))
+# Maintainer: Ivailo Partchev <partchev@gmail.com>
+# Description: A collection of functions useful in learning and practicing IRT, which can be combined into larger programs. Provides basic CTT analysis, a simple common interface to the estimation of item parameters in IRT models for binary responses with three different programs (ICL, BILOG-MG, and ltm), ability estimation (MLE, BME, EAP, WLE, plausible values), item and person fit statistics, scaling methods (MM, MS, Stocking-Lord, and the complete Hebaera method), and a rich array of parametric and non-parametric (kernel) plots. Estimates and plots Haberman's interaction model when all items are dichotomously scored.
+# LazyLoad: yes
+# LazyData: yes
+# License: GPL (>= 2)
+# Depends: sm, ltm
+# Suggests: MASS, knitr, rmarkdown
+# Collate: 'ability.R' 'estimate.R' 'itemfit.R' 'nonpar.R' 'readin.R' 'scale.R' 'tracelines.R' 'utils.R' 'irtoys-package.R' 'interaction.R'
+# VignetteBuilder: knitr
+# RoxygenNote: 7.1.1
+# NeedsCompilation: yes
+# Packaged: 2022-05-12 05:29:30 UTC; partchev
+# Author: Ivailo Partchev [aut, cre], Gunter Maris [aut], Tamaki Hattori [ctb]
+# Repository: CRAN
+# Date/Publication: 2022-05-12 09:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

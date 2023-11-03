@@ -1,0 +1,118 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bgw
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bgw_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bgw/bgw_{{ version }}.tar.gz
+  sha256: 7621b8ab6471c27b9766d8acdbdc30337b81d1bbf594ee7ed5e00a00e5b0e42b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat (>= 3.0.0),
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bgw')"           # [not win]
+    - "\"%R%\" -e \"library('bgw')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=bgw
+  license: GPL-3
+  summary: 'Performs statistical estimation and inference-related computations by accessing and
+    executing modified versions of ''Fortran'' subroutines originally published in the
+    Association for Computing Machinery (ACM) journal Transactions on Mathematical Software
+    (TOMS) by Bunch, Gay and Welsch (1993) <doi:10.1145/151271.151279>. The acronym
+    ''BGW'' (from the authors'' last names) will be used when making reference to technical
+    content (e.g., algorithm, methodology) that originally appeared in ACM TOMS. A key
+    feature of BGW is that it exploits the special structure of statistical estimation
+    problems within a trust-region-based optimization approach to produce an estimation
+    algorithm that is much more effective than the usual practice of using optimization
+    methods and codes originally developed for general optimization. The ''bgw'' package
+    bundles ''R'' wrapper (and related) functions with modified ''Fortran'' source code
+    so that it can be compiled and linked in the ''R'' environment for fast execution.
+    This version implements a function (''bgw_mle.R'') that performs maximum likelihood
+    estimation (MLE) for a user-provided model object that computes probabilities (a.k.a.
+    probability densities). The motivation for producing this initial version is to
+    provide fast, efficient, and reliable MLE for discrete choice models that can be
+    called from the ''Apollo'' choice modelling ''R'' package: see <http://www.apollochoicemodelling.com>.
+    However, estimation can also be performed in a stand-alone fashion without using
+    ''Apollo'' (as shown in simple examples). After this initial version is available
+    on CRAN, an updated version of ''Apollo'' (0.2.9) will be made available that automatically
+    loads ''bgw''. Additional development can then occur, including more detailed examples
+    in ''bgw'' that refer to ''Apollo.'' Note also that BGW capabilities are not limited
+    to MLE, and future extension to other estimators (e.g., nonlinear least squares,
+    generalized method of moments, etc.) is possible. The ''Fortran'' code included
+    in ''bgw'' was modified by one of the original BGW authors (Bunch) under his rights
+    as confirmed by direct consultation with the ACM Intellectual Property and Rights
+    Manager.  See <https://authors.acm.org/author-resources/author-rights>. The main
+    requirement is clear citation of the original publication (see above).'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: bgw
+# Type: Package
+# Title: Bunch-Gay-Welsch Statistical Estimation
+# Version: 0.1.2
+# Authors@R: c( person("David S.", "Bunch", email="dsbunch@ucdavis.edu", role=c("aut","cre"), comment=c(ORCID="0000-0001-8728-7072")), person("David M.", "Gay", email="dmg@acm.org", role=c("ctb")), person("Roy E.", "Welsch", email="rwelsch@mit.edu", role=c("ctb")), person("Stephane", "Hess", email="S.Hess@leeds.ac.uk", role="ctb"), person("David", "Palma", email="D.Palma@leeds.ac.uk", role="ctb"))
+# Maintainer: David S. Bunch <dsbunch@ucdavis.edu>
+# Description: Performs statistical estimation and inference-related computations by accessing and executing modified versions of 'Fortran' subroutines originally published in the Association for Computing Machinery (ACM) journal Transactions on Mathematical Software (TOMS) by Bunch, Gay and Welsch (1993) <doi:10.1145/151271.151279>. The acronym 'BGW' (from the authors' last names) will be used when making reference to technical content (e.g., algorithm, methodology) that originally appeared in ACM TOMS. A key feature of BGW is that it exploits the special structure of statistical estimation problems within a trust-region-based optimization approach to produce an estimation algorithm that is much more effective than the usual practice of using optimization methods and codes originally developed for general optimization. The 'bgw' package bundles 'R' wrapper (and related) functions with modified 'Fortran' source code so that it can be compiled and linked in the 'R' environment for fast execution. This version implements a function ('bgw_mle.R') that performs maximum likelihood estimation (MLE) for a user-provided model object that computes probabilities (a.k.a. probability densities). The motivation for producing this initial version is to provide fast, efficient, and reliable MLE for discrete choice models that can be called from the 'Apollo' choice modelling 'R' package: see <http://www.apollochoicemodelling.com>. However, estimation can also be performed in a stand-alone fashion without using 'Apollo' (as shown in simple examples). After this initial version is available on CRAN, an updated version of 'Apollo' (0.2.9) will be made available that automatically loads 'bgw'. Additional development can then occur, including more detailed examples in 'bgw' that refer to 'Apollo.' Note also that BGW capabilities are not limited to MLE, and future extension to other estimators (e.g., nonlinear least squares, generalized method of moments, etc.) is possible. The 'Fortran' code included in 'bgw' was modified by one of the original BGW authors (Bunch) under his rights as confirmed by direct consultation with the ACM Intellectual Property and Rights Manager.  See <https://authors.acm.org/author-resources/author-rights>. The main requirement is clear citation of the original publication (see above).
+# License: GPL-3
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Depends: R (>= 4.0.0)
+# Suggests: knitr, rmarkdown, testthat (>= 3.0.0),
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# Author: David S. Bunch [aut, cre] (<https://orcid.org/0000-0001-8728-7072>), David M. Gay [ctb], Roy E. Welsch [ctb], Stephane Hess [ctb], David Palma [ctb]
+# Config/testthat/edition: 3
+# Packaged: 2023-07-11 23:14:19 UTC; dsbunch
+# Repository: CRAN
+# Date/Publication: 2023-07-13 14:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

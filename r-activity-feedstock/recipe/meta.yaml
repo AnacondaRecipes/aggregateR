@@ -1,0 +1,86 @@
+{% set version = '1.3.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-activity
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/activity_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/activity/activity_{{ version }}.tar.gz
+  sha256: c246734810d0dfa51ca5a2d9f1859d824d14e9cd1ba35f60d5befc8eb717f781
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-pbapply
+
+  run:
+    - r-base
+    - r-pbapply
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('activity')"           # [not win]
+    - "\"%R%\" -e \"library('activity')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=activity
+  license: GPL-3
+  summary: Provides functions to express clock time data relative to anchor points (typically
+    solar); fit kernel density functions to animal activity time data; plot activity
+    distributions; quantify overall levels of activity; statistically compare activity
+    metrics through bootstrapping; evaluate variation in linear variables with time
+    (or other circular variables).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: activity
+# Type: Package
+# Title: Animal Activity Statistics
+# Version: 1.3.4
+# Author: Marcus Rowcliffe
+# Maintainer: Marcus Rowcliffe <marcus.rowcliffe@ioz.ac.uk>
+# Description: Provides functions to express clock time data relative to anchor points (typically solar); fit kernel density functions to animal activity time data; plot activity distributions; quantify overall levels of activity; statistically compare activity metrics through bootstrapping; evaluate variation in linear variables with time (or other circular variables).
+# License: GPL-3
+# Encoding: UTF-8
+# Depends: methods
+# Imports: pbapply
+# LazyData: true
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-09-27 08:07:46 UTC; Rowcliffe.M
+# Repository: CRAN
+# Date/Publication: 2023-09-27 08:30:13 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

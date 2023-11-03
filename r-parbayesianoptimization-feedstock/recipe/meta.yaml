@@ -1,0 +1,104 @@
+{% set version = '1.2.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-parbayesianoptimization
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ParBayesianOptimization_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ParBayesianOptimization/ParBayesianOptimization_{{ version }}.tar.gz
+  sha256: 011a2e42117182339428ce37747f12ac8a8489eee16927890a5250874022b13c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, xgboost, doParallel, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dicekriging
+    - r-crayon
+    - r-data.table >=1.11.8
+    - r-dbscan
+    - r-foreach
+    - r-ggplot2
+    - r-ggpubr >=0.2.4
+    - r-lhs
+
+  run:
+    - r-base
+    - r-dicekriging
+    - r-crayon
+    - r-data.table >=1.11.8
+    - r-dbscan
+    - r-foreach
+    - r-ggplot2
+    - r-ggpubr >=0.2.4
+    - r-lhs
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ParBayesianOptimization')"           # [not win]
+    - "\"%R%\" -e \"library('ParBayesianOptimization')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/AnotherSamWilson/ParBayesianOptimization
+  license: GPL-2
+  summary: Fast, flexible framework for implementing Bayesian optimization of model hyperparameters
+    according to the methods described in Snoek et al. <arXiv:1206.2944>. The package
+    allows the user to run scoring function in parallel, save intermediary results,
+    and tweak other aspects of the process to fully utilize the computing resources
+    available to the user.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: ParBayesianOptimization
+# Title: Parallel Bayesian Optimization of Hyperparameters
+# Version: 1.2.6
+# Authors@R: person("Samuel", "Wilson", email = "samwilson303@gmail.com", role = c("aut", "cre"))
+# Description: Fast, flexible framework for implementing Bayesian optimization of model hyperparameters according to the methods described in Snoek et al. <arXiv:1206.2944>. The package allows the user to run scoring function in parallel, save intermediary results, and tweak other aspects of the process to fully utilize the computing resources available to the user.
+# URL: https://github.com/AnotherSamWilson/ParBayesianOptimization
+# BugReports: https://github.com/AnotherSamWilson/ParBayesianOptimization/issues
+# Depends: R (>= 3.4)
+# Imports: data.table (>= 1.11.8), DiceKriging, stats, foreach, dbscan, lhs, crayon, ggplot2, ggpubr (>= 0.2.4)
+# Suggests: knitr, rmarkdown, xgboost, doParallel, testthat
+# License: GPL-2
+# Encoding: UTF-8
+# RoxygenNote: 7.2.1
+# VignetteBuilder: knitr
+# Maintainer: Samuel Wilson <samwilson303@gmail.com>
+# NeedsCompilation: no
+# Packaged: 2022-10-18 14:15:20 UTC; swilson
+# Author: Samuel Wilson [aut, cre]
+# Repository: CRAN
+# Date/Publication: 2022-10-18 14:47:54 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

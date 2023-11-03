@@ -1,0 +1,97 @@
+{% set version = '2.1-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-labdsv
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/labdsv_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/labdsv/labdsv_{{ version }}.tar.gz
+  sha256: 99da92515e9aa49ea7f3df7e301ef714c57054a3838139cd3fd798531d625cd1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: optpart
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-rtsne
+    - r-cluster
+    - r-mgcv
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-rtsne
+    - r-cluster
+    - r-mgcv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('labdsv')"           # [not win]
+    - "\"%R%\" -e \"library('labdsv')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=labdsv
+  license: GPL-2
+  summary: A variety of ordination and community analyses useful in analysis of data sets in
+    community ecology. Includes many of the common ordination methods, with graphical
+    routines to facilitate their interpretation, as well as several novel analyses.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: labdsv
+# Version: 2.1-0
+# Title: Ordination and Multivariate Analysis for Ecology
+# Author: David W. Roberts <droberts@montana.edu>
+# Maintainer: David W. Roberts <droberts@montana.edu>
+# Depends: R (>= 3.0), mgcv
+# Imports: cluster, Rtsne, MASS
+# Suggests: optpart
+# Enhances: vegan
+# Description: A variety of ordination and community analyses useful in analysis of data sets in community ecology. Includes many of the common ordination methods, with graphical routines to facilitate their interpretation, as well as several novel analyses.
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Repository: CRAN
+# Packaged: 2023-04-01 16:58:19 UTC; dvrbts
+# Date/Publication: 2023-04-10 09:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,102 @@
+{% set version = '1.5.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gaston
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gaston_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gaston/gaston_{{ version }}.tar.gz
+  sha256: 07fb9be3142626550d12b4a9eb821c04c273bbe44f40bdab0e3c934b74c997b8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcppeigen
+    - r-rcppparallel
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcppeigen
+    - r-rcppparallel
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gaston')"           # [not win]
+    - "\"%R%\" -e \"library('gaston')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=gaston
+  license: GPL-3
+  summary: Manipulation of genetic data (SNPs). Computation of GRM and dominance matrix, LD,
+    heritability with efficient algorithms for linear mixed model (AIREML). Dandine
+    et al <doi:10.1159/000488519>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: gaston
+# Type: Package
+# Title: Genetic Data Handling (QC, GRM, LD, PCA) & Linear Mixed Models
+# Version: 1.5.9
+# Date: 2022-12-21
+# Encoding: UTF-8
+# VignetteBuilder: knitr
+# Authors@R: c( person("Herve", "Perdry", role = c("cre", "aut", "cph"), email = "herve.perdry@universite-paris-saclay.fr"), person("Claire", "Dandine-Roulland", role = c("aut", "cph")), person("Deepak", "Bandyopadhyay", role = "cph", comment = "C++ gzstream class" ), # Deepak & Lutz for gzstream class person("Lutz", "Kettner", role = "cph", comment = "C++ gzstream class" ) )
+# Description: Manipulation of genetic data (SNPs). Computation of GRM and dominance matrix, LD, heritability with efficient algorithms for linear mixed model (AIREML). Dandine et al <doi:10.1159/000488519>.
+# License: GPL-3
+# LinkingTo: Rcpp, RcppParallel, RcppEigen
+# Suggests: knitr
+# Depends: Rcpp, RcppParallel, methods
+# Imports:
+# NeedsCompilation: yes
+# LazyLoad: yes
+# LazyData: yes
+# Packaged: 2022-12-21 16:14:51 UTC; rv
+# Author: Herve Perdry [cre, aut, cph], Claire Dandine-Roulland [aut, cph], Deepak Bandyopadhyay [cph] (C++ gzstream class), Lutz Kettner [cph] (C++ gzstream class)
+# Maintainer: Herve Perdry <herve.perdry@universite-paris-saclay.fr>
+# Repository: CRAN
+# Date/Publication: 2022-12-22 11:00:15 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

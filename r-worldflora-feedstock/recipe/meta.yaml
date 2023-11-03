@@ -1,0 +1,85 @@
+{% set version = '1.13-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-worldflora
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/WorldFlora_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/WorldFlora/WorldFlora_{{ version }}.tar.gz
+  sha256: cc405be71fb53c6a4b5c08eaa83a9ad9cb3365e39721b44e6028e61f94515af4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: data.table, utils, stringr, dplyr, fuzzyjoin, stringdist
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('WorldFlora')"           # [not win]
+    - "\"%R%\" -e \"library('WorldFlora')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=WorldFlora
+  license: GPL-3
+  summary: World Flora Online is an online flora of all known plants, available from <http://www.worldfloraonline.org/>.
+    Methods are provided of matching a list of plant names (scientific names, taxonomic
+    names, botanical names) against a static copy of the World Flora Online Taxonomic
+    Backbone data that can be downloaded from the World Flora Online website. The World
+    Flora Online Taxonomic Backbone is an updated version of The Plant List (<http://www.theplantlist.org/>),
+    a working list of plant names that has become static since 2013.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: WorldFlora
+# Type: Package
+# Title: Standardize Plant Names According to World Flora Online Taxonomic Backbone
+# Version: 1.13-2
+# Date: 2023-5-26
+# Author: Roeland Kindt [cre, aut] (<https://orcid.org/0000-0002-7672-0712>)
+# Authors@R: c(person(given = "Roeland", family = "Kindt", role = c("cre", "aut"), email = "RoelandCEKindt@gmail.com", comment = c(ORCID = "0000-0002-7672-0712")))
+# Maintainer: Roeland Kindt <RoelandCEKindt@gmail.com>
+# Description: World Flora Online is an online flora of all known plants, available from <http://www.worldfloraonline.org/>. Methods are provided of matching a list of plant names (scientific names, taxonomic names, botanical names) against a static copy of the World Flora Online Taxonomic Backbone data that can be downloaded from the World Flora Online website. The World Flora Online Taxonomic Backbone is an updated version of The Plant List (<http://www.theplantlist.org/>), a working list of plant names that has become static since 2013.
+# License: GPL-3
+# Depends: R (>= 3.5.0)
+# Suggests: data.table, utils, stringr, dplyr, fuzzyjoin, stringdist
+# Packaged: 2023-05-26 06:36:11 UTC; RKINDT
+# NeedsCompilation: no
+# Repository: CRAN
+# Date/Publication: 2023-05-26 07:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

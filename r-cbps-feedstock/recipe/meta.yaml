@@ -1,0 +1,107 @@
+{% set version = '0.23' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cbps
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/CBPS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/CBPS/CBPS_{{ version }}.tar.gz
+  sha256: ed8fe09b642db459a516bdeb03a49e718a7d5ad915cbf82400029508efe9b32d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matchit
+    - r-glmnet
+    - r-nnet
+    - r-numderiv
+
+  run:
+    - r-base
+    - r-mass
+    - r-matchit
+    - r-glmnet
+    - r-nnet
+    - r-numderiv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('CBPS')"           # [not win]
+    - "\"%R%\" -e \"library('CBPS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=CBPS
+  license: GPL-2
+  summary: Implements the covariate balancing propensity score (CBPS) proposed by Imai and Ratkovic
+    (2014) <DOI:10.1111/rssb.12027>. The propensity score is estimated such that it
+    maximizes the resulting covariate balance as well as the prediction of treatment
+    assignment. The method, therefore, avoids an iteration between model fitting and
+    balance checking.  The package also implements optimal CBPS from Fan et al. (in-press)
+    <DOI:10.1080/07350015.2021.2002159>, several extensions of the CBPS beyond the cross-sectional,
+    binary treatment setting. They include the CBPS for longitudinal settings so that
+    it can be used in conjunction with marginal structural models from Imai and Ratkovic
+    (2015) <DOI:10.1080/01621459.2014.956872>, treatments with three- and four-valued
+    treatment variables, continuous-valued treatments from Fong, Hazlett, and Imai (2018)
+    <DOI:10.1214/17-AOAS1101>, propensity score estimation with a large number of covariates
+    from Ning, Peng, and Imai (2020) <DOI:10.1093/biomet/asaa020>, and the situation
+    with multiple distinct binary treatments administered simultaneously. In the future
+    it will be extended to other settings including the generalization of experimental
+    and instrumental variable estimates.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: CBPS
+# Version: 0.23
+# Date: 2022-01-18
+# Title: Covariate Balancing Propensity Score
+# Authors@R: c( person("Christian", "Fong", email = "cjfong@umich.edu", role = c("aut", "cre")), person("Marc", "Ratkovic", email = "ratkovic@princeton.edu", role = c("aut")), person("Kosuke", "Imai", email = "imai@Harvard.Edu", role = c("aut")), person("Chad", "Hazlett", email = "chazlett@ucla.edu", role = c("ctb")), person("Xiaolin", "Yang", email = "xiaoliny@princeton.edu", role = c("ctb")), person("Sida", "Peng", email = "sp947@cornell.edu", role = c("ctb")), person("Inbeom", "Lee", email = "il279@cornell.edu", role = c("ctb")) )
+# Depends: R (>= 3.4), MASS, MatchIt, nnet, numDeriv, glmnet
+# Imports:
+# Description: Implements the covariate balancing propensity score (CBPS) proposed by Imai and Ratkovic (2014) <DOI:10.1111/rssb.12027>. The propensity score is estimated such that it maximizes the resulting covariate balance as well as the prediction of treatment assignment. The method, therefore, avoids an iteration between model fitting and balance checking.  The package also implements optimal CBPS from Fan et al. (in-press) <DOI:10.1080/07350015.2021.2002159>, several extensions of the CBPS beyond the cross-sectional, binary treatment setting. They include the CBPS for longitudinal settings so that it can be used in conjunction with marginal structural models from Imai and Ratkovic (2015) <DOI:10.1080/01621459.2014.956872>, treatments with three- and four-valued treatment variables, continuous-valued treatments from Fong, Hazlett, and Imai (2018) <DOI:10.1214/17-AOAS1101>, propensity score estimation with a large number of covariates from Ning, Peng, and Imai (2020) <DOI:10.1093/biomet/asaa020>, and the situation with multiple distinct binary treatments administered simultaneously. In the future it will be extended to other settings including the generalization of experimental and instrumental variable estimates.
+# LazyLoad: yes
+# LazyData: yes
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Repository: CRAN
+# RoxygenNote: 7.1.2
+# Suggests: testthat
+# Packaged: 2022-01-18 16:34:12 UTC; chris
+# Author: Christian Fong [aut, cre], Marc Ratkovic [aut], Kosuke Imai [aut], Chad Hazlett [ctb], Xiaolin Yang [ctb], Sida Peng [ctb], Inbeom Lee [ctb]
+# Maintainer: Christian Fong <cjfong@umich.edu>
+# Date/Publication: 2022-01-18 18:02:52 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

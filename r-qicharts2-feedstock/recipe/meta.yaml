@@ -1,0 +1,95 @@
+{% set version = '0.7.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-qicharts2
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/qicharts2_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/qicharts2/qicharts2_{{ version }}.tar.gz
+  sha256: 05d0193a1662fe7459a592596f8b8b9164f1c2cfd4fdf965aed99662c3fdfc90
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dplyr (>= 0.7.0), knitr, rmarkdown, testthat, tidyr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggplot2 >=2.2.0
+    - r-scales
+
+  run:
+    - r-base
+    - r-ggplot2 >=2.2.0
+    - r-scales
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('qicharts2')"           # [not win]
+    - "\"%R%\" -e \"library('qicharts2')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/anhoej/qicharts2
+  license: GPL-3
+  summary: 'Functions for making run charts, Shewhart control charts and Pareto charts for continuous
+    quality improvement. Included control charts are: I, MR, Xbar, S, T, C, U, U'',
+    P, P'', and G charts. Non-random variation in the form of minor to moderate persistent
+    shifts in data over time is identified by the Anhoej rules for unusually long runs
+    and unusually few crossing  [Anhoej, Olesen (2014) <doi:10.1371/journal.pone.0113825>].
+    Non-random variation in the form of larger, possibly transient, shifts is identified
+    by Shewhart''s 3-sigma rule [Mohammed, Worthington, Woodall (2008) <doi:10.1136/qshc.2004.012047>].'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: qicharts2
+# Title: Quality Improvement Charts
+# Version: 0.7.4
+# Date: 2023-08-21
+# Authors@R: person('Jacob', 'Anhoej', email = 'jacob@anhoej.net', role = c('aut', 'cre'))
+# Description: Functions for making run charts, Shewhart control charts and Pareto charts for continuous quality improvement. Included control charts are: I, MR, Xbar, S, T, C, U, U', P, P', and G charts. Non-random variation in the form of minor to moderate persistent shifts in data over time is identified by the Anhoej rules for unusually long runs and unusually few crossing  [Anhoej, Olesen (2014) <doi:10.1371/journal.pone.0113825>]. Non-random variation in the form of larger, possibly transient, shifts is identified by Shewhart's 3-sigma rule [Mohammed, Worthington, Woodall (2008) <doi:10.1136/qshc.2004.012047>].
+# Depends: R (>= 3.0.0)
+# Imports: ggplot2 (>= 2.2.0), scales, stats
+# Suggests: dplyr (>= 0.7.0), knitr, rmarkdown, testthat, tidyr
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# URL: https://github.com/anhoej/qicharts2
+# NeedsCompilation: no
+# Packaged: 2023-08-21 07:40:56 UTC; jacob
+# Author: Jacob Anhoej [aut, cre]
+# Maintainer: Jacob Anhoej <jacob@anhoej.net>
+# Repository: CRAN
+# Date/Publication: 2023-08-21 08:30:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

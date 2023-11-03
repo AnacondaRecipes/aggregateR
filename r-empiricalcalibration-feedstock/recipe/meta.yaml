@@ -1,0 +1,108 @@
+{% set version = '3.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-empiricalcalibration
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/EmpiricalCalibration_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/EmpiricalCalibration/EmpiricalCalibration_{{ version }}.tar.gz
+  sha256: e1222de97299b61cb8967a76a196e2dbf25c9de43d90e996b90b96c534aa6a86
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, markdown, rmarkdown, testthat, Cyclops, survival, Sequential
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-ggplot2 >=2.0.0
+    - r-gridextra
+    - r-rlang
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-ggplot2 >=2.0.0
+    - r-gridextra
+    - r-rlang
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('EmpiricalCalibration')"           # [not win]
+    - "\"%R%\" -e \"library('EmpiricalCalibration')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://ohdsi.github.io/EmpiricalCalibration/, https://github.com/OHDSI/EmpiricalCalibration
+  license: Apache License 2.0
+  summary: Routines for performing empirical calibration of observational study estimates. By
+    using a set of negative control hypotheses we can estimate the empirical null distribution
+    of a particular observational study setup. This empirical null distribution can
+    be used to compute a calibrated p-value, which reflects the probability of observing
+    an estimated effect size when the null hypothesis is true taking both random and
+    systematic error into account. A similar approach can be used to calibrate confidence
+    intervals, using both negative and positive controls. For more details, see Schuemie
+    et al. (2013) <doi:10.1002/sim.5925> and Schuemie et al. (2018) <doi:10.1073/pnas.1708282114>.
+  license_family: APACHE
+
+# The original CRAN metadata for this package was:
+
+# Package: EmpiricalCalibration
+# Type: Package
+# Title: Routines for Performing Empirical Calibration of Observational Study Estimates
+# Version: 3.1.1
+# Date: 2022-08-08
+# Authors@R: c( person("Martijn", "Schuemie", , "schuemie@ohdsi.org", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0817-5361")), person("Marc", "Suchard", role = c("aut"), comment = c(ORCID = "0000-0001-9818-479X")) )
+# Maintainer: Martijn Schuemie <schuemie@ohdsi.org>
+# Description: Routines for performing empirical calibration of observational study estimates. By using a set of negative control hypotheses we can estimate the empirical null distribution of a particular observational study setup. This empirical null distribution can be used to compute a calibrated p-value, which reflects the probability of observing an estimated effect size when the null hypothesis is true taking both random and systematic error into account. A similar approach can be used to calibrate confidence intervals, using both negative and positive controls. For more details, see Schuemie et al. (2013) <doi:10.1002/sim.5925> and Schuemie et al. (2018) <doi:10.1073/pnas.1708282114>.
+# VignetteBuilder: knitr
+# Depends: R (>= 3.5.0)
+# Imports: ggplot2 (>= 2.0.0), gridExtra, methods, rlang, Rcpp
+# Suggests: knitr, markdown, rmarkdown, testthat, Cyclops, survival, Sequential
+# License: Apache License 2.0
+# LinkingTo: Rcpp
+# NeedsCompilation: yes
+# URL: https://ohdsi.github.io/EmpiricalCalibration/, https://github.com/OHDSI/EmpiricalCalibration
+# BugReports: https://github.com/OHDSI/EmpiricalCalibration/issues
+# RoxygenNote: 7.2.0
+# Encoding: UTF-8
+# Packaged: 2022-08-08 13:55:47 UTC; mschuemi
+# Author: Martijn Schuemie [aut, cre] (<https://orcid.org/0000-0002-0817-5361>), Marc Suchard [aut] (<https://orcid.org/0000-0001-9818-479X>)
+# Repository: CRAN
+# Date/Publication: 2022-08-09 14:40:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

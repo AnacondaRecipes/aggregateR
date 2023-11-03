@@ -1,0 +1,108 @@
+{% set version = '0.0.10-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rgeoda
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rgeoda_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rgeoda/rgeoda_{{ version }}.tar.gz
+  sha256: a023d32067ecd2d8152708534ebb1ffe5d8e5838b07a0692db58c50015cd2ca3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: wkb, sp
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh
+    - r-rcpp >=1.0.1
+    - r-digest
+    - r-sf
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh
+    - r-rcpp >=1.0.1
+    - r-digest
+    - r-sf
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rgeoda')"           # [not win]
+    - "\"%R%\" -e \"library('rgeoda')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/geodacenter/rgeoda/, https://geodacenter.github.io/rgeoda/
+  license: GPL-2
+  summary: Provides spatial data analysis functionalities including Exploratory Spatial Data
+    Analysis, Spatial Cluster Detection and Clustering Analysis, Regionalization, etc.
+    based on the C++ source code of 'GeoDa', which is an open-source software tool that
+    serves as an introduction to spatial data analysis. The 'GeoDa' software and its
+    documentation are available at <https://geodacenter.github.io>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: rgeoda
+# Type: Package
+# Title: R Library for Spatial Data Analysis
+# Version: 0.0.10-4
+# Date: 2023-07-01
+# Authors@R: c(person(given = "Xun", family = "Li", email="lixun910@gmail.com", role=c("aut","cre")), person(given = "Luc", family = "Anselin", email="anselin@uchicago.edu", role="aut"))
+# Maintainer: Xun Li <lixun910@gmail.com>
+# Description: Provides spatial data analysis functionalities including Exploratory Spatial Data Analysis, Spatial Cluster Detection and Clustering Analysis, Regionalization, etc. based on the C++ source code of 'GeoDa', which is an open-source software tool that serves as an introduction to spatial data analysis. The 'GeoDa' software and its documentation are available at <https://geodacenter.github.io>.
+# URL: https://github.com/geodacenter/rgeoda/, https://geodacenter.github.io/rgeoda/
+# BugReports: https://github.com/geodacenter/rgeoda/issues/
+# Depends: R (>= 4.0.0), methods, digest
+# License: GPL (>= 2)
+# Collate: init.R rgeoda.R sf_geoda.R RcppExports.R read_geoda.R weights.R utils.R lisa.R clustering.R
+# Imports: sf, Rcpp (>= 1.0.1)
+# LinkingTo: Rcpp, BH
+# RoxygenNote: 7.1.1
+# Encoding: UTF-8
+# Suggests: wkb, sp
+# SystemRequirements: C++17
+# NeedsCompilation: yes
+# Packaged: 2023-07-01 18:45:47 UTC; xun
+# Author: Xun Li [aut, cre], Luc Anselin [aut]
+# Repository: CRAN
+# Date/Publication: 2023-07-01 20:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

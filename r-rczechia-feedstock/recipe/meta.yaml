@@ -1,0 +1,98 @@
+{% set version = '1.12.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rczechia
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RCzechia_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RCzechia/RCzechia_{{ version }}.tar.gz
+  sha256: d1ea93f0d7a887fe972e4e6046b057448d70172c5c2994ad882ac0b154b77cfb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: terra, readxl, units, ggplot2, tidyterra, stringr, rvest, xml2, scales, knitr, testthat, roxygen2, devtools, rmarkdown, dplyr, lwgeom, s2, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-curl
+    - r-httr
+    - r-jsonlite
+    - r-magrittr
+    - r-sf
+
+  run:
+    - r-base
+    - r-curl
+    - r-httr
+    - r-jsonlite
+    - r-magrittr
+    - r-sf
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RCzechia')"           # [not win]
+    - "\"%R%\" -e \"library('RCzechia')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://rczechia.jla-data.net
+  license: MIT
+  summary: Administrative regions and other spatial objects of the Czech Republic.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: RCzechia
+# Type: Package
+# Title: Spatial Objects of the Czech Republic
+# Version: 1.12.0
+# Date: 2023-10-29
+# Authors@R: c( person("Jindra", "Lacko", , "jindra.lacko@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0375-5156")), person("Nick", "Bearman", role = "rev", comment = c(ORCID = "0000-0002-8396-4061", "Nick reviewed the package for JOSS, providing helpful comments leading to significant improvement of the package.")) )
+# Maintainer: Jindra Lacko <jindra.lacko@gmail.com>
+# Description: Administrative regions and other spatial objects of the Czech Republic.
+# URL: https://rczechia.jla-data.net
+# BugReports: https://github.com/jlacko/RCzechia/issues
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Depends: R (>= 3.3.0), sf
+# Imports: curl, httr, jsonlite, magrittr
+# Suggests: terra, readxl, units, ggplot2, tidyterra, stringr, rvest, xml2, scales, knitr, testthat, roxygen2, devtools, rmarkdown, dplyr, lwgeom, s2, covr
+# SystemRequirements: GDAL (>= 2.2.3), GEOS (>= 3.6.2), PROJ (>= 4.9.3)
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2023-10-29 20:56:59 UTC; jindra
+# Author: Jindra Lacko [aut, cre] (<https://orcid.org/0000-0002-0375-5156>), Nick Bearman [rev] (<https://orcid.org/0000-0002-8396-4061>, Nick reviewed the package for JOSS, providing helpful comments leading to significant improvement of the package.)
+# Repository: CRAN
+# Date/Publication: 2023-10-29 21:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

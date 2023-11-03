@@ -1,0 +1,97 @@
+{% set version = '0.2.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-githubinstall
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/githubinstall_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/githubinstall/githubinstall_{{ version }}.tar.gz
+  sha256: e3bb2b5c512af7d9b36df5358da23cca6a08317720675457fbf00020b2411043
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-curl
+    - r-data.table
+    - r-devtools
+    - r-httr
+    - r-jsonlite
+    - r-mockery
+
+  run:
+    - r-base
+    - r-curl
+    - r-data.table
+    - r-devtools
+    - r-httr
+    - r-jsonlite
+    - r-mockery
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('githubinstall')"           # [not win]
+    - "\"%R%\" -e \"library('githubinstall')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/hoxo-m/githubinstall
+  license: MIT
+  summary: Provides an helpful way to install packages hosted on GitHub.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: githubinstall
+# Type: Package
+# Version: 0.2.2
+# Title: A Helpful Way to Install R Packages Hosted on GitHub
+# Description: Provides an helpful way to install packages hosted on GitHub.
+# Authors@R: c( person("Koji", "Makiyama", email = "hoxo.smile@gmail.com", role = c("cre", "aut")), person("Atsushi", "Hayakawa", role = "ctb"), person("Shinya", "Uryu", role = "ctb"), person("Hiroaki", "Yutani", role = "ctb"), person("Nagi", "Teramo", role = "ctb"), person("Kazuhiro", "Maeda", role = "ctb"))
+# URL: https://github.com/hoxo-m/githubinstall
+# BugReports: https://github.com/hoxo-m/githubinstall/issues
+# License: MIT + file LICENSE
+# Imports: curl, data.table, devtools, httr, jsonlite, mockery, utils
+# RoxygenNote: 6.0.1
+# Encoding: UTF-8
+# Suggests: testthat, knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2018-02-18 17:36:10 UTC; kmakiyam
+# Author: Koji Makiyama [cre, aut], Atsushi Hayakawa [ctb], Shinya Uryu [ctb], Hiroaki Yutani [ctb], Nagi Teramo [ctb], Kazuhiro Maeda [ctb]
+# Maintainer: Koji Makiyama <hoxo.smile@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2018-02-18 17:56:31 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

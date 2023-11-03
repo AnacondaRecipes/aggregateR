@@ -1,0 +1,96 @@
+{% set version = '2023.8.31' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-binsegrcpp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/binsegRcpp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/binsegRcpp/binsegRcpp_{{ version }}.tar.gz
+  sha256: 234d8beb1d1549aedb043f50f36828af0055ed05c7dd67fa928b38f95fcfa8e7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, penaltyLearning, directlabels, ggplot2, testthat, knitr, markdown, neuroblastoma, changepoint, quadprog
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-data.table
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-data.table
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('binsegRcpp')"           # [not win]
+    - "\"%R%\" -e \"library('binsegRcpp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/tdhock/binsegRcpp
+  license: GPL-3
+  summary: Standard template library containers are used to implement an efficient binary segmentation
+    algorithm, which is log-linear on average and quadratic in the worst case.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: binsegRcpp
+# Type: Package
+# Title: Efficient Implementation of Binary Segmentation
+# Version: 2023.8.31
+# Author: Toby Dylan Hocking
+# Maintainer: Toby Dylan Hocking <toby.hocking@r-project.org>
+# Description: Standard template library containers are used to implement an efficient binary segmentation algorithm, which is log-linear on average and quadratic in the worst case.
+# License: GPL-3
+# LinkingTo: Rcpp
+# URL: https://github.com/tdhock/binsegRcpp
+# BugReports: https://github.com/tdhock/binsegRcpp/issues
+# Imports: data.table, Rcpp
+# Suggests: covr, penaltyLearning, directlabels, ggplot2, testthat, knitr, markdown, neuroblastoma, changepoint, quadprog
+# VignetteBuilder: knitr
+# RoxygenNote: 7.1.2
+# NeedsCompilation: yes
+# Packaged: 2023-09-06 03:17:47 UTC; tdhock
+# Repository: CRAN
+# Date/Publication: 2023-09-06 04:30:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

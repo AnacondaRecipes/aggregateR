@@ -1,0 +1,95 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-codalm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/codalm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/codalm/codalm_{{ version }}.tar.gz
+  sha256: 7162ed7f552ac43bbd56f5e21f44e327591db588644dce11eda5a8c74d8a0727
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, gtools, remotes, testthat, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-squarem >=2020.3
+    - r-future
+    - r-future.apply
+
+  run:
+    - r-base
+    - r-squarem >=2020.3
+    - r-future
+    - r-future.apply
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('codalm')"           # [not win]
+    - "\"%R%\" -e \"library('codalm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jfiksel/codalm
+  license: GPL-2
+  summary: Implements the expectation-maximization (EM) algorithm as described in Fiksel et al.
+    (2021) <doi:10.1111/biom.13465> for transformation-free linear regression for compositional
+    outcomes and predictors.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: codalm
+# Type: Package
+# Title: Transformation-Free Linear Regression for Compositional Outcomes and Predictors
+# Version: 0.1.2
+# Authors@R: c(person(given = "Jacob", family = "Fiksel", role = c("aut", "cre"), email = "jfiksel@gmail.com", comment = c(ORCID = "0000-0001-7067-1334")), person(given = "Abhirup", family = "Datta", role = "aut", email = "abhidatta@jhu.edu"))
+# Maintainer: Jacob Fiksel <jfiksel@gmail.com>
+# Description: Implements the expectation-maximization (EM) algorithm as described in Fiksel et al. (2021) <doi:10.1111/biom.13465> for transformation-free linear regression for compositional outcomes and predictors.
+# License: GPL-2
+# biocViews:
+# Imports: SQUAREM (>= 2020.3), future, future.apply
+# Encoding: UTF-8
+# URL: https://github.com/jfiksel/codalm
+# BugReports: https://github.com/jfiksel/codalm/issues
+# RoxygenNote: 7.1.1
+# Suggests: knitr, gtools, remotes, testthat, rmarkdown
+# VignetteBuilder: knitr
+# Depends: R (>= 2.10)
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2021-07-26 17:25:48 UTC; jfiksel
+# Author: Jacob Fiksel [aut, cre] (<https://orcid.org/0000-0001-7067-1334>), Abhirup Datta [aut]
+# Repository: CRAN
+# Date/Publication: 2021-07-26 18:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

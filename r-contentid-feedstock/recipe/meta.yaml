@@ -1,0 +1,103 @@
+{% set version = '0.0.18' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-contentid
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/contentid_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/contentid/contentid_{{ version }}.tar.gz
+  sha256: 5a5c841540d16b88993c8c968d073c17dad06785c5511e080378acb9e13a8fd1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat, covr, thor, vroom, spelling
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-curl
+    - r-fs
+    - r-httr
+    - r-openssl >=1.4.2
+
+  run:
+    - r-base
+    - r-curl
+    - r-fs
+    - r-httr
+    - r-openssl >=1.4.2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('contentid')"           # [not win]
+    - "\"%R%\" -e \"library('contentid')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/cboettig/contentid
+  license: MIT
+  summary: An interface for creating, registering, and resolving content-based identifiers for
+    data management. Content-based identifiers rely on the 'cryptographic' hashes to
+    refer to the files they identify, thus, anyone possessing the file can compute the
+    identifier using a well-known standard algorithm, such as 'SHA256'.  By registering
+    a URL at which the content is accessible to a public archive (such as Hash Archive)
+    or depositing data in a scientific repository such 'Zenodo', 'DataONE' or 'SoftwareHeritage',
+    the content identifier can serve many functions typically associated with A Digital
+    Object Identifier ('DOI').  Unlike location-based identifiers like 'DOIs', content-based
+    identifiers permit the same content to be registered in many locations.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: contentid
+# Version: 0.0.18
+# Title: An Interface for Content-Based Identifiers
+# Description: An interface for creating, registering, and resolving content-based identifiers for data management. Content-based identifiers rely on the 'cryptographic' hashes to refer to the files they identify, thus, anyone possessing the file can compute the identifier using a well-known standard algorithm, such as 'SHA256'.  By registering a URL at which the content is accessible to a public archive (such as Hash Archive) or depositing data in a scientific repository such 'Zenodo', 'DataONE' or 'SoftwareHeritage', the content identifier can serve many functions typically associated with A Digital Object Identifier ('DOI').  Unlike location-based identifiers like 'DOIs', content-based identifiers permit the same content to be registered in many locations.
+# Authors@R: c( person("Carl", "Boettiger", , "cboettig@gmail.com", c("aut", "cre"), comment = c(ORCID = "0000-0002-1642-628X")), person("Jorrit", "Poelen", role ="aut", comment = c(ORCID="0000-0003-3138-4118")), person(given = "NSF OAC 1839201", role = "fnd", comment = "https://www.nsf.gov/awardsearch/showAward?AWD_ID=1839201") )
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# ByteCompile: true
+# Depends: R (>= 4.0)
+# Language: en-US
+# URL: https://github.com/cboettig/contentid
+# BugReports: https://github.com/cboettig/contentid/issues
+# Imports: openssl (>= 1.4.2), httr, curl, fs, tools, methods
+# RoxygenNote: 7.2.3
+# Suggests: knitr, rmarkdown, testthat, covr, thor, vroom, spelling
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2023-10-23 04:08:23 UTC; cboettig
+# Author: Carl Boettiger [aut, cre] (<https://orcid.org/0000-0002-1642-628X>), Jorrit Poelen [aut] (<https://orcid.org/0000-0003-3138-4118>), NSF OAC 1839201 [fnd] (https://www.nsf.gov/awardsearch/showAward?AWD_ID=1839201)
+# Maintainer: Carl Boettiger <cboettig@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-23 04:50:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

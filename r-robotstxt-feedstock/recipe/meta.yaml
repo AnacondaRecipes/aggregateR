@@ -1,0 +1,102 @@
+{% set version = '0.7.13' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-robotstxt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/robotstxt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/robotstxt/robotstxt_{{ version }}.tar.gz
+  sha256: 872a37a548f1cdaf13ca6d01d45498431c601c157fbc1aa412acbce32053baf4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, dplyr, testthat, covr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-future >=1.6.2
+    - r-future.apply >=1.0.0
+    - r-httr >=1.0.0
+    - r-magrittr
+    - r-spiderbar >=0.2.0
+    - r-stringr >=1.0.0
+
+  run:
+    - r-base
+    - r-future >=1.6.2
+    - r-future.apply >=1.0.0
+    - r-httr >=1.0.0
+    - r-magrittr
+    - r-spiderbar >=0.2.0
+    - r-stringr >=1.0.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('robotstxt')"           # [not win]
+    - "\"%R%\" -e \"library('robotstxt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://docs.ropensci.org/robotstxt/, https://github.com/ropensci/robotstxt
+  license: MIT
+  summary: Provides functions to download and parse 'robots.txt' files. Ultimately the package
+    makes it easy to check if bots (spiders, crawler, scrapers, ...) are allowed to
+    access specific resources on a domain.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: robotstxt
+# Date: 2020-09-03
+# Type: Package
+# Title: A 'robots.txt' Parser and 'Webbot'/'Spider'/'Crawler' Permissions Checker
+# Version: 0.7.13
+# Authors@R: c( person( "Peter", "Meissner", role = c("aut", "cre"), email = "retep.meissner@gmail.com" ), person( "Kun", "Ren", email = "mail@renkun.me", role = c("aut", "cph"), comment = "Author and copyright holder of list_merge.R." ), person("Oliver", "Keys", role = "ctb", comment = "original release code review"), person("Rich", "Fitz John", role = "ctb", comment = "original release code review") )
+# Description: Provides functions to download and parse 'robots.txt' files. Ultimately the package makes it easy to check if bots (spiders, crawler, scrapers, ...) are allowed to access specific resources on a domain.
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# BugReports: https://github.com/ropensci/robotstxt/issues
+# URL: https://docs.ropensci.org/robotstxt/, https://github.com/ropensci/robotstxt
+# Imports: stringr (>= 1.0.0), httr (>= 1.0.0), spiderbar (>= 0.2.0), future (>= 1.6.2), future.apply (>= 1.0.0), magrittr, utils
+# Suggests: knitr, rmarkdown, dplyr, testthat, covr
+# Depends: R (>= 3.0.0)
+# VignetteBuilder: knitr
+# RoxygenNote: 7.1.1
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2020-09-03 19:07:34 UTC; peter
+# Author: Peter Meissner [aut, cre], Kun Ren [aut, cph] (Author and copyright holder of list_merge.R.), Oliver Keys [ctb] (original release code review), Rich Fitz John [ctb] (original release code review)
+# Maintainer: Peter Meissner <retep.meissner@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2020-09-03 19:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

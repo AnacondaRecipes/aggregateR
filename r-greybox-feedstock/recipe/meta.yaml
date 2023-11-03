@@ -1,0 +1,120 @@
+{% set version = '2.0.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-greybox
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/greybox_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/greybox/greybox_{{ version }}.tar.gz
+  sha256: c89593b849d896baf070e178c9bab94a7c32e4402609cc22a4520970df25c290
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: smooth (>= 3.1.0), doMC, doParallel, foreach, testthat, rmarkdown, knitr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-generics >=0.1.2
+    - r-nloptr
+    - r-pracma
+    - r-statmod
+    - r-texreg
+    - r-xtable
+    - r-zoo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-generics >=0.1.2
+    - r-nloptr
+    - r-pracma
+    - r-statmod
+    - r-texreg
+    - r-xtable
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('greybox')"           # [not win]
+    - "\"%R%\" -e \"library('greybox')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/config-i1/greybox
+  license: LGPL-2.1
+  summary: Implements functions and instruments for regression model building and its application
+    to forecasting. The main scope of the package is in variables selection and models
+    specification for cases of time series data. This includes promotional modelling,
+    selection between different dynamic regressions with non-standard distributions
+    of errors, selection based on cross validation, solutions to the fat regression
+    model problem and more. Models developed in the package are tailored specifically
+    for forecasting purposes. So as a results there are several methods that allow producing
+    forecasts from these models and visualising them.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-2.1'
+
+# The original CRAN metadata for this package was:
+
+# Package: greybox
+# Type: Package
+# Title: Toolbox for Model Building and Forecasting
+# Version: 2.0.0
+# Date: 2023-09-15
+# Authors@R: c(person("Ivan", "Svetunkov", email = "ivan@svetunkov.ru", role = c("aut", "cre"), comment="Lecturer at Centre for Marketing Analytics and Forecasting, Lancaster University, UK"), person("Yves R.", "Sagaert", role = c("ctb"), comment="Visiting Research at Centre for Marketing Analytics and Forecasting, Lancaster University, UK"))
+# URL: https://github.com/config-i1/greybox
+# BugReports: https://github.com/config-i1/greybox/issues
+# Language: en-GB
+# Description: Implements functions and instruments for regression model building and its application to forecasting. The main scope of the package is in variables selection and models specification for cases of time series data. This includes promotional modelling, selection between different dynamic regressions with non-standard distributions of errors, selection based on cross validation, solutions to the fat regression model problem and more. Models developed in the package are tailored specifically for forecasting purposes. So as a results there are several methods that allow producing forecasts from these models and visualising them.
+# License: LGPL-2.1
+# Depends: R (>= 3.5.0)
+# Imports: stats, generics (>= 0.1.2), graphics, utils, pracma, nloptr, statmod, zoo, texreg, xtable, methods
+# LinkingTo: Rcpp
+# Suggests: smooth (>= 3.1.0), doMC, doParallel, foreach, testthat, rmarkdown, knitr
+# Enhances: vars,
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-09-15 16:22:47 UTC; config
+# Author: Ivan Svetunkov [aut, cre] (Lecturer at Centre for Marketing Analytics and Forecasting, Lancaster University, UK), Yves R. Sagaert [ctb] (Visiting Research at Centre for Marketing Analytics and Forecasting, Lancaster University, UK)
+# Maintainer: Ivan Svetunkov <ivan@svetunkov.ru>
+# Repository: CRAN
+# Date/Publication: 2023-09-16 05:50:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

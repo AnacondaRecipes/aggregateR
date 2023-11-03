@@ -1,0 +1,93 @@
+{% set version = '1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ipw
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ipw_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ipw/ipw_{{ version }}.tar.gz
+  sha256: 4a5037bd2c7cc6b9c8bd27350a7df5b3642afb441dee004bbebd0376c3714c89
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: nlme, survey, boot
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-geepack
+    - r-nnet
+    - r-survival
+
+  run:
+    - r-base
+    - r-mass
+    - r-geepack
+    - r-nnet
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ipw')"           # [not win]
+    - "\"%R%\" -e \"library('ipw')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ipw
+  license: GPL-2
+  summary: Functions to estimate the probability to receive the observed treatment, based on
+    individual characteristics. The inverse of these probabilities can be used as weights
+    when estimating causal effects from observational data via marginal structural models.
+    Both point treatment situations and longitudinal studies can be analysed. The same
+    functions can be used to correct for informative censoring.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: ipw
+# Version: 1.2
+# Date: 2023-01-02
+# Title: Estimate Inverse Probability Weights
+# Authors@R: c(person(c("Willem", "M."), "van der Wal", role = c("aut", "cre"), email = "willem@vanderwalresearch.com"), person(c("Ronald", "B."), "Geskus", role=c("aut"), email = "rgeskus@oucru.org", comment = "maintainer 2011-2022"))
+# Author: Willem M. van der Wal [aut, cre], Ronald B. Geskus [aut] (maintainer 2011-2022)
+# Maintainer: Willem M. van der Wal <willem@vanderwalresearch.com>
+# Depends: R (>= 3.0.0)
+# Imports: MASS, nnet, survival, geepack, graphics, methods, stats
+# Suggests: nlme, survey, boot
+# Description: Functions to estimate the probability to receive the observed treatment, based on individual characteristics. The inverse of these probabilities can be used as weights when estimating causal effects from observational data via marginal structural models. Both point treatment situations and longitudinal studies can be analysed. The same functions can be used to correct for informative censoring.
+# Encoding: latin1
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2023-01-03 07:48:07 UTC; wmvdw
+# Repository: CRAN
+# Date/Publication: 2023-01-07 01:10:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

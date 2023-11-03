@@ -1,0 +1,100 @@
+{% set version = '0.6-8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rtop
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rtop_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rtop/rtop_{{ version }}.tar.gz
+  sha256: 33c797f2f2912088084140228f0e4f965d29d5b91d849775359f04def551d067
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: parallel, intamap, spacetime, data.table, reshape2
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-gstat
+    - r-sf
+    - r-sp
+    - r-units
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-gstat
+    - r-sf
+    - r-sp
+    - r-units
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rtop')"           # [not win]
+    - "\"%R%\" -e \"library('rtop')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=rtop
+  license: GPL-2
+  summary: "Data with irregular spatial support, such as runoff related data or data from administrative
+    units, can with 'rtop' be interpolated to locations without observations with the
+    top-kriging method. A description of the package is given by Sk\xF8ien et al (2014)
+    <doi:10.1016/j.cageo.2014.02.009>."
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: rtop
+# Type: Package
+# Title: Interpolation of Data with Variable Spatial Support
+# Version: 0.6-8
+# Date: 2023-10-30
+# Authors@R: c(person("Jon Olav", "Skien", role = c("aut", "cre"), email = "jon.skoien@gmail.com"), person('Qingyun', 'Duan', role = 'ctb', comment = 'For the original FORTRAN code of SCE-UA, translated and modified to R in this package.'))
+# Maintainer: Jon Olav Skien <jon.skoien@gmail.com>
+# Imports: gstat, graphics, stats, methods, utils, grDevices, sf, units, sp
+# Suggests: parallel, intamap, spacetime, data.table, reshape2
+# Description: Data with irregular spatial support, such as runoff related data or data from administrative units, can with 'rtop' be interpolated to locations without observations with the top-kriging method. A description of the package is given by Skien et al (2014) <doi:10.1016/j.cageo.2014.02.009>.
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Encoding: UTF-8
+# Packaged: 2023-10-30 10:33:47 UTC; skoiejo
+# Author: Jon Olav Skien [aut, cre], Qingyun Duan [ctb] (For the original FORTRAN code of SCE-UA, translated and modified to R in this package.)
+# Repository: CRAN
+# Date/Publication: 2023-10-30 11:30:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

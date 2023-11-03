@@ -1,0 +1,86 @@
+{% set version = '1.4-5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-adlift
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/adlift_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/adlift/adlift_{{ version }}.tar.gz
+  sha256: b3e1ddf1f45ff047fbaed627ae3d9320a0d8c58ccd699f7cab871156fa54c14d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ebayesthresh
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-ebayesthresh
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('adlift')"           # [not win]
+    - "\"%R%\" -e \"library('adlift')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=adlift
+  license: GPL-3
+  summary: Adaptive wavelet lifting transforms for signal denoising using optimal local neighbourhood
+    regression, from Nunes et al. (2006) <doi:10.1007/s11222-006-6560-y>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: adlift
+# Version: 1.4-5
+# Date: 2023-03-22
+# Title: An Adaptive Lifting Scheme Algorithm
+# Author: Matt Nunes [aut, cre], Marina Knight [aut], Guy Nason [ctb, ths]
+# Authors@R: c(person("Matt","Nunes", role=c("aut","cre"),email="nunesrpackages@gmail.com"), person("Marina","Knight", role="aut"), person("Guy","Nason",role=c("ctb","ths")))
+# Maintainer: Matt Nunes <nunesrpackages@gmail.com>
+# Description: Adaptive wavelet lifting transforms for signal denoising using optimal local neighbourhood regression, from Nunes et al. (2006) <doi:10.1007/s11222-006-6560-y>.
+# Depends: EbayesThresh
+# License: GPL
+# Packaged: 2023-03-22 15:45:17 UTC; matt
+# Repository: CRAN
+# Date/Publication: 2023-03-22 17:10:05 UTC
+# NeedsCompilation: yes
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,110 @@
+{% set version = '0.1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bayesfm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BayesFM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BayesFM/BayesFM_{{ version }}.tar.gz
+  sha256: 11a9d20f0e4f1a66839f69fc865842df4dd17bde62646f7cae6680ec8a54d7f4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-checkmate >=1.8.0
+    - r-coda
+    - r-ggplot2 >=2.1.0
+    - r-gridextra
+    - r-plyr >=1.8.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-checkmate >=1.8.0
+    - r-coda
+    - r-ggplot2 >=2.1.0
+    - r-gridextra
+    - r-plyr >=1.8.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BayesFM')"           # [not win]
+    - "\"%R%\" -e \"library('BayesFM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=BayesFM
+  license: GPL-3
+  summary: "Collection of procedures to perform Bayesian analysis on a variety of factor models.
+    Currently, it includes: \"Bayesian Exploratory Factor Analysis\" (befa) from G.
+    Conti, S. Fr\xFChwirth-Schnatter, J.J. Heckman, R. Piatek (2014) <doi:10.1016/j.jeconom.2014.06.008>,
+    an approach to dedicated factor analysis with stochastic search on the structure
+    of the factor loading matrix. The number of latent factors, as well as the allocation
+    of the manifest variables to the factors, are not fixed a priori but determined
+    during MCMC sampling."
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: BayesFM
+# Title: Bayesian Inference for Factor Modeling
+# Type: Package
+# Version: 0.1.5
+# Authors@R: person( given = "Remi", family = "Piatek", role = c("aut", "cre"), email = "remi.piatek@gmail.com", comment = c(ORCID = "0000-0002-3474-1304"))
+# Description: Collection of procedures to perform Bayesian analysis on a variety of factor models. Currently, it includes: "Bayesian Exploratory Factor Analysis" (befa) from G. Conti, S. Fruhwirth-Schnatter, J.J. Heckman, R. Piatek (2014) <doi:10.1016/j.jeconom.2014.06.008>, an approach to dedicated factor analysis with stochastic search on the structure of the factor loading matrix. The number of latent factors, as well as the allocation of the manifest variables to the factors, are not fixed a priori but determined during MCMC sampling.
+# Depends: R (>= 3.0.0)
+# Imports: checkmate (>= 1.8.0), coda, ggplot2 (>= 2.1.0), gridExtra, plyr (>= 1.8.0)
+# SystemRequirements: gfortran (>= 4.6.3)
+# License: GPL-3
+# NeedsCompilation: yes
+# Encoding: UTF-8
+# RoxygenNote: 7.1.2
+# Packaged: 2021-11-19 13:31:36 UTC; piatek
+# Author: Remi Piatek [aut, cre] (<https://orcid.org/0000-0002-3474-1304>)
+# Maintainer: Remi Piatek <remi.piatek@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-11-19 14:50:12 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

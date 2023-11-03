@@ -1,0 +1,105 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tidylpa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tidyLPA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tidyLPA/tidyLPA_{{ version }}.tar.gz
+  sha256: bfc64d5f5dd55cd6cefc765fc1ca6931d6e8e529118c514c5d8948903a43cdd3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, lme4, missForest, parallel, pillar, rmarkdown, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mplusautomation
+    - r-dplyr
+    - r-ggplot2
+    - r-gtable
+    - r-mclust
+    - r-mix
+    - r-tibble
+
+  run:
+    - r-base
+    - r-mplusautomation
+    - r-dplyr
+    - r-ggplot2
+    - r-gtable
+    - r-mclust
+    - r-mix
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tidyLPA')"           # [not win]
+    - "\"%R%\" -e \"library('tidyLPA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://data-edu.github.io/tidyLPA/
+  license: MIT
+  summary: An interface to the 'mclust' package to easily carry out latent profile analysis ("LPA").
+    Provides functionality to estimate commonly-specified models. Follows a tidy approach,
+    in that output is in the form of a data frame that can subsequently be computed
+    on. Also has functions to interface to the commercial 'MPlus' software via the 'MplusAutomation'
+    package.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: tidyLPA
+# Title: Easily Carry Out Latent Profile Analysis (LPA) Using Open-Source or Commercial Software
+# Version: 1.1.0
+# Authors@R: c(person(given = c("Joshua", "M"), family = "Rosenberg", role = c("aut", "cre"), email = "jmrosenberg@utk.edu"), person(given = "Caspar", family = "van Lissa", role = "aut", email = "c.j.vanlissa@uu.nl"), person(given = c("Jennifer", "A"), family = "Schmidt", role = "ctb", email = "jaschmid@msu.edu"), person(given = c("Patrick", "N"), family = "Beymer", role = "ctb", email = "beymerpa@msu.edu"), person(given = "Daniel", family = "Anderson", role = "ctb", email = "daniela@uoregon.edu"), person(given = c("Matthew", "J."), family = "Schell", role = "ctb", email = "schellma@msu.edu"))
+# Maintainer: Joshua M Rosenberg <jmrosenberg@utk.edu>
+# Description: An interface to the 'mclust' package to easily carry out latent profile analysis ("LPA"). Provides functionality to estimate commonly-specified models. Follows a tidy approach, in that output is in the form of a data frame that can subsequently be computed on. Also has functions to interface to the commercial 'MPlus' software via the 'MplusAutomation' package.
+# License: MIT + file LICENSE
+# URL: https://data-edu.github.io/tidyLPA/
+# BugReports: https://github.com/data-edu/tidyLPA/issues
+# Depends: R (>= 2.10)
+# Imports: dplyr, ggplot2, gtable, grid, mclust, methods, mix, MplusAutomation, tibble
+# Suggests: knitr, lme4, missForest, parallel, pillar, rmarkdown, testthat
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.1.2
+# NeedsCompilation: no
+# Packaged: 2021-11-17 00:10:32 UTC; joshuarosenberg
+# Author: Joshua M Rosenberg [aut, cre], Caspar van Lissa [aut], Jennifer A Schmidt [ctb], Patrick N Beymer [ctb], Daniel Anderson [ctb], Matthew J. Schell [ctb]
+# Repository: CRAN
+# Date/Publication: 2021-11-17 11:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

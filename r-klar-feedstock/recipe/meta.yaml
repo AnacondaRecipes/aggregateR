@@ -1,0 +1,94 @@
+{% set version = '1.7-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-klar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/klaR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/klaR/klaR_{{ version }}.tar.gz
+  sha256: 8035c3edb8257973184ad5a2109fc7c77c32da913cb9dd0c2f1c373e6fccbd61
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: scatterplot3d (>= 0.3-22), som, mlbench, rpart, e1071
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-combinat
+    - r-questionr
+
+  run:
+    - r-base
+    - r-mass
+    - r-combinat
+    - r-questionr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('klaR')"           # [not win]
+    - "\"%R%\" -e \"library('klaR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://statistik.tu-dortmund.de
+  license: GPL-2 | GPL-3
+  summary: Miscellaneous functions for classification and visualization, e.g. regularized discriminant
+    analysis, sknn() kernel-density naive Bayes, an interface to 'svmlight' and stepclass()
+    wrapper variable selection for supervised classification, partimat() visualization
+    of classification rules and shardsplot() of cluster results as well as kmodes()
+    clustering for categorical data, corclust() variable clustering, variable extraction
+    from different variable clustering models and weight of evidence preprocessing.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: klaR
+# Version: 1.7-2
+# Date: 2023-03-17
+# Title: Classification and Visualization
+# Author: Christian Roever, Nils Raabe, Karsten Luebke, Uwe Ligges, Gero Szepannek, Marc Zentgraf, David Meyer
+# Maintainer: Uwe Ligges <ligges@statistik.tu-dortmund.de>
+# SystemRequirements: SVMlight
+# Suggests: scatterplot3d (>= 0.3-22), som, mlbench, rpart, e1071
+# Enhances: clustMixType, randomForest, ClustVarLV
+# Depends: R (>= 2.10.0), MASS
+# Imports: combinat, questionr, grDevices, stats, utils, graphics
+# Description: Miscellaneous functions for classification and visualization, e.g. regularized discriminant analysis, sknn() kernel-density naive Bayes, an interface to 'svmlight' and stepclass() wrapper variable selection for supervised classification, partimat() visualization of classification rules and shardsplot() of cluster results as well as kmodes() clustering for categorical data, corclust() variable clustering, variable extraction from different variable clustering models and weight of evidence preprocessing.
+# License: GPL-2 | GPL-3
+# URL: https://statistik.tu-dortmund.de
+# NeedsCompilation: no
+# Packaged: 2023-03-17 17:28:11 UTC; ligges
+# Repository: CRAN
+# Date/Publication: 2023-03-17 23:40:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,105 @@
+{% set version = '0.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bayesrules
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/bayesrules_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/bayesrules/bayesrules_{{ version }}.tar.gz
+  sha256: 8bc801d95109c8e38867ffd9036566ce53f974601883d60b4a3eab90b00a2a28
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr
+    - r-e1071
+    - r-ggplot2
+    - r-groupdata2
+    - r-janitor
+    - r-magrittr
+    - r-purrr
+    - r-rstanarm
+
+  run:
+    - r-base
+    - r-dplyr
+    - r-e1071
+    - r-ggplot2
+    - r-groupdata2
+    - r-janitor
+    - r-magrittr
+    - r-purrr
+    - r-rstanarm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('bayesrules')"           # [not win]
+    - "\"%R%\" -e \"library('bayesrules')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://bayes-rules.github.io/bayesrules/docs/, https://github.com/bayes-rules/bayesrules/
+  license: GPL-3
+  summary: Provides datasets and functions used for analysis and visualizations in the Bayes
+    Rules! book (<https://www.bayesrulesbook.com>). The package contains a set of functions
+    that summarize and plot Bayesian models from some conjugate families and another
+    set of functions for evaluation of some Bayesian models.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: bayesrules
+# Type: Package
+# Title: Datasets and Supplemental Functions from Bayes Rules! Book
+# Version: 0.0.2
+# Authors@R: c( person("Mine", "Dogucu", , "mdogucu@gmail.com", c("aut", "cre"), comment = c(ORCID = "0000-0002-8007-934X")), person("Alicia", "Johnson", , role = "aut"), person("Miles", "Ott", , role = "aut", comment = c(ORCID = "0000-0003-4457-6565")) )
+# Description: Provides datasets and functions used for analysis and visualizations in the Bayes Rules! book (<https://www.bayesrulesbook.com>). The package contains a set of functions that summarize and plot Bayesian models from some conjugate families and another set of functions for evaluation of some Bayesian models.
+# License: GPL (>= 3)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.1.2
+# Suggests: knitr, rmarkdown
+# Imports: ggplot2, janitor, magrittr, dplyr, stats, purrr, rstanarm, e1071, groupdata2
+# Depends: R (>= 2.10)
+# URL: https://bayes-rules.github.io/bayesrules/docs/, https://github.com/bayes-rules/bayesrules/
+# BugReports: https://github.com/bayes-rules/bayesrules/issues
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2021-09-25 02:24:11 UTC; minedogucu
+# Author: Mine Dogucu [aut, cre] (<https://orcid.org/0000-0002-8007-934X>), Alicia Johnson [aut], Miles Ott [aut] (<https://orcid.org/0000-0003-4457-6565>)
+# Maintainer: Mine Dogucu <mdogucu@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-09-25 04:30:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

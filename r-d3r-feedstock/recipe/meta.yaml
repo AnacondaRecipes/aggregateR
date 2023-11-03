@@ -1,0 +1,95 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-d3r
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/d3r_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/d3r/d3r_{{ version }}.tar.gz
+  sha256: c413b218fb34cd2a96b67d72e27a846cda606d831d99e14de6da5f39fc2895b5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: httr, jsonlite, listviewer, purrr, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr
+    - r-htmltools
+    - r-tidyr >=0.8.3
+
+  run:
+    - r-base
+    - r-dplyr
+    - r-htmltools
+    - r-tidyr >=0.8.3
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('d3r')"           # [not win]
+    - "\"%R%\" -e \"library('d3r')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/timelyportfolio/d3r
+  license: BSD_3_clause
+  summary: Provides a suite of functions to help ease the use of 'd3.js' in R. These helpers
+    include 'htmltools::htmlDependency' functions, hierarchy builders, and conversion
+    tools for 'partykit', 'igraph,' 'table', and 'data.frame' R objects into the 'JSON'
+    that 'd3.js' expects.
+  license_family: BSD
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/BSD_3_clause'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: d3r
+# Type: Package
+# Title: 'd3.js' Utilities for R
+# Version: 1.1.0
+# Date: 2023-10-01
+# Authors@R: c( person( "Mike", "Bostock" , role = c("aut", "cph") , comment = "d3.js library in htmlwidgets/lib, http://d3js.org" ), person( "Kent", "Russell" , role = c("aut", "cre", "cph") , comment = "R interface" , email = "kent.russell@timelyportfolio.com" ), person( "Gregor", "Aisch" , role = c("aut", "cph") , comment = "d3-jetpack creator, https://github.com/gka/d3-jetpack" ), person( "Adam", "Pearce" , role = c("aut") , comment = "core contributor to d3-jetpack" ), person( "Ben", "Ortiz" , role = c("ctb") ) )
+# Maintainer: Kent Russell <kent.russell@timelyportfolio.com>
+# URL: https://github.com/timelyportfolio/d3r
+# BugReports: https://github.com/timelyportfolio/d3r/issues
+# Description: Provides a suite of functions to help ease the use of 'd3.js' in R. These helpers include 'htmltools::htmlDependency' functions, hierarchy builders, and conversion tools for 'partykit', 'igraph,' 'table', and 'data.frame' R objects into the 'JSON' that 'd3.js' expects.
+# License: BSD_3_clause + file LICENSE
+# Encoding: UTF-8
+# Imports: dplyr, htmltools, tidyr (>= 0.8.3)
+# Suggests: httr, jsonlite, listviewer, purrr, testthat
+# Enhances: igraph, partykit, rpart, treemap, V8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-10-02 01:58:41 UTC; kentr
+# Author: Mike Bostock [aut, cph] (d3.js library in htmlwidgets/lib, http://d3js.org), Kent Russell [aut, cre, cph] (R interface), Gregor Aisch [aut, cph] (d3-jetpack creator, https://github.com/gka/d3-jetpack), Adam Pearce [aut] (core contributor to d3-jetpack), Ben Ortiz [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-10-02 14:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

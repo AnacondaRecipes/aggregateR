@@ -1,0 +1,90 @@
+{% set version = '0.2-8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-abd
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/abd_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/abd/abd_{{ version }}.tar.gz
+  sha256: 67a56cec1c1606451a395a2e228a24db54561c889908c3d51ea7ecf6f1d52fa4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: boot, car, ggplot2, plyr, HH, ICC, vcd, Hmisc
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-lattice
+    - r-mosaic
+    - r-nlme
+
+  run:
+    - r-base
+    - r-lattice
+    - r-mosaic
+    - r-nlme
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('abd')"           # [not win]
+    - "\"%R%\" -e \"library('abd')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=abd
+  license: GPL-2
+  summary: The abd package contains data sets and sample code for The Analysis of Biological
+    Data by Michael Whitlock and Dolph Schluter (2009; Roberts & Company Publishers).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: abd
+# Type: Package
+# Title: The Analysis of Biological Data
+# Version: 0.2-8
+# Date: 2015-07-02
+# Author: Kevin M. Middleton <middletonk@missouri.edu>, Randall Pruim <rpruim@calvin.edu>
+# Maintainer: Kevin M. Middleton <middletonk@missouri.edu>
+# Depends: R (>= 3.0), nlme, lattice, grid, mosaic
+# Suggests: boot, car, ggplot2, plyr, HH, ICC, vcd, Hmisc
+# Description: The abd package contains data sets and sample code for The Analysis of Biological Data by Michael Whitlock and Dolph Schluter (2009; Roberts & Company Publishers).
+# License: GPL-2
+# LazyLoad: yes
+# LazyData: yes
+# Encoding: UTF-8
+# Collate: 'abdData.R' 'histochart.R' 'datasets.R' 'themes.R'
+# NeedsCompilation: no
+# Packaged: 2015-07-03 01:35:03 UTC; kmm
+# Repository: CRAN
+# Date/Publication: 2015-07-03 05:44:45
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,97 @@
+{% set version = '0.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-word2vec
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/word2vec_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/word2vec/word2vec_{{ version }}.tar.gz
+  sha256: 38c6934ad7c601d6de7fa44a1ecf911ef34609b5c32b67da12a0814124036a91
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: udpipe
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.11.5
+    - r-rcppprogress
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.11.5
+    - r-rcppprogress
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('word2vec')"           # [not win]
+    - "\"%R%\" -e \"library('word2vec')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/bnosac/word2vec
+  license: Apache License (>= 2.0)
+  summary: Learn vector representations of words by continuous bag of words and skip-gram implementations
+    of the 'word2vec' algorithm. The techniques are detailed in the paper "Distributed
+    Representations of Words and Phrases and their Compositionality" by Mikolov et al.
+    (2013), available at <arXiv:1310.4546>.
+  license_family: APACHE
+
+# The original CRAN metadata for this package was:
+
+# Package: word2vec
+# Type: Package
+# Title: Distributed Representations of Words
+# Version: 0.4.0
+# Authors@R: c( person('Jan', 'Wijffels', role = c('aut', 'cre', 'cph'), email = 'jwijffels@bnosac.be', comment = "R wrapper"), person('Kohei', 'Watanabe', role = 'aut', email = 'watanabe.kohei@gmail.com', comment = c(ORCID = '0000-0001-6519-5265')), person('BNOSAC', role = 'cph', comment = "R wrapper"), person('Max', 'Fomichev', role = c('ctb', 'cph'), comment = "Code in src/word2vec"))
+# Maintainer: Jan Wijffels <jwijffels@bnosac.be>
+# Description: Learn vector representations of words by continuous bag of words and skip-gram implementations of the 'word2vec' algorithm. The techniques are detailed in the paper "Distributed Representations of Words and Phrases and their Compositionality" by Mikolov et al. (2013), available at <arXiv:1310.4546>.
+# URL: https://github.com/bnosac/word2vec
+# License: Apache License (>= 2.0)
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Depends: R (>= 2.10)
+# Imports: Rcpp (>= 0.11.5), stats
+# LinkingTo: Rcpp, RcppProgress
+# Suggests: udpipe
+# NeedsCompilation: yes
+# Packaged: 2023-10-07 20:27:05 UTC; jwijf
+# Author: Jan Wijffels [aut, cre, cph] (R wrapper), Kohei Watanabe [aut] (<https://orcid.org/0000-0001-6519-5265>), BNOSAC [cph] (R wrapper), Max Fomichev [ctb, cph] (Code in src/word2vec)
+# Repository: CRAN
+# Date/Publication: 2023-10-07 21:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

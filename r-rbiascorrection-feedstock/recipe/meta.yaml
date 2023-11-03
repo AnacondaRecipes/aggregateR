@@ -1,0 +1,101 @@
+{% set version = '0.3.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rbiascorrection
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rBiasCorrection_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rBiasCorrection/rBiasCorrection_{{ version }}.tar.gz
+  sha256: 3604489d51cf56d3538ad12cefdf7e744f3a7125e9302e972a4907270fef7dc7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggpubr, knitr, lintr, microbenchmark, rmarkdown, testthat (>= 3.0.1)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-future
+    - r-future.apply
+    - r-ggplot2
+    - r-magrittr
+    - r-nls2
+    - r-polynom
+
+  run:
+    - r-base
+    - r-data.table
+    - r-future
+    - r-future.apply
+    - r-ggplot2
+    - r-magrittr
+    - r-nls2
+    - r-polynom
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rBiasCorrection')"           # [not win]
+    - "\"%R%\" -e \"library('rBiasCorrection')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/kapsner/rBiasCorrection
+  license: GPL-3
+  summary: 'Implementation of the algorithms (with minor modifications) to correct bias in quantitative
+    DNA methylation analyses as described by Moskalev et al. (2011) <doi:10.1093/nar/gkr213>.
+    Publication: Kapsner et al. (2021) <doi:10.1002/ijc.33681>.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: rBiasCorrection
+# Title: Correct Bias in DNA Methylation Analyses
+# Version: 0.3.4
+# Authors@R: c( person("Lorenz A.", "Kapsner", , "lorenz.kapsner@gmail.com", role = c("cre", "aut", "cph"), comment = c(ORCID = "0000-0003-1866-860X")), person("Evgeny A.", "Moskalev", role = "aut") )
+# Description: Implementation of the algorithms (with minor modifications) to correct bias in quantitative DNA methylation analyses as described by Moskalev et al. (2011) <doi:10.1093/nar/gkr213>. Publication: Kapsner et al. (2021) <doi:10.1002/ijc.33681>.
+# License: GPL-3
+# URL: https://github.com/kapsner/rBiasCorrection
+# BugReports: https://github.com/kapsner/rBiasCorrection/issues
+# Depends: R (>= 2.10)
+# Imports: data.table, future, future.apply, ggplot2, magrittr, nls2, polynom, stats, utils
+# Suggests: ggpubr, knitr, lintr, microbenchmark, rmarkdown, testthat (>= 3.0.1)
+# VignetteBuilder: knitr
+# Date/Publication: 2022-06-20 18:30:01 UTC
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.0
+# NeedsCompilation: no
+# Packaged: 2022-06-20 17:25:04 UTC; user
+# Author: Lorenz A. Kapsner [cre, aut, cph] (<https://orcid.org/0000-0003-1866-860X>), Evgeny A. Moskalev [aut]
+# Maintainer: Lorenz A. Kapsner <lorenz.kapsner@gmail.com>
+# Repository: CRAN
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

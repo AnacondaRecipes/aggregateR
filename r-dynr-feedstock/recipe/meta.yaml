@@ -1,0 +1,147 @@
+{% set version = '0.1.16-91' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dynr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dynr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dynr/dynr_{{ version }}.tar.gz
+  sha256: a5ea4a0983bf0620859819a2e9444ff92d1ea69cf62d8c8103826006b17d5540
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, roxygen2 (>= 3.1), knitr, rmarkdown, RcppGSL
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix >=1.5_0
+    - r-rdpack
+    - r-car
+    - r-desolve
+    - r-fda
+    - r-ggplot2
+    - r-latex2exp
+    - r-magrittr
+    - r-mice
+    - r-numderiv
+    - r-plyr
+    - r-reshape2
+    - r-stringi
+    - r-tibble
+    - r-xtable
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-matrix >=1.5_0
+    - r-rdpack
+    - r-car
+    - r-desolve
+    - r-fda
+    - r-ggplot2
+    - r-latex2exp
+    - r-magrittr
+    - r-mice
+    - r-numderiv
+    - r-plyr
+    - r-reshape2
+    - r-stringi
+    - r-tibble
+    - r-xtable
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dynr')"           # [not win]
+    - "\"%R%\" -e \"library('dynr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://dynrr.github.io/, https://github.com/mhunter1/dynr
+  license: GPL-3
+  summary: Intensive longitudinal data have become increasingly prevalent in various scientific
+    disciplines. Many such data sets are noisy, multivariate, and multi-subject in nature.
+    The change functions may also be continuous, or continuous but interspersed with
+    periods of discontinuities (i.e., showing regime switches). The package 'dynr' (Dynamic
+    Modeling in R) is an R package that implements a set of computationally efficient
+    algorithms for handling a broad class of linear and nonlinear discrete- and continuous-
+    time models with regime-switching properties under the constraint of linear Gaussian
+    measurement functions. The discrete-time models can generally take on the form of
+    a state-space or difference equation model. The continuous-time models are generally
+    expressed as a set of ordinary or stochastic differential equations. All estimation
+    and computations are performed in C, but users are provided with the option to specify
+    the model of interest via a set of simple and easy-to-learn model specification
+    functions in R. Model fitting can be performed using single-subject time series
+    data or multiple-subject longitudinal data. Ou, Hunter, & Chow (2019) <doi:10.32614%2FRJ-2019-012>
+    provided a detailed introduction to the interface and more information on the algorithms.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: dynr
+# Date: 2022-10-16
+# Title: Dynamic Models with Regime-Switching
+# Authors@R: c(person("Lu", "Ou", role="aut"), person(c("Michael", "D."), "Hunter", role=c("aut", "cre"), email="mike.dynr@gmail.com", comment=c(ORCID = "0000-0002-3651-6709")), person("Sy-Miin", "Chow", role="aut", comment=c(ORCID = "0000-0003-1938-027X")), person("Linying", "Ji", role="aut", email=""), person("Meng", "Chen", role="aut", email=""), person("Hui-Ju", "Hung", role="aut", email=""), person("Jungmin", "Lee", role="aut", email="leejapply@gmail.com"), person("Yanling", "Li", role="aut", email=""), person("Jonathan", "Park", role="aut", email=""), person("Massachusetts Institute of Technology", role="cph"), person("S. G.", "Johnson", role="cph"), person("Benoit", "Scherrer", role="cph"), person("Dieter", "Kraft", role="cph"))
+# Maintainer: Michael D. Hunter <mike.dynr@gmail.com>
+# URL: https://dynrr.github.io/, https://github.com/mhunter1/dynr
+# Contact: <dynr@googlegroups.com>
+# Depends: R (>= 3.0.0), ggplot2
+# Imports: MASS, Matrix (>= 1.5-0), numDeriv, xtable, latex2exp, grid, reshape2, plyr, mice, magrittr, methods, fda, car, stringi, tibble, deSolve, Rdpack
+# Suggests: testthat, roxygen2 (>= 3.1), knitr, rmarkdown, RcppGSL
+# VignetteBuilder: knitr
+# Description: Intensive longitudinal data have become increasingly prevalent in various scientific disciplines. Many such data sets are noisy, multivariate, and multi-subject in nature. The change functions may also be continuous, or continuous but interspersed with periods of discontinuities (i.e., showing regime switches). The package 'dynr' (Dynamic Modeling in R) is an R package that implements a set of computationally efficient algorithms for handling a broad class of linear and nonlinear discrete- and continuous- time models with regime-switching properties under the constraint of linear Gaussian measurement functions. The discrete-time models can generally take on the form of a state-space or difference equation model. The continuous-time models are generally expressed as a set of ordinary or stochastic differential equations. All estimation and computations are performed in C, but users are provided with the option to specify the model of interest via a set of simple and easy-to-learn model specification functions in R. Model fitting can be performed using single-subject time series data or multiple-subject longitudinal data. Ou, Hunter, & Chow (2019) <doi:10.32614%2FRJ-2019-012> provided a detailed introduction to the interface and more information on the algorithms.
+# SystemRequirements: GNU make
+# NeedsCompilation: yes
+# License: GPL-3
+# LazyLoad: yes
+# LazyData: yes
+# Collate: 'dynrData.R' 'dynrRecipe.R' 'dynrModelInternal.R' 'dynrModel.R' 'dynrCook.R' 'dynrPlot.R' 'dynrFuncAddress.R' 'dynrMi.R' 'dynrTaste.R' 'dynrVersion.R' 'dataDoc.R' 'dynrGetDerivs.R' 'dynrPredict.R'
+# RdMacros: Rdpack
+# Version: 0.1.16-91
+# Biarch: TRUE
+# RoxygenNote: 5.0.1
+# Packaged: 2022-10-16 18:14:37 UTC; mhunter
+# Author: Lu Ou [aut], Michael D. Hunter [aut, cre] (<https://orcid.org/0000-0002-3651-6709>), Sy-Miin Chow [aut] (<https://orcid.org/0000-0003-1938-027X>), Linying Ji [aut], Meng Chen [aut], Hui-Ju Hung [aut], Jungmin Lee [aut], Yanling Li [aut], Jonathan Park [aut], Massachusetts Institute of Technology [cph], S. G. Johnson [cph], Benoit Scherrer [cph], Dieter Kraft [cph]
+# Repository: CRAN
+# Date/Publication: 2022-10-17 07:02:35 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,94 @@
+{% set version = '2023.5.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cstime
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cstime_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cstime/cstime_{{ version }}.tar.gz
+  sha256: d170acc6b8efd1378f07ec8e5f5a3e7984afc695a6c6a3cb922e9c14188dd674
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rmarkdown, ggplot2, knitr, testthat (>= 3.0.0), readxl, glue, lubridate
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-magrittr
+
+  run:
+    - r-base
+    - r-data.table
+    - r-magrittr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cstime')"           # [not win]
+    - "\"%R%\" -e \"library('cstime')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.csids.no/cstime/, https://github.com/csids/cstime
+  license: MIT
+  summary: Provides easy and consistent time conversion for public health purposes. The time
+    conversion functions provided here are between date, ISO week, ISO yearweek, ISO
+    year, calendar month/year, season, season week.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: cstime
+# Title: Date and Time Functions for Public Health Purposes
+# Version: 2023.5.3
+# Authors@R: c( person("Chi", "Zhang", email = "andreachizhang@yahoo.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0501-5909") ), person(c("Richard","Aubrey"), "White", email = "hello@rwhite.no", role = c("aut"), comment = c(ORCID = "0000-0002-6747-1726") ) )
+# Description: Provides easy and consistent time conversion for public health purposes. The time conversion functions provided here are between date, ISO week, ISO yearweek, ISO year, calendar month/year, season, season week.
+# License: MIT + file LICENSE
+# URL: https://www.csids.no/cstime/, https://github.com/csids/cstime
+# BugReports: https://github.com/csids/cstime/issues
+# Encoding: UTF-8
+# LazyData: true
+# LazyDataCompression: xz
+# RoxygenNote: 7.2.3
+# Depends: R (>= 3.5.0)
+# Imports: data.table, magrittr
+# Suggests: rmarkdown, ggplot2, knitr, testthat (>= 3.0.0), readxl, glue, lubridate
+# Config/testthat/edition: 3
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2023-05-15 14:01:27 UTC; andrea
+# Author: Chi Zhang [aut, cre] (<https://orcid.org/0000-0003-0501-5909>), Richard Aubrey White [aut] (<https://orcid.org/0000-0002-6747-1726>)
+# Maintainer: Chi Zhang <andreachizhang@yahoo.com>
+# Repository: CRAN
+# Date/Publication: 2023-05-15 14:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

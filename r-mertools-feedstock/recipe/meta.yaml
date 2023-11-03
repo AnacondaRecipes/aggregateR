@@ -1,0 +1,110 @@
+{% set version = '0.6.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mertools
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/merTools_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/merTools/merTools_{{ version }}.tar.gz
+  sha256: ad8e01e195160e568d405871855a3ec491fbb9b7203573281db87797ff23b926
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, parallel, nlme, future.apply, rstanarm, Amelia, DT
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-abind
+    - r-arm
+    - r-blme
+    - r-broom.mixed
+    - r-dplyr
+    - r-foreach
+    - r-ggplot2
+    - r-lme4 >=1.1_11
+    - r-mvtnorm
+    - r-shiny
+
+  run:
+    - r-base
+    - r-matrix
+    - r-abind
+    - r-arm
+    - r-blme
+    - r-broom.mixed
+    - r-dplyr
+    - r-foreach
+    - r-ggplot2
+    - r-lme4 >=1.1_11
+    - r-mvtnorm
+    - r-shiny
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('merTools')"           # [not win]
+    - "\"%R%\" -e \"library('merTools')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=merTools
+  license: GPL-2
+  summary: 'Provides methods for extracting results from mixed-effect model objects fit with
+    the ''lme4'' package. Allows construction of prediction intervals efficiently from
+    large scale linear and generalized linear mixed-effects models. This method draws
+    from the simulation framework used in the Gelman and Hill (2007) textbook: Data
+    Analysis Using Regression and Multilevel/Hierarchical Models.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: merTools
+# Title: Tools for Analyzing Mixed Effect Regression Models
+# Version: 0.6.1
+# Authors@R: c( person(c("Jared", "E."), "Knowles", email = "jared@civilytics.com", role = c("aut", "cre")), person("Carl", "Frederick", email="carlbfrederick@gmail.com", role = c("aut")), person("Alex", "Whitworth", email="whitworth.alex@gmail.com", role = c("ctb")))
+# Description: Provides methods for extracting results from mixed-effect model objects fit with the 'lme4' package. Allows construction of prediction intervals efficiently from large scale linear and generalized linear mixed-effects models. This method draws from the simulation framework used in the Gelman and Hill (2007) textbook: Data Analysis Using Regression and Multilevel/Hierarchical Models.
+# Depends: R (>= 3.0.2), arm, lme4 (>= 1.1-11), methods
+# Suggests: testthat, knitr, rmarkdown, parallel, nlme, future.apply, rstanarm, Amelia, DT
+# Imports: dplyr, mvtnorm, foreach, shiny, abind, ggplot2, blme, broom.mixed, Matrix
+# License: GPL (>= 2)
+# LazyData: true
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# BugReports: https://github.com/jknowles/merTools
+# NeedsCompilation: no
+# Packaged: 2023-03-20 12:38:47 UTC; Jared
+# Author: Jared E. Knowles [aut, cre], Carl Frederick [aut], Alex Whitworth [ctb]
+# Maintainer: Jared E. Knowles <jared@civilytics.com>
+# Repository: CRAN
+# Date/Publication: 2023-03-20 16:50:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

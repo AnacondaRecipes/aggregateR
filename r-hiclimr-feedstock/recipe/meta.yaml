@@ -1,0 +1,110 @@
+{% set version = '2.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hiclimr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/HiClimR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/HiClimR/HiClimR_{{ version }}.tar.gz
+  sha256: c85a8036a1fe7cdffc62450f66377a4bcdf5ccbc2a280a7207c77bc990b95185
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, devtools, knitr, rmarkdown, roxygen2, spelling, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ncdf4
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-ncdf4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('HiClimR')"           # [not win]
+    - "\"%R%\" -e \"library('HiClimR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://hsbadr.github.io/HiClimR/, https://github.com/hsbadr/HiClimR
+  license: GPL-3
+  summary: 'A tool for Hierarchical Climate Regionalization applicable to any correlation-based
+    clustering. It adds several features and a new clustering method (called, ''regional''
+    linkage) to hierarchical clustering in R (''hclust'' function in ''stats'' library):
+    data regridding, coarsening spatial resolution, geographic masking, contiguity-constrained
+    clustering, data filtering by mean and/or variance thresholds, data preprocessing
+    (detrending, standardization, and PCA), faster correlation function with preliminary
+    big data support, different clustering methods, hybrid hierarchical clustering,
+    multivariate clustering (MVC), cluster validation, visualization of regionalization
+    results, and exporting region map and mean timeseries into NetCDF-4 file. The technical
+    details are described in Badr et al. (2015) <doi:10.1007/s12145-015-0221-7>.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: HiClimR
+# Type: Package
+# Version: 2.2.1
+# Title: Hierarchical Climate Regionalization
+# Authors@R: c( person(given = "Hamada S.", family = "Badr", email = "badr@jhu.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9808-2344")), person(given = "Benjamin F.", family = "Zaitchik", email = "zaitchik@jhu.edu", role = c("aut"), comment = c(ORCID = "0000-0002-0698-0658")), person(given = "Amin K.", family = "Dezfuli", email = "amin.dezfuli@nasa.gov", role = c("aut"), comment = c(ORCID = "0000-0003-3274-8542")))
+# Description: A tool for Hierarchical Climate Regionalization applicable to any correlation-based clustering. It adds several features and a new clustering method (called, 'regional' linkage) to hierarchical clustering in R ('hclust' function in 'stats' library): data regridding, coarsening spatial resolution, geographic masking, contiguity-constrained clustering, data filtering by mean and/or variance thresholds, data preprocessing (detrending, standardization, and PCA), faster correlation function with preliminary big data support, different clustering methods, hybrid hierarchical clustering, multivariate clustering (MVC), cluster validation, visualization of regionalization results, and exporting region map and mean timeseries into NetCDF-4 file. The technical details are described in Badr et al. (2015) <doi:10.1007/s12145-015-0221-7>.
+# License: GPL-3
+# URL: https://hsbadr.github.io/HiClimR/, https://github.com/hsbadr/HiClimR
+# BugReports: https://github.com/hsbadr/HiClimR/issues
+# Depends: R (>= 2.10)
+# Imports: graphics, grDevices, stats, utils, ncdf4
+# Suggests: covr, devtools, knitr, rmarkdown, roxygen2, spelling, testthat
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# RoxygenNote: 7.1.2
+# LazyData: yes
+# LazyLoad: yes
+# Biarch: yes
+# ByteCompile: yes
+# NeedsCompilation: yes
+# SystemRequirements: NetCDF (>= 4.1)
+# Language: en-US
+# Packaged: 2022-01-20 18:52:03 UTC; hbadr1
+# Author: Hamada S. Badr [aut, cre] (<https://orcid.org/0000-0002-9808-2344>), Benjamin F. Zaitchik [aut] (<https://orcid.org/0000-0002-0698-0658>), Amin K. Dezfuli [aut] (<https://orcid.org/0000-0003-3274-8542>)
+# Maintainer: Hamada S. Badr <badr@jhu.edu>
+# Repository: CRAN
+# Date/Publication: 2022-01-20 20:02:52 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

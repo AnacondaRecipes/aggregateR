@@ -1,0 +1,128 @@
+{% set version = '2.10.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-inlabru
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/inlabru_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/inlabru/inlabru_{{ version }}.tar.gz
+  sha256: bd4ea720b943acd67aa02c0e179d9d027f1baa4b0edb949c9d335df42db68688
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, ggmap, ggplot2, ggpolypath, graphics, INLA (>= 23.01.31), knitr, maps, mgcv, patchwork, raster, RColorBrewer, rgl, rmarkdown, scales, shiny, sn, spatstat.geom, spatstat.data, sphereplot, splancs, tidyterra, testthat, tidyr, DiagrammeR
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-matrixmodels
+    - r-dplyr
+    - r-fmesher >=0.1.2
+    - r-lifecycle
+    - r-magrittr
+    - r-plyr
+    - r-rlang
+    - r-sf
+    - r-sp >=1.4_5
+    - r-terra
+    - r-tibble
+    - r-withr
+
+  run:
+    - r-base
+    - r-matrix
+    - r-matrixmodels
+    - r-dplyr
+    - r-fmesher >=0.1.2
+    - r-lifecycle
+    - r-magrittr
+    - r-plyr
+    - r-rlang
+    - r-sf
+    - r-sp >=1.4_5
+    - r-terra
+    - r-tibble
+    - r-withr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('inlabru')"           # [not win]
+    - "\"%R%\" -e \"library('inlabru')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/, https://github.com/inlabru-org/inlabru
+  license: GPL-2
+  summary: Facilitates spatial and general latent Gaussian modeling using integrated nested Laplace
+    approximation via the INLA package (<https://www.r-inla.org>). Additionally, extends
+    the GAM-like model class to more general nonlinear predictor expressions, and implements
+    a log Gaussian Cox process likelihood for modeling univariate and spatial point
+    processes based on ecological survey data. Model components are specified with general
+    inputs and mapping methods to the latent variables, and the predictors are specified
+    via general R expressions, with separate expressions for each observation likelihood
+    model in multi-likelihood models. A prediction method based on fast Monte Carlo
+    sampling allows posterior prediction of general expressions of the latent variables.
+    Ecology-focused introduction in Bachl, Lindgren, Borchers, and Illian (2019) <doi:10.1111/2041-210X.13168>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: inlabru
+# Type: Package
+# Title: Bayesian Latent Gaussian Modelling using INLA and Extensions
+# Version: 2.10.0
+# Authors@R: c( person("Finn", "Lindgren", email = "finn.lindgren@gmail.com", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0002-5833-2011", "Finn Lindgren continued development of the main code")), person("Fabian E.", "Bachl", email = "bachlfab@gmail.com", role = c("aut", "cph"), comment = "Fabian Bachl wrote the main code"), person("David L.", "Borchers", email = "dlb@st-andrews.ac.uk", role = c("ctb", "dtc", "cph"), comment = "David Borchers wrote code for Gorilla data import and sampling, multiplot tool"), person("Daniel", "Simpson", email = "dp.simpson@gmail.com", role = c("ctb", "cph"), comment = "Daniel Simpson wrote the basic LGCP sampling method"), person("Lindesay", "Scott-Howard", email = "lass@st-andrews.ac.uk", role = c("ctb", "dtc", "cph"), comment = "Lindesay Scott-Howard provided MRSea data import code"), person("Seaton", "Andy", email = "andy.e.seaton@gmail.com", role = c("ctb"), comment = "Andy Seaton provided testing, bugfixes, and vignettes"), person("Suen", "Man Ho", email = "M.H.Suen@sms.ed.ac.uk", role = c("ctb", "cph"), comment = "Man Ho Suen contributed features for aggregated responses and vignette updates"), person("Roudier", "Pierre", email = "", role = c("ctb", "cph"), comment = "Pierre Roudier contributed general quantile summaries"), person("Meehan", "Tim", email = "tmeeha@gmail.com", role = c("ctb", "cph"), comment = "Tim Meehan contributed the SVC vignette and robins data"), person("Reddy Peddinenikalva", "Niharika", role = c("ctb", "cph"), comment = "Niharika Peddinenikalva contributed the LGCP residuals vignette"), person("Perepolkin", "Dmytro", email = "dperepolkin@gmail.com", role = c("ctb", "cph"), comment = "Dmytro Perepolkin contributed the ZIP/ZAP vignette") )
+# URL: http://www.inlabru.org, https://inlabru-org.github.io/inlabru/, https://github.com/inlabru-org/inlabru
+# BugReports: https://github.com/inlabru-org/inlabru/issues
+# Description: Facilitates spatial and general latent Gaussian modeling using integrated nested Laplace approximation via the INLA package (<https://www.r-inla.org>). Additionally, extends the GAM-like model class to more general nonlinear predictor expressions, and implements a log Gaussian Cox process likelihood for modeling univariate and spatial point processes based on ecological survey data. Model components are specified with general inputs and mapping methods to the latent variables, and the predictors are specified via general R expressions, with separate expressions for each observation likelihood model in multi-likelihood models. A prediction method based on fast Monte Carlo sampling allows posterior prediction of general expressions of the latent variables. Ecology-focused introduction in Bachl, Lindgren, Borchers, and Illian (2019) <doi:10.1111/2041-210X.13168>.
+# License: GPL (>= 2)
+# Additional_repositories: https://inla.r-inla-download.org/R/testing
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# Depends: fmesher (>= 0.1.2), methods, R (>= 3.6), stats
+# Imports: dplyr, lifecycle, magrittr, MatrixModels, Matrix, plyr, rlang, sf, sp (>= 1.4-5), terra, tibble, utils, withr
+# Suggests: covr, ggmap, ggplot2, ggpolypath, graphics, INLA (>= 23.01.31), knitr, maps, mgcv, patchwork, raster, RColorBrewer, rgl, rmarkdown, scales, shiny, sn, spatstat.geom, spatstat.data, sphereplot, splancs, tidyterra, testthat, tidyr, DiagrammeR
+# Enhances: stars
+# Config/testthat/parallel: true
+# Config/testthat/edition: 3
+# Collate: '0_inlabru_envir.R' 'bru.gof.R' 'bru.inference.R' 'bru.integration.R' 'bru.spatial.R' 'data.Poisson1_1D.R' 'data.Poisson2_1D.R' 'data.Poisson3_1D.R' 'data.gorillas.R' 'data.mexdolphin.R' 'data.mrsea.R' 'data.robins_subset.R' 'data.seals.R' 'data.shrimp.R' 'data.toygroups.R' 'deltaIC.R' 'deprecated.R' 'effect.R' 'environment.R' 'fmesher.R' 'ggplot.R' 'inla.R' 'inlabru-package.R' 'integration.R' 'local_testthat.R' 'mappers.R' 'mesh.R' 'model.R' 'nlinla.R' 'plotsample.R' 'rgl.R' 'sampling.R' 'spatstat.R' 'spde.R' 'stack.R' 'track_plotting.R' 'transformation.R' 'utils.R'
+# VignetteBuilder: knitr
+# BuildVignettes: true
+# LazyData: true
+# LazyDataCompression: xz
+# NeedsCompilation: no
+# Packaged: 2023-10-29 02:26:12 UTC; flindgre
+# Author: Finn Lindgren [aut, cre, cph] (<https://orcid.org/0000-0002-5833-2011>, Finn Lindgren continued development of the main code), Fabian E. Bachl [aut, cph] (Fabian Bachl wrote the main code), David L. Borchers [ctb, dtc, cph] (David Borchers wrote code for Gorilla data import and sampling, multiplot tool), Daniel Simpson [ctb, cph] (Daniel Simpson wrote the basic LGCP sampling method), Lindesay Scott-Howard [ctb, dtc, cph] (Lindesay Scott-Howard provided MRSea data import code), Seaton Andy [ctb] (Andy Seaton provided testing, bugfixes, and vignettes), Suen Man Ho [ctb, cph] (Man Ho Suen contributed features for aggregated responses and vignette updates), Roudier Pierre [ctb, cph] (Pierre Roudier contributed general quantile summaries), Meehan Tim [ctb, cph] (Tim Meehan contributed the SVC vignette and robins data), Reddy Peddinenikalva Niharika [ctb, cph] (Niharika Peddinenikalva contributed the LGCP residuals vignette), Perepolkin Dmytro [ctb, cph] (Dmytro Perepolkin contributed the ZIP/ZAP vignette)
+# Maintainer: Finn Lindgren <finn.lindgren@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-29 05:10:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

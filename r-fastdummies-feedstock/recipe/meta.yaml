@@ -1,0 +1,97 @@
+{% set version = '1.7.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fastdummies
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fastDummies_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fastDummies/fastDummies_{{ version }}.tar.gz
+  sha256: cf6a182f778711b69460b00575babfa573f1578166d83ae2ed932db5fa15a06a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.1.0), knitr, rmarkdown, covr, spelling
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table
+    - r-stringr
+    - r-tibble
+
+  run:
+    - r-base
+    - r-data.table
+    - r-stringr
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fastDummies')"           # [not win]
+    - "\"%R%\" -e \"library('fastDummies')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jacobkap/fastDummies, https://jacobkap.github.io/fastDummies/
+  license: MIT
+  summary: Creates dummy columns from columns that have categorical variables (character or factor
+    types). You can also specify which columns to make dummies out of, or which columns
+    to ignore. Also creates dummy rows from character, factor, and Date columns. This
+    package provides a significant speed increase from creating dummy variables through
+    model.matrix().
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: fastDummies
+# Type: Package
+# Title: Fast Creation of Dummy (Binary) Columns and Rows from Categorical Variables
+# Version: 1.7.3
+# Authors@R: c( person("Jacob", "Kaplan", email = "jkkaplan6@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0601-0387")), person("Benjamin", "Schlegel", email = "kontakt@benjaminschlegl.ch", role =  "ctb"))
+# Description: Creates dummy columns from columns that have categorical variables (character or factor types). You can also specify which columns to make dummies out of, or which columns to ignore. Also creates dummy rows from character, factor, and Date columns. This package provides a significant speed increase from creating dummy variables through model.matrix().
+# Depends: R (>= 2.10)
+# Imports: data.table, tibble, stringr
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# URL: https://github.com/jacobkap/fastDummies, https://jacobkap.github.io/fastDummies/
+# BugReports: https://github.com/jacobkap/fastDummies/issues
+# RoxygenNote: 7.2.3
+# Suggests: testthat (>= 2.1.0), knitr, rmarkdown, covr, spelling
+# VignetteBuilder: knitr
+# Language: en-US
+# NeedsCompilation: no
+# Packaged: 2023-07-05 13:40:13 UTC; jkkap
+# Author: Jacob Kaplan [aut, cre] (<https://orcid.org/0000-0002-0601-0387>), Benjamin Schlegel [ctb]
+# Maintainer: Jacob Kaplan <jkkaplan6@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-07-06 13:50:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

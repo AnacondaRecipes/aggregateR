@@ -1,0 +1,90 @@
+{% set version = '0.8-8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sis
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SIS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SIS/SIS_{{ version }}.tar.gz
+  sha256: 089a6d9dbc8de0a8ea135de8a89413561e4e601f9788ba1444b6d6fb18ffacb8
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-glmnet
+    - r-ncvreg
+    - r-survival
+
+  run:
+    - r-base
+    - r-glmnet
+    - r-ncvreg
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SIS')"           # [not win]
+    - "\"%R%\" -e \"library('SIS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SIS
+  license: GPL-2
+  summary: Variable selection techniques are essential tools for model selection and estimation
+    in high-dimensional statistical models. Through this publicly available package,
+    we provide a unified environment to carry out variable selection using iterative
+    sure independence screening (SIS) (Fan and Lv (2008)<doi:10.1111/j.1467-9868.2008.00674.x>)
+    and all of its variants in generalized linear models (Fan and Song (2009)<doi:10.1214/10-AOS798>)
+    and the Cox proportional hazards model (Fan, Feng and Wu (2010)<doi:10.1214/10-IMSCOLL606>).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: SIS
+# Version: 0.8-8
+# Date: 2020-01-27
+# Title: Sure Independence Screening
+# Authors@R: c(person("Yang", "Feng", email = "yangfengstat@gmail.com", role = c("aut", "cre")),person("Jianqing", "Fan", email = "jqfan@princeton.edu", role = c("aut")),person("Diego", "Franco Saldana", email = "diegofrasal@gmail.com", role = c("aut")),person("Yichao", "Wu", email = "yichaowu@uic.edu", role = c("aut")),person("Richard", "Samworth", email = "rjs57@hermes.cam.ac.uk", role = c("aut")))
+# Depends: R (>= 3.2.4)
+# Imports: glmnet, ncvreg, survival
+# Description: Variable selection techniques are essential tools for model selection and estimation in high-dimensional statistical models. Through this publicly available package, we provide a unified environment to carry out variable selection using iterative sure independence screening (SIS) (Fan and Lv (2008)<doi:10.1111/j.1467-9868.2008.00674.x>) and all of its variants in generalized linear models (Fan and Song (2009)<doi:10.1214/10-AOS798>) and the Cox proportional hazards model (Fan, Feng and Wu (2010)<doi:10.1214/10-IMSCOLL606>).
+# License: GPL-2
+# RoxygenNote: 7.0.2
+# NeedsCompilation: no
+# Packaged: 2020-01-27 16:03:49 UTC; yangfeng
+# Author: Yang Feng [aut, cre], Jianqing Fan [aut], Diego Franco Saldana [aut], Yichao Wu [aut], Richard Samworth [aut]
+# Maintainer: Yang Feng <yangfengstat@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2020-01-27 17:10:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

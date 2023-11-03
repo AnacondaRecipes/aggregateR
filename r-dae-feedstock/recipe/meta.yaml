@@ -1,0 +1,95 @@
+{% set version = '3.2.19' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dae
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/dae_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/dae/dae_{{ version }}.tar.gz
+  sha256: 8d468df96bc987ac5882c330db9903f8b0e40a0a23d1dbdfb90d3b8985ec9ba1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, vdiffr, R.rsp
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggplot2
+    - r-ggpubr
+    - r-plyr
+
+  run:
+    - r-base
+    - r-ggplot2
+    - r-ggpubr
+    - r-plyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('dae')"           # [not win]
+    - "\"%R%\" -e \"library('dae')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://chris.brien.name
+  license: GPL-2
+  summary: 'The content falls into the following groupings: (i) Data, (ii) Factor manipulation
+    functions, (iii) Design functions, (iv) ANOVA functions, (v) Matrix functions, (vi)
+    Projector and canonical efficiency functions, and (vii) Miscellaneous functions.
+    There is a vignette describing how to use the design functions for randomizing and
+    assessing designs available as a vignette called ''DesignNotes''. The ANOVA functions
+    facilitate the extraction of information when the ''Error'' function has been used
+    in the call to ''aov''. The package ''dae'' can also be installed from <http://chris.brien.name/rpackages/>.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: dae
+# Version: 3.2.19
+# Date: 2023-08-08
+# Title: Functions Useful in the Design and ANOVA of Experiments
+# Authors@R: person("Chris","Brien", role = c("aut","cre"), comment = c(ORCID = "0000-0003-0581-1817"), email = "chris.brien@adelaide.edu.au")
+# Depends: R (>= 3.5.0), ggplot2
+# Imports: ggpubr, graphics, methods, plyr, stats
+# Suggests: testthat, vdiffr, R.rsp
+# VignetteBuilder: R.rsp
+# Description: The content falls into the following groupings: (i) Data, (ii) Factor manipulation functions, (iii) Design functions, (iv) ANOVA functions, (v) Matrix functions, (vi) Projector and canonical efficiency functions, and (vii) Miscellaneous functions. There is a vignette describing how to use the design functions for randomizing and assessing designs available as a vignette called 'DesignNotes'. The ANOVA functions facilitate the extraction of information when the 'Error' function has been used in the call to 'aov'. The package 'dae' can also be installed from <http://chris.brien.name/rpackages/>.
+# License: GPL (>= 2)
+# URL: http://chris.brien.name
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2023-08-07 15:12:32 UTC; briencj
+# Author: Chris Brien [aut, cre] (<https://orcid.org/0000-0003-0581-1817>)
+# Maintainer: Chris Brien <chris.brien@adelaide.edu.au>
+# Repository: CRAN
+# Date/Publication: 2023-08-07 15:50:14 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

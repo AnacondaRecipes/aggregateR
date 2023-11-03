@@ -1,0 +1,104 @@
+{% set version = '1.8.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spei
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SPEI_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SPEI/SPEI_{{ version }}.tar.gz
+  sha256: 56cfcf6c7b7dc34fd05aa9cca3ee29d3b0628c82bcde80d6dc1519586483c7f6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-tlmoments
+    - r-checkmate
+    - r-ggplot2
+    - r-lmom
+    - r-lmomco
+    - r-lubridate
+    - r-reshape
+    - r-zoo
+
+  run:
+    - r-base
+    - r-tlmoments
+    - r-checkmate
+    - r-ggplot2
+    - r-lmom
+    - r-lmomco
+    - r-lubridate
+    - r-reshape
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SPEI')"           # [not win]
+    - "\"%R%\" -e \"library('SPEI')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://spei.csic.es, https://github.com/sbegueria/SPEI
+  license: GPL-2
+  summary: A set of functions for computing potential evapotranspiration and several widely used
+    drought indices including the Standardized Precipitation-Evapotranspiration Index
+    (SPEI).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: SPEI
+# Type: Package
+# Version: 1.8.1
+# Title: Calculation of the Standardized Precipitation-Evapotranspiration Index
+# Authors@R: c( person('Santiago', 'Begueria', role=c('aut','cre'), email='santiago.begueria@csic.es'), person(c('Sergio','M.'), 'Vicente-Serrano', role='aut', email='svicen@ipe.csic.es'))
+# Description: A set of functions for computing potential evapotranspiration and several widely used drought indices including the Standardized Precipitation-Evapotranspiration Index (SPEI).
+# Depends: R (>= 3.5.0)
+# Imports: lmomco, lmom, TLMoments, reshape, ggplot2, checkmate, zoo, lubridate
+# License: GPL-2
+# URL: https://spei.csic.es, https://github.com/sbegueria/SPEI
+# Language: en-US
+# BugReports: https://github.com/sbegueria/SPEI/issues
+# LazyLoad: true
+# Encoding: UTF-8
+# Suggests: covr, testthat
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-03-02 09:33:30 UTC; sbegueria
+# Author: Santiago Begueria [aut, cre], Sergio M. Vicente-Serrano [aut]
+# Maintainer: Santiago Begueria <santiago.begueria@csic.es>
+# Repository: CRAN
+# Date/Publication: 2023-03-02 13:00:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

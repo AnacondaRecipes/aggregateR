@@ -1,0 +1,93 @@
+{% set version = '3.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-parallellogger
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ParallelLogger_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ParallelLogger/ParallelLogger_{{ version }}.tar.gz
+  sha256: 554989e93ece137e1586d653ddf953bb27db9daab56cf79efdce23c3baac2e2b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: sendmailR, testthat, shiny, DT, knitr, rmarkdown, tibble
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-jsonlite
+    - r-snow
+    - r-xml2
+
+  run:
+    - r-base
+    - r-jsonlite
+    - r-snow
+    - r-xml2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ParallelLogger')"           # [not win]
+    - "\"%R%\" -e \"library('ParallelLogger')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://ohdsi.github.io/ParallelLogger/, https://github.com/OHDSI/ParallelLogger
+  license: Apache License 2.0
+  summary: Support for parallel computation with progress bar, and option to stop or proceed
+    on errors. Also provides logging to console and disk, and the logging persists in
+    the parallel threads. Additional functions support function call automation with
+    delayed execution (e.g. for executing functions in parallel).
+  license_family: APACHE
+
+# The original CRAN metadata for this package was:
+
+# Package: ParallelLogger
+# Type: Package
+# Title: Support for Parallel Computation, Logging, and Function Automation
+# Version: 3.3.0
+# Date: 2023-08-22
+# Authors@R: c( person("Martijn", "Schuemie", email = "schuemie@ohdsi.org", role = c("aut", "cre")), person("Marc", "Suchard", role = c("aut")), person("Observational Health Data Science and Informatics", role = c("cph")) )
+# Maintainer: Martijn Schuemie <schuemie@ohdsi.org>
+# Description: Support for parallel computation with progress bar, and option to stop or proceed on errors. Also provides logging to console and disk, and the logging persists in the parallel threads. Additional functions support function call automation with delayed execution (e.g. for executing functions in parallel).
+# License: Apache License 2.0
+# VignetteBuilder: knitr
+# Depends: R (>= 4.0.0)
+# Imports: snow, xml2, jsonlite, methods, utils
+# Suggests: sendmailR, testthat, shiny, DT, knitr, rmarkdown, tibble
+# URL: https://ohdsi.github.io/ParallelLogger/, https://github.com/OHDSI/ParallelLogger
+# BugReports: https://github.com/OHDSI/ParallelLogger/issues
+# NeedsCompilation: no
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# Packaged: 2023-08-22 11:49:57 UTC; MSCHUEMI
+# Author: Martijn Schuemie [aut, cre], Marc Suchard [aut], Observational Health Data Science and Informatics [cph]
+# Repository: CRAN
+# Date/Publication: 2023-08-22 14:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

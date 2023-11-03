@@ -1,0 +1,88 @@
+{% set version = '0.3-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-icsoutlier
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ICSOutlier_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ICSOutlier/ICSOutlier_{{ version }}.tar.gz
+  sha256: a76ebcb2156e3c093329a46d5ffe8311845ede16b663893b1d9542dc33111702
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: REPPlab
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ics >=1.3_0
+    - r-moments
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-ics >=1.3_0
+    - r-moments
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ICSOutlier')"           # [not win]
+    - "\"%R%\" -e \"library('ICSOutlier')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=ICSOutlier
+  license: GPL-2
+  summary: Multivariate outlier detection is performed using invariant coordinates where the
+    package offers different methods to choose the appropriate components.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: ICSOutlier
+# Type: Package
+# Title: Outlier Detection Using Invariant Coordinate Selection
+# Version: 0.3-1
+# Date: 2023-09-17
+# Authors@R: c(person("Klaus", "Nordhausen", email = "klausnordhausenR@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-3758-8501")), person("Aurore", "Archimbaud", email = "aurore.archimbaud@live.fr", role = "aut", comment = c(ORCID = "0000-0002-6511-9091")), person("Anne", "Ruiz-Gazen", email = "anne.ruiz-gazen@tse-fr.eu", role = "aut", comment = c(ORCID = "0000-0001-8970-8061")))
+# Author: Klaus Nordhausen [aut, cre] (<https://orcid.org/0000-0002-3758-8501>), Aurore Archimbaud [aut] (<https://orcid.org/0000-0002-6511-9091>), Anne Ruiz-Gazen [aut] (<https://orcid.org/0000-0001-8970-8061>)
+# Maintainer: Klaus Nordhausen <klausnordhausenR@gmail.com>
+# Depends: R (>= 3.0.0), methods, ICS (>= 1.3-0), moments
+# Imports: graphics, grDevices, mvtnorm, parallel
+# Suggests: REPPlab
+# Description: Multivariate outlier detection is performed using invariant coordinates where the package offers different methods to choose the appropriate components.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2023-09-18 08:47:44 UTC; admin
+# Repository: CRAN
+# Date/Publication: 2023-09-18 09:30:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

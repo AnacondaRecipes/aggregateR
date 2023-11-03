@@ -1,0 +1,96 @@
+{% set version = '0.2-7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-trajectories
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/trajectories_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/trajectories/trajectories_{{ version }}.tar.gz
+  sha256: c883893c925cb3cc5dba79cba5768001c9514bbd99c069e58ea4e02098371f27
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: OpenStreetMap, RCurl, rjson, adehabitatLT, xts, knitr, rgl, forecast, MASS, spatstat (>= 2.0-1), spatstat.explore, spatstat.geom, taxidata, sf
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-lattice
+    - r-sp >=1.1_0
+    - r-spacetime >=1.0_0
+    - r-zoo
+
+  run:
+    - r-base
+    - r-lattice
+    - r-sp >=1.1_0
+    - r-spacetime >=1.0_0
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('trajectories')"           # [not win]
+    - "\"%R%\" -e \"library('trajectories')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/edzer/trajectories
+  license: GPL-2
+  summary: Classes and methods for trajectory data, with support for nesting individual Track
+    objects in track sets (Tracks) and track sets for different entities in collections
+    of Tracks. Methods include selection, generalization, aggregation, intersection,
+    simulation, and plotting.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: trajectories
+# Version: 0.2-7
+# Title: Classes and Methods for Trajectory Data
+# Authors@R: c(person("Edzer", "Pebesma", role = c("aut", "cre"), email = "edzer.pebesma@uni-muenster.de", comment = c(ORCID = "0000-0001-8049-7069")), person("Benedikt", "Klus", role = "aut"), person("Benedikt", "Graeler", role = "ctb"), person("Nikolai", "Gorte", role = "ctb"), person("Mehdi", "Moradi", role = "aut"))
+# Depends: R (>= 3.0.0)
+# Imports: stats, utils, graphics, methods, lattice, sp (>= 1.1-0), spacetime (>= 1.0-0), zoo
+# Suggests: OpenStreetMap, RCurl, rjson, adehabitatLT, xts, knitr, rgl, forecast, MASS, spatstat (>= 2.0-1), spatstat.explore, spatstat.geom, taxidata, sf
+# Description: Classes and methods for trajectory data, with support for nesting individual Track objects in track sets (Tracks) and track sets for different entities in collections of Tracks. Methods include selection, generalization, aggregation, intersection, simulation, and plotting.
+# License: GPL (>= 2)
+# URL: https://github.com/edzer/trajectories
+# Additional_repositories: http://gis-bigdata.uni-muenster.de/pebesma/
+# BugReports: https://github.com/edzer/trajectories/issues
+# VignetteBuilder: knitr
+# Collate: Class-Tracks.R Tracks-methods.R generalize.R stcube.R stplot.R difftrack.R compare-methods.R rtracks.R Trackstat.R
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Author: Edzer Pebesma [aut, cre] (<https://orcid.org/0000-0001-8049-7069>), Benedikt Klus [aut], Benedikt Graeler [ctb], Nikolai Gorte [ctb], Mehdi Moradi [aut]
+# Maintainer: Edzer Pebesma <edzer.pebesma@uni-muenster.de>
+# Packaged: 2023-04-05 18:29:57 UTC; edzer
+# Repository: CRAN
+# Date/Publication: 2023-04-05 21:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

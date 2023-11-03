@@ -1,0 +1,115 @@
+{% set version = '1.4.10' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ichimoku
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ichimoku_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ichimoku/ichimoku_{{ version }}.tar.gz
+  sha256: cb7b26e8a2574ee0a7ef1ce69a58a17ac528df06da9cb9a1c9e9e2f3e54eb3fe
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: keyring, knitr, rmarkdown, testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcppsimdjson >=0.1.9
+    - r-ggplot2 >=3.4.0
+    - r-nanonext >=0.10.0
+    - r-shiny >=1.4.0
+    - r-xts
+    - r-zoo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcppsimdjson >=0.1.9
+    - r-ggplot2 >=3.4.0
+    - r-nanonext >=0.10.0
+    - r-shiny >=1.4.0
+    - r-xts
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ichimoku')"           # [not win]
+    - "\"%R%\" -e \"library('ichimoku')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://shikokuchuo.net/ichimoku/, https://github.com/shikokuchuo/ichimoku/
+  license: GPL-3
+  summary: An implementation of 'Ichimoku Kinko Hyo', also commonly known as 'cloud charts'.
+    Static and interactive visualizations with tools for creating, backtesting and development
+    of quantitative 'ichimoku' strategies. As described in Sasaki (1996, ISBN:4925152009),
+    the technique is a refinement on candlestick charting, originating from Japan and
+    now in widespread use in technical analysis worldwide. Translating as 'one-glance
+    equilibrium chart', it allows the price action and market structure of financial
+    securities to be determined 'at-a-glance'. Incorporates an interface with the OANDA
+    fxTrade API <https://developer.oanda.com/> for retrieving historical and live streaming
+    price data for major currencies, metals, commodities, government bonds and stock
+    indices.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: ichimoku
+# Type: Package
+# Title: Visualization and Tools for Ichimoku Kinko Hyo Strategies
+# Version: 1.4.10
+# Description: An implementation of 'Ichimoku Kinko Hyo', also commonly known as 'cloud charts'. Static and interactive visualizations with tools for creating, backtesting and development of quantitative 'ichimoku' strategies. As described in Sasaki (1996, ISBN:4925152009), the technique is a refinement on candlestick charting, originating from Japan and now in widespread use in technical analysis worldwide. Translating as 'one-glance equilibrium chart', it allows the price action and market structure of financial securities to be determined 'at-a-glance'. Incorporates an interface with the OANDA fxTrade API <https://developer.oanda.com/> for retrieving historical and live streaming price data for major currencies, metals, commodities, government bonds and stock indices.
+# Authors@R: c(person(given = "Charlie", family = "Gao", role = c("aut", "cre"), email = "charlie.gao@shikokuchuo.net", comment = c(ORCID = "0000-0002-0750-061X")), person(given = "Hibiki AI Limited", role = "cph"))
+# BugReports: https://github.com/shikokuchuo/ichimoku/issues
+# License: GPL (>= 3)
+# URL: https://shikokuchuo.net/ichimoku/, https://github.com/shikokuchuo/ichimoku/
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R (>= 3.5)
+# Imports: ggplot2 (>= 3.4.0), nanonext (>= 0.10.0), RcppSimdJson (>= 0.1.9), shiny (>= 1.4.0), xts, zoo
+# LinkingTo: RcppSimdJson, xts
+# Suggests: keyring, knitr, rmarkdown, testthat (>= 3.0.0)
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# Config/testthat/edition: 3
+# NeedsCompilation: yes
+# Packaged: 2023-10-27 15:11:56 UTC; cg334
+# Author: Charlie Gao [aut, cre] (<https://orcid.org/0000-0002-0750-061X>), Hibiki AI Limited [cph]
+# Maintainer: Charlie Gao <charlie.gao@shikokuchuo.net>
+# Repository: CRAN
+# Date/Publication: 2023-10-28 05:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

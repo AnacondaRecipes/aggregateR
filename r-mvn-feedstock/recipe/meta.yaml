@@ -1,0 +1,104 @@
+{% set version = '5.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mvn
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MVN_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MVN/MVN_{{ version }}.tar.gz
+  sha256: 33dc88b60e657160477ca740a54bd488b3e931e7d1b43561912400dced019a04
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: BiocStyle, knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-boot
+    - r-car
+    - r-energy
+    - r-moments
+    - r-nortest
+    - r-plyr
+    - r-psych
+
+  run:
+    - r-base
+    - r-mass
+    - r-boot
+    - r-car
+    - r-energy
+    - r-moments
+    - r-nortest
+    - r-plyr
+    - r-psych
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MVN')"           # [not win]
+    - "\"%R%\" -e \"library('MVN')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MVN
+  license: GPL-2
+  summary: Performs multivariate normality tests and graphical approaches and implements multivariate
+    outlier detection and univariate normality of marginal distributions through plots
+    and tests, and performs multivariate Box-Cox transformation (Korkmaz et al, (2014),
+    <https://journal.r-project.org/archive/2014-2/korkmaz-goksuluk-zararsiz.pdf>).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: MVN
+# Type: Package
+# Title: Multivariate Normality Tests
+# Version: 5.9
+# Date: 2021-06-29
+# Authors@R: c(person(given = "Selcuk", family =  "Korkmaz", role = c("aut", "cre"), email = "selcukorkmaz@gmail.com", comment = c(ORCID = "0000-0003-4632-6850")), person(given = "Dincer", family = "Goksuluk", role = "aut", email = "dincer.goksuluk@gmail.com"), person(given = "Gokmen", family = "Zararsiz", role = "aut", email = "gokmenzararsiz@hotmail.com"))
+# Maintainer: Selcuk Korkmaz <selcukorkmaz@gmail.com>
+# Depends: R (>= 3.5.0)
+# Suggests: BiocStyle, knitr, rmarkdown
+# VignetteBuilder: knitr
+# Imports: methods, nortest, moments, MASS, plyr, psych, boot, energy, car
+# Collate: mvn.R
+# Description: Performs multivariate normality tests and graphical approaches and implements multivariate outlier detection and univariate normality of marginal distributions through plots and tests, and performs multivariate Box-Cox transformation (Korkmaz et al, (2014), <https://journal.r-project.org/archive/2014-2/korkmaz-goksuluk-zararsiz.pdf>).
+# Encoding: UTF-8
+# License: GPL (>= 2)
+# RoxygenNote: 7.1.1
+# NeedsCompilation: no
+# Packaged: 2021-06-30 07:33:28 UTC; selcukkorkmaz
+# Author: Selcuk Korkmaz [aut, cre] (<https://orcid.org/0000-0003-4632-6850>), Dincer Goksuluk [aut], Gokmen Zararsiz [aut]
+# Repository: CRAN
+# Date/Publication: 2021-06-30 08:40:12 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

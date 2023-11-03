@@ -1,0 +1,96 @@
+{% set version = '1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-familyrank
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/FamilyRank_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/FamilyRank/FamilyRank_{{ version }}.tar.gz
+  sha256: 5d20bad33e7063b59e356fa3d4d341c6441bba00f29ce45b3f74ad9e8d1a2b6c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.6
+    - r-rcpparmadillo
+    - r-plyr >=1.8.6
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.6
+    - r-rcpparmadillo
+    - r-plyr >=1.8.6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('FamilyRank')"           # [not win]
+    - "\"%R%\" -e \"library('FamilyRank')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=FamilyRank
+  license: GPL-3
+  summary: Grows families of features by selecting features that maximize a weighted score calculated
+    from empirical feature scores and graphical knowledge. The final weighted score
+    for a feature is determined by summing a feature's family-weighted scores across
+    all families in which the feature appears.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: FamilyRank
+# Type: Package
+# Title: Algorithm for Ranking Predictors Using Graphical Domain Knowledge
+# Version: 1.0
+# Date: 2021-01-24
+# Author: Michelle Saul
+# Maintainer: Michelle Saul <msaul@carisls.com>
+# Description: Grows families of features by selecting features that maximize a weighted score calculated from empirical feature scores and graphical knowledge. The final weighted score for a feature is determined by summing a feature's family-weighted scores across all families in which the feature appears.
+# License: GPL
+# Imports: Rcpp (>= 1.0.6), plyr (>= 1.8.6), stats (>= 3.6.0)
+# LinkingTo: Rcpp, RcppArmadillo
+# LazyData: true
+# NeedsCompilation: yes
+# Packaged: 2021-01-29 21:06:01 UTC; mwinerip
+# Repository: CRAN
+# Date/Publication: 2021-02-05 08:50:08 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

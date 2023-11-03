@@ -1,0 +1,120 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-highfrequency
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/highfrequency_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/highfrequency/highfrequency_{{ version }}.tar.gz
+  sha256: 6d2a4bebd494e7bb1c75ca77cafb3698a4883ca72ef1337ef8373a3ddaabb34b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: mvtnorm, covr, FKF, rugarch, testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-rcpproll
+    - r-rsolnp
+    - r-data.table >=1.12.0
+    - r-numderiv
+    - r-quantmod
+    - r-robustbase
+    - r-sandwich
+    - r-xts
+    - r-zoo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-rcpproll
+    - r-rsolnp
+    - r-data.table >=1.12.0
+    - r-numderiv
+    - r-quantmod
+    - r-robustbase
+    - r-sandwich
+    - r-xts
+    - r-zoo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('highfrequency')"           # [not win]
+    - "\"%R%\" -e \"library('highfrequency')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jonathancornelissen/highfrequency
+  license: GPL-2
+  summary: 'Provide functionality to manage, clean and match highfrequency trades and quotes
+    data, calculate various liquidity measures, estimate and forecast volatility, detect
+    price jumps and investigate microstructure noise and intraday periodicity. A detailed
+    vignette can be found in the open-access paper "Analyzing Intraday Financial Data
+    in R: The highfrequency Package" by Boudt, Kleen, and Sjoerup (2022, <doi:10.18637/jss.v104.i08>).'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: highfrequency
+# Version: 1.0.1
+# Date: 2023-10-04
+# Title: Tools for Highfrequency Data Analysis
+# Authors@R: c( person("Kris", "Boudt", , "kris.boudt@ugent.be", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-1000-5142")), person("Jonathan", "Cornelissen", role = "aut"), person("Scott", "Payseur", , "Scott.Payseur@gmail.com", role = "aut"), person("Giang", "Nguyen", role = "ctb"), person("Onno", "Kleen", role = "aut", comment = c(ORCID = "0000-0003-4731-4640")), person("Emil", "Sjoerup", role = "aut") )
+# Description: Provide functionality to manage, clean and match highfrequency trades and quotes data, calculate various liquidity measures, estimate and forecast volatility, detect price jumps and investigate microstructure noise and intraday periodicity. A detailed vignette can be found in the open-access paper "Analyzing Intraday Financial Data in R: The highfrequency Package" by Boudt, Kleen, and Sjoerup (2022, <doi:10.18637/jss.v104.i08>).
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# URL: https://github.com/jonathancornelissen/highfrequency
+# BugReports: https://github.com/jonathancornelissen/highfrequency/issues
+# Depends: R (>= 3.5.0)
+# Imports: xts, zoo, Rcpp, graphics, methods, stats, utils, grDevices, robustbase, data.table (>= 1.12.0), RcppRoll, quantmod, sandwich, numDeriv, Rsolnp
+# LinkingTo: Rcpp, RcppArmadillo
+# Suggests: mvtnorm, covr, FKF, rugarch, testthat, knitr, rmarkdown
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-10-04 12:07:14 UTC; onnokleen
+# Author: Kris Boudt [aut, cre] (<https://orcid.org/0000-0002-1000-5142>), Jonathan Cornelissen [aut], Scott Payseur [aut], Giang Nguyen [ctb], Onno Kleen [aut] (<https://orcid.org/0000-0003-4731-4640>), Emil Sjoerup [aut]
+# Maintainer: Kris Boudt <kris.boudt@ugent.be>
+# Repository: CRAN
+# Date/Publication: 2023-10-04 15:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,101 @@
+{% set version = '0.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-shinylogs
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/shinylogs_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/shinylogs/shinylogs_{{ version }}.tar.gz
+  sha256: 527e362c0f00571d2463187c90486563922e813c988037d989764cc13ff829f0
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown, covr, DBI, RSQLite, googledrive
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-anytime
+    - r-bit64
+    - r-data.table
+    - r-digest
+    - r-htmltools
+    - r-jsonlite
+    - r-nanotime
+    - r-shiny >=1.1.0
+
+  run:
+    - r-base
+    - r-anytime
+    - r-bit64
+    - r-data.table
+    - r-digest
+    - r-htmltools
+    - r-jsonlite
+    - r-nanotime
+    - r-shiny >=1.1.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('shinylogs')"           # [not win]
+    - "\"%R%\" -e \"library('shinylogs')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/dreamRs/shinylogs
+  license: GPL-3
+  summary: Track and record the use of applications and the user's interactions with 'Shiny'
+    inputs. Allows to trace the inputs with which the user interacts, the outputs generated,
+    as well as the errors displayed in the interface.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: shinylogs
+# Title: Record Everything that Happens in a 'Shiny' Application
+# Version: 0.2.1
+# Authors@R: c(person("Fanny", "Meyer", role = "aut"), person("Victor", "Perrier", email = "victor.perrier@dreamrs.fr", role = c("aut", "cre")), person("Silex Technologies", comment = "https://www.silex-ip.com", role = "fnd"))
+# Description: Track and record the use of applications and the user's interactions with 'Shiny' inputs. Allows to trace the inputs with which the user interacts, the outputs generated, as well as the errors displayed in the interface.
+# License: GPL-3
+# Encoding: UTF-8
+# RoxygenNote: 7.1.2
+# URL: https://github.com/dreamRs/shinylogs
+# BugReports: https://github.com/dreamRs/shinylogs/issues
+# Imports: htmltools, shiny (>= 1.1.0), jsonlite, data.table, bit64, nanotime, digest, anytime
+# Suggests: testthat, knitr, rmarkdown, covr, DBI, RSQLite, googledrive
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2022-04-18 16:03:54 UTC; perri
+# Author: Fanny Meyer [aut], Victor Perrier [aut, cre], Silex Technologies [fnd] (https://www.silex-ip.com)
+# Maintainer: Victor Perrier <victor.perrier@dreamrs.fr>
+# Repository: CRAN
+# Date/Publication: 2022-04-18 16:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

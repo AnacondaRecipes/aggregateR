@@ -1,0 +1,102 @@
+{% set version = '0.5.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-descriptr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/descriptr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/descriptr/descriptr_{{ version }}.tar.gz
+  sha256: 2cba68f56cadf8ba9e4b317879aaab15c8c51ed9df94aa74560f2a74a76718ea
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, gridExtra, knitr, rmarkdown, testthat, vdiffr, xplorerr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr
+    - r-ggplot2
+    - r-magrittr
+    - r-rlang
+    - r-scales
+    - r-tibble
+    - r-tidyr
+
+  run:
+    - r-base
+    - r-dplyr
+    - r-ggplot2
+    - r-magrittr
+    - r-rlang
+    - r-scales
+    - r-tibble
+    - r-tidyr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('descriptr')"           # [not win]
+    - "\"%R%\" -e \"library('descriptr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://descriptr.rsquaredacademy.com/, https://github.com/rsquaredacademy/descriptr
+  license: MIT
+  summary: Generate descriptive statistics such as measures of location, dispersion, frequency
+    tables, cross tables, group summaries and multiple one/two way tables.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: descriptr
+# Type: Package
+# Title: Generate Descriptive Statistics
+# Version: 0.5.2
+# Authors@R: person("Aravind", "Hebbali", email = "hebbali.aravind@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-9220-9669"))
+# Description: Generate descriptive statistics such as measures of location, dispersion, frequency tables, cross tables, group summaries and multiple one/two way tables.
+# Depends: R(>= 3.3.0)
+# Imports: dplyr, ggplot2, magrittr, rlang, scales, stats, tibble, tidyr, utils
+# Suggests: covr, gridExtra, knitr, rmarkdown, testthat, vdiffr, xplorerr
+# License: MIT + file LICENSE
+# URL: https://descriptr.rsquaredacademy.com/, https://github.com/rsquaredacademy/descriptr
+# BugReports: https://github.com/rsquaredacademy/descriptr/issues
+# Encoding: UTF-8
+# LazyData: true
+# VignetteBuilder: knitr
+# RoxygenNote: 7.1.1
+# NeedsCompilation: no
+# Packaged: 2020-12-09 15:21:54 UTC; HP
+# Author: Aravind Hebbali [aut, cre] (<https://orcid.org/0000-0001-9220-9669>)
+# Maintainer: Aravind Hebbali <hebbali.aravind@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2020-12-09 17:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

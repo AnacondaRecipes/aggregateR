@@ -1,0 +1,105 @@
+{% set version = '0.1-7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-swarmsvm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SwarmSVM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SwarmSVM/SwarmSVM_{{ version }}.tar.gz
+  sha256: ebda183f135307b53ab7a9c3e29d1a2b62f8a6d668b1fadb23c66d1acad6090f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bbmisc
+    - r-liblinear
+    - r-matrix
+    - r-sparsem
+    - r-checkmate >=1.6.0
+    - r-e1071
+    - r-kernlab
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bbmisc
+    - r-liblinear
+    - r-matrix
+    - r-sparsem
+    - r-checkmate >=1.6.0
+    - r-e1071
+    - r-kernlab
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SwarmSVM')"           # [not win]
+    - "\"%R%\" -e \"library('SwarmSVM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SwarmSVM
+  license: GPL-2
+  summary: Three ensemble learning algorithms based on support vector machines. They all train
+    support vector machines on subset of data and combine the result.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: SwarmSVM
+# Title: Ensemble Learning Algorithms Based on Support Vector Machines
+# Version: 0.1-7
+# Date: 2022-12-14
+# Author: Tong He <hetong007@gmail.com>, Aydin Demircioglu <aydin.demircioglu@ini.ruhr-uni-bochum.de>
+# Maintainer: Tong He <hetong007@gmail.com>
+# Description: Three ensemble learning algorithms based on support vector machines. They all train support vector machines on subset of data and combine the result.
+# Depends: R (>= 3.2.0)
+# Imports: e1071, LiblineaR, Matrix, SparseM, kernlab, methods, checkmate (>= 1.6.0), BBmisc
+# License: GPL-2
+# Encoding: UTF-8
+# Suggests: testthat, knitr, rmarkdown
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2022-12-15 07:40:40 UTC; ubuntu
+# Repository: CRAN
+# Date/Publication: 2022-12-15 09:00:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

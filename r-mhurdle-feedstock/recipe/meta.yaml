@@ -1,0 +1,114 @@
+{% set version = '1.3-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mhurdle
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mhurdle_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mhurdle/mhurdle_{{ version }}.tar.gz
+  sha256: 250907c24584b415fe14d0e36c258cc45b9d177781f2725e86aefc24e63fc0c6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, lmtest, xtable, bookdown, texreg, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+    - r-rdpack
+    - r-generics
+    - r-margins
+    - r-maxlik
+    - r-numderiv
+    - r-prediction
+    - r-survival
+    - r-truncreg
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-formula
+    - r-rdpack
+    - r-generics
+    - r-margins
+    - r-maxlik
+    - r-numderiv
+    - r-prediction
+    - r-survival
+    - r-truncreg
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mhurdle')"           # [not win]
+    - "\"%R%\" -e \"library('mhurdle')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.R-project.org
+  license: GPL-2
+  summary: Estimation of models with zero left-censored variables. Null values may be caused
+    by a selection process Cragg (1971) <doi:10.2307/1909582>, insufficient resources
+    Tobin (1958) <doi:10.2307/1907382> or infrequency of purchase Deaton and Irish (1984)
+    <doi:10.1016/0047-2727(84)90067-7>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: mhurdle
+# Version: 1.3-0
+# Date: 2021-12-09
+# Title: Multiple Hurdle Tobit Models
+# Authors@R: c(person("Yves", "Croissant", role = c("aut", "cre"), email = "yves.croissant@univ-reunion.fr", comment = c(ORCID = "0000-0002-4857-7736")), person("Fabrizio", "Carlevaro", role = "aut", email = "fabrizio.carlevaro@unige.ch"), person("Stephane", "Hoareau", role = "aut", email = "sjlhoaro@univ-reunion.fr"))
+# Depends: R (>= 2.10)
+# Imports: Formula, truncreg, maxLik, survival, Rdpack, prediction, margins, generics, numDeriv
+# Suggests: knitr, rmarkdown, lmtest, xtable, bookdown, texreg, testthat
+# Description: Estimation of models with zero left-censored variables. Null values may be caused by a selection process Cragg (1971) <doi:10.2307/1909582>, insufficient resources Tobin (1958) <doi:10.2307/1907382> or infrequency of purchase Deaton and Irish (1984) <doi:10.1016/0047-2727(84)90067-7>.
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# URL: https://www.R-project.org
+# RoxygenNote: 7.1.2
+# RdMacros: Rdpack
+# Packaged: 2021-12-10 12:05:11 UTC; yves
+# Author: Yves Croissant [aut, cre] (<https://orcid.org/0000-0002-4857-7736>), Fabrizio Carlevaro [aut], Stephane Hoareau [aut]
+# Maintainer: Yves Croissant <yves.croissant@univ-reunion.fr>
+# Repository: CRAN
+# Date/Publication: 2021-12-10 12:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

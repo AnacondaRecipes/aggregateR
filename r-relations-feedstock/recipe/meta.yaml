@@ -1,0 +1,89 @@
+{% set version = '0.6-13' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-relations
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/relations_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/relations/relations_{{ version }}.tar.gz
+  sha256: f859c336fb0c4a2df7f294b33d1d04f95c6988e5e76933e2e70bf291d904d9da
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Rgraphviz, clue (>= 0.3-49), Rglpk (>= 0.3-1), lpSolve (>= 5.6.3), Rsymphony (>= 0.1-9), methods
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-cluster
+    - r-sets >=1.0_16
+    - r-slam
+
+  run:
+    - r-base
+    - r-cluster
+    - r-sets >=1.0_16
+    - r-slam
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('relations')"           # [not win]
+    - "\"%R%\" -e \"library('relations')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=relations
+  license: GPL-2
+  summary: Data structures and algorithms for k-ary relations with arbitrary domains, featuring
+    relational algebra, predicate functions, and fitters for consensus relations.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: relations
+# Version: 0.6-13
+# Encoding: UTF-8
+# Title: Data Structures and Algorithms for Relations
+# Description: Data structures and algorithms for k-ary relations with arbitrary domains, featuring relational algebra, predicate functions, and fitters for consensus relations.
+# Authors@R: c(person(given = "David", family = "Meyer", role = c("aut")), person(given = "Kurt", family = "Hornik", role = c("aut", "cre"), email = "Kurt.Hornik@R-project.org", comment = c(ORCID = "0000-0003-4198-9911")), person(given = "Christian", family = "Buchta", role = "ctb"))
+# LazyData: yes
+# Depends: R (>= 3.2.0)
+# Imports: cluster, stats, slam, sets (>= 1.0-16), graphics, grDevices
+# Suggests: Rgraphviz, clue (>= 0.3-49), Rglpk (>= 0.3-1), lpSolve (>= 5.6.3), Rsymphony (>= 0.1-9), methods
+# Enhances: seriation, Rcplex
+# License: GPL-2
+# NeedsCompilation: no
+# Packaged: 2023-03-07 13:59:46 UTC; hornik
+# Author: David Meyer [aut], Kurt Hornik [aut, cre] (<https://orcid.org/0000-0003-4198-9911>), Christian Buchta [ctb]
+# Maintainer: Kurt Hornik <Kurt.Hornik@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2023-03-07 14:19:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

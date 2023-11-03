@@ -1,0 +1,106 @@
+{% set version = '0.1.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-inlaspacetime
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/INLAspacetime_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/INLAspacetime/INLAspacetime_{{ version }}.tar.gz
+  sha256: fc7d2cc6196757a326f4bd851aafa9ff6b0d66f87eb192ef1763bd89df866a2c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: INLA (>= 23.03.26), inlabru (>= 2.8.0), knitr, ggplot2, rmarkdown, parallel, data.table, rnaturalearth, splancs
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-fmesher
+    - r-sf
+    - r-sp
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-fmesher
+    - r-sf
+    - r-sp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('INLAspacetime')"           # [not win]
+    - "\"%R%\" -e \"library('INLAspacetime')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/eliaskrainski/INLAspacetime
+  license: GPL-2
+  summary: Prepare objects to implement models over spatial and spacetime domains with the 'INLA'
+    package (<https://www.r-inla.org>). These objects contain data to for the 'cgeneric'
+    interface in 'INLA', enabling fast parallel computations. We implemented the spatial
+    barrier model, see Bakka et. al. (2019) <doi:10.1016/j.spasta.2019.01.002>, and
+    some of the spatio-temporal models in Lindgren et. al. (2023) <arXiv:2006.04917>.
+    Details are provided in the available vignettes and from the URL bellow.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: INLAspacetime
+# Type: Package
+# Title: Spatial and Spatio-Temporal Models using 'INLA'
+# Version: 0.1.7
+# Authors@R: c( person("Elias Teixeira", "Krainski", email = "eliaskrainski@gmail.com", role = c("cre", "aut", "cph"), comment = c(ORCID = "0000-0002-7063-2615")), person("Finn", "Lindgren", email = "finn.lindgren@gmail.com", role = c("aut"), comment = c(ORCID = "0000-0002-5833-2011")), person("Haavard", "Rue", email = "haavard.rue@kaust.edu.sa", role = c("aut"), comment = c(ORCID = "0000-0002-0222-1881")) )
+# Description: Prepare objects to implement models over spatial and spacetime domains with the 'INLA' package (<https://www.r-inla.org>). These objects contain data to for the 'cgeneric' interface in 'INLA', enabling fast parallel computations. We implemented the spatial barrier model, see Bakka et. al. (2019) <doi:10.1016/j.spasta.2019.01.002>, and some of the spatio-temporal models in Lindgren et. al. (2023) <arXiv:2006.04917>. Details are provided in the available vignettes and from the URL bellow.
+# URL: https://github.com/eliaskrainski/INLAspacetime
+# Additional_repositories: https://inla.r-inla-download.org/R/testing
+# BugReports: https://github.com/eliaskrainski/INLAspacetime/issues
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Depends: R (>= 3.6), Matrix, sp
+# Imports: graphics, grDevices, methods, stats, utils, sf, fmesher
+# Suggests: INLA (>= 23.03.26), inlabru (>= 2.8.0), knitr, ggplot2, rmarkdown, parallel, data.table, rnaturalearth, splancs
+# VignetteBuilder: knitr
+# BuildVignettes: true
+# Packaged: 2023-08-27 08:26:58 UTC; eliask
+# Author: Elias Teixeira Krainski [cre, aut, cph] (<https://orcid.org/0000-0002-7063-2615>), Finn Lindgren [aut] (<https://orcid.org/0000-0002-5833-2011>), Haavard Rue [aut] (<https://orcid.org/0000-0002-0222-1881>)
+# Maintainer: Elias Teixeira Krainski <eliaskrainski@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-08-27 23:10:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

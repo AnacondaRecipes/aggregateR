@@ -1,0 +1,85 @@
+{% set version = '0.6.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fincal
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/FinCal_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/FinCal/FinCal_{{ version }}.tar.gz
+  sha256: fef1345d03ab1317c39c076cb207efa37aa37dedad42ea90cb790a77e1b69bb2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcurl
+    - r-ggplot2
+    - r-reshape2
+
+  run:
+    - r-base
+    - r-rcurl
+    - r-ggplot2
+    - r-reshape2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('FinCal')"           # [not win]
+    - "\"%R%\" -e \"library('FinCal')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://felixfan.github.io/FinCal/
+  license: GPL-2
+  summary: Package for time value of money calculation, time series analysis and computational
+    finance.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: FinCal
+# Title: Time Value of Money, Time Series Analysis and Computational Finance
+# Description: Package for time value of money calculation, time series analysis and computational finance.
+# Version: 0.6.3
+# Date: 2016-07-27
+# Author: Felix Yanhui Fan <nolanfyh@gmail.com>
+# Imports: ggplot2, reshape2, RCurl
+# Maintainer: Felix Yanhui Fan <nolanfyh@gmail.com>
+# License: GPL (>= 2)
+# URL: http://felixfan.github.io/FinCal/
+# RoxygenNote: 5.0.1
+# NeedsCompilation: no
+# Packaged: 2016-07-29 03:22:16 UTC; alicefelix
+# Repository: CRAN
+# Date/Publication: 2016-07-29 06:40:54
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

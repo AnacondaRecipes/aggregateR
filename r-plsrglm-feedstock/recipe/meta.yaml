@@ -1,0 +1,100 @@
+{% set version = '1.5.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-plsrglm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/plsRglm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/plsRglm/plsRglm_{{ version }}.tar.gz
+  sha256: 19afb0caf608211dfb64627b36518088fad215c12b0deb85a1b9c54a7e26eef6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: plsdof, R.rsp, chemometrics, plsdepot
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-bipartite
+    - r-boot
+    - r-car
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mass
+    - r-bipartite
+    - r-boot
+    - r-car
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('plsRglm')"           # [not win]
+    - "\"%R%\" -e \"library('plsRglm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://fbertran.github.io/plsRglm/, https://github.com/fbertran/plsRglm/
+  license: GPL-3
+  summary: Provides (weighted) Partial least squares Regression for generalized linear models
+    and repeated k-fold cross-validation of such models using various criteria <arXiv:1810.01005>.
+    It allows for missing data in the explanatory variables. Bootstrap confidence intervals
+    constructions are also available.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: plsRglm
+# Version: 1.5.1
+# Date: 2023-03-14
+# Depends: R (>= 2.10)
+# Imports: mvtnorm, boot, bipartite, car, MASS
+# Enhances: pls
+# Suggests: plsdof, R.rsp, chemometrics, plsdepot
+# Title: Partial Least Squares Regression for Generalized Linear Models
+# Authors@R: c( person(given = "Frederic", family= "Bertrand", role = c("cre", "aut"), email = "frederic.bertrand@utt.fr", comment = c(ORCID = "0000-0002-0837-8281")), person(given = "Myriam", family= "Maumy-Bertrand", role = c("aut"), email = "myriam.maumy@utt.fr", comment = c(ORCID = "0000-0002-4615-1512")))
+# Author: Frederic Bertrand [cre, aut] (<https://orcid.org/0000-0002-0837-8281>), Myriam Maumy-Bertrand [aut] (<https://orcid.org/0000-0002-4615-1512>)
+# Maintainer: Frederic Bertrand <frederic.bertrand@utt.fr>
+# Description: Provides (weighted) Partial least squares Regression for generalized linear models and repeated k-fold cross-validation of such models using various criteria <arXiv:1810.01005>. It allows for missing data in the explanatory variables. Bootstrap confidence intervals constructions are also available.
+# License: GPL-3
+# Encoding: UTF-8
+# URL: https://fbertran.github.io/plsRglm/, https://github.com/fbertran/plsRglm/
+# BugReports: https://github.com/fbertran/plsRglm/issues/
+# VignetteBuilder: R.rsp
+# Classification/MSC: 62J12, 62J99
+# RoxygenNote: 7.2.1
+# NeedsCompilation: no
+# Packaged: 2023-03-14 20:38:36 UTC; fbertran
+# Repository: CRAN
+# Date/Publication: 2023-03-14 22:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

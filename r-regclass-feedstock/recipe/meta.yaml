@@ -1,0 +1,92 @@
+{% set version = '1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-regclass
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/regclass_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/regclass/regclass_{{ version }}.tar.gz
+  sha256: c541ca81a28ed6ecb82fc34a362865a0aa3a0a435ae2e0ca7e0d38e8c7242755
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-vgam
+    - r-bestglm
+    - r-leaps
+    - r-randomforest
+    - r-rpart
+    - r-rpart.plot
+
+  run:
+    - r-base
+    - r-vgam
+    - r-bestglm
+    - r-leaps
+    - r-randomforest
+    - r-rpart
+    - r-rpart.plot
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('regclass')"           # [not win]
+    - "\"%R%\" -e \"library('regclass')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=regclass
+  license: GPL-2
+  summary: 'Contains basic tools for visualizing, interpreting, and building regression models.  It
+    has been designed for use with the book Introduction to Regression and Modeling
+    with R by Adam Petrie, Cognella Publishers, ISBN: 978-1-63189-250-9 <https://titles.cognella.com/introduction-to-regression-and-modeling-with-r-9781631892509>.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: regclass
+# Type: Package
+# Title: Tools for an Introductory Class in Regression and Modeling
+# Version: 1.6
+# Date: 2020-2-19
+# Author: Adam Petrie
+# Maintainer: Adam Petrie <apetrie@utk.edu>
+# Depends: R (>= 3.6), bestglm, leaps, VGAM, rpart, randomForest
+# Imports: rpart.plot
+# Description: Contains basic tools for visualizing, interpreting, and building regression models.  It has been designed for use with the book Introduction to Regression and Modeling with R by Adam Petrie, Cognella Publishers, ISBN: 978-1-63189-250-9 <https://titles.cognella.com/introduction-to-regression-and-modeling-with-r-9781631892509>.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2020-02-21 17:16:41 UTC; adamp
+# Repository: CRAN
+# Date/Publication: 2020-02-21 18:00:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

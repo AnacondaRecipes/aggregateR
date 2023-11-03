@@ -1,0 +1,102 @@
+{% set version = '1.1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-trend
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/trend_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/trend/trend_{{ version }}.tar.gz
+  sha256: b0005e4afb6cc6522925fe1ff172902e4db6f83c3550f05c26e04c39cd752125
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: strucchange, Kendall, psych, datasets
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-extradistr >=1.8.0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-extradistr >=1.8.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('trend')"           # [not win]
+    - "\"%R%\" -e \"library('trend')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=trend
+  license: GPL-3
+  summary: The analysis of environmental data often requires the detection of trends and change-points.
+    This package includes tests for trend detection (Cox-Stuart Trend Test, Mann-Kendall
+    Trend Test, (correlated) Hirsch-Slack Test, partial Mann-Kendall Trend Test, multivariate
+    (multisite) Mann-Kendall Trend Test, (Seasonal) Sen's slope, partial Pearson and
+    Spearman correlation trend test), change-point detection (Lanzante's test procedures,
+    Pettitt's test, Buishand Range Test, Buishand U Test, Standard Normal Homogeinity
+    Test), detection of non-randomness (Wallis-Moore Phase Frequency Test, Bartels rank
+    von Neumann's ratio test, Wald-Wolfowitz Test) and the two sample Robust Rank-Order
+    Distributional Test.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: trend
+# Version: 1.1.6
+# Date: 2023-10-10
+# Title: Non-Parametric Trend Tests and Change-Point Detection
+# Authors@R: person(given = "Thorsten", family = "Pohlert", email = "thorsten.pohlert@gmx.de", comment = c(ORCID = "0000-0003-3855-3025"), role = c("aut", "cre"))
+# Depends: R (>= 3.0)
+# Description: The analysis of environmental data often requires the detection of trends and change-points. This package includes tests for trend detection (Cox-Stuart Trend Test, Mann-Kendall Trend Test, (correlated) Hirsch-Slack Test, partial Mann-Kendall Trend Test, multivariate (multisite) Mann-Kendall Trend Test, (Seasonal) Sen's slope, partial Pearson and Spearman correlation trend test), change-point detection (Lanzante's test procedures, Pettitt's test, Buishand Range Test, Buishand U Test, Standard Normal Homogeinity Test), detection of non-randomness (Wallis-Moore Phase Frequency Test, Bartels rank von Neumann's ratio test, Wald-Wolfowitz Test) and the two sample Robust Rank-Order Distributional Test.
+# Imports: extraDistr (>= 1.8.0)
+# Suggests: strucchange, Kendall, psych, datasets
+# Classification/MSC-2010: 62F03, 62G10, 62M10, 62P12
+# License: GPL-3
+# Encoding: UTF-8
+# ZipData: yes
+# NeedsCompilation: yes
+# RoxygenNote: 7.2.2
+# Packaged: 2023-10-10 07:57:22 UTC; thorsten
+# Author: Thorsten Pohlert [aut, cre] (<https://orcid.org/0000-0003-3855-3025>)
+# Maintainer: Thorsten Pohlert <thorsten.pohlert@gmx.de>
+# Repository: CRAN
+# Date/Publication: 2023-10-10 08:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

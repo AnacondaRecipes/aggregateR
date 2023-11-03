@@ -1,0 +1,91 @@
+{% set version = '1.1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sigr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sigr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sigr/sigr_{{ version }}.tar.gz
+  sha256: 2a33eed874ca2fdcf3a1f4de0d0e9ebe7cfc6d088e45361608d5ad768b70669b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: pwr, parallel, knitr, rmarkdown, tinytest
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-wrapr >=2.0.9
+
+  run:
+    - r-base
+    - r-wrapr >=2.0.9
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sigr')"           # [not win]
+    - "\"%R%\" -e \"library('sigr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/WinVector/sigr/, https://winvector.github.io/sigr/
+  license: GPL-2 | GPL-3
+  summary: Succinctly and correctly format statistical summaries of various models and tests
+    (F-test, Chi-Sq-test, Fisher-test, T-test, and rank-significance). This package
+    also includes empirical tests, such as Monte Carlo and bootstrap distribution estimates.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: sigr
+# Type: Package
+# Title: Succinct and Correct Statistical Summaries for Reports
+# Version: 1.1.5
+# Date: 2023-08-19
+# Authors@R: c( person("John", "Mount", email = "jmount@win-vector.com", role = c("aut", "cre")), person("Nina", "Zumel", email = "nzumel@win-vector.com", role = c("aut")), person(family = "Win-Vector LLC", role = c("cph")) )
+# URL: https://github.com/WinVector/sigr/, https://winvector.github.io/sigr/
+# Maintainer: John Mount <jmount@win-vector.com>
+# BugReports: https://github.com/WinVector/sigr/issues
+# Description: Succinctly and correctly format statistical summaries of various models and tests (F-test, Chi-Sq-test, Fisher-test, T-test, and rank-significance). This package also includes empirical tests, such as Monte Carlo and bootstrap distribution estimates.
+# License: GPL-2 | GPL-3
+# RoxygenNote: 7.2.3
+# Depends: R (>= 3.2.1)
+# Imports: wrapr (>= 2.0.9), stats
+# Suggests: pwr, parallel, knitr, rmarkdown, tinytest
+# VignetteBuilder: knitr
+# ByteCompile: true
+# NeedsCompilation: no
+# Packaged: 2023-08-20 00:09:29 UTC; johnmount
+# Author: John Mount [aut, cre], Nina Zumel [aut], Win-Vector LLC [cph]
+# Repository: CRAN
+# Date/Publication: 2023-08-20 02:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

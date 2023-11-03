@@ -1,0 +1,92 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-updater
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/updater_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/updater/updater_{{ version }}.tar.gz
+  sha256: 8ec60c347fb34fb7ae7e16470bf17cd625bb93acc511999772c8a21f36072ebf
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, spelling, testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-cli >=3.3.0
+    - r-renv >=1.0.2
+
+  run:
+    - r-base
+    - r-cli >=3.3.0
+    - r-renv >=1.0.2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('updater')"           # [not win]
+    - "\"%R%\" -e \"library('updater')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ddsjoberg/updater, https://www.danieldsjoberg.com/updater/
+  license: MIT
+  summary: When updating major or minor R versions all packages should be re-installed. The utilities
+    in this package assist in getting a user up-and-running again by installing all
+    previously installed R packages. The package uses 'renv' to install; immediately
+    replenishing your 'renv' package cache.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: updater
+# Title: Utilities for Updating R
+# Version: 0.1.2
+# Authors@R: person("Daniel D.", "Sjoberg", , "danield.sjoberg@gmail.com", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0003-0862-2018"))
+# Description: When updating major or minor R versions all packages should be re-installed. The utilities in this package assist in getting a user up-and-running again by installing all previously installed R packages. The package uses 'renv' to install; immediately replenishing your 'renv' package cache.
+# License: MIT + file LICENSE
+# URL: https://github.com/ddsjoberg/updater, https://www.danieldsjoberg.com/updater/
+# BugReports: https://github.com/ddsjoberg/updater/issues
+# Imports: cli (>= 3.3.0), renv (>= 1.0.2)
+# Suggests: covr, spelling, testthat (>= 3.0.0)
+# Config/testthat/edition: 3
+# Encoding: UTF-8
+# Language: en-US
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-09-18 20:49:01 UTC; sjobergd
+# Author: Daniel D. Sjoberg [aut, cre, cph] (<https://orcid.org/0000-0003-0862-2018>)
+# Maintainer: Daniel D. Sjoberg <danield.sjoberg@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-09-19 01:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

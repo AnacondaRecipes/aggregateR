@@ -1,0 +1,103 @@
+{% set version = '0.1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-dataeditr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/DataEditR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/DataEditR/DataEditR_{{ version }}.tar.gz
+  sha256: 8300f76a95dcbd99357eb2b0f80ae9c6a43a52345a4aca6015242a354d7e924f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bslib
+    - r-htmltools
+    - r-miniui
+    - r-rhandsontable >=0.3.8
+    - r-rstudioapi
+    - r-shiny >=1.5.0
+    - r-shinybs
+    - r-shinyjs
+
+  run:
+    - r-base
+    - r-bslib
+    - r-htmltools
+    - r-miniui
+    - r-rhandsontable >=0.3.8
+    - r-rstudioapi
+    - r-shiny >=1.5.0
+    - r-shinybs
+    - r-shinyjs
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('DataEditR')"           # [not win]
+    - "\"%R%\" -e \"library('DataEditR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/DillonHammill/DataEditR
+  license: GPL-2
+  summary: An interactive editor built on 'rhandsontable' to allow the interactive viewing, entering,
+    filtering and editing of data in R <https://dillonhammill.github.io/DataEditR/>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: DataEditR
+# Title: An Interactive Editor for Viewing, Entering, Filtering & Editing Data
+# Version: 0.1.5
+# Date: 2022-03-08
+# Authors@R: person(given = "Dillon", family = "Hammill", role = c("aut", "cre"), email = "Dillon.Hammill@anu.edu.au", comment = c(ORCID = "0000-0002-1407-7223"))
+# Description: An interactive editor built on 'rhandsontable' to allow the interactive viewing, entering, filtering and editing of data in R <https://dillonhammill.github.io/DataEditR/>.
+# URL: https://github.com/DillonHammill/DataEditR
+# BugReports: https://github.com/DillonHammill/DataEditR/issues
+# Depends: R(>= 3.5.0)
+# Imports: shiny (>= 1.5.0), shinyBS, shinyjs, bslib, rhandsontable (>= 0.3.8), rstudioapi, htmltools, miniUI, utils
+# License: GPL-2
+# Encoding: UTF-8
+# RoxygenNote: 7.1.2
+# Language: en-GB
+# Suggests: knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2022-03-08 10:14:21 UTC; Dillon
+# Author: Dillon Hammill [aut, cre] (<https://orcid.org/0000-0002-1407-7223>)
+# Maintainer: Dillon Hammill <Dillon.Hammill@anu.edu.au>
+# Repository: CRAN
+# Date/Publication: 2022-03-08 12:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

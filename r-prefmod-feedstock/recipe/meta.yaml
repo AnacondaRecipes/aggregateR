@@ -1,0 +1,100 @@
+{% set version = '0.8-36' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-prefmod
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/prefmod_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/prefmod/prefmod_{{ version }}.tar.gz
+  sha256: ceccd63a1eb39c5810678058826e79113838a647e96045649919667f401f4cf5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-colorspace
+    - r-gnm >=1.0_0
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-colorspace
+    - r-gnm >=1.0_0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('prefmod')"           # [not win]
+    - "\"%R%\" -e \"library('prefmod')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=prefmod
+  license: GPL-2
+  summary: Generates design matrix for analysing real paired comparisons and derived paired comparison
+    data (Likert type items/ratings or rankings) using a loglinear approach. Fits loglinear
+    Bradley-Terry model (LLBT) exploiting an eliminate feature. Computes pattern models
+    for paired comparisons, rankings, and ratings. Some treatment of missing values
+    (MCAR and MNAR). Fits latent class (mixture) models for paired comparison, rating
+    and ranking patterns using a non-parametric ML approach.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: prefmod
+# Type: Package
+# Title: Utilities to Fit Paired Comparison Models for Preferences
+# Version: 0.8-36
+# Date: 2023-09-28
+# Authors@R: c(person(given = "Reinhold", family = "Hatzinger", role = "aut"), person(given = c("Marco", "Johannes"), family = "Maier", email = "marco_maier@posteo.de", role = "cre"))
+# Depends: R (>= 3.0.0), stats, graphics, gnm (>= 1.0-0), colorspace
+# Imports: grDevices, utils, methods
+# Description: Generates design matrix for analysing real paired comparisons and derived paired comparison data (Likert type items/ratings or rankings) using a loglinear approach. Fits loglinear Bradley-Terry model (LLBT) exploiting an eliminate feature. Computes pattern models for paired comparisons, rankings, and ratings. Some treatment of missing values (MCAR and MNAR). Fits latent class (mixture) models for paired comparison, rating and ranking patterns using a non-parametric ML approach.
+# License: GPL (>= 2)
+# LazyData: yes
+# LazyLoad: yes
+# ByteCompile: yes
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-09-28 15:00:53 UTC; mm
+# Author: Reinhold Hatzinger [aut], Marco Johannes Maier [cre]
+# Maintainer: Marco Johannes Maier <marco_maier@posteo.de>
+# Repository: CRAN
+# Date/Publication: 2023-09-30 16:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

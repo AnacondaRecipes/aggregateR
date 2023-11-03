@@ -1,0 +1,98 @@
+{% set version = '2.3.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-missranger
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/missRanger_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/missRanger/missRanger_{{ version }}.tar.gz
+  sha256: ceb3ba75329093d7d56233532818ae2a0547ecbccdcf93c4a6b1f6140005d96e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-fnn
+    - r-ranger
+
+  run:
+    - r-base
+    - r-fnn
+    - r-ranger
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('missRanger')"           # [not win]
+    - "\"%R%\" -e \"library('missRanger')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mayer79/missRanger
+  license: GPL-2
+  summary: Alternative implementation of the beautiful 'MissForest' algorithm used to impute
+    mixed-type data sets by chaining random forests, introduced by Stekhoven, D.J. and
+    Buehlmann, P. (2012) <doi:10.1093/bioinformatics/btr597>. Under the hood, it uses
+    the lightning fast random jungle package 'ranger'. Between the iterative model fitting,
+    we offer the option of using predictive mean matching. This firstly avoids imputation
+    with values not already present in the original data (like a value 0.3334 in 0-1
+    coded variable).  Secondly, predictive mean matching tries to raise the variance
+    in the resulting conditional distributions to a realistic level. This would allow
+    e.g. to do multiple imputation when repeating the call to missRanger().  A formula
+    interface allows to control which variables should be imputed by which.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: missRanger
+# Title: Fast Imputation of Missing Values
+# Version: 2.3.0
+# Authors@R: person(given = "Michael", family = "Mayer", role = c("aut", "cre", "cph"), email = "mayermichael79@gmail.com")
+# Description: Alternative implementation of the beautiful 'MissForest' algorithm used to impute mixed-type data sets by chaining random forests, introduced by Stekhoven, D.J. and Buehlmann, P. (2012) <doi:10.1093/bioinformatics/btr597>. Under the hood, it uses the lightning fast random jungle package 'ranger'. Between the iterative model fitting, we offer the option of using predictive mean matching. This firstly avoids imputation with values not already present in the original data (like a value 0.3334 in 0-1 coded variable).  Secondly, predictive mean matching tries to raise the variance in the resulting conditional distributions to a realistic level. This would allow e.g. to do multiple imputation when repeating the call to missRanger().  A formula interface allows to control which variables should be imputed by which.
+# License: GPL (>= 2)
+# Depends: R (>= 3.5.0)
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Imports: ranger, FNN, stats, utils
+# Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
+# URL: https://github.com/mayer79/missRanger
+# BugReports: https://github.com/mayer79/missRanger/issues
+# VignetteBuilder: knitr
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2023-10-20 17:47:33 UTC; Michael
+# Author: Michael Mayer [aut, cre, cph]
+# Maintainer: Michael Mayer <mayermichael79@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-20 18:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

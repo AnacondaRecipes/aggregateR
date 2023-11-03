@@ -1,0 +1,82 @@
+{% set version = '0.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-implied
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/implied_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/implied/implied_{{ version }}.tar.gz
+  sha256: d55abcefdaa433ce6f1697a86eb610feec2545767590e3c80701718046c49607
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.0.1), knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('implied')"           # [not win]
+    - "\"%R%\" -e \"library('implied')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=implied
+  license: GPL-3
+  summary: Convert between bookmaker odds and probabilities. Eight different algorithms are available,
+    including basic normalization, Shin's method (Hyun Song Shin, (1992) <doi:10.2307/2234526>),
+    and others.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: implied
+# Type: Package
+# Title: Convert Between Bookmaker Odds and Probabilities
+# Version: 0.5
+# Author: Jonas Christoffer Lindstrm
+# Maintainer: Jonas Christoffer Lindstrm <jonaslindstrom88@gmail.com>
+# Description: Convert between bookmaker odds and probabilities. Eight different algorithms are available, including basic normalization, Shin's method (Hyun Song Shin, (1992) <doi:10.2307/2234526>), and others.
+# License: GPL-3
+# Encoding: UTF-8
+# RoxygenNote: 7.1.2
+# Suggests: testthat (>= 2.0.1), knitr, rmarkdown
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2023-06-11 18:14:04 UTC; Jonas Christoffer
+# Repository: CRAN
+# Date/Publication: 2023-06-11 19:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,135 @@
+{% set version = '4.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-spamm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/spaMM_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/spaMM/spaMM_{{ version }}.tar.gz
+  sha256: ff7299662dfa60b73f8792242a7480332468c9248f337b89c38dc95388762731
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: maps, testthat, rcdd, foreach, future, future.apply, Infusion (>= 1.3.0), IsoriX (>= 0.8.1), blackbox (>= 1.1.25), RSpectra, ROI.plugin.glpk, lme4, rsae, multilevel, agridat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-roi
+    - r-rcpp >=0.12.10
+    - r-rcppeigen >=0.3.3.5.0
+    - r-backports
+    - r-boot
+    - r-crayon
+    - r-geometry >=0.4.0
+    - r-gmp >=0.6.0
+    - r-minqa
+    - r-nlme
+    - r-nloptr
+    - r-numderiv
+    - r-pbapply
+    - r-proxy
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-matrix
+    - r-roi
+    - r-rcpp >=0.12.10
+    - r-rcppeigen >=0.3.3.5.0
+    - r-backports
+    - r-boot
+    - r-crayon
+    - r-geometry >=0.4.0
+    - r-gmp >=0.6.0
+    - r-minqa
+    - r-nlme
+    - r-nloptr
+    - r-numderiv
+    - r-pbapply
+    - r-proxy
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('spaMM')"           # [not win]
+    - "\"%R%\" -e \"library('spaMM')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.r-project.org, https://gitlab.mbb.univ-montp2.fr/francois/spamm-ref
+  license: CeCILL-2
+  summary: Inference based on models with or without spatially-correlated random effects, multivariate
+    responses, or non-Gaussian random effects (e.g., Beta). Variation in residual variance
+    (heteroscedasticity) can itself be represented by a mixed-effect model. Both classical
+    geostatistical models (Rousset and Ferdy 2014 <doi:10.1111/ecog.00566>), and Markov
+    random field models on irregular grids (as considered in the 'INLA' package, <https://www.r-inla.org>),
+    can be fitted, with distinct computational procedures exploiting the sparse matrix
+    representations for the latter case and other autoregressive models. Laplace approximations
+    are used for likelihood or restricted  likelihood. Penalized quasi-likelihood and
+    other variants discussed in the h-likelihood literature (Lee and Nelder 2001 <doi:10.1093/biomet/88.4.987>)
+    are also implemented.
+  license_family: OTHER
+
+# The original CRAN metadata for this package was:
+
+# Package: spaMM
+# Type: Package
+# Title: Mixed-Effect Models, with or without Spatial Random Effects
+# Encoding: UTF-8
+# Version: 4.4.0
+# Date: 2023-08-30
+# Authors@R: c(person("Francois", "Rousset", role = c("aut", "cre", "cph"), email = "francois.rousset@umontpellier.fr", comment = c(ORCID = "0000-0003-4670-0371")), person("Jean-Baptiste", "Ferdy", role = c("aut","cph")), person("Alexandre", "Courtiol", role = "aut", comment = c(ORCID = "0000-0003-0637-2959")) )
+# Maintainer: Francois Rousset <francois.rousset@umontpellier.fr>
+# Imports: methods, stats, graphics, Matrix, MASS, proxy, Rcpp (>= 0.12.10), nlme, nloptr, minqa, pbapply, crayon, gmp (>= 0.6.0), ROI, boot, geometry (>= 0.4.0), numDeriv, backports
+# LinkingTo: Rcpp, RcppEigen (>= 0.3.3.5.0)
+# Depends: R (>= 3.5.0)
+# Suggests: maps, testthat, rcdd, foreach, future, future.apply, Infusion (>= 1.3.0), IsoriX (>= 0.8.1), blackbox (>= 1.1.25), RSpectra, ROI.plugin.glpk, lme4, rsae, multilevel, agridat
+# Enhances: multcomp, RLRsim, lmerTest
+# NeedsCompilation: yes
+# SystemRequirements: GNU Scientific Library (GSL)
+# Description: Inference based on models with or without spatially-correlated random effects, multivariate responses, or non-Gaussian random effects (e.g., Beta). Variation in residual variance (heteroscedasticity) can itself be represented by a mixed-effect model. Both classical geostatistical models (Rousset and Ferdy 2014 <doi:10.1111/ecog.00566>), and Markov random field models on irregular grids (as considered in the 'INLA' package, <https://www.r-inla.org>), can be fitted, with distinct computational procedures exploiting the sparse matrix representations for the latter case and other autoregressive models. Laplace approximations are used for likelihood or restricted  likelihood. Penalized quasi-likelihood and other variants discussed in the h-likelihood literature (Lee and Nelder 2001 <doi:10.1093/biomet/88.4.987>) are also implemented.
+# License: CeCILL-2
+# URL: https://www.r-project.org, https://gitlab.mbb.univ-montp2.fr/francois/spamm-ref
+# RoxygenNote: 7.1.2
+# ByteCompile: true
+# Packaged: 2023-08-29 22:18:49 UTC; francois.rousset
+# Author: Francois Rousset [aut, cre, cph] (<https://orcid.org/0000-0003-4670-0371>), Jean-Baptiste Ferdy [aut, cph], Alexandre Courtiol [aut] (<https://orcid.org/0000-0003-0637-2959>)
+# Repository: CRAN
+# Date/Publication: 2023-08-29 23:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

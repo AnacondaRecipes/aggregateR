@@ -1,0 +1,107 @@
+{% set version = '0.2.48.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-loa
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/loa_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/loa/loa_{{ version }}.tar.gz
+  sha256: 00bf1957ca71fec72865b953f22c578937b27fb21b0069979ca237af6ff741b9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: sf
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-openstreetmap
+    - r-rcolorbrewer
+    - r-rgooglemaps
+    - r-lattice
+    - r-mgcv
+    - r-plyr
+    - r-png
+    - r-sp >=2.1_1
+
+  run:
+    - r-base
+    - r-mass
+    - r-openstreetmap
+    - r-rcolorbrewer
+    - r-rgooglemaps
+    - r-lattice
+    - r-mgcv
+    - r-plyr
+    - r-png
+    - r-sp >=2.1_1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('loa')"           # [not win]
+    - "\"%R%\" -e \"library('loa')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://loa.r-forge.r-project.org/loa.intro.html
+  license: GPL-2
+  summary: Various plots and functions that make use of the lattice/trellis plotting framework.
+    The plots, which include loaPlot(), RgoogleMapsPlot() and trianglePlot(), use panelPal(),
+    a function that extends 'lattice' and 'hexbin' package methods to automate plot
+    subscript and panel-to-panel and panel-to-key synchronization/management.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: loa
+# Type: Package
+# Title: Lattice Options and Add-Ins
+# Version: 0.2.48.3
+# Date: 2023-10-19
+# Authors@R: c(person(given = "Karl", family = "Ropkins", role = c("aut", "cre"), email = "karl.ropkins@gmail.com", comment = c(ORCID = "0000-0002-0294-6997")))
+# URL: http://loa.r-forge.r-project.org/loa.intro.html
+# Maintainer: Karl Ropkins <karl.ropkins@gmail.com>
+# Description: Various plots and functions that make use of the lattice/trellis plotting framework. The plots, which include loaPlot(), RgoogleMapsPlot() and trianglePlot(), use panelPal(), a function that extends 'lattice' and 'hexbin' package methods to automate plot subscript and panel-to-panel and panel-to-key synchronization/management.
+# Depends: R (>= 3.5.0), lattice
+# Imports: methods, MASS, grid, png, RgoogleMaps, OpenStreetMap, sp(>= 2.1-1), RColorBrewer, mgcv, plyr
+# Suggests: sf
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyLoad: yes
+# LazyData: yes
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-10-20 10:51:02 UTC; trakradmin
+# Author: Karl Ropkins [aut, cre] (<https://orcid.org/0000-0002-0294-6997>)
+# Repository: CRAN
+# Date/Publication: 2023-10-20 15:30:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

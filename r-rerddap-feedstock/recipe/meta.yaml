@@ -1,0 +1,111 @@
+{% set version = '1.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rerddap
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rerddap_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rerddap/rerddap_{{ version }}.tar.gz
+  sha256: df1a87c4d4f73e06597875379f5c98cf9a95af776970beb8299734ebb60f6498
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-crul >=0.7.4
+    - r-data.table >=1.12.0
+    - r-digest
+    - r-dplyr >=0.5.0
+    - r-hoardr >=0.5.2
+    - r-jsonlite >=1.6
+    - r-ncdf4 >=1.16
+    - r-tibble
+    - r-xml2 >=1.2.0
+
+  run:
+    - r-base
+    - r-crul >=0.7.4
+    - r-data.table >=1.12.0
+    - r-digest
+    - r-dplyr >=0.5.0
+    - r-hoardr >=0.5.2
+    - r-jsonlite >=1.6
+    - r-ncdf4 >=1.16
+    - r-tibble
+    - r-xml2 >=1.2.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rerddap')"           # [not win]
+    - "\"%R%\" -e \"library('rerddap')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://docs.ropensci.org/rerddap/, https://github.com/ropensci/rerddap
+  license: MIT
+  summary: 'General purpose R client for ''ERDDAP'' servers. Includes functions to search for
+    ''datasets'', get summary information on ''datasets'', and fetch ''datasets'', in
+    either ''csv'' or ''netCDF'' format. ''ERDDAP'' information: <https://upwell.pfeg.noaa.gov/erddap/information.html>.'
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: rerddap
+# Title: General Purpose Client for 'ERDDAP' Servers
+# Description: General purpose R client for 'ERDDAP' servers. Includes functions to search for 'datasets', get summary information on 'datasets', and fetch 'datasets', in either 'csv' or 'netCDF' format. 'ERDDAP' information: <https://upwell.pfeg.noaa.gov/erddap/information.html>.
+# Version: 1.0.4
+# Date: 2023-08-22
+# License: MIT + file LICENSE
+# Authors@R: c( person("Scott", "Chamberlain", role = "aut"), person("Ben", "Tupper", role = "ctb"), person("Salvador Jesus Fernandez", "Bejarano", role = "ctb"), person("Roy", "Mendelssohn", role = c("cre", "ctb"), email = "roy.mendelssohn@noaa.gov") )
+# URL: https://docs.ropensci.org/rerddap/, https://github.com/ropensci/rerddap
+# BugReports: https://github.com/ropensci/rerddap/issues
+# LazyData: true
+# Depends: R (>= 4.00)
+# Encoding: UTF-8
+# Language: en-US
+# Imports: utils, crul (>= 0.7.4), dplyr (>= 0.5.0), data.table (>= 1.12.0), jsonlite (>= 1.6), xml2 (>= 1.2.0), digest, ncdf4 (>= 1.16), tibble, hoardr (>= 0.5.2)
+# Suggests: knitr, rmarkdown
+# RoxygenNote: 7.2.3
+# VignetteBuilder: knitr
+# X-schema.org-applicationCategory: Climate
+# X-schema.org-keywords: earth, science, climate, precipitation, temperature, storm, buoy, NOAA
+# X-schema.org-isPartOf: https://ropensci.org
+# NeedsCompilation: no
+# Packaged: 2023-08-23 01:37:16 UTC; rmendels
+# Author: Scott Chamberlain [aut], Ben Tupper [ctb], Salvador Jesus Fernandez Bejarano [ctb], Roy Mendelssohn [cre, ctb]
+# Maintainer: Roy Mendelssohn <roy.mendelssohn@noaa.gov>
+# Repository: CRAN
+# Date/Publication: 2023-08-23 03:40:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

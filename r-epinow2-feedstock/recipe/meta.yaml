@@ -1,0 +1,153 @@
+{% set version = '1.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-epinow2
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/EpiNow2_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/EpiNow2/EpiNow2_{{ version }}.tar.gz
+  sha256: 1aaaf9427576c3f64c3cde19aa02e423de3ff0f1cde26793ba9881e57ee54d35
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, dplyr, here, kableExtra, knitr, magrittr, precommit, rmarkdown, spelling, styler, testthat, tidyr, withr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh >=1.66.0
+    - r-r.utils >=2.0.0
+    - r-rcpp >=0.12.0
+    - r-rcppeigen >=0.3.3.3.0
+    - r-rcppparallel >=5.0.1
+    - r-stanheaders >=2.26.0
+    - r-data.table
+    - r-futile.logger >=1.4
+    - r-future
+    - r-future.apply
+    - r-ggplot2
+    - r-lifecycle
+    - r-lubridate
+    - r-patchwork
+    - r-progressr
+    - r-purrr
+    - r-rlang >=0.4.7
+    - r-rstan >=2.26.0
+    - r-rstantools >=2.2.0
+    - r-runner
+    - r-scales
+    - r-truncnorm
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.66.0
+    - r-r.utils >=2.0.0
+    - r-rcpp >=0.12.0
+    - r-rcppeigen >=0.3.3.3.0
+    - r-rcppparallel >=5.0.1
+    - r-stanheaders >=2.26.0
+    - r-data.table
+    - r-futile.logger >=1.4
+    - r-future
+    - r-future.apply
+    - r-ggplot2
+    - r-lifecycle
+    - r-lubridate
+    - r-patchwork
+    - r-progressr
+    - r-purrr
+    - r-rlang >=0.4.7
+    - r-rstan >=2.26.0
+    - r-rstantools >=2.2.0
+    - r-runner
+    - r-scales
+    - r-truncnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('EpiNow2')"           # [not win]
+    - "\"%R%\" -e \"library('EpiNow2')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://epiforecasts.io/EpiNow2/, https://epiforecasts.io/EpiNow2/dev/, https://github.com/epiforecasts/EpiNow2
+  license: MIT
+  summary: Estimates the time-varying reproduction number, rate of spread, and doubling time
+    using a range of open-source tools (Abbott et al. (2020) <doi:10.12688/wellcomeopenres.16006.1>),
+    and current best practices (Gostic et al. (2020) <doi:10.1101/2020.06.18.20134858>).  It
+    aims to help users avoid some of the limitations of naive implementations in a framework
+    that is informed by community feedback and is actively supported.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: EpiNow2
+# Title: Estimate Real-Time Case Counts and Time-Varying Epidemiological Parameters
+# Version: 1.4.0
+# Authors@R: c(person(given = "Sam", family = "Abbott", role = c("aut", "cre"), email = "sam.abbott@lshtm.ac.uk", comment = c(ORCID = "0000-0001-8057-8037")), person(given = "Joel", family = "Hellewell", role = "aut", email = "joel.hellewell@lshtm.ac.uk", comment = c(ORCID = "0000-0003-2683-0849")), person(given = "Katharine", family = "Sherratt", role = "aut", email = "katharine.sherratt@lshtm.ac.uk"), person(given = "Katelyn", family = "Gostic", role = "aut", email = "kgostic@uchicago.edu"), person(given = "Joe", family = "Hickson", role = "aut", email = "joseph.hickson@metoffice.gov.uk"), person(given = "Hamada S.", family = "Badr", role = "aut", email = "badr@jhu.edu", comment = c(ORCID = "0000-0002-9808-2344")), person(given = "Michael", family = "DeWitt", role = "aut", email = "me.dewitt.jr@gmail.com", comment = c(ORCID = "0000-0001-8940-1967")), person(given = "Robin", family = "Thompson", role = "ctb", email = "robin.thompson@lshtm.ac.uk"), person(given = "Sophie", family = "Meakin", role = "ctb", email = "sophie.meaking@lshtm.ac.uk"), person(given = "James", family = "Munday", role = "ctb", email = "james.munday@lshtm.ac.uk"), person(given = "Nikos", family = "Bosse", role = "ctb"), person(given = "Paul", family = "Mee", role = "ctb", email = "paul.mee@lshtm.ac.uk"), person(given = "Peter", family = "Ellis", role = "ctb", email = "peter.ellis2013nz@gmail.com"), person(given = "Pietro", family = "Monticone", role = "ctb", email = "pietro.monticone@edu.unito.it"), person(given = "Lloyd", family = "Chapman", role = "ctb", email = "lloyd.chapman1@lshtm.ac.uk "), person(given = "James M.", family = "Azam", role = "ctb", email = "james.azam@lshtm.ac.uk", comment = c(ORCID = "0000-0001-5782-7330")), person(given = "Andrew", family = "Johnson", role = "ctb", email = "andrew.johnson@arjohnsonau.com"), person(given = "EpiForecasts", role = "aut"), person(given = "Sebastian", family = "Funk", role = "aut", email = "sebastian.funk@lshtm.ac.uk", comment = c(ORCID = "0000-0002-2842-3406")) )
+# Description: Estimates the time-varying reproduction number, rate of spread, and doubling time using a range of open-source tools (Abbott et al. (2020) <doi:10.12688/wellcomeopenres.16006.1>), and current best practices (Gostic et al. (2020) <doi:10.1101/2020.06.18.20134858>).  It aims to help users avoid some of the limitations of naive implementations in a framework that is informed by community feedback and is actively supported.
+# License: MIT + file LICENSE
+# URL: https://epiforecasts.io/EpiNow2/, https://epiforecasts.io/EpiNow2/dev/, https://github.com/epiforecasts/EpiNow2
+# BugReports: https://github.com/epiforecasts/EpiNow2/issues
+# Depends: R (>= 3.5.0)
+# Imports: data.table, futile.logger (>= 1.4), future, future.apply, ggplot2, lifecycle, lubridate, methods, patchwork, progressr, purrr, R.utils (>= 2.0.0), Rcpp (>= 0.12.0), rlang (>= 0.4.7), rstan (>= 2.26.0), rstantools (>= 2.2.0), runner, scales, stats, truncnorm, utils
+# Suggests: covr, dplyr, here, kableExtra, knitr, magrittr, precommit, rmarkdown, spelling, styler, testthat, tidyr, withr
+# LinkingTo: BH (>= 1.66.0), Rcpp (>= 0.12.0), RcppEigen (>= 0.3.3.3.0), RcppParallel (>= 5.0.1), rstan (>= 2.26.0), StanHeaders (>= 2.26.0)
+# Biarch: true
+# Config/testthat/edition: 3
+# Encoding: UTF-8
+# Language: en-GB
+# LazyData: true
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# SystemRequirements: GNU make C++17
+# VignetteBuilder: knitr
+# Packaged: 2023-09-18 08:33:03 UTC; sebfunk
+# Author: Sam Abbott [aut, cre] (<https://orcid.org/0000-0001-8057-8037>), Joel Hellewell [aut] (<https://orcid.org/0000-0003-2683-0849>), Katharine Sherratt [aut], Katelyn Gostic [aut], Joe Hickson [aut], Hamada S. Badr [aut] (<https://orcid.org/0000-0002-9808-2344>), Michael DeWitt [aut] (<https://orcid.org/0000-0001-8940-1967>), Robin Thompson [ctb], Sophie Meakin [ctb], James Munday [ctb], Nikos Bosse [ctb], Paul Mee [ctb], Peter Ellis [ctb], Pietro Monticone [ctb], Lloyd Chapman [ctb], James M. Azam [ctb] (<https://orcid.org/0000-0001-5782-7330>), Andrew Johnson [ctb], EpiForecasts [aut], Sebastian Funk [aut] (<https://orcid.org/0000-0002-2842-3406>)
+# Maintainer: Sam Abbott <sam.abbott@lshtm.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2023-09-26 12:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

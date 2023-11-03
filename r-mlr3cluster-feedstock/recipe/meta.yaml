@@ -1,0 +1,104 @@
+{% set version = '0.1.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mlr3cluster
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mlr3cluster_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mlr3cluster/mlr3cluster_{{ version }}.tar.gz
+  sha256: 1cad5cdd6e093447cf8f40c76e0c8b47a87a394e9e1925776cdc80e53040b063
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: dbscan, e1071, ClusterR, kernlab, apcluster, LPCM, mclust, mlbench, RWeka, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6
+    - r-backports >=1.1.10
+    - r-checkmate
+    - r-clue
+    - r-cluster
+    - r-data.table
+    - r-fpc
+    - r-mlr3 >=0.14.0
+    - r-mlr3misc >=0.9.4
+    - r-paradox
+
+  run:
+    - r-base
+    - r-r6
+    - r-backports >=1.1.10
+    - r-checkmate
+    - r-clue
+    - r-cluster
+    - r-data.table
+    - r-fpc
+    - r-mlr3 >=0.14.0
+    - r-mlr3misc >=0.9.4
+    - r-paradox
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mlr3cluster')"           # [not win]
+    - "\"%R%\" -e \"library('mlr3cluster')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://mlr3cluster.mlr-org.com, https://github.com/mlr-org/mlr3cluster
+  license: LGPL-3
+  summary: Extends the 'mlr3' package with cluster analysis.
+  license_family: LGPL
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/LGPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: mlr3cluster
+# Title: Cluster Extension for 'mlr3'
+# Version: 0.1.8
+# Authors@R: c(person(given = "Damir", family = "Pulatov", role = c("cre", "aut"), email = "damirpolat@protonmail.com"), person(given = "Michel", family = "Lang", role = "aut", email = "michellang@gmail.com", comment = c(ORCID = "0000-0001-9754-0393")))
+# Description: Extends the 'mlr3' package with cluster analysis.
+# License: LGPL-3
+# URL: https://mlr3cluster.mlr-org.com, https://github.com/mlr-org/mlr3cluster
+# BugReports: https://github.com/mlr-org/mlr3cluster/issues
+# Depends: R (>= 3.1.0), mlr3 (>= 0.14.0)
+# Imports: backports (>= 1.1.10), checkmate, clue, fpc, cluster, data.table, mlr3misc (>= 0.9.4), paradox, R6, stats
+# Suggests: dbscan, e1071, ClusterR, kernlab, apcluster, LPCM, mclust, mlbench, RWeka, testthat
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Collate: 'LearnerClust.R' 'aaa.R' 'LearnerClustAffinityPropagation.R' 'LearnerClustAgnes.R' 'LearnerClustCMeans.R' 'LearnerClustCobweb.R' 'LearnerClustDBSCAN.R' 'LearnerClustDiana.R' 'LearnerClustEM.R' 'LearnerClustFanny.R' 'LearnerClustFarthestFirst.R' 'LearnerClustFeatureless.R' 'LearnerClustHclust.R' 'LearnerClustKKMeans.R' 'LearnerClustKMeans.R' 'LearnerClustMclust.R' 'LearnerClustMeanShift.R' 'LearnerClustMiniBatchKMeans.R' 'LearnerClustPAM.R' 'LearnerClustSimpleKMeans.R' 'LearnerClustXMeans.R' 'MeasureClust.R' 'measures.R' 'MeasureClustInternal.R' 'PredictionClust.R' 'PredictionDataClust.R' 'TaskClust.R' 'TaskClust_ruspini.R' 'TaskClust_usarrest.R' 'as_prediction_clust.R' 'as_task_clust.R' 'bibentries.R' 'helper.R' 'zzz.R'
+# NeedsCompilation: no
+# Packaged: 2023-03-12 21:18:12 UTC; damir
+# Author: Damir Pulatov [cre, aut], Michel Lang [aut] (<https://orcid.org/0000-0001-9754-0393>)
+# Maintainer: Damir Pulatov <damirpolat@protonmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-03-12 21:50:12 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

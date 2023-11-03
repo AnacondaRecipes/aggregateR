@@ -1,0 +1,103 @@
+{% set version = '1.9.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-regsem
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/regsem_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/regsem/regsem_{{ version }}.tar.gz
+  sha256: 7392bd644efe82f96da0df470a962de398f1d0162273cba1ff31c2ecd7f17a53
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: snowfall, markdown, MASS, GA, caret, glmnet, ISLR, lbfgs, numDeriv, psych, knitr, nloptr, NlcOptim, optimx, semPlot, colorspace, plyr, matrixStats, stringr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-rsolnp
+    - r-lavaan
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-rsolnp
+    - r-lavaan
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('regsem')"           # [not win]
+    - "\"%R%\" -e \"library('regsem')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/Rjacobucci/regsem/
+  license: GPL-2
+  summary: Uses both ridge and lasso penalties (and extensions) to penalize specific parameters
+    in structural equation models. The package offers additional cost functions, cross
+    validation, and other extensions beyond traditional structural equation models.
+    Also contains a function to perform exploratory mediation (XMed).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: regsem
+# Type: Package
+# Title: Regularized Structural Equation Modeling
+# Version: 1.9.5
+# Authors@R: c( person("Ross", "Jacobucci",email = "rcjacobuc@gmail.com",role = c("aut","cre")), person("Kevin","Grimm", role="ctb"), person("Andreas","Brandmaier", role="ctb"), person("Sarfaraz","Serang", role="ctb"), person("Rogier","Kievit", role="ctb"), person("Florian","Scharf", role="ctb"), person("Xiaobei","Li", role="ctb"), person("Ai","Ye", role="ctb") )
+# Maintainer: Ross Jacobucci <rcjacobuc@gmail.com>
+# Description: Uses both ridge and lasso penalties (and extensions) to penalize specific parameters in structural equation models. The package offers additional cost functions, cross validation, and other extensions beyond traditional structural equation models. Also contains a function to perform exploratory mediation (XMed).
+# URL: https://github.com/Rjacobucci/regsem/
+# BugReports: https://github.com/Rjacobucci/regsem/issues/
+# License: GPL (>= 2)
+# VignetteBuilder: knitr
+# Depends: lavaan, Rcpp, Rsolnp
+# Suggests: snowfall, markdown, MASS, GA, caret, glmnet, ISLR, lbfgs, numDeriv, psych, knitr, nloptr, NlcOptim, optimx, semPlot, colorspace, plyr, matrixStats, stringr
+# LinkingTo: Rcpp, RcppArmadillo
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-06-01 17:13:30 UTC; rjacobuc
+# Author: Ross Jacobucci [aut, cre], Kevin Grimm [ctb], Andreas Brandmaier [ctb], Sarfaraz Serang [ctb], Rogier Kievit [ctb], Florian Scharf [ctb], Xiaobei Li [ctb], Ai Ye [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-06-02 09:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

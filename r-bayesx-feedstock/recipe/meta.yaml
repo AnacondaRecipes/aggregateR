@@ -1,0 +1,98 @@
+{% set version = '0.3-3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bayesx
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BayesX_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BayesX/BayesX_{{ version }}.tar.gz
+  sha256: f7b5c4e0bb245973b6d1ef59df383acbe59c5963c7139fa61294c3efed08b2fb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: spdep
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-coda
+    - r-colorspace
+    - r-interp
+    - r-sf
+    - r-shapefiles
+    - r-sp
+
+  run:
+    - r-base
+    - r-coda
+    - r-colorspace
+    - r-interp
+    - r-sf
+    - r-shapefiles
+    - r-sp
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BayesX')"           # [not win]
+    - "\"%R%\" -e \"library('BayesX')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=BayesX
+  license: GPL-2 | GPL-3
+  summary: Functions for exploring and visualising estimation results obtained with BayesX, a
+    free software for estimating structured additive regression models (<https://www.uni-goettingen.de/de/bayesx/550513.html>).
+    In addition, functions that allow to read, write and manipulate map objects that
+    are required in spatial analyses performed with BayesX.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: BayesX
+# Type: Package
+# Title: R Utilities Accompanying the Software Package BayesX
+# Version: 0.3-3
+# Date: 2023-10-20
+# Authors@R: c(person(given = "Nikolaus", family = "Umlauf", role = c("aut", "cre"), email = "Nikolaus.Umlauf@uibk.ac.at", comment = c(ORCID = "0000-0003-2160-9803")), person(given = "Thomas", family = "Kneib", role = "aut", email = "tkneib@uni-goettingen.de"), person(given = "Nadja", family = "Klein", role = "aut", email = "nadja.klein@tu-dortmund.de"), person(given = "Felix", family = "Heinzl", role = "ctb"), person(given = "Andreas", family = "Brezger", role = "ctb"), person(given = "Daniel", family = "Sabanes Bove", role = "ctb"))
+# Description: Functions for exploring and visualising estimation results obtained with BayesX, a free software for estimating structured additive regression models (<https://www.uni-goettingen.de/de/bayesx/550513.html>). In addition, functions that allow to read, write and manipulate map objects that are required in spatial analyses performed with BayesX.
+# Depends: shapefiles
+# Imports: sp, sf, colorspace, coda, splines, methods, interp
+# Suggests: spdep
+# LazyLoad: yes
+# License: GPL-2 | GPL-3
+# NeedsCompilation: no
+# Packaged: 2023-10-20 06:19:08 UTC; nik
+# Author: Nikolaus Umlauf [aut, cre] (<https://orcid.org/0000-0003-2160-9803>), Thomas Kneib [aut], Nadja Klein [aut], Felix Heinzl [ctb], Andreas Brezger [ctb], Daniel Sabanes Bove [ctb]
+# Maintainer: Nikolaus Umlauf <Nikolaus.Umlauf@uibk.ac.at>
+# Repository: CRAN
+# Date/Publication: 2023-10-20 07:20:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

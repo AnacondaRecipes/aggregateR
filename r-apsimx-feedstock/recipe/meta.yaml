@@ -1,0 +1,98 @@
+{% set version = '2.3.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-apsimx
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/apsimx_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/apsimx/apsimx_{{ version }}.tar.gz
+  sha256: f2eada361281d505a102e96c35ce42bb74de88fc9ec90f4819ab4195dcbf31b4
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: BayesianTools, chirps, datasets, daymetr, FedData, ggplot2, GSODR, listviewer, maps, mvtnorm, nasapower, nloptr, reactR, rmarkdown, sensitivity, soilDB, sp, spData, sf, ucminf
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dbi
+    - r-rsqlite
+    - r-jsonlite
+    - r-knitr
+    - r-xml2
+
+  run:
+    - r-base
+    - r-dbi
+    - r-rsqlite
+    - r-jsonlite
+    - r-knitr
+    - r-xml2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('apsimx')"           # [not win]
+    - "\"%R%\" -e \"library('apsimx')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=apsimx
+  license: GPL-3
+  summary: The functions in this package inspect, read, edit and run files for 'APSIM' "Next
+    Generation" ('JSON') and 'APSIM' "Classic" ('XML'). The files with an 'apsim' extension
+    correspond to 'APSIM' Classic (7.x) - Windows only - and the ones with an 'apsimx'
+    extension correspond to 'APSIM' "Next Generation". For more information about 'APSIM'
+    see (<https://www.apsim.info/>) and for 'APSIM' next generation (<https://apsimnextgeneration.netlify.app/>).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: apsimx
+# Title: Inspect, Read, Edit and Run 'APSIM' "Next Generation" and 'APSIM' Classic
+# Version: 2.3.1
+# Authors@R: person("Fernando", "Miguez", email = "femiguez@iastate.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-4627-8329"))
+# Description: The functions in this package inspect, read, edit and run files for 'APSIM' "Next Generation" ('JSON') and 'APSIM' "Classic" ('XML'). The files with an 'apsim' extension correspond to 'APSIM' Classic (7.x) - Windows only - and the ones with an 'apsimx' extension correspond to 'APSIM' "Next Generation". For more information about 'APSIM' see (<https://www.apsim.info/>) and for 'APSIM' next generation (<https://apsimnextgeneration.netlify.app/>).
+# Depends: R (>= 3.5.0)
+# License: GPL-3
+# Encoding: UTF-8
+# VignetteBuilder: knitr
+# BugReports: https://github.com/femiguez/apsimx/issues
+# Imports: DBI, jsonlite, knitr, RSQLite, tools, utils, xml2
+# Suggests: BayesianTools, chirps, datasets, daymetr, FedData, ggplot2, GSODR, listviewer, maps, mvtnorm, nasapower, nloptr, reactR, rmarkdown, sensitivity, soilDB, sp, spData, sf, ucminf
+# LazyData: true
+# RoxygenNote: 7.1.1
+# NeedsCompilation: no
+# Packaged: 2022-01-04 14:39:20 UTC; fernandomiguez
+# Author: Fernando Miguez [aut, cre] (<https://orcid.org/0000-0002-4627-8329>)
+# Maintainer: Fernando Miguez <femiguez@iastate.edu>
+# Repository: CRAN
+# Date/Publication: 2022-01-04 18:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

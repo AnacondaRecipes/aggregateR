@@ -1,0 +1,100 @@
+{% set version = '1.5.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pivottabler
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pivottabler_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pivottabler/pivottabler_{{ version }}.tar.gz
+  sha256: d60f9b7a6aa0761bf28edfa695649a61a695b2e83ec7ad01956f3ba895f8c9cd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: ggplot2 (>= 2.2.0), jsonlite (>= 1.1), lubridate (>= 1.5.0), listviewer (>= 1.4.0), openxlsx (>= 4.0.17), basictabler (>= 1.0.2), shiny, knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r6 >=2.2.0
+    - r-data.table >=1.10.0
+    - r-dplyr >=0.5.0
+    - r-htmltools >=0.3.5
+    - r-htmlwidgets >=0.8
+
+  run:
+    - r-base
+    - r-r6 >=2.2.0
+    - r-data.table >=1.10.0
+    - r-dplyr >=0.5.0
+    - r-htmltools >=0.3.5
+    - r-htmlwidgets >=0.8
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pivottabler')"           # [not win]
+    - "\"%R%\" -e \"library('pivottabler')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.pivottabler.org.uk/, https://github.com/cbailiss/pivottabler
+  license: GPL-3
+  summary: Create regular pivot tables with just a few lines of R. More complex pivot tables
+    can also be created, e.g. pivot tables with irregular layouts, multiple calculations
+    and/or derived calculations based on multiple data frames.  Pivot tables are constructed
+    using R only and can be written to a range of output formats (plain text, 'HTML',
+    'Latex' and 'Excel'), including with styling/formatting.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: pivottabler
+# Type: Package
+# Title: Create Pivot Tables
+# Version: 1.5.5
+# Authors@R: person("Christopher", "Bailiss", email = "cbailiss@gmail.com", role = c("aut", "cre"))
+# Description: Create regular pivot tables with just a few lines of R. More complex pivot tables can also be created, e.g. pivot tables with irregular layouts, multiple calculations and/or derived calculations based on multiple data frames.  Pivot tables are constructed using R only and can be written to a range of output formats (plain text, 'HTML', 'Latex' and 'Excel'), including with styling/formatting.
+# Depends: R (>= 3.3.0)
+# Imports: R6 (>= 2.2.0), dplyr (>= 0.5.0), data.table (>= 1.10.0), htmltools(>= 0.3.5), htmlwidgets (>= 0.8)
+# Suggests: ggplot2 (>= 2.2.0), jsonlite (>= 1.1), lubridate (>= 1.5.0), listviewer (>= 1.4.0), openxlsx (>= 4.0.17), basictabler (>= 1.0.2), shiny, knitr, rmarkdown, testthat
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# URL: http://www.pivottabler.org.uk/, https://github.com/cbailiss/pivottabler
+# BugReports: https://github.com/cbailiss/pivottabler/issues
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-10-01 15:39:47 UTC; bailis01
+# Author: Christopher Bailiss [aut, cre]
+# Maintainer: Christopher Bailiss <cbailiss@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-01 16:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,85 @@
+{% set version = '6.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-portes
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/portes_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/portes/portes_{{ version }}.tar.gz
+  sha256: d96afa67a0e1d2d6ce5c76f1d49c0b10ce220df4fa8166a37269533bf99660cb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-forecast >=8.21
+    - r-vars >=1.5_9
+
+  run:
+    - r-base
+    - r-forecast >=8.21
+    - r-vars >=1.5_9
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('portes')"           # [not win]
+    - "\"%R%\" -e \"library('portes')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=portes
+  license: GPL-2
+  summary: Contains common univariate and multivariate portmanteau test statistics for time series
+    models. These tests are based on using asymptotic distributions such as chi-square
+    distribution and based on using the Monte Carlo significance tests. Also, it can
+    be used to simulate from univariate and multivariate seasonal time series models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: portes
+# Type: Package
+# Title: Portmanteau Tests for Time Series Models
+# Version: 6.0
+# Author: Esam Mahdi
+# Maintainer: Esam Mahdi <emahdi2012@gmail.com>
+# Description: Contains common univariate and multivariate portmanteau test statistics for time series models. These tests are based on using asymptotic distributions such as chi-square distribution and based on using the Monte Carlo significance tests. Also, it can be used to simulate from univariate and multivariate seasonal time series models.
+# Imports: parallel, forecast(>= 8.21), vars(>= 1.5-9)
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: no
+# Packaged: 2023-06-18 07:26:56 UTC; emahdi
+# Repository: CRAN
+# Date/Publication: 2023-06-18 22:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

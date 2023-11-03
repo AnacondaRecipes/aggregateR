@@ -1,0 +1,95 @@
+{% set version = '2.4.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-kml
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/kml_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/kml/kml_{{ version }}.tar.gz
+  sha256: 120d02118c372e51b28a0476e65597756145559d0b559e31fe4ea7bc5989aab6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-clv
+    - r-longitudinaldata >=2.4
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-clv
+    - r-longitudinaldata >=2.4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('kml')"           # [not win]
+    - "\"%R%\" -e \"library('kml')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http:www.r-project.org
+  license: GPL-2
+  summary: An implementation of k-means specifically design to cluster longitudinal data. It
+    provides facilities to deal with missing value, compute several quality criterion
+    (Calinski and Harabatz, Ray and Turie, Davies and Bouldin, BIC, ...) and propose
+    a graphical interface for choosing the 'best' number of clusters.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: kml
+# Type: Package
+# Title: K-Means for Longitudinal Data
+# Version: 2.4.6
+# Date: 2023-02-11
+# Authors@R: c(person("Christophe","Genolini",role=c("cre","aut"),email="christophe.genolini@u-paris10.fr"), person("Bruno","Falissard",role=c("ctb")), person("Patrice","Kiener",role=c("ctb")) )
+# Description: An implementation of k-means specifically design to cluster longitudinal data. It provides facilities to deal with missing value, compute several quality criterion (Calinski and Harabatz, Ray and Turie, Davies and Bouldin, BIC, ...) and propose a graphical interface for choosing the 'best' number of clusters.
+# License: GPL (>= 2)
+# LazyData: no
+# URL: http:www.r-project.org
+# Collate: global.R clusterLongData.R parKml.R parChoice.R kml.R
+# Depends: methods,clv,longitudinalData (>= 2.4)
+# Encoding: latin1
+# NeedsCompilation: yes
+# Author: Christophe Genolini [cre, aut], Bruno Falissard [ctb], Patrice Kiener [ctb]
+# Maintainer: Christophe Genolini <christophe.genolini@u-paris10.fr>
+# Packaged: 2023-02-11 12:37:44 UTC; Patrice
+# Repository: CRAN
+# Date/Publication: 2023-02-13 15:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

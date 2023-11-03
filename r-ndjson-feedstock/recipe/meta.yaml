@@ -1,0 +1,108 @@
+{% set version = '0.9.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ndjson
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ndjson_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ndjson/ndjson_{{ version }}.tar.gz
+  sha256: 4d84f5d81a85db615392860ba71bb3cac15de9334faf0d09da6b5b95575c45a2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tinytest, covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-data.table
+    - r-tibble
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-data.table
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ndjson')"           # [not win]
+    - "\"%R%\" -e \"library('ndjson')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/hrbrmstr/ndjson
+  license: MIT
+  summary: Streaming 'JSON' ('ndjson') has one 'JSON' record per-line and many modern 'ndjson'
+    files contain large numbers of records. These constructs may not be columnar in
+    nature, but it is often useful to read in these files and "flatten" the structure
+    out to enable working with the data in an R 'data.frame'-like context. Functions
+    are provided that make it possible to read in plain 'ndjson' files or compressed
+    ('gz') 'ndjson' files and either validate the format of the records or create "flat"
+    'data.table' structures from them.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: ndjson
+# Type: Package
+# Title: Wicked-Fast Streaming 'JSON' ('ndjson') Reader
+# Version: 0.9.0
+# Date: 2022-10-14
+# Authors@R: c( person("Bob", "Rudis", email = "bob@rud.is", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5670-2640")), person("Niels", "Lohmann", role = "aut", comment = "C++ json parser"), person("Deepak", "Bandyopadhyay", role = "aut", comment = "C++ gzstream"), person("Lutz", "Kettner", role = "aut", comment = "C++ gzstream"), person("Neal", "Fultz", role = "ctb", comment = "Rcpp integration"), person("Maarten", "Demeyer", role = "ctb", comment = "dtplyr cleanup"))
+# Maintainer: Bob Rudis <bob@rud.is>
+# Description: Streaming 'JSON' ('ndjson') has one 'JSON' record per-line and many modern 'ndjson' files contain large numbers of records. These constructs may not be columnar in nature, but it is often useful to read in these files and "flatten" the structure out to enable working with the data in an R 'data.frame'-like context. Functions are provided that make it possible to read in plain 'ndjson' files or compressed ('gz') 'ndjson' files and either validate the format of the records or create "flat" 'data.table' structures from them.
+# URL: https://github.com/hrbrmstr/ndjson
+# BugReports: https://github.com/hrbrmstr/ndjson/issues
+# SystemRequirements: zlib, C++17
+# NeedsCompilation: yes
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Suggests: tinytest, covr
+# Depends: R (>= 3.2.0)
+# Imports: Rcpp, data.table, tibble
+# LinkingTo: Rcpp
+# RoxygenNote: 7.2.1
+# Packaged: 2022-10-16 12:47:45 UTC; hrbrmstr
+# Author: Bob Rudis [aut, cre] (<https://orcid.org/0000-0001-5670-2640>), Niels Lohmann [aut] (C++ json parser), Deepak Bandyopadhyay [aut] (C++ gzstream), Lutz Kettner [aut] (C++ gzstream), Neal Fultz [ctb] (Rcpp integration), Maarten Demeyer [ctb] (dtplyr cleanup)
+# Repository: CRAN
+# Date/Publication: 2022-10-17 07:10:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

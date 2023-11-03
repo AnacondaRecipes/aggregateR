@@ -1,0 +1,83 @@
+{% set version = '0.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/COR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/COR/COR_{{ version }}.tar.gz
+  sha256: eeb110c7a5a4c2f3905312b56f5c5530a11c9438af71c6210a4463cc6bc8913a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('COR')"           # [not win]
+    - "\"%R%\" -e \"library('COR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=COR
+  license: MIT
+  summary: An algorithm of optimal subset selection, related to Covariance matrices, Observation
+    matrices and Response vectors (COR) to select the optimal subsets in distributed
+    estimation. The philosophy of the package is described in Guo G. (2020) <doi:10.1080/02331888.2020.1823979>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: COR
+# Title: The COR for Optimal Subset Selection in Distributed Estimation
+# Date: 2021-11-30
+# Version: 0.0.1
+# Authors@R: c(person("Guangbao", "Guo",role = c("aut", "cre"), email = "ggb11111111@163.com", comment =  c(ORCID = "0000-0002-4115-6218")), person("Haoyue", "Song", role="aut"), person("Lixing", "Zhu", role="aut"))
+# Description: An algorithm of optimal subset selection, related to Covariance matrices, Observation matrices and Response vectors (COR) to select the optimal subsets in distributed estimation. The philosophy of the package is described in Guo G. (2020) <doi:10.1080/02331888.2020.1823979>.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# RoxygenNote: 7.1.1
+# Imports: stats
+# NeedsCompilation: no
+# Packaged: 2021-12-06 01:27:36 UTC; 123
+# Author: Guangbao Guo [aut, cre] (<https://orcid.org/0000-0002-4115-6218>), Haoyue Song [aut], Lixing Zhu [aut]
+# Maintainer: Guangbao Guo <ggb11111111@163.com>
+# Depends: R (>= 3.5.0)
+# Repository: CRAN
+# Date/Publication: 2021-12-06 17:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

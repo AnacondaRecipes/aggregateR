@@ -1,0 +1,102 @@
+{% set version = '0.5.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-torchvision
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/torchvision_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/torchvision/torchvision_{{ version }}.tar.gz
+  sha256: 77f53dddb652a5956c711e397ed6b2c13818be704aa4a506e37a3902f3cb8918
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: magick, testthat, coro, zip
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-abind
+    - r-fs
+    - r-jpeg
+    - r-magrittr
+    - r-png
+    - r-rappdirs
+    - r-rlang
+    - r-torch >=0.5.0
+    - r-withr
+
+  run:
+    - r-base
+    - r-abind
+    - r-fs
+    - r-jpeg
+    - r-magrittr
+    - r-png
+    - r-rappdirs
+    - r-rlang
+    - r-torch >=0.5.0
+    - r-withr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('torchvision')"           # [not win]
+    - "\"%R%\" -e \"library('torchvision')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://torchvision.mlverse.org, https://github.com/mlverse/torchvision
+  license: MIT
+  summary: Provides access to datasets, models and preprocessing facilities for deep learning
+    with images. Integrates seamlessly with the 'torch' package and it's 'API' borrows
+    heavily from 'PyTorch' vision package.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: torchvision
+# Title: Models, Datasets and Transformations for Images
+# Version: 0.5.1
+# Authors@R: c( person(given = "Daniel", family = "Falbel", role = c("aut", "cre"), email = "daniel@rstudio.com" ), person(given = "Christophe", family = "Regouby", role = c("ctb"), email = "christophe.regouby@free.fr" ), person(family = "RStudio", role = c("cph")) )
+# Description: Provides access to datasets, models and preprocessing facilities for deep learning with images. Integrates seamlessly with the 'torch' package and it's 'API' borrows heavily from 'PyTorch' vision package.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# URL: https://torchvision.mlverse.org, https://github.com/mlverse/torchvision
+# RoxygenNote: 7.2.3
+# Imports: torch (>= 0.5.0), fs, rlang, rappdirs, utils, jpeg, magrittr, png, abind, withr
+# Suggests: magick, testthat, coro, zip
+# NeedsCompilation: no
+# Packaged: 2023-04-14 09:09:26 UTC; dfalbel
+# Author: Daniel Falbel [aut, cre], Christophe Regouby [ctb], RStudio [cph]
+# Maintainer: Daniel Falbel <daniel@rstudio.com>
+# Repository: CRAN
+# Date/Publication: 2023-04-14 10:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

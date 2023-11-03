@@ -1,0 +1,92 @@
+{% set version = '0.3.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ldavis
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/LDAvis_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/LDAvis/LDAvis_{{ version }}.tar.gz
+  sha256: efbbd7480a06588bf8432e84bd9df2281ab86d109416e346cb63bb9cce683cf9
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: mallet, lda, topicmodels, gistr (>= 0.0.8.99), servr, shiny, knitr, rmarkdown, digest, htmltools
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rjsonio
+    - r-proxy
+
+  run:
+    - r-base
+    - r-rjsonio
+    - r-proxy
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('LDAvis')"           # [not win]
+    - "\"%R%\" -e \"library('LDAvis')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/cpsievert/LDAvis
+  license: MIT
+  summary: Tools to create an interactive web-based visualization of a topic model that has been
+    fit to a corpus of text data using Latent Dirichlet Allocation (LDA). Given the
+    estimated parameters of the topic model, it computes various summary statistics
+    as input to an interactive visualization built with D3.js that is accessed via a
+    browser. The goal is to help users interpret the topics in their LDA topic model.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: LDAvis
+# Title: Interactive Visualization of Topic Models
+# Version: 0.3.2
+# Authors@R: c(person("Carson", "Sievert", role = c("aut", "cre"), email = "cpsievert1@gmail.com"), person("Kenny", "Shirley", role = "aut", email = "kshirley@research.att.com"))
+# Description: Tools to create an interactive web-based visualization of a topic model that has been fit to a corpus of text data using Latent Dirichlet Allocation (LDA). Given the estimated parameters of the topic model, it computes various summary statistics as input to an interactive visualization built with D3.js that is accessed via a browser. The goal is to help users interpret the topics in their LDA topic model.
+# Depends: R (>= 2.10)
+# Imports: proxy, RJSONIO, parallel
+# License: MIT + file LICENSE
+# Suggests: mallet, lda, topicmodels, gistr (>= 0.0.8.99), servr, shiny, knitr, rmarkdown, digest, htmltools
+# LazyData: true
+# VignetteBuilder: knitr
+# URL: https://github.com/cpsievert/LDAvis
+# BugReports: https://github.com/cpsievert/LDAvis/issues
+# NeedsCompilation: no
+# Packaged: 2015-10-23 23:58:20 UTC; cpsievert
+# Author: Carson Sievert [aut, cre], Kenny Shirley [aut]
+# Maintainer: Carson Sievert <cpsievert1@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2015-10-24 08:21:16
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

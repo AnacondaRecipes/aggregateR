@@ -1,0 +1,154 @@
+{% set version = '1.0.11' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-pagoda2
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/pagoda2_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/pagoda2/pagoda2_{{ version }}.tar.gz
+  sha256: c17bb5a0f59d23a87e745fc74df594118b0a915ab0b0205239c9b4cde0a1a28f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: AnnotationDbi, base64enc, BiocGenerics, BiocParallel, colorRamps, data.table, dbscan, dplyr, ggplot2, GO.db, gridExtra, KernSmooth, knitr, org.Dr.eg.db, org.Hs.eg.db, org.Mm.eg.db, pcaMethods, pheatmap, rgl, rmarkdown, robustbase, scde, testthat, uwot
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-matrix
+    - r-n2r
+    - r-r.utils
+    - r-r6
+    - r-rmtstat
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-rcppeigen
+    - r-rcppprogress
+    - r-rook
+    - r-rtsne
+    - r-dendsort
+    - r-drat
+    - r-fastcluster
+    - r-igraph
+    - r-irlba
+    - r-magrittr
+    - r-mgcv
+    - r-plyr
+    - r-rjson
+    - r-rlang
+    - r-sccore >=0.1.1
+    - r-urltools
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-matrix
+    - r-n2r
+    - r-r.utils
+    - r-r6
+    - r-rmtstat
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-rcppeigen
+    - r-rcppprogress
+    - r-rook
+    - r-rtsne
+    - r-dendsort
+    - r-drat
+    - r-fastcluster
+    - r-igraph
+    - r-irlba
+    - r-magrittr
+    - r-mgcv
+    - r-plyr
+    - r-rjson
+    - r-rlang
+    - r-sccore >=0.1.1
+    - r-urltools
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('pagoda2')"           # [not win]
+    - "\"%R%\" -e \"library('pagoda2')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/kharchenkolab/pagoda2
+  license: GPL-3
+  summary: Analyzing and interactively exploring large-scale single-cell RNA-seq datasets. 'pagoda2'
+    primarily performs normalization and differential gene expression analysis, with
+    an interactive application for exploring single-cell RNA-seq datasets. It performs
+    basic tasks such as cell size normalization, gene variance normalization, and can
+    be used to identify subpopulations and run differential expression within individual
+    samples. 'pagoda2' was written to rapidly process modern large-scale scRNAseq datasets
+    of approximately 1e6 cells. The companion web application allows users to explore
+    which gene expression patterns form the different subpopulations within your data.
+    The package also serves as the primary method for preprocessing data for conos,
+    <https://github.com/kharchenkolab/conos>. This package interacts with data available
+    through the 'p2data' package, which is available in a 'drat' repository. To access
+    this data package, see the instructions at <https://github.com/kharchenkolab/pagoda2>.
+    The size of the 'p2data' package is approximately 6 MB.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: pagoda2
+# Title: Single Cell Analysis and Differential Expression
+# Version: 1.0.11
+# Authors@R: c(person("Nikolas","Barkas", email="nikolas_barkas@hms.harvard.edu", role="aut"), person("Viktor", "Petukhov", email="viktor.s.petuhov@ya.ru", role="aut"), person("Peter", "Kharchenko", email = "peter_kharchenko@hms.harvard.edu", role = "aut"), person("Simon", "Steiger", email = "simon.steiger@gmail.com", role = "ctb"), person("Rasmus", "Rydbirk", email = "rrydbirk@bmb.sdu.dk", role = "ctb"), person("Evan", "Biederstedt", email="evan.biederstedt@gmail.com", role=c("cre", "aut")))
+# Description: Analyzing and interactively exploring large-scale single-cell RNA-seq datasets. 'pagoda2' primarily performs normalization and differential gene expression analysis, with an interactive application for exploring single-cell RNA-seq datasets. It performs basic tasks such as cell size normalization, gene variance normalization, and can be used to identify subpopulations and run differential expression within individual samples. 'pagoda2' was written to rapidly process modern large-scale scRNAseq datasets of approximately 1e6 cells. The companion web application allows users to explore which gene expression patterns form the different subpopulations within your data. The package also serves as the primary method for preprocessing data for conos, <https://github.com/kharchenkolab/conos>. This package interacts with data available through the 'p2data' package, which is available in a 'drat' repository. To access this data package, see the instructions at <https://github.com/kharchenkolab/pagoda2>. The size of the 'p2data' package is approximately 6 MB.
+# License: GPL-3
+# Copyright: See the file COPYRIGHTS for various pagoda2 copyright details
+# Encoding: UTF-8
+# Depends: R (>= 3.5.0), Matrix, igraph
+# biocViews:
+# Imports: dendsort, drat, fastcluster, graphics, grDevices, irlba, magrittr, MASS, mgcv, methods, N2R, parallel, plyr, R.utils, Rcpp, rjson, rlang, R6, RMTstat, Rook, Rtsne, sccore (>= 0.1.1), stats, urltools, utils
+# RoxygenNote: 7.1.1
+# Suggests: AnnotationDbi, base64enc, BiocGenerics, BiocParallel, colorRamps, data.table, dbscan, dplyr, ggplot2, GO.db, gridExtra, KernSmooth, knitr, org.Dr.eg.db, org.Hs.eg.db, org.Mm.eg.db, pcaMethods, pheatmap, rgl, rmarkdown, robustbase, scde, testthat, uwot
+# URL: https://github.com/kharchenkolab/pagoda2
+# BugReports: https://github.com/kharchenkolab/pagoda2/issues
+# NeedsCompilation: yes
+# LinkingTo: Rcpp, RcppArmadillo, RcppProgress, RcppEigen
+# Author: Nikolas Barkas [aut], Viktor Petukhov [aut], Peter Kharchenko [aut], Simon Steiger [ctb], Rasmus Rydbirk [ctb], Evan Biederstedt [cre, aut]
+# Maintainer: Evan Biederstedt <evan.biederstedt@gmail.com>
+# Packaged: 2023-08-08 18:56:22 UTC; evanbiederstedt
+# Repository: CRAN
+# Date/Publication: 2023-08-08 19:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,101 @@
+{% set version = '1.1-3.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gmnl
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gmnl_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gmnl/gmnl_{{ version }}.tar.gz
+  sha256: e8d1b6467da64ebe4ac96a1e622fb43f8134c6fdfc7859366d72fb37968afb06
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: AER, lmtest, car, memisc, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+    - r-maxlik
+    - r-mlogit
+    - r-msm
+    - r-plotrix
+    - r-truncnorm
+
+  run:
+    - r-base
+    - r-formula
+    - r-maxlik
+    - r-mlogit
+    - r-msm
+    - r-plotrix
+    - r-truncnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gmnl')"           # [not win]
+    - "\"%R%\" -e \"library('gmnl')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://msarrias.com/description.html
+  license: GPL-2
+  summary: An implementation of maximum simulated likelihood method for the estimation of multinomial
+    logit models with random coefficients as presented by Sarrias and Daziano (2017)
+    <doi:10.18637/jss.v079.i02>. Specifically, it allows estimating models with continuous
+    heterogeneity such as the mixed multinomial logit and the generalized multinomial
+    logit. It also allows estimating models with discrete heterogeneity such as the
+    latent class and the mixed-mixed multinomial logit model.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: gmnl
+# Type: Package
+# Title: Multinomial Logit Models with Random Parameters
+# Version: 1.1-3.2
+# Date: 2020-05-27
+# Authors@R: c(person("Mauricio", "Sarrias", role = c("aut", "cre"), email = "msarrias86@gmail.com", comment = c(ORCID = "0000-0001-5932-4817")), person("Ricardo", "Daziano", role = "aut", email = "daziano@cornell.edu"), person("Yves", "Croissant", role = "ctb"))
+# Description: An implementation of maximum simulated likelihood method for the estimation of multinomial logit models with random coefficients as presented by Sarrias and Daziano (2017) <doi:10.18637/jss.v079.i02>. Specifically, it allows estimating models with continuous heterogeneity such as the mixed multinomial logit and the generalized multinomial logit. It also allows estimating models with discrete heterogeneity such as the latent class and the mixed-mixed multinomial logit model.
+# Depends: R (>= 3.6.0), maxLik, Formula
+# Imports: plotrix, msm, mlogit, truncnorm, stats, graphics, utils
+# Suggests: AER, lmtest, car, memisc, testthat
+# URL: https://msarrias.com/description.html
+# License: GPL (>= 2)
+# RoxygenNote: 7.1.0
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2020-05-27 15:29:15 UTC; mauriciosarrias
+# Author: Mauricio Sarrias [aut, cre] (<https://orcid.org/0000-0001-5932-4817>), Ricardo Daziano [aut], Yves Croissant [ctb]
+# Maintainer: Mauricio Sarrias <msarrias86@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2020-05-27 17:00:11 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

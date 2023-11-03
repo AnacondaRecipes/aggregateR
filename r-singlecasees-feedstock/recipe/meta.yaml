@@ -1,0 +1,103 @@
+{% set version = '0.7.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-singlecasees
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SingleCaseES_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SingleCaseES/SingleCaseES_{{ version }}.tar.gz
+  sha256: 679a675f6c59491bbbd7feb86af71ce6d62d2a609ff62f51f509d3f44680e77a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: spelling, shiny, shinytest, stringr, rvest, xml2, ggplot2, purrrlyr, testthat, markdown, knitr, rmarkdown, cleanrmd, Kendall, kableExtra, covr, readxl, glue, janitor, rclipboard
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr
+    - r-magrittr
+    - r-purrr
+    - r-rlang
+    - r-tidyr
+    - r-tidyselect
+
+  run:
+    - r-base
+    - r-dplyr
+    - r-magrittr
+    - r-purrr
+    - r-rlang
+    - r-tidyr
+    - r-tidyselect
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SingleCaseES')"           # [not win]
+    - "\"%R%\" -e \"library('SingleCaseES')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://jepusto.github.io/SingleCaseES/
+  license: GPL-3
+  summary: Provides R functions for calculating basic effect size indices for single-case designs,
+    including several non-overlap measures and parametric effect size measures, and
+    for estimating the gradual effects model developed by Swan and Pustejovsky (2018)
+    <DOI:10.1080/00273171.2018.1466681>. Standard errors and confidence intervals (based
+    on the assumption that the outcome measurements are mutually independent) are provided
+    for the subset of effect sizes indices with known sampling distributions.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: SingleCaseES
+# Type: Package
+# Title: A Calculator for Single-Case Effect Sizes
+# Version: 0.7.2
+# Authors@R: c( person(c("James","E."), "Pustejovsky", email = "jepusto@gmail.com", role = c("aut", "cre")), person("Man", "Chen", email = "manchen9005@gmail.com", role = "aut"), person(c("Daniel","M."), "Swan", email = "dms031000@gmail.com", role = "aut"), person("Paulina", "Grekov", email = "grekov.paulina@gmail.com", role = "ctb") )
+# Description: Provides R functions for calculating basic effect size indices for single-case designs, including several non-overlap measures and parametric effect size measures, and for estimating the gradual effects model developed by Swan and Pustejovsky (2018) <DOI:10.1080/00273171.2018.1466681>. Standard errors and confidence intervals (based on the assumption that the outcome measurements are mutually independent) are provided for the subset of effect sizes indices with known sampling distributions.
+# URL: https://jepusto.github.io/SingleCaseES/
+# BugReports: https://github.com/jepusto/SingleCaseES/issues
+# License: GPL-3
+# Imports: stats, purrr, magrittr, dplyr, tidyr, rlang, tidyselect, utils
+# Suggests: spelling, shiny, shinytest, stringr, rvest, xml2, ggplot2, purrrlyr, testthat, markdown, knitr, rmarkdown, cleanrmd, Kendall, kableExtra, covr, readxl, glue, janitor, rclipboard
+# LazyData: TRUE
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# Language: en-US
+# VignetteBuilder: knitr, rmarkdown, cleanrmd
+# NeedsCompilation: no
+# Packaged: 2023-08-12 02:08:09 UTC; jepusto
+# Author: James E. Pustejovsky [aut, cre], Man Chen [aut], Daniel M. Swan [aut], Paulina Grekov [ctb]
+# Maintainer: James E. Pustejovsky <jepusto@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-08-12 15:20:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

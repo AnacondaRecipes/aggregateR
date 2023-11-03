@@ -1,0 +1,89 @@
+{% set version = '0.9.39' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-clickr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/clickR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/clickR/clickR_{{ version }}.tar.gz
+  sha256: cd94b4e306063c35d2f6277fd117e03c843d00f0ed81004e3378b520f91c1b4f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-beeswarm
+    - r-future
+    - r-future.apply
+    - r-stringdist
+
+  run:
+    - r-base
+    - r-beeswarm
+    - r-future
+    - r-future.apply
+    - r-stringdist
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('clickR')"           # [not win]
+    - "\"%R%\" -e \"library('clickR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=clickR
+  license: GPL-2
+  summary: Tools for assessing data quality, performing exploratory analysis, and semi-automatic
+    preprocessing of messy data with change tracking for integral dataset cleaning.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: clickR
+# Type: Package
+# Title: Semi-Automatic Preprocessing of Messy Data with Change Tracking for Dataset Cleaning
+# Version: 0.9.39
+# Author: David Hervas Marin
+# Maintainer: David Hervas Marin <ddhervas@yahoo.es>
+# Imports: beeswarm, future, future.apply, methods, stringdist
+# Description: Tools for assessing data quality, performing exploratory analysis, and semi-automatic preprocessing of messy data with change tracking for integral dataset cleaning.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-08-07 17:06:49 UTC; aghil
+# LazyData: true
+# Depends: R (>= 3.5.0)
+# Repository: CRAN
+# Date/Publication: 2023-08-07 17:40:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,110 @@
+{% set version = '1.4.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-rust
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/rust_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/rust/rust_{{ version }}.tar.gz
+  sha256: 376f19690727653a70effd40c06720caa326551176a381f2832ff992c04b4b08
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: bang, knitr, microbenchmark, revdbayes, rmarkdown, testthat
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=0.12.10
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=0.12.10
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('rust')"           # [not win]
+    - "\"%R%\" -e \"library('rust')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://paulnorthrop.github.io/rust/, https://github.com/paulnorthrop/rust
+  license: GPL-2
+  summary: Uses the generalized ratio-of-uniforms (RU) method to simulate from univariate and
+    (low-dimensional) multivariate continuous distributions. The user specifies the
+    log-density, up to an additive constant. The RU algorithm is applied after relocation
+    of mode of the density to zero, and the user can choose a tuning parameter r. For
+    details see Wakefield, Gelfand and Smith (1991) <DOI:10.1007/BF01889987>, Efficient
+    generation of random variates via the ratio-of-uniforms method, Statistics and Computing
+    (1991) 1, 129-133.  A Box-Cox variable transformation can be used to make the input
+    density suitable for the RU method and to improve efficiency.  In the multivariate
+    case rotation of axes can also be used to improve efficiency. From version 1.2.0
+    the 'Rcpp' package <https://cran.r-project.org/package=Rcpp> can be used to improve
+    efficiency.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: rust
+# Type: Package
+# Title: Ratio-of-Uniforms Simulation with Transformation
+# Version: 1.4.1
+# Date: 2023-09-02
+# Authors@R: person(c("Paul", "J."), "Northrop", email = "p.northrop@ucl.ac.uk", role = c("aut", "cre", "cph"))
+# Description: Uses the generalized ratio-of-uniforms (RU) method to simulate from univariate and (low-dimensional) multivariate continuous distributions. The user specifies the log-density, up to an additive constant. The RU algorithm is applied after relocation of mode of the density to zero, and the user can choose a tuning parameter r. For details see Wakefield, Gelfand and Smith (1991) <DOI:10.1007/BF01889987>, Efficient generation of random variates via the ratio-of-uniforms method, Statistics and Computing (1991) 1, 129-133.  A Box-Cox variable transformation can be used to make the input density suitable for the RU method and to improve efficiency.  In the multivariate case rotation of axes can also be used to improve efficiency. From version 1.2.0 the 'Rcpp' package <https://cran.r-project.org/package=Rcpp> can be used to improve efficiency.
+# Imports: graphics, Rcpp (>= 0.12.10), stats
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# Depends: R (>= 3.3.0)
+# RoxygenNote: 7.2.3
+# Suggests: bang, knitr, microbenchmark, revdbayes, rmarkdown, testthat
+# VignetteBuilder: knitr
+# URL: https://paulnorthrop.github.io/rust/, https://github.com/paulnorthrop/rust
+# BugReports: https://github.com/paulnorthrop/rust/issues
+# LinkingTo: Rcpp (>= 0.12.10), RcppArmadillo
+# Config/testthat/edition: 3
+# NeedsCompilation: yes
+# Packaged: 2023-09-02 13:45:38 UTC; paul
+# Author: Paul J. Northrop [aut, cre, cph]
+# Maintainer: Paul J. Northrop <p.northrop@ucl.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2023-09-02 14:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

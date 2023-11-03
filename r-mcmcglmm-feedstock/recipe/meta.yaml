@@ -1,0 +1,100 @@
+{% set version = '2.35' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mcmcglmm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MCMCglmm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MCMCglmm/MCMCglmm_{{ version }}.tar.gz
+  sha256: cc10f074a78702bfe46e342235eff747cd52993ade76f59cf8fa9e80968179a6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: rgl, combinat, mvtnorm, orthopolynom, MCMCpack, bayesm, msm
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-ape
+    - r-coda
+    - r-corpcor
+    - r-cubature
+    - r-tensora
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-ape
+    - r-coda
+    - r-corpcor
+    - r-cubature
+    - r-tensora
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MCMCglmm')"           # [not win]
+    - "\"%R%\" -e \"library('MCMCglmm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MCMCglmm
+  license: GPL-2
+  summary: Fits Multivariate Generalised Linear Mixed Models (and related models) using Markov
+    chain Monte Carlo techniques (Hadfield 2010 J. Stat. Soft.).
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: MCMCglmm
+# Version: 2.35
+# Date: 2023-06-30
+# Title: MCMC Generalised Linear Mixed Models
+# Depends: Matrix, coda, ape
+# Imports: corpcor, tensorA, cubature, methods
+# Suggests: rgl, combinat, mvtnorm, orthopolynom, MCMCpack, bayesm, msm
+# Author: Jarrod Hadfield
+# Maintainer: Jarrod Hadfield <j.hadfield@ed.ac.uk>
+# Description: Fits Multivariate Generalised Linear Mixed Models (and related models) using Markov chain Monte Carlo techniques (Hadfield 2010 J. Stat. Soft.).
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2023-06-30 12:34:30 UTC; jhadfiel
+# Repository: CRAN
+# Date/Publication: 2023-06-30 21:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

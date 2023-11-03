@@ -1,0 +1,108 @@
+{% set version = '0.7-9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-deducer
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Deducer_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Deducer/Deducer_{{ version }}.tar.gz
+  sha256: 460fbd80ad1594f0b0fdddbc6cfffdfac001cdfd926bdaec25c544249c9f6a92
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: lawstat, Hmisc, XLConnect
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-jgr >=1.7_10
+    - r-mass
+    - r-car
+    - r-e1071
+    - r-effects
+    - r-foreign
+    - r-ggplot2 >=2.0.0
+    - r-multcomp
+    - r-plyr
+    - r-rjava
+    - r-scales
+
+  run:
+    - r-base
+    - r-jgr >=1.7_10
+    - r-mass
+    - r-car
+    - r-e1071
+    - r-effects
+    - r-foreign
+    - r-ggplot2 >=2.0.0
+    - r-multcomp
+    - r-plyr
+    - r-rjava
+    - r-scales
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Deducer')"           # [not win]
+    - "\"%R%\" -e \"library('Deducer')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.deducer.org/manual.html http://www.fellstat.com
+  license: GPL-2
+  summary: An intuitive, cross-platform graphical data analysis system. It uses menus and dialogs
+    to guide the user efficiently through the data manipulation and analysis process,
+    and has an excel like spreadsheet for easy data frame visualization and editing.
+    Deducer works best when used with the Java based R GUI JGR, but the dialogs can
+    be called from the command line. Dialogs have also been integrated into the Windows
+    Rgui.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: Deducer
+# Version: 0.7-9
+# Date: 2015-12-28
+# Title: A Data Analysis GUI for R
+# Author: Ian Fellows with contributions from others (see documentation).
+# Maintainer: Ian Fellows <ian@fellstat.com>
+# Description: An intuitive, cross-platform graphical data analysis system. It uses menus and dialogs to guide the user efficiently through the data manipulation and analysis process, and has an excel like spreadsheet for easy data frame visualization and editing. Deducer works best when used with the Java based R GUI JGR, but the dialogs can be called from the command line. Dialogs have also been integrated into the Windows Rgui.
+# Depends: R (>= 2.15.0), ggplot2 (>= 2.0.0), JGR(>= 1.7-10), car, MASS
+# Imports: rJava, e1071, scales, plyr, foreign, multcomp, effects
+# Suggests: lawstat, Hmisc, XLConnect
+# SystemRequirements: Java (>= 1.4), JRI
+# License: GPL-2
+# URL: http://www.deducer.org/manual.html http://www.fellstat.com
+# NeedsCompilation: no
+# Packaged: 2015-12-29 20:31:26 UTC; ianfellows
+# Repository: CRAN
+# Date/Publication: 2015-12-29 22:16:31
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

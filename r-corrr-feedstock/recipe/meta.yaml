@@ -1,0 +1,107 @@
+{% set version = '0.4.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-corrr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/corrr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/corrr/corrr_{{ version }}.tar.gz
+  sha256: 4582a102c0f0d020a3b34c0abb567e2a45b3a926bb68747942bb29d3aed1aa41
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, DBI, dbplyr (>= 1.2.1), knitr (>= 1.13), rmarkdown (>= 0.9.6), RSQLite, sparklyr (>= 0.9), testthat (>= 3.0.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dplyr >=1.0.0
+    - r-ggplot2 >=2.2.0
+    - r-ggrepel >=0.6.5
+    - r-glue >=1.4.2
+    - r-purrr >=0.2.2
+    - r-rlang >=0.4.0
+    - r-seriation >=1.2_0
+    - r-tibble >=2.0
+
+  run:
+    - r-base
+    - r-dplyr >=1.0.0
+    - r-ggplot2 >=2.2.0
+    - r-ggrepel >=0.6.5
+    - r-glue >=1.4.2
+    - r-purrr >=0.2.2
+    - r-rlang >=0.4.0
+    - r-seriation >=1.2_0
+    - r-tibble >=2.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('corrr')"           # [not win]
+    - "\"%R%\" -e \"library('corrr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/tidymodels/corrr, https://corrr.tidymodels.org
+  license: MIT
+  summary: A tool for exploring correlations.  It makes it possible to easily perform routine
+    tasks when exploring correlation matrices such as ignoring the diagonal, focusing
+    on the correlations of certain variables against others, or rearranging and visualizing
+    the matrix in terms of the strength of the correlations.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: corrr
+# Title: Correlations in R
+# Version: 0.4.4
+# Authors@R: c( person("Max", "Kuhn", , "max@rstudio.com", role = c("aut", "cre")), person("Simon", "Jackson", role = "aut"), person("Jorge", "Cimentada", role = "aut") )
+# Description: A tool for exploring correlations.  It makes it possible to easily perform routine tasks when exploring correlation matrices such as ignoring the diagonal, focusing on the correlations of certain variables against others, or rearranging and visualizing the matrix in terms of the strength of the correlations.
+# License: MIT + file LICENSE
+# URL: https://github.com/tidymodels/corrr, https://corrr.tidymodels.org
+# BugReports: https://github.com/tidymodels/corrr/issues
+# Depends: R (>= 3.4)
+# Imports: dplyr (>= 1.0.0), ggplot2 (>= 2.2.0), ggrepel (>= 0.6.5), glue (>= 1.4.2), purrr (>= 0.2.2), rlang (>= 0.4.0), seriation (>= 1.2-0), tibble (>= 2.0)
+# Suggests: covr, DBI, dbplyr (>= 1.2.1), knitr (>= 1.13), rmarkdown (>= 0.9.6), RSQLite, sparklyr (>= 0.9), testthat (>= 3.0.0)
+# VignetteBuilder: knitr
+# Config/Needs/website: tidyverse/tidytemplate
+# Encoding: UTF-8
+# RoxygenNote: 7.2.1.9000
+# Config/testthat/edition: 3
+# NeedsCompilation: no
+# Packaged: 2022-08-16 19:58:27 UTC; max
+# Author: Max Kuhn [aut, cre], Simon Jackson [aut], Jorge Cimentada [aut]
+# Maintainer: Max Kuhn <max@rstudio.com>
+# Repository: CRAN
+# Date/Publication: 2022-08-16 20:40:01 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

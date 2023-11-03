@@ -1,0 +1,98 @@
+{% set version = '2.2.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-fastai
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/fastai_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/fastai/fastai_{{ version }}.tar.gz
+  sha256: 8b5c1b4b4c289b91c53f4332e4f7be70206acdb2a120c7741297670e213198be
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, testthat, rmarkdown, curl, magrittr, data.table, vctrs, stats, utils, R.utils, viridis, zeallot
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-generics
+    - r-ggplot2
+    - r-ggpubr
+    - r-glue
+    - r-png
+    - r-reticulate
+
+  run:
+    - r-base
+    - r-generics
+    - r-ggplot2
+    - r-ggpubr
+    - r-glue
+    - r-png
+    - r-reticulate
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('fastai')"           # [not win]
+    - "\"%R%\" -e \"library('fastai')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/EagerAI/fastai
+  license: Apache License 2.0
+  summary: The 'fastai' <https://docs.fast.ai/index.html> library simplifies training fast and
+    accurate neural networks using modern best practices. It is based on research in
+    to deep learning best practices undertaken at 'fast.ai', including 'out of the box'
+    support for vision, text, tabular, audio, time series, and collaborative filtering
+    models.
+  license_family: APACHE
+
+# The original CRAN metadata for this package was:
+
+# Package: fastai
+# Type: Package
+# Title: Interface to 'fastai'
+# Version: 2.2.1
+# Authors@R: c( person('Turgut', 'Abdullayev', role = c('ctb', 'cre', 'cph', 'aut'), email = 'turqut.a.314@gmail.com') )
+# Maintainer: Turgut Abdullayev <turqut.a.314@gmail.com>
+# Description: The 'fastai' <https://docs.fast.ai/index.html> library simplifies training fast and accurate neural networks using modern best practices. It is based on research in to deep learning best practices undertaken at 'fast.ai', including 'out of the box' support for vision, text, tabular, audio, time series, and collaborative filtering models.
+# License: Apache License 2.0
+# URL: https://github.com/EagerAI/fastai
+# BugReports: https://github.com/EagerAI/fastai/issues
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Imports: reticulate, generics, png, ggplot2, ggpubr, glue
+# Suggests: knitr, testthat, rmarkdown, curl, magrittr, data.table, vctrs, stats, utils, R.utils, viridis, zeallot
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2023-03-11 17:06:51 UTC; turgutabd
+# Author: Turgut Abdullayev [ctb, cre, cph, aut]
+# Repository: CRAN
+# Date/Publication: 2023-03-12 00:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

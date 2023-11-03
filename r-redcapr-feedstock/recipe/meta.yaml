@@ -1,0 +1,110 @@
+{% set version = '1.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-redcapr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/REDCapR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/REDCapR/REDCapR_{{ version }}.tar.gz
+  sha256: 19c930f409bc8c70fe84e2c38ee52e29aaefbe13c669e33c58ee307a570da409
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: spelling, covr (>= 3.4), DBI (>= 1.1), kableExtra (>= 1.0), knitr (>= 1.18), odbc (>= 1.1.1), rmarkdown (>= 2.0), sessioninfo (>= 1.1.1), testthat (>= 3.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-checkmate >=2.0
+    - r-dplyr >=1.0
+    - r-httr >=1.4.0
+    - r-jsonlite
+    - r-magrittr >=1.5
+    - r-readr >=2.0
+    - r-rlang >=0.4
+    - r-tibble >=2.0
+    - r-tidyr >=1.0
+
+  run:
+    - r-base
+    - r-checkmate >=2.0
+    - r-dplyr >=1.0
+    - r-httr >=1.4.0
+    - r-jsonlite
+    - r-magrittr >=1.5
+    - r-readr >=2.0
+    - r-rlang >=0.4
+    - r-tibble >=2.0
+    - r-tidyr >=1.0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('REDCapR')"           # [not win]
+    - "\"%R%\" -e \"library('REDCapR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://ouhscbbmc.github.io/REDCapR/, https://github.com/OuhscBbmc/REDCapR, https://www.ouhsc.edu/bbmc/,
+    https://project-redcap.org
+  license: MIT
+  summary: Encapsulates functions to streamline calls from R to the REDCap API.  REDCap (Research
+    Electronic Data CAPture) is a web application for building and managing online surveys
+    and databases developed at Vanderbilt University.  The Application Programming Interface
+    (API) offers an avenue to access and modify data programmatically, improving the
+    capacity for literate and reproducible programming.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: REDCapR
+# Title: Interaction Between R and REDCap
+# Description: Encapsulates functions to streamline calls from R to the REDCap API.  REDCap (Research Electronic Data CAPture) is a web application for building and managing online surveys and databases developed at Vanderbilt University.  The Application Programming Interface (API) offers an avenue to access and modify data programmatically, improving the capacity for literate and reproducible programming.
+# Version: 1.1.0
+# Authors@R: c(person("Will", "Beasley", role = c("aut", "cre"), email = "wibeasley@hotmail.com", comment = c(ORCID = "0000-0002-5613-5006")), person("David", "Bard", role = "ctb"), person("Thomas", "Wilson", role = "ctb"), person(given="John J", family="Aponte", role = "ctb", email="john.aponte@isglobal.org"), person("Rollie", "Parrish", role = "ctb", email = "rparrish@flightweb.com"), person("Benjamin", "Nutter", role = "ctb"), person("Andrew", "Peters", role = "ctb"), person("Hao", "Zhu", role = "ctb", comment = c(ORCID = '0000-0002-3386-6076')), person("Janosch", "Linkersdorfer", role = "ctb", comment = c(ORCID = '0000-0002-1577-1233')), person("Jonathan", "Mang", role = "ctb", comment = c(ORCID = '0000-0003-0518-4710')), person("Felix", "Torres", role = "ctb", email = "fetorres@ucsd.edu"), person("Philip", "Chase", role = "ctb", email = "pbc@ufl.edu"), person("Victor", "Castro", role = "ctb", email = "vcastro@mgh.harvard.edu", comment = c(ORCID = '0000-0001-7390-6354')))
+# URL: https://ouhscbbmc.github.io/REDCapR/, https://github.com/OuhscBbmc/REDCapR, https://www.ouhsc.edu/bbmc/, https://project-redcap.org
+# BugReports: https://github.com/OuhscBbmc/REDCapR/issues
+# Depends: R(>= 3.5.0)
+# Imports: checkmate (>= 2.0), dplyr (>= 1.0), httr (>= 1.4.0), jsonlite, magrittr (>= 1.5), methods, readr (>= 2.0), rlang (>= 0.4), tibble (>= 2.0), tidyr (>= 1.0)
+# Suggests: spelling, covr (>= 3.4), DBI (>= 1.1), kableExtra (>= 1.0), knitr (>= 1.18), odbc (>= 1.1.1), rmarkdown (>= 2.0), sessioninfo (>= 1.1.1), testthat (>= 3.0)
+# License: MIT + file LICENSE
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# RoxygenNote: 7.2.1
+# Config/testthat/edition: 3
+# Language: en-US
+# NeedsCompilation: no
+# Packaged: 2022-08-10 14:25:17 UTC; wibeasley
+# Author: Will Beasley [aut, cre] (<https://orcid.org/0000-0002-5613-5006>), David Bard [ctb], Thomas Wilson [ctb], John J Aponte [ctb], Rollie Parrish [ctb], Benjamin Nutter [ctb], Andrew Peters [ctb], Hao Zhu [ctb] (<https://orcid.org/0000-0002-3386-6076>), Janosch Linkersdorfer [ctb] (<https://orcid.org/0000-0002-1577-1233>), Jonathan Mang [ctb] (<https://orcid.org/0000-0003-0518-4710>), Felix Torres [ctb], Philip Chase [ctb], Victor Castro [ctb] (<https://orcid.org/0000-0001-7390-6354>)
+# Maintainer: Will Beasley <wibeasley@hotmail.com>
+# Repository: CRAN
+# Date/Publication: 2022-08-10 16:10:18 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

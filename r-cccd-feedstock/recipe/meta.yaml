@@ -1,0 +1,87 @@
+{% set version = '1.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cccd
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/cccd_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/cccd/cccd_{{ version }}.tar.gz
+  sha256: 9e342a3c1d7a7293bea66efbe3aa0857d7b63c20757c9bf037ec5e85650ab033
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: Matrix
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-fnn
+    - r-deldir
+    - r-igraph
+    - r-proxy
+
+  run:
+    - r-base
+    - r-fnn
+    - r-deldir
+    - r-igraph
+    - r-proxy
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('cccd')"           # [not win]
+    - "\"%R%\" -e \"library('cccd')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=cccd
+  license: GPL-2
+  summary: Class Cover Catch Digraphs, neighborhood graphs, and relatives.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: cccd
+# Version: 1.6
+# Date: 2022-04-08
+# Title: Class Cover Catch Digraphs
+# Author: David J. Marchette <dmarchette@gmail.com>
+# Maintainer: David J. Marchette <dmarchette@gmail.com>
+# Depends: igraph
+# Imports: proxy, deldir, FNN
+# Suggests: Matrix
+# Description: Class Cover Catch Digraphs, neighborhood graphs, and relatives.
+# License: GPL (>= 2)
+# Packaged: 2022-04-08 11:43:02 UTC; dmarchette
+# Repository: CRAN
+# Date/Publication: 2022-04-08 12:22:29 UTC
+# NeedsCompilation: no
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

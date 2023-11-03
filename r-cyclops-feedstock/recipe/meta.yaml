@@ -1,0 +1,118 @@
+{% set version = '3.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-cyclops
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Cyclops_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Cyclops/Cyclops_{{ version }}.tar.gz
+  sha256: a29c2a824e920f86567e49f9cdaec9da03691191608e25fa04fe9bf49943da67
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, readr, MASS, gnm, ggplot2, microbenchmark, cmprsk
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-andromeda >=0.3.1
+    - r-matrix
+    - r-rcpp >=0.12.12
+    - r-rcppeigen >=0.3.2
+    - r-bit64
+    - r-dplyr
+    - r-rlang
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-andromeda >=0.3.1
+    - r-matrix
+    - r-rcpp >=0.12.12
+    - r-rcppeigen >=0.3.2
+    - r-bit64
+    - r-dplyr
+    - r-rlang
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Cyclops')"           # [not win]
+    - "\"%R%\" -e \"library('Cyclops')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/ohdsi/cyclops
+  license: Apache License 2.0
+  summary: 'This model fitting tool incorporates cyclic coordinate descent and majorization-minimization
+    approaches to fit a variety of regression models found in large-scale observational
+    healthcare data.  Implementations focus on computational optimization and fine-scale
+    parallelization to yield efficient inference in massive datasets.  Please see: Suchard,
+    Simpson, Zorych, Ryan and Madigan (2013) <doi:10.1145/2414416.2414791>.'
+  license_family: APACHE
+
+# The original CRAN metadata for this package was:
+
+# Package: Cyclops
+# Type: Package
+# Title: Cyclic Coordinate Descent for Logistic, Poisson and Survival Analysis
+# Version: 3.4.0
+# Authors@R: c( person("Marc A.", "Suchard", email = "msuchard@ucla.edu", role = c("aut","cre")), person("Martijn J.", "Schuemie", role = "aut"), person("Trevor R.", "Shaddox", role = "aut"), person("Yuxi", "Tian", role = "aut"), person("Jianxiao", "Yang", role = "aut"), person("Eric", "Kawaguchi", role = "aut"), person("Sushil", "Mittal", role ="ctb"), person("Observational Health Data Sciences and Informatics", role = "cph"), person("Marcus", "Geelnard", role = c("cph", "ctb"), comment = "provided the TinyThread library"), person("Rutgers University", role = c("cph", "ctb"), comment = "provided the HParSearch routine"), person("R Development Core Team", role = c("cph", "ctb"), comment = "provided the ZeroIn routine") )
+# Description: This model fitting tool incorporates cyclic coordinate descent and majorization-minimization approaches to fit a variety of regression models found in large-scale observational healthcare data.  Implementations focus on computational optimization and fine-scale parallelization to yield efficient inference in massive datasets.  Please see: Suchard, Simpson, Zorych, Ryan and Madigan (2013) <doi:10.1145/2414416.2414791>.
+# License: Apache License 2.0
+# LazyData: Yes
+# Biarch: true
+# URL: https://github.com/ohdsi/cyclops
+# BugReports: https://github.com/ohdsi/cyclops/issues
+# Depends: R (>= 3.5.0)
+# Imports: rlang, Matrix, Rcpp (>= 0.12.12), Andromeda (>= 0.3.1), dplyr, methods, survival, bit64
+# LinkingTo: Rcpp, RcppEigen (>= 0.3.2)
+# Suggests: testthat, readr, MASS, gnm, ggplot2, microbenchmark, cmprsk
+# NeedsCompilation: yes
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# Packaged: 2023-10-30 23:43:14 UTC; msuchard
+# Author: Marc A. Suchard [aut, cre], Martijn J. Schuemie [aut], Trevor R. Shaddox [aut], Yuxi Tian [aut], Jianxiao Yang [aut], Eric Kawaguchi [aut], Sushil Mittal [ctb], Observational Health Data Sciences and Informatics [cph], Marcus Geelnard [cph, ctb] (provided the TinyThread library), Rutgers University [cph, ctb] (provided the HParSearch routine), R Development Core Team [cph, ctb] (provided the ZeroIn routine)
+# Maintainer: Marc A. Suchard <msuchard@ucla.edu>
+# Repository: CRAN
+# Date/Publication: 2023-10-31 00:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

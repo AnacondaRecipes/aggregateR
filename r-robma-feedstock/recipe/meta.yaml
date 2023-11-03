@@ -1,0 +1,127 @@
+{% set version = '3.1.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-robma
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/RoBMA_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/RoBMA/RoBMA_{{ version }}.tar.gz
+  sha256: 42e56cb2d5661d13cc50dacc3af8cae0827a2937ce46bbbfa544ea44aa840133
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: parallel, metaBMA, metafor, weightr, lme4, fixest, metadat, testthat, vdiffr, knitr, rmarkdown, covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bayestools >=0.2.16
+    - r-rdpack
+    - r-ggplot2
+    - r-mvtnorm
+    - r-rjags
+    - r-rlang
+    - r-runjags
+    - r-scales
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bayestools >=0.2.16
+    - r-rdpack
+    - r-ggplot2
+    - r-mvtnorm
+    - r-rjags
+    - r-rlang
+    - r-runjags
+    - r-scales
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('RoBMA')"           # [not win]
+    - "\"%R%\" -e \"library('RoBMA')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://fbartos.github.io/RoBMA/
+  license: GPL-3
+  summary: "A framework for estimating ensembles of meta-analytic models (assuming either presence
+    or absence of the effect, heterogeneity, and publication bias). The RoBMA framework
+    uses Bayesian model-averaging to combine the competing meta-analytic models into
+    a model ensemble, weights the posterior parameter distributions based on posterior
+    model probabilities and uses Bayes factors to test for the presence or absence of
+    the individual components (e.g., effect vs. no effect; Barto\u0161 et al., 2022,
+    <doi:10.1002/jrsm.1594>; Maier, Barto\u0161 & Wagenmakers, 2022, <doi:10.1037/met0000405>).
+    Users can define a wide range of non-informative or informative prior distributions
+    for the effect size, heterogeneity, and publication bias components (including selection
+    models and PET-PEESE). The package provides convenient functions for summary, visualizations,
+    and fit diagnostics."
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: RoBMA
+# Title: Robust Bayesian Meta-Analyses
+# Version: 3.1.0
+# Maintainer: Frantisek Bartos <f.bartos96@gmail.com>
+# Authors@R: c( person("Frantisek", "Bartos",     role = c("aut", "cre"), email   = "f.bartos96@gmail.com", comment = c(ORCID = "0000-0002-0018-5573")), person("Maximilian", "Maier",     role = "aut", email   = "maximilianmaier0401@gmail.com", comment = c(ORCID = "0000-0002-9873-6096")), person("Eric-Jan", "Wagenmakers", role = "ths", comment = c(ORCID = "0000-0003-1596-1034")), person("Joris", "Goosen",         role = "ctb"), person("Matthew", "Denwood", role="cph", comment="Original copyright holder of some modified code where indicated."), person("Martyn", "Plummer", role="cph", comment="Original copyright holder of some modified code where indicated.") )
+# Description: A framework for estimating ensembles of meta-analytic models (assuming either presence or absence of the effect, heterogeneity, and publication bias). The RoBMA framework uses Bayesian model-averaging to combine the competing meta-analytic models into a model ensemble, weights the posterior parameter distributions based on posterior model probabilities and uses Bayes factors to test for the presence or absence of the individual components (e.g., effect vs. no effect; Bartos et al., 2022, <doi:10.1002/jrsm.1594>; Maier, Bartos & Wagenmakers, 2022, <doi:10.1037/met0000405>). Users can define a wide range of non-informative or informative prior distributions for the effect size, heterogeneity, and publication bias components (including selection models and PET-PEESE). The package provides convenient functions for summary, visualizations, and fit diagnostics.
+# URL: https://fbartos.github.io/RoBMA/
+# BugReports: https://github.com/FBartos/RoBMA/issues
+# License: GPL-3
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.2.3
+# SystemRequirements: JAGS >= 4.3.1 (https://mcmc-jags.sourceforge.io/)
+# NeedsCompilation: yes
+# Depends: R (>= 4.0.0)
+# Imports: BayesTools (>= 0.2.16), runjags, rjags, stats, graphics, mvtnorm, scales, Rdpack, rlang, ggplot2
+# Suggests: parallel, metaBMA, metafor, weightr, lme4, fixest, metadat, testthat, vdiffr, knitr, rmarkdown, covr
+# LinkingTo: mvtnorm
+# RdMacros: Rdpack
+# VignetteBuilder: knitr
+# Packaged: 2023-07-17 14:01:51 UTC; fbart
+# Author: Frantisek Bartos [aut, cre] (<https://orcid.org/0000-0002-0018-5573>), Maximilian Maier [aut] (<https://orcid.org/0000-0002-9873-6096>), Eric-Jan Wagenmakers [ths] (<https://orcid.org/0000-0003-1596-1034>), Joris Goosen [ctb], Matthew Denwood [cph] (Original copyright holder of some modified code where indicated.), Martyn Plummer [cph] (Original copyright holder of some modified code where indicated.)
+# Repository: CRAN
+# Date/Publication: 2023-07-18 21:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

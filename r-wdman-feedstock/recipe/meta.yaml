@@ -1,0 +1,99 @@
+{% set version = '0.2.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-wdman
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/wdman_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/wdman/wdman_{{ version }}.tar.gz
+  sha256: e62ebbe240ef349f5f9486227b80716321b61cd68dd8de3e460c9b1bd3e21c58
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr, knitr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-assertthat
+    - r-binman
+    - r-processx
+    - r-semver >=0.2.0
+    - r-yaml
+
+  run:
+    - r-base
+    - r-assertthat
+    - r-binman
+    - r-processx
+    - r-semver >=0.2.0
+    - r-yaml
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('wdman')"           # [not win]
+    - "\"%R%\" -e \"library('wdman')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://docs.ropensci.org/wdman/, https://github.com/ropensci/wdman
+  license: MIT
+  summary: There are a number of binary files associated with the 'Webdriver'/'Selenium' project.
+    This package provides functions to download these binaries and to manage processes
+    involving them.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: wdman
+# Type: Package
+# Title: 'Webdriver'/'Selenium' Binary Manager
+# Version: 0.2.6
+# Authors@R: c( person("John", "Harrison", , "johndharrison0@gmail.com", role = "aut", comment = "original author"), person("Ju Yeong", "Kim", , "jkim2345@fredhutch.org", role = "cre", comment = "rOpenSci maintainer"))
+# Description: There are a number of binary files associated with the 'Webdriver'/'Selenium' project. This package provides functions to download these binaries and to manage processes involving them.
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Depends: R (>= 3.2)
+# Suggests: testthat, covr, knitr, rmarkdown
+# Imports: binman, assertthat, processx, yaml, semver(>= 0.2.0), utils
+# URL: https://docs.ropensci.org/wdman/, https://github.com/ropensci/wdman
+# URLNote: https://github.com/ropensci/wdman
+# BugReports: https://github.com/ropensci/wdman/issues
+# RoxygenNote: 7.2.1
+# VignetteBuilder: knitr
+# NeedsCompilation: no
+# Packaged: 2022-09-01 04:54:08 UTC; juyeongkim
+# Author: John Harrison [aut] (original author), Ju Yeong Kim [cre] (rOpenSci maintainer)
+# Maintainer: Ju Yeong Kim <jkim2345@fredhutch.org>
+# Repository: CRAN
+# Date/Publication: 2022-09-01 05:10:03 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

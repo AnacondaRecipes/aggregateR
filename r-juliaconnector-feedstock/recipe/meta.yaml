@@ -1,0 +1,85 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-juliaconnector
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/JuliaConnectoR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/JuliaConnectoR/JuliaConnectoR_{{ version }}.tar.gz
+  sha256: b6dca0a991b3d0d6807cc389a98f366e9e8756e0ddeea941c6e3062a40570b32
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.1.0), future, parallel
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('JuliaConnectoR')"           # [not win]
+    - "\"%R%\" -e \"library('JuliaConnectoR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=JuliaConnectoR
+  license: MIT
+  summary: Allows to import functions and whole packages from 'Julia' in R. Imported 'Julia'
+    functions can directly be called as R functions. Data structures can be translated
+    between 'Julia' and R. More details can also be found in the corresponding article
+    <doi:10.18637/jss.v101.i06>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENCE
+
+# The original CRAN metadata for this package was:
+
+# Package: JuliaConnectoR
+# Type: Package
+# Title: A Functionally Oriented Interface for Integrating 'Julia' with R
+# Version: 1.1.1
+# Maintainer: Stefan Lenz <stefan-m-lenz@web.de>
+# Authors@R: c(person("Stefan", "Lenz", role = c("aut", "cre"), email = "stefan-m-lenz@web.de", comment = c(ORCID = "0000-0001-9135-1743")), person("Harald", "Binder", role = c("aut", "ths"), comment = c(ORCID = "0000-0002-5666-8662")), person("Angelo", "D\'Ambrosio", comment = c(ORCID = "0000-0002-2045-5155"), role = "ctb"))
+# Description: Allows to import functions and whole packages from 'Julia' in R. Imported 'Julia' functions can directly be called as R functions. Data structures can be translated between 'Julia' and R. More details can also be found in the corresponding article <doi:10.18637/jss.v101.i06>.
+# License: MIT + file LICENCE
+# SystemRequirements: Julia >= 1.0
+# Encoding: UTF-8
+# RoxygenNote: 7.1.2
+# Suggests: testthat (>= 2.1.0), future, parallel
+# NeedsCompilation: no
+# Packaged: 2022-01-25 18:57:21 UTC; Stefan Lenz
+# Author: Stefan Lenz [aut, cre] (<https://orcid.org/0000-0001-9135-1743>), Harald Binder [aut, ths] (<https://orcid.org/0000-0002-5666-8662>), Angelo D'Ambrosio [ctb] (<https://orcid.org/0000-0002-2045-5155>)
+# Repository: CRAN
+# Date/Publication: 2022-01-26 18:12:49 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

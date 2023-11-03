@@ -1,0 +1,84 @@
+{% set version = '2.6.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-forectheta
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/forecTheta_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/forecTheta/forecTheta_{{ version }}.tar.gz
+  sha256: 8d4bbcff6e313e13ae1708e0beab9f548089df464e0c858ce7a057e50ced8577
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-forecast
+    - r-tseries
+
+  run:
+    - r-base
+    - r-forecast
+    - r-tseries
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('forecTheta')"           # [not win]
+    - "\"%R%\" -e \"library('forecTheta')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://www.sciencedirect.com/science/article/pii/S0169207016300243
+  license: GPL-2
+  summary: Routines for forecasting univariate time series using Theta Models.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: forecTheta
+# Type: Package
+# Title: Forecasting Time Series by Theta Models
+# Version: 2.6.2
+# Author: Jose Augusto Fiorucci [aut, cre, cph] (<https://orcid.org/0000-0002-1201-9089>), Francisco Louzada [aut, cph] (<https://orcid.org/0000-0001-7815-9554>)
+# Maintainer: Jose Augusto Fiorucci <jafiorucci@gmail.com>
+# Description: Routines for forecasting univariate time series using Theta Models.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# Depends: R (>= 2.0), forecast, tseries
+# Authors@R: c( person("Jose Augusto", "Fiorucci", email="jafiorucci@gmail.com", role=c("aut", "cre", "cph"), comment = c(ORCID = "0000-0002-1201-9089")), person("Francisco", "Louzada", email="louzada@icmc.usp.br", role=c("aut", "cph"), comment = c(ORCID = "0000-0001-7815-9554")) )
+# BugReports: https://github.com/jafiorucci/forecTheta/issues
+# URL: https://www.sciencedirect.com/science/article/pii/S0169207016300243
+# NeedsCompilation: no
+# Packaged: 2022-11-11 22:10:15 UTC; jafio
+# Repository: CRAN
+# Date/Publication: 2022-11-11 22:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

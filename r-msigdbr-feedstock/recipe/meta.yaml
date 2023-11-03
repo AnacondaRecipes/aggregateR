@@ -1,0 +1,103 @@
+{% set version = '7.5.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-msigdbr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/msigdbr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/msigdbr/msigdbr_{{ version }}.tar.gz
+  sha256: dc30487bdf3594425ae9faec1ca0d7d0cd7278f4f177689133f92880e74acaca
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-babelgene
+    - r-dplyr >=0.7.0
+    - r-magrittr
+    - r-rlang
+    - r-tibble
+    - r-tidyselect
+
+  run:
+    - r-base
+    - r-babelgene
+    - r-dplyr >=0.7.0
+    - r-magrittr
+    - r-rlang
+    - r-tibble
+    - r-tidyselect
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('msigdbr')"           # [not win]
+    - "\"%R%\" -e \"library('msigdbr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://igordot.github.io/msigdbr/
+  license: MIT
+  summary: Provides the 'Molecular Signatures Database' (MSigDB) gene sets typically used with
+    the 'Gene Set Enrichment Analysis' (GSEA) software (Subramanian et al. 2005 <doi:10.1073/pnas.0506580102>,
+    Liberzon et al. 2015 <doi:10.1016/j.cels.2015.12.004>) in a standard R data frame
+    with key-value pairs. The package includes the human genes as listed in MSigDB as
+    well as the corresponding symbols and IDs for frequently studied model organisms
+    such as mouse, rat, pig, fly, and yeast.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: msigdbr
+# Title: MSigDB Gene Sets for Multiple Organisms in a Tidy Data Format
+# Version: 7.5.1
+# Authors@R: person("Igor", "Dolgalev", , "igor.dolgalev@nyumc.org", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-4451-126X"))
+# Description: Provides the 'Molecular Signatures Database' (MSigDB) gene sets typically used with the 'Gene Set Enrichment Analysis' (GSEA) software (Subramanian et al. 2005 <doi:10.1073/pnas.0506580102>, Liberzon et al. 2015 <doi:10.1016/j.cels.2015.12.004>) in a standard R data frame with key-value pairs. The package includes the human genes as listed in MSigDB as well as the corresponding symbols and IDs for frequently studied model organisms such as mouse, rat, pig, fly, and yeast.
+# License: MIT + file LICENSE
+# URL: https://igordot.github.io/msigdbr/
+# BugReports: https://github.com/igordot/msigdbr/issues
+# Depends: R (>= 3.4)
+# Imports: babelgene, dplyr (>= 0.7.0), magrittr, rlang, tibble, tidyselect
+# Suggests: knitr, rmarkdown, testthat
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# RoxygenNote: 7.1.2
+# NeedsCompilation: no
+# Packaged: 2022-03-30 00:48:07 UTC; id460
+# Author: Igor Dolgalev [aut, cre] (<https://orcid.org/0000-0003-4451-126X>)
+# Maintainer: Igor Dolgalev <igor.dolgalev@nyumc.org>
+# Repository: CRAN
+# Date/Publication: 2022-03-30 07:00:16 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

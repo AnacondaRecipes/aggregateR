@@ -1,0 +1,130 @@
+{% set version = '1.2.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-bfpack
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BFpack_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BFpack/BFpack_{{ version }}.tar.gz
+  sha256: 8ad21c81c968a05fcadca88da3e9ec1cbf74976912b5f84c5913a3944e3251ae
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, polycor, survival, pscl, metafor, knitr, rmarkdown, lmtest
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('fortran') }}        # [not win]
+    - {{ compiler('m2w64_fortran') }}  # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bergm
+    - r-mass
+    - r-qrm
+    - r-bain
+    - r-ergm
+    - r-extradistr
+    - r-lme4
+    - r-mvtnorm
+    - r-pracma
+    - r-sandwich
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bergm
+    - r-mass
+    - r-qrm
+    - r-bain
+    - r-ergm
+    - r-extradistr
+    - r-lme4
+    - r-mvtnorm
+    - r-pracma
+    - r-sandwich
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BFpack')"           # [not win]
+    - "\"%R%\" -e \"library('BFpack')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jomulder/BFpack
+  license: GPL-3
+  summary: Implementation of default Bayes factors for testing statistical hypotheses under various
+    statistical models. The package is intended for applied quantitative researchers
+    in the social and behavioral sciences, medical research, and related fields. The
+    Bayes factor tests can be executed for statistical models such as univariate and
+    multivariate normal linear models, correlation analysis, generalized linear models,
+    special cases of linear mixed models, survival models, relational event models.
+    Parameters that can be tested are location parameters (e.g., group means, regression
+    coefficients), variances (e.g., group variances), and measures of association (e.g,.
+    polychoric/polyserial/biserial/tetrachoric/product moments correlations), among
+    others. The statistical underpinnings are described in Mulder and Xin (2019) <DOI:10.1080/00273171.2021.1904809>,
+    Mulder and Gelissen (2019) <DOI:10.1080/02664763.2021.1992360>, Mulder (2016) <DOI:10.1016/j.jmp.2014.09.004>,
+    Mulder and Fox (2019) <DOI:10.1214/18-BA1115>, Mulder and Fox (2013) <DOI:10.1007/s11222-011-9295-3>,
+    Boeing-Messing, van Assen, Hofman, Hoijtink, and Mulder (2017) <DOI:10.1037/met0000116>,
+    Hoijtink, Mulder, van Lissa, and Gu, (2018) <DOI:10.31234/osf.io/v3shc>, Gu, Mulder,
+    and Hoijtink, (2018) <DOI:10.1111/bmsp.12110>, Hoijtink, Gu, and Mulder, (2018)
+    <DOI:10.1111/bmsp.12145>, and Hoijtink, Gu, Mulder, and Rosseel, (2018) <DOI:10.1037/met0000187>.
+    When using the packages, please refer to Mulder et al. (2021) <DOI:10.18637/jss.v100.i18>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: BFpack
+# Type: Package
+# Title: Flexible Bayes Factor Testing of Scientific Expectations
+# Version: 1.2.3
+# Authors@R: c(person(given = c("Joris"), family = "Mulder", role = c("aut", "cre"), email = "j.mulder3@tilburguniversity.edu"), person(given = "Caspar", family = "van Lissa", role = c("aut", "ctb"), email = "c.j.vanlissa@uu.nl"), person(given = "Donald R.", family = "Williams", role = c("aut", "ctb"), email = "drwwilliams@ucdavis.edu"), person(given = "Xin", family = "Gu", role = c("aut", "ctb"), email = "guxin57@hotmail.com"), person(given = "Anton", family = "Olsson-Collentine", role = c("aut", "ctb"), email = "J.A.E.OlssonCollentine@tilburguniversity.edu"), person(given = "Florian", family = "Boeing-Messing", role = c("aut", "ctb"), email = "F.Boeing-Messing@uvt.nl"), person(given = "Jean-Paul", family = "Fox", role = c("aut", "ctb"), email = "g.j.a.fox@utwente.nl"), person(given = "Janosch", family = "Menke", role = c("ctb"), email = "janosch.menke@uni-muenster.de"), person(given = "Robbie", family = "van Aert", role = c("ctb"), email = "R.C.M.vanAert@tilburguniversity.edu"), person(given = "Barry", family = "Brown", role = "ctb"), person(given = "James", family = "Lovato", role = "ctb"), person(given = "Kathy", family = "Russell", role = "ctb"), person("Lapack 3.8", role = "ctb"), person(given = "Jack", family = "Dongarra", role = "ctb"), person(given = "Jim", family = "Bunch", role = "ctb"), person(given = "Cleve", family = "Moler", role = "ctb"), person(given = "Gilbert", family = "Stewart", role = "ctb"), person(given = "John", family = "Burkandt", role = "ctb"), person(given = "Ashwith", family = "Rego", role = "ctb"), person(given = "Alexander", family = "Godunov", role = "ctb"), person(given = "Alan", family = "Miller", role = "ctb"), person(given = "Jean-Pierre", family = "Moreau", role = "ctb"), person("The R Core Team", role = "cph") )
+# Maintainer: Joris Mulder <j.mulder3@tilburguniversity.edu>
+# Description: Implementation of default Bayes factors for testing statistical hypotheses under various statistical models. The package is intended for applied quantitative researchers in the social and behavioral sciences, medical research, and related fields. The Bayes factor tests can be executed for statistical models such as univariate and multivariate normal linear models, correlation analysis, generalized linear models, special cases of linear mixed models, survival models, relational event models. Parameters that can be tested are location parameters (e.g., group means, regression coefficients), variances (e.g., group variances), and measures of association (e.g,. polychoric/polyserial/biserial/tetrachoric/product moments correlations), among others. The statistical underpinnings are described in Mulder and Xin (2019) <DOI:10.1080/00273171.2021.1904809>, Mulder and Gelissen (2019) <DOI:10.1080/02664763.2021.1992360>, Mulder (2016) <DOI:10.1016/j.jmp.2014.09.004>, Mulder and Fox (2019) <DOI:10.1214/18-BA1115>, Mulder and Fox (2013) <DOI:10.1007/s11222-011-9295-3>, Boeing-Messing, van Assen, Hofman, Hoijtink, and Mulder (2017) <DOI:10.1037/met0000116>, Hoijtink, Mulder, van Lissa, and Gu, (2018) <DOI:10.31234/osf.io/v3shc>, Gu, Mulder, and Hoijtink, (2018) <DOI:10.1111/bmsp.12110>, Hoijtink, Gu, and Mulder, (2018) <DOI:10.1111/bmsp.12145>, and Hoijtink, Gu, Mulder, and Rosseel, (2018) <DOI:10.1037/met0000187>. When using the packages, please refer to Mulder et al. (2021) <DOI:10.18637/jss.v100.i18>.
+# License: GPL (>= 3)
+# URL: https://github.com/jomulder/BFpack
+# BugReports: https://github.com/jomulder/BFpack/issues
+# Encoding: UTF-8
+# LazyData: true
+# NeedsCompilation: yes
+# RoxygenNote: 7.2.1
+# Depends: R (>= 3.0.0), bain
+# Imports: stats, utils, MASS, mvtnorm, pracma, lme4, extraDistr, ergm, Bergm, sandwich, QRM
+# Suggests: testthat, polycor, survival, pscl, metafor, knitr, rmarkdown, lmtest
+# VignetteBuilder: knitr
+# Packaged: 2023-10-19 12:15:00 UTC; jorismulder
+# Author: Joris Mulder [aut, cre], Caspar van Lissa [aut, ctb], Donald R. Williams [aut, ctb], Xin Gu [aut, ctb], Anton Olsson-Collentine [aut, ctb], Florian Boeing-Messing [aut, ctb], Jean-Paul Fox [aut, ctb], Janosch Menke [ctb], Robbie van Aert [ctb], Barry Brown [ctb], James Lovato [ctb], Kathy Russell [ctb], Lapack 3.8 [ctb], Jack Dongarra [ctb], Jim Bunch [ctb], Cleve Moler [ctb], Gilbert Stewart [ctb], John Burkandt [ctb], Ashwith Rego [ctb], Alexander Godunov [ctb], Alan Miller [ctb], Jean-Pierre Moreau [ctb], The R Core Team [cph]
+# Repository: CRAN
+# Date/Publication: 2023-10-20 09:00:16 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

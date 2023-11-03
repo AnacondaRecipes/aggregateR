@@ -1,0 +1,94 @@
+{% set version = '0.9.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mvinfluence
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mvinfluence_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mvinfluence/mvinfluence_{{ version }}.tar.gz
+  sha256: 1039f26ec9bbfbb50b58997205a257456127d62461830794b322d7babc46f77b
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, ggplot2, tibble, patchwork, rgl, dplyr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-car
+    - r-heplots
+
+  run:
+    - r-base
+    - r-car
+    - r-heplots
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mvinfluence')"           # [not win]
+    - "\"%R%\" -e \"library('mvinfluence')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/friendly/mvinfluence
+  license: GPL-2
+  summary: Computes regression deletion diagnostics for multivariate linear models and provides
+    some associated diagnostic plots.  The diagnostic measures include hat-values (leverages),
+    generalized Cook's distance, and generalized squared 'studentized' residuals.  Several
+    types of plots to detect influential observations are provided.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: mvinfluence
+# Type: Package
+# Title: Influence Measures and Diagnostic Plots for Multivariate Linear Models
+# Version: 0.9.0
+# Date: 2022-09-10
+# Authors@R: person(given ="Michael", family = "Friendly", email = "friendly@yorku.ca", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-3237-0941"))
+# Maintainer: Michael Friendly <friendly@yorku.ca>
+# Description: Computes regression deletion diagnostics for multivariate linear models and provides some associated diagnostic plots.  The diagnostic measures include hat-values (leverages), generalized Cook's distance, and generalized squared 'studentized' residuals.  Several types of plots to detect influential observations are provided.
+# Depends: car, heplots
+# Suggests: knitr, rmarkdown, ggplot2, tibble, patchwork, rgl, dplyr
+# LazyData: TRUE
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# License: GPL-2
+# Language: en-US
+# URL: https://github.com/friendly/mvinfluence
+# BugReports: https://github.com/friendly/mvinfluence/issues
+# Packaged: 2022-09-20 16:49:20 UTC; friendly
+# RoxygenNote: 7.2.1
+# NeedsCompilation: no
+# Author: Michael Friendly [aut, cre] (<https://orcid.org/0000-0002-3237-0941>)
+# Repository: CRAN
+# Date/Publication: 2022-09-20 17:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

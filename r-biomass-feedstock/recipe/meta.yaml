@@ -1,0 +1,106 @@
+{% set version = '2.1.11' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-biomass
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BIOMASS_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BIOMASS/BIOMASS_{{ version }}.tar.gz
+  sha256: b0819d8860cd37ce120083627683858c94ca55c7bced9601b8dcf2ff3b3c7de1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, prettydoc, testthat, curl, geodata, httr2
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table >=1.9.8
+    - r-jsonlite
+    - r-minpack.lm
+    - r-proj4
+    - r-rappdirs
+    - r-sf
+    - r-terra
+
+  run:
+    - r-base
+    - r-data.table >=1.9.8
+    - r-jsonlite
+    - r-minpack.lm
+    - r-proj4
+    - r-rappdirs
+    - r-sf
+    - r-terra
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BIOMASS')"           # [not win]
+    - "\"%R%\" -e \"library('BIOMASS')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/umr-amap/BIOMASS
+  license: GPL-2
+  summary: "Contains functions to estimate aboveground biomass/carbon and its uncertainty in
+    tropical forests. These functions allow to (1) retrieve and to correct taxonomy,
+    (2) estimate wood density and its uncertainty, (3) construct height-diameter models,
+    (4) manage tree and plot coordinates, (5) estimate the aboveground biomass/carbon
+    at the stand level with associated uncertainty. To cite 'BIOMASS', please use citation(\"BIOMASS\").
+    See more in the article of R\xE9jou-M\xE9chain et al. (2017) <doi:10.1111/2041-210X.12753>."
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: BIOMASS
+# Type: Package
+# Title: Estimating Aboveground Biomass and Its Uncertainty in Tropical Forests
+# Version: 2.1.11
+# Date: 2023-09-27
+# Authors@R: c( person("Maxime", "Rejou-Mechain", email = "maxime.rejou@gmail.com", role = c("aut", "dtc")), person("Guillaume","Cornu", email = "gcornu@cirad.fr", role = c("aut"), comment = c(ORCID="0000-0002-7523-5176")), person("Dominique", "Lamonica", email = "dominique.lamonica@ird.fr", role = c("aut","cre")), person("Arthur", "Pere", role = c("aut")), person("Ariane", "Tanguy", role = c("aut")), person("Camille", "Piponiot", role = c("aut")), person("Jerome", "Chave", email = "jerome.chave@univ-tlse3.fr", role = c("dtc")), person("Bruno", "Herault", email = "bruno.herault@cirad.fr", role = c("aut")), person("Ted", "Feldpausch", email = "T.R.Feldpausch@exeter.ac.uk", role = c("dtc")), person("Philippe", "Verley", email = "philippe.verley@ird.fr ", role = c("ctb")) )
+# Description: Contains functions to estimate aboveground biomass/carbon and its uncertainty in tropical forests. These functions allow to (1) retrieve and to correct taxonomy, (2) estimate wood density and its uncertainty, (3) construct height-diameter models, (4) manage tree and plot coordinates, (5) estimate the aboveground biomass/carbon at the stand level with associated uncertainty. To cite 'BIOMASS', please use citation("BIOMASS"). See more in the article of Rejou-Mechain et al. (2017) <doi:10.1111/2041-210X.12753>.
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: true
+# Depends: R(>= 3.6)
+# URL: https://github.com/umr-amap/BIOMASS
+# BugReports: https://github.com/umr-amap/BIOMASS/issues
+# Imports: minpack.lm, jsonlite, methods, proj4, graphics, stats, utils, data.table (>= 1.9.8), rappdirs, sf, terra
+# VignetteBuilder: knitr
+# Suggests: knitr, rmarkdown, prettydoc, testthat, curl, geodata, httr2
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-09-29 11:48:52 UTC; lamonica
+# Author: Maxime Rejou-Mechain [aut, dtc], Guillaume Cornu [aut] (<https://orcid.org/0000-0002-7523-5176>), Dominique Lamonica [aut, cre], Arthur Pere [aut], Ariane Tanguy [aut], Camille Piponiot [aut], Jerome Chave [dtc], Bruno Herault [aut], Ted Feldpausch [dtc], Philippe Verley [ctb]
+# Maintainer: Dominique Lamonica <dominique.lamonica@ird.fr>
+# Repository: CRAN
+# Date/Publication: 2023-09-29 12:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

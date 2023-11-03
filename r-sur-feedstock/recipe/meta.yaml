@@ -1,0 +1,89 @@
+{% set version = '1.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sur
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/sur_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/sur/sur_{{ version }}.tar.gz
+  sha256: 544b0dd39e05f7f6411568152e24d787dd74bbbebd7e3e8e67df9a3a3abfe566
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-learnr
+
+  run:
+    - r-base
+    - r-learnr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('sur')"           # [not win]
+    - "\"%R%\" -e \"library('sur')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=sur
+  license: GPL-2
+  summary: 'Access to the datasets and many of the functions used in "Statistics Using R: An
+    Integrative Approach". These datasets include a subset of the National Education
+    Longitudinal Study, the Framingham Heart Study, as well as several simulated datasets
+    used in the examples throughout the textbook. The functions included in the package
+    reproduce some of the functionality of ''Stata'' that is not directly available
+    in ''R''.  The package also contains a tutorial on basic data frame management,
+    including how to handle missing data.'
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: sur
+# Type: Package
+# Title: Companion to "Statistics Using R: An Integrative Approach"
+# Version: 1.0.4
+# Authors@R: c(person("Daphna","Harel",email = "daphna.harel@gmail.com",role=c("cre","aut")), person("Sharon","Weinberg",email = "sharon.weinberg@nyu.edu",role=c("ctb")), person("Sarah","Abramowitz",email = "sabramow@drew.edu",role=c("ctb")))
+# Depends: R (>= 3.5.0)
+# Description: Access to the datasets and many of the functions used in "Statistics Using R: An Integrative Approach". These datasets include a subset of the National Education Longitudinal Study, the Framingham Heart Study, as well as several simulated datasets used in the examples throughout the textbook. The functions included in the package reproduce some of the functionality of 'Stata' that is not directly available in 'R'.  The package also contains a tutorial on basic data frame management, including how to handle missing data.
+# License: GPL (>= 2)
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.0.0
+# Imports: learnr
+# NeedsCompilation: no
+# Packaged: 2020-08-24 22:05:29 UTC; daphnaharel
+# Author: Daphna Harel [cre, aut], Sharon Weinberg [ctb], Sarah Abramowitz [ctb]
+# Maintainer: Daphna Harel <daphna.harel@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2020-08-25 22:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

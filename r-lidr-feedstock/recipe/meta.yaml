@@ -1,0 +1,126 @@
+{% set version = '4.0.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lidr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/lidR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/lidR/lidR_{{ version }}.tar.gz
+  sha256: 9380ca5538ef30f369d2ef640e51e92e1d87c13b3a3c7fe39e6f46b3edf3a57d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: EBImage, future, geometry, gstat, RCSF, RMCC, mapview, mapedit, progress, testthat (>= 2.1.0), knitr, rmarkdown
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-bh >=1.72.0
+    - r-rcpp >=1.0.3
+    - r-rcpparmadillo
+    - r-classint
+    - r-data.table >=1.12.0
+    - r-glue
+    - r-lazyeval
+    - r-raster
+    - r-rgl
+    - r-rlas >=1.5.0
+    - r-sf
+    - r-sp
+    - r-stars
+    - r-terra >=1.5_17
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-bh >=1.72.0
+    - r-rcpp >=1.0.3
+    - r-rcpparmadillo
+    - r-classint
+    - r-data.table >=1.12.0
+    - r-glue
+    - r-lazyeval
+    - r-raster
+    - r-rgl
+    - r-rlas >=1.5.0
+    - r-sf
+    - r-sp
+    - r-stars
+    - r-terra >=1.5_17
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('lidR')"           # [not win]
+    - "\"%R%\" -e \"library('lidR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/r-lidar/lidR
+  license: GPL-3
+  summary: Airborne LiDAR (Light Detection and Ranging) interface for data manipulation and visualization.
+    Read/write 'las' and 'laz' files, computation of metrics in area based approach,
+    point filtering, artificial point reduction, classification from geographic data,
+    normalization, individual tree segmentation and other manipulations.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: lidR
+# Type: Package
+# Title: Airborne LiDAR Data Manipulation and Visualization for Forestry Applications
+# Version: 4.0.4
+# Authors@R: c( person("Jean-Romain", "Roussel", email = "jean-romain.roussel.1@ulaval.ca", role = c("aut", "cre", "cph")), person("David", "Auty", email = "", role = c("aut", "ctb"), comment = "Reviews the documentation"), person("Florian", "De Boissieu", email = "", role = ("ctb"), comment = "Fixed bugs and improved catalog features"), person("Andrew", "Sanchez Meador", email = "", role = ("ctb"), comment = "Implemented wing2015() for segment_snags()"), person("Bourdon", "Jean-Francois", email = "", role = ("ctb"), comment = "Contributed to Roussel2020() for track_sensor()"), person("Gatziolis", "Demetrios", email = "", role = ("ctb"), comment = "Implemented Gatziolis2019() for track_sensor()"), person("Leon", "Steinmeier", email = "", role = ("ctb"), comment = "Contributed to parallelization management"), person("Stanislaw", "Adaszewski", email = "", role = ("cph"), comment = "Author of the C++ concaveman code"))
+# Description: Airborne LiDAR (Light Detection and Ranging) interface for data manipulation and visualization. Read/write 'las' and 'laz' files, computation of metrics in area based approach, point filtering, artificial point reduction, classification from geographic data, normalization, individual tree segmentation and other manipulations.
+# URL: https://github.com/r-lidar/lidR
+# BugReports: https://github.com/r-lidar/lidR/issues
+# License: GPL-3
+# Depends: R (>= 3.5.0), methods
+# Imports: classInt, data.table (>= 1.12.0), glue, grDevices, lazyeval, raster, Rcpp (>= 1.0.3), rgl, rlas (>= 1.5.0), sf, sp, stats, stars, terra (>= 1.5-17), tools, utils
+# Suggests: EBImage, future, geometry, gstat, RCSF, RMCC, mapview, mapedit, progress, testthat (>= 2.1.0), knitr, rmarkdown
+# RoxygenNote: 7.2.3
+# LinkingTo: BH (>= 1.72.0),Rcpp,RcppArmadillo
+# Encoding: UTF-8
+# ByteCompile: true
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2023-09-07 08:07:23 UTC; jr
+# Author: Jean-Romain Roussel [aut, cre, cph], David Auty [aut, ctb] (Reviews the documentation), Florian De Boissieu [ctb] (Fixed bugs and improved catalog features), Andrew Sanchez Meador [ctb] (Implemented wing2015() for segment_snags()), Bourdon Jean-Francois [ctb] (Contributed to Roussel2020() for track_sensor()), Gatziolis Demetrios [ctb] (Implemented Gatziolis2019() for track_sensor()), Leon Steinmeier [ctb] (Contributed to parallelization management), Stanislaw Adaszewski [cph] (Author of the C++ concaveman code)
+# Maintainer: Jean-Romain Roussel <jean-romain.roussel.1@ulaval.ca>
+# Repository: CRAN
+# Date/Publication: 2023-09-07 15:20:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

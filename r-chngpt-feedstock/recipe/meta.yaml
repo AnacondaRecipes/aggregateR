@@ -1,0 +1,107 @@
+{% set version = '2023.1-30' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-chngpt
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/chngpt_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/chngpt/chngpt_{{ version }}.tar.gz
+  sha256: fccfc5e545d44a9436a0647fc7b74a43522bca50f20b8263bb7d2f8cdf16c896
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: R.rsp, RUnit, mvtnorm
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-rhpcblasctl
+    - r-boot
+    - r-kyotil >=2020.10_12
+    - r-lme4
+    - r-survival
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-mass
+    - r-rhpcblasctl
+    - r-boot
+    - r-kyotil >=2020.10_12
+    - r-lme4
+    - r-survival
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('chngpt')"           # [not win]
+    - "\"%R%\" -e \"library('chngpt')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=chngpt
+  license: GPL-2
+  summary: Threshold regression models are also called two-phase regression, broken-stick regression,
+    split-point regression, structural change models, and regression kink models, with
+    and without interaction terms. Methods for both continuous and discontinuous threshold
+    models are included, but the support for the former is much greater. This package
+    is described in Fong, Huang, Gilbert and Permar (2017) <DOI:10.1186/s12859-017-1863-x>
+    and the package vignette.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: chngpt
+# LazyLoad: yes
+# LazyData: yes
+# Version: 2023.1-30
+# Title: Estimation and Hypothesis Testing for Threshold Regression
+# Authors@R: c(person("Youyi", "Fong", role = "cre", email = "youyifong@gmail.com"), person("Qianqian", "Chen", role = "aut", email = "qc25@uw.edu"), person("Shuangcheng", "Hua", role = "aut", email = "shuangch.hua@gmail.com"), person("Hyunju", "Son", role = "aut", email = "hson@uw.edu"), person("Adam", "Elder", role = "aut", email = "eldera3@uw.edu"), person("Tao", "Yang", role = "aut", email = "tyang23@fredhutch.org"), person("Zonglin", "He", role = "aut", email = "nkhezl@gmail.com"), person("Simone", "Giannerini", role = "aut", email = "simone.giannerini@unibo.it") )
+# Depends: R (>= 3.6)
+# Suggests: R.rsp, RUnit, mvtnorm
+# Imports: survival, splines, kyotil (>= 2020.10-12), boot, MASS, methods, lme4, parallel, RhpcBLASctl
+# VignetteBuilder: R.rsp
+# Description: Threshold regression models are also called two-phase regression, broken-stick regression, split-point regression, structural change models, and regression kink models, with and without interaction terms. Methods for both continuous and discontinuous threshold models are included, but the support for the former is much greater. This package is described in Fong, Huang, Gilbert and Permar (2017) <DOI:10.1186/s12859-017-1863-x> and the package vignette.
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2023-01-31 17:33:55 UTC; Youyi
+# Author: Youyi Fong [cre], Qianqian Chen [aut], Shuangcheng Hua [aut], Hyunju Son [aut], Adam Elder [aut], Tao Yang [aut], Zonglin He [aut], Simone Giannerini [aut]
+# Maintainer: Youyi Fong <youyifong@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-01-31 20:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

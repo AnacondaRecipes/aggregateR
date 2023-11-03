@@ -1,0 +1,109 @@
+{% set version = '0.3.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-graphicalvar
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/graphicalVAR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/graphicalVAR/graphicalVAR_{{ version }}.tar.gz
+  sha256: cae80cc508b38cc1ad58b8cd91481a869c4ca73d6d369cf4cd6738b99648fcf2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-rcpp >=0.11.3
+    - r-rcpparmadillo
+    - r-dplyr
+    - r-glasso
+    - r-glmnet
+    - r-igraph
+    - r-mvtnorm
+    - r-qgraph >=1.3.1
+    - r-rlang
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix
+    - r-rcpp >=0.11.3
+    - r-rcpparmadillo
+    - r-dplyr
+    - r-glasso
+    - r-glmnet
+    - r-igraph
+    - r-mvtnorm
+    - r-qgraph >=1.3.1
+    - r-rlang
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('graphicalVAR')"           # [not win]
+    - "\"%R%\" -e \"library('graphicalVAR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=graphicalVAR
+  license: GPL-2
+  summary: Estimates within and between time point interactions in experience sampling data,
+    using the Graphical vector autoregression model in combination with regularization.
+    See also Epskamp, Waldorp, Mottus & Borsboom (2018) <doi:10.1080/00273171.2018.1454823>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: graphicalVAR
+# Type: Package
+# Title: Graphical VAR for Experience Sampling Data
+# Version: 0.3.3
+# Authors@R: c( person("Sacha", "Epskamp", email = "mail@sachaepskamp.com",role = c("aut", "cre")), person("Eren", "Asena", role = c("ctb")) )
+# Maintainer: Sacha Epskamp <mail@sachaepskamp.com>
+# Description: Estimates within and between time point interactions in experience sampling data, using the Graphical vector autoregression model in combination with regularization. See also Epskamp, Waldorp, Mottus & Borsboom (2018) <doi:10.1080/00273171.2018.1454823>.
+# License: GPL (>= 2)
+# LinkingTo: Rcpp, RcppArmadillo
+# Imports: Rcpp (>= 0.11.3), Matrix, glasso, glmnet, mvtnorm, qgraph (>= 1.3.1), dplyr, methods, igraph, rlang
+# Depends: R (>= 3.1.0)
+# NeedsCompilation: yes
+# Packaged: 2023-10-18 06:01:22 UTC; sachaepskamp
+# Author: Sacha Epskamp [aut, cre], Eren Asena [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-10-18 08:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

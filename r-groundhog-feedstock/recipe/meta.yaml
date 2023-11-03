@@ -1,0 +1,89 @@
+{% set version = '3.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-groundhog
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/groundhog_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/groundhog/groundhog_{{ version }}.tar.gz
+  sha256: 3ea6060b04a86e76b201e1a7a1e52ba2d616df6ca14182ffb8bcd2d51cd8ea9f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: git2r, remotes
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('groundhog')"           # [not win]
+    - "\"%R%\" -e \"library('groundhog')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://groundhogr.com/, https://github.com/CredibilityLab/groundhog
+  license: GPL-3
+  summary: Make R scripts reproducible, by ensuring that every time a given script is run, the
+    same version of the used packages are loaded (instead of whichever version the user
+    running the script happens to have installed). This is achieved by using the command
+    groundhog.library() instead of the base command library(), and including a date
+    in the call. The date is used to call on the same version of the package every time
+    (the most recent version available at that date). Load packages  from CRAN, GitHub,
+    or Gitlab.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: groundhog
+# Title: Version-Control for CRAN, GitHub, and GitLab Packages
+# Version: 3.1.2
+# Authors@R: c( person(given = "Uri", family = "Simonsohn", role = c("aut", "cre"), email = "urisohn@gmail.com", comment = c(ORCID = "0000-0002-8601-7211")), person(given = "Hugo", family = "Gruson", role = c("ctb", "aut"), email = "hugo.gruson+R@normalesup.org", comment = c(ORCID = "0000-0002-4094-1476")) )
+# Description: Make R scripts reproducible, by ensuring that every time a given script is run, the same version of the used packages are loaded (instead of whichever version the user running the script happens to have installed). This is achieved by using the command groundhog.library() instead of the base command library(), and including a date in the call. The date is used to call on the same version of the package every time (the most recent version available at that date). Load packages  from CRAN, GitHub, or Gitlab.
+# URL: https://groundhogr.com/, https://github.com/CredibilityLab/groundhog
+# BugReports: https://github.com/CredibilityLab/groundhog/issues
+# Depends: utils
+# Imports: methods
+# Suggests: git2r, remotes
+# License: GPL-3
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-10-13 04:40:47 UTC; _sohn
+# Author: Uri Simonsohn [aut, cre] (<https://orcid.org/0000-0002-8601-7211>), Hugo Gruson [ctb, aut] (<https://orcid.org/0000-0002-4094-1476>)
+# Maintainer: Uri Simonsohn <urisohn@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-10-13 05:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

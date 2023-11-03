@@ -1,0 +1,92 @@
+{% set version = '1.0.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-getoptlong
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/GetoptLong_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/GetoptLong/GetoptLong_{{ version }}.tar.gz
+  sha256: 8c237986ed3dfb72d956ad865ef7768644eebf144675ad66140acfd1aca9d701
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 1.0.0), knitr, markdown, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-globaloptions >=0.1.0
+    - r-crayon
+    - r-rjson
+
+  run:
+    - r-base
+    - r-globaloptions >=0.1.0
+    - r-crayon
+    - r-rjson
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('GetoptLong')"           # [not win]
+    - "\"%R%\" -e \"library('GetoptLong')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/jokergoo/GetoptLong
+  license: MIT
+  summary: This is a command-line argument parser which wraps the powerful Perl module Getopt::Long
+    and with some adaptations for easier use in R. It also provides a simple way for
+    variable interpolation in R.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: GetoptLong
+# Type: Package
+# Title: Parsing Command-Line Arguments and Simple Variable Interpolation
+# Version: 1.0.5
+# Date: 2020-12-15
+# Author: Zuguang Gu
+# Maintainer: Zuguang Gu <z.gu@dkfz.de>
+# Depends: R (>= 3.3.0)
+# Imports: rjson, GlobalOptions (>= 0.1.0), methods, crayon
+# Suggests: testthat (>= 1.0.0), knitr, markdown, rmarkdown
+# VignetteBuilder: knitr
+# Description: This is a command-line argument parser which wraps the powerful Perl module Getopt::Long and with some adaptations for easier use in R. It also provides a simple way for variable interpolation in R.
+# URL: https://github.com/jokergoo/GetoptLong
+# SystemRequirements: Perl, Getopt::Long
+# License: MIT + file LICENSE
+# NeedsCompilation: no
+# Packaged: 2020-12-15 14:31:20 UTC; jokergoo
+# Repository: CRAN
+# Date/Publication: 2020-12-15 15:50:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

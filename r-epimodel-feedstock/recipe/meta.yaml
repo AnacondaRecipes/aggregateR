@@ -1,0 +1,141 @@
+{% set version = '2.4.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-epimodel
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/EpiModel_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/EpiModel/EpiModel_{{ version }}.tar.gz
+  sha256: f024605f4024cd020d5f556e90e6bd3d5dc313f2d4af5fb30e8f891d673e912f
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, ndtv, rmarkdown, shiny, testthat, tidyr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcolorbrewer
+    - r-rcpp
+    - r-ape
+    - r-coda
+    - r-desolve >=1.21
+    - r-doparallel
+    - r-dplyr
+    - r-egor
+    - r-ergm >=4.5.0
+    - r-ergm.ego >=1.1.0
+    - r-foreach
+    - r-ggplot2
+    - r-lazyeval
+    - r-network >=1.18.1
+    - r-networkdynamic >=0.11.3
+    - r-networklite >=1.0.5
+    - r-rlang
+    - r-statnet.common >=4.8.0
+    - r-tergm >=4.2.0
+    - r-tibble
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcolorbrewer
+    - r-rcpp
+    - r-ape
+    - r-coda
+    - r-desolve >=1.21
+    - r-doparallel
+    - r-dplyr
+    - r-egor
+    - r-ergm >=4.5.0
+    - r-ergm.ego >=1.1.0
+    - r-foreach
+    - r-ggplot2
+    - r-lazyeval
+    - r-network >=1.18.1
+    - r-networkdynamic >=0.11.3
+    - r-networklite >=1.0.5
+    - r-rlang
+    - r-statnet.common >=4.8.0
+    - r-tergm >=4.2.0
+    - r-tibble
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('EpiModel')"           # [not win]
+    - "\"%R%\" -e \"library('EpiModel')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.epimodel.org/
+  license: GPL-3
+  summary: Tools for simulating mathematical models of infectious disease dynamics. Epidemic
+    model classes include deterministic compartmental models, stochastic individual-contact
+    models, and stochastic network models. Network models use the robust statistical
+    methods of exponential-family random graph models (ERGMs) from the Statnet suite
+    of software packages in R. Standard templates for epidemic modeling include SI,
+    SIR, and SIS disease types. EpiModel features an API for extending these templates
+    to address novel scientific research aims. Full methods for EpiModel are detailed
+    in Jenness et al. (2018, <doi:10.18637/jss.v084.i08>).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: EpiModel
+# Version: 2.4.0
+# Date: 2023-06-20
+# Title: Mathematical Modeling of Infectious Disease Dynamics
+# Description: Tools for simulating mathematical models of infectious disease dynamics. Epidemic model classes include deterministic compartmental models, stochastic individual-contact models, and stochastic network models. Network models use the robust statistical methods of exponential-family random graph models (ERGMs) from the Statnet suite of software packages in R. Standard templates for epidemic modeling include SI, SIR, and SIS disease types. EpiModel features an API for extending these templates to address novel scientific research aims. Full methods for EpiModel are detailed in Jenness et al. (2018, <doi:10.18637/jss.v084.i08>).
+# Maintainer: Samuel Jenness <samuel.m.jenness@emory.edu>
+# Authors@R: c(person("Samuel", "Jenness", role=c("cre","aut"), email="samuel.m.jenness@emory.edu"), person("Steven M.","Goodreau", role=c("aut"), email="goodreau@uw.edu"), person("Martina", "Morris", role=c("aut"), email="morrism@uw.edu"), person("Adrien", "Le Guillou", role=c("aut"), email="contact@aleguillou.org"), person("Chad", "Klumb", role=c("aut"), email="cklumb@gmail.com"), person("Skye", "Bender-deMoll", role=c("ctb"), email="skyebend@uw.edu"))
+# License: GPL-3
+# URL: http://www.epimodel.org/
+# BugReports: https://github.com/EpiModel/EpiModel/issues
+# Depends: R (>= 4.1), deSolve (>= 1.21), networkDynamic (>= 0.11.3), tergm (>= 4.2.0), statnet.common (>= 4.8.0)
+# Imports: graphics, grDevices, stats, utils, doParallel, ergm (>= 4.5.0), ergm.ego (>= 1.1.0), egor, foreach, network (>= 1.18.1), RColorBrewer, ape, lazyeval, ggplot2, tibble, methods, rlang, dplyr, coda, networkLite (>= 1.0.5)
+# Suggests: knitr, ndtv, rmarkdown, shiny, testthat, tidyr
+# VignetteBuilder: knitr
+# LinkingTo: Rcpp, ergm
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2023-06-20 17:48:32 UTC; sjennes
+# Author: Samuel Jenness [cre, aut], Steven M. Goodreau [aut], Martina Morris [aut], Adrien Le Guillou [aut], Chad Klumb [aut], Skye Bender-deMoll [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-06-20 18:20:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

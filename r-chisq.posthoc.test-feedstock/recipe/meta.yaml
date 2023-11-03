@@ -1,0 +1,85 @@
+{% set version = '0.1.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-chisq.posthoc.test
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/chisq.posthoc.test_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/chisq.posthoc.test/chisq.posthoc.test_{{ version }}.tar.gz
+  sha256: 11905bb7b11795348d0c09f69bcc7e6ef8a0867503dffdaf94314805b11c7253
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+
+  run:
+    - r-base
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('chisq.posthoc.test')"           # [not win]
+    - "\"%R%\" -e \"library('chisq.posthoc.test')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://chisq-posthoc-test.ebbert.nrw/
+  license: GPL-3
+  summary: 'Perform post hoc analysis based on residuals of Pearson''s Chi-squared Test for Count
+    Data based on T. Mark Beasley & Randall E. Schumacker (1995) <doi: 10.1080/00220973.1995.9943797>.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Type: Package
+# Package: chisq.posthoc.test
+# Title: A Post Hoc Analysis for Pearson's Chi-Squared Test for Count Data
+# Version: 0.1.2
+# Authors@R: c( person("Daniel", "Ebbert", email = "daniel.ebbert@uni-muenster.de", role = c("cre", "aut"), comment = c(ORCID = "0000-0003-3666-7205")))
+# Description: Perform post hoc analysis based on residuals of Pearson's Chi-squared Test for Count Data based on T. Mark Beasley & Randall E. Schumacker (1995) <doi: 10.1080/00220973.1995.9943797>.
+# License: GPL-3
+# URL: http://chisq-posthoc-test.ebbert.nrw/
+# BugReports: https://github.com/ebbertd/chisq.posthoc.test/issues
+# Suggests: knitr, testthat
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 6.1.1
+# NeedsCompilation: no
+# Packaged: 2019-10-21 15:13:48 UTC; ebbertd
+# Author: Daniel Ebbert [cre, aut] (<https://orcid.org/0000-0003-3666-7205>)
+# Maintainer: Daniel Ebbert <daniel.ebbert@uni-muenster.de>
+# Repository: CRAN
+# Date/Publication: 2019-10-25 08:00:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

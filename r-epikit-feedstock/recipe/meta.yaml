@@ -1,0 +1,110 @@
+{% set version = '0.1.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-epikit
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/epikit_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/epikit/epikit_{{ version }}.tar.gz
+  sha256: e603dc7b991c35aa62472ec11656a734bce95f99f8a4a070f47894fd57d11f1a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 2.1.0), outbreaks, epidict, covr, knitr, magrittr, rmarkdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-binom
+    - r-dplyr >=1.0.2
+    - r-forcats
+    - r-ggplot2
+    - r-glue
+    - r-rlang
+    - r-scales
+    - r-sf
+    - r-tibble >=3.0.0
+    - r-tidyr >=1.0.0
+    - r-tidyselect
+
+  run:
+    - r-base
+    - r-binom
+    - r-dplyr >=1.0.2
+    - r-forcats
+    - r-ggplot2
+    - r-glue
+    - r-rlang
+    - r-scales
+    - r-sf
+    - r-tibble >=3.0.0
+    - r-tidyr >=1.0.0
+    - r-tidyselect
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('epikit')"           # [not win]
+    - "\"%R%\" -e \"library('epikit')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/R4EPI/epikit, https://r4epis.netlify.app, https://r4epi.github.io/epikit/
+  license: GPL-3
+  summary: Contains tools for formatting inline code, renaming redundant columns, aggregating
+    age categories, adding survey weights, finding the earliest date of an event, plotting
+    z-curves, generating population counts and calculating proportions with confidence
+    intervals. This is part of the 'R4Epis' project <https://r4epis.netlify.app/>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: epikit
+# Title: Miscellaneous Helper Tools for Epidemiologists
+# Version: 0.1.5
+# Authors@R: c(person(given = "Alexander", family = "Spina", email = "aspina@appliedepi.org", comment = c(ORCID = "0000-0001-8425-1867"), role = c("aut")), person(given = "Zhian N.", family = "Kamvar", role = c("aut", "cre"), email = "zkamvar@gmail.com", comment = c(ORCID = "0000-0003-1458-7108")), person(given = "Dirk", family = "Schumacher", role = "aut", email = "mai@dirk-schumacher.net"), person(given = "Kate", family = "Doyle", role = "ctb"))
+# Description: Contains tools for formatting inline code, renaming redundant columns, aggregating age categories, adding survey weights, finding the earliest date of an event, plotting z-curves, generating population counts and calculating proportions with confidence intervals. This is part of the 'R4Epis' project <https://r4epis.netlify.app/>.
+# License: GPL-3
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# Imports: binom, scales, dplyr (>= 1.0.2), rlang, forcats, tidyr (>= 1.0.0), tibble (>= 3.0.0), glue, tidyselect, ggplot2, sf
+# Suggests: testthat (>= 2.1.0), outbreaks, epidict, covr, knitr, magrittr, rmarkdown
+# Additional_repositories: https://r4epi.github.io/drat
+# URL: https://github.com/R4EPI/epikit, https://r4epis.netlify.app, https://r4epi.github.io/epikit/
+# BugReports: https://github.com/R4EPI/epikit/issues
+# VignetteBuilder: knitr
+# Config/Needs/check: R4EPI/epidict
+# NeedsCompilation: no
+# Packaged: 2023-02-14 17:12:50 UTC; zhian
+# Author: Alexander Spina [aut] (<https://orcid.org/0000-0001-8425-1867>), Zhian N. Kamvar [aut, cre] (<https://orcid.org/0000-0003-1458-7108>), Dirk Schumacher [aut], Kate Doyle [ctb]
+# Maintainer: Zhian N. Kamvar <zkamvar@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-02-15 21:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

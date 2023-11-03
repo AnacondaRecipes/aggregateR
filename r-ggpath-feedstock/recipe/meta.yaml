@@ -1,0 +1,99 @@
+{% set version = '1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-ggpath
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ggpath_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ggpath/ggpath_{{ version }}.tar.gz
+  sha256: 7508bad90088fbd741c600c7ef0d28da1f69d645d0b83b228c8579f611750947
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr (>= 3.5.1), rsvg (>= 2.0), testthat (>= 3.0.0), vdiffr (>= 1.0.2)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-cachem >=1.0.0
+    - r-cli >=3.0.0
+    - r-ggplot2 >=3.3.0
+    - r-magick >=2.7.3
+    - r-memoise >=2.0.0
+    - r-rappdirs >=0.3.0
+    - r-rlang >=0.4.11
+
+  run:
+    - r-base
+    - r-cachem >=1.0.0
+    - r-cli >=3.0.0
+    - r-ggplot2 >=3.3.0
+    - r-magick >=2.7.3
+    - r-memoise >=2.0.0
+    - r-rappdirs >=0.3.0
+    - r-rlang >=0.4.11
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ggpath')"           # [not win]
+    - "\"%R%\" -e \"library('ggpath')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mrcaseb/ggpath, https://mrcaseb.github.io/ggpath/
+  license: MIT
+  summary: A 'ggplot2' extension that enables robust image grobs in panels and theme elements.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: ggpath
+# Title: Robust Image Rendering Support for 'ggplot2'
+# Version: 1.0.1
+# Authors@R: person("Sebastian", "Carl", , "mrcaseb@gmail.com", role = c("aut", "cre", "cph"))
+# Description: A 'ggplot2' extension that enables robust image grobs in panels and theme elements.
+# License: MIT + file LICENSE
+# URL: https://github.com/mrcaseb/ggpath, https://mrcaseb.github.io/ggpath/
+# BugReports: https://github.com/mrcaseb/ggpath/issues
+# Depends: R (>= 3.5.0)
+# Imports: cachem (>= 1.0.0), cli (>= 3.0.0), ggplot2 (>= 3.3.0), grid, magick (>= 2.7.3), memoise (>= 2.0.0), rappdirs (>= 0.3.0), rlang (>= 0.4.11)
+# Suggests: covr (>= 3.5.1), rsvg (>= 2.0), testthat (>= 3.0.0), vdiffr (>= 1.0.2)
+# Config/testthat/edition: 3
+# Encoding: UTF-8
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-01-29 14:59:30 UTC; S.Carl
+# Author: Sebastian Carl [aut, cre, cph]
+# Maintainer: Sebastian Carl <mrcaseb@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-01-29 22:40:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,93 @@
+{% set version = '0.5.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-miivsem
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MIIVsem_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MIIVsem/MIIVsem_{{ version }}.tar.gz
+  sha256: a908f51e1598290d25864c358d57201bd50c1c40775d4d0405cbc8077bee61e1
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix
+    - r-boot
+    - r-car
+    - r-lavaan
+    - r-numderiv
+
+  run:
+    - r-base
+    - r-matrix
+    - r-boot
+    - r-car
+    - r-lavaan
+    - r-numderiv
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MIIVsem')"           # [not win]
+    - "\"%R%\" -e \"library('MIIVsem')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/zackfisher/MIIVsem
+  license: GPL-2
+  summary: Functions for estimating structural equation models using instrumental variables.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Encoding: UTF-8
+# Package: MIIVsem
+# Title: Model Implied Instrumental Variable (MIIV) Estimation of Structural Equation Models
+# Version: 0.5.8
+# Authors@R: c( person("Zachary","Fisher", email = "fish.zachary@gmail.com", role = c("aut", "cre")), person("Kenneth", "Bollen", role = "aut"), person("Kathleen", "Gates", role = "aut"), person("Mikko", "Ronkko", role = "aut") )
+# Description: Functions for estimating structural equation models using instrumental variables.
+# URL: https://github.com/zackfisher/MIIVsem
+# BugReports: https://github.com/zackfisher/MIIVsem/issues
+# Depends: R (>= 2.10)
+# Imports: stats, utils, lavaan, numDeriv, Matrix, car, boot
+# License: GPL-2
+# LazyData: true
+# ByteCompile: true
+# RoxygenNote: 7.1.1
+# NeedsCompilation: no
+# Packaged: 2021-07-11 17:30:26 UTC; lola
+# Author: Zachary Fisher [aut, cre], Kenneth Bollen [aut], Kathleen Gates [aut], Mikko Ronkko [aut]
+# Maintainer: Zachary Fisher <fish.zachary@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-07-13 12:30:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

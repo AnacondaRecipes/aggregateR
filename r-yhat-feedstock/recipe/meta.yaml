@@ -1,0 +1,91 @@
+{% set version = '2.0-4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-yhat
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/yhat_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/yhat/yhat_{{ version }}.tar.gz
+  sha256: db4a01c288691ce85b10bec82addf48a5a21ef8efc1ba5f5315b9ea1ad33ee43
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MBESS
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-boot
+    - r-misctools
+    - r-plotrix
+    - r-yacca
+
+  run:
+    - r-base
+    - r-boot
+    - r-misctools
+    - r-plotrix
+    - r-yacca
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('yhat')"           # [not win]
+    - "\"%R%\" -e \"library('yhat')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=yhat
+  license: GPL-2
+  summary: The purpose of this package is to provide methods to interpret multiple linear regression
+    and canonical correlation results including beta weights,structure coefficients,
+    validity coefficients, product measures, relative weights, all-possible-subsets
+    regression, dominance analysis, commonality analysis, and adjusted effect sizes.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: yhat
+# Type: Package
+# Title: Interpreting Regression Effects
+# Version: 2.0-4
+# Date: 2023-10-10
+# Author: Kim Nimon <kim.nimon@gmail.com>, Fred Oswald, and J. Kyle Roberts.
+# Maintainer: Kim Nimon <kim.nimon@gmail.com>
+# Depends: R (>= 2.7.0)
+# Imports: yacca, miscTools, plotrix, boot
+# Suggests: MBESS
+# Description: The purpose of this package is to provide methods to interpret multiple linear regression and canonical correlation results including beta weights,structure coefficients, validity coefficients, product measures, relative weights, all-possible-subsets regression, dominance analysis, commonality analysis, and adjusted effect sizes.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2023-10-10 17:49:43 UTC; kimnimon
+# Repository: CRAN
+# Date/Publication: 2023-10-10 18:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

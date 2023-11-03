@@ -1,0 +1,89 @@
+{% set version = '0.9.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-repplab
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/REPPlab_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/REPPlab/REPPlab_{{ version }}.tar.gz
+  sha256: 85b085d5adac5a7739dafdf9548cbb4712cb8e8ce186c1a9c03efedf64fec8dd
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: tourr, amap
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ldrtools >=0.2
+    - r-lattice
+    - r-rjava
+
+  run:
+    - r-base
+    - r-ldrtools >=0.2
+    - r-lattice
+    - r-rjava
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('REPPlab')"           # [not win]
+    - "\"%R%\" -e \"library('REPPlab')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=REPPlab
+  license: GPL-2
+  summary: An R Interface to 'EPP-lab' v1.0. 'EPP-lab' is a Java program for projection pursuit
+    using genetic algorithms written by Alain Berro and S. Larabi Marie-Sainte and is
+    included in the package. The 'EPP-lab' sources are available under https://github.com/fischuu/EPP-lab.git.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: REPPlab
+# Type: Package
+# Title: R Interface to 'EPP-Lab', a Java Program for Exploratory Projection Pursuit
+# Version: 0.9.4
+# Date: 2016-08-23
+# Author: Daniel Fischer, Alain Berro, Klaus Nordhausen, Anne Ruiz-Gazen
+# Maintainer: Daniel Fischer <daniel.fischer@luke.fi>
+# Depends: R (>= 2.15.1), rJava, lattice, LDRTools (>= 0.2), utils, graphics
+# Suggests: tourr, amap
+# Description: An R Interface to 'EPP-lab' v1.0. 'EPP-lab' is a Java program for projection pursuit using genetic algorithms written by Alain Berro and S. Larabi Marie-Sainte and is included in the package. The 'EPP-lab' sources are available under https://github.com/fischuu/EPP-lab.git.
+# License: GPL (>= 2)
+# Encoding: latin1
+# NeedsCompilation: no
+# Repository: CRAN
+# RoxygenNote: 5.0.1
+# Packaged: 2016-08-28 05:53:45 UTC; fischuu
+# Date/Publication: 2016-08-28 09:17:09
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

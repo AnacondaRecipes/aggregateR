@@ -1,0 +1,96 @@
+{% set version = '0.9.4' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-webpower
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/WebPower_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/WebPower/WebPower_{{ version }}.tar.gz
+  sha256: c5fe0cfe94e4fc3ec9b83316861e3aa1d3a9eb2cfe3d18fdf7ce69926baaae45
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-pearsonds
+    - r-dplyr
+    - r-lavaan
+    - r-lme4
+
+  run:
+    - r-base
+    - r-mass
+    - r-pearsonds
+    - r-dplyr
+    - r-lavaan
+    - r-lme4
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('WebPower')"           # [not win]
+    - "\"%R%\" -e \"library('WebPower')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://webpower.psychstat.org
+  license: GPL-3
+  summary: This is a collection of tools for conducting both basic and advanced statistical power
+    analysis including correlation, proportion, t-test, one-way ANOVA, two-way ANOVA,
+    linear regression, logistic regression, Poisson regression, mediation analysis,
+    longitudinal data analysis, structural equation modeling and multilevel modeling.
+    It also serves as the engine for conducting power analysis online at <https://webpower.psychstat.org>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: WebPower
+# Title: Basic and Advanced Statistical Power Analysis
+# Version: 0.9.4
+# Date: 2023-10-13
+# Authors@R: c(person("Zhiyong", "Zhang", role = c("aut", "cre"), email = "johnnyzhz@gmail.com"), person("Yujiao", "Mai", role = "aut"), person("Miao", "Yang", role = "ctb", email = "Miao.Yang.100@nd.edu"), person("Ziqian", "Xu", role = "ctb"), person("Conor", "McNamara", role = "ctb"))
+# Author: Zhiyong Zhang [aut, cre], Yujiao Mai [aut], Miao Yang [ctb], Ziqian Xu [ctb], Conor McNamara [ctb]
+# Maintainer: Zhiyong Zhang <johnnyzhz@gmail.com>
+# Depends: R (>= 3.2.5), MASS, grDevices, graphics, lme4, lavaan, parallel, PearsonDS
+# Imports: dplyr, stats
+# License: GPL (>= 3)
+# Description: This is a collection of tools for conducting both basic and advanced statistical power analysis including correlation, proportion, t-test, one-way ANOVA, two-way ANOVA, linear regression, logistic regression, Poisson regression, mediation analysis, longitudinal data analysis, structural equation modeling and multilevel modeling. It also serves as the engine for conducting power analysis online at <https://webpower.psychstat.org>.
+# URL: https://webpower.psychstat.org
+# Encoding: UTF-8
+# LazyLoad: yes
+# LazyData: yes
+# NeedsCompilation: no
+# Packaged: 2023-10-13 16:34:44 UTC; ziqianxu
+# Repository: CRAN
+# Date/Publication: 2023-10-13 20:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

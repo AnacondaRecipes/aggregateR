@@ -1,0 +1,95 @@
+{% set version = '1.5.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-lqmm
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/lqmm_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/lqmm/lqmm_{{ version }}.tar.gz
+  sha256: 11eddeeeed6b9d3190a80a3b3cc3d64519c6e9cb208746a3736139340df691fb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-sparsegrid
+    - r-nlme >=3.1_124
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-sparsegrid
+    - r-nlme >=3.1_124
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('lqmm')"           # [not win]
+    - "\"%R%\" -e \"library('lqmm')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=lqmm
+  license: GPL-2
+  summary: "Functions to fit quantile regression models for hierarchical data (2-level nested
+    designs) as described in Geraci and Bottai (2014, Statistics and Computing) <doi:10.1007/s11222-013-9381-9>.
+    A vignette is given in Geraci (2014, Journal of Statistical Software) <doi:10.18637/jss.v057.i13>
+    and included in the package documents. The packages also provides functions to fit
+    quantile models for independent\tdata and for count responses."
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: lqmm
+# Type: Package
+# Title: Linear Quantile Mixed Models
+# Version: 1.5.8
+# Date: 2022-04-05
+# Author: Marco Geraci
+# Maintainer: Marco Geraci <marco.geraci@uniroma1.it>
+# Depends: R (>= 3.0.0)
+# Imports: stats, utils, nlme (>= 3.1-124), SparseGrid
+# Description: Functions to fit quantile regression models for hierarchical data (2-level nested designs) as described in Geraci and Bottai (2014, Statistics and Computing) <doi:10.1007/s11222-013-9381-9>. A vignette is given in Geraci (2014, Journal of Statistical Software) <doi:10.18637/jss.v057.i13> and included in the package documents. The packages also provides functions to fit quantile models for independent	data and for count responses.
+# License: GPL (>= 2)
+# LazyLoad: yes
+# RoxygenNote: 7.0.2
+# Encoding: UTF-8
+# NeedsCompilation: yes
+# Packaged: 2022-04-05 15:45:53 UTC; marco
+# Repository: CRAN
+# Date/Publication: 2022-04-06 13:52:30 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

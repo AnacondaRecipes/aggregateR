@@ -1,0 +1,93 @@
+{% set version = '1.1.0.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-randomcolor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/randomcoloR_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/randomcoloR/randomcoloR_{{ version }}.tar.gz
+  sha256: cbae51a47a92b2cc3d5ab48877818404429fb73fc795430ec622a8dff20f1067
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rtsne
+    - r-v8
+    - r-cluster
+    - r-colorspace
+    - r-scales
+    - r-stringr
+
+  run:
+    - r-base
+    - r-rtsne
+    - r-v8
+    - r-cluster
+    - r-colorspace
+    - r-scales
+    - r-stringr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('randomcoloR')"           # [not win]
+    - "\"%R%\" -e \"library('randomcoloR')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=randomcoloR
+  license: CC0
+  summary: Simple methods to generate attractive random colors. The random colors are from a
+    wrapper of 'randomColor.js' <https://github.com/davidmerfield/randomColor>. In addition,
+    it also generates optimally distinct colors based on k-means (inspired by 'IWantHue'
+    <https://github.com/medialab/iwanthue>).
+  license_family: CC
+
+# The original CRAN metadata for this package was:
+
+# Package: randomcoloR
+# Type: Package
+# Title: Generate Attractive Random Colors
+# Version: 1.1.0.1
+# Date: 2017-12-06
+# Author: Ron Ammar
+# Maintainer: Ron Ammar <ron.ammar@gmail.com>
+# Description: Simple methods to generate attractive random colors. The random colors are from a wrapper of 'randomColor.js' <https://github.com/davidmerfield/randomColor>. In addition, it also generates optimally distinct colors based on k-means (inspired by 'IWantHue' <https://github.com/medialab/iwanthue>).
+# License: CC0
+# BugReports: https://github.com/ronammar/randomcoloR/issues
+# LazyData: TRUE
+# RoxygenNote: 6.0.1
+# Imports: colorspace, stringr, V8, stats, methods, scales, Rtsne, grDevices, cluster
+# NeedsCompilation: no
+# Packaged: 2019-11-24 16:38:07 UTC; ripley
+# Repository: CRAN
+# Date/Publication: 2019-11-24 18:36:34 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,103 @@
+{% set version = '0.12.5' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tikzdevice
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tikzDevice_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tikzDevice/tikzDevice_{{ version }}.tar.gz
+  sha256: 7d060c35bdbeb46c2b0f0386a1f0912f7a48f46092958627977123ddcde65aec
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: evaluate, formatR, ggplot2, knitr, lattice, maps, scales, stringr, testthat (>= 0.8.1), withr, covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-filehash >=2.3
+    - r-png
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-filehash >=2.3
+    - r-png
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tikzDevice')"           # [not win]
+    - "\"%R%\" -e \"library('tikzDevice')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/daqana/tikzDevice
+  license: GPL-2
+  summary: Provides a graphics output device for R that records plots in a LaTeX-friendly format.
+    The device transforms plotting commands issued by R functions into LaTeX code blocks.
+    When included in a LaTeX document, these blocks are interpreted with the help of
+    'TikZ'---a graphics package for TeX and friends written by Till Tantau. Using the
+    'tikzDevice', the text of R plots can contain LaTeX commands such as mathematical
+    formula. The device also allows arbitrary LaTeX code to be inserted into the output
+    stream.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Encoding: UTF-8
+# Package: tikzDevice
+# Type: Package
+# Title: R Graphics Output in LaTeX Format
+# Version: 0.12.5
+# Authors@R: c( person("Charlie", "Sharpsteen", role = "aut"), person("Cameron", "Bracken", role = "aut"), person("Kirill", "Muller", role = c("ctb"), email = "krlmlr+r@mailbox.org"), person("Yihui", "Xie", role = "ctb"), person("Ralf", "Stubner", email = "ralf.stubner@gmail.com", role = "cre"), person("Nico", "Bellack", email = "nico.belack@daqana.com", role = "ctb") )
+# URL: https://github.com/daqana/tikzDevice
+# BugReports: https://github.com/daqana/tikzDevice/issues
+# Description: Provides a graphics output device for R that records plots in a LaTeX-friendly format. The device transforms plotting commands issued by R functions into LaTeX code blocks. When included in a LaTeX document, these blocks are interpreted with the help of 'TikZ'---a graphics package for TeX and friends written by Till Tantau. Using the 'tikzDevice', the text of R plots can contain LaTeX commands such as mathematical formula. The device also allows arbitrary LaTeX code to be inserted into the output stream.
+# License: GPL (>= 2)
+# Depends: R (>= 2.14.0)
+# Imports: filehash (>= 2.3), png
+# Suggests: evaluate, formatR, ggplot2, knitr, lattice, maps, scales, stringr, testthat (>= 0.8.1), withr, covr
+# SystemRequirements: pgf (>= 2.00)
+# LazyLoad: yes
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-08-17 14:52:49 UTC; ralf
+# Author: Charlie Sharpsteen [aut], Cameron Bracken [aut], Kirill Muller [ctb], Yihui Xie [ctb], Ralf Stubner [cre], Nico Bellack [ctb]
+# Maintainer: Ralf Stubner <ralf.stubner@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2023-08-17 23:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

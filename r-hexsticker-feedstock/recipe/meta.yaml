@@ -1,0 +1,95 @@
+{% set version = '0.4.9' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-hexsticker
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/hexSticker_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/hexSticker/hexSticker_{{ version }}.tar.gz
+  sha256: 40e59362877f60813312c22c21268049ec51e57ed3a53651c09458a899f83a35
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: magick
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-ggimage
+    - r-ggplot2
+    - r-hexbin
+    - r-showtext
+    - r-sysfonts
+
+  run:
+    - r-base
+    - r-ggimage
+    - r-ggplot2
+    - r-hexbin
+    - r-showtext
+    - r-sysfonts
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('hexSticker')"           # [not win]
+    - "\"%R%\" -e \"library('hexSticker')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/GuangchuangYu/hexSticker
+  license: Artistic-2.0
+  summary: Helper functions for creating reproducible hexagon sticker purely in R.
+  license_family: OTHER
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/Artistic-2.0'
+
+# The original CRAN metadata for this package was:
+
+# Package: hexSticker
+# Title: Create Hexagon Sticker in R
+# Version: 0.4.9
+# Authors@R: c(person(given = "Guangchuang", family = "Yu",        email = "guangchuangyu@gmail.com",   role = c("aut", "cre")), person(given = "Laurent",     family = "Gatto",     email = "lg390@cam.ac.uk",           role = "ctb"), person(given = "Johannes",    family = "Rainer",    email = "johannes.rainer@eurac.edu", role = "ctb"), person(given = "Sebastian",   family = "Gibb",      email = "mail@sebastiangibb.de",     role = "ctb"), person(given = "Robert",      family = "Corty",     email = "rcorty@gmail.com",          role = "ctb"), person(given = "Thomas",      family = "Neitmann",  email = "th.neitmann@gmail.com",     role = "ctb") )
+# Description: Helper functions for creating reproducible hexagon sticker purely in R.
+# Depends: R (>= 3.4.0)
+# Imports: ggimage, ggplot2, grDevices, hexbin, showtext, stats, sysfonts,
+# Suggests: magick
+# License: Artistic-2.0
+# ByteCompile: true
+# URL: https://github.com/GuangchuangYu/hexSticker
+# BugReports: https://github.com/GuangchuangYu/hexSticker/issues
+# Encoding: UTF-8
+# LazyData: true
+# RoxygenNote: 7.1.1
+# NeedsCompilation: no
+# Packaged: 2020-12-05 04:03:57 UTC; ygc
+# Author: Guangchuang Yu [aut, cre], Laurent Gatto [ctb], Johannes Rainer [ctb], Sebastian Gibb [ctb], Robert Corty [ctb], Thomas Neitmann [ctb]
+# Maintainer: Guangchuang Yu <guangchuangyu@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2020-12-05 05:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

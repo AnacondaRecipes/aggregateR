@@ -1,0 +1,111 @@
+{% set version = '2.7.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-googleway
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/googleway_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/googleway/googleway_{{ version }}.tar.gz
+  sha256: 80566b03823e4e3431c18a395f146bcb7e5e61d4ec960a7d5407d0ad3c84b19e
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, testthat
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-curl
+    - r-googlepolylines >=0.7.1
+    - r-htmltools
+    - r-htmlwidgets
+    - r-jpeg
+    - r-jqr
+    - r-jsonlite >=0.9.20
+    - r-magrittr
+    - r-scales
+    - r-shiny
+    - r-viridislite
+
+  run:
+    - r-base
+    - r-curl
+    - r-googlepolylines >=0.7.1
+    - r-htmltools
+    - r-htmlwidgets
+    - r-jpeg
+    - r-jqr
+    - r-jsonlite >=0.9.20
+    - r-magrittr
+    - r-scales
+    - r-shiny
+    - r-viridislite
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('googleway')"           # [not win]
+    - "\"%R%\" -e \"library('googleway')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=googleway
+  license: MIT
+  summary: Provides a mechanism to plot a 'Google Map' from 'R' and overlay it with shapes and
+    markers. Also provides access to 'Google Maps' APIs, including places, directions,
+    roads, distances, geocoding, elevation and timezone.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: googleway
+# Type: Package
+# Title: Accesses Google Maps APIs to Retrieve Data and Plot Maps
+# Version: 2.7.8
+# Date: 2023-08-22
+# Authors@R: c( person("David", "Cooley", ,"dcooley@symbolix.com.au", role = c("aut", "cre")), person("Paulo", "Barcelos", role = "ctb", comment = "Author of c++ decode_pl"), person("Rstudio", role = "ctb", comment = "Functions written for the Leaflet pacakge") )
+# Description: Provides a mechanism to plot a 'Google Map' from 'R' and overlay it with shapes and markers. Also provides access to 'Google Maps' APIs, including places, directions, roads, distances, geocoding, elevation and timezone.
+# License: MIT + file LICENSE
+# LazyData: TRUE
+# Depends: R (>= 2.10.0)
+# Imports: jsonlite (>= 0.9.20), curl, htmlwidgets, htmltools, magrittr, shiny, jpeg, utils, jqr, viridisLite, scales, grDevices, googlePolylines (>= 0.7.1)
+# RoxygenNote: 7.2.3
+# BugReports: https://github.com/SymbolixAU/googleway/issues
+# Suggests: knitr, rmarkdown, testthat
+# VignetteBuilder: knitr
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2023-08-21 23:00:00 UTC; dave
+# Author: David Cooley [aut, cre], Paulo Barcelos [ctb] (Author of c++ decode_pl), Rstudio [ctb] (Functions written for the Leaflet pacakge)
+# Maintainer: David Cooley <dcooley@symbolix.com.au>
+# Repository: CRAN
+# Date/Publication: 2023-08-22 06:40:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

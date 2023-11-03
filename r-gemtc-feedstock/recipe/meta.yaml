@@ -1,0 +1,108 @@
+{% set version = '1.0-2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-gemtc
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/gemtc_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/gemtc/gemtc_{{ version }}.tar.gz
+  sha256: 14a4efc62c7784712d7c26a1efca112fde942104dfa4876753458f7688d14a07
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat (>= 0.8), Matrix
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rglpk
+    - r-coda >=0.13
+    - r-forcats >=0.5.0
+    - r-igraph >=1.0
+    - r-meta >=2.1
+    - r-plyr >=1.8
+    - r-rjags >=4_0
+    - r-truncnorm
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rglpk
+    - r-coda >=0.13
+    - r-forcats >=0.5.0
+    - r-igraph >=1.0
+    - r-meta >=2.1
+    - r-plyr >=1.8
+    - r-rjags >=4_0
+    - r-truncnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('gemtc')"           # [not win]
+    - "\"%R%\" -e \"library('gemtc')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/gertvv/gemtc
+  license: GPL-3
+  summary: Network meta-analyses (mixed treatment comparisons) in the Bayesian framework using
+    JAGS. Includes methods to assess heterogeneity and inconsistency, and a number of
+    standard visualizations. van Valkenhoef et al. (2012) <doi:10.1002/jrsm.1054>; van
+    Valkenhoef et al. (2015) <doi:10.1002/jrsm.1167>.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: gemtc
+# Version: 1.0-2
+# Date: 2023-06-21
+# Title: Network Meta-Analysis Using Bayesian Methods
+# Author: Gert van Valkenhoef, Joel Kuiper
+# Maintainer: Gert van Valkenhoef <gert@gertvv.nl>
+# Description: Network meta-analyses (mixed treatment comparisons) in the Bayesian framework using JAGS. Includes methods to assess heterogeneity and inconsistency, and a number of standard visualizations. van Valkenhoef et al. (2012) <doi:10.1002/jrsm.1054>; van Valkenhoef et al. (2015) <doi:10.1002/jrsm.1167>.
+# Depends: R (>= 3.5.0), coda (>= 0.13)
+# Imports: igraph (>= 1.0), meta (>= 2.1), plyr (>= 1.8), graphics, grDevices, stats, utils, grid, rjags (>= 4-0), truncnorm, Rglpk, forcats (>= 0.5.0)
+# Suggests: testthat (>= 0.8), Matrix
+# URL: https://github.com/gertvv/gemtc
+# License: GPL-3
+# LazyData: true
+# Collate: 'anohe.R' 'arrayize.R' 'blobbogram.R' 'template.R' 'code.R' 'data.R' 'deviance.R' 'forest.R' 'solveLP.R' 'inits.R' 'likelihoods.R' 'll-helper.counts.R' 'll.binom.cloglog.R' 'll.binom.log.R' 'll.binom.logit.R' 'll.call.R' 'll.normal.identity.R' 'll.poisson.log.R' 'minimum.diameter.spanning.tree.R' 'mtc.data.studyrow.R' 'mtc.hy.prior.R' 'mtc.model.R' 'mtc.model.consistency.R' 'mtc.model.nodesplit.R' 'mtc.model.regression.R' 'mtc.model.ume.R' 'mtc.model.use.R' 'mtc.network.R' 'stopIfNotConsistent.R' 'mtc.result.R' 'mtc.run.R' 'nodesplit.R' 'plotCovariateEffect.R' 'priors.R' 'rank.probability.R' 'regression.R' 'relative.effect.R' 'relative.effect.table.R'
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-06-21 18:18:18 UTC; gert
+# Repository: CRAN
+# Date/Publication: 2023-06-21 19:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,128 @@
+{% set version = '1.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-sungeo
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SUNGEO_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SUNGEO/SUNGEO_{{ version }}.tar.gz
+  sha256: e236af88a9dab5130d3101b4ecb4f91e5314c8b66c9201c67032996c079fc9eb
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rann
+    - r-rcurl
+    - r-rcpp
+    - r-automap
+    - r-cartogram
+    - r-data.table
+    - r-dplyr
+    - r-httr
+    - r-jsonlite
+    - r-measurements
+    - r-packcircles
+    - r-purrr
+    - r-raster
+    - r-rlang
+    - r-rmapshaper
+    - r-sf
+    - r-sp
+    - r-spdep
+    - r-stringr
+    - r-terra
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rann
+    - r-rcurl
+    - r-rcpp
+    - r-automap
+    - r-cartogram
+    - r-data.table
+    - r-dplyr
+    - r-httr
+    - r-jsonlite
+    - r-measurements
+    - r-packcircles
+    - r-purrr
+    - r-raster
+    - r-rlang
+    - r-rmapshaper
+    - r-sf
+    - r-sp
+    - r-spdep
+    - r-stringr
+    - r-terra
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SUNGEO')"           # [not win]
+    - "\"%R%\" -e \"library('SUNGEO')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: <https://github.com/zhukovyuri/SUNGEO>
+  license: GPL-2
+  summary: Tools for integrating spatially-misaligned GIS datasets. Part of the Sub-National
+    Geospatial Data Archive System.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: SUNGEO
+# Type: Package
+# Title: Sub-National Geospatial Data Archive: Geoprocessing Toolkit
+# Version: 1.1.1
+# Date: 2023-03-20
+# Author: Jason Byers, Marty Davidson, Yuri M. Zhukov
+# Maintainer: Yuri M. Zhukov <zhukov@umich.edu>
+# Description: Tools for integrating spatially-misaligned GIS datasets. Part of the Sub-National Geospatial Data Archive System.
+# URL: <https://github.com/zhukovyuri/SUNGEO>
+# License: GPL-2
+# Encoding: UTF-8
+# LazyData: TRUE
+# Depends: R (>= 2.10)
+# Imports: sf,data.table,dplyr,RCurl,jsonlite,terra,raster,stringr,stats,methods,purrr,measurements,RANN,cartogram,packcircles,rmapshaper,sp,spdep,Rcpp,httr,rlang,automap
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Packaged: 2023-03-20 21:46:36 UTC; zhukov
+# Repository: CRAN
+# Date/Publication: 2023-03-20 22:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

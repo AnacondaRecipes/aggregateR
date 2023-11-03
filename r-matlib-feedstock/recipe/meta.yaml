@@ -1,0 +1,101 @@
+{% set version = '0.9.6' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-matlib
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/matlib_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/matlib/matlib_{{ version }}.tar.gz
+  sha256: 504055db7665b8cef15b0c768cf8896508e7ddb749b606c5215210514bada16a
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: knitr, rmarkdown, carData, webshot2, markdown
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-car
+    - r-rgl
+    - r-xtable
+
+  run:
+    - r-base
+    - r-mass
+    - r-car
+    - r-rgl
+    - r-xtable
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('matlib')"           # [not win]
+    - "\"%R%\" -e \"library('matlib')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/friendly/matlib
+  license: GPL-2
+  summary: A collection of matrix functions for teaching and learning matrix linear algebra as
+    used in multivariate statistical methods. These functions are mainly for tutorial
+    purposes in learning matrix algebra ideas using R. In some cases, functions are
+    provided for concepts available elsewhere in R, but where the function call or name
+    is not obvious. In other cases, functions are provided to show or demonstrate an
+    algorithm. In addition, a collection of functions are provided for drawing vector
+    diagrams in 2D and 3D.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: matlib
+# Type: Package
+# Title: Matrix Functions for Teaching and Learning Linear Algebra and Multivariate Statistics
+# Version: 0.9.6
+# Date: 2022-12-06
+# Authors@R: c(person(given = "Michael", family = "Friendly", role=c("aut", "cre"), email="friendly@yorku.ca", comment=c(ORCID="0000-0002-3237-0941")), person(given = "John", family = "Fox", role="aut"), person(given = "Phil", family = "Chalmers", role="aut"), person(given = "Georges", family = "Monette", role="ctb"), person(given = "Gaston", family = "Sanchez", role="ctb") )
+# Maintainer: Michael Friendly <friendly@yorku.ca>
+# Description: A collection of matrix functions for teaching and learning matrix linear algebra as used in multivariate statistical methods. These functions are mainly for tutorial purposes in learning matrix algebra ideas using R. In some cases, functions are provided for concepts available elsewhere in R, but where the function call or name is not obvious. In other cases, functions are provided to show or demonstrate an algorithm. In addition, a collection of functions are provided for drawing vector diagrams in 2D and 3D.
+# License: GPL (>= 2)
+# Language: en-US
+# URL: https://github.com/friendly/matlib
+# BugReports: https://github.com/friendly/matlib/issues
+# LazyData: TRUE
+# Suggests: knitr, rmarkdown, carData, webshot2, markdown
+# Imports: xtable, MASS, rgl, car, methods
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.2
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2022-12-08 16:28:30 UTC; friendly
+# Author: Michael Friendly [aut, cre] (<https://orcid.org/0000-0002-3237-0941>), John Fox [aut], Phil Chalmers [aut], Georges Monette [ctb], Gaston Sanchez [ctb]
+# Repository: CRAN
+# Date/Publication: 2022-12-08 17:20:15 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,90 @@
+{% set version = '0.16-0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-psychotree
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/psychotree_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/psychotree/psychotree_{{ version }}.tar.gz
+  sha256: 88e19e4ed30ecdeb3a97279d3de75ffc65832ad008b119f97e10fa33ea2167d6
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: stablelearner (>= 0.1-3), strucchange, tinytest, mirt
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-formula
+    - r-partykit >=1.2_9
+    - r-psychotools >=0.7_1
+
+  run:
+    - r-base
+    - r-formula
+    - r-partykit >=1.2_9
+    - r-psychotools >=0.7_1
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('psychotree')"           # [not win]
+    - "\"%R%\" -e \"library('psychotree')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=psychotree
+  license: GPL-2 | GPL-3
+  summary: Recursive partitioning based on psychometric models, employing the general MOB algorithm
+    (from package partykit) to obtain Bradley-Terry trees, Rasch trees, rating scale
+    and partial credit trees, and MPT trees, trees for 1PL, 2PL, 3PL and 4PL models
+    and generalized partial credit models.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: psychotree
+# Title: Recursive Partitioning Based on Psychometric Models
+# Version: 0.16-0
+# Date: 2022-05-03
+# Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org", comment = c(ORCID = "0000-0003-0918-3766")), person(given = "Carolin", family = "Strobl", role = "aut", email = "Carolin.Strobl@psychologie.uzh.ch"), person(given = "Florian", family = "Wickelmaier", role = "aut"), person(given = "Basil", family = "Komboz", role = "aut"), person(given = "Julia", family = "Kopf", role = "aut"), person(given = "Lennart", family = "Schneider", role = "aut", email = "Lennart.Sch@web.de", comment = c(ORCID = "0000-0003-4152-5308")), person(given = "David", family = "Dreifuss", role = "aut"), person(given = "Rudolf", family = "Debelak", role = "aut", email = "rudolf.debelak@gmail.com", comment = c(ORCID = "0000-0001-8900-2106")))
+# Depends: R (>= 4.0.0), partykit (>= 1.2-9), psychotools (>= 0.7-1)
+# Suggests: stablelearner (>= 0.1-3), strucchange, tinytest, mirt
+# Imports: graphics, grDevices, grid, stats, Formula
+# Description: Recursive partitioning based on psychometric models, employing the general MOB algorithm (from package partykit) to obtain Bradley-Terry trees, Rasch trees, rating scale and partial credit trees, and MPT trees, trees for 1PL, 2PL, 3PL and 4PL models and generalized partial credit models.
+# License: GPL-2 | GPL-3
+# NeedsCompilation: no
+# Packaged: 2022-05-03 12:28:06 UTC; zeileis
+# Author: Achim Zeileis [aut, cre] (<https://orcid.org/0000-0003-0918-3766>), Carolin Strobl [aut], Florian Wickelmaier [aut], Basil Komboz [aut], Julia Kopf [aut], Lennart Schneider [aut] (<https://orcid.org/0000-0003-4152-5308>), David Dreifuss [aut], Rudolf Debelak [aut] (<https://orcid.org/0000-0001-8900-2106>)
+# Maintainer: Achim Zeileis <Achim.Zeileis@R-project.org>
+# Repository: CRAN
+# Date/Publication: 2022-05-06 09:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

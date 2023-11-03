@@ -1,0 +1,110 @@
+{% set version = '2.0.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-reproducible
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/reproducible_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/reproducible/reproducible_{{ version }}.tar.gz
+  sha256: 171771cc547679d6f566f69b6fd4643b28df780bdc114f80ecc3826a7d8d3d07
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, crayon, DBI, fastdigest, future, geodata, glue, googledrive, httr, knitr, parallel, qs, raster (>= 3.5-15), RCurl (>= 1.95-4.8), rlang, rmarkdown, RSQLite, sf, sp (>= 1.4-2), terra (>= 1.7-20), testthat, withr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-data.table >=1.10.4
+    - r-digest
+    - r-filelock
+    - r-fpcompare
+    - r-lobstr
+
+  run:
+    - r-base
+    - r-data.table >=1.10.4
+    - r-digest
+    - r-filelock
+    - r-fpcompare
+    - r-lobstr
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('reproducible')"           # [not win]
+    - "\"%R%\" -e \"library('reproducible')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://reproducible.predictiveecology.org, https://github.com/PredictiveEcology/reproducible
+  license: GPL-3
+  summary: A collection of high-level, machine- and OS-independent tools for making reproducible
+    and reusable content in R. The two workhorse functions are Cache() and prepInputs().
+    Cache() allows for nested caching, is robust to environments and objects with environments
+    (like functions), and has deals with some classes of file-backed R objects e.g.,
+    from terra and raster packages. Both functions have been developed to be foundational
+    components of data retrieval and processing in continuous workflow situations. In
+    both functions, efforts are made to make the first and subsequent calls of functions
+    have the same result, but faster at subsequent times by way of checksums and digesting.
+    Several features are still under development, including cloud storage of cached
+    objects, allowing for sharing between users. Several advanced options are available,
+    see ?reproducibleOptions().
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: reproducible
+# Type: Package
+# Title: Enhance Reproducibility of R Code
+# Description: A collection of high-level, machine- and OS-independent tools for making reproducible and reusable content in R. The two workhorse functions are Cache() and prepInputs(). Cache() allows for nested caching, is robust to environments and objects with environments (like functions), and has deals with some classes of file-backed R objects e.g., from terra and raster packages. Both functions have been developed to be foundational components of data retrieval and processing in continuous workflow situations. In both functions, efforts are made to make the first and subsequent calls of functions have the same result, but faster at subsequent times by way of checksums and digesting. Several features are still under development, including cloud storage of cached objects, allowing for sharing between users. Several advanced options are available, see ?reproducibleOptions().
+# SystemRequirements: 'unrar' (Linux/macOS) or '7-Zip' (Windows) to work with '.rar' files.
+# URL: https://reproducible.predictiveecology.org, https://github.com/PredictiveEcology/reproducible
+# Date: 2023-08-23
+# Version: 2.0.8
+# Authors@R: c(person(given = "Eliot J B", family = "McIntire", role = c("aut", "cre"), email = "eliot.mcintire@canada.ca", comment = c(ORCID = "0000-0002-6914-8316")), person(given = "Alex M", family = "Chubaty", role = c("aut"), email = "achubaty@for-cast.ca", comment = c(ORCID = "0000-0001-7146-8135")), person(given = "Tati", family = "Micheletti", role = "ctb", email = "tati.micheletti@gmail.com", comment = c(ORCID = "0000-0003-4838-8342")), person(given = "Ceres", family = "Barros", role = "ctb", email = "ceres.barros@ubc.ca", comment = c(ORCID = "0000-0003-4036-977X")), person(given = "Ian", family = "Eddy", role = "ctb", email = "ian.eddy@nrcan-rncan.gc.ca", comment = c(ORCID = "0000-0001-7397-2116")), person(given = "His Majesty the King in Right of Canada, as represented by the Minister of Natural Resources Canada", role = "cph"))
+# Depends: R (>= 4.1)
+# Imports: data.table (>= 1.10.4), digest, filelock, fpCompare, lobstr, methods, stats, utils
+# Suggests: covr, crayon, DBI, fastdigest, future, geodata, glue, googledrive, httr, knitr, parallel, qs, raster (>= 3.5-15), RCurl (>= 1.95-4.8), rlang, rmarkdown, RSQLite, sf, sp (>= 1.4-2), terra (>= 1.7-20), testthat, withr
+# Encoding: UTF-8
+# Language: en-CA
+# License: GPL-3
+# VignetteBuilder: knitr, rmarkdown
+# BugReports: https://github.com/PredictiveEcology/reproducible/issues
+# ByteCompile: yes
+# RoxygenNote: 7.2.3
+# Collate: 'DBI.R' 'cache-helpers.R' 'cache-internals.R' 'robustDigest.R' 'cache.R' 'cacheGeo.R' 'checksums.R' 'cloud.R' 'convertPaths.R' 'copy.R' 'download.R' 'exportedMethods.R' 'gis.R' 'helpers.R' 'messages.R' 'objectSize.R' 'options.R' 'packages.R' 'paths.R' 'pipe.R' 'postProcess.R' 'postProcessTo.R' 'preProcess.R' 'prepInputs.R' 'reproducible-deprecated.R' 'reproducible-package.R' 'search.R' 'showCacheEtc.R' 'spatialObjects-class.R' 'terra-migration.R' 'zzz.R'
+# NeedsCompilation: no
+# Packaged: 2023-08-23 16:50:26 UTC; emcintir
+# Author: Eliot J B McIntire [aut, cre] (<https://orcid.org/0000-0002-6914-8316>), Alex M Chubaty [aut] (<https://orcid.org/0000-0001-7146-8135>), Tati Micheletti [ctb] (<https://orcid.org/0000-0003-4838-8342>), Ceres Barros [ctb] (<https://orcid.org/0000-0003-4036-977X>), Ian Eddy [ctb] (<https://orcid.org/0000-0001-7397-2116>), His Majesty the King in Right of Canada, as represented by the Minister of Natural Resources Canada [cph]
+# Maintainer: Eliot J B McIntire <eliot.mcintire@canada.ca>
+# Repository: CRAN
+# Date/Publication: 2023-08-23 21:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

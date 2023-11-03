@@ -1,0 +1,88 @@
+{% set version = '1.2-11' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-daewr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/daewr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/daewr/daewr_{{ version }}.tar.gz
+  sha256: 43c00d7b8eb76daf155ae7c68564b84961dd88ca7e6368c8213c5bdf34f80742
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-lattice
+    - r-stringi
+
+  run:
+    - r-base
+    - r-lattice
+    - r-stringi
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('daewr')"           # [not win]
+    - "\"%R%\" -e \"library('daewr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=daewr
+  license: GPL-2
+  summary: Contains Data frames and functions used in the book "Design and Analysis of Experiments
+    with R", Lawson(2015) ISBN-13:978-1-4398-6813-3.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: daewr
+# Type: Package
+# Title: Design and Analysis of Experiments with R
+# Version: 1.2-11
+# Date: 2023-09-04
+# Authors@R: c( person("John", "Lawson", email = "lawsonjsl7net@gmail.com", role=c("aut","cre")), person("Gerhard", "Krennrich", email="krennri@uni-heidelberg.de", role="aut"), person("Ruben","Amoros", email="ruben.amoros@uv.es", role="ctr"))
+# Maintainer: John Lawson <lawsonjsl7net@gmail.com>
+# Description: Contains Data frames and functions used in the book "Design and Analysis of Experiments with R", Lawson(2015) ISBN-13:978-1-4398-6813-3.
+# License: GPL-2
+# Depends: R (>= 3.5.0)
+# Encoding: UTF-8
+# LazyLoad: true
+# LazyData: true
+# Imports: stringi,stats,graphics,grDevices,lattice
+# RoxygenNote: 7.2.3
+# NeedsCompilation: no
+# Author: John Lawson [aut, cre], Gerhard Krennrich [aut], Ruben Amoros [ctr]
+# Packaged: 2023-09-08 20:04:31 UTC; John
+# Repository: CRAN
+# Date/Publication: 2023-09-09 08:20:07 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

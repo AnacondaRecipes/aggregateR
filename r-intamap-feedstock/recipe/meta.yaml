@@ -1,0 +1,103 @@
+{% set version = '1.5-7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-intamap
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/intamap_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/intamap/intamap_{{ version }}.tar.gz
+  sha256: b843e6ab5d5e6e3db5eb4d6388371bfc27372c9d78cdc4b4515ebb85cac672e7
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: psgp
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-mba
+    - r-automap
+    - r-doparallel
+    - r-evd
+    - r-foreach
+    - r-gstat >=0.9_36
+    - r-mvtnorm
+    - r-sf
+    - r-sp >=0.9_0
+
+  run:
+    - r-base
+    - r-mass
+    - r-mba
+    - r-automap
+    - r-doparallel
+    - r-evd
+    - r-foreach
+    - r-gstat >=0.9_36
+    - r-mvtnorm
+    - r-sf
+    - r-sp >=0.9_0
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('intamap')"           # [not win]
+    - "\"%R%\" -e \"library('intamap')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=intamap
+  license: GPL-2
+  summary: Geostatistical interpolation has traditionally been done by manually fitting a variogram
+    and then interpolating. Here, we introduce classes and methods that can do this
+    interpolation automatically. Pebesma et al (2010) gives an overview of the methods
+    behind and possible usage <doi:10.1016/j.cageo.2010.03.019>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: intamap
+# Version: 1.5-7
+# Date: 2023-10-30
+# Title: Procedures for Automated Interpolation
+# Authors@R: c(person("Edzer", "Pebesma", role = c("aut"), email = "edzer.pebesma@uni-muenster.de"), person("Jon Olav", "Skoien", role = c("aut", "cre"), email = "jon.skoien@gmail.com"), person("Olivier", "Baume", role = c("ctb")), person("A", "Chorti", role = "ctb"), person("Dionisis", "Hristopulos", role = "ctb"), person("Hannes", "Kazianka", role = "ctb"), person("Stepahnie", "Melles", role = "ctb"), person("Giannis", "Spiliopoulos", role = "ctb"))
+# Maintainer: Jon Olav Skoien <jon.skoien@gmail.com>
+# Depends: R (>= 2.14.0), sp (>= 0.9-0)
+# Imports: gstat (>= 0.9-36), sf, automap, MBA, mvtnorm, MASS, evd, doParallel, foreach, parallel, stats, methods, grDevices, utils, graphics
+# Suggests: psgp
+# Description: Geostatistical interpolation has traditionally been done by manually fitting a variogram and then interpolating. Here, we introduce classes and methods that can do this interpolation automatically. Pebesma et al (2010) gives an overview of the methods behind and possible usage <doi:10.1016/j.cageo.2010.03.019>.
+# License: GPL (>= 2)
+# NeedsCompilation: no
+# Packaged: 2023-10-30 10:34:22 UTC; skoiejo
+# Author: Edzer Pebesma [aut], Jon Olav Skoien [aut, cre], Olivier Baume [ctb], A Chorti [ctb], Dionisis Hristopulos [ctb], Hannes Kazianka [ctb], Stepahnie Melles [ctb], Giannis Spiliopoulos [ctb]
+# Repository: CRAN
+# Date/Publication: 2023-10-30 11:40:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,119 @@
+{% set version = '0.9.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mendelianrandomization
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/MendelianRandomization_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/MendelianRandomization/MendelianRandomization_{{ version }}.tar.gz
+  sha256: 368c20e55dffbe5712790cf9d91bcaeb59d13fe67835af4fc51bd24928ae7780
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix >=1.2
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-ggplot2 >=1.0.1
+    - r-glmnet
+    - r-iterpc >=0.3
+    - r-knitr
+    - r-numderiv
+    - r-plotly >=3.6.0
+    - r-quantreg >=5.01
+    - r-rjson
+    - r-rmarkdown
+    - r-robustbase >=0.92_6
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-matrix >=1.2
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-ggplot2 >=1.0.1
+    - r-glmnet
+    - r-iterpc >=0.3
+    - r-knitr
+    - r-numderiv
+    - r-plotly >=3.6.0
+    - r-quantreg >=5.01
+    - r-rjson
+    - r-rmarkdown
+    - r-robustbase >=0.92_6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('MendelianRandomization')"           # [not win]
+    - "\"%R%\" -e \"library('MendelianRandomization')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=MendelianRandomization
+  license: GPL-2 | GPL-3
+  summary: Encodes several methods for performing Mendelian randomization analyses with summarized
+    data. Summarized data on genetic associations with the exposure and with the outcome
+    can be obtained from large consortia. These data can be used for obtaining causal
+    estimates using instrumental variable methods.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: MendelianRandomization
+# Type: Package
+# Title: Mendelian Randomization Package
+# Version: 0.9.0
+# Date: 2023-08-07
+# Author: Olena Yavorska <olena.yavorska@ludwig.ox.ac.uk> James Staley <james.staley@bristol.ac.uk>
+# Maintainer: Stephen Burgess <sb452@medschl.cam.ac.uk>
+# Description: Encodes several methods for performing Mendelian randomization analyses with summarized data. Summarized data on genetic associations with the exposure and with the outcome can be obtained from large consortia. These data can be used for obtaining causal estimates using instrumental variable methods.
+# License: GPL-2 | GPL-3
+# Depends: R (>= 3.0.1), methods
+# Imports: knitr, rmarkdown, plotly (>= 3.6.0), ggplot2 (>= 1.0.1), robustbase (>= 0.92-6), Matrix (>= 1.2), iterpc (>= 0.3), quantreg (>= 5.01), rjson, glmnet, numDeriv, Rcpp
+# LinkingTo: Rcpp, RcppArmadillo
+# VignetteBuilder: knitr
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-08-08 17:27:33 UTC; stephenb
+# Repository: CRAN
+# Date/Publication: 2023-08-08 18:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

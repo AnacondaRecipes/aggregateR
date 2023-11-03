@@ -1,0 +1,139 @@
+{% set version = '2.7.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-treedist
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/TreeDist_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/TreeDist/TreeDist_{{ version }}.tar.gz
+  sha256: 3297bc26d44f1f4aa9cb7bf8ac9950f0df50bc39540dd62149338f7923f822f5
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: bookdown, cluster, ggplot2, hypervolume, kdensity, knitr, MASS, parallel, plotly, PlotTools, protoclust, Quartet, readxl, rmarkdown, Rcpp (>= 1.0.8), rgl, Rogue, spelling, testthat (>= 3.0), Ternary (>= 1.1.2), TreeDistData (> 0.1.0), TreeSearch (>= 1.4.0), Umatrix, uwot, vdiffr (>= 1.0.0),
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp
+    - r-rdpack >=0.7
+    - r-treetools >=1.7.2
+    - r-ape >=5.0
+    - r-cli >=3.0
+    - r-colorspace
+    - r-memoise
+    - r-phangorn >=2.2.1
+    - r-shiny
+    - r-shinyjs
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp
+    - r-rdpack >=0.7
+    - r-treetools >=1.7.2
+    - r-ape >=5.0
+    - r-cli >=3.0
+    - r-colorspace
+    - r-memoise
+    - r-phangorn >=2.2.1
+    - r-shiny
+    - r-shinyjs
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('TreeDist')"           # [not win]
+    - "\"%R%\" -e \"library('TreeDist')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://ms609.github.io/TreeDist/, https://github.com/ms609/TreeDist/
+  license: GPL-3
+  summary: Implements measures of tree similarity, including information-based generalized Robinson-Foulds
+    distances (Phylogenetic Information Distance, Clustering Information Distance, Matching
+    Split Information Distance; Smith 2020) <doi:10.1093/bioinformatics/btaa614>; Jaccard-Robinson-Foulds
+    distances (Bocker et al. 2013) <doi:10.1007/978-3-642-40453-5_13>, including the
+    Nye et al. (2006) metric <doi:10.1093/bioinformatics/bti720>; the Matching Split
+    Distance (Bogdanowicz & Giaro 2012) <doi:10.1109/TCBB.2011.48>; Maximum Agreement
+    Subtree distances; the Kendall-Colijn (2016) distance <doi:10.1093/molbev/msw124>,
+    and the Nearest Neighbour Interchange (NNI) distance, approximated per Li et al.
+    (1996) <doi:10.1007/3-540-61332-3_168>. Includes tools for visualizing mappings
+    of tree space (Smith 2022) <doi:10.1093/sysbio/syab100>, for calculating the median
+    of sets of trees, and for computing the information content of trees and splits.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: TreeDist
+# Type: Package
+# Title: Calculate and Map Distances Between Phylogenetic Trees
+# Version: 2.7.0
+# Authors@R: c(person("Martin R.", "Smith", email = "martin.smith@durham.ac.uk", role = c("aut", "cre", "cph", "prg"), comment = c(ORCID = "0000-0001-5660-1727")), person("Roy", "Jonker", email = "roy_jonker@magiclogic.com", role = c("prg", "cph")), person("Yong", "Yang", email = "yongyanglink@gmail.com", role = c("ctb", "cph")), person("Yi", "Cao", role = c("ctb", "cph")) )
+# License: GPL (>= 3)
+# Description: Implements measures of tree similarity, including information-based generalized Robinson-Foulds distances (Phylogenetic Information Distance, Clustering Information Distance, Matching Split Information Distance; Smith 2020) <doi:10.1093/bioinformatics/btaa614>; Jaccard-Robinson-Foulds distances (Bocker et al. 2013) <doi:10.1007/978-3-642-40453-5_13>, including the Nye et al. (2006) metric <doi:10.1093/bioinformatics/bti720>; the Matching Split Distance (Bogdanowicz & Giaro 2012) <doi:10.1109/TCBB.2011.48>; Maximum Agreement Subtree distances; the Kendall-Colijn (2016) distance <doi:10.1093/molbev/msw124>, and the Nearest Neighbour Interchange (NNI) distance, approximated per Li et al. (1996) <doi:10.1007/3-540-61332-3_168>. Includes tools for visualizing mappings of tree space (Smith 2022) <doi:10.1093/sysbio/syab100>, for calculating the median of sets of trees, and for computing the information content of trees and splits.
+# Copyright: Jonker-Volgenant Linear Assignment Problem implementation by Roy Jonker modified by Yong Yang and Yi Cao.
+# URL: https://ms609.github.io/TreeDist/, https://github.com/ms609/TreeDist/
+# BugReports: https://github.com/ms609/TreeDist/issues/
+# Additional_repositories: https://ms609.github.io/packages/
+# Depends: R (>= 3.4.0), stats,
+# Imports: ape (>= 5.0), cli (>= 3.0), colorspace, memoise, phangorn (>= 2.2.1), Rdpack (>= 0.7), shiny, shinyjs, TreeTools (>= 1.7.2),
+# Suggests: bookdown, cluster, ggplot2, hypervolume, kdensity, knitr, MASS, parallel, plotly, PlotTools, protoclust, Quartet, readxl, rmarkdown, Rcpp (>= 1.0.8), rgl, Rogue, spelling, testthat (>= 3.0), Ternary (>= 1.1.2), TreeDistData (> 0.1.0), TreeSearch (>= 1.4.0), Umatrix, uwot, vdiffr (>= 1.0.0),
+# LinkingTo: Rcpp, TreeTools,
+# RdMacros: Rdpack
+# VignetteBuilder: knitr
+# Config/Needs/check: rcmdcheck
+# Config/Needs/coverage: covr
+# Config/Needs/memcheck: devtools
+# Config/Needs/metadata: codemetar
+# Config/Needs/revdeps: revdepcheck
+# Config/Needs/website: pkgdown
+# Config/testthat/parallel: false
+# Config/testthat/edition: 3
+# SystemRequirements: C++17
+# ByteCompile: true
+# Encoding: UTF-8
+# Language: en-GB
+# X-schema.org-keywords: phylogenetics, tree-distance
+# RoxygenNote: 7.2.3
+# NeedsCompilation: yes
+# Packaged: 2023-10-25 16:11:53 UTC; pjjg18
+# Author: Martin R. Smith [aut, cre, cph, prg] (<https://orcid.org/0000-0001-5660-1727>), Roy Jonker [prg, cph], Yong Yang [ctb, cph], Yi Cao [ctb, cph]
+# Maintainer: Martin R. Smith <martin.smith@durham.ac.uk>
+# Repository: CRAN
+# Date/Publication: 2023-10-25 22:10:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

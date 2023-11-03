@@ -1,0 +1,116 @@
+{% set version = '1.2.0' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-btydplus
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/BTYDplus_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/BTYDplus/BTYDplus_{{ version }}.tar.gz
+  sha256: a2b24b1e596dd7aedd7f290a8c41aefecf6b92894950d3741c0f0819e7890aea
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr, knitr, rmarkdown, gsl, lintr (>= 1.0.0)
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-btyd >=2.3
+    - r-rcpp
+    - r-bayesm
+    - r-coda
+    - r-data.table
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-btyd >=2.3
+    - r-rcpp
+    - r-bayesm
+    - r-coda
+    - r-data.table
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('BTYDplus')"           # [not win]
+    - "\"%R%\" -e \"library('BTYDplus')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/mplatzer/BTYDplus#readme
+  license: GPL-3
+  summary: 'Provides advanced statistical methods to describe and predict customers'' purchase
+    behavior in a non-contractual setting. It uses historic transaction records to fit
+    a probabilistic model, which then allows to compute quantities of managerial interest
+    on a cohort- as well as on a customer level (Customer Lifetime Value, Customer Equity,
+    P(alive), etc.). This package complements the BTYD package by providing several
+    additional buy-till-you-die models, that have been published in the marketing literature,
+    but whose implementation are complex and non-trivial. These models are: NBD [Ehrenberg
+    (1959) <doi:10.2307/2985810>], MBG/NBD [Batislam et al (2007) <doi:10.1016/j.ijresmar.2006.12.005>],
+    (M)BG/CNBD-k [Reutterer et al (2020) <doi:10.1016/j.ijresmar.2020.09.002>], Pareto/NBD
+    (HB) [Abe (2009) <doi:10.1287/mksc.1090.0502>] and Pareto/GGG [Platzer and Reutterer
+    (2016) <doi:10.1287/mksc.2015.0963>].'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: BTYDplus
+# Type: Package
+# Title: Probabilistic Models for Assessing and Predicting your Customer Base
+# Version: 1.2.0
+# Authors@R: person("Michael", "Platzer", email = "michael.platzer@gmail.com", role = c("aut", "cre"))
+# Description: Provides advanced statistical methods to describe and predict customers' purchase behavior in a non-contractual setting. It uses historic transaction records to fit a probabilistic model, which then allows to compute quantities of managerial interest on a cohort- as well as on a customer level (Customer Lifetime Value, Customer Equity, P(alive), etc.). This package complements the BTYD package by providing several additional buy-till-you-die models, that have been published in the marketing literature, but whose implementation are complex and non-trivial. These models are: NBD [Ehrenberg (1959) <doi:10.2307/2985810>], MBG/NBD [Batislam et al (2007) <doi:10.1016/j.ijresmar.2006.12.005>], (M)BG/CNBD-k [Reutterer et al (2020) <doi:10.1016/j.ijresmar.2020.09.002>], Pareto/NBD (HB) [Abe (2009) <doi:10.1287/mksc.1090.0502>] and Pareto/GGG [Platzer and Reutterer (2016) <doi:10.1287/mksc.2015.0963>].
+# URL: https://github.com/mplatzer/BTYDplus#readme
+# BugReports: https://github.com/mplatzer/BTYDplus/issues
+# License: GPL-3
+# LinkingTo: Rcpp
+# Depends: R (>= 3.2.0)
+# Imports: Rcpp, BTYD (>= 2.3), coda, data.table, mvtnorm, bayesm, stats, graphics
+# Suggests: testthat, covr, knitr, rmarkdown, gsl, lintr (>= 1.0.0)
+# RoxygenNote: 7.1.1
+# LazyData: true
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2021-01-20 17:16:22 UTC; mplatzer
+# Author: Michael Platzer [aut, cre]
+# Maintainer: Michael Platzer <michael.platzer@gmail.com>
+# Repository: CRAN
+# Date/Publication: 2021-01-21 11:00:16 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

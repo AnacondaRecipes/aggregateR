@@ -1,0 +1,90 @@
+{% set version = '3.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-simcomp
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/SimComp_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/SimComp/SimComp_{{ version }}.tar.gz
+  sha256: 2542f02e314841a03491ef081981077ef14bb173f65bb297201fcc0f848e1313
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mratios
+    - r-multcomp
+    - r-mvtnorm
+
+  run:
+    - r-base
+    - r-mratios
+    - r-multcomp
+    - r-mvtnorm
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('SimComp')"           # [not win]
+    - "\"%R%\" -e \"library('SimComp')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=SimComp
+  license: GPL-3
+  summary: Simultaneous tests and confidence intervals are provided for one-way experimental
+    designs with one or many normally distributed, primary response variables (endpoints).
+    Differences (Hasler and Hothorn, 2011 <doi:10.2202/1557-4679.1258>) or ratios (Hasler
+    and Hothorn, 2012 <doi:10.1080/19466315.2011.633868>) of means can be considered.
+    Various contrasts can be chosen, unbalanced sample sizes are allowed as well as
+    heterogeneous variances (Hasler and Hothorn, 2008 <doi:10.1002/bimj.200710466>)
+    or covariance matrices (Hasler, 2014 <doi:10.1515/ijb-2012-0015>).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: SimComp
+# Type: Package
+# Title: Simultaneous Comparisons for Multiple Endpoints
+# Version: 3.3
+# Date: 2019-08-26
+# Author: Mario Hasler, Christof Kluss
+# Maintainer: Mario Hasler <hasler@email.uni-kiel.de>
+# Imports: mvtnorm, multcomp, mratios, graphics, stats
+# Description: Simultaneous tests and confidence intervals are provided for one-way experimental designs with one or many normally distributed, primary response variables (endpoints). Differences (Hasler and Hothorn, 2011 <doi:10.2202/1557-4679.1258>) or ratios (Hasler and Hothorn, 2012 <doi:10.1080/19466315.2011.633868>) of means can be considered. Various contrasts can be chosen, unbalanced sample sizes are allowed as well as heterogeneous variances (Hasler and Hothorn, 2008 <doi:10.1002/bimj.200710466>) or covariance matrices (Hasler, 2014 <doi:10.1515/ijb-2012-0015>).
+# License: GPL
+# LazyLoad: yes
+# NeedsCompilation: no
+# Packaged: 2019-08-26 13:46:48 UTC; Administrator
+# Repository: CRAN
+# Date/Publication: 2019-08-26 14:50:10 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

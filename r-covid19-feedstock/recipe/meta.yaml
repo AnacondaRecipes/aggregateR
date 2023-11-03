@@ -1,0 +1,91 @@
+{% set version = '3.0.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-covid19
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/COVID19_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/COVID19/COVID19_{{ version }}.tar.gz
+  sha256: 3e8a145854ecd91739027f75a9b6e2ae3fda01ac20df188f6da24addb0c6bb45
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: RSQLite, wbstats (>= 1.0.0)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-r.utils
+    - r-data.table
+
+  run:
+    - r-base
+    - r-r.utils
+    - r-data.table
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('COVID19')"           # [not win]
+    - "\"%R%\" -e \"library('COVID19')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://covid19datahub.io
+  license: MIT
+  summary: 'Provides a daily summary of COVID-19 cases, deaths, recovered, tests, vaccinations,
+    and hospitalizations for 230+ countries, 760+ regions, and 12000+ administrative
+    divisions of lower level. Includes policy measures, mobility data, and geospatial
+    identifiers. Data source: COVID-19 Data Hub <https://covid19datahub.io>.'
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: COVID19
+# Type: Package
+# Title: R Interface to COVID-19 Data Hub
+# Version: 3.0.3
+# Authors@R: c( person(given = "Emanuele", family = "Guidotti", email = "emanuele.guidotti@unine.ch", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-8961-6623")), person(given = "David", family = "Ardia", role = c("ctb"), comment = c(ORCID = "0000-0003-2823-782X")) )
+# Description: Provides a daily summary of COVID-19 cases, deaths, recovered, tests, vaccinations, and hospitalizations for 230+ countries, 760+ regions, and 12000+ administrative divisions of lower level. Includes policy measures, mobility data, and geospatial identifiers. Data source: COVID-19 Data Hub <https://covid19datahub.io>.
+# License: MIT + file LICENSE
+# URL: https://covid19datahub.io
+# BugReports: https://github.com/covid19datahub/COVID19/issues
+# Encoding: UTF-8
+# Imports: tools, utils, R.utils, data.table
+# Suggests: RSQLite, wbstats (>= 1.0.0)
+# RoxygenNote: 7.2.1
+# NeedsCompilation: no
+# Packaged: 2023-02-28 22:14:21 UTC; eguidotti
+# Author: Emanuele Guidotti [aut, cre] (<https://orcid.org/0000-0002-8961-6623>), David Ardia [ctb] (<https://orcid.org/0000-0003-2823-782X>)
+# Maintainer: Emanuele Guidotti <emanuele.guidotti@unine.ch>
+# Repository: CRAN
+# Date/Publication: 2023-02-28 22:32:28 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,107 @@
+{% set version = '0.1.1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tree.interpreter
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tree.interpreter_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tree.interpreter/tree.interpreter_{{ version }}.tar.gz
+  sha256: e8d8e767963a9b5531f64af68d80bab9d0946d5702eb47df5310c28047e9e1a2
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, randomForest, ranger, testthat (>= 2.1.0), knitr, rmarkdown, covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}sed               # [win]
+    - {{ posix }}grep              # [win]
+    - {{ posix }}autoconf
+    - {{ posix }}automake          # [not win]
+    - {{ posix }}automake-wrapper  # [win]
+    - {{ posix }}pkg-config
+    - {{ posix }}make
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-rcpp >=1.0.2
+    - r-rcpparmadillo
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-rcpp >=1.0.2
+    - r-rcpparmadillo
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tree.interpreter')"           # [not win]
+    - "\"%R%\" -e \"library('tree.interpreter')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/nalzok/tree.interpreter
+  license: MIT
+  summary: An R re-implementation of the 'treeinterpreter' package on PyPI <https://pypi.org/project/treeinterpreter/>.
+    Each prediction can be decomposed as 'prediction = bias + feature_1_contribution
+    + ... + feature_n_contribution'. This decomposition is then used to calculate the
+    Mean Decrease Impurity (MDI) and Mean Decrease Impurity using out-of-bag samples
+    (MDI-oob) feature importance measures based on the work of Li et al. (2019) <arXiv:1906.10845>.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: tree.interpreter
+# Type: Package
+# Title: Random Forest Prediction Decomposition and Feature Importance Measure
+# Version: 0.1.1
+# Date: 2020-01-28
+# Author: Qingyao Sun
+# Maintainer: Qingyao Sun <sunqingyao19970825@gmail.com>
+# Description: An R re-implementation of the 'treeinterpreter' package on PyPI <https://pypi.org/project/treeinterpreter/>. Each prediction can be decomposed as 'prediction = bias + feature_1_contribution + ... + feature_n_contribution'. This decomposition is then used to calculate the Mean Decrease Impurity (MDI) and Mean Decrease Impurity using out-of-bag samples (MDI-oob) feature importance measures based on the work of Li et al. (2019) <arXiv:1906.10845>.
+# Encoding: UTF-8
+# License: MIT + file LICENSE
+# Imports: Rcpp (>= 1.0.2)
+# LinkingTo: Rcpp, RcppArmadillo
+# RoxygenNote: 7.0.2
+# Suggests: MASS, randomForest, ranger, testthat (>= 2.1.0), knitr, rmarkdown, covr
+# URL: https://github.com/nalzok/tree.interpreter
+# BugReports: https://github.com/nalzok/tree.interpreter/issues
+# VignetteBuilder: knitr
+# NeedsCompilation: yes
+# Packaged: 2020-01-28 21:58:01 UTC; nalzok
+# Repository: CRAN
+# Date/Publication: 2020-02-05 14:10:06 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

@@ -1,0 +1,105 @@
+{% set version = '0.6.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-andromeda
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/Andromeda_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/Andromeda/Andromeda_{{ version }}.tar.gz
+  sha256: 39fe6eaf0c14e900b0cb6cd4ff4393147e1449e23f4e0991244a4143b4cf7532
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, stringr, knitr, rmarkdown, tibble, rJava, rcmdcheck, arrow
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-dbi
+    - r-rsqlite
+    - r-cli
+    - r-dbplyr
+    - r-dplyr
+    - r-hms
+    - r-pillar
+    - r-rlang
+    - r-tidyselect
+    - r-zip
+
+  run:
+    - r-base
+    - r-dbi
+    - r-rsqlite
+    - r-cli
+    - r-dbplyr
+    - r-dplyr
+    - r-hms
+    - r-pillar
+    - r-rlang
+    - r-tidyselect
+    - r-zip
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('Andromeda')"           # [not win]
+    - "\"%R%\" -e \"library('Andromeda')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/OHDSI/Andromeda
+  license: Apache License 2.0
+  summary: Storing very large data objects on a local drive, while still making it possible to
+    manipulate the data in an efficient manner.
+  license_family: APACHE
+
+# The original CRAN metadata for this package was:
+
+# Package: Andromeda
+# Type: Package
+# Title: Asynchronous Disk-Based Representation of Massive Data
+# Version: 0.6.3
+# Date: 2023-03-26
+# Authors@R: c( person("Adam", "Black", , "black@ohdsi.org", role = c("aut", "cre")), person("Martijn", "Schuemie", , "schuemie@ohdsi.org", role = c("aut")), person("Marc A.", "Suchard", , "msuchard@ucla.edu", role = c("aut")), person("Observational Health Data Science and Informatics", role = c("cph")) )
+# Maintainer: Adam Black <black@ohdsi.org>
+# Description: Storing very large data objects on a local drive, while still making it possible to manipulate the data in an efficient manner.
+# License: Apache License 2.0
+# VignetteBuilder: knitr
+# URL: https://github.com/OHDSI/Andromeda
+# BugReports: https://github.com/OHDSI/Andromeda/issues
+# Depends: dplyr
+# Imports: RSQLite, DBI, zip, methods, dbplyr, tidyselect, cli, rlang, pillar, hms
+# Suggests: testthat, stringr, knitr, rmarkdown, tibble, rJava, rcmdcheck, arrow
+# RoxygenNote: 7.2.3
+# Encoding: UTF-8
+# NeedsCompilation: no
+# Packaged: 2023-03-26 16:35:20 UTC; adamblack
+# Author: Adam Black [aut, cre], Martijn Schuemie [aut], Marc A. Suchard [aut], Observational Health Data Science and Informatics [cph]
+# Repository: CRAN
+# Date/Publication: 2023-03-26 17:40:13 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

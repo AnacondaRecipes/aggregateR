@@ -1,0 +1,93 @@
+{% set version = '0.9.7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-qlcmatrix
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/qlcMatrix_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/qlcMatrix/qlcMatrix_{{ version }}.tar.gz
+  sha256: 1ef5e0350cfbdb07fca761fc7251584d39d3da2958ea813498b467e4f7661347
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS, knitr
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-matrix >=1.1_0
+    - r-docopt
+    - r-slam >=0.1_32
+    - r-sparsesvd
+
+  run:
+    - r-base
+    - r-matrix >=1.1_0
+    - r-docopt
+    - r-slam >=0.1_32
+    - r-sparsesvd
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('qlcMatrix')"           # [not win]
+    - "\"%R%\" -e \"library('qlcMatrix')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://CRAN.R-project.org/package=qlcMatrix
+  license: GPL-3
+  summary: Extension of the functionality of the Matrix package for using sparse matrices. Some
+    of the functions are very general, while other are highly specific for special data
+    format as used for quantitative language comparison (QLC).
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: qlcMatrix
+# Type: Package
+# Title: Utility Sparse Matrix Functions for Quantitative Language Comparison
+# Version: 0.9.7
+# Date: 2018-04-19
+# Author: Michael Cysouw
+# Maintainer: Michael Cysouw <cysouw@mac.com>
+# Description: Extension of the functionality of the Matrix package for using sparse matrices. Some of the functions are very general, while other are highly specific for special data format as used for quantitative language comparison (QLC).
+# License: GPL-3
+# Encoding: UTF-8
+# Depends: Matrix (>= 1.1-0), R (>= 3.2), slam (>= 0.1-32), sparsesvd
+# Imports: methods, docopt
+# Suggests: MASS, knitr
+# VignetteBuilder: knitr
+# RoxygenNote: 6.0.1
+# NeedsCompilation: no
+# Packaged: 2018-04-20 06:25:11 UTC; cysouw
+# Repository: CRAN
+# Date/Publication: 2018-04-20 07:03:04 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

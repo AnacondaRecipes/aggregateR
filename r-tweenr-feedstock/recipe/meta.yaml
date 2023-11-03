@@ -1,0 +1,108 @@
+{% set version = '2.0.2' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-tweenr
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/tweenr_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/tweenr/tweenr_{{ version }}.tar.gz
+  sha256: 64bbfded418d4880e3636f434571c20303d2f66be6950d64583a864fbb661ff3
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: testthat, covr
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-cpp11 >=0.4.2
+    - r-farver
+    - r-magrittr
+    - r-rlang
+    - r-vctrs
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-cpp11 >=0.4.2
+    - r-farver
+    - r-magrittr
+    - r-rlang
+    - r-vctrs
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('tweenr')"           # [not win]
+    - "\"%R%\" -e \"library('tweenr')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/thomasp85/tweenr
+  license: MIT
+  summary: In order to create smooth animation between states of data, tweening is necessary.
+    This package provides a range of functions for creating tweened data that can be
+    used as basis for animation. Furthermore it adds a number of vectorized interpolaters
+    for common R data types such as numeric, date and colour.
+  license_family: MIT
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/MIT'
+    - LICENSE
+
+# The original CRAN metadata for this package was:
+
+# Package: tweenr
+# Type: Package
+# Title: Interpolate Data for Smooth Animations
+# Version: 2.0.2
+# Authors@R: c(person(given = "Thomas Lin", family = "Pedersen", role = c("aut", "cre"), email = "thomasp85@gmail.com", comment = c(ORCID = "0000-0002-5147-4711")))
+# Maintainer: Thomas Lin Pedersen <thomasp85@gmail.com>
+# Description: In order to create smooth animation between states of data, tweening is necessary. This package provides a range of functions for creating tweened data that can be used as basis for animation. Furthermore it adds a number of vectorized interpolaters for common R data types such as numeric, date and colour.
+# URL: https://github.com/thomasp85/tweenr
+# BugReports: https://github.com/thomasp85/tweenr/issues
+# License: MIT + file LICENSE
+# Encoding: UTF-8
+# Depends: R (>= 3.2.0)
+# Imports: farver, magrittr, rlang, vctrs
+# LinkingTo: cpp11 (>= 0.4.2)
+# RoxygenNote: 7.2.1
+# Suggests: testthat, covr
+# SystemRequirements: C++11
+# NeedsCompilation: yes
+# Packaged: 2022-09-06 07:43:28 UTC; thomas
+# Author: Thomas Lin Pedersen [aut, cre] (<https://orcid.org/0000-0002-5147-4711>)
+# Repository: CRAN
+# Date/Publication: 2022-09-06 08:00:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

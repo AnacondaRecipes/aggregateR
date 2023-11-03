@@ -1,0 +1,103 @@
+{% set version = '0.9.8' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-nnfor
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/nnfor_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/nnfor/nnfor_{{ version }}.tar.gz
+  sha256: 7966385d07d310d3df9a5e5f4842d61b7b8844f34b35c2f34a39748ae061630c
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: thief
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-mass
+    - r-forecast
+    - r-generics
+    - r-glmnet
+    - r-neuralnet
+    - r-plotrix
+    - r-tsutils
+    - r-uroot
+
+  run:
+    - r-base
+    - r-mass
+    - r-forecast
+    - r-generics
+    - r-glmnet
+    - r-neuralnet
+    - r-plotrix
+    - r-tsutils
+    - r-uroot
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('nnfor')"           # [not win]
+    - "\"%R%\" -e \"library('nnfor')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://kourentzes.com/forecasting/2019/01/16/tutorial-for-the-nnfor-r-package/
+  license: GPL-3
+  summary: 'Automatic time series modelling with neural networks. Allows fully automatic, semi-manual
+    or fully manual specification of networks. For details of the specification methodology
+    see: (i) Crone and Kourentzes (2010) <doi:10.1016/j.neucom.2010.01.017>; and (ii)
+    Kourentzes et al. (2014) <doi:10.1016/j.eswa.2013.12.011>.'
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: nnfor
+# Type: Package
+# Title: Time Series Forecasting with Neural Networks
+# Version: 0.9.8
+# Authors@R: person("Nikolaos", "Kourentzes", email = "nikolaos@kourentzes.com", role = c("aut", "cre"))
+# Description: Automatic time series modelling with neural networks. Allows fully automatic, semi-manual or fully manual specification of networks. For details of the specification methodology see: (i) Crone and Kourentzes (2010) <doi:10.1016/j.neucom.2010.01.017>; and (ii) Kourentzes et al. (2014) <doi:10.1016/j.eswa.2013.12.011>.
+# License: GPL-3
+# Encoding: UTF-8
+# Depends: generics
+# Imports: forecast, glmnet, neuralnet, plotrix, MASS, tsutils, uroot, methods
+# Suggests: thief
+# URL: https://kourentzes.com/forecasting/2019/01/16/tutorial-for-the-nnfor-r-package/
+# BugReports: https://github.com/trnnick/nnfor/issues
+# RoxygenNote: 7.2.0
+# NeedsCompilation: no
+# Packaged: 2022-07-09 06:02:32 UTC; Nikos
+# Author: Nikolaos Kourentzes [aut, cre]
+# Maintainer: Nikolaos Kourentzes <nikolaos@kourentzes.com>
+# Repository: CRAN
+# Date/Publication: 2022-07-09 07:10:01 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

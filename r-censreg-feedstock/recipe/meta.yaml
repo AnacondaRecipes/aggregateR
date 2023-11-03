@@ -1,0 +1,93 @@
+{% set version = '0.5-36' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-censreg
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/censReg_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/censReg/censReg_{{ version }}.tar.gz
+  sha256: c61e42ba5f03175453c01f8b39a593219e09ce941a9c5e8da3a80eae99f61765
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: AER, lmtest (>= 0.9-27)
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-glmmml >=0.81_6
+    - r-maxlik >=0.7_3
+    - r-misctools >=0.6_11
+    - r-plm
+    - r-sandwich >=2.2_6
+
+  run:
+    - r-base
+    - r-glmmml >=0.81_6
+    - r-maxlik >=0.7_3
+    - r-misctools >=0.6_11
+    - r-plm
+    - r-sandwich >=2.2_6
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('censReg')"           # [not win]
+    - "\"%R%\" -e \"library('censReg')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: http://www.sampleSelection.org
+  license: GPL-2
+  summary: Maximum Likelihood estimation of censored regression (Tobit) models with cross-sectional
+    and panel data.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: censReg
+# Version: 0.5-36
+# Date: 2022-08-03
+# Title: Censored Regression (Tobit) Models
+# Author: Arne Henningsen <arne.henningsen@gmail.com>
+# Maintainer: Arne Henningsen <arne.henningsen@gmail.com>
+# BugReports: https://r-forge.r-project.org/projects/sampleselection/
+# Depends: R (>= 2.4.0), maxLik (>= 0.7-3)
+# Imports: glmmML (>= 0.81-6), sandwich (>= 2.2-6), miscTools (>= 0.6-11), stats (>= 2.15.0), plm
+# Suggests: AER, lmtest (>= 0.9-27)
+# Enhances: sampleSelection
+# Description: Maximum Likelihood estimation of censored regression (Tobit) models with cross-sectional and panel data.
+# License: GPL (>= 2)
+# URL: http://www.sampleSelection.org
+# NeedsCompilation: no
+# Packaged: 2022-08-03 07:23:39 UTC; gsl324
+# Repository: CRAN
+# Date/Publication: 2022-08-07 06:20:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

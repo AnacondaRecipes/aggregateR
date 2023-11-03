@@ -1,0 +1,91 @@
+{% set version = '2.2.3' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-seewave
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/seewave_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/seewave/seewave_{{ version }}.tar.gz
+  sha256: 1f897af809e8e5f9d515d788f4b5ea14ba27b2b554a3ab8024d78f42ac46848d
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: audio, circlize, FactoMineR, fftw, ggplot2, rgl, rpanel, phonTools, signal
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-tuner
+
+  run:
+    - r-base
+    - r-tuner
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('seewave')"           # [not win]
+    - "\"%R%\" -e \"library('seewave')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://rug.mnhn.fr/seewave/
+  license: GPL-2
+  summary: Functions for analysing, manipulating, displaying, editing and synthesizing time waves
+    (particularly sound).  This package processes time analysis (oscillograms and envelopes),
+    spectral content, resonance quality factor, entropy, cross correlation and autocorrelation,
+    zero-crossing, dominant frequency, analytic signal, frequency coherence, 2D and
+    3D spectrograms and many other analyses. See Sueur et al. (2008) <doi:10.1080/09524622.2008.9753600>
+    and Sueur (2018) <doi:10.1007/978-3-319-77647-7>.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: seewave
+# Type: Package
+# Title: Sound Analysis and Synthesis
+# Version: 2.2.3
+# Date: 2023-10-15
+# Authors@R: c(person("Jerome", "Sueur", role = c("aut", "cre"), email = "sueur@mnhn.fr"), person("Thierry", "Aubin", role = "aut"), person("Caroline", "Simonis", role = "aut"), person("Laurent", "Lellouch", role = "ctr"), person("Pierre", "Aumond", role = "ctr"), person("Adele", "de Baudouin", role = "ctr"), person("Ethan C.", "Brown", role = "ctr"), person("Guillaume", "Corbeau", role = "ctr"), person("Marion", "Depraetere", role = "ctr"), person("Camille", "Desjonqueres", role = "ctr"), person("Francois", "Fabianek", role = "ctr"), person("Amandine", "Gasc", role = "ctr"), person("Sylvain", "Haupert", role = "ctr"), person("Eric", "Kasten", role = "ctr"), person("Jonathan", "Lees", role = "ctr"), person("Jean", "Marchal", role = "ctr"), person("Andre", "Mikulec", role = "ctr"), person("Sandrine", "Pavoine", role = "ctr"), person("David", "Pinaud", role = "ctr"), person("Alicia", "Stotz", role = "ctr"), person("Luis J.", "Villanueva-Rivera", role = "ctr"), person("Zev", "Ross", role = "ctr"), person("Carl G.", "Witthoft", role = "ctr"), person("Hristo", "Zhivomirov", role = "ctr"))
+# Author: Jerome Sueur [aut, cre], Thierry Aubin [aut], Caroline Simonis [aut], Laurent Lellouch [ctr], Pierre Aumond [ctr], Adele de Baudouin [ctr], Ethan C. Brown [ctr], Guillaume Corbeau [ctr], Marion Depraetere [ctr], Camille Desjonqueres [ctr], Francois Fabianek [ctr], Amandine Gasc [ctr], Sylvain Haupert [ctr], Eric Kasten [ctr], Jonathan Lees [ctr], Jean Marchal [ctr], Andre Mikulec [ctr], Sandrine Pavoine [ctr], David Pinaud [ctr], Alicia Stotz [ctr], Luis J. Villanueva-Rivera [ctr], Zev Ross [ctr], Carl G. Witthoft [ctr], Hristo Zhivomirov [ctr]
+# Maintainer: Jerome Sueur <sueur@mnhn.fr>
+# Encoding: UTF-8
+# SystemRequirements: LIBSNDFILE
+# Imports: graphics, grDevices, stats, utils, tuneR, methods
+# Suggests: audio, circlize, FactoMineR, fftw, ggplot2, rgl, rpanel, phonTools, signal
+# ZipData: no
+# Description: Functions for analysing, manipulating, displaying, editing and synthesizing time waves (particularly sound).  This package processes time analysis (oscillograms and envelopes), spectral content, resonance quality factor, entropy, cross correlation and autocorrelation, zero-crossing, dominant frequency, analytic signal, frequency coherence, 2D and 3D spectrograms and many other analyses. See Sueur et al. (2008) <doi:10.1080/09524622.2008.9753600> and Sueur (2018) <doi:10.1007/978-3-319-77647-7>.
+# License: GPL (>= 2)
+# URL: https://rug.mnhn.fr/seewave/
+# NeedsCompilation: no
+# Packaged: 2023-10-19 09:02:03 UTC; root
+# Repository: CRAN
+# Date/Publication: 2023-10-19 09:40:02 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

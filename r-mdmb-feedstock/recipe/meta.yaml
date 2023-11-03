@@ -1,0 +1,110 @@
+{% set version = '1.8-7' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-mdmb
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/mdmb_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/mdmb/mdmb_{{ version }}.tar.gz
+  sha256: 1e6e60bdd0268551eecc463d924ca3c5cfb80304925a0b891b4ca88cf08da163
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: MASS
+requirements:
+  build:
+    - {{ compiler('c') }}              # [not win]
+    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('cxx') }}            # [not win]
+    - {{ compiler('m2w64_cxx') }}      # [win]
+    - {{ posix }}filesystem        # [win]
+    - {{ posix }}make
+    - {{ posix }}sed               # [win]
+    - {{ posix }}coreutils         # [win]
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-cdm
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-coda
+    - r-miceadds >=3.2_23
+    - r-sirt
+
+  run:
+    - r-base
+    - {{native}}gcc-libs         # [win]
+    - r-cdm
+    - r-rcpp
+    - r-rcpparmadillo
+    - r-coda
+    - r-miceadds >=3.2_23
+    - r-sirt
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('mdmb')"           # [not win]
+    - "\"%R%\" -e \"library('mdmb')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/alexanderrobitzsch/mdmb, https://sites.google.com/site/alexanderrobitzsch2/software
+  license: GPL-2
+  summary: Contains model-based treatment of missing data for regression models with missing
+    values in covariates or the dependent variable using maximum likelihood or Bayesian
+    estimation (Ibrahim et al., 2005; <doi:10.1198/016214504000001844>; Luedtke, Robitzsch,
+    & West, 2020a, 2020b; <doi:10.1080/00273171.2019.1640104><doi:10.1037/met0000233>).
+    The regression model can be nonlinear (e.g., interaction effects, quadratic effects
+    or B-spline functions). Multilevel models with missing data in predictors are available
+    for Bayesian estimation. Substantive-model compatible multiple imputation can be
+    also conducted.
+  license_family: GPL2
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-2'
+
+# The original CRAN metadata for this package was:
+
+# Package: mdmb
+# Type: Package
+# Title: Model Based Treatment of Missing Data
+# Version: 1.8-7
+# Date: 2023-02-28 22:35:18
+# Author: Alexander Robitzsch [aut, cre], Oliver Luedtke [aut]
+# Maintainer: Alexander Robitzsch <robitzsch@ipn.uni-kiel.de>
+# Description: Contains model-based treatment of missing data for regression models with missing values in covariates or the dependent variable using maximum likelihood or Bayesian estimation (Ibrahim et al., 2005; <doi:10.1198/016214504000001844>; Luedtke, Robitzsch, & West, 2020a, 2020b; <doi:10.1080/00273171.2019.1640104><doi:10.1037/met0000233>). The regression model can be nonlinear (e.g., interaction effects, quadratic effects or B-spline functions). Multilevel models with missing data in predictors are available for Bayesian estimation. Substantive-model compatible multiple imputation can be also conducted.
+# Depends: R (>= 3.1)
+# Imports: CDM, coda, graphics, miceadds (>= 3.2-23), Rcpp, sirt, stats, utils
+# Suggests: MASS
+# LinkingTo: miceadds, Rcpp, RcppArmadillo
+# Enhances: JointAI, jomo, mice, smcfcs
+# URL: https://github.com/alexanderrobitzsch/mdmb, https://sites.google.com/site/alexanderrobitzsch2/software
+# License: GPL (>= 2)
+# NeedsCompilation: yes
+# Packaged: 2023-02-28 21:36:48 UTC; sunpn563
+# Repository: CRAN
+# Date/Publication: 2023-02-28 22:02:29 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml

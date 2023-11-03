@@ -1,0 +1,89 @@
+{% set version = '1.0-1' %}
+
+{% set posix = 'm2-' if win else '' %}
+{% set native = 'm2w64-' if win else '' %}
+
+package:
+  name: r-roi.plugin.neos
+  version: {{ version|replace("-", "_") }}
+
+source:
+  url:
+    - {{ cran_mirror }}/src/contrib/ROI.plugin.neos_{{ version }}.tar.gz
+    - {{ cran_mirror }}/src/contrib/Archive/ROI.plugin.neos/ROI.plugin.neos_{{ version }}.tar.gz
+  sha256: 77aba73ed86a8da6c3474cc1d93dbf2fba17567fe4529f986957c76f4bc2cbcc
+
+build:
+  merge_build_host: True  # [win]
+  # If this is a new build for the same version, increment the build number.
+  number: 0
+  # no skip
+  noarch: generic
+
+  # This is required to make R link correctly on Linux.
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: slam
+requirements:
+  build:
+    - {{ posix }}zip               # [win]
+
+  host:
+    - r-base
+    - r-roi >=1.0_0
+    - r-xml2
+    - r-xmlrpc2
+
+  run:
+    - r-base
+    - r-roi >=1.0_0
+    - r-xml2
+    - r-xmlrpc2
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('ROI.plugin.neos')"           # [not win]
+    - "\"%R%\" -e \"library('ROI.plugin.neos')\""  # [win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://roigrp.gitlab.io, https://gitlab.com/roigrp/solver/ROI.plugin.neos
+  license: GPL-3
+  summary: Enhances the 'R' Optimization Infrastructure ('ROI') package with a connection to
+    the 'neos' server. 'ROI' optimization problems can be directly be sent to the 'neos'
+    server and solution obtained in the typical 'ROI' style.
+  license_family: GPL3
+  license_file:
+    - '{{ environ["PREFIX"] }}/lib/R/share/licenses/GPL-3'
+
+# The original CRAN metadata for this package was:
+
+# Package: ROI.plugin.neos
+# Version: 1.0-1
+# Title: 'NEOS' Plug-in for the 'R' Optimization Interface
+# Authors@R: c( person("Ronald", "Hochreiter", role = "aut"), person("Florian", "Schwendinger", role = c("aut", "cre"), email = "FlorianSchwendinger@gmx.at"))
+# Description: Enhances the 'R' Optimization Infrastructure ('ROI') package with a connection to the 'neos' server. 'ROI' optimization problems can be directly be sent to the 'neos' server and solution obtained in the typical 'ROI' style.
+# Imports: stats, methods, utils, ROI (>= 1.0-0), xmlrpc2, xml2
+# Suggests: slam
+# License: GPL-3
+# Encoding: UTF-8
+# URL: https://roigrp.gitlab.io, https://gitlab.com/roigrp/solver/ROI.plugin.neos
+# RoxygenNote: 7.2.1
+# NeedsCompilation: no
+# Packaged: 2023-07-06 14:44:36 UTC; f
+# Author: Ronald Hochreiter [aut], Florian Schwendinger [aut, cre]
+# Maintainer: Florian Schwendinger <FlorianSchwendinger@gmx.at>
+# Repository: CRAN
+# Date/Publication: 2023-07-06 15:10:05 UTC
+
+# See
+# https://docs.conda.io/projects/conda-build for
+# more information about meta.yaml
