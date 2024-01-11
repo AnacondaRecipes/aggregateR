@@ -10,7 +10,6 @@ sed -i \
 
 sed -i \
   -e 's/. validate existence/continue()/' \
-  -e '/SKIP_BUILD_RPATH/d' \
   ./src/cpp/session/CMakeLists.txt
 
 export RSTUDIO_TOOLS_ROOT="${PWD}/rstudio-tools"
@@ -19,8 +18,6 @@ export RSTUDIO_TOOLS_ROOT="${PWD}/rstudio-tools"
 
 mkdir build
 pushd build > /dev/null
-
-#-DCMAKE_FIND_ROOT_PATH="${PREFIX}" \
 
 cmake \
   -DCMAKE_BUILD_TYPE=Release \
@@ -45,3 +42,7 @@ cmake \
   --install .
 
 popd > /dev/null
+
+rm \
+  -f \
+  "${PREFIX}"/{README.md,INSTALL,COPYING,NOTICE,SOURCE,VERSION}
