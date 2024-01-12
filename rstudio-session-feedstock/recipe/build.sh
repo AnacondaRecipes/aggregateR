@@ -9,6 +9,7 @@ sed -i \
   ./CMakeLists.txt
 
 sed -i \
+  -e '/SKIP_BUILD_RPATH/d' \
   -e 's/. validate existence/continue()/' \
   ./src/cpp/session/CMakeLists.txt
 
@@ -21,7 +22,7 @@ pushd build > /dev/null
 
 cmake \
   -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_RPATH="${PREFIX}/lib" \
+  -DCMAKE_INSTALL_RPATH="${PREFIX}/lib:${PREFIX}/lib/R/lib" \
   -DCMAKE_INSTALL_PREFIX="${PREFIX}" \
   -DCMAKE_PREFIX_PATH="${PREFIX}" \
   -DRSTUDIO_BOOST_REQUESTED_VERSION=1.82.0 \
