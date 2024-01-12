@@ -15,6 +15,9 @@ sed -i \
 
 export RSTUDIO_TOOLS_ROOT="${PWD}/rstudio-tools"
 
+./dependencies/common/install-dictionaries
+./dependencies/common/install-mathjax
+./dependencies/common/install-quarto
 ./dependencies/common/install-soci
 
 mkdir build
@@ -32,7 +35,6 @@ cmake \
   -DRSTUDIO_DEVELOPMENT=OFF \
   -DRSTUDIO_SERVER=OFF \
   -DRSTUDIO_DESKTOP=OFF \
-  -DRSESSION_ALTERNATE_BUILD=ON \
   -G Ninja \
   ..
 
