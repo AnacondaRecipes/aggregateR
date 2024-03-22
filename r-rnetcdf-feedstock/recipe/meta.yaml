@@ -1,7 +1,8 @@
 {% set version = '2.7-1' %}
 
-{% set posix = 'm2-' if win else '' %}
-{% set native = 'm2w64-' if win else '' %}
+{% set posix = 'msys2-' if win else '' %}
+{% set msystem = "ucrt64-" if win else "" %}
+{% set native = '' if win else '' %}
 
 package:
   name: r-rnetcdf
@@ -28,7 +29,7 @@ build:
 requirements:
   build:
     - {{ compiler('c') }}              # [not win]
-    - {{ compiler('m2w64_c') }}        # [win]
+    - {{ compiler('ucrt64_c') }}        # [win]
     - {{ posix }}filesystem        # [win]
     - {{ posix }}sed               # [win]
     - {{ posix }}grep              # [win]
@@ -43,10 +44,12 @@ requirements:
   host:
     - r-base
     - libnetcdf
+    - udunits2
   run:
     - r-base
-    - {{native}}gcc-libs         # [win]
+    - {{msystem}}gcc-libs         # [win]
     - libnetcdf
+    - udunits2
 
 test:
   commands:
