@@ -1,3 +1,4 @@
+REM Use pkg-config to get the correct flags for netcdf
 set PKG_CONFIG_PATH=%LIBRARY_LIB%\pkgconfig
 
 pkg-config --cflags netcdf >cflags
