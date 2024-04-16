@@ -1,3 +1,4 @@
+REM Fix the place of libraries on Windows
 set PKG_LIBS=-L$(R_HOME)/../../Library/bin -lxml2 -liconv -lz -lws2_32 -lstdc++ -lglpk -lgmp -lgfortran $(BLAS_LIBS) $(LAPACK_LIBS) -llzma
 
 sed -i.bak "s/^PKG_LIBS/#PKG_LIBS/" src/Makevars.ucrt
